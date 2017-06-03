@@ -1,0 +1,9 @@
+[ignore]
+
+[include]
+
+[libs]
+<PROJECT_ROOT>/flow-typed/
+
+[options]
+module.name_mapper='.+\(.s?css\)' -> 'CSSModule'

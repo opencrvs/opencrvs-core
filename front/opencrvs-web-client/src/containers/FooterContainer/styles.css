@@ -1,0 +1,12 @@
+.footer {
+    padding: 1em;
+    background: #111;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    composes: isCenter from "../../index.css";
+}
+
+.logoSvg {
+  height: 4em;
+}

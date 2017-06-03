@@ -1,0 +1,31 @@
+
+.pureButtonPrimary {
+    background: white;
+    color: #1f8dd6;
+    padding: 0.5em 2em;
+    border-radius: 5px;
+    font-size: 120%;
+    margin: 1.5em 0em;
+}
+
+.errorMessageSplash{
+    color: #FFC2E2;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+    font-weight: bold;
+    text-transform: none;
+    margin: 0.2em;
+}
+
+.loginInput {
+  margin: 0.2em;
+  width: 100%;
+  height: 3em;
+}
+
+@media (min-width: 48em) {
+
+    .loginInput {
+      width: 45%;
+    }
+}
