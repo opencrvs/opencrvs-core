@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import Login from '../../components/Login';
-import Logout from '../../components/Logout';
-import { loginUser, logoutUser } from '../../actions/user-actions';
+import React from 'react';
+import Login from 'components/Login';
+import Logout from 'components/Logout';
+import { loginUser, logoutUser } from 'actions/user-actions';
 const LoginContainer = ({ dispatch, isAuthenticated, errorMessage }) => (
 
     <div className="pure-form">

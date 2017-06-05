@@ -3,8 +3,8 @@
     /*background: $splashBackground;
     z-index: $splashZIndex;*/
 
-    background: #1f8dd6;
-    /*background-image: url('../../static/img/wall-lo-res.jpg') no-repeat center center fixed;*/
+    /*background: #1f8dd6*/;
+    background: url('static/img/whereweworkzambiaemma.jpg') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
@@ -15,6 +15,36 @@
     top: 0;
     left: 0;
     position: fixed !important;
+}
+
+.getStarted {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-radius: 30px;
+    color: #fff;
+    background: #1b98f8;
+    margin: 1em 0;
+    cursor: pointer;
+    height: 3.5em;
+}
+
+.avatar {
+    margin: 0.5em;
+  -webkit-clip-path: circle(50% at 50% 50%);
+    clip-path: circle(50% at 50% 50%);
+    text-align: left;
+}
+.getStartedTitle {
+        position: relative;
+    top: -1em;
+    left: 1.2em;
+    color: #fff;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 2em 0 1em;
+    font-size: 1em;
 }
 
 .splash {

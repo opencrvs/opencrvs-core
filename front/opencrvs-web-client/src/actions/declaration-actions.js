@@ -1,4 +1,4 @@
-import { BASE_URL } from '../constants/urls';
+import { BASE_URL } from 'constants/urls';
 export const DECLARATION_REQUEST = 'DECLARATION_REQUEST';
 export const DECLARATION_SUCCESS = 'DECLARATION_SUCCESS';
 export const DECLARATION_FAILURE = 'DECLARATION_FAILURE';

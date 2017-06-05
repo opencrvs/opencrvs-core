@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './styles.css';
-import Worknav from '../../components/Worknav';
-import SearchForm from '../../components/SearchForm';
+import Worknav from 'components/Worknav';
+import SearchForm from 'components/SearchForm';
 
 
 const WorkContainer = ({

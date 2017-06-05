@@ -1,6 +1,7 @@
 const { resolve } = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = env => {
   return {
@@ -9,10 +10,14 @@ module.exports = env => {
       filename: 'static/js/bundle.[name].[chunkhash].js',
       path: resolve(__dirname, 'build/'),
       pathinfo: !env.prod,
+      publicPath: 'http://localhost:3000/',
     },
     context: resolve(__dirname, 'src'),
     devtool: env.prod ? 'source-map' : 'eval',
     bail: env.prod,
+    resolve: {
+      modules: ['./src', './node_modules'],
+    },
     module: {
       rules: [
         {
@@ -39,7 +44,7 @@ module.exports = env => {
                 options: {
                   modules: true,
                   importLoaders: 1,
-                  localIdentName: '[name]__[local]__[hash:base64:5]',
+                  localIdentName: '[path][name]__[local]__[hash:base64:5]',
                 },
               },
               'postcss-loader',
@@ -51,12 +56,8 @@ module.exports = env => {
           loader: 'url-loader',
           options: {
             limit: 1000, 
-            name: 'static/img/[hash].[ext]',
+            name: '[path][name].[hash].[ext]',
           },
-        },
-        { 
-          test: /\.(png|jpg)$/,
-          loader: 'file-loader'
         },
       ],
     },
@@ -64,13 +65,14 @@ module.exports = env => {
     plugins: [
       new ExtractTextPlugin( {
         filename: 'static/css/style.[chunkhash].css',
-        publicPath: 'static/css/',
+        publicPath: 'http://localhost:3000/',
         allChunks: true,
       }),
       new HtmlWebpackPlugin( {
         template: './index.html',
       }),
-      
+      new CopyWebpackPlugin([{from: 'static/img', to: 'static/img'}]),
+
     ],
     devServer: {
       contentBase: resolve(__dirname, 'build/'),

@@ -24,6 +24,10 @@
     font-size: 120%;
 }
 
+.homeMenuHeading {
+    color: #1b98f8 !important;
+}
+
 .homeMenu a {
     color: #6FBEF3;
 }

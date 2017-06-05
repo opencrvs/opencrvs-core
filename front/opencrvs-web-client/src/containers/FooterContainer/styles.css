@@ -1,6 +1,6 @@
 .footer {
-    padding: 1em;
-    background: #111;
+    padding: 0.5em;
+    background: #1b98f8;
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -8,5 +8,5 @@
 }
 
 .logoSvg {
-  height: 4em;
+  height: 3em;
 }
