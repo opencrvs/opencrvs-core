@@ -10,7 +10,7 @@ const Worknav = () => (
         height="64"
         alt="Ed Duffus&#x27;s avatar"
         className={styles.avatar}
-        src="img/avatars/ed-duffus.png"
+        src="static/img/avatars/ed-duffus.jpg"
       />
       <h5 className={styles.userName}>Ed Duffus</h5>
       <h4 className={styles.menuHeading}>Ghana</h4>
