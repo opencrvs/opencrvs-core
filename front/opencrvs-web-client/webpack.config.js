@@ -70,6 +70,7 @@ module.exports = env => {
       new HtmlWebpackPlugin( {
         template: './index.html',
       }),
+      
     ],
     devServer: {
       contentBase: resolve(__dirname, 'build/'),

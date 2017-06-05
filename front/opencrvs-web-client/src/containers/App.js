@@ -1,23 +1,35 @@
 import React from 'react';
-//import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 //import LoginContainer from '../containers/LoginContainer';
 import HeaderContainer from '../containers/HeaderContainer';
 import HomeContainer from '../containers/HomeContainer';
 //import Declarations from '../components/Declarations';
 import WorkContainer from '../containers/WorkContainer';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Redirect } from 'react-router';
 
 
 const App = (props) => (
   <BrowserRouter>
       <Switch>
-        <Route exact path="/" component={HomeContainer}/>
-        <Route path="/work" component={WorkContainer} />
+        {
+          props.isAuthenticated ?
+          <Route path="/work" component={WorkContainer} /> :
+          <Route exact path="/" component={HomeContainer}/>
+        }
       </Switch>
   </BrowserRouter>
 );
 
-export default App;
+const mapStateToProps = ({ userReducer }) => {
+  const { isAuthenticated } = userReducer;
+
+  return {
+    isAuthenticated,
+  };
+};
+
+export default connect(mapStateToProps, null)(App);
 
 
 /*

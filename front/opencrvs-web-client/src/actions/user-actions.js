@@ -78,6 +78,7 @@ export function loginUser(creds) {
           localStorage.setItem('access_token', user.access_token);
           // Dispatch the success action
           dispatch(receiveLogin(user));
+          window.location.href = '/work';
           return true;
         }
       })
