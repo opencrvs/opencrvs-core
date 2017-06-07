@@ -32,6 +32,10 @@ server {
   root /var/www/OpenCRVS/front/opencrvs-web-client/build;
   index index.html index.htm;
 
+  location ~* \.(eot|ttf|woff|woff2)$ {
+    add_header Access-Control-Allow-Origin *;
+  }
+
 	location ~* \.(?:manifest|appcache|html?|xml|json)$ {
     expires -1;
     # access_log logs/static.log; # I don't usually include a static log
