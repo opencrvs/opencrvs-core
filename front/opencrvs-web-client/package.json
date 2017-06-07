@@ -80,8 +80,8 @@
     "validate": "yarn validate-webpack:* lint-staged test --serial check-coverage",
     "validate-webpack:dev": "webpack-validator webpack.config.js --env.dev",
     "validate-webpack:prod": "webpack-validator webpack.config.js --env.prod",
-    "build": "webpack --env.dev",
-    "build:prod": "webpack --env.prod -p",
+    "build": "webpack --env=dev --progress --profile --colors",
+    "build:prod": "webpack --env=prod --progress --profile --colors",
     "devserver": "webpack-dev-server --env.dev --open",
     "start": "yarn devserver",
     "precommit": "validate"
