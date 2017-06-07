@@ -2,6 +2,7 @@ var express = require('express'),
     _       = require('lodash'),
     config  = require('./config'),
     jwt     = require('jsonwebtoken');
+    cors    = require('cors');
 
 var app = module.exports = express.Router();
 
@@ -66,6 +67,10 @@ function getUserScheme(req) {
 }
 
 app.post('/users', function(req, res) {
+
+  response.header("Access-Control-Allow-Origin", "*");
+  response.header("Access-Control-Allow-Headers", "X-Requested-With");
+  response.header("Access-Control-Allow-Methods', 'GET,POST");
   
   var userScheme = getUserScheme(req);  
 
@@ -89,6 +94,10 @@ app.post('/users', function(req, res) {
 });
 
 app.post('/sessions/create', function(req, res) {
+
+  response.header("Access-Control-Allow-Origin", "*");
+  response.header("Access-Control-Allow-Headers", "X-Requested-With");
+  response.header("Access-Control-Allow-Methods', 'GET,POST");
 
   var userScheme = getUserScheme(req);
 
