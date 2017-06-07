@@ -69,6 +69,11 @@ module.exports = {
         template: './index.html',
       }),
       new CopyWebpackPlugin([{from: 'static/img', to: 'static/img'}]),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production')
+        },
+      }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
         debug: false,
