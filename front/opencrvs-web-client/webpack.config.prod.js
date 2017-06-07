@@ -9,7 +9,7 @@ module.exports = {
     output: {
       filename: 'static/js/bundle.[name].[chunkhash].js',
       path: resolve(__dirname, 'build/'),
-      publicPath: 'http://46.101.36.211:3000/',
+      publicPath: 'http://46.101.36.211/',
     },
     context: resolve(__dirname, 'src'),
     resolve: {
@@ -62,7 +62,7 @@ module.exports = {
     plugins: [
       new ExtractTextPlugin( {
         filename: 'static/css/style.[chunkhash].css',
-        publicPath: 'http://46.101.36.211:3000/',
+        publicPath: 'http://46.101.36.211/',
         allChunks: true,
       }),
       new HtmlWebpackPlugin( {
