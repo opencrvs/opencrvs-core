@@ -1,5 +1,5 @@
 
-import { BASE_URL } from 'constants/urls';
+import { UNPROTECTED_URL } from 'constants/urls';
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
@@ -64,7 +64,7 @@ export function loginUser(creds) {
     // We dispatch requestLogin to kickoff the call to the API
     dispatch(requestLogin(creds));
 
-    return fetch(BASE_URL + 'sessions/create', config)
+    return fetch(UNPROTECTED_URL + 'sessions/create', config)
       .then(response => response.json().then(user => ({ user, response })))
       .then(({ user, response }) => {
         if (!response.ok) {
