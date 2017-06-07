@@ -9,6 +9,7 @@
   "dependencies": {
     "express": "^4.15.3",
     "lodash": "^4.17.4",
+    "morgan": "^1.8.2",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.5",
