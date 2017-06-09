@@ -1,0 +1,67 @@
+.workingItemContainer {
+    margin: 0;
+    padding: 0;
+}
+
+.secondaryButton {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 0.5em 2em;
+    font-size: 80%;
+    margin-bottom: 0.3em;
+}
+
+.wiContentHeader, .wiContentBody, .wiContentFooter {
+    padding: 1em 2em;
+}
+.wiContentHeader {
+    border-bottom: 1px solid #ddd;
+}
+
+.wiContentTitle {
+    margin: 0.5em 0 0;
+}
+
+.wiContentSubtitle {
+    font-size: 1em;
+    margin: 0;
+    font-weight: normal;
+}
+
+.wiContentSubtitle span {
+    color: #999;
+}
+
+.wiContentControls {
+    margin-top: 2em;
+    text-align: right;
+}
+
+@media (min-width: 40em) {
+
+    .workingItemContainer {
+        position: fixed;
+        top: 33%;
+        right: 0;
+        bottom: 0;
+        left: 150px;
+        overflow: auto;
+        width: auto;
+    }
+}
+
+@media (min-width: 60em) {
+
+    .workingItemContainer {
+        position: static;
+        margin: 0;
+        padding: 0;
+        width:100%;
+    }
+}
+

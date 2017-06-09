@@ -31,7 +31,7 @@ const Worknav = () => (
             <a href="#" className={styles.menuLink}>Rejected</a>
           </li>
           <li className="pure-menu-item">
-            <a href="#" className={styles.menuLink}>Drafts</a>
+            <a href="#" className={styles.menuLink}>Drafts  <span className={styles.itemCount}>(2)</span></a>
           </li>
           <li className="pure-menu-item">
             <a href="#" className={styles.menuLink}>Trash</a>

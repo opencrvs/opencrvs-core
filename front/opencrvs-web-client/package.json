@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": "https://github.com/jembi/OpenCRVS/FrontEnd",
   "author": "Euan Millar",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "express": "^4.15.3",
     "lodash": "^4.17.4",
@@ -68,8 +68,8 @@
     "purecss": "^0.6.2",
     "react-css-modules": "^4.3.0",
     "react-dev-utils": "^2.0.1",
+    "react-toolbox": "^2.0.0-beta.12",
     "style-loader": "^0.18.1",
-    "sugarss": "^1.0.0",
     "url-loader": "^0.5.8",
     "webpack": "^2.6.1",
     "webpack-dev-server": "^2.4.5"
@@ -83,7 +83,7 @@
     "validate-webpack:prod": "webpack-validator webpack.config.js --env.prod",
     "build": "webpack --env=dev --progress --profile --colors",
     "build:prod": "webpack --env=prod --progress --profile --colors",
-    "devserver": "webpack-dev-server --env.dev --open",
+    "devserver": "webpack-dev-server --env=dev --open",
     "start": "yarn devserver",
     "precommit": "validate"
   },

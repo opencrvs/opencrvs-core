@@ -8,7 +8,6 @@ function declarationsReducer(
   state = {
     isFetching: false,
     declaration: '',
-    authenticated: false,
   },
   action
 ) {
@@ -21,7 +20,6 @@ function declarationsReducer(
       return Object.assign({}, state, {
         isFetching: false,
         declaration: action.response,
-        authenticated: action.authenticated || false,
       });
     case DECLARATION_FAILURE:
       return Object.assign({}, state, {
