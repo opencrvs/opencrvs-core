@@ -1,14 +1,8 @@
-.workItemContainer {
+.workContainer {
     margin: 0;
     padding: 0;
     color: #333;
     text-decoration: none;
 }
 
-@media (min-width: 40em) {
-    /* Move the layout over so we can fit the nav + list in on the left */
-    .workItemContainer {
-        padding-left:500px; /* "left col (nav + list)" width */
-        position: relative;
-    }
-}
+

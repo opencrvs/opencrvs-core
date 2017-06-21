@@ -1,10 +1,9 @@
 import React from 'react';
 import styles from './styles.css';   
-import { values } from 'lodash';
-import {connect} from 'react-redux'
+import {connect} from 'react-redux';
         
 const WorkListItem = ({ onClick, firstName, lastName, district, gender, dob, id, selectedDeclaration }) => (   
-  <div onClick={onClick} className={id == selectedDeclaration ? styles.openedWorkItem + ' ' + styles.workItem + ' pure-g' : styles.workItem + ' pure-g'}>
+  <div onClick={onClick} className={id == selectedDeclaration.id ? styles.openedWorkItem + ' ' + styles.workItem + ' pure-g' : styles.workItem + ' pure-g'}>
     <div className="pure-u">
       <span className={styles.labelDeclaration}></span>
     </div>
@@ -12,7 +11,7 @@ const WorkListItem = ({ onClick, firstName, lastName, district, gender, dob, id,
       <h5 className={styles.workItemTitle}>{firstName + ' ' + lastName}</h5>
       <h4 className={styles.workItemSubject}>{district}</h4>
       <p className={styles.workItemDesc}>
-        {district + ' - ' + dob}
+        {gender + ' - ' + dob}
       </p>
     </div>
   </div>

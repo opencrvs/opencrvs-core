@@ -1,6 +1,8 @@
 .workingItemContainer {
     margin: 0;
     padding: 0;
+    position: relative;
+    display: block;
 }
 
 .secondaryButton {
@@ -19,8 +21,28 @@
 .wiContentHeader, .wiContentBody, .wiContentFooter {
     padding: 1em 2em;
 }
+
+.noSelectedDeclaration {
+    position: fixed;
+
+    width: 75%;
+    height: 100%;
+    top:0;
+    bottom:0;
+    padding: 1em 2em;
+}
+
+.noSelectedMessage {
+    position: relative;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
 .wiContentHeader {
     border-bottom: 1px solid #ddd;
+    height: 6.6em;
 }
 
 .wiContentTitle {
@@ -38,30 +60,39 @@
 }
 
 .wiContentControls {
-    margin-top: 2em;
+    margin-top: 1.2em;
     text-align: right;
 }
 
 @media (min-width: 40em) {
 
     .workingItemContainer {
-        position: fixed;
-        top: 33%;
+        top: 28.3em;;
         right: 0;
         bottom: 0;
-        left: 150px;
+        left: 0%;
         overflow: auto;
         width: auto;
+        position: fixed;
+        display: block;
+    }
+    .noSelectedDeclaration {
+        width: 100%;
+        position: relative;
     }
 }
 
 @media (min-width: 60em) {
 
     .workingItemContainer {
-        position: static;
+        position: fixed;
         margin: 0;
         padding: 0;
-        width:100%;
+        width: 75%;
+        top: 6em;
+        left: 25%;
+        bottom: 0;
+        height: 100%;
     }
 }
 

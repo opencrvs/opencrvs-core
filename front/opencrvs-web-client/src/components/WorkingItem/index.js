@@ -1,52 +1,66 @@
 import React from 'react';
 import styles from './styles.css';
 import WorkingItemForm from 'components/WorkingItemForm';
-import WorkingItemDisplay from 'components/WorkingItemDisplay';
+import {connect} from 'react-redux';
+import { Button } from 'react-toolbox/lib/button';
 
-class WorkingItem extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  editItem = event => {
-    
-  };
-
-  render = (props) => {
-    return (
+const WorkingItem = ({ selectedDeclaration }) => (   
       <div className={styles.workingItemContainer + ' pure-u-1'}>
-        <div className={styles.wiContentHeader + ' pure-g'}>
-          <div className="pure-u-1-2">
-            <h1 className={styles.wiContentTitle}>Validation required</h1>
-            <p className={styles.wiContentSubtitle}>
-              Declaration DV-874654681
-              {' '}
-              <span>3:56pm, July 3, 2017</span>
-              {' '}
-              Declared by Chris Joffe
-            </p>
-          </div>
-          <div className={styles.wiContentControls + ' pure-u-1-2'}>
-            <button
-              className={styles.secondaryButton + ' pure-button'}
-              onClick={this.editItem}
-            >
-              Edit
-            </button>
-            <button className={styles.secondaryButton + ' pure-button'}>
-              Submit
-            </button>
-            <button className={styles.secondaryButton + ' pure-button'}>
-              Move to
-            </button>
-          </div>
-        </div>
-        <div className={styles.wiContentBody}>
-          <WorkingItemForm {...props} />
+        {
+        selectedDeclaration ? 
+          <div className={styles.wiContentHeader + ' pure-g'}>
+            <div className="pure-u-1-2">
+              <h1 className={styles.wiContentTitle}>
+              
+              { selectedDeclaration.firstName + ' ' + selectedDeclaration.lastName }
+              
+              </h1>
+              <p className={styles.wiContentSubtitle}>
+                
+                {' '}
+                <span>
+                
+                { selectedDeclaration.dob }
+                
+                </span>
+                {' '}
+                {
+                  selectedDeclaration.district 
+                }
+              </p>
+            </div>
+            <div className={styles.wiContentControls + ' pure-u-1-2'}>
+              <Button icon='save' label='Save' flat />
+              <Button icon='delete' label='Trash' flat />
+              <Button icon='send' label='Submit' flat />
+            </div>
+          </div> : ''
+        }
+        <div className={ !selectedDeclaration ? styles.noSelectedDeclaration : styles.wiContentBody}>
+          {
+              selectedDeclaration ? 
+              <WorkingItemForm selectedDeclaration={selectedDeclaration} />
+              : 
+              <div className={styles.noSelectedMessage}>
+                <h1 className={styles.wiContentTitle}>
+                Select a birth to edit, or enter a new birth
+                </h1>
+              </div>
+            }
         </div>
       </div>
     );
-  };
-}
 
-export default WorkingItem;
+const mapStateToProps = ({ declarationsReducer }) => {
+  const {
+    selectedDeclaration,
+  } = declarationsReducer;
+  return {
+    selectedDeclaration,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(WorkingItem)

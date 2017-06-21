@@ -2,8 +2,10 @@ import React from 'react';
 import HeaderContainer from 'containers/HeaderContainer';
 import FooterContainer from 'containers/FooterContainer';
 import LoginContainer from 'containers/LoginContainer';
+import { Button } from 'react-toolbox/lib/button';
 import { connect } from 'react-redux';
 import styles from './styles.css';
+import theme from './getStartedButton.css';
 
 
 class HomeContainer extends React.Component {
@@ -20,6 +22,16 @@ class HomeContainer extends React.Component {
       dispatch,
       isAuthenticated,
     } = this.props;
+
+    const UserAvatar = () => (
+      <img
+        width="40"
+        height="40"
+        alt="Ed Duffus&#x27;s avatar"
+        className={styles.avatar}
+        src="static/img/avatars/ed-duffus.jpg"
+      />
+    );
   
   return (
     <div className={styles.app}>
@@ -29,7 +41,7 @@ class HomeContainer extends React.Component {
         <div className={styles.splash}>
           <h1 className={styles.splashHead}>Open CRVS</h1>
           <p className={styles.splashSubhead}>
-            The free civil registration and vital statistics platform.
+            The free civil registration and vital statistics platform. 
           </p>
           <div className="">
             {!isAuthenticated
@@ -40,19 +52,11 @@ class HomeContainer extends React.Component {
                 />
               : <div className="pure-g">
                   <div className="pure-u-1-3"></div>
-                  <div className={styles.getStarted + ' pure-u-1-3'} onClick={this.handleClick}>
-                    <div className="pure-g">
-                        <img
-                            width="40"
-                            height="40"
-                            alt="Ed Duffus&#x27;s avatar"
-                            className={styles.avatar}
-                            src="static/img/avatars/ed-duffus.jpg"
-                          />
-                      <h2 className={styles.getStartedTitle}>
-                      Get Started
-                      </h2>
-                    </div>
+                  <div className="pure-u-1-3">
+                  <Button theme={theme} onClick={this.handleClick} raised >
+                    <UserAvatar /> Get Started 
+
+                  </Button> 
                   </div>
                   <div className="pure-u-1-3"></div>
                 </div>

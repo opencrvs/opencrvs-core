@@ -6,6 +6,7 @@ import { RadioGroup, RadioButton } from 'react-toolbox/lib/radio';
 import DatePicker from 'react-toolbox/lib/date_picker';
 import Collapsible from 'react-collapsible';
 import Switch from 'react-toolbox/lib/switch';
+import {connect} from 'react-redux';
 
 const datetime = new Date(2015, 10, 16);
 const min_datetime = new Date(new Date(datetime).setDate(8));
@@ -349,6 +350,18 @@ const years = [
 class WorkingItemForm extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  handleContinue = event => {};
+
+  handleChange = (name, value) => {
+    this.setState({ ...this.state, [name]: value });
+  };
+
+  render = () => {
+    const { selectedDeclaration } = this.props;
+    selectedDeclaration ? this.state = selectedDeclaration :
+
     this.state = {
       firstName: '',
       middleName: '',
@@ -437,18 +450,6 @@ class WorkingItemForm extends React.Component {
       informant_region: '',
       informant_zip: '',
     };
-  }
-
-  handleContinue = event => {};
-
-  handleChange = (name, value) => {
-    this.setState({ ...this.state, [name]: value });
-    console.log(this.state);
-  };
-
-  render = () => {
-    const { errorMessage } = this.props;
-
     return (
       <form className={styles.declarationForm}>
         <Collapsible
@@ -1180,4 +1181,17 @@ class WorkingItemForm extends React.Component {
   };
 }
 
-export default WorkingItemForm;
+const mapStateToProps = ({ declarationsReducer }) => {
+  const {
+    selectedDeclaration,
+  } = declarationsReducer;
+  return {
+    selectedDeclaration,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(WorkingItemForm)
+

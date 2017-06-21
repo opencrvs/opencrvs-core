@@ -1,21 +1,4 @@
 
-
-.workNav {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 40px;
-  position: relative;
-  background: rgb(37, 42, 58);
-  text-align: center;
-  display:none;
-}
-
-.navInner {
-    display: block;
-    padding: 2em 0;
-}
-
 .avatar {
     border-radius: 3px;
     margin-right: 0.5em;
@@ -24,87 +7,125 @@
     clip-path: circle(50% at 50% 50%);
     text-align: left;
 }
-.userName,
-.userLocation {
-    margin: 0;
+
+.workIcons {
+    position: relative;
+    top: -0.7em;
 }
+
+.avatarString {
+    position: relative;
+    text-decoration: none;
+        top: 1.7em;
+    left: 1em;
+    color: #FFFFFF;
+}
+
+.avatarName {
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    word-spacing: normal;
+    text-rendering: auto;
+}
+
+.inboxIcon {
+    width: 1.25em;
+    float: left;
+    margin-right: 0.3em;
+
+}
+
+.draftIcon {
+    width: 1.5em;
+    float: left;
+    margin-right: 0.3em;
+
+}
+
+.trashIcon {
+    top: 0em;
+    float: left;
+    margin-right: 0.3em;
+
+}
+
 .userName {
+    display: block;
     text-transform: uppercase;
     color: #999;
 }
 
-.labelDeclaration,
-.labelValidation,
-.labelRegistration {
+.labelNotification {
   width: 15px;
     height: 15px;
     display: inline-block;
     margin-right: 0.5em;
     border-radius: 3px;
-}
-
-.labelDeclaration {
   background: #ffc94c;
 }
 
-.labelValidation {
-  background: #41ccb4;
-}
-
-.labelRegistration {
-  background: #40c365;
-}
-
-
-.primaryButton {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    border-radius: 20px;
-    color: #fff;
-    background: #1b98f8;
-    margin: 1em 0;
-}
 .itemCount {
-    color: rgb(75, 113, 151);
+    margin-right: 2em;
 }
 
-.menu {
-    background: transparent;
-    border: none;
-    text-align: left;
-    text-decoration: none;
+
+
+/*
+ * -- MENU STYLES --
+ * I want to customize how my .pure-menu looks at the top of the page
+ */
+
+
+.homeMenu {
+    background: #2d3e50;
+    padding: 0.5em;
+    text-align: center;
+    box-shadow: 0 1px 1px rgba(0,0,0, 0.10);
+    height: 6.0em;
 }
-.menuLink:hover,
-.menuLink:focus {
-    background: rgb(55, 60, 90);
-    text-decoration: none;
-}
-.menuLink {
-    color: #fff;
-    margin-left: 1em;
-    text-decoration: none;
-}
-.menuHeading {
+.pure-menu.pure-menu-fixed {
+    /* Fixed menus normally have a border at the bottom. */
     border-bottom: none;
-    font-size:110%;
-    color: rgb(75, 113, 151);
-    padding: .5em 1em;
+    /* I need a higher z-index here because of the scroll-over effect. */
+    z-index: 4;
 }
 
-@media (min-width: 40em) {
-  .workNav {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    overflow: auto;
-    margin-left:-500px; /* "left col (nav + list)" width */
-    width:150px;
-    height: 100%;
-    display:block;
-  }
-  .navInner {
-      display: block;
-      padding: 2em 0;
-  }
+.homeMenu .pure-menu-heading {
+    color: white;
+    font-weight: 400;
+    font-size: 120%;
+}
+
+.menuIcon svg{
+    position: relative;
+    top: 0.2em;
+}
+
+.homeMenu a {
+    color: #6FBEF3;
+    display: block;
+    float: left;
+}
+.homeMenu li a:hover,
+.homeMenu li a:visited,
+.homeMenu li a:focus {
+    background: none;
+    border: none;
+    color: #AECFE5;
+}
+
+.pureMenuSelected a {
+    color: white !important;
+}
+
+
+@media (min-width: 48em) {
+
+    .homeMenu {
+        text-align: left;
+    }
+    .homeMenu ul {
+        float: right;
+    }
 }

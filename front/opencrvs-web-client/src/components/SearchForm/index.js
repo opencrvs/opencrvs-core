@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './styles.css';
+import Input from 'react-toolbox/lib/input';
 
 class SearchForm extends React.Component {
   constructor(props) {
@@ -18,25 +19,9 @@ class SearchForm extends React.Component {
     const { errorMessage } = this.props;
     return (
       <div className={styles.searchContainer + ' pure-g'}>
-        <div className="pure-u-3-4">
-          <h4 className={styles.workItemSubject}>Search Notifications</h4>
-          <form className="pure-form">
-            <input
-              type="text"
-              className="pure-input-rounded"
-              ref="notification"
-              placeholder="Notification search"
-            />
-            <button
-              type="submit"
-              className={styles.secondaryButton + ' pure-button'}
-              onClick={this.handleClick}
-            >
-              Search
-            </button>
-            <p className={styles.errorMessageSplash + ' pure-form-message'}>
-              {errorMessage}
-            </p>
+        <div className="pure-u-7-8">
+          <form>
+            <Input type='text' label='Search notifications' hint='Notification ID' icon='search' />
           </form>
         </div>
       </div>

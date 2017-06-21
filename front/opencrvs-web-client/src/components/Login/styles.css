@@ -9,9 +9,8 @@
 }
 
 .errorMessageSplash{
-    color: #FFC2E2;
+    color: #F1C400;
     letter-spacing: 0.05em;
-    opacity: 0.8;
     font-weight: bold;
     text-transform: none;
     margin: 0.2em;

@@ -17,23 +17,12 @@
     position: fixed !important;
 }
 
-.getStarted {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    border-radius: 30px;
-    color: #fff;
-    background: #1b98f8;
-    margin: 1em 0;
-    cursor: pointer;
-    height: 3.5em;
-}
-
 .avatar {
-    margin: 0.5em;
-  -webkit-clip-path: circle(50% at 50% 50%);
+    position: absolute;
+    -webkit-clip-path: circle(50% at 50% 50%);
     clip-path: circle(50% at 50% 50%);
-    text-align: left;
+    left: 2em;
+    top: 0.6em;
 }
 .getStartedTitle {
         position: relative;

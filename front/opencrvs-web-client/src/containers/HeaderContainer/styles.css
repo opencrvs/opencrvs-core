@@ -24,6 +24,11 @@
     font-size: 120%;
 }
 
+.menuIcon svg{
+    position: relative;
+    top: 0.2em;
+}
+
 .homeMenuHeading {
     color: #1b98f8 !important;
 }

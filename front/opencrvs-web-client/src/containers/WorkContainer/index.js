@@ -18,10 +18,12 @@ class WorkContainer extends React.Component {
 
   render = () => {
     return (
-      <div className={styles.workItemContainer + " content pure-g"}>
+      <div className={styles.workContainer}>
         <Worknav {...this.props} />
-        <WorkList {...this.props} />
-        <WorkingItem {...this.props} />
+        <div className=" pure-g">
+          <WorkList {...this.props} />
+          <WorkingItem {...this.props} />
+        </div>
       </div>
     );
   };
@@ -43,8 +45,8 @@ const mapStateToProps = ({ declarationsReducer, userReducer }) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onWorkItemClick: id => {
-      dispatch(selectDeclaration(id));
+    onWorkItemClick: declaration => {
+      dispatch(selectDeclaration(declaration));
     },
     fetchData: () => {dispatch(fetchDeclarations())}
   }

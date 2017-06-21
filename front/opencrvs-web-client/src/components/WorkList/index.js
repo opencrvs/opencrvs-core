@@ -9,7 +9,7 @@ const WorkList = ({ declarations, onWorkItemClick }) => (
     <SearchForm />
     {
       values(declarations).map(declaration => (
-      <WorkListItem key={declaration.id} {...declaration} onClick={() => onWorkItemClick(declaration.id)} />
+      <WorkListItem key={declaration.id} {...declaration} onClick={() => onWorkItemClick(declaration)} />
     ))}
   </div>
 );
