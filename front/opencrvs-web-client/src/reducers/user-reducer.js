@@ -12,7 +12,7 @@ function userReducer(
   state = {
     isFetching: false,
     isAuthenticated: !!localStorage.getItem('id_token'),
-    user: {},
+    user: null,
     errorMessage: '',
   },
   action
@@ -26,11 +26,13 @@ function userReducer(
         user: action.creds,
       };
     case LOGIN_SUCCESS:
+      console.log('action: ' + action.user);
       return {
         ...state,
         isFetching: false,
         isAuthenticated: true,
         errorMessage: '',
+        user: action.user,
       };
     case LOGIN_FAILURE:
       return {

@@ -1,7 +1,9 @@
 import { BASE_URL } from 'constants/urls';
+import { logoutUser } from 'actions/user-actions';
 export const DECLARATION_REQUEST = 'DECLARATION_REQUEST';
 export const DECLARATION_SUCCESS = 'DECLARATION_SUCCESS';
 export const DECLARATION_FAILURE = 'DECLARATION_FAILURE';
+export const DECLARATION_SELECTED = 'DECLARATION_SELECTED';
 
 // const requestDeclaration = () => ({
 //   type: DECLARATION_REQUEST,
@@ -17,12 +19,19 @@ function requestDeclaration() {
   };
 }
 
+function selectDeclaration(id) {
+  return {
+    type: DECLARATION_SELECTED,
+    selectedDeclaration: id,
+  };
+}
+
 function receiveDeclaration(data) {
   return {
     type: DECLARATION_SUCCESS,
     isFetching: false,
     authenticated: true,
-    declaration: data,
+    declarations: data,
   };
 }
 
@@ -31,19 +40,18 @@ function declarationError(message) {
     type: DECLARATION_FAILURE,
     isFetching: false,
     authenticated: true,
-    message,
+    message
   };
 }
 
-export function fetchDeclaration() {
+export function fetchDeclarations() {
   let token = localStorage.getItem('access_token') || null;
   let config = {};
-
   return dispatch => {
     dispatch(requestDeclaration());
     if (token) {
       config = {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       };
       return fetch(BASE_URL + 'protected/random-declaration', config)
         .then(response =>
@@ -54,11 +62,16 @@ export function fetchDeclaration() {
             dispatch(declarationError(payload.message));
             return Promise.reject(payload);
           }
-          console.log('PAYLOAD: ' + payload);
           dispatch(receiveDeclaration(payload.data));
           return true;
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          if (err.message == 'The token has expired'){
+            dispatch(logoutUser());
+          }else{
+            console.log(err);
+          }
+        });
     } else {
       dispatch(declarationError('No token saved!'));
       return false;

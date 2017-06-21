@@ -1,0 +1,46 @@
+.collapsibleParent {
+	position: relative;
+  border-bottom: 1px solid #ddd;
+	padding-top: 2em;
+  padding-bottom: 2em;
+  cursor: pointer;
+}
+
+
+.collapsibleClosed {
+  color: #34495e;
+	font-size: 2em;
+}
+
+.collapsibleClosed:before {
+  position: absolute;
+  right:0;
+	top: 40px;
+  content: ' ';
+	width: 0; 
+	height: 0; 
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 5px solid #34495e;
+	font-size: 0;
+	line-height: 0;
+}
+
+.collapsibleOpened {
+  color: #34495e;
+	font-size: 2em;
+}
+
+.collapsibleOpened:before {
+  position: absolute;
+  right:0;
+	top: 40px;
+  content: ' ';
+	width: 0; 
+	height: 0; 
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid #34495e;
+	font-size: 0;
+	line-height: 0;
+}

@@ -4,6 +4,8 @@ import Input from 'react-toolbox/lib/input';
 import Dropdown from 'react-toolbox/lib/dropdown';
 import { RadioGroup, RadioButton } from 'react-toolbox/lib/radio';
 import DatePicker from 'react-toolbox/lib/date_picker';
+import Collapsible from 'react-collapsible';
+import Switch from 'react-toolbox/lib/switch';
 
 const datetime = new Date(2015, 10, 16);
 const min_datetime = new Date(new Date(datetime).setDate(8));
@@ -67,6 +69,24 @@ const maritalStatuses = [
   { value: 'married', label: 'Married' },
   { value: 'separated', label: 'Separated' },
   { value: 'divorced', label: 'Divorced' },
+];
+
+const educations = [
+  { value: 'elementary', label: 'Elementary School' },
+  { value: 'high', label: 'High School' },
+  { value: 'university', label: 'University' },
+];
+
+const occupations = [
+  { value: 'teacher', label: 'Teacher' },
+  { value: 'builder', label: 'Builder' },
+  { value: 'other', label: 'Other' },
+];
+
+const religions = [
+  { value: 'muslim', label: 'Muslim' },
+  { value: 'christian', label: 'Christian' },
+  { value: 'jewish', label: 'Jewish' },
 ];
 
 const countries = [
@@ -340,39 +360,90 @@ class WorkingItemForm extends React.Component {
       placeOfDelivery: '',
       attendantAtBirth: '',
       hospitalName: '',
-      placeOfBirthStreetNumber: '',
+      streetNumber: '',
       addressLine1: '',
       addressLine2: '',
       town: '',
       district: '',
+      region: '',
       zip: '',
-      mother: {
-        personalIDNummber: '',
-        firstName: '',
-        middleName: '',
-        maidenName: '',
-        dob: '',
-        maritalStatus: '',
-        doMarriage: '',
-        durationOfMarriage: '',
-        nationality: '',
-        mobileNumber: '',
-        emailAddress: '',
-        streetNumber: '',
-        houseNumber: '',
-        addressLine1: '',
-        addressLine2: '',
-        town: '',
-        district: '',
-        zip: '',
-      },
+      notes: '',
+
+      mother_personalIDNummber: '',
+      mother_firstName: '',
+      mother_middleName: '',
+      mother_maidenName: '',
+      mother_dob: '',
+      mother_maritalStatus: '',
+      mother_doMarriage: '',
+      mother_durationOfMarriage: '',
+      mother_nationality: '',
+      mother_mobileNumber: '',
+      mother_emailAddress: '',
+      mother_streetNumber: '',
+      mother_houseName: '',
+      mother_addressLine1: '',
+      mother_addressLine2: '',
+      mother_town: '',
+      mother_district: '',
+      mother_region: '',
+      mother_zip: '',
+      mother_childrenBornAlive: '',
+      mother_childrenBornLiving: '',
+      mother_foetalDeaths: '',
+      mother_dobLastPreviousBirth: '',
+      mother_formalEducation: '',
+      mother_occupation: '',
+      mother_religion: '',
+      mother_gainfulEmployment: false,
+
+      father_personalIDNummber: '',
+      father_firstName: '',
+      father_middleName: '',
+      father_lastName: '',
+      father_dob: '',
+      father_maritalStatus: '',
+      father_doMarriage: '',
+      father_durationOfMarriage: '',
+      father_nationality: '',
+      father_mobileNumber: '',
+      father_emailAddress: '',
+      father_streetNumber: '',
+      father_houseName: '',
+      father_addressLine1: '',
+      father_addressLine2: '',
+      father_town: '',
+      father_district: '',
+      father_region: '',
+      father_zip: '',
+      father_formalEducation: '',
+      father_occupation: '',
+      father_religion: '',
+      father_gainfulEmployment: false,
+
+      informant_personalIDNummber: '',
+      informant_firstName: '',
+      informant_middleName: '',
+      informant_lastName: '',
+      informant_relationship: '',
+      informant_mobileNumber: '',
+      informant_emailAddress: '',
+      informant_streetNumber: '',
+      informant_houseName: '',
+      informant_addressLine1: '',
+      informant_addressLine2: '',
+      informant_town: '',
+      informant_district: '',
+      informant_region: '',
+      informant_zip: '',
     };
   }
 
   handleContinue = event => {};
 
   handleChange = (name, value) => {
-    this.setState({ ...this.formData, [name]: value });
+    this.setState({ ...this.state, [name]: value });
+    console.log(this.state);
   };
 
   render = () => {
@@ -380,10 +451,14 @@ class WorkingItemForm extends React.Component {
 
     return (
       <form className={styles.declarationForm}>
-        <div className={styles.formSection}>
-          <h2 className="content-subhead">
+        <Collapsible
+          classParentString={styles.collapsibleParent}
+          triggerClassName={styles.collapsibleClosed}
+          triggerOpenedClassName={styles.collapsibleOpened}
+          trigger="
             Particulars of child
-          </h2>
+          "
+        >
           <Input
             type="text"
             label="First Name"
@@ -413,7 +488,6 @@ class WorkingItemForm extends React.Component {
           />
           <p>Gender</p>
           <Dropdown
-            auto
             onChange={this.handleChange.bind(this, 'gender')}
             source={gender}
             value={this.state.gender}
@@ -423,7 +497,7 @@ class WorkingItemForm extends React.Component {
               label="Date of birth"
               sundayFirstDayOfWeek
               onChange={this.handleChange.bind(this, 'dob')}
-              value={this.state.date1}
+              value={this.state.dob}
             />
           </section>
           <Input
@@ -438,9 +512,10 @@ class WorkingItemForm extends React.Component {
           <RadioGroup
             name="typeOfBirth"
             value={this.state.typeOfBirth}
-            onChange={this.handleChange.bind(this, 'typeOfBirth')}>
+            onChange={this.handleChange.bind(this, 'typeOfBirth')}
+          >
             <RadioButton label="Single" value="single" />
-            <RadioButton label="Twin" value="twin" disabled />
+            <RadioButton label="Twin" value="twin" />
             <RadioButton label="Triplet" value="triplet" />
             <RadioButton label="Other" value="other" />
           </RadioGroup>
@@ -458,11 +533,6 @@ class WorkingItemForm extends React.Component {
             source={attendantsAtBirth}
             value={this.state.attendantAtBirth}
           />
-        </div>
-        <div className={styles.formSection}>
-          <h2 className="content-subhead">
-            Detailed address of place of delivery
-          </h2>
           <Input
             type="text"
             multiline
@@ -474,10 +544,10 @@ class WorkingItemForm extends React.Component {
           <Input
             type="text"
             label="Street number"
-            name="placeOfBirthStreetNumber"
+            name="streetNumber"
             required
-            value={this.state.placeOfBirthStreetNumber}
-            onChange={this.handleChange.bind(this, 'placeOfBirthStreetNumber')}
+            value={this.state.streetNumber}
+            onChange={this.handleChange.bind(this, 'streetNumber')}
             maxLength={16}
           />
           <Input
@@ -527,90 +597,95 @@ class WorkingItemForm extends React.Component {
             onChange={this.handleChange.bind(this, 'zip')}
             maxLength={40}
           />
-        </div>
-        <div className={styles.formSection}>
-          <h2 className="content-subhead">
+        </Collapsible>
+        <Collapsible
+          classParentString={styles.collapsibleParent}
+          triggerClassName={styles.collapsibleClosed}
+          triggerOpenedClassName={styles.collapsibleOpened}
+          trigger="
             Particulars of mother
-          </h2>
+          "
+        >
           <Input
             type="text"
             label="Personal ID Number"
-            name="mother.personalIDNummber"
-            value={this.state.mother.personalIDNummber}
-            onChange={this.handleChange.bind(this, 'mother.personalIDNummber')}
+            name="mother_personalIDNummber"
+            value={this.state.mother_personalIDNummber}
+            onChange={this.handleChange.bind(this, 'mother_personalIDNummber')}
             maxLength={16}
           />
           <Input
             type="text"
             label="First Name"
-            name="mother.firstName"
+            name="mother_firstName"
             required
-            value={this.state.mother.firstName}
-            onChange={this.handleChange.bind(this, 'mother.firstName')}
+            value={this.state.mother_firstName}
+            onChange={this.handleChange.bind(this, 'mother_firstName')}
             maxLength={16}
           />
           <Input
             type="text"
             label="Middle Name"
-            name="mother.middleName"
+            name="mother_middleName"
             required
-            value={this.state.mother.middleName}
-            onChange={this.handleChange.bind(this, 'mother.middleName')}
+            value={this.state.mother_middleName}
+            onChange={this.handleChange.bind(this, 'mother_middleName')}
             maxLength={16}
           />
           <Input
             type="text"
             label="Maiden Name"
-            name="mother.maidenName"
+            name="mother_maidenName"
             required
-            value={this.state.mother.maidenName}
-            onChange={this.handleChange.bind(this, 'mother.maidenName')}
+            value={this.state.mother_maidenName}
+            onChange={this.handleChange.bind(this, 'mother_maidenName')}
             maxLength={16}
           />
           <section>
             <DatePicker
               label="Date of birth"
+              name="mother_dob"
               sundayFirstDayOfWeek
-              onChange={this.handleChange.bind(this, 'mother.dob')}
-              value={this.state.mother.dob}
+              onChange={this.handleChange.bind(this, 'mother_dob')}
+              value={this.state.mother_dob}
             />
           </section>
           <p>Marital status</p>
           <Dropdown
             auto
-            onChange={this.handleChange.bind(this, 'mother.maritalStatus')}
+            onChange={this.handleChange.bind(this, 'mother_maritalStatus')}
             source={maritalStatuses}
-            value={this.state.mother.maritalStatus}
+            value={this.state.mother_maritalStatus}
           />
           <section>
             <DatePicker
               label="Date of marriage"
               sundayFirstDayOfWeek
-              onChange={this.handleChange.bind(this, 'mother.doMarriage')}
-              value={this.state.mother.doMarriage}
+              onChange={this.handleChange.bind(this, 'mother_doMarriage')}
+              value={this.state.mother_doMarriage}
             />
           </section>
           <p>Duration of marriage</p>
           <Dropdown
             auto
-            onChange={this.handleChange.bind(this, 'mother.durationOfMarriage')}
+            onChange={this.handleChange.bind(this, 'mother_durationOfMarriage')}
             source={years}
-            value={this.state.mother.durationOfMarriage}
+            value={this.state.mother_durationOfMarriage}
           />
           <p>Nationality</p>
           <Dropdown
             auto
-            onChange={this.handleChange.bind(this, 'mother.nationality')}
+            onChange={this.handleChange.bind(this, 'mother_nationality')}
             source={countries}
-            value={this.state.mother.nationality}
+            value={this.state.mother_nationality}
           />
           <Input
             type="text"
             label="Mobile number"
             name="mobileNumber"
             required
-            value={this.state.mother.mobileNumber}
-            onChange={this.handleChange.bind(this, 'mother.mobileNumber')}
+            value={this.state.mother_mobileNumber}
+            onChange={this.handleChange.bind(this, 'mother_mobileNumber')}
             maxLength={16}
           />
           <Input
@@ -618,8 +693,8 @@ class WorkingItemForm extends React.Component {
             label="Email address"
             name="emailAddress"
             required
-            value={this.state.mother.emailAddress}
-            onChange={this.handleChange.bind(this, 'mother.emailAddress')}
+            value={this.state.mother_emailAddress}
+            onChange={this.handleChange.bind(this, 'mother_emailAddress')}
             maxLength={16}
           />
           <p>Address</p>
@@ -628,16 +703,16 @@ class WorkingItemForm extends React.Component {
             type="text"
             label="Street number"
             name="StreetNumber"
-            value={this.state.mother.placeOfBirthStreetNumber}
-            onChange={this.handleChange.bind(this, 'mother.streetNumber')}
+            value={this.state.mother_streetNumber}
+            onChange={this.handleChange.bind(this, 'mother_streetNumber')}
             maxLength={16}
           />
           <Input
             type="text"
             label="House number"
-            name="HouseNumber"
-            value={this.state.mother.placeOfBirthHouseNumber}
-            onChange={this.handleChange.bind(this, 'mother.houseNumber')}
+            name="houseName"
+            value={this.state.mother_houseName}
+            onChange={this.handleChange.bind(this, 'mother_houseName')}
             maxLength={16}
           />
           <Input
@@ -645,8 +720,8 @@ class WorkingItemForm extends React.Component {
             label="Address Line 1"
             name="addressLine1"
             required
-            value={this.state.mother.addressLine1}
-            onChange={this.handleChange.bind(this, 'mother.addressLine1')}
+            value={this.state.mother_addressLine1}
+            onChange={this.handleChange.bind(this, 'mother_addressLine1')}
             maxLength={40}
           />
           <Input
@@ -654,50 +729,452 @@ class WorkingItemForm extends React.Component {
             label="Address Line 2"
             name="addressLine2"
             required
-            value={this.state.mother.addressLine2}
-            onChange={this.handleChange.bind(this, 'mother.addressLine2')}
+            value={this.state.mother_addressLine2}
+            onChange={this.handleChange.bind(this, 'mother_addressLine2')}
             maxLength={40}
           />
           <p>Region</p>
           <Dropdown
             auto
-            onChange={this.handleChange.bind(this, 'mother.region')}
+            onChange={this.handleChange.bind(this, 'mother_region')}
             source={regions}
-            value={this.state.mother.region}
+            value={this.state.mother_region}
           />
           <p>District</p>
           <Dropdown
             auto
-            onChange={this.handleChange.bind(this, 'mother.district')}
+            onChange={this.handleChange.bind(this, 'mother_district')}
             source={districts}
-            value={this.state.mother.district}
+            value={this.state.mother_district}
           />
           <p>Town</p>
           <Dropdown
             auto
-            onChange={this.handleChange.bind(this, 'mother.town')}
+            onChange={this.handleChange.bind(this, 'mother_town')}
             source={towns}
-            value={this.state.mother.town}
+            value={this.state.mother_town}
           />
           <Input
             type="text"
             label="Zip / Postal code"
             name="zip"
-            value={this.state.mother.zip}
-            onChange={this.handleChange.bind(this, 'mother.zip')}
+            value={this.state.mother_zip}
+            onChange={this.handleChange.bind(this, 'mother_zip')}
             maxLength={40}
           />
-          <RadioGroup
-            name="typeOfBirth"
-            value={this.state.typeOfBirth}
-            onChange={this.handleChange.bind(this, 'typeOfBirth')}
-          >
-            <RadioButton label="Single" value="single" />
-            <RadioButton label="Twin" value="twin" disabled />
-            <RadioButton label="Triplet" value="triplet" />
-            <RadioButton label="Other" value="other" />
-          </RadioGroup>
-        </div>
+          <p>Number of children ever born alive (including this birth)</p>
+          <Input
+            type="text"
+            label="No. of children"
+            name="childrenBornAlive"
+            value={this.state.mother_childrenBornAlive}
+            onChange={this.handleChange.bind(this, 'mother_childrenBornAlive')}
+            maxLength={2}
+          />
+          <p>Number of children born alive and now living</p>
+          <Input
+            type="text"
+            label="No. of children"
+            name="childrenBornLiving"
+            value={this.state.mother_childrenBornLiving}
+            onChange={this.handleChange.bind(this, 'mother_childrenBornLiving')}
+            maxLength={2}
+          />
+          <p>Foetal deaths to mother</p>
+          <Input
+            type="text"
+            label="No. of foetal deaths"
+            name="foetalDeaths"
+            value={this.state.mother_foetalDeaths}
+            onChange={this.handleChange.bind(this, 'mother_foetalDeaths')}
+            maxLength={2}
+          />
+          <p>Date of last previous live birth</p>
+          <section>
+            <DatePicker
+              label="Date of birth"
+              sundayFirstDayOfWeek
+              onChange={this.handleChange.bind(
+                this,
+                'mother_dobLastPreviousBirth'
+              )}
+              value={this.state.mother_dobLastPreviousBirth}
+            />
+          </section>
+          <p>Formal education</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'mother_formalEducation')}
+            source={educations}
+            value={this.state.mother_formalEducation}
+          />
+          <p>Occupation</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'mother_occupation')}
+            source={occupations}
+            value={this.state.mother_occupation}
+          />
+          <p>Religion</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'mother_religion')}
+            source={religions}
+            value={this.state.mother_religion}
+          />
+          <p>In gainful employment</p>
+          <Switch
+            checked={this.state.mother_gainfulEmployment}
+            label="In gainful employment"
+            onChange={this.handleChange.bind(this, 'mother_gainfulEmployment')}
+          />
+        </Collapsible>
+
+        <Collapsible
+          classParentString={styles.collapsibleParent}
+          triggerClassName={styles.collapsibleClosed}
+          triggerOpenedClassName={styles.collapsibleOpened}
+          trigger="
+            Particulars of father
+          "
+        >
+          <Input
+            type="text"
+            label="Personal ID Number"
+            name="father_personalIDNummber"
+            value={this.state.father_personalIDNummber}
+            onChange={this.handleChange.bind(this, 'father_personalIDNummber')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="First Name"
+            name="father_firstName"
+            required
+            value={this.state.father_firstName}
+            onChange={this.handleChange.bind(this, 'father_firstName')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Middle Name"
+            name="father_middleName"
+            required
+            value={this.state.father_middleName}
+            onChange={this.handleChange.bind(this, 'father_middleName')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Last Name"
+            name="father_lastName"
+            required
+            value={this.state.father_lastName}
+            onChange={this.handleChange.bind(this, 'father_lastName')}
+            maxLength={16}
+          />
+          <section>
+            <DatePicker
+              label="Date of birth"
+              sundayFirstDayOfWeek
+              onChange={this.handleChange.bind(this, 'father_dob')}
+              value={this.state.father_dob}
+            />
+          </section>
+          <p>Marital status</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_maritalStatus')}
+            source={maritalStatuses}
+            value={this.state.father_maritalStatus}
+          />
+          <section>
+            <DatePicker
+              label="Date of marriage"
+              sundayFirstDayOfWeek
+              onChange={this.handleChange.bind(this, 'father_doMarriage')}
+              value={this.state.father_doMarriage}
+            />
+          </section>
+          <p>Duration of marriage</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_durationOfMarriage')}
+            source={years}
+            value={this.state.father_durationOfMarriage}
+          />
+          <p>Nationality</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_nationality')}
+            source={countries}
+            value={this.state.father_nationality}
+          />
+          <Input
+            type="text"
+            label="Mobile number"
+            name="mobileNumber"
+            required
+            value={this.state.father_mobileNumber}
+            onChange={this.handleChange.bind(this, 'father_mobileNumber')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Email address"
+            name="emailAddress"
+            required
+            value={this.state.father_emailAddress}
+            onChange={this.handleChange.bind(this, 'father_emailAddress')}
+            maxLength={16}
+          />
+          <p>Address</p>
+
+          <Input
+            type="text"
+            label="Street number"
+            name="StreetNumber"
+            value={this.state.father_streetNumber}
+            onChange={this.handleChange.bind(this, 'father_streetNumber')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="House number"
+            name="HouseNumber"
+            value={this.state.father_houseNumber}
+            onChange={this.handleChange.bind(this, 'father_houseNumber')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Address Line 1"
+            name="addressLine1"
+            required
+            value={this.state.father_addressLine1}
+            onChange={this.handleChange.bind(this, 'father_addressLine1')}
+            maxLength={40}
+          />
+          <Input
+            type="text"
+            label="Address Line 2"
+            name="addressLine2"
+            required
+            value={this.state.father_addressLine2}
+            onChange={this.handleChange.bind(this, 'father_addressLine2')}
+            maxLength={40}
+          />
+          <p>Region</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_region')}
+            source={regions}
+            value={this.state.father_region}
+          />
+          <p>District</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_district')}
+            source={districts}
+            value={this.state.father_district}
+          />
+          <p>Town</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_town')}
+            source={towns}
+            value={this.state.father_town}
+          />
+          <Input
+            type="text"
+            label="Zip / Postal code"
+            name="zip"
+            value={this.state.father_zip}
+            onChange={this.handleChange.bind(this, 'father_zip')}
+            maxLength={40}
+          />
+          <p>Formal education</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_formalEducation')}
+            source={educations}
+            value={this.state.father_formalEducation}
+          />
+          <p>Occupation</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_occupation')}
+            source={occupations}
+            value={this.state.father_occupation}
+          />
+          <p>Religion</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'father_religion')}
+            source={religions}
+            value={this.state.father_religion}
+          />
+          <p>In gainful employment</p>
+          <Switch
+            checked={this.state.father_gainfulEmployment}
+            label="In gainful employment"
+            onChange={this.handleChange.bind(this, 'father_gainfulEmployment')}
+          />
+        </Collapsible>
+        <Collapsible
+          classParentString={styles.collapsibleParent}
+          triggerClassName={styles.collapsibleClosed}
+          triggerOpenedClassName={styles.collapsibleOpened}
+          trigger="
+            Particulars of informant
+          "
+        >
+          <Input
+            type="text"
+            label="Personal ID Number"
+            name="informant_personalIDNummber"
+            value={this.state.informant_personalIDNummber}
+            onChange={this.handleChange.bind(
+              this,
+              'informant_personalIDNummber'
+            )}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="First Name"
+            name="informant_firstName"
+            required
+            value={this.state.informant_firstName}
+            onChange={this.handleChange.bind(this, 'informant_firstName')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Middle Name"
+            name="informant_middleName"
+            required
+            value={this.state.informant_middleName}
+            onChange={this.handleChange.bind(this, 'informant_middleName')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Last Name"
+            name="informant_lastName"
+            required
+            value={this.state.informant_lastName}
+            onChange={this.handleChange.bind(this, 'informant_lastName')}
+            maxLength={16}
+          />
+          <p>Relationship</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'informant_relationship')}
+            source={religions}
+            value={this.state.informant_relationship}
+          />
+          <Input
+            type="text"
+            label="Mobile number"
+            name="mobileNumber"
+            required
+            value={this.state.informant_mobileNumber}
+            onChange={this.handleChange.bind(this, 'informant_mobileNumber')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Email address"
+            name="emailAddress"
+            required
+            value={this.state.informant_emailAddress}
+            onChange={this.handleChange.bind(this, 'informant_emailAddress')}
+            maxLength={16}
+          />
+          <p>Address</p>
+
+          <Input
+            type="text"
+            label="Street number"
+            name="StreetNumber"
+            value={this.state.informant_streetNumber}
+            onChange={this.handleChange.bind(this, 'informant_streetNumber')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="House number"
+            name="HouseNumber"
+            value={this.state.informant_houseNumber}
+            onChange={this.handleChange.bind(this, 'informant_houseNumber')}
+            maxLength={16}
+          />
+          <Input
+            type="text"
+            label="Address Line 1"
+            name="addressLine1"
+            required
+            value={this.state.informant_addressLine1}
+            onChange={this.handleChange.bind(this, 'informant_addressLine1')}
+            maxLength={40}
+          />
+          <Input
+            type="text"
+            label="Address Line 2"
+            name="addressLine2"
+            required
+            value={this.state.informant_addressLine2}
+            onChange={this.handleChange.bind(this, 'informant_addressLine2')}
+            maxLength={40}
+          />
+          <p>Region</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'informant_region')}
+            source={regions}
+            value={this.state.informant_region}
+          />
+          <p>District</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'informant_district')}
+            source={districts}
+            value={this.state.informant_district}
+          />
+          <p>Town</p>
+          <Dropdown
+            auto
+            onChange={this.handleChange.bind(this, 'informant_town')}
+            source={towns}
+            value={this.state.informant_town}
+          />
+          <Input
+            type="text"
+            label="Zip / Postal code"
+            name="zip"
+            value={this.state.informant_zip}
+            onChange={this.handleChange.bind(this, 'informant_zip')}
+            maxLength={40}
+          />
+        </Collapsible>
+        <Collapsible
+          classParentString={styles.collapsibleParent}
+          triggerClassName={styles.collapsibleClosed}
+          triggerOpenedClassName={styles.collapsibleOpened}
+          trigger="
+            Notes
+          "
+        >
+          <Input
+            type="text"
+            multiline
+            label="Notes"
+            maxLength={200}
+            value={this.state.notes}
+            onChange={this.handleChange.bind(this, 'notes')}
+          />
+        </Collapsible>
       </form>
     );
   };

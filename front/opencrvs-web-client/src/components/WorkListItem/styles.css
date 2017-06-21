@@ -1,0 +1,42 @@
+.workItem {
+    padding: 0.9em 1em;
+    border-bottom: 1px solid #ddd;
+    border-left: 6px solid transparent;
+}
+
+.openedWorkItem {
+    border-left: 6px solid #1b98f8;
+}
+
+
+.workItemTitle,
+.workItemSubject {
+    margin: 0;
+}
+
+.workItemTitle {
+    text-transform: uppercase;
+    color: #999;
+}
+
+.labelDeclaration,
+.labelValidation,
+.labelRegistration {
+  width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 0.5em;
+    border-radius: 3px;
+}
+
+.labelDeclaration {
+  background: #ffc94c;
+}
+
+.labelValidation {
+  background: #41ccb4;
+}
+
+.labelRegistration {
+  background: #40c365;
+}

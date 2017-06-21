@@ -7,6 +7,8 @@ export const LOGOUT_REQUEST = 'LOGOUT_REQUEST';
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
 
+//actions
+
 function requestLogin(creds) {
   return {
     type: LOGIN_REQUEST,
@@ -21,7 +23,7 @@ function receiveLogin(user) {
     type: LOGIN_SUCCESS,
     isFetching: false,
     isAuthenticated: true,
-    id_token: user.id_token,
+    user: user,
   };
 }
 
@@ -90,8 +92,10 @@ export function loginUser(creds) {
 export function logoutUser() {
   return dispatch => {
     dispatch(requestLogout());
+    console.log('Logging out.  Removing tokens.');
     localStorage.removeItem('id_token');
     localStorage.removeItem('access_token');
     dispatch(receiveLogout());
+    //window.location.href = '/tokenexpired';
   };
 }

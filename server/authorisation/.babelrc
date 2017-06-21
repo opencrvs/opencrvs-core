@@ -1,0 +1,10 @@
+{
+  "presets": ["es2015", "flow", "stage-0"],
+  "env": {
+    "test": {
+      "plugins": [
+        ["istanbul", {"ignore": "*.test.*"}]
+      ]
+    }
+  }
+}

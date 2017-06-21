@@ -7,24 +7,27 @@ import {
 function declarationsReducer(
   state = {
     isFetching: false,
-    declaration: '',
+    declarations: '',
   },
   action
 ) {
   switch (action.type) {
     case DECLARATION_REQUEST:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: true,
-      });
+      };
     case DECLARATION_SUCCESS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: false,
-        declaration: action.response,
-      });
+        declarations: action.declarations,
+      };
     case DECLARATION_FAILURE:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: false,
-      });
+      };
     default:
       return state;
   }

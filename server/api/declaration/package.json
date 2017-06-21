@@ -1,0 +1,28 @@
+{
+  "name": "declaration",
+  "version": "1.0.0",
+  "description": "declaration microservice ",
+  "main": "index.js",
+  "author": "Euan Millar",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "babel-core": "^6.25.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "chai": "^4.0.2",
+    "hapi": "^16.4.3",
+    "hapi-auth-jwt": "^4.0.0",
+    "jsonwebtoken": "^7.4.1",
+    "knex": "^0.13.0",
+    "mocha": "^3.4.2",
+    "pg": "^6.2.4"
+  },
+  "devDependencies": {
+    "chai-http": "^3.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bootstrap.js"
+  }
+}

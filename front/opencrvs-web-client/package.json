@@ -10,13 +10,18 @@
     "express": "^4.15.3",
     "lodash": "^4.17.4",
     "morgan": "^1.8.2",
+    "postcss-mixins": "^6.0.0",
+    "prop-types": "^15.5.10",
     "react": "^15.5.4",
+    "react-addons-css-transition-group": "^15.5.2",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.5",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
+    "react-toolbox": "^2.0.0-beta.12",
     "redux": "^3.6.0",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "redux-thunk-actions": "^1.1.6"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.1",
@@ -61,14 +66,16 @@
     "postcss": "^6.0.1",
     "postcss-advanced-variables": "^1.2.2",
     "postcss-cssnext": "^2.11.0",
+    "postcss-each": "^0.10.0",
     "postcss-import": "^10.0.0",
     "postcss-loader": "^2.0.5",
     "postcss-modules-values": "^1.3.0",
     "prettier": "^1.3.1",
     "purecss": "^0.6.2",
+    "react-collapsible": "^1.4.0",
     "react-css-modules": "^4.3.0",
     "react-dev-utils": "^2.0.1",
-    "react-toolbox": "^2.0.0-beta.12",
+    "redux-logger": "^3.0.6",
     "style-loader": "^0.18.1",
     "url-loader": "^0.5.8",
     "webpack": "^2.6.1",
@@ -78,14 +85,10 @@
     "test": "karma start",
     "check-coverage": "istanbul check-coverage --statements 23 --branches 5 --functions 9 --lines 24",
     "watch:test": "yarn test -- --auto-watch --no-single-run",
-    "validate": "yarn validate-webpack:* lint-staged test --serial check-coverage",
-    "validate-webpack:dev": "webpack-validator webpack.config.js --env.dev",
-    "validate-webpack:prod": "webpack-validator webpack.config.js --env.prod",
     "build": "webpack --env=dev --progress --profile --colors",
     "build:prod": "webpack --env=prod --progress --profile --colors",
     "devserver": "webpack-dev-server --env=dev --open",
-    "start": "yarn devserver",
-    "precommit": "validate"
+    "start": "yarn devserver"
   },
   "lint-staged": {
     "*.js": [

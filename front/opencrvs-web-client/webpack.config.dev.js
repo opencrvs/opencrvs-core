@@ -32,9 +32,9 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
+        loader: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: [
+          loader: [
             {
               loader: 'css-loader',
               options: {

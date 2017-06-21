@@ -12,21 +12,20 @@ var jwtCheck = jwt({
   issuer: config.issuer
 });
 
-// Check for scope
-function requireScope(scope) {
-  return function (req, res, next) {
-    var has_scopes = req.user.scope === scope;
-    if (!has_scopes) { 
-        res.sendStatus(401); 
-        return;
-    }
-    next();
-  };
-}
+app.get('/api/protected/random-declaration',
+  jwt({
+    secret: config.secret,
+    audience: config.audience,
+    issuer: config.issuer
+  }),
+  function(req, res) {
+    if (!req.user) return res.sendStatus(401);
+    res.status(200).send({data: declarationer.getRandomOne()});
+  });
 
-app.use('/api/protected', jwtCheck, requireScope('full_access'));
-
-app.get('/api/protected/random-declaration', function(req, res) {
-  console.log("DECLARATION: "+declarationer.getRandomOne());
-  res.status(200).send({data: declarationer.getRandomOne()});
+    
+  app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+    res.status(401).send({message: "The token has expired"});
+  }
 });
