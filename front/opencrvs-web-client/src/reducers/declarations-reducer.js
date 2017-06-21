@@ -2,12 +2,15 @@ import {
   DECLARATION_REQUEST,
   DECLARATION_SUCCESS,
   DECLARATION_FAILURE,
+  DECLARATION_SELECTED,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
   state = {
     isFetching: false,
     declarations: '',
+    selectedDeclaration: '',
+    newDeclaration: '',
   },
   action
 ) {
@@ -27,6 +30,11 @@ function declarationsReducer(
       return {
         ...state,
         isFetching: false,
+      };
+    case DECLARATION_SELECTED:
+      return {
+        ...state,
+        selectedDeclaration: action.selectedDeclaration,
       };
     default:
       return state;

@@ -19,7 +19,7 @@ function requestDeclaration() {
   };
 }
 
-function selectDeclaration(id) {
+export function selectDeclaration(id) {
   return {
     type: DECLARATION_SELECTED,
     selectedDeclaration: id,

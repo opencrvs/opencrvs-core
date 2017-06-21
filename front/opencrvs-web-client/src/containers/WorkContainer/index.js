@@ -4,7 +4,7 @@ import Worknav from 'components/Worknav';
 import WorkList from 'components/WorkList';
 import WorkingItem from 'components/WorkingItem';
 import { connect } from 'react-redux';
-import { fetchDeclarations } from 'actions/declaration-actions';
+import { fetchDeclarations, selectDeclaration } from 'actions/declaration-actions';
 
 class WorkContainer extends React.Component {
 
@@ -30,25 +30,21 @@ class WorkContainer extends React.Component {
 const mapStateToProps = ({ declarationsReducer, userReducer }) => {
   const {
     declarations,
-    authenticated,
-    isFetchingDeclaration,
+    selectedDeclaration,
   } = declarationsReducer;
-  const { isAuthenticated, isFetchingUser, errorMessage } = userReducer;
+  const { isAuthenticated } = userReducer;
 
   return {
     declarations,
-    authenticated,
+    selectedDeclaration,
     isAuthenticated,
-    isFetchingUser,
-    errorMessage,
-    isFetchingDeclaration,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onTodoClick: id => {
-      //dispatch(selectDeclaration(id))
+    onWorkItemClick: id => {
+      dispatch(selectDeclaration(id));
     },
     fetchData: () => {dispatch(fetchDeclarations())}
   }
