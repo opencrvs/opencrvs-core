@@ -23,7 +23,6 @@ Glue.compose(
                 }
                 else {
                     console.log('Web App running.');
-                    resolve(server);
                 }
             });
         }

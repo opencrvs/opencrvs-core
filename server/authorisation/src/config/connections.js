@@ -7,7 +7,7 @@ const internals = {
             labels: ['web-app']
         },
         {
-            port: 9000,
+            port: 6000,
             labels: ['api']
         }
     ]
