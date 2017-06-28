@@ -4,6 +4,34 @@ const Config = require('./config');
 
 const internals = {
     registrations: [
+        // Vision Plugin
+        {
+            plugin: 'vision'
+        },
+        // Inert Plugin
+        {
+            plugin: 'inert'
+        },
+        // Logging Plugin
+        {
+            plugin: {
+                register: 'good',
+                options: {
+                    ops: {
+                        interval: 1000
+                    },
+                    reporters: {
+                        console: [{
+                            module: 'good-squeeze',
+                            name: 'Squeeze',
+                            args: [{ log: '*', response: '*' }]
+                        }, {
+                            module: 'good-console'
+                        }, 'stdout']
+                    }
+                }
+            }
+        },
         // Swagger Plugin
         {
             plugin: {
@@ -13,7 +41,7 @@ const internals = {
                         title: 'App API Documentation',
                         version: '1.0.0'
                     },
-                    documentationPath: './docs'
+                    documentationPath: '/docs'
                 }
             }
         },
