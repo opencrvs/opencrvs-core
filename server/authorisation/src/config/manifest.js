@@ -1,5 +1,6 @@
 // App Manifest
 
+const Confidence = require('confidence');
 const Registrations = require('./registrations');
 const Connections = require('./connections');
 
@@ -19,6 +20,8 @@ internals.manifest = {
     connections: Connections,
     registrations: Registrations
 };
+
+internals.store = new Confidence.Store(internals.manifest);
 
 exports.get = function (key) {
 

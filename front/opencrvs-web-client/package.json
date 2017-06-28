@@ -40,6 +40,7 @@
     "clean-webpack-plugin": "^0.1.16",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.3",
+    "enzyme": "^2.9.0",
     "eslint": "^3.19.0",
     "eslint-config-fbjs": "^1.1.1",
     "eslint-config-react": "^1.1.7",

@@ -11,15 +11,15 @@ module.exports = (request, reply) => {
         { email: request.payload.email },
         { username: request.payload.username }
         ]).fetch()
-        .then(function (user) {
+        .then((user) => {
 
             if (!user) {
-                return res(Boom.badRequest('Incorrect username or email!'));
+                reply(Boom.badRequest('Incorrect username or email!'));
             }
             bcrypt.compare(password, user.password, (err, isValid) => {
 
                 if (err){
-                    return res(Boom.badRequest('Incorrect username or email!'));
+                    reply(Boom.badRequest('Incorrect username or email!'));
                 }
                 else if (isValid) {
                     const secret = Config.get('/jwtAuth/secret');
@@ -32,12 +32,12 @@ module.exports = (request, reply) => {
                     },
                     secret, { expiresIn: '14 days' }
                     );
-                    return jwtToken;
+                    reply('{"user:" ' + JSON.stringify(user) + ', "token" ' + JSON.stringify(jwtToken) + '}');
                 }
             });
 
         })
-        .catch(function (err) {
+        .catch((err) => {
 
             if (err){
                 return res(Boom.badImplementation('terrible implementation'));

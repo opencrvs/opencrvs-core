@@ -16,6 +16,7 @@ exports.up = function (knex, Promise) {
 
         table.increments('id').primary();
         table.string('role').notNullable();
+        table.integer('user_id').unique().references('users.id');
     });
 
 };
