@@ -29,6 +29,7 @@
     "jsonwebtoken": "^7.4.1",
     "knex": "^0.13.0",
     "mocha": "^3.4.2",
+    "node-uuid": "^1.4.8",
     "node-vault": "^0.5.7",
     "pg": "^6.2.4",
     "vision": "^4.1.1"

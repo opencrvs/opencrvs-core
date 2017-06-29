@@ -12,43 +12,126 @@ const users = [
       username: 'lindataylor',
       password: lindaHash,
       role: 'validator',
-      claims: 'post:verifyCredentials,post:login,post:declaration,store:image,notification:search'
-
+      claims: [
+          {
+              claim: 'post:verifyCredentials'
+          },
+          {
+              claim: 'post:login'
+          },
+          {
+              claim: 'post:declaration'
+          },
+          {
+              claim: 'store:image'
+          },
+          {
+              claim: 'notification:search'
+          }]
   },
   {
       email: 'Annina.Wersun@plan-international.org', 
       username: 'anninawersun',
       password: anninaHash,
       role: 'registrar',
-      claims: 'post:verifyCredentials,post:login,post:declaration,store:image,notification:search'
+      claims: [
+          {
+              claim: 'post:verifyCredentials'
+          },
+          {
+              claim: 'post:login'
+          },
+          {
+              claim: 'post:declaration'
+          },
+          {
+              claim: 'store:image'
+          },
+          {
+              claim: 'notification:search'
+          }]
   },
   {
       email: 'edward.duffus@plan-international.org', 
       username: 'edduffus',
       password: edHash,
       role: 'admin',
-      claims: 'post:verifyCredentials,post:login,post:declaration,store:image,notification:search'
+      claims: [
+          {
+              claim: 'post:verifyCredentials'
+          },
+          {
+              claim: 'post:login'
+          },
+          {
+              claim: 'post:declaration'
+          },
+          {
+              claim: 'store:image'
+          },
+          {
+              claim: 'notification:search'
+          }]
   },
   {
       email: 'carl@jembi.org', 
       username: 'carlfourie',
       password: carlHash,
       role: 'manager',
-      claims: 'post:verifyCredentials,post:login,post:declaration,store:image,notification:search'
+      claims: [
+          {
+              claim: 'post:verifyCredentials'
+          },
+          {
+              claim: 'post:login'
+          },
+          {
+              claim: 'post:declaration'
+          },
+          {
+              claim: 'store:image'
+          },
+          {
+              claim: 'notification:search'
+          }]
   },
   {
       email: 'euan@yumeteki.io', 
       username: 'euanmillar',
       password: euanHash,
       role: 'clerk',
-      claims: 'post:verifyCredentials,post:login,post:notification'
+      claims: [
+          {
+              claim: 'post:verifyCredentials'
+          },
+          {
+              claim: 'post:login'
+          },
+          {
+              claim: 'post:notification'
+          }]
   },
   {
       email: 'ryan@jembi.org', 
       username: 'ryancrichton',
       password: ryanHash,
       role: 'admin',
-      claims: 'post:verifyCredentials,post:login,post:declaration,store:image,notification:search'
+      claims: [
+          {
+              claim: 'post:verifyCredentials'
+          },
+          {
+              claim: 'post:login'
+          },
+          {
+              claim: 'post:declaration'
+          },
+          {
+              claim: 'store:image'
+          },
+          {
+              claim: 'notification:search'
+          }]
   }
 ];
 

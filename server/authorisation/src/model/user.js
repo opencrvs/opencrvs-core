@@ -1,18 +1,16 @@
-import Bookshelf from '../bookshelf';
+import bookshelf from '../bookshelf';
 
-const Role = Bookshelf.Model.extend({
-    tableName: 'roles'
+var Claims = bookshelf.Model.extend({
+    tableName: 'claims'
 });
 
-const User = Bookshelf.Model.extend({
+var User = bookshelf.Model.extend({
     tableName: 'users',
-    roles: function () {
+    claims: function () {
 
-        return this.hasMany(Role, 'user_id');
+        return this.hasMany(Claims, 'user_id');
     },
     hasTimestamps: true
 });
 
-module.exports = {
-    User
-};
+module.exports = bookshelf.model('User', User);

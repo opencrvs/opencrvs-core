@@ -55,7 +55,8 @@ internals.config = {
             },
             seeds: {
                 directory: './src/model/seeds/development'
-            }
+            },
+            debug: true
         }
 
     },

@@ -18,15 +18,13 @@ function createUser(knex, user) {
       password: user.password, 
       role: user.role,
       username: user.username
-    }
-  )
+    })
     .then(function(userIds){
-      return knex('claims')
-        .insert(
-        {
-          claims: user.claims,
-          user_id: userIds[0],
-        }
-      );
+
+        var claims = user.claims;
+        claims.forEach(function (userClaims) {
+            userClaims.user_id = userIds[0];
+        });
+        return knex('claims').insert(claims);
     });
 }
