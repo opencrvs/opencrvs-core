@@ -10,6 +10,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-stage-0": "^6.24.1",
+    "bcryptjs": "^2.4.3",
     "bookshelf": "^0.10.3",
     "boom": "^5.1.0",
     "chai": "^4.0.2",

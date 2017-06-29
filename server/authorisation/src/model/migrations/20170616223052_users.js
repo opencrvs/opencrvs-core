@@ -6,16 +6,13 @@ exports.up = function (knex, Promise) {
         table.string('email').notNullable().unique();
         table.string('username').notNullable().unique();
         table.string('password').notNullable();
-        table.boolean('admin').notNullable().defaultTo(false);
-        table.boolean('manager').notNullable().defaultTo(false);
-        table.boolean('registrar').notNullable().defaultTo(false);
-        table.boolean('validator').notNullable().defaultTo(false);
-        table.boolean('clerk').notNullable().defaultTo(false);
+        table.string('role').notNullable();
+        table.boolean('active').notNullable().defaultTo(true);
         table.timestamp('created_at').notNullable().defaultTo(knex.raw('now()'));
-    }).createTable('roles', (table) => {
+    }).createTable('claims', (table) => {
 
         table.increments('id').primary();
-        table.string('role').notNullable();
+        table.string('claims').notNullable();
         table.integer('user_id').unique().references('users.id');
     });
 
@@ -24,5 +21,5 @@ exports.up = function (knex, Promise) {
 exports.down = function (knex, Promise) {
 
     return knex.schema.dropTable('users')
-        .dropTable('roles');
+        .dropTable('claims');
 };

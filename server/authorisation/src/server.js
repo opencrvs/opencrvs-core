@@ -22,7 +22,7 @@ Glue.compose(
                     throw err;
                 }
                 else {
-                    console.log('Web App running.');
+                    console.log('API Gateway running.');
                 }
             });
         }
