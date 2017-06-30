@@ -32,7 +32,6 @@ module.exports = (request, reply) => {
                     const userClaims = user.related('claims').toJSON();
                     const scopes = userClaims.map((item) => item.claim)
                         .filter((value, index, self) => self.indexOf(value) === index);
-                    console.log(scopes);
                     const secret = Config.get('/jwtAuth/secret');
                     const jti = Uuid.v4();
                     const jwtToken = Jwt.sign({
@@ -52,7 +51,10 @@ module.exports = (request, reply) => {
                     }).save()
                         .then((model) => {
 
-                            reply('{"token" ' + JSON.stringify(jwtToken) + '}');
+                            const data = {
+                                token: jwtToken
+                            };
+                            reply(data);
                         }).catch((err) => {
 
                             reply(Boom.badImplementation('terrible implementation on token: ' + err));

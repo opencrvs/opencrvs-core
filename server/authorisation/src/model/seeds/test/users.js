@@ -5,6 +5,7 @@ const salt = Bcrypt.genSaltSync();
 const passHash = Bcrypt.hashSync('plan2017', salt);
 const users = [
     {
+        email: 'tester1@yumeteki.io',
         username: 'validator',
         password: passHash,
         role: 'validator',
@@ -26,6 +27,7 @@ const users = [
             }]
     },
     {
+        email: 'tester2@yumeteki.io',
         username: 'registrar',
         password: passHash,
         role: 'registrar',
@@ -47,7 +49,7 @@ const users = [
             }]
     },
     {
-        email: 'edward.duffus@plan-international.org',
+        email: 'tester3@yumeteki.io',
         username: 'admin',
         password: passHash,
         role: 'admin',
@@ -69,6 +71,7 @@ const users = [
             }]
     },
     {
+        email: 'tester4@yumeteki.io',
         username: 'manager',
         password: passHash,
         role: 'manager',
@@ -90,6 +93,7 @@ const users = [
             }]
     },
     {
+        email: 'tester5@yumeteki.io',
         username: 'clerk',
         password: passHash,
         role: 'clerk',
@@ -125,7 +129,7 @@ const createUser = function (knex, user) {
         .insert(
             {
                 email: user.email,
-                password: user.password, 
+                password: user.password,
                 role: user.role,
                 username: user.username
             })

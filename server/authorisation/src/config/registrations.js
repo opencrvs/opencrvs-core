@@ -61,14 +61,14 @@ const internals = {
                 options: Config.get('/jwtAuth')
             },
             options: {
-                select: ['web-app']
+                select: ['api']
             }
         },
         // Auth Routes
         {
             plugin: './routes/auth',
             options: {
-                select: ['web-app'],
+                select: ['api'],
                 routes: {
                     prefix: '/auth'
                 }
@@ -78,7 +78,7 @@ const internals = {
         /*{
               plugin: './routes/user',
               options: {
-                  select: ['web-app'],
+                  select: ['api'],
                   routes: {
                       prefix: '/user'
                   }

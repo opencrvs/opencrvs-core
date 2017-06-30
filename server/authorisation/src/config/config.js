@@ -1,5 +1,6 @@
 
 const Confidence = require('confidence');
+require('dotenv').config();
 
 const internals = {
     criteria: {
@@ -27,7 +28,8 @@ internals.config = {
             },
             seeds: {
                 directory: './src/model/seeds/test'
-            }
+            },
+            debug: true
         },
         production: {
             client: 'pg',
@@ -55,8 +57,7 @@ internals.config = {
             },
             seeds: {
                 directory: './src/model/seeds/development'
-            },
-            debug: true
+            }
         }
 
     },

@@ -2456,6 +2456,10 @@ lab@^14.1.0:
     source-map "0.5.x"
     source-map-support "0.4.x"
 
+labbable@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/labbable/-/labbable-2.1.1.tgz#e63b755c4088b4e332b490b1bac8120c8354d9dc"
+
 lazy-cache@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/lazy-cache/-/lazy-cache-1.0.4.tgz#a1d78fc3a50474cb80845d3b3b6e1da49a446e8e"

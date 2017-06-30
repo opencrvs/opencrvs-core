@@ -1,8 +1,10 @@
-import Hapi from 'hapi';
-import Glue from 'glue';
+require( 'babel-core/register' );
 
-const server = new Hapi.Server();
+const Glue = require('glue');
+const Labbable = require('labbable');
+const labbable = module.exports = new Labbable();
 const Manifest = require('./config/manifest');
+
 
 Glue.compose(
 
@@ -12,20 +14,40 @@ Glue.compose(
     },
     (err, server) => {
 
+        // $lab:coverage:off$
         if (err) {
             throw err;
         }
-        else {
+        // $lab:coverage:on$
+
+        // Step 2.
+        // Show the server to our instance of labbable
+        labbable.using(server);
+
+        // Step 3.
+        // Initialize your server
+        server.initialize((err) => {
+
+            // $lab:coverage:off$
+            if (err) {
+                throw err;
+            }
+
+            // Don't continue to start server if module
+            // is being require()'d (likely in a test)
+            // $lab:coverage:off$
+            if (module.parent) {
+                return;
+            }
+
             server.start((err) => {
 
                 if (err) {
                     throw err;
                 }
-                else {
-                    console.log('API Gateway running.');
-                }
             });
-        }
+            // $lab:coverage:on$
+        });
     }
 );
 

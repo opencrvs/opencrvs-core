@@ -2,6 +2,6 @@
 
 import knex from './knex';
 
-var bookshelf = require('bookshelf')(knex);
+const bookshelf = require('bookshelf')(knex);
 bookshelf.plugin('registry');
 module.exports = bookshelf;
