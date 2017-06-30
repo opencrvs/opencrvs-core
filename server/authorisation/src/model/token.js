@@ -1,6 +1,6 @@
 import bookshelf from '../bookshelf';
 
-var Token = bookshelf.Model.extend({
+const Token = bookshelf.Model.extend({
     tableName: 'tokens',
     hasTimestamps: true
 });

@@ -10,18 +10,19 @@ exports.up = function (knex, Promise) {
         table.boolean('active').notNullable().defaultTo(true);
         table.timestamps();
     })
-    .createTable('claims', (table) => {
+        .createTable('claims', (table) => {
 
-        table.increments('id').primary();
-        table.string('claim').notNullable();
-        table.integer('user_id').references('users.id');
-    })
-    .createTable('tokens', (table) => {
-        table.increments('id').primary();
-        table.string('jti').notNullable().unique();
-        table.string('token', 1000).notNullable();
-        table.timestamps();
-    });
+            table.increments('id').primary();
+            table.string('claim').notNullable();
+            table.integer('user_id').references('users.id');
+        })
+        .createTable('tokens', (table) => {
+
+            table.increments('id').primary();
+            table.string('jti').notNullable().unique();
+            table.string('token', 1000).notNullable();
+            table.timestamps();
+        });
 
 };
 

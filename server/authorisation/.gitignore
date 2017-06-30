@@ -6,8 +6,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production user knex seeds
+/authorisation/src/model/seeds/production/users.js
 
 # misc
 .DS_Store

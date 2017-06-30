@@ -19,8 +19,8 @@ internals.config = {
             client: 'pg',
             connection: {
                 database: 'authorisation_test',
-                user:     'opencrvs',
-                password: '8d3db93cf3832222992b6351a19b4de43a5b0fd1b01a0a6b10634bcc83780785'
+                user:     process.env.DB_USER,
+                password: process.env.DB_PASS
             },
             migrations: {
                 directory: './src/model/migrations'
@@ -29,12 +29,12 @@ internals.config = {
                 directory: './src/model/seeds/test'
             }
         },
-        prod: {
+        production: {
             client: 'pg',
             connection: {
-                database: 'authorisation',
-                user:     '',
-                password: ''
+                database: 'authorisation_prod',
+                user:     process.env.DB_USER,
+                password: process.env.DB_PASS
             },
             migrations: {
                 directory: './src/model/migrations'
@@ -47,8 +47,8 @@ internals.config = {
             client: 'pg',
             connection: {
                 database: 'authorisation',
-                user:     'opencrvs',
-                password: '8d3db93cf3832222992b6351a19b4de43a5b0fd1b01a0a6b10634bcc83780785'
+                user:     process.env.DB_USER,
+                password: process.env.DB_PASS
             },
             migrations: {
                 directory: './src/model/migrations'
@@ -64,7 +64,7 @@ internals.config = {
     // JWT Auth
     //
     jwtAuth: {
-        secret: '38c565b35098797461bf3582897fef10da80178fc0a07c7fbc0ade3214b150d2'
+        secret: process.env.JWT_SECRET
     }
 };
 

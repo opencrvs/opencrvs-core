@@ -38,10 +38,19 @@ const internals = {
                 register: 'hapi-swagger',
                 options: {
                     info: {
-                        title: 'App API Documentation',
+                        title: 'OpenCRVS Auth Gateway Documentation',
                         version: '1.0.0'
                     },
-                    documentationPath: '/docs'
+                    documentationPath: '/docs',
+                    basePath: '/',
+                    pathPrefixSize: 2,
+                    jsonPath: '/docs/swagger.json',
+                    sortPaths: 'path-method',
+                    lang: 'en',
+                    tags: [
+                        { name: 'api' }
+                    ],
+                    securityDefinitions: []
                 }
             }
         },

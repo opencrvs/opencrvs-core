@@ -11,6 +11,11 @@ exports.register = (server, options, next) => {
             description: 'User login',
             notes: 'Login with email or username and password.',
             tags: ['api'],
+            plugins: {
+                'hapi-swagger': {
+                    payloadType: 'form'
+                }
+            },
             validate: {
                 payload: Schema
             }

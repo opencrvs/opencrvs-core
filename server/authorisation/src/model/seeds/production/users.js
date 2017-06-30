@@ -1,12 +1,16 @@
-
-
 const Bcrypt = require('bcryptjs');
 const salt = Bcrypt.genSaltSync();
-const passHash = Bcrypt.hashSync('plan2017', salt);
+const lindaHash = Bcrypt.hashSync('2675KC2903tD80E', salt);
+const anninaHash = Bcrypt.hashSync('4WM88f5Jm0OB94M', salt);
+const edHash = Bcrypt.hashSync('plan2017', salt);
+const carlHash = Bcrypt.hashSync('3VV4m89F2e4cZpc', salt);
+const euanHash = Bcrypt.hashSync('4x11dFcm10h7h0a', salt);
+const ryanHash = Bcrypt.hashSync('M6ksxscibnWeNqW', salt);
 const users = [
     {
-        username: 'validator',
-        password: passHash,
+        email: 'linda@jembi.org',
+        username: 'lindataylor',
+        password: lindaHash,
         role: 'validator',
         claims: [
             {
@@ -26,8 +30,9 @@ const users = [
             }]
     },
     {
-        username: 'registrar',
-        password: passHash,
+        email: 'Annina.Wersun@plan-international.org',
+        username: 'anninawersun',
+        password: anninaHash,
         role: 'registrar',
         claims: [
             {
@@ -48,8 +53,8 @@ const users = [
     },
     {
         email: 'edward.duffus@plan-international.org',
-        username: 'admin',
-        password: passHash,
+        username: 'edduffus',
+        password: edHash,
         role: 'admin',
         claims: [
             {
@@ -69,8 +74,9 @@ const users = [
             }]
     },
     {
-        username: 'manager',
-        password: passHash,
+        email: 'carl@jembi.org', 
+        username: 'carlfourie',
+        password: carlHash,
         role: 'manager',
         claims: [
             {
@@ -90,8 +96,9 @@ const users = [
             }]
     },
     {
-        username: 'clerk',
-        password: passHash,
+        email: 'euan@yumeteki.io',
+        username: 'euanmillar',
+        password: euanHash,
         role: 'clerk',
         claims: [
             {
@@ -103,9 +110,30 @@ const users = [
             {
                 claim: 'post:notification'
             }]
+    },
+    {
+        email: 'ryan@jembi.org',
+        username: 'ryancrichton',
+        password: ryanHash,
+        role: 'admin',
+        claims: [
+            {
+                claim: 'post:verifyCredentials'
+            },
+            {
+                claim: 'post:login'
+            },
+            {
+                claim: 'post:declaration'
+            },
+            {
+                claim: 'store:image'
+            },
+            {
+                claim: 'notification:search'
+            }]
     }
 ];
-
 
 exports.seed = function (knex, Promise) {
 

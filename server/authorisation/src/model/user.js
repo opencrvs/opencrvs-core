@@ -1,10 +1,10 @@
 import bookshelf from '../bookshelf';
 
-var Claims = bookshelf.Model.extend({
+const Claims = bookshelf.Model.extend({
     tableName: 'claims'
 });
 
-var User = bookshelf.Model.extend({
+const User = bookshelf.Model.extend({
     tableName: 'users',
     claims: function () {
 
