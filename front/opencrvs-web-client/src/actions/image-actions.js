@@ -76,7 +76,7 @@ export function uploadImage(image) {
       config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-      return fetch(BASE_URL + 'protected/random-declaration', config)
+      return fetch(BASE_URL + 'protected/random-declaration', config, onProgress)
         .then(response =>
           response.json().then(payload => ({ payload, response }))
         )

@@ -76,11 +76,11 @@ const internals = {
         },
         // Protected routes
         {
-            plugin: './routes/declaration',
+            plugin: './routes/declarations',
             options: {
                 select: ['api'],
                 routes: {
-                    prefix: '/api/declaration'
+                    prefix: '/api/declarations'
                 }
             }
         }
