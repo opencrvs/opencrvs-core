@@ -16,6 +16,13 @@
         "flowtype"
     ],
     "rules": {
+    "max-len": [
+        "error",
+        120,
+        {
+          "ignoreStrings": true
+        }
+    ],
     "react/sort-comp": [
       2,
       {

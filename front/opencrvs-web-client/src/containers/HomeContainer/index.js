@@ -33,7 +33,7 @@ class HomeContainer extends React.Component {
       />
     );
   
-  return (
+    return (
     <div className={styles.app}>
 
       <HeaderContainer />
@@ -154,9 +154,9 @@ class HomeContainer extends React.Component {
         <FooterContainer />
       </div>
     </div>
-  );
+    );
   }
-};
+}
 
 const mapStateToProps = ({ declarationsReducer, userReducer }) => {
   const {

@@ -1,10 +1,11 @@
 require( 'babel-core/register' );
-
+const Hapi = require('hapi');
 const Glue = require('glue');
 const Labbable = require('labbable');
 const labbable = module.exports = new Labbable();
 const Manifest = require('./config/manifest');
 
+const server = new Hapi.Server();
 
 Glue.compose(
 

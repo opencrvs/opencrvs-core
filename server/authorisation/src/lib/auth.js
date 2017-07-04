@@ -10,7 +10,7 @@ exports.register = (server, options, next) => {
         key: options.secret,
         validateFunc: (decoded, request, callback) => {
 
-            if (User.where({ id: decoded.id }).fetch()) {
+            if (User.where({ id: decoded.user_id }).fetch()) {
                 return callback(null, true);
             }
             return callback(null, false);

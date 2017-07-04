@@ -73,17 +73,17 @@ const internals = {
                     prefix: '/auth'
                 }
             }
+        },
+        // Protected routes
+        {
+            plugin: './routes/declaration',
+            options: {
+                select: ['api'],
+                routes: {
+                    prefix: '/api/declaration'
+                }
+            }
         }
-        // User Routes
-        /*{
-              plugin: './routes/user',
-              options: {
-                  select: ['api'],
-                  routes: {
-                      prefix: '/user'
-                  }
-              }
-          }*/
     ]
 };
 

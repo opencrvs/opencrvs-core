@@ -1,0 +1,13 @@
+{
+  "name": "notifications",
+  "version": "1.0.0",
+  "description": "Notifications client microservice",
+  "main": "index.js",
+  "author": "Euan Millar",
+  "license": "MIT",
+  "dependencies": {
+    "seneca": "^3.3.0",
+    "seneca-balance-client": "^0.6.1",
+    "seneca-mesh": "^0.10.0"
+  }
+}

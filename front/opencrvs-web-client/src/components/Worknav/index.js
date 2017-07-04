@@ -5,28 +5,21 @@ const Worknav = () => (
   <div className="header">
     <div
       className={
-        styles.homeMenu + " pure-menu pure-menu-horizontal pure-menu-fixed"
+        styles.homeMenu + ' pure-menu pure-menu-horizontal pure-menu-fixed'
       }
     >
       <div>
         <a href="">
-          <img
-            width="64"
-            height="64"
-            alt="Ed Duffus&#x27;s avatar"
-            className={styles.avatar}
-            src="static/img/avatars/ed-duffus.jpg"
-          />
+          <img width="64" height="64" alt="Ed Duffus&#x27;s avatar" className={styles.avatar} src="static/img/avatars/ed-duffus.jpg"/>
         </a>
         <div className={styles.avatarString}>
           <span className={styles.avatarName}>Ed Duffus</span>
-          {" "}
-          - Civil Registrar - Central Region - Ghana
+          {' '} - Civil Registrar - Central Region - Ghana
         </div>
       </div>
 
       <ul className={
-        styles.workIcons + " pure-menu-list"}>
+        styles.workIcons + ' pure-menu-list'}>
         <li className="pure-menu-item">
           <a href="#" className="pure-menu-link">
             <svg className={styles.inboxIcon} 

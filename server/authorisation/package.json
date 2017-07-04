@@ -54,6 +54,6 @@
   "scripts": {
     "test": "NODE_ENV=test node node_modules/lab/bin/lab -v -L -C -D -c -t 90 -I __core-js_shared__,__coverage__",
     "vault:dev": "vault server -dev",
-    "start": "node server.js"
+    "start": "node src/server.js"
   }
 }

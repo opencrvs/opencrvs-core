@@ -29,6 +29,6 @@ const mapStateToProps = ({ declarationsReducer }) => {
 export default connect(
   mapStateToProps,
   null
-)(WorkListItem)
+)(WorkListItem);
 
 

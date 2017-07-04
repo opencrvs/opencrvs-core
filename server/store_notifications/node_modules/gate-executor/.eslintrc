@@ -1,0 +1,10 @@
+{
+  "extends": "seneca",
+  "rules": {
+    "no-return-assign": 2,
+    "yoda": 0,
+    "padded-blocks": 0,
+    "no-eval": 0,
+    "quotes": 0
+  }
+}

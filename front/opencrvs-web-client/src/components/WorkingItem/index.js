@@ -4,7 +4,18 @@ import WorkingItemForm from 'components/WorkingItemForm';
 import {connect} from 'react-redux';
 import { Button } from 'react-toolbox/lib/button';
 
-const WorkingItem = ({ selectedDeclaration }) => (   
+class WorkingItem extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  
+  openImageModal = (event) => {
+    this.props.onModalOpenClick();
+  }
+
+  render = () => {
+    const { selectedDeclaration } = this.props;
+    return (
       <div className={styles.workingItemContainer + ' pure-u-1'}>
         {
         selectedDeclaration ? 
@@ -30,9 +41,10 @@ const WorkingItem = ({ selectedDeclaration }) => (
               </p>
             </div>
             <div className={styles.wiContentControls + ' pure-u-1-2'}>
-              <Button icon='save' label='Save' flat />
-              <Button icon='delete' label='Trash' flat />
-              <Button icon='send' label='Submit' flat />
+              <Button icon="save" label="Save" flat />
+              <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
+              <Button icon="delete" label="Trash" flat />
+              <Button icon="send" label="Submit" flat />
             </div>
           </div> : ''
         }
@@ -50,6 +62,8 @@ const WorkingItem = ({ selectedDeclaration }) => (
         </div>
       </div>
     );
+  }
+}
 
 const mapStateToProps = ({ declarationsReducer }) => {
   const {
@@ -63,4 +77,4 @@ const mapStateToProps = ({ declarationsReducer }) => {
 export default connect(
   mapStateToProps,
   null
-)(WorkingItem)
+)(WorkingItem);

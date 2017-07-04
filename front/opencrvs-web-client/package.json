@@ -15,13 +15,15 @@
     "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.5.2",
     "react-dom": "^15.5.4",
+    "react-dropzone": "^3.13.3",
     "react-redux": "^5.0.5",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
     "react-toolbox": "^2.0.0-beta.12",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
-    "redux-thunk-actions": "^1.1.6"
+    "redux-thunk-actions": "^1.1.6",
+    "stream-http": "^2.7.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.1",

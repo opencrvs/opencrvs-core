@@ -9,7 +9,7 @@ import Switch from 'react-toolbox/lib/switch';
 import {connect} from 'react-redux';
 
 const datetime = new Date(2015, 10, 16);
-const min_datetime = new Date(new Date(datetime).setDate(8));
+//const min_datetime = new Date(new Date(datetime).setDate(8));
 datetime.setHours(17);
 datetime.setMinutes(28);
 
@@ -1193,5 +1193,5 @@ const mapStateToProps = ({ declarationsReducer }) => {
 export default connect(
   mapStateToProps,
   null
-)(WorkingItemForm)
+)(WorkingItemForm);
 

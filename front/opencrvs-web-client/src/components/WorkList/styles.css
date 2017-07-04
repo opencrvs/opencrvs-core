@@ -8,6 +8,7 @@
     position: relative;
     overflow: scroll;
     top: 6em;
+    z-index: 20; /* Sit on top */
 }
 
 

@@ -40,7 +40,7 @@ function declarationError(message) {
     type: DECLARATION_FAILURE,
     isFetching: false,
     authenticated: true,
-    message
+    message,
   };
 }
 
@@ -51,7 +51,7 @@ export function fetchDeclarations() {
     dispatch(requestDeclaration());
     if (token) {
       config = {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       };
       return fetch(BASE_URL + 'protected/random-declaration', config)
         .then(response =>
@@ -66,9 +66,9 @@ export function fetchDeclarations() {
           return true;
         })
         .catch(err => {
-          if (err.message == 'The token has expired'){
+          if (err.message == 'The token has expired') {
             dispatch(logoutUser());
-          }else{
+          } else {
             console.log(err);
           }
         });

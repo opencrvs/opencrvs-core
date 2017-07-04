@@ -16,12 +16,12 @@ class SearchForm extends React.Component {
   };
 
   render = () => {
-    const { errorMessage } = this.props;
+    //const { errorMessage } = this.props;
     return (
       <div className={styles.searchContainer + ' pure-g'}>
         <div className="pure-u-7-8">
           <form>
-            <Input type='text' label='Search notifications' hint='Notification ID' icon='search' />
+            <Input type="text" label="Search notifications" hint="Notification ID" icon="search" />
           </form>
         </div>
       </div>

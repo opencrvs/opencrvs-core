@@ -1,0 +1,19 @@
+.imageTarget {
+    border: #ddd 4px dashed;
+    border-radius: 2px;
+    text-align: center;
+    position: relative;
+    min-height: 11.5em;
+}
+
+h1 {
+    color: #ddd;
+}
+
+h2 {
+    color: #ddd;
+}
+
+.imageInput{
+  display: none;
+}

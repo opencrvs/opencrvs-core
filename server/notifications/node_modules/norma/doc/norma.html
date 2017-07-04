@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>norma.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>norma.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/* Copyright (c) 2014-2015 Richard Rodger, MIT License */</span>
+<span class="hljs-comment">/* jshint node:true, asi:true, eqnull:true */</span>
+<span class="hljs-pi">"use strict"</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO: allow _ and $ in named args !!! doh!</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h4 id="system-modules">System modules</h4>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h4 id="external-modules">External modules</h4>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> _     = <span class="hljs-built_in">require</span>(<span class="hljs-string">'lodash'</span>)
+<span class="hljs-keyword">var</span> error = <span class="hljs-built_in">require</span>(<span class="hljs-string">'eraro'</span>)({package:<span class="hljs-string">'norma'</span>})</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h4 id="internal-modules">Internal modules</h4>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> parser = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./norma-parser'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Default options.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> defopts = {
+  onfail:<span class="hljs-string">'throw'</span>,
+  desclen:<span class="hljs-number">33</span>
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Cache of previously seen type specs.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> specmap = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <h4 id="compile-type-spec-into-a-regexp">Compile type spec into a regexp</h4>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">compile</span><span class="hljs-params">( spec )</span> </span>{
+  <span class="hljs-keyword">if</span>( <span class="hljs-literal">null</span> == spec ) <span class="hljs-keyword">throw</span> error(<span class="hljs-string">'no_spec'</span>, <span class="hljs-string">'no argument specification'</span>);
+
+  <span class="hljs-keyword">var</span> specdef = specmap[spec]
+  <span class="hljs-keyword">if</span>( <span class="hljs-literal">null</span> != specdef ) <span class="hljs-keyword">return</span> specdef;
+
+  <span class="hljs-keyword">var</span> respec = parse_spec( spec )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Build regex.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> reindex = []
+  <span class="hljs-keyword">var</span> index   = <span class="hljs-number">1</span>
+  <span class="hljs-keyword">var</span> restr = [<span class="hljs-string">'^'</span>]
+  <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>
+  respec.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(entry)</span></span>{
+    restr.push(<span class="hljs-string">'('</span>)
+
+    <span class="hljs-keyword">if</span>( entry.type.or &amp;&amp; <span class="hljs-number">0</span> &lt; entry.type.or.length ) {
+      <span class="hljs-keyword">var</span> count = <span class="hljs-number">1</span>
+
+      restr.push(<span class="hljs-string">'('</span>)
+      restr.push(entry.type.mark)
+      restr.push(<span class="hljs-string">')'</span>)
+
+      entry.type.or.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(or)</span></span>{
+        restr.push(<span class="hljs-string">'|'</span>)
+        restr.push(<span class="hljs-string">'('</span>)
+        restr.push(or[<span class="hljs-number">1</span>])
+        count++
+        restr.push(<span class="hljs-string">')'</span>)
+      })
+
+      <span class="hljs-keyword">if</span>( <span class="hljs-string">'?'</span> == entry.mod ) {
+        restr.push(<span class="hljs-string">'|[UNA]?'</span>)
+      }
+
+      reindex[i]={index:index}
+      index += count
+    }
+
+    <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">if</span>( <span class="hljs-string">'?'</span> == entry.mod ) {
+        restr.push(<span class="hljs-string">'[UNA'</span>+entry.type.mark+<span class="hljs-string">']?'</span>)
+      }
+      <span class="hljs-keyword">else</span> {
+        restr.push(entry.type.mark);
+        restr.push(entry.mod || <span class="hljs-string">''</span>)
+      }
+
+      reindex[i]={index:index}
+    }
+
+    reindex[i].mod = entry.mod
+    restr.push(<span class="hljs-string">')'</span>)
+    index++
+    i++
+  })
+  restr.push(<span class="hljs-string">'$'</span>)
+
+  <span class="hljs-keyword">var</span> re = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(restr.join(<span class="hljs-string">''</span>))
+  specdef = specmap[spec] = {re:re,spec:spec,respec:respec,reindex:reindex}
+
+  <span class="hljs-keyword">return</span> specdef;
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parse_spec</span><span class="hljs-params">( spec )</span> </span>{
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">return</span> parser.parse( spec )
+  }
+  <span class="hljs-keyword">catch</span>(e) {
+    <span class="hljs-keyword">throw</span> error(<span class="hljs-string">'parse'</span>, e.message+<span class="hljs-string">'; spec:"'</span>+spec+
+                <span class="hljs-string">'", col:'</span>+e.column+<span class="hljs-string">', line:'</span>+e.line)
+  }
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <h4 id="create-output-array-or-object-with-organised-argument-values-">Create output array or object with organised argument values.</h4>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processargs</span><span class="hljs-params">( specdef, options, rawargs )</span> </span>{
+  <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">Array</span>.prototype.slice.call(rawargs||[])
+  <span class="hljs-keyword">var</span> argdesc = describe( args )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Match the spec regexp against the argument types regexp.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> outslots = specdef.re.exec(argdesc)
+  <span class="hljs-keyword">if</span>( !outslots ) {
+    <span class="hljs-keyword">if</span>( <span class="hljs-string">'throw'</span> == options.onfail ) {
+      <span class="hljs-keyword">throw</span> error(
+        <span class="hljs-string">'invalid_arguments'</span>, 
+        <span class="hljs-string">'invalid arguments; expected: "'</span>+specdef.spec+
+          <span class="hljs-string">'", was: ['</span>+argdesc+<span class="hljs-string">']; values: '</span>+descargs(args,options),
+        {args:args,specdef:specdef,options:options})
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Build the organised output.
+Need to do some index housekeeping as regexp has additional groups.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> out = specdef.respec.object ? {} : []
+  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, j = <span class="hljs-number">0</span>, k = <span class="hljs-number">0</span>; i &lt; specdef.reindex.length; i++ ) {
+    <span class="hljs-keyword">var</span> indexspec = specdef.reindex[i]
+    <span class="hljs-keyword">var</span> val = <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>
+
+    <span class="hljs-keyword">if</span>( !specdef.respec.object ) {
+      out[k] = val
+    }
+    
+    <span class="hljs-keyword">if</span>( <span class="hljs-literal">null</span> != indexspec.index) {
+      <span class="hljs-keyword">var</span> m = outslots[indexspec.index]
+      <span class="hljs-keyword">var</span> found = (<span class="hljs-string">''</span> !== m)
+      <span class="hljs-keyword">if</span>( found ) {
+        <span class="hljs-keyword">var</span> iname = specdef.respec[i].name
+        <span class="hljs-keyword">var</span> istar = <span class="hljs-string">'*'</span> === specdef.respec[i].mod
+        <span class="hljs-keyword">var</span> iplus = <span class="hljs-string">'+'</span> === specdef.respec[i].mod
+
+        <span class="hljs-keyword">if</span>( <span class="hljs-number">0</span> === m.length &amp;&amp; iplus ) {
+          <span class="hljs-keyword">throw</span> error(
+            <span class="hljs-string">'invalid_arguments'</span>, 
+            <span class="hljs-string">'invalid arguments; expected: "'</span>+specdef.spec+
+              <span class="hljs-string">'", was: ['</span>+argdesc+<span class="hljs-string">']; values: '</span>+descargs(args,options),
+            {args:args,specdef:specdef,options:options})
+        }
+        <span class="hljs-keyword">if</span>( <span class="hljs-number">1</span> == m.length ) {
+          val = args[j]
+          j++
+
+          <span class="hljs-keyword">if</span>( !specdef.respec.object ) {
+            out[k] = val
+          }
+
+          <span class="hljs-keyword">if</span>( <span class="hljs-literal">null</span> != iname ) {
+            <span class="hljs-keyword">if</span>( istar || iplus ) {
+              (out[iname] = (out[iname] || [])).push(val)
+            }
+            <span class="hljs-keyword">else</span> {
+              out[specdef.respec[i].name] = val
+            }
+          }
+
+          k++
+        }
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( <span class="hljs-number">1</span> &lt; m.length ) {
+          <span class="hljs-keyword">for</span>( <span class="hljs-keyword">var</span> mI = <span class="hljs-number">0</span>; mI &lt; m.length; mI++ ) {
+            val = args[j]
+            j++
+
+            <span class="hljs-keyword">if</span>( !specdef.respec.object ) {
+              out[k] = val
+            }
+
+            <span class="hljs-keyword">if</span>( <span class="hljs-literal">null</span> != iname ) {
+              (out[iname] = (out[iname] || [])).push(val)
+            }
+
+            k++
+          }
+        }
+      }
+      <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">if</span>( !specdef.respec.object ) {
+          out[k] = <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>
+        }
+        k++
+      }
+    }
+  }
+
+  <span class="hljs-keyword">return</span> out;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <h4 id="create-a-type-description-of-the-arguments-array">Create a type description of the arguments array</h4>
+<p>Example: [“a”,1] =&gt; “si”.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">describe</span><span class="hljs-params">(args)</span> </span>{
+  <span class="hljs-keyword">var</span> desc = []
+
+  args.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(arg)</span></span>{
+
+    <span class="hljs-keyword">if</span>( _.isString(arg) ) {
+      desc.push(<span class="hljs-string">'s'</span>)
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Need to check for integer first.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( (!<span class="hljs-built_in">isNaN</span>(arg) &amp;&amp; ((arg | <span class="hljs-number">0</span>) === <span class="hljs-built_in">parseFloat</span>(arg))) ) {
+      desc.push(<span class="hljs-string">'i'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isNaN(arg) ) {
+      desc.push(<span class="hljs-string">'A'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( <span class="hljs-literal">Infinity</span> === arg ) {
+      desc.push(<span class="hljs-string">'Y'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isNumber(arg) ) {
+      desc.push(<span class="hljs-string">'n'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isBoolean(arg) ) {
+      desc.push(<span class="hljs-string">'b'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isFunction(arg) ) {
+      desc.push(<span class="hljs-string">'f'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isArray(arg) ) {
+      desc.push(<span class="hljs-string">'a'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isRegExp(arg) ) {
+      desc.push(<span class="hljs-string">'r'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isDate(arg) ) {
+      desc.push(<span class="hljs-string">'d'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isArguments(arg) ) {
+      desc.push(<span class="hljs-string">'g'</span>)
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Use standard Node.js API for <em>isError</em> test.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( util.isError(arg) ) {
+      desc.push(<span class="hljs-string">'e'</span>)
+    }
+
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isNull(arg) ) {
+      desc.push(<span class="hljs-string">'N'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isUndefined(arg) ) {
+      desc.push(<span class="hljs-string">'U'</span>)
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( _.isObject(arg) ) {
+      desc.push(<span class="hljs-string">'o'</span>)
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>“q” means an unknown type.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">else</span> {
+      desc.push(<span class="hljs-string">'q'</span>)
+    }
+  })
+
+  <span class="hljs-keyword">return</span> desc.join(<span class="hljs-string">''</span>)
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <h4 id="describe-arguments-array-for-error-message">Describe arguments array for error message</h4>
+<p>Avoids over long messages.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">descargs</span><span class="hljs-params">( args, options )</span> </span>{
+  <span class="hljs-keyword">var</span> desc = []
+  
+  _.each(args,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(arg)</span></span>{
+    <span class="hljs-keyword">var</span> str = util.inspect(arg).substring(<span class="hljs-number">0</span>,options.desclen)
+    desc.push(str)
+  })
+
+  <span class="hljs-keyword">return</span> desc
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <h4 id="perform-the-actual-organisation-">Perform the actual organisation.</h4>
+<p>Options are … optional.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">handle</span><span class="hljs-params">( specdef, options, rawargs )</span> </span>{
+  <span class="hljs-keyword">if</span>( _.isArguments(options) || _.isArray(options ) ) {
+    rawargs = options
+    options = <span class="hljs-literal">null</span>
+  }
+  options = <span class="hljs-literal">null</span> == options ? defopts : _.extend({},defopts,options)
+
+  <span class="hljs-keyword">if</span>( <span class="hljs-literal">null</span> == rawargs ) {
+    <span class="hljs-keyword">throw</span> error(
+      <span class="hljs-string">'init'</span>, 
+      <span class="hljs-string">'no arguments variable; expected norma( "...", arguments ), '</span>+
+        <span class="hljs-string">'or &lt;compiled&gt;( arguments )'</span>,
+      {<span class="hljs-built_in">arguments</span>:<span class="hljs-built_in">arguments</span>}
+    )
+  }
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> processargs(specdef, options, rawargs)
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <h4 id="primary-api">Primary API</h4>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( spec, options, rawargs )</span> </span>{
+  <span class="hljs-keyword">var</span> specdef = compile( spec )
+  <span class="hljs-keyword">return</span> handle( specdef, options, rawargs )
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <h4 id="compile-spec-for-later-use">Compile spec for later use</h4>
+<p><em>toString</em> shows you the constructed regexp (for debugging).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports.compile = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( spec )</span> </span>{
+  <span class="hljs-keyword">var</span> specdef = compile( spec )
+
+  <span class="hljs-keyword">var</span> out = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( options, rawargs )</span> </span>{
+    <span class="hljs-keyword">return</span> handle( specdef, options, rawargs )
+  }
+  out.toString = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> util.inspect({spec:specdef.spec, re:<span class="hljs-string">''</span>+specdef.re})
+  }
+  <span class="hljs-keyword">return</span> out
+}</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
