@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 12:29:34
+ * @Last Modified time: 2017-07-05 13:14:27
  */
 
 const Joi = require('joi');
@@ -53,7 +53,9 @@ exports.register = (server, options, next) => {
             },
             validate: {
                 // How do I include the above Schema here as an either/or payload?
-                payload: patientSchema
+                params: {
+                    data: patientSchema
+                }
             }
         },
         handler: require('./post')

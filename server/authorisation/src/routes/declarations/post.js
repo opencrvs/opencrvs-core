@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:12 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:14:12 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-05 12:35:28
  */
 
 
@@ -14,3 +14,5 @@ module.exports = (request, reply) => {
     reply(data)
         .header('Authorization', request.headers.authorization);
 };
+
+
