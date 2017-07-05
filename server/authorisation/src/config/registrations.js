@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:47 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 09:23:37
+ * @Last Modified time: 2017-07-05 12:19:23
  */
 // App Registrations
 
@@ -83,6 +83,15 @@ const internals = {
         // Protected routes
         {
             plugin: './routes/declarations',
+            options: {
+                select: ['api'],
+                routes: {
+                    prefix: '/api'
+                }
+            }
+        },
+        {
+            plugin: './routes/patients',
             options: {
                 select: ['api'],
                 routes: {
