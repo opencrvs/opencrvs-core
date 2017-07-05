@@ -1,9 +1,12 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:14:16 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-05 09:19:56
  */
+
+const Joi = require('joi');
+
 const location = Joi.object().keys({
     placeOfDelivery: Joi.string(),
     attendantAtBirth: Joi.string(),

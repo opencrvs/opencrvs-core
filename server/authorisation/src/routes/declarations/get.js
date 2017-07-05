@@ -1,15 +1,15 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:20 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:14:20 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-05 12:12:10
  */
 const Boom = require('boom');
 const Declaration = require('../../model/declaration');
 
 module.exports = (request, reply) => {
 
-    Declaration.fetch({ withRelated:['documents', 'locations'] })
+    Declaration.fetchAll({ withRelated:['documents', 'locations'] })
         .then((declaration) => {
 
             if (!declaration) {

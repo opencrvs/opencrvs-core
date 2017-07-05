@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:47 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:15:47 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-05 09:23:37
  */
 // App Registrations
 
@@ -86,7 +86,7 @@ const internals = {
             options: {
                 select: ['api'],
                 routes: {
-                    prefix: '/api/declarations'
+                    prefix: '/api'
                 }
             }
         }
