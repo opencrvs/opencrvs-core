@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 13:14:27
+ * @Last Modified time: 2017-07-05 13:39:27
  */
 
 const Joi = require('joi');
@@ -52,7 +52,6 @@ exports.register = (server, options, next) => {
                 }
             },
             validate: {
-                // How do I include the above Schema here as an either/or payload?
                 params: {
                     data: patientSchema
                 }
@@ -76,8 +75,10 @@ exports.register = (server, options, next) => {
                 }
             },
             validate: {
-                // How do I include the above Schema here as an either/or payload?
-                payload: patientSchema
+                params: {
+                    data: patientSchema,
+                    id: Joi.number()
+                }
             }
         },
         handler: require('./put')
@@ -95,6 +96,11 @@ exports.register = (server, options, next) => {
             plugins: {
                 'hapi-swagger': {
                     payloadType: 'form'
+                }
+            },
+            validate: {
+                params: {
+                    id: Joi.number()
                 }
             }
         },
