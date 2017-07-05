@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:18:48 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:18:48 
+ */
 import React from 'react';
 import styles from './styles.css';
 import WorkingItemForm from 'components/WorkingItemForm';

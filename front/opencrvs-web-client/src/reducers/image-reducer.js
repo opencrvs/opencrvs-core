@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:17:23 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:17:23 
+ */
 import {
   IMAGE_REQUEST,
   IMAGE_SUCCESS,

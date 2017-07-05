@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:19:24 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:19:24 
+ */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
 export const IMAGE_REQUEST = 'IMAGE_REQUEST';

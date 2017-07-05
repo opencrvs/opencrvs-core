@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:14:16 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:14:16 
+ */
 const location = Joi.object().keys({
     placeOfDelivery: Joi.string(),
     attendantAtBirth: Joi.string(),
@@ -29,7 +35,7 @@ exports.register = (server, options, next) => {
         method: 'GET',
         config: {
             auth: 'jwt',
-            description: 'Protected gateway endpoint.',
+            description: 'Protected route to retrieve declarations.',
             notes: 'Token and message scopes are required.',
             tags: ['api'],
             plugins: {
@@ -47,7 +53,7 @@ exports.register = (server, options, next) => {
         method: 'POST',
         config: {
             auth: 'jwt',
-            description: 'Protected gateway endpoint.',
+            description: 'Protected route to create a declaration.',
             notes: 'Token and message scopes are required.',
             tags: ['api'],
             plugins: {
@@ -69,7 +75,7 @@ exports.register = (server, options, next) => {
         method: 'PUT',
         config: {
             auth: 'jwt',
-            description: 'Protected gateway endpoint.',
+            description: 'Protected route to update a declaration.',
             notes: 'Token and message scopes are required.',
             tags: ['api'],
             plugins: {
@@ -91,7 +97,7 @@ exports.register = (server, options, next) => {
         method: 'DELETE',
         config: {
             auth: 'jwt',
-            description: 'Protected gateway endpoint.',
+            description: 'Protected route to delete a declaration.',
             notes: 'Token and message scopes are required.',
             tags: ['api'],
             plugins: {

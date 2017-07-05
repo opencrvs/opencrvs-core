@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:15:34 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:15:34 
+ */
 exports.up = function (knex, Promise) {
 
     return knex.schema.createTable('patients', (table) => {

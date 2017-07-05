@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:17:32 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:17:32 
+ */
 import React from 'react';
 import { connect } from 'react-redux';
 //import HeaderContainer from 'containers/HeaderContainer';

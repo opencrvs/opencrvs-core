@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:13:53 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:13:53 
+ */
 require( 'babel-core/register' );
 const Hapi = require('hapi');
 const Glue = require('glue');

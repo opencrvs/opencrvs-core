@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:15:23 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:15:23 
+ */
 const Uuid = require('node-uuid');
 
 const declarations = [

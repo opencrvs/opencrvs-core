@@ -1,5 +1,11 @@
-import React from "react";
-import styles from "./styles.css";
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:18:13 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:18:13 
+ */
+import React from 'react';
+import styles from './styles.css';
 
 const Worknav = () => (
   <div className="header">

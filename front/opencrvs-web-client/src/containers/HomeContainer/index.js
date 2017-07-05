@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:17:48 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:17:48 
+ */
 import React from 'react';
 import HeaderContainer from 'containers/HeaderContainer';
 import FooterContainer from 'containers/FooterContainer';

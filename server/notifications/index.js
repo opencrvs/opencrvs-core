@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:13:20 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:13:20 
+ */
 var seneca = require ("seneca")();
 
 seneca.add("list:notifications,cmd:check", function (msg, respond) {

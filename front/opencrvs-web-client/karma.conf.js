@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:16:50 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:16:50 
+ */
 // Karma configuration
 // Generated on Wed May 31 2017 21:31:20 GMT+0100 (BST)
 const webpackEnv = {test: true}

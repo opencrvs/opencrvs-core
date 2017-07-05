@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:19:30 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:19:30 
+ */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
 export const DECLARATION_REQUEST = 'DECLARATION_REQUEST';

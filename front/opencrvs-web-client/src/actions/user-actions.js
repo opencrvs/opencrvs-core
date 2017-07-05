@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:19:18 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:19:18 
+ */
 
 import { UNPROTECTED_URL } from 'constants/urls';
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';

@@ -1,3 +1,9 @@
+/*
+ * @Author: Euan Millar 
+ * @Date: 2017-07-05 01:13:01 
+ * @Last Modified by:   Euan Millar 
+ * @Last Modified time: 2017-07-05 01:13:01 
+ */
 var Seneca = require ('seneca')();
 var data = require ('./data.json');
 
