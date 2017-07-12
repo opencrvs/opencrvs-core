@@ -21,7 +21,7 @@
     position: absolute;
     -webkit-clip-path: circle(50% at 50% 50%);
     clip-path: circle(50% at 50% 50%);
-    left: 2em;
+    left: 1em;
     top: 0.6em;
 }
 .getStartedTitle {

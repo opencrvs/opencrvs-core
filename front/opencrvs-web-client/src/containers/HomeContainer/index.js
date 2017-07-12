@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:17:48 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-06 10:13:52
  */
 import React from 'react';
 import HeaderContainer from 'containers/HeaderContainer';
@@ -27,8 +27,18 @@ class HomeContainer extends React.Component {
     const { errorMessage,
       dispatch,
       isAuthenticated,
+      role,
     } = this.props;
 
+    const RyanAvatar = () => (
+      <img
+        width="40"
+        height="40"
+        alt="Ryan Crichton&#x27;s avatar"
+        className={styles.avatar}
+        src="static/img/avatars/ryan-crichton.jpg"
+      />
+    );
     const UserAvatar = () => (
       <img
         width="40"
@@ -60,7 +70,12 @@ class HomeContainer extends React.Component {
                   <div className="pure-u-1-3"></div>
                   <div className="pure-u-1-3">
                   <Button theme={theme} onClick={this.handleClick} raised >
-                    <UserAvatar /> Get Started 
+                    {
+                      role=='validator' ? 
+                      <UserAvatar /> : 
+                      <RyanAvatar />
+                    }
+                     Get Started 
 
                   </Button> 
                   </div>
@@ -170,7 +185,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer }) => {
     authenticated,
     isFetchingDeclaration,
   } = declarationsReducer;
-  const { isAuthenticated, isFetchingUser, errorMessage } = userReducer;
+  const { isAuthenticated, isFetchingUser, errorMessage, role } = userReducer;
 
   return {
     declaration,
@@ -179,6 +194,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer }) => {
     isFetchingUser,
     errorMessage,
     isFetchingDeclaration,
+    role,
   };
 };
 

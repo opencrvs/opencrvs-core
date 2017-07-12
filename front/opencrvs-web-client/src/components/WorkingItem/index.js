@@ -1,14 +1,15 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:18:48 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-06 09:58:36
  */
 import React from 'react';
 import styles from './styles.css';
-import WorkingItemForm from 'components/WorkingItemForm';
+import WorkingItemCanvas from 'components/WorkingItemCanvas';
 import {connect} from 'react-redux';
 import { Button } from 'react-toolbox/lib/button';
+import { filter, get, head } from 'lodash';
 
 class WorkingItem extends React.Component {
   constructor(props) {
@@ -20,7 +21,10 @@ class WorkingItem extends React.Component {
   }
 
   render = () => {
-    const { selectedDeclaration } = this.props;
+    const { selectedDeclaration, patients, role } = this.props;
+    const childPatient = head(filter(patients,
+      function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
+    const childAddress = head(get(childPatient, 'patient.address'));
     return (
       <div className={styles.workingItemContainer + ' pure-u-1'}>
         {
@@ -29,7 +33,7 @@ class WorkingItem extends React.Component {
             <div className="pure-u-1-2">
               <h1 className={styles.wiContentTitle}>
               
-              { selectedDeclaration.firstName + ' ' + selectedDeclaration.lastName }
+              { get(childPatient, 'patient.given').toString().replace(/,/g, '') + ' ' + get(childPatient, 'patient.family') }
               
               </h1>
               <p className={styles.wiContentSubtitle}>
@@ -37,12 +41,12 @@ class WorkingItem extends React.Component {
                 {' '}
                 <span>
                 
-                { selectedDeclaration.dob }
+                { get(childPatient, 'patient.birthDate') }
                 
                 </span>
                 {' '}
                 {
-                  selectedDeclaration.district 
+                  get(childAddress, 'county') 
                 }
               </p>
             </div>
@@ -57,11 +61,16 @@ class WorkingItem extends React.Component {
         <div className={ !selectedDeclaration ? styles.noSelectedDeclaration : styles.wiContentBody}>
           {
               selectedDeclaration ? 
-              <WorkingItemForm selectedDeclaration={selectedDeclaration} />
+              <WorkingItemCanvas selectedDeclaration={selectedDeclaration} />
               : 
               <div className={styles.noSelectedMessage}>
                 <h1 className={styles.wiContentTitle}>
-                Select a birth to edit, or enter a new birth
+                  {
+                    role == 'validator' ? 
+                     'Select a declaration to validate, or create a new declaration'  : 
+                     'Select a notification to declare, or create a new declaration'  
+                  }
+                
                 </h1>
               </div>
             }

@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:16 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:15:16 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-12 14:51:14
  */
 
 
@@ -22,9 +22,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 5555',
                 addressLine2: '',
-                addressLine3: 'Cape Coast',
-                city: 'Cape Coast',
-                county: 'Cape Coast Metropolitan',
+                addressLine3: '',
+                city: 'Kwaman',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -65,9 +65,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 5555',
                 addressLine2: '',
-                addressLine3: 'Cape Coast',
-                city: 'Cape Coast',
-                county: 'Cape Coast Metropolitan',
+                addressLine3: '',
+                city: 'Kwaman',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -108,9 +108,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 5555',
                 addressLine2: '',
-                addressLine3: 'Cape Coast',
-                city: 'Cape Coast',
-                county: 'Cape Coast Metropolitan',
+                addressLine3: '',
+                city: 'Kwaman',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -151,9 +151,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 78',
                 addressLine2: '',
-                addressLine3: 'Abura',
-                city: 'Abura',
-                county: 'Abura/Asebu/Kwamankese',
+                addressLine3: '',
+                city: 'Mankrong',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -194,9 +194,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 78',
                 addressLine2: '',
-                addressLine3: 'Abura',
-                city: 'Abura',
-                county: 'Abura/Asebu/Kwamankese',
+                addressLine3: '',
+                city: 'Mankrong',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -237,9 +237,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 78',
                 addressLine2: '',
-                addressLine3: 'Abura',
-                city: 'Abura',
-                county: 'Abura/Asebu/Kwamankese',
+                addressLine3: '',
+                city: 'Mankrong',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -280,9 +280,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 66',
                 addressLine2: '',
-                addressLine3: 'Ekroful',
-                city: 'Ekroful',
-                county: 'Gomoa East',
+                addressLine3: '',
+                city: 'Asafo',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -323,9 +323,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 66',
                 addressLine2: '',
-                addressLine3: 'Ekroful',
-                city: 'Ekroful',
-                county: 'Gomoa East',
+                addressLine3: '',
+                city: 'Asafo',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }
@@ -366,9 +366,9 @@ const patients = [
             {
                 addressLine1: 'P.O. Box 66',
                 addressLine2: '',
-                addressLine3: 'Ekroful',
-                city: 'Ekroful',
-                county: 'Gomoa East',
+                addressLine3: '',
+                city: 'Asafo',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             }

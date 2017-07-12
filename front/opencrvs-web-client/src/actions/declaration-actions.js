@@ -1,11 +1,12 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:19:30 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-06 09:22:08
  */
 import { BASE_URL } from 'constants/urls';
-import { logoutUser } from 'actions/user-actions';
+import { logoutUser, updateUserDetails } from 'actions/user-actions';
+import { fetchPatients } from 'actions/patient-actions';
 export const DECLARATION_REQUEST = 'DECLARATION_REQUEST';
 export const DECLARATION_SUCCESS = 'DECLARATION_SUCCESS';
 export const DECLARATION_FAILURE = 'DECLARATION_FAILURE';
@@ -51,15 +52,16 @@ function declarationError(message) {
 }
 
 export function fetchDeclarations() {
-  let token = localStorage.getItem('access_token') || null;
+  let token = localStorage.getItem('token') || null;
   let config = {};
   return dispatch => {
     dispatch(requestDeclaration());
     if (token) {
+      dispatch(updateUserDetails(token));
       config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-      return fetch(BASE_URL + 'protected/random-declaration', config)
+      return fetch(BASE_URL + 'declarations', config)
         .then(response =>
           response.json().then(payload => ({ payload, response }))
         )
@@ -68,11 +70,17 @@ export function fetchDeclarations() {
             dispatch(declarationError(payload.message));
             return Promise.reject(payload);
           }
-          dispatch(receiveDeclaration(payload.data));
+          dispatch(receiveDeclaration(payload));
+
+          payload.declaration.forEach((declaration) => {
+            dispatch(fetchPatients(declaration.childDetails));
+            dispatch(fetchPatients(declaration.motherDetails));
+            dispatch(fetchPatients(declaration.fatherDetails));
+          });
           return true;
         })
         .catch(err => {
-          if (err.message == 'The token has expired') {
+          if (err.message == 'Invalid token') {
             dispatch(logoutUser());
           } else {
             console.log(err);

@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:51 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:18:51 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-06 09:55:35
  */
 import React from 'react';
 import styles from './styles.css';
@@ -22,12 +22,16 @@ class SearchForm extends React.Component {
   };
 
   render = () => {
-    //const { errorMessage } = this.props;
+    const { role } = this.props;
     return (
       <div className={styles.searchContainer + ' pure-g'}>
         <div className="pure-u-7-8">
           <form>
-            <Input type="text" label="Search notifications" hint="Notification ID" icon="search" />
+            {
+              role=='validator' ? 
+              <Input type="text" label="Search declarations" hint="Notification ID" icon="search" /> : 
+              <Input type="text" label="Search notifications" hint="Notification ID" icon="search" /> 
+            }
           </form>
         </div>
       </div>

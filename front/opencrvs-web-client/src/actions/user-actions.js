@@ -1,9 +1,10 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:18 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:19:18 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-06 09:24:37
  */
+var jwtDecode = require('jwt-decode');
 
 import { UNPROTECTED_URL } from 'constants/urls';
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
@@ -12,7 +13,7 @@ export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT_REQUEST = 'LOGOUT_REQUEST';
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
-
+export const USER_UPDATE = 'USER_UPDATE';
 //actions
 
 function requestLogin(creds) {
@@ -25,11 +26,33 @@ function requestLogin(creds) {
 }
 
 function receiveLogin(user) {
+  const decoded = jwtDecode(user.token);
+  console.log(decoded);
   return {
     type: LOGIN_SUCCESS,
     isFetching: false,
     isAuthenticated: true,
     user: user,
+    email: decoded.email,
+    role: decoded.role,
+    scopes: decoded.scopes,
+    user_id: decoded.user_id,
+    username: decoded.username,
+  };
+}
+
+function updateUser(token) {
+  const decoded = jwtDecode(token);
+  console.log(decoded);
+  return {
+    type: USER_UPDATE,
+    isFetching: false,
+    isAuthenticated: true,
+    email: decoded.email,
+    role: decoded.role,
+    scopes: decoded.scopes,
+    user_id: decoded.user_id,
+    username: decoded.username,
   };
 }
 
@@ -58,6 +81,12 @@ function receiveLogout() {
   };
 }
 
+export function updateUserDetails(token){
+  return dispatch => {
+    dispatch(updateUser(token));
+  };
+}
+
 // Calls the API to get a token and
 // dispatches actions along the way
 export function loginUser(creds) {
@@ -72,7 +101,7 @@ export function loginUser(creds) {
     // We dispatch requestLogin to kickoff the call to the API
     dispatch(requestLogin(creds));
 
-    return fetch(UNPROTECTED_URL + 'sessions/create', config)
+    return fetch(UNPROTECTED_URL + 'auth/login', config)
       .then(response => response.json().then(user => ({ user, response })))
       .then(({ user, response }) => {
         if (!response.ok) {
@@ -82,11 +111,10 @@ export function loginUser(creds) {
           return Promise.reject(user);
         } else {
           // If login was successful, set the token in local storage
-          localStorage.setItem('id_token', user.id_token);
-          localStorage.setItem('access_token', user.access_token);
+          localStorage.setItem('token', user.token);
           // Dispatch the success action
           dispatch(receiveLogin(user));
-          window.location.href = '/work';
+          //window.location.href = '/work';
           return true;
         }
       })
@@ -99,8 +127,7 @@ export function logoutUser() {
   return dispatch => {
     dispatch(requestLogout());
     console.log('Logging out.  Removing tokens.');
-    localStorage.removeItem('id_token');
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('token');
     dispatch(receiveLogout());
     //window.location.href = '/tokenexpired';
   };

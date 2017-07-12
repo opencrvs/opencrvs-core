@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:23 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:15:23 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-12 13:51:05
  */
 const Uuid = require('node-uuid');
 
@@ -15,14 +15,14 @@ const declarations = [
         status: 'declaration',
         locations: [
             {
-                placeOfDelivery: 'Cape Coast Hospital',
+                placeOfDelivery: 'hospital',
                 attendantAtBirth: 'Midwife',
                 hospitalName: 'Cape Coast Hospital',
                 addressLine1: 'Cape Coast Hospital',
                 addressLine2: 'P.O. Box 23',
-                addressLine3: 'Cape Coast',
-                city: 'Cape Coast',
-                county: 'Cape Coast Metropolitan',
+                addressLine3: 'Kwaman',
+                city: 'Kwaman',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             } 
@@ -35,14 +35,14 @@ const declarations = [
         status: 'declaration',
         locations: [
             {
-                placeOfDelivery: 'Abura Clinic',
+                placeOfDelivery: 'clinic',
                 attendantAtBirth: 'Midwife',
                 hospitalName: 'Abura Clinic',
                 addressLine1: 'P.O. Box 19',
                 addressLine2: '',
-                addressLine3: 'Abura',
-                city: 'Abura',
-                county: 'Abura/Asebu/Kwamankese',
+                addressLine3: 'Mankrong',
+                city: 'Mankrong',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             } 
@@ -60,9 +60,9 @@ const declarations = [
                 hospitalName: '',
                 addressLine1: 'P.O. Box 66',
                 addressLine2: '',
-                addressLine3: 'Ekroful',
-                city: 'Ekroful',
-                county: 'Gomoa East',
+                addressLine3: 'Asafo',
+                city: 'Asafo',
+                county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
             } 

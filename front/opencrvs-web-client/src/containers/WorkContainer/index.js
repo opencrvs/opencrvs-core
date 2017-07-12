@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:17:38 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-06 10:03:37
  */
 import React from 'react';
 import styles from './styles.css';
@@ -12,6 +12,7 @@ import WorkingItem from 'components/WorkingItem';
 import ImageLoader from 'components/ImageLoader';
 import { connect } from 'react-redux';
 import { fetchDeclarations, selectDeclaration } from 'actions/declaration-actions';
+import { logoutUser } from 'actions/user-actions';
 import {  imageModalOpened, 
           imageModalClosed, 
           imageOptionToggle,
@@ -43,12 +44,15 @@ class WorkContainer extends React.Component {
   };
 }
 
-const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer }) => {
+const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patientsReducer }) => {
   const {
     declarations,
     selectedDeclaration,
   } = declarationsReducer;
-  const { isAuthenticated } = userReducer;
+  const { isAuthenticated,
+    role,
+    username } = userReducer;
+  const { patients } = patientsReducer;
   const { imageModal,
     imageOption,
     previewImages,
@@ -64,6 +68,9 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer }) => 
     previewImages,
     imageFetching,
     imageErrorMessage,
+    patients,
+    role,
+    username,
   };
 };
 
@@ -84,6 +91,9 @@ const mapDispatchToProps = dispatch => {
     },
     onImageOptionClick: () => {
       dispatch(imageOptionToggle());
+    },
+    onLogout: () => {
+      dispatch(logoutUser());
     },
     uploadImage: image => {
       dispatch(uploadImageFile(image));

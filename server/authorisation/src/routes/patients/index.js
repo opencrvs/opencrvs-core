@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 13:39:27
+ * @Last Modified time: 2017-07-05 19:53:19
  */
 
 const Joi = require('joi');
@@ -111,5 +111,5 @@ exports.register = (server, options, next) => {
 };
 
 exports.register.attributes = {
-    name: 'patient-routes'
+    name: 'patients-routes'
 };

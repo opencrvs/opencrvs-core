@@ -8,6 +8,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "express": "^4.15.3",
+    "jwt-decode": "^2.2.0",
     "lodash": "^4.17.4",
     "morgan": "^1.8.2",
     "postcss-mixins": "^6.0.0",
@@ -21,6 +22,7 @@
     "react-router-dom": "^4.1.1",
     "react-toolbox": "^2.0.0-beta.12",
     "redux": "^3.6.0",
+    "redux-form": "^6.8.0",
     "redux-thunk": "^2.2.0",
     "redux-thunk-actions": "^1.1.6",
     "stream-http": "^2.7.2"

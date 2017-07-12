@@ -50,6 +50,13 @@
 
 }
 
+.exitIcon {
+    top: 0em;
+    float: left;
+    margin-right: 0.3em;
+    cursor: pointer;
+}
+
 .userName {
     display: block;
     text-transform: uppercase;

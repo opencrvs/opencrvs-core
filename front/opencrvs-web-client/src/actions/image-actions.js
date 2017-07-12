@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:19:24 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-05 16:47:13
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
@@ -76,34 +76,5 @@ function imageUploading() {
 export function uploadImage(image) {
   let token = localStorage.getItem('token') || null;
   let config = {};
-  return dispatch => {
-    dispatch(imageUploading());
-    if (token) {
-      config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
-      return fetch(BASE_URL + 'protected/random-declaration', config, onProgress)
-        .then(response =>
-          response.json().then(payload => ({ payload, response }))
-        )
-        .then(({ payload, response }) => {
-          if (!response.ok) {
-            dispatch(imageError(payload.message));
-            return Promise.reject(payload);
-          }
-          dispatch(imageUploaded(payload.data));
-          return true;
-        })
-        .catch(err => {
-          if (err.message == 'The token has expired') {
-            dispatch(logoutUser());
-          } else {
-            console.log(err);
-          }
-        });
-    } else {
-      dispatch(imageError('No token saved!'));
-      return false;
-    }
-  };
+  
 }

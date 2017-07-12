@@ -1,23 +1,18 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:32 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:14:32 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-06 08:55:57
  */
 
 const Joi = require('joi');
 
 // accepts either or, and errors if neither
-const authenticateUserSchema = Joi.alternatives().try(
-    Joi.object({
-        username: Joi.string().alphanum().min(2).max(30).required(),
-        password: Joi.string().required()
-    }),
-    Joi.object({
-        email: Joi.string().email().required(),
-        password: Joi.string().required()
-    })
-);
+const authenticateUserSchema = Joi.object().keys({
+    username: Joi.string(),
+    email: Joi.string().email(),
+    password: Joi.string().min(6).max(200).required()
+}).xor('username', 'email');
 
 exports.register = (server, options, next) => {
 
