@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:51 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-06 09:55:35
+ * @Last Modified time: 2017-07-12 16:08:17
  */
 import React from 'react';
 import styles from './styles.css';
@@ -28,7 +28,7 @@ class SearchForm extends React.Component {
         <div className="pure-u-7-8">
           <form>
             {
-              role=='validator' ? 
+              role == 'validator' ? 
               <Input type="text" label="Search declarations" hint="Notification ID" icon="search" /> : 
               <Input type="text" label="Search notifications" hint="Notification ID" icon="search" /> 
             }

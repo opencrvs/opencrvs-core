@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-12 16:03:47
+ * @Last Modified time: 2017-07-12 16:15:22
  */
 import React from 'react';
 import styles from './styles.css';
@@ -130,8 +130,8 @@ class WorkingItemForm extends React.Component {
 
           <Field component={renderDropdown} name="mother_religion" label="Religion" source={ religionsReference } />
           <Field component={renderDropdown} name="mother_formalEducation" label="Education" source={ educationsReference } />
-          <Field component={renderDropdown} name="mother_occupation" label="Occupation" source={ occupationsReference } />
-          <Field component={renderInput} name="mother_employment" placeholder="Employment" label="Employment" required />
+          <Field component={renderDropdown} name="mother_employment" label="Employment status" source={ occupationsReference } />
+          <Field component={renderInput} name="mother_occupation" placeholder="Occupation" label="Occupation" required />
          </Collapsible>
          <Collapsible
             classParentString={styles.collapsibleParent}

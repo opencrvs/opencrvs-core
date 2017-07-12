@@ -2,12 +2,11 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-12 15:53:18
+ * @Last Modified time: 2017-07-12 16:07:32
  */
 import React from 'react';
-import styles from './styles.css';
 import {connect} from 'react-redux';
-import { set, filter, get, head } from 'lodash';
+import { filter, get, head } from 'lodash';
 import WorkingItemForm from 'components/WorkingItemForm';
 
 class WorkingItemCanvas extends React.Component {
@@ -25,7 +24,6 @@ class WorkingItemCanvas extends React.Component {
       function(patient) { return patient.patient.id == selectedDeclaration.fatherDetails; }));
 
     //Addresses
-    const childAddress = head(get(childPatient, 'patient.address'));
     const motherAddress = head(get(motherPatient, 'patient.address'));
     const fatherAddress = head(get(fatherPatient, 'patient.address'));
 
@@ -35,7 +33,6 @@ class WorkingItemCanvas extends React.Component {
     const fatherExtra = head(get(fatherPatient, 'patient.extra'));
 
     //Telecom
-    const childTelecom = head(get(childPatient, 'patient.telecom'));
     const motherTelecom = head(get(motherPatient, 'patient.telecom'));
     const fatherTelecom = head(get(fatherPatient, 'patient.telecom'));
 
@@ -127,8 +124,6 @@ class WorkingItemCanvas extends React.Component {
       father_occupation: get(fatherExtra, 'occupation'),
       father_employment: get(fatherExtra, 'employment'),
     };
-
-    console.log('FORM VALUES: ' + JSON.stringify(myInitialValues));
 
     return (
       <WorkingItemForm initialValues={myInitialValues} selectedDeclaration={selectedDeclaration} />
