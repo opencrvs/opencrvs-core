@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-  - "iojs"
   - "7"
 env:
   - TEST_DIR=front/opencrvs-web-client
   - TEST_DIR=server/authorisation
-script: cd $TEST_DIR && yarn test
+script: cd $TEST_DIR && npm install && npm test
