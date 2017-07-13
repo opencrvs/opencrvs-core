@@ -1,13 +1,13 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:16:50 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:16:50 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-12 17:43:11
  */
 // Karma configuration
 // Generated on Wed May 31 2017 21:31:20 GMT+0100 (BST)
-const webpackEnv = {test: true}
-const webpackConfig = require('./webpack.config')(webpackEnv)
+
+const webpackConfig = require('./webpack.config.dev');
 const testGlob = 'src/**/*.test.js';
 const sourceGlob = 'src/**/*!(test|stub).js';
 process.env.BABEL_ENV = 'test';

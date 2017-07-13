@@ -1,19 +1,25 @@
 /*
  * @Author: Euan Millar 
- * @Date: 2017-07-05 01:15:10 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:15:10 
+ * @Date: 2017-07-05 01:15:04 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-13 09:28:22
  */
-
-
 const Bcrypt = require('bcryptjs');
 const salt = Bcrypt.genSaltSync();
-const passHash = Bcrypt.hashSync('plan2017', salt);
+const lindaHash = Bcrypt.hashSync('plan2017', salt);
+const anninaHash = Bcrypt.hashSync('plan2017', salt);
+const edHash = Bcrypt.hashSync('plan2017', salt);
+const carlHash = Bcrypt.hashSync('plan2017', salt);
+const euanHash = Bcrypt.hashSync('plan2017', salt);
+const ryanHash = Bcrypt.hashSync('plan2017', salt);
 const users = [
     {
-        email: 'tester1@yumeteki.io',
-        username: 'validator',
-        password: passHash,
+        email: 'linda@jembi.org',
+        username: 'lindataylor',
+        password: lindaHash,
+        given: 'Linda',
+        family: 'Taylor',
+        avatar: 'linda-taylor.jpg',
         role: 'validator',
         claims: [
             {
@@ -33,9 +39,12 @@ const users = [
             }]
     },
     {
-        email: 'tester2@yumeteki.io',
-        username: 'registrar',
-        password: passHash,
+        email: 'Annina.Wersun@plan-international.org',
+        username: 'anninawersun',
+        password: anninaHash,
+        given: 'Annina',
+        family: 'Wersun',
+        avatar: 'annina-wersun.jpg',
         role: 'registrar',
         claims: [
             {
@@ -55,9 +64,12 @@ const users = [
             }]
     },
     {
-        email: 'tester3@yumeteki.io',
-        username: 'admin',
-        password: passHash,
+        email: 'edward.duffus@plan-international.org',
+        username: 'edduffus',
+        password: edHash,
+        given: 'Ed',
+        family: 'Duffus',
+        avatar: 'ed-duffus.jpg',
         role: 'admin',
         claims: [
             {
@@ -77,9 +89,12 @@ const users = [
             }]
     },
     {
-        email: 'tester4@yumeteki.io',
-        username: 'manager',
-        password: passHash,
+        email: 'carl@jembi.org',
+        username: 'carlfourie',
+        password: carlHash,
+        given: 'Carl',
+        family: 'Fourie',
+        avatar: 'carl-fourie.jpg',
         role: 'manager',
         claims: [
             {
@@ -99,9 +114,12 @@ const users = [
             }]
     },
     {
-        email: 'tester5@yumeteki.io',
-        username: 'clerk',
-        password: passHash,
+        email: 'euan@yumeteki.io',
+        username: 'euanmillar',
+        password: euanHash,
+        given: 'Euan',
+        family: 'Millar',
+        avatar: 'euan-millar.jpg',
         role: 'clerk',
         claims: [
             {
@@ -113,9 +131,33 @@ const users = [
             {
                 claim: 'post:notification'
             }]
+    },
+    {
+        email: 'ryan@jembi.org',
+        username: 'ryancrichton',
+        password: ryanHash,
+        given: 'Ryan',
+        family: 'Crichton',
+        avatar: 'ryan-crichton.jpg',
+        role: 'admin',
+        claims: [
+            {
+                claim: 'post:verifyCredentials'
+            },
+            {
+                claim: 'post:login'
+            },
+            {
+                claim: 'post:declaration'
+            },
+            {
+                claim: 'store:image'
+            },
+            {
+                claim: 'notification:search'
+            }]
     }
 ];
-
 
 exports.seed = function (knex, Promise) {
 
