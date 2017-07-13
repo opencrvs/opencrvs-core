@@ -17,10 +17,10 @@ const users = [
         email: 'linda@jembi.org',
         username: 'lindataylor',
         password: lindaHash,
+        role: 'validator',
         given: 'Linda',
         family: 'Taylor',
         avatar: 'linda-taylor.jpg',
-        role: 'validator',
         claims: [
             {
                 claim: 'post:verifyCredentials'
@@ -42,10 +42,10 @@ const users = [
         email: 'Annina.Wersun@plan-international.org',
         username: 'anninawersun',
         password: anninaHash,
+        role: 'registrar',
         given: 'Annina',
         family: 'Wersun',
         avatar: 'annina-wersun.jpg',
-        role: 'registrar',
         claims: [
             {
                 claim: 'post:verifyCredentials'
@@ -67,10 +67,10 @@ const users = [
         email: 'edward.duffus@plan-international.org',
         username: 'edduffus',
         password: edHash,
+        role: 'admin',
         given: 'Ed',
         family: 'Duffus',
         avatar: 'ed-duffus.jpg',
-        role: 'admin',
         claims: [
             {
                 claim: 'post:verifyCredentials'
@@ -92,10 +92,10 @@ const users = [
         email: 'carl@jembi.org',
         username: 'carlfourie',
         password: carlHash,
+        role: 'manager',
         given: 'Carl',
         family: 'Fourie',
         avatar: 'carl-fourie.jpg',
-        role: 'manager',
         claims: [
             {
                 claim: 'post:verifyCredentials'
@@ -117,10 +117,10 @@ const users = [
         email: 'euan@yumeteki.io',
         username: 'euanmillar',
         password: euanHash,
+        role: 'clerk',
         given: 'Euan',
         family: 'Millar',
         avatar: 'euan-millar.jpg',
-        role: 'clerk',
         claims: [
             {
                 claim: 'post:verifyCredentials'
@@ -136,10 +136,10 @@ const users = [
         email: 'ryan@jembi.org',
         username: 'ryancrichton',
         password: ryanHash,
+        role: 'admin',
         given: 'Ryan',
         family: 'Crichton',
         avatar: 'ryan-crichton.jpg',
-        role: 'admin',
         claims: [
             {
                 claim: 'post:verifyCredentials'
@@ -179,7 +179,10 @@ const createUser = function (knex, user) {
                 email: user.email,
                 password: user.password,
                 role: user.role,
-                username: user.username
+                username: user.username,
+                given: user.given,
+                family: user.family,
+                avatar: user.avatar
             })
         .then((userIds) => {
 

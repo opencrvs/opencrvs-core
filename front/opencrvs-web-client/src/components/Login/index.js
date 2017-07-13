@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:02 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:19:02 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-13 13:10:08
  */
 import React from 'react';
 import styles from './styles.css';
@@ -21,7 +21,7 @@ class Login extends React.Component {
       username: username.value.trim(),
       password: password.value.trim(),
     };
-    this.props.onLoginClick(creds);
+    this.props.onLogin(creds);
   }
 
   render = () => {

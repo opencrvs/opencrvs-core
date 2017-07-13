@@ -1,14 +1,15 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:17:28 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-13 12:45:02
  */
 import {
   DECLARATION_REQUEST,
   DECLARATION_SUCCESS,
   DECLARATION_FAILURE,
   DECLARATION_SELECTED,
+  DECLARATION_CLOSED,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -17,6 +18,7 @@ function declarationsReducer(
     declarations: '',
     selectedDeclaration: '',
     newDeclaration: '',
+    workView: false,
   },
   action
 ) {
@@ -25,6 +27,7 @@ function declarationsReducer(
       return {
         ...state,
         isFetching: true,
+        workView: true,
       };
     case DECLARATION_SUCCESS:
       return {
@@ -41,6 +44,11 @@ function declarationsReducer(
       return {
         ...state,
         selectedDeclaration: action.selectedDeclaration,
+      };
+    case DECLARATION_CLOSED:
+      return {
+        ...state,
+        workView: false,
       };
     default:
       return state;

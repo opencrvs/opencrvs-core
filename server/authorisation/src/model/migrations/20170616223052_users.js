@@ -7,6 +7,9 @@ exports.up = function (knex, Promise) {
         table.string('username').notNullable().unique();
         table.string('password').notNullable();
         table.string('role').notNullable();
+        table.string('given').notNullable();
+        table.string('family').notNullable();
+        table.string('avatar').notNullable();
         table.boolean('active').notNullable().defaultTo(true);
         table.timestamps();
     })

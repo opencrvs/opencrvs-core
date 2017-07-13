@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-06 10:03:37
+ * @Last Modified time: 2017-07-13 12:07:32
  */
 import React from 'react';
 import styles from './styles.css';
@@ -51,7 +51,10 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
   } = declarationsReducer;
   const { isAuthenticated,
     role,
-    username } = userReducer;
+    username,
+    given,
+    family,
+    avatar, } = userReducer;
   const { patients } = patientsReducer;
   const { imageModal,
     imageOption,
@@ -71,6 +74,9 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     patients,
     role,
     username,
+    given,
+    family,
+    avatar,
   };
 };
 

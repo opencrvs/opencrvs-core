@@ -2,11 +2,12 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:18 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-06 09:24:37
+ * @Last Modified time: 2017-07-13 13:14:41
  */
 var jwtDecode = require('jwt-decode');
 
 import { UNPROTECTED_URL } from 'constants/urls';
+import { deselctWorkView } from 'actions/declaration-actions';
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
@@ -34,6 +35,9 @@ function receiveLogin(user) {
     isAuthenticated: true,
     user: user,
     email: decoded.email,
+    family: decoded.family,
+    given: decoded.given,
+    avatar: decoded.avatar,
     role: decoded.role,
     scopes: decoded.scopes,
     user_id: decoded.user_id,
@@ -49,6 +53,9 @@ function updateUser(token) {
     isFetching: false,
     isAuthenticated: true,
     email: decoded.email,
+    family: decoded.family,
+    given: decoded.given,
+    avatar: decoded.avatar,
     role: decoded.role,
     scopes: decoded.scopes,
     user_id: decoded.user_id,
@@ -126,6 +133,7 @@ export function loginUser(creds) {
 export function logoutUser() {
   return dispatch => {
     dispatch(requestLogout());
+    dispatch(deselctWorkView());
     console.log('Logging out.  Removing tokens.');
     localStorage.removeItem('token');
     dispatch(receiveLogout());

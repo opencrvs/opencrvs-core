@@ -2,10 +2,11 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:13 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-06 10:15:06
+ * @Last Modified time: 2017-07-13 12:23:16
  */
 import React from 'react';
 import styles from './styles.css';
+import UserAvatar from 'components/UserAvatar';
 
 class Worknav extends React.Component {
   constructor(props) {
@@ -21,7 +22,7 @@ class Worknav extends React.Component {
 
   render = () => {
 
-    const { role } = this.props;
+    const { role, given, family, avatar } = this.props;
 
     return (
       <div className="header">
@@ -32,27 +33,16 @@ class Worknav extends React.Component {
         >
           <div>
             <a href="">
-              
-              {
-                role=='validator' ? 
-                <img width="64" height="64" alt="Ed Duffus&#x27;s avatar" className={styles.avatar} src="static/img/avatars/ed-duffus.jpg"/> : 
-                <img width="64" height="64" alt="Ryan Crichton&#x27;s avatar" className={styles.avatar} src="static/img/avatars/ryan-crichton.jpg"/>
-              }
+              <UserAvatar 
+                given={given}
+                family={family}
+                avatar={avatar}
+              />
             </a>
             <div className={styles.avatarString}>
-              {
-                role=='validator' ? 
-                <span className={styles.avatarName}>Ed Duffus</span> : 
-                <span className={styles.avatarName}>Ryan Crichton</span>
-              }
-
-
-
-              
-              {' '} - <span className={styles.avatarName}>{role}</span> - Central Region - Ghana
+              <span className={styles.avatarName}>{given + ' ' + family + ' - ' + role}</span> - Central Region - Ghana
             </div>
           </div>
-
           <ul className={
             styles.workIcons + ' pure-menu-list'}>
             <li className="pure-menu-item">

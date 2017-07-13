@@ -1,0 +1,22 @@
+
+.homeAvatar {
+    position: absolute;
+    -webkit-clip-path: circle(50% at 50% 50%);
+    clip-path: circle(50% at 50% 50%);
+    left: 1em;
+    top: 0.6em;
+    width: 40px;
+    height: 40px;
+}
+
+
+.workAvatar {
+    -webkit-clip-path: circle(50% at 50% 50%);
+    clip-path: circle(50% at 50% 50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 3px;
+    margin-right: 0.5em;
+    margin: 0.5em;
+    text-align: left;
+}

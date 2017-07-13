@@ -2,21 +2,32 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 10:16:30
+ * @Last Modified time: 2017-07-13 13:09:36
  */
 import React from 'react';
 import HeaderContainer from 'containers/HeaderContainer';
 import FooterContainer from 'containers/FooterContainer';
 import LoginContainer from 'containers/LoginContainer';
+import UserAvatar from 'components/UserAvatar';
 import { Button } from 'react-toolbox/lib/button';
 import { connect } from 'react-redux';
 import styles from './styles.css';
 import theme from './getStartedButton.css';
+import { updateUserDetails } from 'actions/user-actions';
+import { deselctWorkView } from 'actions/declaration-actions';
 
 
 class HomeContainer extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  componentWillMount() {
+    let token = localStorage.getItem('token') || null;
+    if (token) {
+      this.props.fetchData(token);
+      this.props.onHome();
+    }
   }
   
   handleClick = (event) => {
@@ -27,27 +38,11 @@ class HomeContainer extends React.Component {
     const { errorMessage,
       dispatch,
       isAuthenticated,
-      role,
+      given,
+      family,
+      avatar,
+      workView,
     } = this.props;
-
-    const RyanAvatar = () => (
-      <img
-        width="40"
-        height="40"
-        alt="Ryan Crichton&#x27;s avatar"
-        className={styles.avatar}
-        src="static/img/avatars/ryan-crichton.jpg"
-      />
-    );
-    const UserAvatar = () => (
-      <img
-        width="40"
-        height="40"
-        alt="Ed Duffus&#x27;s avatar"
-        className={styles.avatar}
-        src="static/img/avatars/ed-duffus.jpg"
-      />
-    );
   
     return (
     <div className={styles.app}>
@@ -61,20 +56,18 @@ class HomeContainer extends React.Component {
           </p>
           <div className="">
             {!isAuthenticated
-              ? <LoginContainer
-                  isAuthenticated={isAuthenticated}
-                  errorMessage={errorMessage}
-                  dispatch={dispatch}
-                />
+              ? <LoginContainer />
               : <div className="pure-g">
                   <div className="pure-u-1-3"></div>
                   <div className="pure-u-1-3">
                   <Button theme={theme} onClick={this.handleClick} raised >
-                    {
-                      role=='validator' ? 
-                      <UserAvatar /> : 
-                      <RyanAvatar />
-                    }
+                    <UserAvatar 
+                      isAuthenticated={isAuthenticated}
+                      given={given}
+                      family={family}
+                      avatar={avatar}
+                      workView={workView}
+                    />
                      Get Started 
 
                   </Button> 
@@ -181,21 +174,32 @@ class HomeContainer extends React.Component {
 
 const mapStateToProps = ({ declarationsReducer, userReducer }) => {
   const {
-    declaration,
+    workView,
     authenticated,
     isFetchingDeclaration,
   } = declarationsReducer;
-  const { isAuthenticated, isFetchingUser, errorMessage, role } = userReducer;
+  const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar } = userReducer;
 
   return {
-    declaration,
+    workView,
     authenticated,
     isAuthenticated,
     isFetchingUser,
     errorMessage,
     isFetchingDeclaration,
-    role,
+    given,
+    family,
+    avatar,
   };
 };
 
-export default connect(mapStateToProps, null)(HomeContainer);
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchData: token => {dispatch(updateUserDetails(token));},
+    onHome: () => {
+      dispatch(deselctWorkView());
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeContainer);
