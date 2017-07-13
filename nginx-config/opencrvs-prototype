@@ -29,7 +29,7 @@ server {
 
 
 	server_name _;
-  root /var/www/OpenCRVS/front/opencrvs-web-client/build;
+  root /var/www/OpenCRVS-production/front/opencrvs-web-client/build;
   index index.html index.htm;
 
   location ~* \.(?:manifest|appcache|html?|xml|json)$ {
@@ -61,7 +61,7 @@ server {
 
 	location /api {
 					proxy_set_header Access-Control-Allow-Origin *;
-					proxy_pass http://10.30.100.53:3001;
+					proxy_pass http://46.101.36.211:3000;
 					proxy_http_version 1.1;
 					proxy_set_header Upgrade $http_upgrade;
 					proxy_set_header Connection 'upgrade';
