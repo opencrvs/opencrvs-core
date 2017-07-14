@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 14:32:55
+ * @Last Modified time: 2017-07-13 15:45:43
  */
 import React from 'react';
 import HeaderContainer from 'containers/HeaderContainer';
@@ -35,8 +35,7 @@ class HomeContainer extends React.Component {
   }
 
   render = () => {
-    const { errorMessage,
-      dispatch,
+    const { 
       isAuthenticated,
       given,
       family,

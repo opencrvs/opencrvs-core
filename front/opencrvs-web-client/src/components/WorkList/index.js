@@ -2,13 +2,15 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:35 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-06 09:54:34
+ * @Last Modified time: 2017-07-13 16:46:48
  */
 import React from 'react';
 import styles from './styles.css';
 import SearchForm from 'components/SearchForm';
 import WorkListItem from 'components/WorkListItem';
 import { map, filter, get, head } from 'lodash';
+import { Button } from 'react-toolbox/lib/button';
+import Drawer from 'react-toolbox/lib/drawer';
 
 
 class WorkList extends React.Component {
@@ -16,7 +18,8 @@ class WorkList extends React.Component {
     super(props);
   }
 
-  componentWillMount() {
+  openNewModal = (event) => {
+    this.props.onModalOpenClick('new');
   }
 
   render = () => {
@@ -30,6 +33,9 @@ class WorkList extends React.Component {
     return (
       <div className={styles.list + ' pure-u-1'}>
         <SearchForm role={role} />
+        <section className={styles.newDecl}>
+          <Button icon="add" floating accent mini onClick={this.openNewModal} />
+        </section>
         {
           map(declarations.declaration, (declaration, index ) => (
           <WorkListItem 
@@ -43,7 +49,7 @@ class WorkList extends React.Component {
             onClick={() => onWorkItemClick(declaration)} />
         ))}
       </div>
-    )
+    );
   }
 }
 

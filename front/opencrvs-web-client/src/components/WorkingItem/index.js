@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-06 09:58:36
+ * @Last Modified time: 2017-07-13 16:14:45
  */
 import React from 'react';
 import styles from './styles.css';
@@ -17,7 +17,7 @@ class WorkingItem extends React.Component {
   }
   
   openImageModal = (event) => {
-    this.props.onModalOpenClick();
+    this.props.onModalOpenClick('image');
   }
 
   render = () => {

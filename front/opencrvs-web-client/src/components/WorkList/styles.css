@@ -11,6 +11,15 @@
     z-index: 20; /* Sit on top */
 }
 
+.list div:nth-child(3n) {
+    border-top: 1px solid #ddd;
+}
+
+.newDecl {
+    text-align: center;
+    margin: 2em;
+}
+
 
 @media (min-width: 40em) {
 

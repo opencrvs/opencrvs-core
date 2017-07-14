@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:19:12 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-14 08:57:17
  */
 import React from 'react';
 import styles from './styles.css';
@@ -18,7 +18,7 @@ class ImageLoader extends React.Component {
   }
   
   closeImageModal = (event) => {
-    this.props.onModalCloseClick();
+    this.props.onModalCloseClick('image');
   }
 
   handleOptionChange = (index) => {
@@ -67,7 +67,7 @@ class ImageLoader extends React.Component {
                       <p className={styles.errorMessage}>{imageErrorMessage}</p>
                     </Dropzone>
                   :
-                    <ProgressBar type='circular' mode='indeterminate' multicolor />
+                    <ProgressBar type="circular" mode="indeterminate" multicolor />
                 }
                
               </div>

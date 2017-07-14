@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:18 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 13:14:41
+ * @Last Modified time: 2017-07-13 15:44:25
  */
 var jwtDecode = require('jwt-decode');
 
@@ -88,7 +88,7 @@ function receiveLogout() {
   };
 }
 
-export function updateUserDetails(token){
+export function updateUserDetails(token) {
   return dispatch => {
     dispatch(updateUser(token));
   };

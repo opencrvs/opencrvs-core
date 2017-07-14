@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 12:44:23
+ * @Last Modified time: 2017-07-13 16:21:09
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser, updateUserDetails } from 'actions/user-actions';
@@ -12,6 +12,8 @@ export const DECLARATION_SUCCESS = 'DECLARATION_SUCCESS';
 export const DECLARATION_FAILURE = 'DECLARATION_FAILURE';
 export const DECLARATION_SELECTED = 'DECLARATION_SELECTED';
 export const DECLARATION_CLOSED = 'DECLARATION_CLOSED';
+export const NEW_DECL_MODAL_OPENED = 'NEW_DECL_MODAL_OPENED';
+export const NEW_DECL_MODAL_CLOSED = 'NEW_DECL_MODAL_CLOSED';
 
 // const requestDeclaration = () => ({
 //   type: DECLARATION_REQUEST,
@@ -25,6 +27,21 @@ function requestDeclaration() {
     isFetching: true,
     workView: true,
     authenticated: true,
+  };
+}
+
+
+export function newDeclarationModalOpened() {
+  return {
+    type: NEW_DECL_MODAL_OPENED,
+    newDeclarationModal: true,
+  };
+}
+
+export function newDeclarationModalClosed() {
+  return {
+    type: NEW_DECL_MODAL_CLOSED,
+    newDeclarationModal: false,
   };
 }
 
@@ -64,7 +81,7 @@ function workViewClosed() {
 export function deselctWorkView() {
   return dispatch => {
     dispatch(workViewClosed());
-  }
+  };
 }
 
 export function fetchDeclarations() {

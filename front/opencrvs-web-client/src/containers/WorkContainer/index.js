@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 12:07:32
+ * @Last Modified time: 2017-07-13 16:37:36
  */
 import React from 'react';
 import styles from './styles.css';
@@ -10,8 +10,13 @@ import Worknav from 'components/Worknav';
 import WorkList from 'components/WorkList';
 import WorkingItem from 'components/WorkingItem';
 import ImageLoader from 'components/ImageLoader';
+import NewVitalEvent from 'components/NewVitalEvent';
 import { connect } from 'react-redux';
-import { fetchDeclarations, selectDeclaration } from 'actions/declaration-actions';
+import { 
+  fetchDeclarations, 
+  selectDeclaration, 
+  newDeclarationModalOpened,
+  newDeclarationModalClosed } from 'actions/declaration-actions';
 import { logoutUser } from 'actions/user-actions';
 import {  imageModalOpened, 
           imageModalClosed, 
@@ -38,6 +43,7 @@ class WorkContainer extends React.Component {
           <WorkList {...this.props} />
           <WorkingItem {...this.props} />
           <ImageLoader {...this.props} />
+          <NewVitalEvent {...this.props} />
         </div>
       </div>
     );
@@ -48,13 +54,14 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
   const {
     declarations,
     selectedDeclaration,
+    newDeclarationModal,
   } = declarationsReducer;
   const { isAuthenticated,
     role,
     username,
     given,
     family,
-    avatar, } = userReducer;
+    avatar } = userReducer;
   const { patients } = patientsReducer;
   const { imageModal,
     imageOption,
@@ -77,20 +84,35 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     given,
     family,
     avatar,
+    newDeclarationModal,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     
-    onModalOpenClick: () => {
-      dispatch(imageModalOpened());
+    onModalOpenClick: context => {
+      switch (context) {
+        case 'image':
+          dispatch(imageModalOpened());
+          break;
+        case 'new':
+          dispatch(newDeclarationModalOpened());
+          break;
+      }
     },
     onImageChanges: images => {
       dispatch(previewImages(images));
     },
-    onModalCloseClick: () => {
-      dispatch(imageModalClosed());
+    onModalCloseClick: context => {
+      switch (context) {
+        case 'image':
+          dispatch(imageModalClosed());
+          break;
+        case 'new':
+          dispatch(newDeclarationModalClosed());
+          break;
+      }
     },
     onWorkItemClick: declaration => {
       dispatch(selectDeclaration(declaration));

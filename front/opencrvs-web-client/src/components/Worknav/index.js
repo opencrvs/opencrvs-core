@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:13 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 12:23:16
+ * @Last Modified time: 2017-07-13 15:44:27
  */
 import React from 'react';
 import styles from './styles.css';
@@ -86,7 +86,7 @@ class Worknav extends React.Component {
           </ul>
         </div>
       </div>
-    )
+    );
   }
 }
 export default Worknav;

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 12:45:02
+ * @Last Modified time: 2017-07-13 16:26:45
  */
 import {
   DECLARATION_REQUEST,
@@ -10,6 +10,8 @@ import {
   DECLARATION_FAILURE,
   DECLARATION_SELECTED,
   DECLARATION_CLOSED,
+  NEW_DECL_MODAL_CLOSED,
+  NEW_DECL_MODAL_OPENED,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -19,6 +21,7 @@ function declarationsReducer(
     selectedDeclaration: '',
     newDeclaration: '',
     workView: false,
+    newDeclarationModal: false,
   },
   action
 ) {
@@ -49,6 +52,16 @@ function declarationsReducer(
       return {
         ...state,
         workView: false,
+      };
+    case NEW_DECL_MODAL_OPENED:
+      return {
+        ...state,
+        newDeclarationModal: true,
+      };
+    case NEW_DECL_MODAL_CLOSED:
+      return {
+        ...state,
+        newDeclarationModal: false,
       };
     default:
       return state;
