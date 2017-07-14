@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 16:21:09
+ * @Last Modified time: 2017-07-14 11:18:50
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser, updateUserDetails } from 'actions/user-actions';
@@ -14,6 +14,7 @@ export const DECLARATION_SELECTED = 'DECLARATION_SELECTED';
 export const DECLARATION_CLOSED = 'DECLARATION_CLOSED';
 export const NEW_DECL_MODAL_OPENED = 'NEW_DECL_MODAL_OPENED';
 export const NEW_DECL_MODAL_CLOSED = 'NEW_DECL_MODAL_CLOSED';
+export const NEW_DECL_EDIT = 'NEW_DECL_EDIT';
 
 // const requestDeclaration = () => ({
 //   type: DECLARATION_REQUEST,
@@ -30,6 +31,13 @@ function requestDeclaration() {
   };
 }
 
+export function newDeclarationEdit(category) {
+  return {
+    type: NEW_DECL_EDIT,
+    newDeclaration: true,
+    category: category,
+  };
+}
 
 export function newDeclarationModalOpened() {
   return {
@@ -49,6 +57,7 @@ export function selectDeclaration(declaration) {
   return {
     type: DECLARATION_SELECTED,
     selectedDeclaration: declaration,
+    newDeclaration: false,
   };
 }
 

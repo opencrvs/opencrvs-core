@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 16:37:36
+ * @Last Modified time: 2017-07-14 10:55:27
  */
 import React from 'react';
 import styles from './styles.css';
@@ -16,7 +16,9 @@ import {
   fetchDeclarations, 
   selectDeclaration, 
   newDeclarationModalOpened,
-  newDeclarationModalClosed } from 'actions/declaration-actions';
+  newDeclarationModalClosed,
+  newDeclarationEdit,
+} from 'actions/declaration-actions';
 import { logoutUser } from 'actions/user-actions';
 import {  imageModalOpened, 
           imageModalClosed, 
@@ -55,6 +57,8 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     declarations,
     selectedDeclaration,
     newDeclarationModal,
+    newDeclaration,
+    category,
   } = declarationsReducer;
   const { isAuthenticated,
     role,
@@ -72,6 +76,8 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
   return {
     declarations,
     selectedDeclaration,
+    newDeclaration,
+    category,
     isAuthenticated,
     imageModal,
     imageOption,
@@ -127,6 +133,10 @@ const mapDispatchToProps = dispatch => {
       dispatch(uploadImageFile(image));
     },
     fetchData: () => {dispatch(fetchDeclarations());},
+    onNewEventClick: category => {
+      dispatch(newDeclarationModalClosed());
+      dispatch(newDeclarationEdit(category));
+    },
   };
 };
 

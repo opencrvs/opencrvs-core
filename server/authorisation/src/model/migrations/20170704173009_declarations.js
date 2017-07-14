@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:31 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:15:31 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-14 10:26:47
  */
 exports.up = function (knex, Promise) {
 
@@ -10,9 +10,11 @@ exports.up = function (knex, Promise) {
 
         table.increments('id').primary();
         table.string('uuid').notNullable();
+        table.string('tracking').notNullable();
         table.string('motherDetails').notNullable();
         table.string('fatherDetails').notNullable();
         table.string('childDetails').notNullable();
+        table.string('code').notNullable();
         table.string('status').notNullable();
         table.timestamps();
     })

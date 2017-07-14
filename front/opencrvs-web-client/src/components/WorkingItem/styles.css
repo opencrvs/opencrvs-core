@@ -64,7 +64,12 @@
     text-align: right;
 }
 
-@media (min-width: 40em) {
+.newWorkItem {
+    position: relative;
+    top: 0.7em;
+}
+
+@media (min-width: 962px) {
 
     .workingItemContainer {
         top: 28.3em;;
@@ -80,10 +85,16 @@
         width: 100%;
         position: relative;
     }
+
+    .wiContentTitle {
+        font-size: 1.4em;
+    }
 }
 
-@media (min-width: 60em) {
-
+@media (max-width:1127px) and (min-width:963px) {
+    .wiContentTitle {
+        font-size: 1.4em;
+    }
     .workingItemContainer {
         position: fixed;
         margin: 0;
@@ -96,3 +107,26 @@
     }
 }
 
+@media (min-width:963px) {
+
+    .workingItemContainer {
+        position: fixed;
+        margin: 0;
+        padding: 0;
+        width: 75%;
+        top: 6em;
+        left: 25%;
+        bottom: 0;
+        height: 100%;
+    }
+}
+@media (min-width:1128px) {
+
+    .wiContentTitle {
+        font-size: 2em;
+    }
+    .newWorkItem {
+        position: relative;
+        top: 0.25em;
+    }
+}

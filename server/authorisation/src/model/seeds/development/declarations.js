@@ -2,17 +2,18 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:23 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-12 13:51:05
+ * @Last Modified time: 2017-07-14 10:34:55
  */
-const Uuid = require('node-uuid');
 
 const declarations = [
     {
-        uuid: Uuid.v4(),
+        uuid: 'f08150eeeeb84dc19ac6456591956489',
+        tracking: 'BD-70514629L',
         motherDetails: '2',
         fatherDetails: '3',
         childDetails: '1',
-        status: 'declaration',
+        code: 'birth-declaration',
+        status: 'saved',
         locations: [
             {
                 placeOfDelivery: 'hospital',
@@ -28,11 +29,13 @@ const declarations = [
             } 
         ]
     },{
-        uuid: Uuid.v4(),
+        uuid: 'f9e2525862d34db8b497b48f68471b70',
+        tracking: 'BD-15727985L',
         motherDetails: '5',
         fatherDetails: '6',
         childDetails: '4',
-        status: 'declaration',
+        code: 'birth-declaration',
+        status: 'saved',
         locations: [
             {
                 placeOfDelivery: 'clinic',
@@ -48,11 +51,13 @@ const declarations = [
             } 
         ]
     },{
-        uuid: Uuid.v4(),
+        uuid: '8ac7ca2c58d743988d51677fdd755d3c',
+        tracking: 'BD-64747259L',
         motherDetails: '8',
         fatherDetails: '9',
         childDetails: '7',
-        status: 'declaration',
+        code: 'birth-declaration',
+        status: 'saved',
         locations: [
             {
                 placeOfDelivery: 'home',
@@ -88,9 +93,11 @@ const createDeclaration = function (knex, declaration) {
         .insert(
             {
                 uuid: declaration.uuid,
+                tracking: declaration.tracking,
                 motherDetails: declaration.motherDetails,
                 fatherDetails: declaration.fatherDetails,
                 childDetails: declaration.childDetails,
+                code: declaration.code,
                 status: declaration.status
             })
         .then((id) => {

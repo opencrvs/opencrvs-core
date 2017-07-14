@@ -2,11 +2,12 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:51 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-12 16:08:17
+ * @Last Modified time: 2017-07-14 13:28:33
  */
 import React from 'react';
 import styles from './styles.css';
 import Input from 'react-toolbox/lib/input';
+import theme from './searchInput.css';
 
 class SearchForm extends React.Component {
   constructor(props) {
@@ -25,12 +26,12 @@ class SearchForm extends React.Component {
     const { role } = this.props;
     return (
       <div className={styles.searchContainer + ' pure-g'}>
-        <div className="pure-u-7-8">
+        <div className="pure-u-1">
           <form>
             {
               role == 'validator' ? 
-              <Input type="text" label="Search declarations" hint="Notification ID" icon="search" /> : 
-              <Input type="text" label="Search notifications" hint="Notification ID" icon="search" /> 
+              <Input theme={theme} type="text" label="Search declarations" hint="Notification ID" icon="search" /> : 
+              <Input theme={theme} type="text" label="Search notifications" hint="Notification ID" icon="search" /> 
             }
           </form>
         </div>
