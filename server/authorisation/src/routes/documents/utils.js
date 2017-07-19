@@ -1,20 +1,13 @@
 /*
  * @Author: Euan Millar 
- * @Date: 2017-07-16 17:45:21 
+ * @Date: 2017-07-16 17:45:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 19:19:59
+ * @Last Modified time: 2017-07-16 17:48:21
  */
-/*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:14:12 
- * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 17:37:39
- */
+
 import * as fs from 'fs';
-const Documents = require('../../model/documents');
 const Boom = require('boom');
-const UPLOAD_PATH = __dirname + '/uploads';
-const fileOptions: FileUploaderOption = { dest: `${UPLOAD_PATH}/`, fileFilter: imageFilter };
+const Documents = require('../../model/documents');
 
 const imageFilter = function (fileName: string) {
     // accept image only
@@ -25,20 +18,18 @@ const imageFilter = function (fileName: string) {
     return true;
 };
 
-module.exports = (request, reply) => {
-
-    const data = request.payload;
-    const file = data.uploadFile;
+const uploader = function (file: any, data, options: FileUploaderOption, reply) {
+  
     if (!file) {
         reply(Boom.badImplementation('No file: ' + err));
     }
 
-    if (fileOptions.fileFilter && !fileOptions.fileFilter(file.hapi.filename)) {
+    if (options.fileFilter && !options.fileFilter(file.hapi.filename)) {
         reply(Boom.badImplementation('Type not allowed: ' + err));
     }
     const extension = data.name.split('.').pop();
     const newFilename = data.uuid + '.' + extension;
-    const path = `${fileOptions.dest}${newFilename}`;
+    const path = `${options.dest}${newFilename}`;
     const fileStream = fs.createWriteStream(path);
 
     return new Promise((resolve, reject) => {
@@ -60,15 +51,14 @@ module.exports = (request, reply) => {
                 const dbData =
                 {
                     uuid: data.uuid,
-                    oldName: data.name,
                     staticFile: newFilename,
+                    content: fs.readFileSync(path),
                     contentType: data.type,
                     declaration_id: data.declaration_id
                 };
                 new Documents(dbData)
                     .save()
                     .then((documents) => {
-
 
                         const responseData = {
                             message: 'Documents success',
@@ -86,5 +76,6 @@ module.exports = (request, reply) => {
             }
         });
     });
-
 };
+
+export { imageFilter, uploader };

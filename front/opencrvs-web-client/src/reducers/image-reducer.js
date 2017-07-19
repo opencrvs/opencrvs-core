@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:23 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:17:23 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-19 10:07:13
  */
 import {
   IMAGE_REQUEST,
@@ -13,6 +13,10 @@ import {
   IMAGE_OPTION_TOGGLE,
   IMAGE_PREVIEW_CHANGE,
   IMAGE_UPLOADING,
+  IMAGE_ZOOM_TOGGLE,
+  IMAGE_DELETE_REQUEST,
+  IMAGE_DELETE_SUCCESS,
+  IMAGE_DELETE_FAILURE,
 } from '../actions/image-actions';
 
 
@@ -21,12 +25,14 @@ import {
 function imageReducer(
   state = {
     imageFetching: false,
-    images: '',
+    images: [],
     imageModal: false,
     newImage: '',
     imageOption: 0,
     previewImages: {},
     imageErrorMessage: '',
+    imageZoom: false,
+    imageZoomID: 0,
   },
   action
 ) {
@@ -40,9 +46,27 @@ function imageReducer(
       return {
         ...state,
         imageFetching: false,
-        image: action.image,
+        images: [...state.images, action.image],
       };
     case IMAGE_FAILURE:
+      return {
+        ...state,
+        imageFetching: false,
+        imageErrorMessage: action.message,
+      };
+    case IMAGE_DELETE_REQUEST:
+      return {
+        ...state,
+        imageFetching: true,
+      };
+    case IMAGE_DELETE_SUCCESS:
+      return {
+        ...state,
+        imageFetching: false,
+        ...state.images.slice(0, action.index),
+        ...state.images.slice(action.index + 1),
+      };
+    case IMAGE_DELETE_FAILURE:
       return {
         ...state,
         imageFetching: false,
@@ -62,6 +86,12 @@ function imageReducer(
       return {
         ...state,
         imageOption: state.imageOption == 0 ? 1 : 0,
+      };
+    case IMAGE_ZOOM_TOGGLE:
+      return {
+        ...state,
+        imageZoomID: action.index,
+        imageZoom: state.imageOption == 0 ? 1 : 0,
       };
     case IMAGE_PREVIEW_CHANGE:
       return {

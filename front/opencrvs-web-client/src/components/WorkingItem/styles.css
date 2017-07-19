@@ -1,9 +1,4 @@
-.workingItemContainer {
-    margin: 0;
-    padding: 0;
-    position: relative;
-    display: block;
-}
+
 
 .secondaryButton {
     -webkit-box-shadow: none;
@@ -18,26 +13,28 @@
     margin-bottom: 0.3em;
 }
 
+.formOpen {
+    overflow: scroll;
+    height: 100%;
+}
+
 .wiContentHeader, .wiContentBody, .wiContentFooter {
     padding: 1em 2em;
 }
 
-.noSelectedDeclaration {
-    position: fixed;
-
-    width: 75%;
-    height: 100%;
-    top:0;
-    bottom:0;
-    padding: 1em 2em;
+.wiContentBody {
+    padding: 1em 1em;
+    overflow: scroll;
 }
 
 .noSelectedMessage {
-    position: relative;
-  top: 42%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+position: relative;
+  top: 35%;
   text-align: center;
+}
+
+.noSelectedMessage h1 {
+    line-height: 0.5em;
 }
 
 .wiContentHeader {
@@ -47,6 +44,7 @@
 
 .wiContentTitle {
     margin: 0.5em 0 0;
+    color: #34495e;
 }
 
 .wiContentSubtitle {
@@ -69,26 +67,12 @@
     top: 0.7em;
 }
 
-@media (min-width: 962px) {
-
-    .workingItemContainer {
-        top: 28.3em;;
-        right: 0;
-        bottom: 0;
-        left: 0%;
-        overflow: auto;
-        width: auto;
-        position: fixed;
-        display: block;
-    }
-    .noSelectedDeclaration {
-        width: 100%;
-        position: relative;
-    }
-
-    .wiContentTitle {
-        font-size: 1.4em;
-    }
+.workingItemContainer {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    display: block;
+    top: 19em;
 }
 
 @media (max-width:1127px) and (min-width:963px) {
@@ -105,6 +89,15 @@
         bottom: 0;
         height: 100%;
     }
+
+    .noSelectedDeclaration {
+        position: fixed;
+        width: 75%;
+        height: 100%;
+        top:6em;
+        bottom:0;
+        padding: 1em 2em;
+    }
 }
 
 @media (min-width:963px) {
@@ -119,6 +112,15 @@
         bottom: 0;
         height: 100%;
     }
+
+    .noSelectedDeclaration {
+        position: fixed;
+        width: 75%;
+        height: 100%;
+        top:6em;
+        bottom:0;
+        padding: 1em 2em;
+    }
 }
 @media (min-width:1128px) {
 
@@ -129,4 +131,26 @@
         position: relative;
         top: 0.25em;
     }
+
+    .noSelectedDeclaration {
+        position: fixed;
+        width: 75%;
+        height: 100%;
+        top:6em;
+        bottom:0;
+        padding: 1em 2em;
+    }
+}
+
+.iconHolder {
+    width: 3em;
+    float: left;
+    top: 0.5em;
+    position: relative;
+    left: -1.5em;
+}
+
+.titleText {
+    position: relative;
+    left: -1em;
 }

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:08 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 13:32:22
+ * @Last Modified time: 2017-07-19 11:35:48
  */
 
 const Boom = require('boom');
@@ -18,7 +18,7 @@ module.exports = (request, reply) => {
         .then((patient) => {
 
             patient
-                .save( JSON.parse(request.payload.data))
+                .save( JSON.parse(request.payload))
                 .then((updated) => {
 
                     const data = {

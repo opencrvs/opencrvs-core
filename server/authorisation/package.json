@@ -13,6 +13,7 @@
     "bcryptjs": "^2.4.3",
     "bookshelf": "^0.10.3",
     "boom": "^5.1.0",
+    "busboy": "^0.2.14",
     "chai": "^4.0.2",
     "confidence": "^3.0.2",
     "dotenv": "^4.0.0",

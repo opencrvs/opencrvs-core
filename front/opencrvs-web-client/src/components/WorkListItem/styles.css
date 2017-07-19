@@ -1,8 +1,24 @@
+.iconHolder {
+    width: 4em;
+    float: left;
+    top: 0.5em;
+    position: relative;
+    left: -0.6em;
+}
+
+.copyHolder {
+    position: relative;
+    width: 80%;
+    top: -4em;
+    left: 4em;
+}
+
 .workItem {
     padding: 0.9em 1em;
     border-bottom: 1px solid #ddd;
     border-left: 6px solid transparent;
     cursor: pointer;
+        height: 7em;
 }
 
 .openedWorkItem {
@@ -16,28 +32,12 @@
 }
 
 .workItemTitle {
-    text-transform: uppercase;
-    color: #999;
+    color: #34495e;
+    font-size: 1.2em;
+    margin-top: 0.2em;
 }
 
-.labelDeclaration,
-.labelValidation,
-.labelRegistration {
-  width: 15px;
-    height: 15px;
-    display: inline-block;
-    margin-right: 0.5em;
-    border-radius: 3px;
+.workItemDesc {
+    color: #1b98f8;
 }
 
-.labelDeclaration {
-  background: #ffc94c;
-}
-
-.labelValidation {
-  background: #41ccb4;
-}
-
-.labelRegistration {
-  background: #40c365;
-}

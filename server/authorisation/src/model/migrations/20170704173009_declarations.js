@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:31 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-14 10:26:47
+ * @Last Modified time: 2017-07-16 19:23:58
  */
 exports.up = function (knex, Promise) {
 
@@ -37,8 +37,9 @@ exports.up = function (knex, Promise) {
 
             table.increments('id').primary();
             table.string('uuid').notNullable();
+            table.string('oldName').notNullable();
             table.string('contentType').notNullable();
-            table.binary('content').notNullable();
+            table.string('staticFile').notNullable();
             table.integer('declaration_id').notNullable();
             table.timestamps();
         });

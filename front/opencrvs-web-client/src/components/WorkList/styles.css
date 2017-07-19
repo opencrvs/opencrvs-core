@@ -9,6 +9,7 @@
     overflow: scroll;
     top: 6em;
     z-index: 20; /* Sit on top */
+    background-color: white;
 }
 
 .list div:nth-child(3n) {
@@ -27,7 +28,7 @@
         position: fixed;
         bottom: 0;
         width: 100%;
-        height: 33%;
+        height: 13em;
         border-bottom: 1px solid #ddd;
     }
 }

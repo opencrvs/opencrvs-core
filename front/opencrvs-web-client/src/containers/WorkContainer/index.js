@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-14 10:55:27
+ * @Last Modified time: 2017-07-19 10:10:04
  */
 import React from 'react';
 import styles from './styles.css';
@@ -11,6 +11,9 @@ import WorkList from 'components/WorkList';
 import WorkingItem from 'components/WorkingItem';
 import ImageLoader from 'components/ImageLoader';
 import NewVitalEvent from 'components/NewVitalEvent';
+import ImageZoom from 'components/ImageZoom';
+import SubmitModal from 'components/SubmitModal';
+import { submit } from 'redux-form';
 import { connect } from 'react-redux';
 import { 
   fetchDeclarations, 
@@ -18,13 +21,15 @@ import {
   newDeclarationModalOpened,
   newDeclarationModalClosed,
   newDeclarationEdit,
+  submitModalOpened,
 } from 'actions/declaration-actions';
 import { logoutUser } from 'actions/user-actions';
 import {  imageModalOpened, 
           imageModalClosed, 
           imageOptionToggle,
           previewImages,
-          uploadImageFile } from 'actions/image-actions';
+          uploadImageFile,
+          closeZoomModal } from 'actions/image-actions';
 
 class WorkContainer extends React.Component {
 
@@ -37,7 +42,7 @@ class WorkContainer extends React.Component {
   }
 
   render = () => {
-
+    const { imageZoomID, submitModal } = this.props;
     return (
       <div className={styles.workContainer}>
         <Worknav {...this.props} />
@@ -46,6 +51,17 @@ class WorkContainer extends React.Component {
           <WorkingItem {...this.props} />
           <ImageLoader {...this.props} />
           <NewVitalEvent {...this.props} />
+          {
+            imageZoomID !=0 
+            ? <ImageZoom {...this.props} />
+            : ''
+          }
+          {
+            submitModal !=0 
+            ? <SubmitModal {...this.props} />
+            : ''
+          }
+          
         </div>
       </div>
     );
@@ -59,6 +75,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     newDeclarationModal,
     newDeclaration,
     category,
+    submitModal,
   } = declarationsReducer;
   const { isAuthenticated,
     role,
@@ -72,9 +89,13 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     previewImages,
     imageFetching,
     imageErrorMessage,
+    images,
+    imageZoom,
+    imageZoomID,
      } = imageReducer;
   return {
     declarations,
+    submitModal,
     selectedDeclaration,
     newDeclaration,
     category,
@@ -91,6 +112,9 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     family,
     avatar,
     newDeclarationModal,
+    images,
+    imageZoom,
+    imageZoomID,
   };
 };
 
@@ -105,6 +129,9 @@ const mapDispatchToProps = dispatch => {
         case 'new':
           dispatch(newDeclarationModalOpened());
           break;
+        case 'submit':
+          dispatch(submitModalOpened());
+          break;
       }
     },
     onImageChanges: images => {
@@ -117,6 +144,12 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'new':
           dispatch(newDeclarationModalClosed());
+          break;
+        case 'zoom':
+          dispatch(closeZoomModal());
+          break;
+        case 'submit':
+          dispatch(submitModalOpened());
           break;
       }
     },
@@ -137,6 +170,9 @@ const mapDispatchToProps = dispatch => {
       dispatch(newDeclarationModalClosed());
       dispatch(newDeclarationEdit(category));
     },
+    onSubmitModalConfirm: () => {
+      dispatch(submit('activeDeclaration'));
+    }
   };
 };
 

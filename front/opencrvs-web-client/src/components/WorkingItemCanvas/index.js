@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-14 11:52:13
+ * @Last Modified time: 2017-07-16 22:15:53
  */
 import React from 'react';
 import {connect} from 'react-redux';
@@ -135,7 +135,7 @@ class WorkingItemCanvas extends React.Component {
     } else if (newDeclaration == true) {
       myInitialValues = {
         status: 'new',
-        code: category + '-declaration',
+        code: category.toLowerCase() + '-declaration',
       };
     }
     console.log('INITIAL VALUES: ' + JSON.stringify(myInitialValues));

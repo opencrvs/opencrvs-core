@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-14 08:57:17
+ * @Last Modified time: 2017-07-14 21:51:41
  */
 import React from 'react';
 import styles from './styles.css';
@@ -51,7 +51,13 @@ class ImageLoader extends React.Component {
          <section>
           <Tabs index={imageOption} onChange={this.handleOptionChange}>
             <Tab label="Upload">
-              <div className={styles.imageTarget + ' pure-g'}>
+              <div className={
+                !imageFetching
+                  ?
+                  styles.imageTarget + ' pure-g'
+                  :
+                  styles.imageTargetUploading + ' pure-g'
+                }>
                 {!imageFetching
                   ?
                      <Dropzone 
@@ -67,7 +73,9 @@ class ImageLoader extends React.Component {
                       <p className={styles.errorMessage}>{imageErrorMessage}</p>
                     </Dropzone>
                   :
-                    <ProgressBar type="circular" mode="indeterminate" multicolor />
+                    <div className={styles.progressHolder}>
+                      <ProgressBar type="circular" mode="indeterminate" multicolor />
+                    </div>
                 }
                
               </div>

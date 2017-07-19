@@ -6,6 +6,10 @@
     min-height: 11.5em;
 }
 
+.imageTargetUploading {
+    border: none;
+}
+
 h1 {
     color: #ddd;
 }
@@ -16,4 +20,10 @@ h2 {
 
 .imageInput{
   display: none;
+}
+
+.progressHolder {
+    margin: 0 auto;
+    position: relative;
+    top: 2.3em;
 }

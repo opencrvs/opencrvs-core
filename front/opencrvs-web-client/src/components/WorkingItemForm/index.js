@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-14 11:51:36
+ * @Last Modified time: 2017-07-19 10:26:57
  */
 import React from 'react';
 import styles from './styles.css';
@@ -12,6 +12,7 @@ import Input from 'react-toolbox/lib/input';
 import Dropdown from 'react-toolbox/lib/dropdown';
 import DatePicker from 'react-toolbox/lib/date_picker';
 import Collapsible from 'react-collapsible';
+import submit from './submit';
 import { 
   genderReference,
   typesOfBirth,
@@ -53,11 +54,12 @@ class WorkingItemForm extends React.Component {
 
     const { 
       handleSubmit, 
-      onSubmit,
+      error,
     } = this.props;
 
     return (
-      <form className={styles.declarationForm}>
+      <form className={styles.declarationForm} onSubmit={handleSubmit}>
+        {error && <strong>{error}</strong>}
         <Collapsible
           classParentString={styles.collapsibleParent}
           triggerClassName={styles.collapsibleClosed}
@@ -185,4 +187,5 @@ class WorkingItemForm extends React.Component {
 
 export default reduxForm({
   form: 'activeDeclaration',
+  onSubmit: submit,
 })(WorkingItemForm);

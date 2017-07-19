@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 16:47:13
+ * @Last Modified time: 2017-07-16 20:17:03
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
@@ -14,6 +14,14 @@ export const IMAGE_MODAL_CLOSED = 'IMAGE_MODAL_CLOSED';
 export const IMAGE_OPTION_TOGGLE = 'IMAGE_OPTION_TOGGLE';
 export const IMAGE_PREVIEW_CHANGE = 'IMAGE_PREVIEW_CHANGE';
 export const IMAGE_UPLOADING = 'IMAGE_UPLOADING';
+export const IMAGE_ZOOM_TOGGLE = 'IMAGE_ZOOM_TOGGLE';
+export const IMAGE_DELETE_REQUEST = 'IMAGE_DELETE_REQUEST';
+export const IMAGE_DELETE_SUCCESS = 'IMAGE_DELETE_SUCCESS';
+export const IMAGE_DELETE_FAILURE = 'IMAGE_DELETE_FAILURE';
+
+const uuidv4 = require('uuid/v4');
+import axios, { post } from 'axios';
+const FormData = require('form-data');
 
 function requestImage() {
   return {
@@ -46,7 +54,28 @@ export function previewImages(images) {
 
 export function imageOptionToggle() {
   return {
-    type: IMAGE_OPTION_TOGGLE
+    type: IMAGE_OPTION_TOGGLE,
+  };
+}
+
+export function onZoomImage(id) {
+  return {
+    type: IMAGE_ZOOM_TOGGLE,
+    index: id,
+  };
+}
+
+export function closeZoomModal() {
+  return {
+    type: IMAGE_ZOOM_TOGGLE,
+    index: 0,
+  };
+}
+
+export function onDeleteImage(id) {
+  return {
+    type: IMAGE_DELETE_REQUEST,
+    index: id,
   };
 }
 
@@ -73,8 +102,51 @@ function imageUploading() {
   };
 }
 
-export function uploadImage(image) {
-  let token = localStorage.getItem('token') || null;
-  let config = {};
-  
+export function uploadImageFile(image) {
+  console.log(image);
+  return (dispatch, getState) => {
+    const {selectedDeclaration} = getState().declarationsReducer;
+    let addToExisting = false;
+    let declarationID = 0;
+    if (selectedDeclaration.id) {
+      addToExisting = true;
+      declarationID = selectedDeclaration.id;
+    }
+    let token = localStorage.getItem('token') || null;
+    if (token) {
+      var formData = new FormData();
+      formData.append('name', image[0].name);
+      formData.append('preview', image[0].preview);
+      formData.append('size', image[0].size);
+      formData.append('type', image[0].type);
+      formData.append('addToExisting', addToExisting);
+      formData.append('declaration_id', declarationID);
+      formData.append('uuid', uuidv4());
+      formData.append('uploadFile', image[0]);
+      dispatch(requestImage());
+      const instance = axios.create({BASE_URL});
+      const config = {
+        headers: {
+          'Authorization': token,
+        },
+      };
+      instance.post(BASE_URL + 'documents', formData, config)
+        .then((response) => {
+          dispatch(imageUploaded(response.data.documents));
+          dispatch(imageModalClosed());
+          return true;
+        })
+        .catch(err => {
+          if (err.status == 401) {
+            dispatch(logoutUser());
+          } else {
+            console.log(err);
+            dispatch(imageError());
+          }
+        });
+    } else {
+      dispatch(imageError('No token saved!'));
+      return false;
+    }
+  };
 }
