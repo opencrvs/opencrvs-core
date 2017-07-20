@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 12:17:23
+ * @Last Modified time: 2017-07-20 23:16:52
  */
 import {
   DECLARATION_REQUEST,
@@ -18,6 +18,7 @@ import {
   DECLARATION_SUBMIT_SUCCESS,
   DECLARATION_SUBMIT_FAILURE,
   TRACKING_MODAL_TOGGLE,
+  DECLARATION_READY_TO_CONFIRM,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -33,10 +34,16 @@ function declarationsReducer(
     trackingID: '',
     submitModal: 0,
     trackingModal: 0,
+    submitValues: '',
   },
   action
 ) {
   switch (action.type) {
+    case DECLARATION_READY_TO_CONFIRM:
+      return {
+        ...state,
+        submitValues: action.values,
+      };
     case DECLARATION_SUBMIT_REQUEST:
       return {
         ...state,
@@ -48,6 +55,11 @@ function declarationsReducer(
         isSubmitting: false,
         trackingID: action.trackingID,
         selectedDeclaration: '',
+        submitValues: '',
+        submitModal: 0,
+        workView: false,
+        newDeclaration: false,
+        category: '',
       };
     case DECLARATION_SUBMIT_FAILURE:
       return {

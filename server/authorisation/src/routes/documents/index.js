@@ -2,18 +2,12 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 18:15:30
+ * @Last Modified time: 2017-07-20 23:48:47
  */
 
 const Joi = require('joi');
 
 const documentsSchema = Joi.object().keys({
-    uuid: Joi.string(),
-    name: Joi.string(),
-    preview: Joi.string(),
-    size: Joi.string(),
-    type: Joi.string(),
-    addToExisting: Joi.boolean(),
     declaration_id: Joi.number()
 });
 

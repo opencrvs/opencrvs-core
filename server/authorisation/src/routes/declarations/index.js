@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 11:36:21
+ * @Last Modified time: 2017-07-20 22:57:36
  */
 
 const Joi = require('joi');
@@ -46,6 +46,8 @@ exports.register = (server, options, next) => {
                     status: Joi.string(),
                     motherDetails: Joi.string(),
                     uuid: Joi.string(),
+                    code: Joi.string(),
+                    tracking: Joi.string(),
                     motherDetails: Joi.number(),
                     fatherDetails: Joi.number(),
                     childDetails: Joi.number()

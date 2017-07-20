@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 09:45:46
+ * @Last Modified time: 2017-07-20 22:11:47
  */
 
 const Joi = require('joi');
@@ -29,6 +29,8 @@ exports.register = (server, options, next) => {
             },
             validate: {
                 payload: {
+                    uuid: Joi.string().required(),
+                    prefix: Joi.string().required(),
                     given: Joi.string().required(),
                     family: Joi.string().required(),
                     birthDate: Joi.string().required(),

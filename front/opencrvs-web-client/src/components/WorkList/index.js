@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:35 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 12:28:14
+ * @Last Modified time: 2017-07-20 23:13:19
  */
 import React from 'react';
 import styles from './styles.css';
@@ -32,7 +32,6 @@ class WorkList extends React.Component {
     //TODO temp hack - do on the backend with pagination
     let workArray = [];
     map(declarations.declaration, (declaration, index ) => {
-      console.log('xxxxxxxxxxxxxxxxxxxxxxx: ' + declaration.status);
       if (declaration.status != 'submitted') {
         workArray.push(declaration);
       }

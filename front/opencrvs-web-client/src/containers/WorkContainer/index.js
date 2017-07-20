@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 12:16:07
+ * @Last Modified time: 2017-07-20 21:46:57
  */
 import React from 'react';
 import styles from './styles.css';
@@ -24,6 +24,7 @@ import {
   newDeclarationEdit,
   submitModalOpened,
   trackingModalOpened,
+  submitDeclaration,
 } from 'actions/declaration-actions';
 import { logoutUser } from 'actions/user-actions';
 import {  imageModalOpened, 
@@ -138,9 +139,6 @@ const mapDispatchToProps = dispatch => {
         case 'new':
           dispatch(newDeclarationModalOpened());
           break;
-        case 'submit':
-          dispatch(submitModalOpened());
-          break;
       }
     },
     onModalCloseClick: context => {
@@ -165,6 +163,9 @@ const mapDispatchToProps = dispatch => {
     onWorkItemClick: declaration => {
       dispatch(selectDeclaration(declaration));
     },
+    onNavSubmitClick: () => {
+      dispatch(submit('activeDeclaration'));
+    },
     onImageOptionClick: () => {
       dispatch(imageOptionToggle());
     },
@@ -180,8 +181,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(newDeclarationEdit(category));
     },
     onSubmitModalConfirm: () => {
-      dispatch(submit('activeDeclaration'));
-    }
+      dispatch(submitDeclaration());
+    },
   };
 };
 

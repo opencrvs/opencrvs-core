@@ -2,19 +2,17 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-19 09:58:11 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-19 10:41:07
+ * @Last Modified time: 2017-07-20 21:32:24
  */
 import { SubmissionError } from 'redux-form';
 
 import { 
-  submitDeclaration,
-  submitModalOpened,
+  submitModalOpen,
 } from 'actions/declaration-actions';
 
 
 function submit(values, dispatch) {
-  dispatch(submitDeclaration(values));
-  dispatch(submitModalOpened());
+  dispatch(submitModalOpen(values));
     // simulate server latency
     /*if (!['john', 'paul', 'george', 'ringo'].includes(values.username)) {
       throw new SubmissionError({

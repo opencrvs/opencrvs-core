@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 11:32:49
+ * @Last Modified time: 2017-07-20 23:00:33
  */
 
 const Boom = require('boom');
@@ -12,11 +12,11 @@ module.exports = (request, reply) => {
 
     new Declaration(request.payload)
         .save()
-        .then((declaration) => {
+        .then((updated) => {
 
             const responseData = {
                 message: 'declaration success',
-                declaration
+                updated
             };
             reply(responseData)
                 .header('Authorization', request.headers.authorization);

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 11:08:26
+ * @Last Modified time: 2017-07-20 21:45:00
  */
 import React from 'react';
 import styles from './styles.css';
@@ -30,8 +30,8 @@ class WorkingItem extends React.Component {
     this.props.onModalOpenClick('image');
   }
 
-  openSubmitModal = (event) => {
-    this.props.onModalOpenClick('submit');
+  openSubmit = (event) => {
+    this.props.onNavSubmitClick();
   }
 
   render = () => {
@@ -127,7 +127,7 @@ class WorkingItem extends React.Component {
                   <Button icon="delete" label="Trash" flat />
                 </div>
                 <div className="pure-u-2 pure-u-md-1-4">
-                  <Button icon="send" label="Submit" flat onClick={this.openSubmitModal} />
+                  <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
                 </div>
               </div>
             </div>

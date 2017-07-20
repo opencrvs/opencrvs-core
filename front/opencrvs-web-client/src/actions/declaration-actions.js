@@ -2,12 +2,13 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 12:28:31
+ * @Last Modified time: 2017-07-20 23:51:59
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser, updateUserDetails } from 'actions/user-actions';
 import { clearTempImages } from 'actions/image-actions';
 import { get, head } from 'lodash';
+import { submit } from 'redux-form';
 import { fetchPatients } from 'actions/patient-actions';
 export const DECLARATION_REQUEST = 'DECLARATION_REQUEST';
 export const DECLARATION_SUCCESS = 'DECLARATION_SUCCESS';
@@ -22,6 +23,7 @@ export const DECLARATION_SUBMIT_REQUEST = 'DECLARATION_SUBMIT_REQUEST';
 export const DECLARATION_SUBMIT_SUCCESS = 'DECLARATION_SUBMIT_SUCCESS';
 export const DECLARATION_SUBMIT_FAILURE = 'DECLARATION_SUBMIT_FAILURE';
 export const TRACKING_MODAL_TOGGLE = 'TRACKING_MODAL_TOGGLE';
+export const DECLARATION_READY_TO_CONFIRM = 'DECLARATION_READY_TO_CONFIRM';
 const uuidv4 = require('uuid/v4');
 
 // const requestDeclaration = () => ({
@@ -74,6 +76,20 @@ export function newDeclarationModalOpened() {
   return {
     type: NEW_DECL_MODAL_OPENED,
     newDeclarationModal: true,
+  };
+}
+
+function setFormSubmitValues(values) {
+  return {
+    type: DECLARATION_READY_TO_CONFIRM,
+    values,
+  };
+}
+
+export function submitModalOpen(values) {
+  return dispatch => {
+    dispatch(submitModalOpened());
+    dispatch(setFormSubmitValues(values));
   };
 }
 
@@ -200,7 +216,7 @@ const apiMiddleware = function(config, url, dispatch) {
     });
 };
 
-export function submitDeclaration(values) {
+export function submitDeclaration() {
 
   let token = localStorage.getItem('token') || null;
   let childPatientURL = BASE_URL + 'patient';
@@ -221,10 +237,9 @@ export function submitDeclaration(values) {
 
   let declarationsURL = BASE_URL + 'declarations';
   let locationsURL = BASE_URL + 'locations';
-  let documentsURL = BASE_URL + 'documents';
 
   return (dispatch, getState) => {
-    const {selectedDeclaration, newDeclaration} = getState().declarationsReducer;
+    const {selectedDeclaration, newDeclaration, submitValues} = getState().declarationsReducer;
     const {tempImages} = getState().imageReducer;
     
     let childConfig = {};
@@ -247,7 +262,6 @@ export function submitDeclaration(values) {
 
     const declarationsData = new FormData();
     const locationsData = new FormData();
-    const documentsData = new FormData();
 
     if (newDeclaration){
       childConfig = {
@@ -259,9 +273,9 @@ export function submitDeclaration(values) {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
       };
-      childData.append('id', get(values, 'child_id'));
-      motherData.append('id', get(values, 'mother_id'));
-      fatherData.append('id', get(values, 'father_id'));
+      childData.append('id', get(submitValues, 'child_id'));
+      motherData.append('id', get(submitValues, 'mother_id'));
+      fatherData.append('id', get(submitValues, 'father_id'));
       
     }
 
@@ -283,39 +297,47 @@ export function submitDeclaration(values) {
 
     let declarationsConfig = Object.assign({}, childConfig);
     let locationsConfig = Object.assign({}, childConfig);
-    let documentsConfig = Object.assign({}, childConfig);
 
-    if (get(values, 'child_id')) { 
-      childPatientURL += '/' + get(values, 'child_id');
+    if (get(submitValues, 'child_id')) { 
+      childPatientURL += '/' + get(submitValues, 'child_id');
+    } else {
+      childData.append('uuid', uuidv4());
+      childData.append('prefix', 'ch');
     }
-    childData.append('given', get(values, 'firstName') + ', ' +  get(values, 'middleName'));
-    childData.append('family', get(values, 'family'));
-    childData.append('birthDate', get(values, 'birthDate').toDateString());
-    childData.append('gender', get(values, 'gender'));
+    childData.append('given', get(submitValues, 'firstName') + ', ' +  get(submitValues, 'middleName'));
+    childData.append('family', get(submitValues, 'family'));
+    childData.append('birthDate', get(submitValues, 'birthDate').toDateString());
+    childData.append('gender', get(submitValues, 'gender'));
     childData.append('maritalStatus', 'single');
     childData.append('nationality', 'Ghana');
     childConfig.body = childData;
 
-    if (get(values, 'mother_id')) { 
-      motherPatientURL += '/' + get(values, 'mother_id');
+    if (get(submitValues, 'mother_id')) { 
+      motherPatientURL += '/' + get(submitValues, 'mother_id');
+    } else {
+      motherData.append('uuid', uuidv4());
+      motherData.append('prefix', 'Mrs');
     }
-    motherData.append('given', get(values, 'mother_firstName') + ', ' +  get(values, 'mother_middleName'));
-    motherData.append('family', get(values, 'mother_family'));
-    motherData.append('birthDate', get(values, 'mother_birthDate').toDateString());
-    motherData.append('gender', get(values, 'mother_gender'));
-    motherData.append('maritalStatus', get(values, 'mother_maritalStatus'));
-    motherData.append('nationality', get(values, 'mother_nationality'));
+    motherData.append('given', get(submitValues, 'mother_firstName') + ', ' +  get(submitValues, 'mother_middleName'));
+    motherData.append('family', get(submitValues, 'mother_family'));
+    motherData.append('birthDate', get(submitValues, 'mother_birthDate').toDateString());
+    motherData.append('gender', get(submitValues, 'mother_gender'));
+    motherData.append('maritalStatus', get(submitValues, 'mother_maritalStatus'));
+    motherData.append('nationality', get(submitValues, 'mother_nationality'));
     motherConfig.body = motherData;
 
-    if (get(values, 'father_id')) { 
-      fatherPatientURL += '/' + get(values, 'father_id');
+    if (get(submitValues, 'father_id')) { 
+      fatherPatientURL += '/' + get(submitValues, 'father_id');
+    } else {
+      fatherData.append('uuid', uuidv4());
+      fatherData.append('prefix', 'Mr');
     }
-    fatherData.append('given', get(values, 'father_firstName') + ', ' +  get(values, 'father_middleName'));
-    fatherData.append('family', get(values, 'father_family'));
-    fatherData.append('birthDate', get(values, 'father_birthDate').toDateString());
-    fatherData.append('gender', get(values, 'father_gender'));
-    fatherData.append('maritalStatus', get(values, 'father_maritalStatus'));
-    fatherData.append('nationality', get(values, 'father_nationality'));
+    fatherData.append('given', get(submitValues, 'father_firstName') + ', ' +  get(submitValues, 'father_middleName'));
+    fatherData.append('family', get(submitValues, 'father_family'));
+    fatherData.append('birthDate', get(submitValues, 'father_birthDate').toDateString());
+    fatherData.append('gender', get(submitValues, 'father_gender'));
+    fatherData.append('maritalStatus', get(submitValues, 'father_maritalStatus'));
+    fatherData.append('nationality', get(submitValues, 'father_nationality'));
     fatherConfig.body = fatherData;
 
     const patientPromises = [];
@@ -330,48 +352,49 @@ export function submitDeclaration(values) {
       const childID = get(updatedPatient[0], 'updated.id');
       const motherID = get(updatedPatient[1], 'updated.id');
       const fatherID = get(updatedPatient[2], 'updated.id');
+      
       // set up addresses
 
-      if (get(values, 'child_address_id')) { 
-        childAddressURL += '/' + get(values, 'child_address_id');
+      if (get(submitValues, 'child_address_id')) { 
+        childAddressURL += '/' + get(submitValues, 'child_address_id');
       }
-      childAddressData.append('addressLine1', get(values, 'mother_addressLine1'));
-      childAddressData.append('addressLine2', get(values, 'mother_addressLine2'));
-      childAddressData.append('addressLine3', get(values, 'mother_addressLine3'));
-      childAddressData.append('city', get(values, 'mother_city'));
-      childAddressData.append('county', get(values, 'mother_county'));
-      childAddressData.append('state', get(values, 'mother_state'));
-      childAddressData.append('postalCode', get(values, 'mother_postalCode'));
+      childAddressData.append('addressLine1', get(submitValues, 'mother_addressLine1'));
+      childAddressData.append('addressLine2', get(submitValues, 'mother_addressLine2'));
+      childAddressData.append('addressLine3', get(submitValues, 'mother_addressLine3'));
+      childAddressData.append('city', get(submitValues, 'mother_city'));
+      childAddressData.append('county', get(submitValues, 'mother_county'));
+      childAddressData.append('state', get(submitValues, 'mother_state'));
+      childAddressData.append('postalCode', get(submitValues, 'mother_postalCode'));
 
       childAddressData.append('patient_id', childID);
 
       childAddressConfig.body = childAddressData;
 
-      if (get(values, 'mother_address_id')) { 
-        motherAddressURL += '/' + get(values, 'mother_address_id');
+      if (get(submitValues, 'mother_address_id')) { 
+        motherAddressURL += '/' + get(submitValues, 'mother_address_id');
       }
-      motherAddressData.append('addressLine1', get(values, 'mother_addressLine1'));
-      motherAddressData.append('addressLine2', get(values, 'mother_addressLine2'));
-      motherAddressData.append('addressLine3', get(values, 'mother_addressLine3'));
-      motherAddressData.append('city', get(values, 'mother_city'));
-      motherAddressData.append('county', get(values, 'mother_county'));
-      motherAddressData.append('state', get(values, 'mother_state'));
-      motherAddressData.append('postalCode', get(values, 'mother_postalCode'));
+      motherAddressData.append('addressLine1', get(submitValues, 'mother_addressLine1'));
+      motherAddressData.append('addressLine2', get(submitValues, 'mother_addressLine2'));
+      motherAddressData.append('addressLine3', get(submitValues, 'mother_addressLine3'));
+      motherAddressData.append('city', get(submitValues, 'mother_city'));
+      motherAddressData.append('county', get(submitValues, 'mother_county'));
+      motherAddressData.append('state', get(submitValues, 'mother_state'));
+      motherAddressData.append('postalCode', get(submitValues, 'mother_postalCode'));
 
       motherAddressData.append('patient_id', motherID);
 
       motherAddressConfig.body = motherAddressData;
 
-      if (get(values, 'father_address_id')) { 
-        fatherAddressURL += '/' + get(values, 'father_address_id');
+      if (get(submitValues, 'father_address_id')) { 
+        fatherAddressURL += '/' + get(submitValues, 'father_address_id');
       }
-      fatherAddressData.append('addressLine1', get(values, 'father_addressLine1'));
-      fatherAddressData.append('addressLine2', get(values, 'father_addressLine2'));
-      fatherAddressData.append('addressLine3', get(values, 'father_addressLine3'));
-      fatherAddressData.append('city', get(values, 'father_city'));
-      fatherAddressData.append('county', get(values, 'father_county'));
-      fatherAddressData.append('state', get(values, 'father_state'));
-      fatherAddressData.append('postalCode', get(values, 'father_postalCode'));
+      fatherAddressData.append('addressLine1', get(submitValues, 'father_addressLine1'));
+      fatherAddressData.append('addressLine2', get(submitValues, 'father_addressLine2'));
+      fatherAddressData.append('addressLine3', get(submitValues, 'father_addressLine3'));
+      fatherAddressData.append('city', get(submitValues, 'father_city'));
+      fatherAddressData.append('county', get(submitValues, 'father_county'));
+      fatherAddressData.append('state', get(submitValues, 'father_state'));
+      fatherAddressData.append('postalCode', get(submitValues, 'father_postalCode'));
 
       fatherAddressData.append('patient_id', fatherID);
 
@@ -381,34 +404,34 @@ export function submitDeclaration(values) {
       subPromises.push(apiMiddleware(motherAddressConfig, motherAddressURL, dispatch));
       subPromises.push(apiMiddleware(fatherAddressConfig, fatherAddressURL, dispatch));
       //set up telecom
-      if (get(values, 'child_telecom_id')) { 
-        childTelecomURL += '/' + get(values, 'child_telecom_id');
+      if (get(submitValues, 'child_telecom_id')) { 
+        childTelecomURL += '/' + get(submitValues, 'child_telecom_id');
       }
-      childTelecomData.append('email', get(values, 'mother_email'));
-      childTelecomData.append('phone', get(values, 'mother_phone'));
-      childTelecomData.append('use', get(values, 'mother_use'));
+      childTelecomData.append('email', get(submitValues, 'mother_email'));
+      childTelecomData.append('phone', get(submitValues, 'mother_phone'));
+      childTelecomData.append('use', get(submitValues, 'mother_use'));
 
       childTelecomData.append('patient_id', childID);
 
       childTelecomConfig.body = childTelecomData;
 
-      if (get(values, 'mother_telecom_id')) { 
-        motherTelecomURL += '/' + get(values, 'mother_telecom_id');
+      if (get(submitValues, 'mother_telecom_id')) { 
+        motherTelecomURL += '/' + get(submitValues, 'mother_telecom_id');
       }
-      motherTelecomData.append('email', get(values, 'mother_email'));
-      motherTelecomData.append('phone', get(values, 'mother_phone'));
-      motherTelecomData.append('use', get(values, 'mother_use'));
+      motherTelecomData.append('email', get(submitValues, 'mother_email'));
+      motherTelecomData.append('phone', get(submitValues, 'mother_phone'));
+      motherTelecomData.append('use', get(submitValues, 'mother_use'));
 
       motherTelecomData.append('patient_id', motherID);
 
       motherTelecomConfig.body = motherTelecomData;
 
-      if (get(values, 'father_telecom_id')) { 
-        fatherTelecomURL += '/' + get(values, 'father_telecom_id');
+      if (get(submitValues, 'father_telecom_id')) { 
+        fatherTelecomURL += '/' + get(submitValues, 'father_telecom_id');
       }
-      fatherTelecomData.append('email', get(values, 'father_email'));
-      fatherTelecomData.append('phone', get(values, 'father_phone'));
-      fatherTelecomData.append('use', get(values, 'father_use'));
+      fatherTelecomData.append('email', get(submitValues, 'father_email'));
+      fatherTelecomData.append('phone', get(submitValues, 'father_phone'));
+      fatherTelecomData.append('use', get(submitValues, 'father_use'));
 
       fatherTelecomData.append('patient_id', fatherID);
 
@@ -418,40 +441,40 @@ export function submitDeclaration(values) {
       subPromises.push(apiMiddleware(motherTelecomConfig, motherTelecomURL, dispatch));
       subPromises.push(apiMiddleware(fatherTelecomConfig, fatherTelecomURL, dispatch));
       //set up extra
-      if (get(values, 'mother_extra_id')) { 
-        motherExtraURL += '/' + get(values, 'mother_extra_id');
+      if (get(submitValues, 'mother_extra_id')) { 
+        motherExtraURL += '/' + get(submitValues, 'mother_extra_id');
       }
-      motherExtraData.append('childrenBornAlive', get(values, 'mother_childrenBornAlive'));
-      motherExtraData.append('childrenBornLiving', get(values, 'mother_childrenBornLiving'));
-      motherExtraData.append('foetalDeaths', get(values, 'mother_foetalDeaths'));
-      motherExtraData.append('birthDateLast', get(values, 'mother_birthDateLast'));
-      motherExtraData.append('formalEducation', get(values, 'mother_formalEducation'));
-      motherExtraData.append('occupation', get(values, 'mother_occupation'));
-      motherExtraData.append('religion', get(values, 'mother_religion'));
-      motherExtraData.append('employment', get(values, 'mother_employment'));
-      motherExtraData.append('personalIDNummber', get(values, 'mother_personalIDNummber'));
-      motherExtraData.append('maidenName', get(values, 'mother_maidenName'));
-      motherExtraData.append('marriageDate', get(values, 'mother_marriageDate'));
+      motherExtraData.append('childrenBornAlive', get(submitValues, 'mother_childrenBornAlive'));
+      motherExtraData.append('childrenBornLiving', get(submitValues, 'mother_childrenBornLiving'));
+      motherExtraData.append('foetalDeaths', get(submitValues, 'mother_foetalDeaths'));
+      motherExtraData.append('birthDateLast', get(submitValues, 'mother_birthDateLast'));
+      motherExtraData.append('formalEducation', get(submitValues, 'mother_formalEducation'));
+      motherExtraData.append('occupation', get(submitValues, 'mother_occupation'));
+      motherExtraData.append('religion', get(submitValues, 'mother_religion'));
+      motherExtraData.append('employment', get(submitValues, 'mother_employment'));
+      motherExtraData.append('personalIDNummber', get(submitValues, 'mother_personalIDNummber'));
+      motherExtraData.append('maidenName', get(submitValues, 'mother_maidenName'));
+      motherExtraData.append('marriageDate', get(submitValues, 'mother_marriageDate'));
 
       motherExtraData.append('patient_id', motherID);
 
       motherExtraConfig.body = motherExtraData;
 
-      if (get(values, 'father_extra_id')) { 
-        fatherExtraURL += '/' + get(values, 'father_extra_id');
+      if (get(submitValues, 'father_extra_id')) { 
+        fatherExtraURL += '/' + get(submitValues, 'father_extra_id');
       }
 
-      fatherExtraData.append('childrenBornAlive', get(values, 'father_childrenBornAlive'));
-      fatherExtraData.append('childrenBornLiving', get(values, 'father_childrenBornLiving'));
-      fatherExtraData.append('foetalDeaths', get(values, 'father_foetalDeaths'));
-      fatherExtraData.append('birthDateLast', get(values, 'father_birthDateLast'));
-      fatherExtraData.append('formalEducation', get(values, 'father_formalEducation'));
-      fatherExtraData.append('occupation', get(values, 'father_occupation'));
-      fatherExtraData.append('religion', get(values, 'father_religion'));
-      fatherExtraData.append('employment', get(values, 'father_employment'));
-      fatherExtraData.append('personalIDNummber', get(values, 'father_personalIDNummber'));
-      fatherExtraData.append('maidenName', get(values, 'father_maidenName'));
-      fatherExtraData.append('marriageDate', get(values, 'father_marriageDate'));
+      fatherExtraData.append('childrenBornAlive', get(submitValues, 'father_childrenBornAlive'));
+      fatherExtraData.append('childrenBornLiving', get(submitValues, 'father_childrenBornLiving'));
+      fatherExtraData.append('foetalDeaths', get(submitValues, 'father_foetalDeaths'));
+      fatherExtraData.append('birthDateLast', get(submitValues, 'father_birthDateLast'));
+      fatherExtraData.append('formalEducation', get(submitValues, 'father_formalEducation'));
+      fatherExtraData.append('occupation', get(submitValues, 'father_occupation'));
+      fatherExtraData.append('religion', get(submitValues, 'father_religion'));
+      fatherExtraData.append('employment', get(submitValues, 'father_employment'));
+      fatherExtraData.append('personalIDNummber', get(submitValues, 'father_personalIDNummber'));
+      fatherExtraData.append('maidenName', get(submitValues, 'father_maidenName'));
+      fatherExtraData.append('marriageDate', get(submitValues, 'father_marriageDate'));
 
       fatherExtraData.append('patient_id', fatherID);
 
@@ -459,18 +482,23 @@ export function submitDeclaration(values) {
 
       subPromises.push(apiMiddleware(motherExtraConfig, motherExtraURL, dispatch));
       subPromises.push(apiMiddleware(fatherExtraConfig, fatherExtraURL, dispatch));
-
+      
       Promise.all(subPromises).then(updatedItems => { 
         // save declaration then update tempImages and clear them
         const declarationPromises = [];
 
         if (newDeclaration) { 
-          declarationsData.append('uuid', uuidv4());
+          let newUuid = uuidv4();
+          declarationsData.append('uuid', newUuid);
+          let newHash = 'BD-' + newUuid.toUpperCase();
+          let newTrackID = newHash.slice(8);
+          console.log('newTrackID: ' + newTrackID);
+          declarationsData.append('tracking', newTrackID);
           declarationsData.append('motherDetails', motherID);
           declarationsData.append('fatherDetails', fatherID);
           declarationsData.append('childDetails', childID);
-          declarationsData.append('code', get(values, 'code'));
-          declarationsData.append('status', 'submitted');
+          declarationsData.append('code', get(submitValues, 'code'));
+          declarationsData.append('status', 'saved');
         } else {
           declarationsURL += '/' + selectedDeclaration.id;
           declarationsData.append('status', 'submitted');
@@ -480,60 +508,70 @@ export function submitDeclaration(values) {
 
         declarationPromises.push(apiMiddleware(declarationsConfig, declarationsURL, dispatch));
         Promise.all(declarationPromises).then(updatedDeclaration => { 
+          console.log(JSON.stringify(updatedDeclaration));
           const declarationID = updatedDeclaration[0].updated.id;
+          console.log('declarationID: ' + declarationID);
           const trackingID = updatedDeclaration[0].updated.tracking;
+          console.log('trackingID: ' + trackingID);
           const locationPromises = [];
           // TODO update locations
 
-          if (get(values, 'location_id')) { 
-            locationsURL += '/' + get(values, 'location_id');
+          if (get(submitValues, 'location_id')) { 
+            locationsURL += '/' + get(submitValues, 'location_id');
           }
-          locationsData.append('placeOfDelivery', get(values, 'placeOfDelivery'));
-          locationsData.append('attendantAtBirth', get(values, 'attendantAtBirth'));
-          locationsData.append('hospitalName', get(values, 'hospitalName'));
-          locationsData.append('addressLine1', get(values, 'addressLine1'));
-          locationsData.append('addressLine2', get(values, 'addressLine2'));
-          locationsData.append('addressLine3', get(values, 'addressLine3'));
-          locationsData.append('city', get(values, 'city'));
-          locationsData.append('county', get(values, 'county'));
-          locationsData.append('state', get(values, 'state'));
-          locationsData.append('postalCode', get(values, 'postalCode'));
+          locationsData.append('placeOfDelivery', get(submitValues, 'placeOfDelivery'));
+          locationsData.append('attendantAtBirth', get(submitValues, 'attendantAtBirth'));
+          locationsData.append('hospitalName', get(submitValues, 'hospitalName'));
+          locationsData.append('addressLine1', get(submitValues, 'addressLine1'));
+          locationsData.append('addressLine2', get(submitValues, 'addressLine2'));
+          locationsData.append('addressLine3', get(submitValues, 'addressLine3'));
+          locationsData.append('city', get(submitValues, 'city'));
+          locationsData.append('county', get(submitValues, 'county'));
+          locationsData.append('state', get(submitValues, 'state'));
+          locationsData.append('postalCode', get(submitValues, 'postalCode'));
           locationsData.append('declaration_id', declarationID);
           locationsConfig.body = locationsData;
 
           locationPromises.push(apiMiddleware(locationsConfig, locationsURL, dispatch));
+
+          
           Promise.all(locationPromises).then(updatedDeclaration => { 
-            dispatch(submitDeclarationSuccess(trackingID));
-            dispatch(clearTempImages());
-            dispatch(fetchDeclarations());
-            dispatch(trackingModalOpened());
+            const imagePromises = [];
+            if (newDeclaration) {
+              console.log('checking images: ' + tempImages.length);
+              if (tempImages.length > 0) {
+                tempImages.forEach((image) => {
+                  let newDocURL = BASE_URL + 'documents/' + image.id;
+                  let documentsData = new FormData();
+                  documentsData.append('declaration_id', declarationID);
+                  let documentsConfig = {
+                    method: 'PUT',
+                    headers: { Authorization: `Bearer ${token}` },
+                  };
+                  documentsConfig.body = documentsData;
+                  imagePromises.push(apiMiddleware(documentsConfig, newDocURL, dispatch));
+                });
+
+                Promise.all(imagePromises).then(updatedImage => { 
+                  console.log('images updated for new declaration: ' + updatedImage);
+                  
+                  dispatch(submitDeclarationSuccess(trackingID));
+                  dispatch(clearTempImages());
+                  dispatch(fetchDeclarations());
+                  dispatch(trackingModalOpened());
+                });
+              } else {
+                console.log('error no images in declaration');
+              }
+            } else {
+              dispatch(submitDeclarationSuccess(trackingID));
+              dispatch(clearTempImages());
+              dispatch(fetchDeclarations());
+              dispatch(trackingModalOpened());
+            }
           });
         });
-
-        // display modal with tracking ID
         
-        /*images.forEach((image) => {
-            dispatch(fetchPatients(declaration.childDetails));
-            dispatch(fetchPatients(declaration.motherDetails));
-            dispatch(fetchPatients(declaration.fatherDetails));
-          });*/
-
-          /*
-    let declarationsConfig = Object.assign({}, childConfig);
-    let locationsConfig = Object.assign({}, childConfig);
-    let documentsConfig = Object.assign({}, childConfig);
-
-          const declarationsData = new FormData();
-    const locationsData = new FormData();
-    const documentsData = new FormData();
-            let declarationsURL = BASE_URL + 'declarations';
-            let locationsURL = BASE_URL + 'locations';
-            let documentsURL = BASE_URL + 'documents';
-
-            return (dispatch, getState) => {
-              const {selectedDeclaration, newDeclaration} = getState().declarationsReducer;
-              const {tempImages} = getState().imageReducer;
-          */
       });
     });
   };
