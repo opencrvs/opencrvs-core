@@ -35,7 +35,7 @@ exports.register = (server, options, next) => {
             },
             payload: {
                 output: 'stream',
-                maxBytes: 209715200,
+                maxBytes: 20000000,
                 allow: 'multipart/form-data',
                 parse: true
             }

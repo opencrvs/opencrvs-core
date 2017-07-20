@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:23 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-19 10:07:13
+ * @Last Modified time: 2017-07-20 12:07:25
  */
 import {
   IMAGE_REQUEST,
@@ -11,12 +11,12 @@ import {
   IMAGE_MODAL_OPENED,
   IMAGE_MODAL_CLOSED,
   IMAGE_OPTION_TOGGLE,
-  IMAGE_PREVIEW_CHANGE,
   IMAGE_UPLOADING,
   IMAGE_ZOOM_TOGGLE,
   IMAGE_DELETE_REQUEST,
   IMAGE_DELETE_SUCCESS,
   IMAGE_DELETE_FAILURE,
+  CLEAR_TEMP_IMAGES,
 } from '../actions/image-actions';
 
 
@@ -25,7 +25,7 @@ import {
 function imageReducer(
   state = {
     imageFetching: false,
-    images: [],
+    tempImages: [],
     imageModal: false,
     newImage: '',
     imageOption: 0,
@@ -43,16 +43,29 @@ function imageReducer(
         imageFetching: true,
       };
     case IMAGE_SUCCESS:
-      return {
-        ...state,
-        imageFetching: false,
-        images: [...state.images, action.image],
-      };
+      if (action.image) {
+        return {
+          ...state,
+          imageFetching: false,
+          tempImages: [...state.tempImages, action.image],
+        };
+      } else {
+        return {
+          ...state,
+          imageFetching: false,
+        };
+      }
     case IMAGE_FAILURE:
       return {
         ...state,
         imageFetching: false,
         imageErrorMessage: action.message,
+      };
+    case CLEAR_TEMP_IMAGES:
+      return {
+        ...state,
+        imageFetching: false,
+        tempImages: [],
       };
     case IMAGE_DELETE_REQUEST:
       return {
@@ -63,8 +76,8 @@ function imageReducer(
       return {
         ...state,
         imageFetching: false,
-        ...state.images.slice(0, action.index),
-        ...state.images.slice(action.index + 1),
+        ...state.tempImages.slice(0, action.index),
+        ...state.tempImages.slice(action.index + 1),
       };
     case IMAGE_DELETE_FAILURE:
       return {
@@ -92,11 +105,6 @@ function imageReducer(
         ...state,
         imageZoomID: action.index,
         imageZoom: state.imageOption == 0 ? 1 : 0,
-      };
-    case IMAGE_PREVIEW_CHANGE:
-      return {
-        ...state,
-        previewImages: action.images,
       };
     case IMAGE_UPLOADING:
       return {

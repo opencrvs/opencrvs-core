@@ -2,22 +2,23 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 20:17:03
+ * @Last Modified time: 2017-07-20 12:06:21
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
+import { fetchDeclarations } from 'actions/declaration-actions';
 export const IMAGE_REQUEST = 'IMAGE_REQUEST';
 export const IMAGE_SUCCESS = 'IMAGE_SUCCESS';
 export const IMAGE_FAILURE = 'IMAGE_FAILURE';
 export const IMAGE_MODAL_OPENED = 'IMAGE_MODAL_OPENED';
 export const IMAGE_MODAL_CLOSED = 'IMAGE_MODAL_CLOSED';
 export const IMAGE_OPTION_TOGGLE = 'IMAGE_OPTION_TOGGLE';
-export const IMAGE_PREVIEW_CHANGE = 'IMAGE_PREVIEW_CHANGE';
 export const IMAGE_UPLOADING = 'IMAGE_UPLOADING';
 export const IMAGE_ZOOM_TOGGLE = 'IMAGE_ZOOM_TOGGLE';
 export const IMAGE_DELETE_REQUEST = 'IMAGE_DELETE_REQUEST';
 export const IMAGE_DELETE_SUCCESS = 'IMAGE_DELETE_SUCCESS';
 export const IMAGE_DELETE_FAILURE = 'IMAGE_DELETE_FAILURE';
+export const CLEAR_TEMP_IMAGES = 'CLEAR_TEMP_IMAGES';
 
 const uuidv4 = require('uuid/v4');
 import axios, { post } from 'axios';
@@ -44,17 +45,15 @@ export function imageModalClosed() {
   };
 }
 
-export function previewImages(images) {
-  return {
-    type: IMAGE_PREVIEW_CHANGE,
-    imageFetching: false,
-    images,
-  };
-}
-
 export function imageOptionToggle() {
   return {
     type: IMAGE_OPTION_TOGGLE,
+  };
+}
+
+export function clearTempImages() {
+  return {
+    type: CLEAR_TEMP_IMAGES,
   };
 }
 
@@ -80,11 +79,18 @@ export function onDeleteImage(id) {
 }
 
 function imageUploaded(data) {
-  return {
-    type: IMAGE_SUCCESS,
-    imageFetching: false,
-    image: data,
-  };
+  if (data) {
+    return {
+      type: IMAGE_SUCCESS,
+      imageFetching: false,
+      image: data,
+    };
+  } else {
+    return {
+      type: IMAGE_SUCCESS,
+      imageFetching: false,
+    };
+  }
 }
 
 function imageError(message) {
@@ -132,8 +138,13 @@ export function uploadImageFile(image) {
       };
       instance.post(BASE_URL + 'documents', formData, config)
         .then((response) => {
-          dispatch(imageUploaded(response.data.documents));
           dispatch(imageModalClosed());
+          if (addToExisting) {
+            dispatch(fetchDeclarations());
+            dispatch(imageUploaded());
+          } else {
+            dispatch(imageUploaded(response.data.documents));
+          }
           return true;
         })
         .catch(err => {

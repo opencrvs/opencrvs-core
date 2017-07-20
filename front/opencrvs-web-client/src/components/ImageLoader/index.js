@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-14 21:51:41
+ * @Last Modified time: 2017-07-20 10:17:15
  */
 import React from 'react';
 import styles from './styles.css';
@@ -68,6 +68,7 @@ class ImageLoader extends React.Component {
                       className="pure-u-1-1">
                       <h1>Drag photos here</h1>
                       <h2>Or, if you prefer ...</h2>
+                      <h5>Max size: 1MB</h5>
                       <input type="file" id="file" ref="fileUploader" className={styles.imageInput} />
                       <Button icon="image" label="Choose photos to upload" raised primary />
                       <p className={styles.errorMessage}>{imageErrorMessage}</p>

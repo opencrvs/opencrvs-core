@@ -2,20 +2,10 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-19 12:15:29
+ * @Last Modified time: 2017-07-20 09:45:46
  */
 
 const Joi = require('joi');
-
-const patientsSchema = Joi.object().keys({
-    prefix: Joi.string(),
-    given: Joi.string(),
-    family: Joi.string(),
-    birthDate: Joi.string(),
-    gender: Joi.string(),
-    maritalStatus: Joi.string(),
-    nationality: Joi.string()
-});
 
 exports.register = (server, options, next) => {
 
@@ -36,6 +26,16 @@ exports.register = (server, options, next) => {
             payload: {
                 allow: 'multipart/form-data',
                 parse: true
+            },
+            validate: {
+                payload: {
+                    given: Joi.string().required(),
+                    family: Joi.string().required(),
+                    birthDate: Joi.string().required(),
+                    gender: Joi.string().required(),
+                    maritalStatus: Joi.string().required(),
+                    nationality: Joi.string().required()
+                }
             }
         },
         handler: require('./post')
@@ -47,7 +47,7 @@ exports.register = (server, options, next) => {
         method: 'PUT',
         config: {
             auth: 'jwt',
-            description: 'Protected route to update a patients.',
+            description: 'Protected route to update a patient.',
             notes: 'Token and message scopes are required.',
             tags: ['api'],
             plugins: {
@@ -58,6 +58,17 @@ exports.register = (server, options, next) => {
             payload: {
                 allow: 'multipart/form-data',
                 parse: true
+            },
+            validate: {
+                payload: {
+                    id: Joi.number().required(),
+                    given: Joi.string().required(),
+                    family: Joi.string().required(),
+                    birthDate: Joi.string().required(),
+                    gender: Joi.string().required(),
+                    maritalStatus: Joi.string().required(),
+                    nationality: Joi.string().required()
+                }
             }
         },
         handler: require('./put')

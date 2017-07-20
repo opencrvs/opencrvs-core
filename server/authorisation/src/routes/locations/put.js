@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:08 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 14:17:15
+ * @Last Modified time: 2017-07-20 11:37:12
  */
 
 const Boom = require('boom');
@@ -18,14 +18,14 @@ module.exports = (request, reply) => {
         .then((locations) => {
 
             locations
-                .save( JSON.parse(request.payload.data))
+                .save( request.payload)
                 .then((updated) => {
 
-                    const data = {
+                    const responseData = {
                         message: 'Locations updated',
                         updated
                     };
-                    reply(data)
+                    reply(responseData)
                         .header('Authorization', request.headers.authorization);
                 });
         })

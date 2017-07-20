@@ -24,6 +24,7 @@
 
 .wiContentBody {
     padding: 1em 1em;
+    height: 573px;
     overflow: scroll;
 }
 

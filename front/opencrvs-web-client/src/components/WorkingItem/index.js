@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-18 22:08:18
+ * @Last Modified time: 2017-07-20 11:08:26
  */
 import React from 'react';
 import styles from './styles.css';
@@ -35,7 +35,7 @@ class WorkingItem extends React.Component {
   }
 
   render = () => {
-    const { selectedDeclaration, patients, role, category, newDeclaration, images } = this.props;
+    const { selectedDeclaration, patients, role, category, newDeclaration, tempImages } = this.props;
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
     const childAddress = head(get(childPatient, 'patient.address'));
@@ -84,8 +84,17 @@ class WorkingItem extends React.Component {
         iconType = <BirthIcon />;
         break;
     }
-
-    const pixelHeight = (images.length * 750) + 'px';
+    let pixelHeight = 0;
+    let showPics = false;
+    if (selectedDeclaration) {
+      if (selectedDeclaration.documents.length > 0) {
+        showPics = true;
+        pixelHeight = (selectedDeclaration.documents.length * 750) + 'px';
+      }
+    } else if (tempImages.length > 0) {
+      showPics = true;
+      pixelHeight = (tempImages.length * 750) + 'px';
+    }
     return (
       <div className={styles.workingItemContainer + ' pure-u-1'}>
         {
@@ -146,7 +155,7 @@ class WorkingItem extends React.Component {
               </div>
             :
             <div className={
-              images.length > 0 && (selectedDeclaration || newDeclaration == true)
+              (showPics == true)
               ? 'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody
               : 'pure-u-1 pure-u-md-1-1 ' + styles.wiContentBody
               }>
@@ -159,7 +168,7 @@ class WorkingItem extends React.Component {
             </div>
           }
           {
-            images.length > 0 && (selectedDeclaration || newDeclaration == true)
+            (showPics == true)
             ? 
               <div className={'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody} style={{ height: pixelHeight }}>
                 <div className="pure-g">
@@ -167,7 +176,7 @@ class WorkingItem extends React.Component {
                     <DocumentContainer 
                       selectedDeclaration={selectedDeclaration} 
                       newDeclaration={newDeclaration}
-                      images={images}
+                      tempImages={tempImages}
                     />
                   </div>
                 </div>
@@ -186,12 +195,12 @@ const mapStateToProps = ({ declarationsReducer, imageReducer }) => {
     newDeclaration,
   } = declarationsReducer;
   const {
-    images,
+    tempImages
   } = imageReducer;
   return {
     selectedDeclaration,
     newDeclaration,
-    images,
+    tempImages,
   };
 };
 

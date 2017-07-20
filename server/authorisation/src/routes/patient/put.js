@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:08 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-19 11:35:48
+ * @Last Modified time: 2017-07-19 13:26:55
  */
 
 const Boom = require('boom');
@@ -10,22 +10,20 @@ const Patient = require('../../model/patient');
 
 module.exports = (request, reply) => {
 
-
-
     Patient
         .where('id', request.params.id)
         .fetch()
         .then((patient) => {
 
             patient
-                .save( JSON.parse(request.payload))
+                .save(request.payload)
                 .then((updated) => {
 
-                    const data = {
+                    const responseData = {
                         message: 'Patient updated',
                         updated
                     };
-                    reply(data)
+                    reply(responseData)
                         .header('Authorization', request.headers.authorization);
                 });
         })

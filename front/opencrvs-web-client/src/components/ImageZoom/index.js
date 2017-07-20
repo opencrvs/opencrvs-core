@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 21:42:08
+ * @Last Modified time: 2017-07-20 11:19:17
  */
 import React from 'react';
 import styles from './styles.css';
@@ -26,12 +26,18 @@ class ImageZoom extends React.Component {
   }
 
   render = () => {
-    const { imageZoom, images, imageZoomID } = this.props;
+    const { imageZoom, tempImages, selectedDeclaration, imageZoomID } = this.props;
+    let imageArray = null;
+    if (selectedDeclaration) {
+      imageArray = selectedDeclaration.documents;
+    } else {
+      imageArray = tempImages;
+    }
     const dialogueActions = [
       { label: 'Close', onClick: this.closeImageModal },
     ];
     let imageObj = {};
-    imageObj = find(images, {'id': imageZoomID});
+    imageObj = find(imageArray, {'id': imageZoomID});
     
     console.log('image to zoom: ' + JSON.stringify(imageObj));
 

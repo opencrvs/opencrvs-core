@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-19 10:26:57
+ * @Last Modified time: 2017-07-20 09:36:05
  */
 import React from 'react';
 import styles from './styles.css';
@@ -31,26 +31,26 @@ import {
 
  } from 'constants/reference';
 
+const renderInput = ({ input, label, type, icon, meta: { touched, error } }) => (
+  <Input {...input} label={label} type={type} icon={icon} error={touched ? error : ''} />
+);
+const renderTextArea = ({ input, label, type, icon, meta: { touched, error } }) => (
+  <Input {...input} label={label} multiline maxLength={200} type={type} icon={icon} error={touched ? error : ''} />
+);
+const renderDropdown = ({ input: { onBlur, ...inputForm }, label, source }) => (
+  <Dropdown {...inputForm} label={label} source={source}  />
+);
+const renderDatePicker = ({ input: { onBlur, ...inputForm }, label, source }) => (
+  <DatePicker {...inputForm} label={label} sundayFirstDayOfWeek />
+);
+
 class WorkingItemForm extends React.Component {
   constructor(props) {
     super(props);
   }
 
-  
-
   render = () => {
-    const renderInput = ({ input, label, type, icon, meta: { touched, error } }) => (
-      <Input {...input} label={label} type={type} icon={icon} error={touched ? error : ''} />
-    );
-    const renderTextArea = ({ input, label, type, icon, meta: { touched, error } }) => (
-      <Input {...input} label={label} multiline maxLength={200} type={type} icon={icon} error={touched ? error : ''} />
-    );
-    const renderDropdown = ({ input: { onBlur, ...inputForm }, label, source }) => (
-      <Dropdown {...inputForm} label={label} source={source}  />
-    );
-    const renderDatePicker = ({ input: { onBlur, ...inputForm }, label, source }) => (
-      <DatePicker {...inputForm} label={label} sundayFirstDayOfWeek />
-    );
+    
 
     const { 
       handleSubmit, 
@@ -64,6 +64,7 @@ class WorkingItemForm extends React.Component {
           classParentString={styles.collapsibleParent}
           triggerClassName={styles.collapsibleClosed}
           triggerOpenedClassName={styles.collapsibleOpened}
+          overflowWhenOpen={styles.scroll}
           trigger="
             Particulars of child
           "
@@ -93,6 +94,7 @@ class WorkingItemForm extends React.Component {
           classParentString={styles.collapsibleParent}
           triggerClassName={styles.collapsibleClosed}
           triggerOpenedClassName={styles.collapsibleOpened}
+          overflowWhenOpen={styles.scroll}
           trigger="
             Particulars of mother
           "
@@ -139,6 +141,7 @@ class WorkingItemForm extends React.Component {
             classParentString={styles.collapsibleParent}
             triggerClassName={styles.collapsibleClosed}
             triggerOpenedClassName={styles.collapsibleOpened}
+            overflowWhenOpen={styles.scroll}
             trigger="
               Particulars of father
             "
@@ -174,6 +177,7 @@ class WorkingItemForm extends React.Component {
             classParentString={styles.collapsibleParent}
             triggerClassName={styles.collapsibleClosed}
             triggerOpenedClassName={styles.collapsibleOpened}
+            overflowWhenOpen={styles.scroll}
             trigger="
               Notes
             "

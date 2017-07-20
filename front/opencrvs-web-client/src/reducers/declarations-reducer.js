@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-18 22:33:40
+ * @Last Modified time: 2017-07-20 12:17:23
  */
 import {
   DECLARATION_REQUEST,
@@ -17,6 +17,7 @@ import {
   DECLARATION_SUBMIT_REQUEST,
   DECLARATION_SUBMIT_SUCCESS,
   DECLARATION_SUBMIT_FAILURE,
+  TRACKING_MODAL_TOGGLE,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -29,7 +30,9 @@ function declarationsReducer(
     newDeclarationModal: false,
     newDeclaration: false,
     category: '',
+    trackingID: '',
     submitModal: 0,
+    trackingModal: 0,
   },
   action
 ) {
@@ -43,7 +46,8 @@ function declarationsReducer(
       return {
         ...state,
         isSubmitting: false,
-        declarations: action.declarations,
+        trackingID: action.trackingID,
+        selectedDeclaration: '',
       };
     case DECLARATION_SUBMIT_FAILURE:
       return {
@@ -71,6 +75,11 @@ function declarationsReducer(
       return {
         ...state,
         submitModal: state.submitModal == 0 ? 1 : 0,
+      };
+    case TRACKING_MODAL_TOGGLE:
+      return {
+        ...state,
+        trackingModal: state.trackingModal == 0 ? 1 : 0,
       };
     case DECLARATION_SELECTED:
       return {

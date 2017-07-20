@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-14 20:45:09 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 22:01:56
+ * @Last Modified time: 2017-07-20 11:12:33
  */
 import React from 'react';
 import ImageCard from 'components/ImageCard';
@@ -21,11 +21,18 @@ class DocumentContainer extends React.Component {
   }
 
   render = () => {
-    const { images, onZoomImage, onDeleteImage} = this.props;
+    const { tempImages, onZoomImage, onDeleteImage, selectedDeclaration} = this.props;
+
+    let imageArray = null;
+    if (selectedDeclaration) {
+      imageArray = selectedDeclaration.documents;
+    } else {
+      imageArray = tempImages;
+    }
     return (
       <div className={styles.documents + ' pure-g'}>
       {
-          map(images, (image, index ) => (
+          map(imageArray, (image, index ) => (
           <ImageCard 
             id={image.id} 
             key={index} 
@@ -42,13 +49,16 @@ class DocumentContainer extends React.Component {
   };
 }
 
-const mapStateToProps = ({ imageReducer }) => {
-
+const mapStateToProps = ({ declarationsReducer, imageReducer }) => {
+  const {
+    selectedDeclaration,
+  } = declarationsReducer;
   const { 
-    images,
+    tempImages,
      } = imageReducer;
   return {
-    images,
+    tempImages,
+    selectedDeclaration,
   };
 };
 
