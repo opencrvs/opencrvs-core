@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 21:54:35
+ * @Last Modified time: 2017-07-21 00:27:57
  */
 import React from 'react';
 import styles from './styles.css';
@@ -83,7 +83,7 @@ class WorkingItemForm extends React.Component {
           <Field component={renderDropdown} name="placeOfDelivery" label="Place of delivery" source={ placesOfDeliveryReference } />
           <Field component={renderDropdown} name="attendantAtBirth" label="Attendant at birth" source={ attendantsAtBirthReference } />
           
-          <Field component={renderInput} name="hospitalName" placeholder="Hospital name" label="Hospital name" />
+          <Field component={renderInput} name="hospitalName" placeholder="Hospital name" label="Hospital name" validate={[required]}/>
           <Field component={renderInput} name="addressLine1" placeholder="Address line 1" label="Address line 1" validate={[required]} />
           <Field component={renderInput} name="addressLine2" placeholder="Address line 2" label="Address line 2" />
           <Field component={renderInput} name="addressLine3" placeholder="Address line 3" label="Address line 3" />
@@ -111,9 +111,9 @@ class WorkingItemForm extends React.Component {
             <Field component={renderDatePicker} name="mother_birthDate" label="Date of birth" validate={[required]} />
           </section>
           <Field component={renderInput} name="mother_personalIDNummber" placeholder="Personal ID number" label="Personal ID Number" validate={[required]} />
-          <Field component={renderDropdown} name="mother_maritalStatus" label="Marital status" source={ maritalStatusesReference } />
+          <Field component={renderDropdown} name="mother_maritalStatus" label="Marital status" source={ maritalStatusesReference } validate={[required]} />
           <section>
-            <Field component={renderDatePicker} name="mother_marriageDate" label="Date of marriage" />
+            <Field component={renderDatePicker} name="mother_marriageDate" label="Date of marriage" validate={[required]} />
           </section>
           <Field component={renderDropdown} name="mother_nationality" label="Nationality" source={ countriesReference } validate={[required]}/>
           <Field component={renderInput} name="mother_phone" placeholder="Mobile number" label="Mobile number" />
@@ -155,11 +155,11 @@ class WorkingItemForm extends React.Component {
               <Field component={renderDatePicker} name="father_birthDate" label="Date of birth" validate={[required]}/>
             </section>
             <Field component={renderInput} name="father_personalIDNummber" placeholder="Personal ID number" label="Personal ID Number" validate={[required]} />
-            <Field component={renderDropdown} name="father_maritalStatus" label="Marital status" source={ maritalStatusesReference } />
+            <Field component={renderDropdown} name="father_maritalStatus" label="Marital status" source={ maritalStatusesReference } validate={[required]} />
             <section>
-              <Field component={renderDatePicker} name="father_marriageDate" label="Date of marriage" />
+              <Field component={renderDatePicker} name="father_marriageDate" label="Date of marriage" validate={[required]}/>
             </section>
-            <Field component={renderDropdown} name="father_nationality" label="Nationality" source={ countriesReference } />
+            <Field component={renderDropdown} name="father_nationality" label="Nationality" source={ countriesReference } validate={[required]} />
             <Field component={renderInput} name="father_phone" placeholder="Mobile number" label="Mobile number" />
             <Field component={renderInput} name="father_email" placeholder="Email address" label="Email address" />
             <Field component={renderDropdown} name="father_use" label="Use" source={ telecomReference } />

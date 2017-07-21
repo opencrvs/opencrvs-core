@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 21:45:00
+ * @Last Modified time: 2017-07-21 01:10:17
  */
 import React from 'react';
 import styles from './styles.css';
@@ -31,7 +31,23 @@ class WorkingItem extends React.Component {
   }
 
   openSubmit = (event) => {
-    this.props.onNavSubmitClick();
+    if (this.props.newDeclaration) {
+      if (this.props.tempImages.length == 0) {
+        this.props.onModalOpenClick('req');
+      } else {
+        this.props.onNavSubmitClick();
+      }
+    } else if (this.props.selectedDeclaration) {
+      if (this.props.selectedDeclaration.documents.length == 0) {
+        if (this.props.tempImages.length == 0) {
+          this.props.onModalOpenClick('req');
+        } else {
+          this.props.onNavSubmitClick();
+        }
+      } else {
+        this.props.onNavSubmitClick();
+      }
+    } 
   }
 
   render = () => {
@@ -86,15 +102,30 @@ class WorkingItem extends React.Component {
     }
     let pixelHeight = 0;
     let showPics = false;
-    if (selectedDeclaration) {
-      if (selectedDeclaration.documents.length > 0) {
+    if (selectedDeclaration) {  
+      console.log('1');    
+      console.log('tempImages.length: ' + tempImages.length);    
+      console.log('tempImages.length: ' + selectedDeclaration.documents.length);    
+      if (tempImages.length > 0 && selectedDeclaration.documents.length > 0) {
+        showPics = true;
+        console.log('2');   
+        let multiplier = tempImages.length + selectedDeclaration.documents.length;
+        pixelHeight = (multiplier * 750) + 'px';
+      } else if (tempImages.length > 0) {
+        console.log('3');   
+        showPics = true;
+        pixelHeight = (tempImages.length * 750) + 'px';
+      } else if (selectedDeclaration.documents.length > 0) {
+        console.log('4');   
         showPics = true;
         pixelHeight = (selectedDeclaration.documents.length * 750) + 'px';
       }
     } else if (tempImages.length > 0) {
+      console.log('5');   
       showPics = true;
       pixelHeight = (tempImages.length * 750) + 'px';
     }
+    console.log('showPics: ' + showPics);   
     return (
       <div className={styles.workingItemContainer + ' pure-u-1'}>
         {
@@ -195,7 +226,7 @@ const mapStateToProps = ({ declarationsReducer, imageReducer }) => {
     newDeclaration,
   } = declarationsReducer;
   const {
-    tempImages
+    tempImages,
   } = imageReducer;
   return {
     selectedDeclaration,

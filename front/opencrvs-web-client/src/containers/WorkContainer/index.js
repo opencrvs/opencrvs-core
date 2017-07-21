@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 21:46:57
+ * @Last Modified time: 2017-07-21 01:17:59
  */
 import React from 'react';
 import styles from './styles.css';
@@ -14,6 +14,8 @@ import NewVitalEvent from 'components/NewVitalEvent';
 import ImageZoom from 'components/ImageZoom';
 import SubmitModal from 'components/SubmitModal';
 import TrackingModal from 'components/TrackingModal';
+import ReqDocsModal from 'components/ReqDocsModal';
+
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
 import { 
@@ -25,12 +27,14 @@ import {
   submitModalOpened,
   trackingModalOpened,
   submitDeclaration,
+  reqModalToggle,
 } from 'actions/declaration-actions';
 import { logoutUser } from 'actions/user-actions';
 import {  imageModalOpened, 
           imageModalClosed, 
           imageOptionToggle,
           uploadImageFile,
+          clearTempImages,
           closeZoomModal } from 'actions/image-actions';
 
 class WorkContainer extends React.Component {
@@ -44,7 +48,12 @@ class WorkContainer extends React.Component {
   }
 
   render = () => {
-    const { imageZoomID, submitModal, trackingID, trackingModal } = this.props;
+    const { 
+      imageZoomID, 
+      submitModal, 
+      trackingID, 
+      trackingModal,
+      reqDocsModal } = this.props;
     return (
       <div className={styles.workContainer}>
         <Worknav {...this.props} />
@@ -69,6 +78,12 @@ class WorkContainer extends React.Component {
             ? <TrackingModal {...this.props} />
             : ''
           }
+
+          {
+            reqDocsModal != 0
+            ? <ReqDocsModal {...this.props} />
+            : ''
+          }
           
         </div>
       </div>
@@ -86,6 +101,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     submitModal,
     trackingModal,
     trackingID,
+    reqDocsModal,
   } = declarationsReducer;
   const { isAuthenticated,
     role,
@@ -105,6 +121,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
   return {
     declarations,
     trackingID,
+    reqDocsModal,
     trackingModal,
     submitModal,
     selectedDeclaration,
@@ -139,6 +156,9 @@ const mapDispatchToProps = dispatch => {
         case 'new':
           dispatch(newDeclarationModalOpened());
           break;
+        case 'req':
+          dispatch(reqModalToggle());
+          break;
       }
     },
     onModalCloseClick: context => {
@@ -157,6 +177,9 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'tracking':
           dispatch(trackingModalOpened());
+          break;
+        case 'req':
+          dispatch(reqModalToggle());
           break;
       }
     },
@@ -177,6 +200,7 @@ const mapDispatchToProps = dispatch => {
     },
     fetchData: () => {dispatch(fetchDeclarations());},
     onNewEventClick: category => {
+      dispatch(clearTempImages());
       dispatch(newDeclarationModalClosed());
       dispatch(newDeclarationEdit(category));
     },

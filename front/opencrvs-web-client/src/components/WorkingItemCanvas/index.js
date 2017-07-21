@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 11:58:54
+ * @Last Modified time: 2017-07-21 00:54:15
  */
 import React from 'react';
 import {connect} from 'react-redux';
@@ -162,9 +162,92 @@ class WorkingItemCanvas extends React.Component {
       myInitialValues = {
         status: 'new',
         code: category.toLowerCase() + '-declaration',
+        //TODO - add a 'same as mothers address switch' 
+        // currently the below is not used in form but is required for submission - temp fix
+       
+        child_phone: '',
+        child_email: '',
+        child_use: '',
+        child_addressLine1: '',
+        child_addressLine2: '',
+        child_addressLine3: '',
+        child_city: '',
+        child_county: '',
+        child_postalCode: '',
+        child_state: '',
+        // TODO: Type of birth outstanding
+        placeOfDelivery: '',
+        attendantAtBirth: '',
+        addressLine1: '',
+        addressLine2: '',
+        addressLine3: '',
+        city: '',
+        county: '',
+        hospitalName: '',
+        postalCode: '',
+        state: '',
+        // Mother
+        mother_firstName: '',
+        mother_middleName: '',
+        mother_family: '',
+
+        mother_maidenName: '',
+    
+        mother_birthDate: '',
+        mother_personalIDNummber: '',
+        mother_maritalStatus: '',
+        mother_marriageDate: '',
+        mother_nationality: '',
+        mother_phone: '',
+        mother_email: '',
+        mother_use: '',
+        mother_addressLine1: '',
+        mother_addressLine2: '',
+        mother_addressLine3: '',
+        mother_city: '',
+        mother_county: '',
+        mother_postalCode: '',
+        mother_state: '',
+        // Extra
+        childrenBornAlive: '',
+        childrenBornLiving: '',
+        foetalDeaths: '',
+        birthDateLast: '',
+        mother_gender: 'female',
+        mother_religion: '',
+        mother_formalEducation: '',
+        mother_occupation: '',
+        mother_employment: '',
+        // Father,
+        father_firstName: '',
+        father_middleName: '',
+        father_family: '',
+        father_birthDate: '',
+
+        // Extra
+        father_personalIDNummber: '',
+        father_maritalStatus: '',
+        father_marriageDate: '',
+        father_nationality: '',
+        
+        father_phone: '',
+        father_email: '',
+        father_use: '',
+        
+        father_addressLine1: '',
+        father_addressLine2: '',
+        father_addressLine3: '',
+        father_city: '',
+        father_county: '',
+        father_postalCode: '',
+        father_state: '',
+        father_gender: 'male',
+        father_religion: '',
+        father_formalEducation: '',
+        father_occupation: '',
+        father_employment: '',
       };
     }
-    console.log('INITIAL VALUES: ' + JSON.stringify(myInitialValues));
     this.props.onFormUpdate(myInitialValues);
     
     return (

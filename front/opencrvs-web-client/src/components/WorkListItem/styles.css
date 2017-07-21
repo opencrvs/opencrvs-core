@@ -41,3 +41,14 @@
     color: #1b98f8;
 }
 
+@media (min-width: 40em) {
+
+    .iconHolder {
+        width: 3em;
+        float: left;
+        top: 0.5em;
+        position: relative;
+        left: -0.6em;
+    }
+}
+

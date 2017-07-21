@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 23:51:59
+ * @Last Modified time: 2017-07-21 00:38:38
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser, updateUserDetails } from 'actions/user-actions';
@@ -23,6 +23,8 @@ export const DECLARATION_SUBMIT_REQUEST = 'DECLARATION_SUBMIT_REQUEST';
 export const DECLARATION_SUBMIT_SUCCESS = 'DECLARATION_SUBMIT_SUCCESS';
 export const DECLARATION_SUBMIT_FAILURE = 'DECLARATION_SUBMIT_FAILURE';
 export const TRACKING_MODAL_TOGGLE = 'TRACKING_MODAL_TOGGLE';
+export const REQD_MODAL_TOGGLE = 'REQD_MODAL_TOGGLE';
+
 export const DECLARATION_READY_TO_CONFIRM = 'DECLARATION_READY_TO_CONFIRM';
 const uuidv4 = require('uuid/v4');
 
@@ -102,6 +104,12 @@ export function submitModalOpened() {
 export function trackingModalOpened() {
   return {
     type: TRACKING_MODAL_TOGGLE,
+  };
+}
+
+export function reqModalToggle() {
+  return {
+    type: REQD_MODAL_TOGGLE,
   };
 }
 

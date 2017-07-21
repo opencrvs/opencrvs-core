@@ -2,23 +2,30 @@
 
 .workIcons {
     position: relative;
-    top: -0.7em;
+    top: 1.1em;
 }
 
 .avatarString {
     position: relative;
     text-decoration: none;
-        top: 1.7em;
-    left: 1em;
     color: #FFFFFF;
 }
 
 .avatarName {
+        position: relative;
+    top: -4.5em;
+    left: 6em;
     text-transform: uppercase;
     font-weight: bold;
     letter-spacing: 0.1em;
     word-spacing: normal;
     text-rendering: auto;
+}
+
+.avatarLocation {
+    position: relative;
+    top: -4.7em;
+    left: 6em;
 }
 
 .inboxIcon {

@@ -1,0 +1,10 @@
+.confirmSection {
+  text-align: center;
+  position: relative;
+  top: 1em;
+  line-height: 2.8em;
+}
+
+.submitConfirmHeader {
+  color: #34495e;
+}

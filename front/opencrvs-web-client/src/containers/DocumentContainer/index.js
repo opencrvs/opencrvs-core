@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-14 20:45:09 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 11:12:33
+ * @Last Modified time: 2017-07-21 01:06:48
  */
 import React from 'react';
 import ImageCard from 'components/ImageCard';
@@ -25,7 +25,7 @@ class DocumentContainer extends React.Component {
 
     let imageArray = null;
     if (selectedDeclaration) {
-      imageArray = selectedDeclaration.documents;
+      imageArray = selectedDeclaration.documents.concat(tempImages);
     } else {
       imageArray = tempImages;
     }

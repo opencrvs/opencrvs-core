@@ -22,6 +22,10 @@
     padding: 1em 2em;
 }
 
+.noSelectedDeclaration {
+    height: 100%;
+}
+
 .wiContentBody {
     padding: 1em 1em;
     height: 573px;
@@ -29,9 +33,9 @@
 }
 
 .noSelectedMessage {
-position: relative;
-  top: 35%;
-  text-align: center;
+    position: relative;
+    top: 75%;
+    text-align: center;
 }
 
 .noSelectedMessage h1 {
@@ -73,12 +77,17 @@ position: relative;
     padding: 0;
     position: relative;
     display: block;
-    top: 19em;
+    top: 26em;
 }
 
 @media (max-width:1127px) and (min-width:963px) {
     .wiContentTitle {
         font-size: 1.4em;
+    }
+    .noSelectedMessage {
+        position: relative;
+        top: 35%;
+        text-align: center;
     }
     .workingItemContainer {
         position: fixed;
@@ -122,6 +131,12 @@ position: relative;
         bottom:0;
         padding: 1em 2em;
     }
+
+    .noSelectedMessage {
+        position: relative;
+        top: 35%;
+        text-align: center;
+    }
 }
 @media (min-width:1128px) {
 
@@ -140,6 +155,12 @@ position: relative;
         top:6em;
         bottom:0;
         padding: 1em 2em;
+    }
+
+    .noSelectedMessage {
+        position: relative;
+        top: 35%;
+        text-align: center;
     }
 }
 

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 23:16:52
+ * @Last Modified time: 2017-07-21 00:39:30
  */
 import {
   DECLARATION_REQUEST,
@@ -19,6 +19,7 @@ import {
   DECLARATION_SUBMIT_FAILURE,
   TRACKING_MODAL_TOGGLE,
   DECLARATION_READY_TO_CONFIRM,
+  REQD_MODAL_TOGGLE,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -35,6 +36,7 @@ function declarationsReducer(
     submitModal: 0,
     trackingModal: 0,
     submitValues: '',
+    reqDocsModal: 0,
   },
   action
 ) {
@@ -87,6 +89,11 @@ function declarationsReducer(
       return {
         ...state,
         submitModal: state.submitModal == 0 ? 1 : 0,
+      };
+    case REQD_MODAL_TOGGLE:
+      return {
+        ...state,
+        reqDocsModal: state.reqDocsModal == 0 ? 1 : 0,
       };
     case TRACKING_MODAL_TOGGLE:
       return {
