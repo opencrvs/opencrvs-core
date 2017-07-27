@@ -26,6 +26,7 @@
     "react-router-dom": "^4.1.1",
     "react-toolbox": "^2.0.0-beta.12",
     "react-tooltip": "^3.3.0",
+    "react-webcam": "^0.2.0",
     "redux": "^3.6.0",
     "redux-form": "^6.8.0",
     "redux-thunk": "^2.2.0",

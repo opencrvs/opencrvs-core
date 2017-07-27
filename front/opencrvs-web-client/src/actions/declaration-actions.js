@@ -2,13 +2,12 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 16:52:14
+ * @Last Modified time: 2017-07-27 22:54:51
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser, updateUserDetails } from 'actions/user-actions';
 import { clearTempImages } from 'actions/image-actions';
 import { get, head, map, filter } from 'lodash';
-import { submit } from 'redux-form';
 const Moment = require('moment');
 const Fuzzysearch = require('fuzzysearch');
 import { fetchPatients } from 'actions/patient-actions';
@@ -46,26 +45,11 @@ function requestDeclaration() {
   };
 }
 
-function requestSubmit() {
-  return {
-    type: DECLARATION_SUBMIT_REQUEST,
-    isSubmitting: true,
-  };
-}
-
 function submitDeclarationSuccess(trackingID) {
   return {
     type: DECLARATION_SUBMIT_SUCCESS,
     isSubmitting: false,
     trackingID,
-  };
-}
-
-function submitDeclarationFailure(message) {
-  return {
-    type: DECLARATION_SUBMIT_FAILURE,
-    isSubmitting: false,
-    message,
   };
 }
 
@@ -292,7 +276,6 @@ export function submitDeclaration() {
 
   let childAddressURL = BASE_URL + 'address';
   let childTelecomURL = BASE_URL + 'telecom';
-  let childExtraURL = BASE_URL + 'extra';
 
   let motherAddressURL = BASE_URL + 'address';
   let motherTelecomURL = BASE_URL + 'telecom';
@@ -304,6 +287,7 @@ export function submitDeclaration() {
 
   let declarationsURL = BASE_URL + 'declarations';
   let locationsURL = BASE_URL + 'locations';
+  let informantsURL = BASE_URL + 'informant';
 
   return (dispatch, getState) => {
     const {selectedDeclaration, newDeclaration, submitValues} = getState().declarationsReducer;
@@ -329,8 +313,9 @@ export function submitDeclaration() {
 
     const declarationsData = new FormData();
     const locationsData = new FormData();
+    const informantsData = new FormData();
 
-    if (newDeclaration){
+    if (newDeclaration) {
       childConfig = {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
@@ -364,6 +349,7 @@ export function submitDeclaration() {
 
     let declarationsConfig = Object.assign({}, childConfig);
     let locationsConfig = Object.assign({}, childConfig);
+    let informantsConfig = Object.assign({}, childConfig);
 
     if (get(submitValues, 'child_id')) { 
       childPatientURL += '/' + get(submitValues, 'child_id');
@@ -551,16 +537,18 @@ export function submitDeclaration() {
       subPromises.push(apiMiddleware(fatherExtraConfig, fatherExtraURL, dispatch));
       
       Promise.all(subPromises).then(updatedItems => { 
-        // save declaration then update tempImages and clear them
+
         const declarationPromises = [];
 
         if (newDeclaration) { 
-          let newUuid = uuidv4();
+          const newUuid = uuidv4();
+          const prefix = get(submitValues, 'code').substring(0, 1);
+          const suffix1 = get(submitValues, 'firstName').substring(0, 1);
+          const suffix2 = get(submitValues, 'family').substring(0, 1);
+          const newTrackID = prefix + 'd-' + newUuid.substring(0, 8) + suffix1 + suffix2;
+
           declarationsData.append('uuid', newUuid);
-          let newHash = 'BD-' + newUuid.toUpperCase();
-          let newTrackID = newHash.slice(8);
-          console.log('newTrackID: ' + newTrackID);
-          declarationsData.append('tracking', newTrackID);
+          declarationsData.append('tracking', newTrackID.toUpperCase());
           declarationsData.append('motherDetails', motherID);
           declarationsData.append('fatherDetails', fatherID);
           declarationsData.append('childDetails', childID);
@@ -575,14 +563,10 @@ export function submitDeclaration() {
 
         declarationPromises.push(apiMiddleware(declarationsConfig, declarationsURL, dispatch));
         Promise.all(declarationPromises).then(updatedDeclaration => { 
-          console.log(JSON.stringify(updatedDeclaration));
-          const declarationID = updatedDeclaration[0].updated.id;
-          console.log('declarationID: ' + declarationID);
-          const trackingID = updatedDeclaration[0].updated.tracking;
-          console.log('trackingID: ' + trackingID);
-          const locationPromises = [];
-          // TODO update locations
 
+          const declarationID = updatedDeclaration[0].updated.id;
+          const trackingID = updatedDeclaration[0].updated.tracking;
+          const declarationExtraPromises = [];
           if (get(submitValues, 'location_id')) { 
             locationsURL += '/' + get(submitValues, 'location_id');
           }
@@ -599,13 +583,35 @@ export function submitDeclaration() {
           locationsData.append('declaration_id', declarationID);
           locationsConfig.body = locationsData;
 
-          locationPromises.push(apiMiddleware(locationsConfig, locationsURL, dispatch));
+
+          if (get(submitValues, 'informant_id')) { 
+            informantsURL += '/' + get(submitValues, 'informant_id');
+          } else {
+            informantsData.append('uuid', uuidv4());
+          }
+          informantsData.append('given', get(submitValues, 'informant_firstName') + ', ' +  get(submitValues, 'informant_middleName'));
+          informantsData.append('family', get(submitValues, 'informant_family'));
+          informantsData.append('relationship', get(submitValues, 'informant_relationship'));
+          informantsData.append('informant_phone', get(submitValues, 'informant_phone'));
+          informantsData.append('informant_email', get(submitValues, 'informant_email'));
+          informantsData.append('informant_personalIDNummber', get(submitValues, 'informant_personalIDNummber'));
+          informantsData.append('addressLine1', get(submitValues, 'addressLine1'));
+          informantsData.append('addressLine2', get(submitValues, 'addressLine2'));
+          informantsData.append('addressLine3', get(submitValues, 'addressLine3'));
+          informantsData.append('city', get(submitValues, 'city'));
+          informantsData.append('county', get(submitValues, 'county'));
+          informantsData.append('state', get(submitValues, 'state'));
+          informantsData.append('postalCode', get(submitValues, 'postalCode'));
+          informantsData.append('declaration_id', declarationID);
+          informantsConfig.body = informantsData;
+
+          declarationExtraPromises.push(apiMiddleware(locationsConfig, locationsURL, dispatch));
+          declarationExtraPromises.push(apiMiddleware(informantsConfig, informantsURL, dispatch));
 
           
-          Promise.all(locationPromises).then(updatedDeclaration => { 
+          Promise.all(declarationExtraPromises).then(updatedDeclaration => { 
             const imagePromises = [];
             if (newDeclaration) {
-              console.log('checking images: ' + tempImages.length);
               if (tempImages.length > 0) {
                 tempImages.forEach((image) => {
                   let newDocURL = BASE_URL + 'documents/' + image.id;
@@ -620,7 +626,6 @@ export function submitDeclaration() {
                 });
 
                 Promise.all(imagePromises).then(updatedImage => { 
-                  console.log('images updated for new declaration: ' + updatedImage);
                   
                   dispatch(submitDeclarationSuccess(trackingID));
                   dispatch(clearTempImages());

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 11:54:35
+ * @Last Modified time: 2017-07-27 22:56:00
  */
 import React from 'react';
 import styles from './styles.css';
@@ -34,40 +34,40 @@ class WorkListItem extends React.Component {
       created,
       id,
       selectedDeclaration } = this.props;
-      const category = code.slice(0, code.indexOf('-'));
-      let iconType = null;
-      switch (category) {
-        case 'birth':
-          iconType = <BirthIcon />;
-          break;
-        case 'marriage':
-          iconType = <MarriageIcon />;
-          break;
-        case 'adoption':
-          iconType = <AdoptionIcon />;
-          break;
-        case 'annulment':
-          iconType = <AnnulmentIcon />;
-          break;
-        case 'legitimation':
-          iconType = <LegitimationIcon />;
-          break;
-        case 'recognition':
-          iconType = <RecognitionIcon />;
-          break;
-        case 'separation':
-          iconType = <JudicialIcon />;
-          break;
-        case 'death':
-          iconType = <DeathIcon />;
-          break;
-        case 'foetal-death':
-          iconType = <FoetalIcon />;
-          break;
-        default:
-          iconType = <BirthIcon />;
-          break;
-      }
+    const category = code.slice(0, code.indexOf('-'));
+    let iconType = null;
+    switch (category) {
+      case 'birth':
+        iconType = <BirthIcon />;
+        break;
+      case 'marriage':
+        iconType = <MarriageIcon />;
+        break;
+      case 'adoption':
+        iconType = <AdoptionIcon />;
+        break;
+      case 'annulment':
+        iconType = <AnnulmentIcon />;
+        break;
+      case 'legitimation':
+        iconType = <LegitimationIcon />;
+        break;
+      case 'recognition':
+        iconType = <RecognitionIcon />;
+        break;
+      case 'separation':
+        iconType = <JudicialIcon />;
+        break;
+      case 'death':
+        iconType = <DeathIcon />;
+        break;
+      case 'foetal-death':
+        iconType = <FoetalIcon />;
+        break;
+      default:
+        iconType = <BirthIcon />;
+        break;
+    }
     return (
         <div
           onClick={onClick}

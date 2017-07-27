@@ -36,11 +36,13 @@
     position: relative;
     bottom: -5.4em;
     opacity: 0.5;
+    text-transform: uppercase;
 }
 
 .workItemTitle {
     color: #34495e;
     font-size: 0.9em;
+    line-height: 1.2em;
     margin-top: -1.8em;
 }
 

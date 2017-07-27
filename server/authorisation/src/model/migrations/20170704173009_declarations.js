@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:31 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-26 19:36:52
+ * @Last Modified time: 2017-07-27 18:33:34
  */
 exports.up = function (knex, Promise) {
 
@@ -41,6 +41,27 @@ exports.up = function (knex, Promise) {
             table.string('oldName').notNullable();
             table.string('contentType').notNullable();
             table.string('staticFile').notNullable();
+            table.integer('declaration_id').notNullable();
+            table.timestamps();
+        })
+        .createTable('informant', (table) => {
+
+            table.increments('id').primary();
+            table.string('uuid').notNullable();
+            table.string('prefix').notNullable();
+            table.string('given').notNullable();
+            table.string('family').notNullable();
+            table.string('relationship').notNullable();
+            table.string('addressLine1').notNullable();
+            table.string('addressLine2').nullable();
+            table.string('addressLine3').nullable();
+            table.string('city').nullable();
+            table.string('county').notNullable();
+            table.string('state').notNullable();
+            table.string('postalCode').nullable();
+            table.string('personalIDNummber').nullable();
+            table.string('email').nullable();
+            table.string('phone').nullable();
             table.integer('declaration_id').notNullable();
             table.timestamps();
         });

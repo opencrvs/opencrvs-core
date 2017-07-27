@@ -24,7 +24,6 @@ export const attendantsAtBirthReference = [
 ];
 
 export const townsReference = [
-  { value: 'town1', label: 'Town 1' },
   { value: 'Abodom', label: 'Abodom' },
   { value: 'Agona Nsaba', label: 'Agona Nsaba' },
   { value: 'Agona Swedru', label: 'Agona Swedru' },
@@ -44,6 +43,7 @@ export const townsReference = [
   { value: 'Nyakrom', label: 'Nyakrom' },
   { value: 'Okitsew', label: 'Okitsew' },
   { value: 'Otenkorang', label: 'Otenkorang' },
+  { value: 'Swedru', label: 'Swedru' },
   { value: 'Wawase', label: 'Wawase'},
 ];
 

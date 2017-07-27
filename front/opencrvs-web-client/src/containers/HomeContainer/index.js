@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 13:54:00
+ * @Last Modified time: 2017-07-27 23:43:11
  */
 import React from 'react';
 import Worknav from 'components/Worknav';
@@ -50,15 +50,12 @@ class HomeContainer extends React.Component {
       <div className={styles.splashContainer}>
         <div className={styles.splash}>
           <h1 className={styles.splashHead}>Open CRVS</h1>
-          <p className={styles.splashSubhead}>
-            The free civil registration and vital statistics platform. 
-          </p>
-          <div className="">
+          <div className={styles.LoginContainer}>
             {!isAuthenticated
               ? <LoginContainer />
               : <div className="pure-g">
-                  <div className="pure-u-1-3"></div>
-                  <div className="pure-u-1-3">
+                  <div className="pure-u-1 pure-u-md-1-3"></div>
+                  <div className="pure-u-1 pure-u-md-1-3">
                   <Button theme={theme} onClick={this.handleClick} raised >
                     <UserAvatar 
                       isAuthenticated={isAuthenticated}
@@ -71,7 +68,7 @@ class HomeContainer extends React.Component {
 
                   </Button> 
                   </div>
-                  <div className="pure-u-1-3"></div>
+                  <div className="pure-u-1 pure-u-md-1-3"></div>
                 </div>
                 }
           </div>

@@ -2,11 +2,10 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 01:16:43
+ * @Last Modified time: 2017-07-27 22:57:55
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
-import { fetchDeclarations } from 'actions/declaration-actions';
 export const IMAGE_REQUEST = 'IMAGE_REQUEST';
 export const IMAGE_SUCCESS = 'IMAGE_SUCCESS';
 export const IMAGE_FAILURE = 'IMAGE_FAILURE';
@@ -21,7 +20,8 @@ export const IMAGE_DELETE_FAILURE = 'IMAGE_DELETE_FAILURE';
 export const CLEAR_TEMP_IMAGES = 'CLEAR_TEMP_IMAGES';
 
 const uuidv4 = require('uuid/v4');
-import axios, { post } from 'axios';
+// maybe should be import
+const axios = require('axios');
 const FormData = require('form-data');
 
 function requestImage() {
@@ -101,15 +101,7 @@ function imageError(message) {
   };
 }
 
-function imageUploading() {
-  return {
-    type: IMAGE_UPLOADING,
-    imageFetching: true,
-  };
-}
-
 export function uploadImageFile(image) {
-  console.log(image);
   return (dispatch, getState) => {
     const {selectedDeclaration} = getState().declarationsReducer;
     let addToExisting = false;
@@ -140,12 +132,6 @@ export function uploadImageFile(image) {
         .then((response) => {
           dispatch(imageModalClosed());
           dispatch(imageUploaded(response.data.documents));
-          /*if (addToExisting) {
-            dispatch(fetchDeclarations());
-            dispatch(imageUploaded());
-          } else {
-            dispatch(imageUploaded(response.data.documents));
-          }*/
           return true;
         })
         .catch(err => {

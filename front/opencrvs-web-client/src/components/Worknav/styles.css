@@ -128,7 +128,14 @@
  * I want to customize how my .pure-menu looks at the top of the page
  */
 
-
+.splashSubhead {
+    color: white;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+    text-align: center;
+    margin-top: 0.7em;
+    text-transform: uppercase;
+}
 .homeMenu {
     background: #2d3e50;
     padding: 0.5em;

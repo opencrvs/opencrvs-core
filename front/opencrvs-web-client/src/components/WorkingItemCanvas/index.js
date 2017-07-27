@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 00:54:15
+ * @Last Modified time: 2017-07-27 22:03:00
  */
 import React from 'react';
 import {connect} from 'react-redux';
@@ -49,6 +49,10 @@ class WorkingItemCanvas extends React.Component {
         return item.trim();
       });
       const fatherGiven = get(fatherPatient, 'patient.given').toString().split(',').map(function(item) {
+        return item.trim();
+      });
+
+      const informantGiven = head(selectedDeclaration.informant).given.toString().split(',').map(function(item) {
         return item.trim();
       });
 
@@ -157,6 +161,24 @@ class WorkingItemCanvas extends React.Component {
         father_formalEducation: get(fatherExtra, 'formalEducation'),
         father_occupation: get(fatherExtra, 'occupation'),
         father_employment: get(fatherExtra, 'employment'),
+
+        // Informant
+
+        informant_id: head(selectedDeclaration.informant).id,
+        informant_firstName: informantGiven.shift(),
+        informant_middleName: informantGiven.toString().replace(/,/g, ''),
+        informant_family: head(selectedDeclaration.informant).family,
+        informant_relationship: head(selectedDeclaration.informant).relationship,
+        informant_addressLine1: head(selectedDeclaration.informant).addressLine1,
+        informant_addressLine2: head(selectedDeclaration.informant).addressLine2,
+        informant_addressLine3: head(selectedDeclaration.informant).addressLine3,
+        informant_city: head(selectedDeclaration.informant).city,
+        informant_county: head(selectedDeclaration.informant).county,
+        informant_state: head(selectedDeclaration.informant).state,
+        informant_postalCode: head(selectedDeclaration.informant).postalCode,
+        informant_personalIDNummber: head(selectedDeclaration.informant).personalIDNummber,
+        informant_email: head(selectedDeclaration.informant).email,
+        informant_phone: head(selectedDeclaration.informant).phone,
       };
     } else if (newDeclaration == true) {
       myInitialValues = {
@@ -246,6 +268,22 @@ class WorkingItemCanvas extends React.Component {
         father_formalEducation: '',
         father_occupation: '',
         father_employment: '',
+
+        // Informant 
+        informant_firstName: '',
+        informant_middleName: '',
+        informant_family: '',
+        informant_relationship: '', 
+        informant_addressLine1: '', 
+        informant_addressLine2: '', 
+        informant_addressLine3: '', 
+        informant_city: '', 
+        informant_county: '', 
+        informant_state: '', 
+        informant_postalCode: '', 
+        informant_personalIDNummber: '', 
+        informant_email: '', 
+        informant_phone: '', 
       };
     }
     this.props.onFormUpdate(myInitialValues);

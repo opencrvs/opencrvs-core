@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-26 20:20:48
+ * @Last Modified time: 2017-07-27 18:25:44
  */
 
 
@@ -14,7 +14,7 @@ const patients = [
         uuid: Uuid.v4(),
         prefix: 'ch',
         given: 'Kojo, Emmanuel',
-        family: 'Abraham',
+        family: 'Adjei',
         birthDate: Moment().subtract(1, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         gender: 'male',
         nationality: 'Ghana',
@@ -24,7 +24,7 @@ const patients = [
                 addressLine1: 'P.O. Box 5555',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Kwaman',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -56,8 +56,8 @@ const patients = [
     {
         uuid: Uuid.v4(),
         prefix: 'Mrs',
-        given: 'Adzo, Enam',
-        family: 'Abraham',
+        given: 'Nana, Enam',
+        family: 'Adjei',
         birthDate: '1985-02-02',
         gender: 'female',
         nationality: 'Ghana',
@@ -67,7 +67,7 @@ const patients = [
                 addressLine1: 'P.O. Box 5555',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Kwaman',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -75,7 +75,7 @@ const patients = [
         ],
         telecom: [
             {
-                email: 'adzo.e.abraham@gmail.com',
+                email: 'nana.e.Adjei@gmail.com',
                 phone: '024 222 3344',
                 use: 'phone'
             }
@@ -90,7 +90,7 @@ const patients = [
                 occupation: 'Teacher',
                 religion: 'Catholic',
                 employment: 'full-time',
-                personalIDNummber: 'GH37494872',
+                personalIDNummber: 'G120603',
                 maidenName: 'Ayittey',
                 marriageDate: '2007-09-23'
             }
@@ -100,7 +100,7 @@ const patients = [
         uuid: Uuid.v4(),
         prefix: 'Mr',
         given: 'Kobena, Dommie',
-        family: 'Abraham',
+        family: 'Adjei',
         birthDate: '1985-07-15',
         gender: 'male',
         nationality: 'Ghana',
@@ -110,7 +110,7 @@ const patients = [
                 addressLine1: 'P.O. Box 5555',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Kwaman',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -118,7 +118,7 @@ const patients = [
         ],
         telecom: [
             {
-                email: 'kobena.d.abraham@gmail.com',
+                email: 'kobena.d.Adjei@gmail.com',
                 phone: '024 222 3344',
                 use: 'phone'
             }
@@ -153,7 +153,7 @@ const patients = [
                 addressLine1: 'P.O. Box 78',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Mankrong',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -196,7 +196,7 @@ const patients = [
                 addressLine1: 'P.O. Box 78',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Mankrong',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -239,7 +239,7 @@ const patients = [
                 addressLine1: 'P.O. Box 78',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Mankrong',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -282,7 +282,7 @@ const patients = [
                 addressLine1: 'P.O. Box 66',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Asafo',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -325,7 +325,7 @@ const patients = [
                 addressLine1: 'P.O. Box 66',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Asafo',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -368,7 +368,7 @@ const patients = [
                 addressLine1: 'P.O. Box 66',
                 addressLine2: '',
                 addressLine3: '',
-                city: 'Asafo',
+                city: 'Swedru',
                 county: 'Agona West Municipal',
                 state: 'Central Region',
                 postalCode: ''
@@ -394,6 +394,782 @@ const patients = [
                 personalIDNummber: 'GH50025698',
                 maidenName: '',
                 marriageDate: ''
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'ch',
+        given: 'John, Peter',
+        family: 'Dansua',
+        birthDate: Moment().subtract(1, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: '',
+        address: [
+            {
+                addressLine1: 'P.O. Box 879',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: '',
+                phone: '',
+                use: ''
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: '',
+                occupation: '',
+                religion: '',
+                employment: '',
+                personalIDNummber: '',
+                maidenName: '',
+                marriageDate: ''
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mrs',
+        given: 'Abam, Esther',
+        family: 'Dansua',
+        birthDate: '1985-02-02',
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 879',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'abam.e.dansua@gmail.com',
+                phone: '024 789 3655',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '3',
+                childrenBornLiving: '3',
+                foetalDeaths: '0',
+                birthDateLast: '2005-12-23',
+                formalEducation: 'University',
+                occupation: 'Teacher',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH12587965',
+                maidenName: 'Adu',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mr',
+        given: 'Frederick, Jerry',
+        family: 'Dansua',
+        birthDate: '1985-07-15',
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 879',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'freddy.j.dansua@gmail.com',
+                phone: '024 654 4489',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: 'University',
+                occupation: 'Civil Servant',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH49652387',
+                maidenName: '',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'ch',
+        given: 'Sally, Hilda',
+        family: 'Akufo-Addo',
+        birthDate: Moment().subtract(2, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: '',
+        address: [
+            {
+                addressLine1: 'P.O. Box 1365',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: '',
+                phone: '',
+                use: ''
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: '',
+                occupation: '',
+                religion: '',
+                employment: '',
+                personalIDNummber: '',
+                maidenName: '',
+                marriageDate: ''
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mrs',
+        given: 'Samia, Coffie',
+        family: 'Akufo-Addo',
+        birthDate: '1985-02-02',
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 1365',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'samia.c.akufo-addo@gmail.com',
+                phone: '024 458 7923',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '3',
+                childrenBornLiving: '3',
+                foetalDeaths: '0',
+                birthDateLast: '2005-12-23',
+                formalEducation: 'University',
+                occupation: 'Teacher',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH37379465',
+                maidenName: 'Nikrumah',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mr',
+        given: 'Isaac, Kaldezi',
+        family: 'Akufo-Addo',
+        birthDate: '1985-07-15',
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 1365',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'isaac.akufo-addo@gmail.com',
+                phone: '024 145 1122',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: 'University',
+                occupation: 'Civil Servant',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH1398563',
+                maidenName: '',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    /////
+    {
+        uuid: Uuid.v4(),
+        prefix: 'ch',
+        given: 'Pearl, Hilda',
+        family: 'Kaledzi',
+        birthDate: Moment().subtract(3, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: '',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9615',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: '',
+                phone: '',
+                use: ''
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: '',
+                occupation: '',
+                religion: '',
+                employment: '',
+                personalIDNummber: '',
+                maidenName: '',
+                marriageDate: ''
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mrs',
+        given: 'Samihah, Riham',
+        family: 'Kaledzi',
+        birthDate: '1985-02-02',
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9615',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'samihah.r.kaledzi@gmail.com',
+                phone: '024 913 6789',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '3',
+                childrenBornLiving: '3',
+                foetalDeaths: '0',
+                birthDateLast: '2005-12-23',
+                formalEducation: 'University',
+                occupation: 'Teacher',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH39136587',
+                maidenName: 'Dumor',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mr',
+        given: 'Cameron, Nathaniel',
+        family: 'Kaledzi',
+        birthDate: '1985-07-15',
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9615',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'cameron.kaledzi@gmail.com',
+                phone: '024 897 1365',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: 'University',
+                occupation: 'Civil Servant',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH13659877',
+                maidenName: '',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    /////
+    {
+        uuid: Uuid.v4(),
+        prefix: 'ch',
+        given: 'Shafiq, Kent',
+        family: 'Ampofo',
+        birthDate: Moment().subtract(1, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: '',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9764',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: '',
+                phone: '',
+                use: ''
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: '',
+                occupation: '',
+                religion: '',
+                employment: '',
+                personalIDNummber: '',
+                maidenName: '',
+                marriageDate: ''
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mrs',
+        given: 'Yaa, Abeena',
+        family: 'Ampofo',
+        birthDate: '1985-02-02',
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9764',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'yaa.a.Ampofo@gmail.com',
+                phone: '024 649 1987',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '3',
+                childrenBornLiving: '3',
+                foetalDeaths: '0',
+                birthDateLast: '2005-12-23',
+                formalEducation: 'University',
+                occupation: 'Teacher',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH36562567',
+                maidenName: 'Mensa',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mr',
+        given: 'Aban, Adeben',
+        family: 'Ampofo',
+        birthDate: '1985-07-15',
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9764',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'aban.ampofo@gmail.com',
+                phone: '024 975 8698',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: 'University',
+                occupation: 'Civil Servant',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH13956264',
+                maidenName: '',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'ch',
+        given: 'Coujoe, Gamal',
+        family: 'Nkrumah',
+        birthDate: Moment().subtract(2, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: '',
+        address: [
+            {
+                addressLine1: 'P.O. Box 7986',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: '',
+                phone: '',
+                use: ''
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: '',
+                occupation: '',
+                religion: '',
+                employment: '',
+                personalIDNummber: '',
+                maidenName: '',
+                marriageDate: ''
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mrs',
+        given: 'Bashirah, Awo',
+        family: 'Nkrumah',
+        birthDate: '1985-02-02',
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 7986',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'Bashirah.a.Nkrumah@gmail.com',
+                phone: '024 965 1365',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '3',
+                childrenBornLiving: '3',
+                foetalDeaths: '0',
+                birthDateLast: '2005-12-23',
+                formalEducation: 'University',
+                occupation: 'Teacher',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH99856325',
+                maidenName: 'Attoh',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mr',
+        given: 'Afua, Hirsch',
+        family: 'Nkrumah',
+        birthDate: '1985-07-15',
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 7986',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'Afua.Nkrumah@gmail.com',
+                phone: '024 123 3568',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: 'University',
+                occupation: 'Civil Servant',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH1968576',
+                maidenName: '',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'ch',
+        given: 'Baba, Awusi',
+        family: 'Konadu',
+        birthDate: Moment().subtract(3, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: '',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9875',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: '',
+                phone: '',
+                use: ''
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: '',
+                occupation: '',
+                religion: '',
+                employment: '',
+                personalIDNummber: '',
+                maidenName: '',
+                marriageDate: ''
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mrs',
+        given: 'Yaba, Christina',
+        family: 'Konadu',
+        birthDate: '1985-02-02',
+        gender: 'female',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9875',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'Yaba.c.Konadu@gmail.com',
+                phone: '024 645 1958',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '3',
+                childrenBornLiving: '3',
+                foetalDeaths: '0',
+                birthDateLast: '2005-12-23',
+                formalEducation: 'University',
+                occupation: 'Teacher',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH99658745',
+                maidenName: 'Afrira',
+                marriageDate: '2007-09-23'
+            }
+        ]
+    },
+    {
+        uuid: Uuid.v4(),
+        prefix: 'Mr',
+        given: 'Gamal, Roland',
+        family: 'Konadu',
+        birthDate: '1985-07-15',
+        gender: 'male',
+        nationality: 'Ghana',
+        maritalStatus: 'Married',
+        address: [
+            {
+                addressLine1: 'P.O. Box 9875',
+                addressLine2: '',
+                addressLine3: '',
+                city: 'Swedru',
+                county: 'Agona West Municipal',
+                state: 'Central Region',
+                postalCode: ''
+            }
+        ],
+        telecom: [
+            {
+                email: 'Gamal.Konadu@gmail.com',
+                phone: '024 987 6585',
+                use: 'phone'
+            }
+        ],
+        extra: [
+            {
+                childrenBornAlive: '',
+                childrenBornLiving: '',
+                foetalDeaths: '',
+                birthDateLast: '',
+                formalEducation: 'University',
+                occupation: 'Civil Servant',
+                religion: 'Catholic',
+                employment: 'full-time',
+                personalIDNummber: 'GH65487965',
+                maidenName: '',
+                marriageDate: '2007-09-23'
             }
         ]
     }

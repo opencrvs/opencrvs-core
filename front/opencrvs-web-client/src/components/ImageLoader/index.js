@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 10:17:15
+ * @Last Modified time: 2017-07-28 00:15:01
  */
 import React from 'react';
 import styles from './styles.css';
@@ -11,11 +11,21 @@ import {Tab, Tabs} from 'react-toolbox';
 import { Button } from 'react-toolbox/lib/button';
 import Dropzone from 'react-dropzone';
 import ProgressBar from 'react-toolbox/lib/progress_bar';
+import Webcam from 'react-webcam';
+import theme from './cameraButton.css';
 
 class ImageLoader extends React.Component {
   constructor(props) {
     super(props);
   }
+
+  setRef = (webcam) => {
+    this.webcam = webcam;
+  }
+ 
+  capture = () => {
+    const imageSrc = this.webcam.getScreenshot();
+  };
   
   closeImageModal = (event) => {
     this.props.onModalCloseClick('image');
@@ -82,8 +92,32 @@ class ImageLoader extends React.Component {
               </div>
             </Tab>
             <Tab label="Camera" onActive={this.handleActive}>
-              <small>Use your camera
-              </small>
+              <div className={
+                !imageFetching
+                  ?
+                  styles.cameraTarget + ' pure-g'
+                  :
+                  styles.cameraTargetUploading + ' pure-g'
+                }>
+                {!imageFetching
+                  ?
+                    <div className="pure-u-1">
+                      <Webcam
+                        audio={false}
+                        ref={this.setRef}
+                        screenshotFormat="image/jpeg"
+                        className={styles.webcam}
+                      />
+
+                      <Button theme={theme} icon="image" label="Take picture" raised primary />
+                    </div>
+                  :
+                    <div className={styles.progressHolder}>
+                      <ProgressBar type="circular" mode="indeterminate" multicolor />
+                    </div>
+                }
+               
+              </div>
             </Tab>
           </Tabs>
           </section>

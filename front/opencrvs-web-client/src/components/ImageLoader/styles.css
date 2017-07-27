@@ -21,9 +21,30 @@ h2 {
 .imageInput{
   display: none;
 }
-
+.webcam {
+    width: 80%;
+    max-width: 27em;
+    margin: 0 auto;
+    max-height: 22em;
+}
 .progressHolder {
     margin: 0 auto;
     position: relative;
     top: 2.3em;
+}
+
+.cameraTarget {
+    border: #ddd 4px dashed;
+    border-radius: 2px;
+    text-align: center;
+    position: relative;
+    min-height: 15.5em;
+    max-width: 32em;
+
+    max-height: 23em;
+    margin: 0 auto;
+}
+
+.cameraTargetUploading {
+    border: none;
 }

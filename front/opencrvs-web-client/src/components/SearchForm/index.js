@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:51 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 16:10:52
+ * @Last Modified time: 2017-07-27 22:56:21
  */
 import React from 'react';
 import styles from './styles.css';
@@ -27,7 +27,7 @@ class SearchForm extends React.Component {
   }
 
   render = () => {
-    const { role, onSearchRequest } = this.props;
+    const { role } = this.props;
     return (
       <div className={styles.searchContainer + ' pure-g'}>
         <div className="pure-u-1">

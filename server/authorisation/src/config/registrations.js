@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:47 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 19:46:51
+ * @Last Modified time: 2017-07-27 22:15:47
  */
 // App Registrations
 
@@ -146,6 +146,15 @@ const internals = {
         },
         {
             plugin: './routes/documents',
+            options: {
+                select: ['api'],
+                routes: {
+                    prefix: '/api'
+                }
+            }
+        },
+        {
+            plugin: './routes/informant',
             options: {
                 select: ['api'],
                 routes: {

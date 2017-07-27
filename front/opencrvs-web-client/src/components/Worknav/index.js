@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:13 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 15:05:49
+ * @Last Modified time: 2017-07-27 23:41:55
  */
 import React from 'react';
 import styles from './styles.css';
@@ -46,7 +46,16 @@ class Worknav extends React.Component {
           <div className={styles.burgerMenuHolder} onClick={this.toggleMobileMenu}>
             <div className={styles.burgerMenu}></div>
           </div>
+          <div className={
+              !workView
+                ? styles.splashSubhead + ' pure-u-1'
+                : styles.homeHide
+              }>
+            The <strong>free</strong> civil registration and vital statistics platform 
+          </div>
           <div className="pure-u-1 pure-u-md-1-2">
+
+            
             <div className={
                 !workView
                   ? styles.homeHide + ' pure-g'

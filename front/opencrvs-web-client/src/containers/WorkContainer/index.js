@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-26 16:32:58
+ * @Last Modified time: 2017-07-27 22:59:32
  */
 import React from 'react';
 import styles from './styles.css';
@@ -54,7 +54,6 @@ class WorkContainer extends React.Component {
     const { 
       imageZoomID, 
       submitModal, 
-      trackingID, 
       trackingModal,
       reqDocsModal } = this.props;
     return (

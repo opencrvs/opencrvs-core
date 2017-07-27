@@ -2,11 +2,10 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 00:27:57
+ * @Last Modified time: 2017-07-27 22:55:28
  */
 import React from 'react';
 import styles from './styles.css';
-import {connect} from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
 import Input from 'react-toolbox/lib/input';
 import Dropdown from 'react-toolbox/lib/dropdown';
@@ -174,6 +173,30 @@ class WorkingItemForm extends React.Component {
             <Field component={renderDropdown} name="father_formalEducation" label="Education" source={ educationsReference } />
             <Field component={renderDropdown} name="father_employment" label="Employment" source={ occupationsReference } />
             <Field component={renderInput} name="father_occupation" placeholder="Occupation" label="Occupation" />
+          </Collapsible>
+          <Collapsible
+            classParentString={styles.collapsibleParent}
+            triggerClassName={styles.collapsibleClosed}
+            triggerOpenedClassName={styles.collapsibleOpened}
+            overflowWhenOpen={styles.scroll}
+            trigger="
+              Particulars of informant 
+            "
+          >
+            <Field component={renderInput} name="informant_firstName" placeholder="First name" label="First name" validate={[required]} />
+            <Field component={renderInput} name="informant_middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
+            <Field component={renderInput} name="informant_family" placeholder="Last name" label="Last name" validate={[required]} />
+            <Field component={renderInput} name="informant_relationship" placeholder="Relationship" label="Relationship" validate={[required]} />
+            <Field component={renderInput} name="informant_personalIDNummber" placeholder="Personal ID number" label="Personal ID Number" validate={[required]} />
+            <Field component={renderInput} name="informant_phone" placeholder="Mobile number" label="Mobile number" />
+            <Field component={renderInput} name="informant_email" placeholder="Email address" label="Email address" />
+            <Field component={renderInput} name="informant_addressLine1" placeholder="Address line 1" label="Address line 1"  />
+            <Field component={renderInput} name="informant_addressLine2" placeholder="Address line 2" label="Address line 2"  />
+            <Field component={renderInput} name="informant_addressLine3" placeholder="Address line 3" label="Address line 3"  />
+            <Field component={renderDropdown} name="informant_city" label="City or town" source={ townsReference } validate={[required]}/>
+            <Field component={renderDropdown} name="informant_county" label="County or district" source={ districtsReference } validate={[required]}/>
+            <Field component={renderInput} name="informant_postalCode" placeholder="Postal code" label="Postal code"  />
+            <Field component={renderDropdown} name="informant_state" label="State or region" source={ regionsReference } validate={[required]}/>
           </Collapsible>
           <Collapsible
             classParentString={styles.collapsibleParent}

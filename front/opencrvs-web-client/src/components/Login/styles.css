@@ -9,22 +9,40 @@
 }
 
 .errorMessageSplash{
-    color: #F1C400;
+    color: #ff4081;
     letter-spacing: 0.05em;
     font-weight: bold;
     text-transform: none;
     margin: 0.2em;
 }
 
-.loginInput {
-  margin: 0.2em;
-  width: 100%;
-  height: 3em;
+.formContainer {
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    border: 3px solid white;
+    min-width: 17em;
+    max-height: 13.1em;
 }
 
-@media (min-width: 48em) {
+.usernameInput {
+  width: 100% !important;
+  height: 4em;
+min-width: 16em;
+    border-radius: 5px 5px 0 0  !important;
+}
+.passwordInput {
+  width: 100% !important;
+  height: 4em;
+  min-width: 16em;
+    border-radius: 0px  !important;
+}
 
-    .loginInput {
-      width: 45%;
+@media (min-width: 55em) {
+
+    .usernameInput {
+        height: 3em;
+    }
+    .passwordInput {
+        height: 3em;
     }
 }

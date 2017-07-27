@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 15:17:13
+ * @Last Modified time: 2017-07-27 23:00:16
  */
 import React from 'react';
 import styles from './styles.css';
@@ -20,7 +20,6 @@ import JudicialIcon from 'components/icons/JudicialIcon';
 import LegitimationIcon from 'components/icons/LegitimationIcon';
 import MarriageIcon from 'components/icons/MarriageIcon';
 import RecognitionIcon from 'components/icons/RecognitionIcon';
-import ReactTooltip from 'react-tooltip';
 const Moment = require('moment');
 
 class WorkingItem extends React.Component {
@@ -56,18 +55,15 @@ class WorkingItem extends React.Component {
     const { selectedDeclaration, patients, role, category, newDeclaration, tempImages } = this.props;
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
-    const childAddress = head(get(childPatient, 'patient.address'));
     let pageTitle = null;
     let birthDate = null;
-    let address = null;
+
     if (selectedDeclaration) {
       pageTitle = get(childPatient, 'patient.given').toString().replace(/,/g, '') + ' ' + get(childPatient, 'patient.family');
       birthDate = get(childPatient, 'patient.birthDate');
-      address = get(childAddress, 'county');
     } else {
       pageTitle = 'New ' + category + ' Declaration';
       birthDate = '';
-      address = '';
     }
     let iconType = null;
     switch (category) {
@@ -105,29 +101,21 @@ class WorkingItem extends React.Component {
     let pixelHeight = 0;
     let showPics = false;
     if (selectedDeclaration) {  
-      console.log('1');    
-      console.log('tempImages.length: ' + tempImages.length);    
-      console.log('tempImages.length: ' + selectedDeclaration.documents.length);    
       if (tempImages.length > 0 && selectedDeclaration.documents.length > 0) {
         showPics = true;
-        console.log('2');   
         let multiplier = tempImages.length + selectedDeclaration.documents.length;
         pixelHeight = (multiplier * 750) + 'px';
       } else if (tempImages.length > 0) {
-        console.log('3');   
         showPics = true;
         pixelHeight = (tempImages.length * 750) + 'px';
       } else if (selectedDeclaration.documents.length > 0) {
-        console.log('4');   
         showPics = true;
         pixelHeight = (selectedDeclaration.documents.length * 750) + 'px';
       }
     } else if (tempImages.length > 0) {
-      console.log('5');   
       showPics = true;
       pixelHeight = (tempImages.length * 750) + 'px';
     }
-    console.log('showPics: ' + showPics);   
     return (
       <div className={styles.workingItemContainer + ' pure-u-1'}>
         {
@@ -147,9 +135,8 @@ class WorkingItem extends React.Component {
                   <span>{' ' + birthDate }</span>
                 </p>
                 <div className={styles.smsMother}>
-                  <ReactTooltip place="bottom" type="dark" effect="float"/>
                 
-                  <a href="#" data-tip="Text mother"><svg
+                  <svg
                     fill="#2d3e50"
                     viewBox="0 0 100 103"
                     height="30"
@@ -160,7 +147,7 @@ class WorkingItem extends React.Component {
     s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2S32.6,46.8,29.2,46.8z M50,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2
     c3.4,0,6.2,2.8,6.2,6.2S53.4,46.8,50,46.8z M70.8,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2
     S74.3,46.8,70.8,46.8z"/>
-                  </svg></a>
+                  </svg>
                 </div>
                   <div className={
                     Moment().diff(selectedDeclaration.created_at, 'days') > 1

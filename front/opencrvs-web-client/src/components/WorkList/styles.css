@@ -9,9 +9,10 @@
     overflow: scroll;
     z-index: 20; /* Sit on top */
     background-color: white;
+    max-height: 35.8em;
 }
 
-.list div:nth-child(3n) {
+.list div:nth-child(3) {
     border-top: 1px solid #ddd;
 }
 
@@ -30,6 +31,7 @@
         top: 6em;
         height: auto;
         border-right: 1px solid #ddd;
+        max-height: 100%;
     }
 
 }
