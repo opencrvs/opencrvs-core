@@ -2,10 +2,10 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 15:45:43
+ * @Last Modified time: 2017-07-27 13:54:00
  */
 import React from 'react';
-import HeaderContainer from 'containers/HeaderContainer';
+import Worknav from 'components/Worknav';
 import FooterContainer from 'containers/FooterContainer';
 import LoginContainer from 'containers/LoginContainer';
 import UserAvatar from 'components/UserAvatar';
@@ -46,7 +46,7 @@ class HomeContainer extends React.Component {
     return (
     <div className={styles.app}>
 
-      <HeaderContainer />
+      <Worknav {...this.props} />
       <div className={styles.splashContainer}>
         <div className={styles.splash}>
           <h1 className={styles.splashHead}>Open CRVS</h1>
@@ -171,13 +171,15 @@ class HomeContainer extends React.Component {
   }
 }
 
-const mapStateToProps = ({ declarationsReducer, userReducer }) => {
+const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) => {
   const {
     workView,
     authenticated,
     isFetchingDeclaration,
   } = declarationsReducer;
-  const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar } = userReducer;
+
+  const { menuOpened } = globalReducer;
+  const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar, role } = userReducer;
 
   return {
     workView,
@@ -189,6 +191,8 @@ const mapStateToProps = ({ declarationsReducer, userReducer }) => {
     given,
     family,
     avatar,
+    menuOpened,
+    role,
   };
 };
 

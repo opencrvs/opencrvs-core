@@ -1,4 +1,6 @@
-
+.homeHide {
+    display: none;
+}
 
 .workIcons {
     position: relative;
@@ -12,9 +14,9 @@
 }
 
 .avatarName {
-        position: relative;
-    top: -4.5em;
-    left: 6em;
+    position: relative;
+    top:0em;
+    left: 0em;
     text-transform: uppercase;
     font-weight: bold;
     letter-spacing: 0.1em;
@@ -24,38 +26,82 @@
 
 .avatarLocation {
     position: relative;
-    top: -4.7em;
-    left: 6em;
+    top: 0em;
+    left: 0em;
 }
 
 .inboxIcon {
-    width: 1.25em;
+    position: relative;
+    top: -0.2em;
     float: left;
-    margin-right: 0.3em;
+    left: 0.5em;
+    margin-right: 3em;
+
+}
+
+
+.inboxItem {
+    margin-top: 2em;
 
 }
 
 .draftIcon {
-    width: 1.5em;
+    position: relative;
+    top: -0.2em;
     float: left;
-    margin-right: 0.3em;
+    left: 0.5em;
+    margin-right: 3em;
 
 }
 
 .trashIcon {
-    top: 0em;
+    position: relative;
+    top: -0.2em;
     float: left;
-    margin-right: 0.3em;
-
+    left: 0.5em;
+    margin-right: 3em;
 }
 
-.exitIcon {
-    top: 0em;
+.settingIcon {
+    top: -0.2em;
+    position: relative;
     float: left;
-    margin-right: 0.3em;
+    left: 0.5em;
+    margin-right: 3em;
     cursor: pointer;
 }
 
+.exitIcon {
+    top: -0.2em;
+    position: relative;
+    float: left;
+    margin-right: 1.8em;
+    cursor: pointer;
+}
+
+.statsIcon {
+    top: -0.5em;
+    position: relative;
+    float: left;
+    margin-right: 1.8em;
+    cursor: pointer;
+}
+.reportsIcon {
+    top: -0.2em;
+    position: relative;
+    float: left;
+    margin-right: 2.1em;
+    cursor: pointer;
+}
+.teamIcon {
+
+    
+    top: -0.8em;
+    position: relative;
+    float: left;
+    margin-right: 1.8em;
+    cursor: pointer;
+}
 .userName {
     display: block;
     text-transform: uppercase;
@@ -88,7 +134,14 @@
     padding: 0.5em;
     text-align: center;
     box-shadow: 0 1px 1px rgba(0,0,0, 0.10);
-    height: 6.0em;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 20%;
+    min-width: 18em;
+    z-index: 998;
+    
 }
 .pure-menu.pure-menu-fixed {
     /* Fixed menus normally have a border at the bottom. */
@@ -124,14 +177,156 @@
 .pureMenuSelected a {
     color: white !important;
 }
+.menuItem {
+    width: 100%;
+    display: block;
+    float: left;
+    margin-bottom: 1em;
+    cursor: pointer;
+}
+
+.reportsItem {
+    margin-top: 2em;
+}
+
+.logoutItem {
+    margin-top: 1em;
+}
+
+.burgerMenuHolder {
+    position: relative;
+    width: 2.5em;
+    height: 2.5em;
+    left: 17.5em;
+    cursor: pointer;
+    background: #2d3e50;
+    top: -0.5em;
+}
+
+.burgerMenu {
+  position: relative;
+  padding-left: 1.25em;
+  top: 0.4em;
+left: -0.27em;
+}
+.burgerMenu:before {
+  content: "";
+  position: absolute;
+    right: 0.5em;
+    top: 0.5em;
+  width: 1em;
+  height: 0.1em;
+  background: white;
+  box-shadow: 
+    0 0.25em 0 0 white,
+    0 0.5em 0 0 white;
+}
+.homeHeader {
+    height: 4em !important;
+}
+@media (min-width: 55em) {
 
 
-@media (min-width: 48em) {
+    .inboxItem {
+        margin-top: 0em;
+
+    }
+
+    .menuItem {
+        display: inline-block;
+        vertical-align: middle;
+        width: 5em;
+        float: none;
+    }
+
+    .menuText {
+        display: none;
+    }
 
     .homeMenu {
         text-align: left;
+        height: 6.0em;
+        width: 100%;
     }
     .homeMenu ul {
         float: right;
+    }
+
+    .avatarName {
+        top: -4.5em;
+        left: 6em;
+    }
+
+
+    .avatarLocation {
+        position: relative;
+        top: -4.7em;
+        left: 6em;
+    }
+    .settingIcon {
+        position: relative;
+        top: -0.25em;
+        left: 0.6em;
+    }
+    .burgerMenuHolder {
+        display: none;
+    }
+    
+    .reportsItem {
+        margin-top: 0em;
+    }
+
+    .logoutItem {
+        margin-top: 0em;
+    }
+    .teamIcon {
+
+        
+        top: -0.5em;
+    }
+    .statsIcon {
+
+        
+        top: -0.2em;
+    }
+}
+
+.menuOpened {
+    left: 0;
+    -webkit-transition-property: left;
+    -moz-transition-property: left;
+    -o-transition-property: left;
+    transition-property: left;
+    -webkit-transition-duration: 0.25s;
+    -moz-transition-duration: 0.25s;
+    -o-transition-duration: 0.25s;
+    transition-duration: 0.25s;
+    -webkit-transition-timing-function: linear;
+    -moz-transition-timing-function: linear;
+    -o-transition-timing-function: linear;
+    transition-timing-function: linear;
+}
+
+.menuClosed {
+    left: -18em;
+    -webkit-transition-property: left;
+    -moz-transition-property: left;
+    -o-transition-property: left;
+    transition-property: left;
+    -webkit-transition-duration: 0.25s;
+    -moz-transition-duration: 0.25s;
+    -o-transition-duration: 0.25s;
+    transition-duration: 0.25s;
+    -webkit-transition-timing-function: linear;
+    -moz-transition-timing-function: linear;
+    -o-transition-timing-function: linear;
+    transition-timing-function: linear;
+    
+}
+
+@media (min-width: 55em) {
+    .menuClosed {
+        left: 0;
+        
     }
 }

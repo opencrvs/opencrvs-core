@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:34 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 12:18:55
+ * @Last Modified time: 2017-07-26 19:47:29
  */
 exports.up = function (knex, Promise) {
 
@@ -18,7 +18,8 @@ exports.up = function (knex, Promise) {
         table.string('maritalStatus').nullable();
         table.string('nationality').notNullable();
         table.boolean('active').notNullable().defaultTo(true);
-        table.timestamps();
+        table.timestamp('created_at').notNullable().index().defaultTo(knex.raw('now()'));
+        table.timestamp('updated_at').notNullable().index().defaultTo(knex.raw('now()'));
     })
         .createTable('address', (table) => {
 

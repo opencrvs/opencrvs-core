@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 01:17:59
+ * @Last Modified time: 2017-07-26 16:32:58
  */
 import React from 'react';
 import styles from './styles.css';
@@ -36,6 +36,9 @@ import {  imageModalOpened,
           uploadImageFile,
           clearTempImages,
           closeZoomModal } from 'actions/image-actions';
+import {
+  mobileMenuControl,
+} from 'actions/global-actions';
 
 class WorkContainer extends React.Component {
 
@@ -91,7 +94,7 @@ class WorkContainer extends React.Component {
   };
 }
 
-const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patientsReducer }) => {
+const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patientsReducer, globalReducer }) => {
   const {
     declarations,
     selectedDeclaration,
@@ -110,6 +113,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     family,
     avatar } = userReducer;
   const { patients } = patientsReducer;
+  const { menuOpened } = globalReducer;
   const { imageModal,
     imageOption,
     imageFetching,
@@ -142,6 +146,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, imageReducer, patie
     newDeclarationModal,
     imageZoom,
     imageZoomID,
+    menuOpened,
   };
 };
 
@@ -206,6 +211,9 @@ const mapDispatchToProps = dispatch => {
     },
     onSubmitModalConfirm: () => {
       dispatch(submitDeclaration());
+    },
+    toggleMobileMenu: () => {
+      dispatch(mobileMenuControl());
     },
   };
 };

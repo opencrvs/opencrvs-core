@@ -2,10 +2,11 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-12 14:51:14
+ * @Last Modified time: 2017-07-26 20:20:48
  */
 
 
+const Moment = require('moment');
 const Uuid = require('node-uuid');
 
 const patients = [
@@ -14,7 +15,7 @@ const patients = [
         prefix: 'ch',
         given: 'Kojo, Emmanuel',
         family: 'Abraham',
-        birthDate: '2017-06-25',
+        birthDate: Moment().subtract(1, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         gender: 'male',
         nationality: 'Ghana',
         maritalStatus: '',
@@ -143,7 +144,7 @@ const patients = [
         prefix: 'ch',
         given: 'Kwasi, Kwarfo',
         family: 'Adarkwa',
-        birthDate: '2017-06-25',
+        birthDate: Moment().subtract(2, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         gender: 'male',
         nationality: 'Ghana',
         maritalStatus: '',
@@ -272,7 +273,7 @@ const patients = [
         prefix: 'ch',
         given: 'Nana, Oforiatta',
         family: 'Ayim',
-        birthDate: '2017-06-26',
+        birthDate: Moment().subtract(3, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         gender: 'female',
         nationality: 'Ghana',
         maritalStatus: '',

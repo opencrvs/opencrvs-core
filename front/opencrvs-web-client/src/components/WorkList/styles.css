@@ -7,7 +7,6 @@
     border-bottom: 1px solid #ddd;
     position: relative;
     overflow: scroll;
-    top: 6em;
     z-index: 20; /* Sit on top */
     background-color: white;
 }
@@ -22,21 +21,13 @@
 }
 
 
-@media (min-width: 40em) {
 
-    .list {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        height: 20em;
-        border-bottom: 1px solid #ddd;
-    }
-}
 
-@media (min-width: 60em) {
+@media (min-width: 55em) {
 
     .list {
         width:25%;
+        top: 6em;
         height: auto;
         border-right: 1px solid #ddd;
     }

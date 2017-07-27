@@ -30,18 +30,40 @@
 .workItemSubject {
     margin: 0;
 }
+.tracking {
+    font-style: italic;
+    font-size: 0.8em;
+    position: relative;
+    bottom: -5.4em;
+    opacity: 0.5;
+}
 
 .workItemTitle {
     color: #34495e;
-    font-size: 1.2em;
-    margin-top: 0.2em;
+    font-size: 0.9em;
+    margin-top: -1.8em;
 }
 
 .workItemDesc {
-    color: #1b98f8;
+    font-size: 0.8em;
+    line-height: 1.3em;
+    color: #34495e;
+    opacity: 0.7;
+    text-transform: capitalize;
 }
 
-@media (min-width: 40em) {
+.stopWatch {
+    position: relative;
+    top: -4em;
+    left: 100%;
+    border: none !important;
+}
+
+.stopWatchHidden {
+    display: none;
+}
+
+@media (min-width: 55em) {
 
     .iconHolder {
         width: 3em;
@@ -50,5 +72,5 @@
         position: relative;
         left: -0.6em;
     }
-}
 
+}

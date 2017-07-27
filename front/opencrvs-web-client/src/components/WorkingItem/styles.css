@@ -39,22 +39,23 @@
 }
 
 .noSelectedMessage h1 {
-    line-height: 0.5em;
+    line-height: 1em;
+    font-size: 2em;
 }
 
 .wiContentHeader {
     border-bottom: 1px solid #ddd;
-    height: 6.6em;
+    height: 13.6em;
 }
 
 .wiContentTitle {
     margin: 0.5em 0 0;
-    font-size: 1.4em;
+    font-size: 1em;
     color: #34495e;
 }
 
 .wiContentSubtitle {
-    font-size: 1em;
+    font-size: 0.8em;
     margin: 0;
     font-weight: normal;
 }
@@ -64,8 +65,7 @@
 }
 
 .wiContentControls {
-    margin-top: 1.2em;
-    text-align: right;
+    margin-top: -2.8em;
 }
 
 .newWorkItem {
@@ -78,18 +78,45 @@
     padding: 0;
     position: relative;
     display: block;
-    top: 26em;
 }
 
-@media (max-width:1127px) and (min-width:963px) {
-    .wiContentTitle {
-        font-size: 1.4em;
+.smsMother {
+    position: relative;
+    left: 81%;
+    top: -3.5em;
+    cursor: pointer;
+}
+
+.stopWatch {
+    position: relative;
+    top: -3em;
+    left: 81%;
+    border: none !important;
+}
+
+.stopWatchHidden {
+    display: none;
+}
+
+@media (min-width: 55em) {
+    .wiContentControls {
+        text-align: right;
+        margin-top: 1.2em;
     }
-    .noSelectedMessage {
-        position: relative;
-        top: 35%;
-        text-align: center;
+    .wiContentHeader {
+        height: 6.6em;
     }
+
+
+    .noSelectedDeclaration {
+        position: fixed;
+        width: 75%;
+        height: 100%;
+        top:6em;
+        bottom:0;
+        padding: 1em 2em;
+    }
+
     .workingItemContainer {
         position: fixed;
         margin: 0;
@@ -101,68 +128,20 @@
         height: 100%;
     }
 
-    .noSelectedDeclaration {
-        position: fixed;
-        width: 75%;
-        height: 100%;
-        top:6em;
-        bottom:0;
-        padding: 1em 2em;
-    }
-}
-
-@media (min-width:963px) {
-
-    .workingItemContainer {
-        position: fixed;
-        margin: 0;
-        padding: 0;
-        width: 75%;
-        top: 6em;
-        left: 25%;
-        bottom: 0;
-        height: 100%;
-    }
-
-    .noSelectedDeclaration {
-        position: fixed;
-        width: 75%;
-        height: 100%;
-        top:6em;
-        bottom:0;
-        padding: 1em 2em;
-    }
-
     .noSelectedMessage {
         position: relative;
         top: 35%;
         text-align: center;
     }
-}
-@media (min-width:1128px) {
 
     .wiContentTitle {
-        font-size: 2em;
+        font-size: 1em;
     }
     .newWorkItem {
         position: relative;
         top: 0.25em;
     }
 
-    .noSelectedDeclaration {
-        position: fixed;
-        width: 75%;
-        height: 100%;
-        top:6em;
-        bottom:0;
-        padding: 1em 2em;
-    }
-
-    .noSelectedMessage {
-        position: relative;
-        top: 35%;
-        text-align: center;
-    }
 }
 
 .iconHolder {

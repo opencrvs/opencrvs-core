@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 01:10:17
+ * @Last Modified time: 2017-07-27 15:17:13
  */
 import React from 'react';
 import styles from './styles.css';
@@ -20,6 +20,8 @@ import JudicialIcon from 'components/icons/JudicialIcon';
 import LegitimationIcon from 'components/icons/LegitimationIcon';
 import MarriageIcon from 'components/icons/MarriageIcon';
 import RecognitionIcon from 'components/icons/RecognitionIcon';
+import ReactTooltip from 'react-tooltip';
+const Moment = require('moment');
 
 class WorkingItem extends React.Component {
   constructor(props) {
@@ -142,22 +144,70 @@ class WorkingItem extends React.Component {
                     }
                 >{ pageTitle }</h1>
                 <p className={styles.wiContentSubtitle}>
-                  <span>{' ' + birthDate }</span>{' ' + address }
+                  <span>{' ' + birthDate }</span>
                 </p>
+                <div className={styles.smsMother}>
+                  <ReactTooltip place="bottom" type="dark" effect="float"/>
+                
+                  <a href="#" data-tip="Text mother"><svg
+                    fill="#2d3e50"
+                    viewBox="0 0 100 103"
+                    height="30"
+                    width="30"
+                  >
+                    <path d="M79.2,5.2H20.8C9.3,5.2,0,14.5,0,26v29.1C0,66.7,9.3,76,20.9,76c2.9,0,5.2,2.3,5.2,5.2v9.5c0,3.7,4.5,5.5,7.1,2.9l15.2-15.1
+    c1.6-1.6,3.7-2.4,5.9-2.4h24.9c11.5,0,20.8-9.3,20.8-20.8V26C100,14.5,90.7,5.2,79.2,5.2z M29.2,46.8c-3.4,0-6.3-2.8-6.3-6.2
+    s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2S32.6,46.8,29.2,46.8z M50,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2
+    c3.4,0,6.2,2.8,6.2,6.2S53.4,46.8,50,46.8z M70.8,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2
+    S74.3,46.8,70.8,46.8z"/>
+                  </svg></a>
+                </div>
+                  <div className={
+                    Moment().diff(selectedDeclaration.created_at, 'days') > 1
+                    ?
+                      styles.stopWatch
+                    :
+                      styles.stopWatchHidden
+                }>
+                
+                  <svg
+                    fill="#ff4081"
+                    viewBox="0 0 100 101"
+                    height="30"
+                    width="30"
+                  >
+                    <g>
+                      <g>
+                        <path d="M61.7,57.1h-13c-0.6,0-1-0.4-1-1V39.7c0-0.6,0.4-1,1-1s1,0.4,1,1v15.4h12c0.6,0,1,0.4,1,1S62.3,57.1,61.7,57.1z"/>
+                      </g>
+                      <g>
+                        <path d="M54,16.8H43.4c-0.6,0-1-0.4-1-1s0.4-1,1-1H54c0.6,0,1,0.4,1,1S54.5,16.8,54,16.8z"/>
+                      </g>
+                      <g>
+                        <path d="M80.3,32.6c-0.3,0-0.5-0.1-0.7-0.3l-6.8-6.8c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l6.8,6.8c0.4,0.4,0.4,1,0,1.4
+                          C80.8,32.5,80.6,32.6,80.3,32.6z"/>
+                      </g>
+                      <g>
+                        <path d="M48.7,85.2c-16.5,0-30-13.5-30-30s13.5-30,30-30s30,13.5,30,30S65.2,85.2,48.7,85.2z M48.7,27.2c-15.4,0-28,12.6-28,28
+                          s12.6,28,28,28s28-12.6,28-28S64.1,27.2,48.7,27.2z"/>
+                      </g>
+                    </g>
+                  </svg>
+                </div>
               </div>
             </div>
             <div className={styles.wiContentControls + ' pure-u-1 pure-u-md-1-2'}>
               <div className="pure-g">
-                <div className="pure-u-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="save" label="Save" flat />
                 </div>
-                <div className="pure-u-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                 </div>
-                <div className="pure-u-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="delete" label="Trash" flat />
                 </div>
-                <div className="pure-u-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
                 </div>
               </div>
@@ -179,7 +229,7 @@ class WorkingItem extends React.Component {
                       ? 
                         <div><p>Select a declaration to validate,</p><p>or create a new declaration</p></div>
                       : 
-                        <div><p>Select a notification to declare,</p><p>'or create a new declaration</p></div>
+                        <div><p>Select a notification to declare,</p><p>or create a new declaration</p></div>
                   }
                 
                 </h1>

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 00:39:30
+ * @Last Modified time: 2017-07-27 16:05:23
  */
 import {
   DECLARATION_REQUEST,
@@ -20,6 +20,7 @@ import {
   TRACKING_MODAL_TOGGLE,
   DECLARATION_READY_TO_CONFIRM,
   REQD_MODAL_TOGGLE,
+  DECLARATION_SEARCH,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -37,6 +38,8 @@ function declarationsReducer(
     trackingModal: 0,
     submitValues: '',
     reqDocsModal: 0,
+    searchTerm: '',
+    declarationsList: '',
   },
   action
 ) {
@@ -74,11 +77,18 @@ function declarationsReducer(
         isFetching: true,
         workView: true,
       };
+    case DECLARATION_SEARCH:
+      return {
+        ...state,
+        seacrhTerm: action.seacrhTerm,
+        declarationsList: action.declarationsList,
+      };
     case DECLARATION_SUCCESS:
       return {
         ...state,
         isFetching: false,
         declarations: action.declarations,
+        declarationsList: action.declarationsList,
       };
     case DECLARATION_FAILURE:
       return {

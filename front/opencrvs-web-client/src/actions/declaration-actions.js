@@ -2,13 +2,15 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 00:38:38
+ * @Last Modified time: 2017-07-27 16:52:14
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser, updateUserDetails } from 'actions/user-actions';
 import { clearTempImages } from 'actions/image-actions';
-import { get, head } from 'lodash';
+import { get, head, map, filter } from 'lodash';
 import { submit } from 'redux-form';
+const Moment = require('moment');
+const Fuzzysearch = require('fuzzysearch');
 import { fetchPatients } from 'actions/patient-actions';
 export const DECLARATION_REQUEST = 'DECLARATION_REQUEST';
 export const DECLARATION_SUCCESS = 'DECLARATION_SUCCESS';
@@ -24,6 +26,7 @@ export const DECLARATION_SUBMIT_SUCCESS = 'DECLARATION_SUBMIT_SUCCESS';
 export const DECLARATION_SUBMIT_FAILURE = 'DECLARATION_SUBMIT_FAILURE';
 export const TRACKING_MODAL_TOGGLE = 'TRACKING_MODAL_TOGGLE';
 export const REQD_MODAL_TOGGLE = 'REQD_MODAL_TOGGLE';
+export const DECLARATION_SEARCH = 'DECLARATION_SEARCH';
 
 export const DECLARATION_READY_TO_CONFIRM = 'DECLARATION_READY_TO_CONFIRM';
 const uuidv4 = require('uuid/v4');
@@ -95,6 +98,57 @@ export function submitModalOpen(values) {
   };
 }
 
+function setSearchValues(searchTerm, declarationsList) {
+  return {
+    type: DECLARATION_SEARCH,
+    searchTerm,
+    declarationsList,
+  };
+}
+
+export function searchDeclarations(value) {
+
+  return (dispatch, getState) => {
+
+    let declarationsList = [];
+    const {declarations} = getState().declarationsReducer;
+    const {patients} = getState().patientsReducer;
+
+    map(declarations.declaration, (declaration, index ) => {
+      let addToList = false;
+      const created = Moment(declaration.created_at).format('MMM Do YY');
+      let given = get(head(filter(patients, function(patient) { 
+        return patient.patient.id == declaration.childDetails; 
+      })), 'patient.given');
+      let family = get(head(filter(patients, function(patient) { 
+        return patient.patient.id == declaration.childDetails; 
+      })), 'patient.family');
+
+      let dob = get(head(filter(patients, function(patient) { 
+        return patient.patient.id == declaration.childDetails; 
+      })), 'patient.birthDate');
+
+      const dobFormat = Moment(dob).format('MMM Do YY');
+      const tests = [];
+      tests.push(Fuzzysearch(value.toUpperCase(), given.toUpperCase()));
+      tests.push(Fuzzysearch(value.toUpperCase(), family.toUpperCase()));
+      tests.push(Fuzzysearch(value.toUpperCase(), declaration.tracking.toUpperCase()));
+      tests.push(Fuzzysearch(value, dobFormat));
+      tests.push(Fuzzysearch(value, created));
+
+      tests.forEach((test) => {
+        if ( test == true) {
+          addToList = true;
+        }
+      });
+      if (addToList) {
+        declarationsList.push(declaration);
+      }
+    });
+    dispatch(setSearchValues(value, declarationsList));
+  };
+}
+
 export function submitModalOpened() {
   return {
     type: SUBMIT_MODAL_TOGGLE,
@@ -129,11 +183,16 @@ export function selectDeclaration(declaration) {
 }
 
 function receiveDeclaration(data) {
+  let declarationsList = [];
+  map(data.declaration, (declaration, index ) => {
+    declarationsList.push(declaration);
+  });
   return {
     type: DECLARATION_SUCCESS,
     isFetching: false,
     authenticated: true,
     declarations: data,
+    declarationsList,
   };
 }
 

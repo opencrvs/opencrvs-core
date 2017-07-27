@@ -2,8 +2,12 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:23 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-14 10:34:55
+ * @Last Modified time: 2017-07-26 20:21:02
  */
+
+const Moment = require('moment');
+
+
 
 const declarations = [
     {
@@ -14,6 +18,7 @@ const declarations = [
         childDetails: '1',
         code: 'birth-declaration',
         status: 'saved',
+        created_at: Moment().subtract(1, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
                 placeOfDelivery: 'hospital',
@@ -36,6 +41,7 @@ const declarations = [
         childDetails: '4',
         code: 'birth-declaration',
         status: 'saved',
+        created_at: Moment().subtract(2, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
                 placeOfDelivery: 'clinic',
@@ -58,6 +64,7 @@ const declarations = [
         childDetails: '7',
         code: 'birth-declaration',
         status: 'saved',
+        created_at: Moment().subtract(3, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
                 placeOfDelivery: 'home',
@@ -98,7 +105,8 @@ const createDeclaration = function (knex, declaration) {
                 fatherDetails: declaration.fatherDetails,
                 childDetails: declaration.childDetails,
                 code: declaration.code,
-                status: declaration.status
+                status: declaration.status,
+                created_at: declaration.created_at
             })
         .then((id) => {
 

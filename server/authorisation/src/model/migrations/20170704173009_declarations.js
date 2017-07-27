@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:31 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 19:23:58
+ * @Last Modified time: 2017-07-26 19:36:52
  */
 exports.up = function (knex, Promise) {
 
@@ -16,7 +16,8 @@ exports.up = function (knex, Promise) {
         table.string('childDetails').notNullable();
         table.string('code').notNullable();
         table.string('status').notNullable();
-        table.timestamps();
+        table.timestamp('created_at').notNullable().index().defaultTo(knex.raw('now()'));
+        table.timestamp('updated_at').notNullable().index().defaultTo(knex.raw('now()'));
     })
         .createTable('locations', (table) => {
 
