@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 16:05:23
+ * @Last Modified time: 2017-07-28 14:03:07
  */
 import {
   DECLARATION_REQUEST,
@@ -21,6 +21,7 @@ import {
   DECLARATION_READY_TO_CONFIRM,
   REQD_MODAL_TOGGLE,
   DECLARATION_SEARCH,
+  OLD_DOCUMENT_DELETED,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -138,6 +139,17 @@ function declarationsReducer(
         newDeclaration: true,
         selectedDeclaration: '',
         category: action.category,
+      };
+    case OLD_DOCUMENT_DELETED:
+      return {
+        ...state, 
+        selectedDeclaration: {
+          ...state.selectedDeclaration,
+          [action.reference] : [
+            ...state.selectedDeclaration[action.reference].slice(0, action.index),
+            ...state.selectedDeclaration[action.reference].slice(action.index + 1),
+          ],
+        },
       };
     default:
       return state;

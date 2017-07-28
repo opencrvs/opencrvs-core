@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 23:48:47
+ * @Last Modified time: 2017-07-28 12:23:03
  */
 
 const Joi = require('joi');
@@ -70,6 +70,24 @@ exports.register = (server, options, next) => {
             }
         },
         handler: require('./put')
+    });
+
+    server.route({
+
+        path: '/documents/{id}',
+        method: 'DELETE',
+        config: {
+            auth: 'jwt',
+            description: 'Protected route to delete a document.',
+            notes: 'Token and message scopes are required.',
+            tags: ['api'],
+            plugins: {
+                'hapi-swagger': {
+                    payloadType: 'form'
+                }
+            }
+        },
+        handler: require('./delete')
     });
 
     next();

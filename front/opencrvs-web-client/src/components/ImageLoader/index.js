@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 00:15:01
+ * @Last Modified time: 2017-07-28 09:14:11
  */
 import React from 'react';
 import styles from './styles.css';
@@ -13,6 +13,7 @@ import Dropzone from 'react-dropzone';
 import ProgressBar from 'react-toolbox/lib/progress_bar';
 import Webcam from 'react-webcam';
 import theme from './cameraButton.css';
+const Moment = require('moment');
 
 class ImageLoader extends React.Component {
   constructor(props) {
@@ -22,9 +23,21 @@ class ImageLoader extends React.Component {
   setRef = (webcam) => {
     this.webcam = webcam;
   }
- 
+
   capture = () => {
-    const imageSrc = this.webcam.getScreenshot();
+    const b64Data = this.webcam.getScreenshot();
+
+    fetch(b64Data)
+      .then(res => res.blob())
+      .then(blob => {
+
+        const filename = 'Camera-' +  Moment().format('MMM Do YY') + '-at-' + Moment().format('h.mm.ss') + '.jpg';
+        const file = new File([blob], filename, {type: 'image/jpeg', lastModified: Date.now()});
+        const fileArray = [];
+        fileArray.push(file);
+        this.props.uploadImage(fileArray);
+      });
+    
   };
   
   closeImageModal = (event) => {
@@ -109,7 +122,7 @@ class ImageLoader extends React.Component {
                         className={styles.webcam}
                       />
 
-                      <Button theme={theme} icon="image" label="Take picture" raised primary />
+                      <Button theme={theme} icon="image" label="Take picture" raised primary onClick={this.capture} />
                     </div>
                   :
                     <div className={styles.progressHolder}>

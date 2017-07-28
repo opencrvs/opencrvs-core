@@ -1655,6 +1655,10 @@ fs-exists-sync@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/fs-exists-sync/-/fs-exists-sync-0.1.0.tgz#982d6893af918e72d08dec9e8673ff2b5a8d6add"
 
+fs.promised@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/fs.promised/-/fs.promised-3.0.0.tgz#ab77379f7c1ad0939e1262a8c2ced93fa6c39d3b"
+
 fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"

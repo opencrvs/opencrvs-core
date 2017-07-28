@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 11:19:17
+ * @Last Modified time: 2017-07-28 14:05:03
  */
 import React from 'react';
 import styles from './styles.css';
@@ -38,8 +38,6 @@ class ImageZoom extends React.Component {
     ];
     let imageObj = {};
     imageObj = find(imageArray, {'id': imageZoomID});
-    
-    console.log('image to zoom: ' + JSON.stringify(imageObj));
 
     return (
       <Dialog

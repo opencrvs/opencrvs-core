@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-14 20:45:09 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-21 01:06:48
+ * @Last Modified time: 2017-07-28 12:34:10
  */
 import React from 'react';
 import ImageCard from 'components/ImageCard';
@@ -12,8 +12,11 @@ import { connect } from 'react-redux';
 import styles from './styles.css';
 import { 
   onZoomImage, 
-  deleteImage,
+  imageToDelete,
 } from 'actions/image-actions';
+import {
+  submitModalOpened,
+} from 'actions/declaration-actions';
 
 class DocumentContainer extends React.Component {
   constructor(props) {
@@ -69,9 +72,10 @@ const mapDispatchToProps = dispatch => {
       dispatch(onZoomImage(id));
     },
     onDeleteImage: id => {
-      dispatch(deleteImage(id));
+      console.log('buttton: ' + id);
+      dispatch(imageToDelete(id));
+      dispatch(submitModalOpened());
     },
-    
   };
 };
 

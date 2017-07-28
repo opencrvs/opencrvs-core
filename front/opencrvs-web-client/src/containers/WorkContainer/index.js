@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 22:59:32
+ * @Last Modified time: 2017-07-28 11:25:53
  */
 import React from 'react';
 import styles from './styles.css';
@@ -35,6 +35,7 @@ import {  imageModalOpened,
           imageOptionToggle,
           uploadImageFile,
           clearTempImages,
+          deleteImage,
           closeZoomModal } from 'actions/image-actions';
 import {
   mobileMenuControl,
@@ -54,6 +55,7 @@ class WorkContainer extends React.Component {
     const { 
       imageZoomID, 
       submitModal, 
+      imageModal,
       trackingModal,
       reqDocsModal } = this.props;
     return (
@@ -62,8 +64,13 @@ class WorkContainer extends React.Component {
         <div className=" pure-g">
           <WorkList {...this.props} />
           <WorkingItem {...this.props} />
-          <ImageLoader {...this.props} />
           <NewVitalEvent {...this.props} />
+
+          {
+            imageModal  
+            ? <ImageLoader {...this.props} />
+            : ''
+          }
           {
             imageZoomID != 0 
             ? <ImageZoom {...this.props} />
@@ -208,7 +215,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(newDeclarationModalClosed());
       dispatch(newDeclarationEdit(category));
     },
-    onSubmitModalConfirm: () => {
+    onSubmitModalConfirm: context => {
+      dispatch(deleteImage());
       dispatch(submitDeclaration());
     },
     toggleMobileMenu: () => {
