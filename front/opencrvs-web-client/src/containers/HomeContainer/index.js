@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 16:10:45
+ * @Last Modified time: 2017-08-03 11:38:35
  */
 import React from 'react';
 import Worknav from 'components/Worknav';
@@ -38,7 +38,7 @@ class HomeContainer extends React.Component {
       avatar,
       workView,
     } = this.props;
-  
+    this.props.setHome();
     return (
     <div className={styles.app}>
 
@@ -192,8 +192,10 @@ const mapDispatchToProps = dispatch => {
   return {
     fetchUserDetails: () => {
       dispatch(updateUserDetails());
-      dispatch(deselectWorkView());
     },
+    setHome: () => {
+      dispatch(deselectWorkView());
+    }
   };
 };
 

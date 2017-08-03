@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 22:13:20
+ * @Last Modified time: 2017-08-03 11:46:40
  */
 import React from 'react';
 import styles from './styles.css';
@@ -38,7 +38,8 @@ import {  imageModalOpened,
           uploadImageFile,
           clearTempImages,
           deleteImage,
-          closeZoomModal } from 'actions/image-actions';
+          closeZoomModal,
+          resetDeleteImageFlag } from 'actions/image-actions';
 import {
   mobileMenuControl,
 } from 'actions/global-actions';
@@ -58,6 +59,7 @@ class WorkContainer extends React.Component {
       imageZoomID, 
       submitModal, 
       imageModal,
+      imageToDelete,
       trackingModal,
       role,
       selectedLocationMapData,
@@ -127,6 +129,7 @@ const mapStateToProps = ({
     imageErrorMessage,
     imageZoom,
     tempImages,
+    imageToDelete,
     imageZoomID,
      } = imageReducer;
   return {
@@ -135,6 +138,7 @@ const mapStateToProps = ({
     trackingID,
     reqDocsModal,
     trackingModal,
+    imageToDelete,
     submitModal,
     selectedDeclaration,
     newDeclaration,
@@ -188,6 +192,7 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'submit':
           dispatch(submitModalOpened());
+          dispatch(resetDeleteImageFlag());
           break;
         case 'tracking':
           dispatch(trackingModalOpened());
