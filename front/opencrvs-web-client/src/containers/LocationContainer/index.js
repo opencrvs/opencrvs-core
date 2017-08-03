@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 00:20:37
+ * @Last Modified time: 2017-08-03 12:57:25
  */
 import React from 'react';
 import styles from './styles.css';
@@ -12,6 +12,8 @@ import OverviewDetails from 'components/OverviewDetails';
 import TrackerGraph from 'components/TrackerGraph';
 import TrackerDetails from 'components/TrackerDetails';
 import {Tab, Tabs} from 'react-toolbox';
+import { connect } from 'react-redux';
+import { selectRegion } from 'actions/manager-actions';
 
 class LocationContainer extends React.Component {
   constructor(props) {
@@ -23,7 +25,8 @@ class LocationContainer extends React.Component {
   };
 
   render = () => {
-    const { managerView, reportOption } = this.props;
+    const { managerView, 
+      reportOption } = this.props;
    
     return (
       <div className={
@@ -50,4 +53,46 @@ class LocationContainer extends React.Component {
 
    
 
-export default LocationContainer;
+const mapStateToProps = ({  
+  managerReducer,
+  globalReducer }) => {
+  const { 
+    mapLocations,
+    fetchingMapView,
+    subLocations,
+    selectedLocation,
+    countryMapData,
+    regionMapData,
+    selectedLocationMapData,
+  } = managerReducer;
+  const { 
+    country,
+    region,
+    reportOption } = globalReducer;
+  return {
+    
+    mapLocations,
+    reportOption,
+    fetchingMapView,
+    subLocations,
+    selectedLocation,
+    countryMapData,
+    regionMapData,
+    selectedLocationMapData,
+    country,
+    region,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    
+    onRegionClick: name => {
+      dispatch(selectRegion(name));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LocationContainer);
+
+

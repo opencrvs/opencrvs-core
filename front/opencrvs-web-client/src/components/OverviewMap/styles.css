@@ -4,7 +4,7 @@
   height: 100%;
   z-index: 20;
   top: 6em;
-  left: 5em;
+  left: 2em;
 }
 
 .mapSvg {
@@ -20,4 +20,11 @@
 
 .selectedTint {
   fill: #666666;
+}
+
+@media (min-width: 55em) {
+  .mapSvgContainer {
+    top: 6em;
+    left: 5em;
+  }
 }

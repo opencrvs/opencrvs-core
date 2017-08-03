@@ -5,9 +5,11 @@
 .locationContainer {
     margin: 0;
     padding: 0;
-    position: relative;
+    position: fixed;
     display: block;
     background-color: #cccccc;
+    top: 16em;
+    height: 100%;
 }
 
 .tabs section {

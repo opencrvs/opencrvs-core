@@ -4,6 +4,8 @@ import React from 'react';
 import styles from './styles.css';
 import { connect } from 'react-redux';
 import { geoMercator, geoPath } from 'd3-geo';
+import Navigation from 'react-toolbox/lib/navigation';
+import Link from 'react-toolbox/lib/link';
 
 class OverviewMap extends React.Component {
   constructor(props) {
@@ -24,17 +26,21 @@ class OverviewMap extends React.Component {
   }
 
   handleRegionClick(e, mapData, regionIndex) {
-    
-    console.log('Clicked on a region: ', mapData[regionIndex].properties.HRname);
+    this.props.onRegionClick(mapData[regionIndex].properties.HRname);
   }
 
   render = () => {
     const { selectedLocation,
             subLocation,
             selectedLocationMapData } = this.props;
-    
+    console.log(selectedLocation);
     return (
       <div className="pure-g">
+        <div className={ styles.mapBreadcrumbs + ' pure-u-1 pure-u-md-1-1'}>
+          <Navigation type="vertical">
+            <Link label={selectedLocation.title} active />
+          </Navigation>
+        </div>
         <div className={ styles.mapSvgContainer + ' pure-u-1 pure-u-md-1-1'}>
           <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 800 450" className={styles.mapSvg}  >
             <g className={styles.svgG}>

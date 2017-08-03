@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 15:45:39
+ * @Last Modified time: 2017-08-03 12:29:24
  */
 import {
   MOBILE_MENU,
@@ -18,6 +18,8 @@ function globalReducer(
     confirmationCase: '',
     reportOption: 0,
     workView: null,
+    country: 'ghana',
+    regions: ['volta'],
   },
   action
 ) {
