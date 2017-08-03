@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 12:23:03
+ * @Last Modified time: 2017-08-03 17:50:28
  */
 
 const Joi = require('joi');
@@ -43,7 +43,7 @@ exports.register = (server, options, next) => {
         method: 'GET',
         handler: {
             directory: {
-                path: __dirname + '/uploads'
+                path: 'uploads'
             }
         }
     });
