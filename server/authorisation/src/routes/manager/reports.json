@@ -1,0 +1,2597 @@
+{
+  "resourceType": "reportView",
+  "country": {
+      "uuid": "uuid",
+      "title": "Ghana",
+      "staff": {
+        "manager": {
+          "uuid": "uuid",
+          "given": "Daniel",
+          "family": "Gbedema",
+          "title": "National Operations Manager",
+          "email": "schrute@acme.com",
+          "phone": "555-555-555"
+        },
+        "team": [
+          {
+
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "marriage",
+          "timePeriod": [
+            {
+              "title": "This week",
+              "certifications": 90,
+              "certificationsKpi": 150,
+              "registrations": 100,
+              "registrationsKpi": 150,
+              "validations": 110,
+              "validationsKpi": 150,
+              "declarations": 110,
+              "declarationsKpi": 150,
+              "notifications": 140,
+              "notificationsKpi": 150
+            },
+            {
+              "title": "This month",
+              "certifications": 600,
+              "certificationsKpi": 900,
+              "registrations": 600,
+              "registrationsKpi": 900,
+              "validations": 600,
+              "validationsKpi": 900,
+              "declarations": 700,
+              "declarationsKpi": 900,
+              "notifications": 800,
+              "notificationsKpi": 900
+            },
+            {
+              "title": "This year",
+              "certifications": 4500,
+              "certificationsKpi": 9000,
+              "registrations": 5000,
+              "registrationsKpi": 9000,
+              "validations": 5600,
+              "validationsKpi": 9000,
+              "declarations": 6500,
+              "declarationsKpi": 9000,
+              "notifications": 8500,
+              "notificationsKpi": 9000
+            }
+
+          ]
+        },
+        {
+          "type": "birth",
+          "timePeriod": [
+            {
+              "title": "This week",
+              "certifications": 90,
+              "certificationsKpi": 150,
+              "registrations": 100,
+              "registrationsKpi": 150,
+              "validations": 110,
+              "validationsKpi": 150,
+              "declarations": 110,
+              "declarationsKpi": 150,
+              "notifications": 140,
+              "notificationsKpi": 150
+            },
+            {
+              "title": "This month",
+              "certifications": 600,
+              "certificationsKpi": 900,
+              "registrations": 600,
+              "registrationsKpi": 900,
+              "validations": 600,
+              "validationsKpi": 900,
+              "declarations": 700,
+              "declarationsKpi": 900,
+              "notifications": 800,
+              "notificationsKpi": 900
+            },
+            {
+              "title": "This year",
+              "certifications": 4500,
+              "certificationsKpi": 9000,
+              "registrations": 5000,
+              "registrationsKpi": 9000,
+              "validations": 5600,
+              "validationsKpi": 9000,
+              "declarations": 6500,
+              "declarationsKpi": 9000,
+              "notifications": 8500,
+              "notificationsKpi": 9000
+            }
+
+          ]
+        }  
+      ],
+      "sub": "Central",
+      "subEntries": {
+        "code": "regions",
+        "entries": [
+          {
+            "uuid": "uuid",
+            "title": "Volta",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Janice",
+                "family": "Dotse",
+                "title": "Regional Operations Manager",
+                "email": "j-dotse@acme.com",
+                "phone": "333-333-333"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ],
+            "sub": "Keta",
+            "subEntries": {
+              "code": "districts",
+              "entries": [
+                {
+                  "title": "Adaklu Anyigbe",
+                  "sub": "Adaklu Waya",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                
+                {
+                  "title": "Akatsi",
+                  "sub": "Ave-Dakpa",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                
+                {
+                  "title": "Ho",
+                  "sub": "Ho",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Hohoe",
+                  "sub": "Hohoe",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Jasikan",
+                  "sub": "Jasikan",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Kadjebi",
+                  "sub": "Kadjebi",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Keta",
+                  "sub": "Keta",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Ketu",
+                  "sub": "Dzodze",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Kpandu",
+                  "sub": "Kpandu",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Krachi East",
+                  "sub": "Dambai",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Krachi",
+                  "sub": "Kete Krachi",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Nkwanta",
+                  "sub": "Kpassa",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "North Tongu",
+                  "sub": "Battor Dugame",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "South Dayi",
+                  "sub": "Kpeve New Town",
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "uuid": "uuid",
+                  "title": "South Tongu",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Kenneth",
+                      "family": "Dede",
+                      "title": "District Operations Manager",
+                      "email": "k-dede@acme.com",
+                      "phone": "777-777-777"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
+                  "events": [
+    
+                    {
+                      "type": "marriage",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    },
+                    {
+                      "type": "birth",
+                      "timePeriod": [
+                        {
+                          "title": "This week",
+                          "certifications": 1,
+                          "certificationsKpi": 1,
+                          "registrations": 1,
+                          "registrationsKpi": 1,
+                          "validations": 1,
+                          "validationsKpi": 2,
+                          "declarations": 1,
+                          "declarationsKpi": 2,
+                          "notifications": 1,
+                          "notificationsKpi": 2
+                        },
+                        {
+                          "title": "This month",
+                          "certifications": 6,
+                          "certificationsKpi": 9,
+                          "registrations": 6,
+                          "registrationsKpi": 9,
+                          "validations": 6,
+                          "validationsKpi": 9,
+                          "declarations": 7,
+                          "declarationsKpi": 9,
+                          "notifications": 8,
+                          "notificationsKpi": 9
+                        },
+                        {
+                          "title": "This year",
+                          "certifications": 45,
+                          "certificationsKpi": 90,
+                          "registrations": 50,
+                          "registrationsKpi": 90,
+                          "validations": 56,
+                          "validationsKpi": 90,
+                          "declarations": 65,
+                          "declarationsKpi": 90,
+                          "notifications": 85,
+                          "notificationsKpi": 90
+                        }
+
+                      ]
+                    }
+                  ],
+                  "sub": "Sogakope",
+                  "subEntries": {
+                    "code": "towns",
+                    "entries": [
+                      {
+                       
+
+
+
+
+
+                        
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          
+          {
+            "title": "Brong Ahafo",
+            "sub": "Sunyani",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+          
+          {
+            "title": "Eastern",
+            "sub": "Koforidua",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+          
+          {
+            "title": "Greater Accra",
+            "sub": "Accra",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+          
+          {
+            "title": "Upper East",
+            "sub": "Bolgatanga",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+          
+          {
+            "title": "Upper West",
+            "sub": "Wa",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+          
+          {
+            "title": "Northern",
+            "sub": "Tamale",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+          
+          {
+            "title": "Central",
+            "sub": "Cape Coast",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+
+          {
+            "title": "Western",
+            "sub": "Sekondi-Takoradi",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          },
+          
+          {
+            "title": "Ashanti",
+            "sub": "Kumasi",
+            "events": [
+              {
+                "type": "marriage",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              },
+              {
+                "type": "birth",
+                "timePeriod": [
+                  {
+                    "title": "This week",
+                    "certifications": 9,
+                    "certificationsKpi": 15,
+                    "registrations": 10,
+                    "registrationsKpi": 15,
+                    "validations": 11,
+                    "validationsKpi": 15,
+                    "declarations": 11,
+                    "declarationsKpi": 15,
+                    "notifications": 14,
+                    "notificationsKpi": 15
+                  },
+                  {
+                    "title": "This month",
+                    "certifications": 60,
+                    "certificationsKpi": 90,
+                    "registrations": 60,
+                    "registrationsKpi": 90,
+                    "validations": 60,
+                    "validationsKpi": 90,
+                    "declarations": 70,
+                    "declarationsKpi": 90,
+                    "notifications": 80,
+                    "notificationsKpi": 90
+                  },
+                  {
+                    "title": "This year",
+                    "certifications": 450,
+                    "certificationsKpi": 900,
+                    "registrations": 500,
+                    "registrationsKpi": 900,
+                    "validations": 560,
+                    "validationsKpi": 900,
+                    "declarations": 650,
+                    "declarationsKpi": 900,
+                    "notifications": 850,
+                    "notificationsKpi": 900
+                  }
+
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+}

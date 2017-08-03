@@ -1,12 +1,11 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:32 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:17:32 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-07-28 17:58:17
  */
 import React from 'react';
 import { connect } from 'react-redux';
-//import HeaderContainer from 'containers/HeaderContainer';
 import HomeContainer from 'containers/HomeContainer';
 import WorkContainer from 'containers/WorkContainer';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';

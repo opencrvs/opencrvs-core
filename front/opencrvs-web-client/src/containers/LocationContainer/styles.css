@@ -1,0 +1,30 @@
+.registrationView {
+  display: none;
+}
+
+.locationContainer {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    display: block;
+    background-color: #cccccc;
+}
+
+.tabs section {
+  outline: none !important;
+  border: none !important;
+}
+
+
+@media (min-width: 55em) {
+ 
+    .locationContainer {
+        position: fixed;
+        margin: 0;
+        padding: 0;
+        width: 75%;
+        top: 6em;
+        bottom: 0;
+        height: 100%;
+    }
+}

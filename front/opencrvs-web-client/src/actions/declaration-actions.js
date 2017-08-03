@@ -2,11 +2,12 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 13:57:49
+ * @Last Modified time: 2017-08-02 16:25:51
  */
 import { BASE_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
-import { logoutUser, updateUserDetails } from 'actions/user-actions';
+import { logoutUser } from 'actions/user-actions';
+import { selectWorkView } from 'actions/global-actions';
 import { clearTempImages } from 'actions/image-actions';
 import { get, head, map, filter } from 'lodash';
 const Moment = require('moment');
@@ -16,7 +17,6 @@ export const DECLARATION_REQUEST = 'DECLARATION_REQUEST';
 export const DECLARATION_SUCCESS = 'DECLARATION_SUCCESS';
 export const DECLARATION_FAILURE = 'DECLARATION_FAILURE';
 export const DECLARATION_SELECTED = 'DECLARATION_SELECTED';
-export const DECLARATION_CLOSED = 'DECLARATION_CLOSED';
 export const NEW_DECL_MODAL_OPENED = 'NEW_DECL_MODAL_OPENED';
 export const NEW_DECL_MODAL_CLOSED = 'NEW_DECL_MODAL_CLOSED';
 export const NEW_DECL_EDIT = 'NEW_DECL_EDIT';
@@ -41,7 +41,6 @@ function requestDeclaration() {
   return {
     type: DECLARATION_REQUEST,
     isFetching: true,
-    workView: true,
     authenticated: true,
   };
 }
@@ -198,27 +197,12 @@ function declarationError(message) {
   };
 }
 
-function workViewClosed() {
-  return {
-    type: DECLARATION_CLOSED,
-    isFetching: false,
-    workView: false,
-  };
-}
-
-export function deselctWorkView() {
-  return dispatch => {
-    dispatch(workViewClosed());
-  };
-}
-
 export function fetchDeclarations() {
   let token = localStorage.getItem('token') || null;
   let config = {};
   return dispatch => {
     dispatch(requestDeclaration());
     if (token) {
-      dispatch(updateUserDetails(token));
       config = {
         headers: { Authorization: `Bearer ${token}` },
       };
@@ -232,12 +216,13 @@ export function fetchDeclarations() {
             return Promise.reject(payload);
           }
           dispatch(receiveDeclaration(payload));
-
+          
           payload.declaration.forEach((declaration) => {
             dispatch(fetchPatients(declaration.childDetails));
             dispatch(fetchPatients(declaration.motherDetails));
             dispatch(fetchPatients(declaration.fatherDetails));
           });
+          dispatch(selectWorkView('work'));
           return true;
         })
         .catch(err => {

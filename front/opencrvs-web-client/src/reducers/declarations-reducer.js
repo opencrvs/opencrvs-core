@@ -2,14 +2,13 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 14:03:07
+ * @Last Modified time: 2017-08-02 15:39:50
  */
 import {
   DECLARATION_REQUEST,
   DECLARATION_SUCCESS,
   DECLARATION_FAILURE,
   DECLARATION_SELECTED,
-  DECLARATION_CLOSED,
   NEW_DECL_MODAL_CLOSED,
   NEW_DECL_MODAL_OPENED,
   NEW_DECL_EDIT,
@@ -30,7 +29,6 @@ function declarationsReducer(
     isSubmitting: false,
     declarations: '',
     selectedDeclaration: '',
-    workView: false,
     newDeclarationModal: false,
     newDeclaration: false,
     category: '',
@@ -63,7 +61,6 @@ function declarationsReducer(
         selectedDeclaration: '',
         submitValues: '',
         submitModal: 0,
-        workView: false,
         newDeclaration: false,
         category: '',
       };
@@ -76,7 +73,6 @@ function declarationsReducer(
       return {
         ...state,
         isFetching: true,
-        workView: true,
       };
     case DECLARATION_SEARCH:
       return {
@@ -117,11 +113,6 @@ function declarationsReducer(
         selectedDeclaration: action.selectedDeclaration,
         newDeclaration: false,
         category: '',
-      };
-    case DECLARATION_CLOSED:
-      return {
-        ...state,
-        workView: false,
       };
     case NEW_DECL_MODAL_OPENED:
       return {

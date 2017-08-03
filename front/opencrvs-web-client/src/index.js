@@ -2,19 +2,30 @@
  * @Author: Euan Millar 
  * @Date: 2017-05-25 22:14:06 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-06-21 11:39:51
+ * @Last Modified time: 2017-07-28 20:09:34
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, applyMiddleware} from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import App from 'containers/App';
 import reducer from 'reducers/index';
 import thunk from 'redux-thunk';
 import styles from 'index.css';
-import logger from 'redux-logger';
 
-const store = createStore(reducer, applyMiddleware(thunk, logger));
+const composeEnhancers =
+  typeof window === 'object' &&
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?   
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+      // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+    }) : compose;
+const enhancer = composeEnhancers(
+  applyMiddleware(thunk),
+  // other store enhancers if any
+);
+const store = createStore(
+  reducer, enhancer
+);
 const rootElement = document.getElementById('root');
 /**
  * Logs all actions and states after they are dispatched.

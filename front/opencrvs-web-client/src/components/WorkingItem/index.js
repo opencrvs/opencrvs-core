@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 23:00:16
+ * @Last Modified time: 2017-07-28 16:34:07
  */
 import React from 'react';
 import styles from './styles.css';
@@ -52,7 +52,7 @@ class WorkingItem extends React.Component {
   }
 
   render = () => {
-    const { selectedDeclaration, patients, role, category, newDeclaration, tempImages } = this.props;
+    const { selectedDeclaration, patients, role, category, newDeclaration, tempImages, managerView } = this.props;
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
     let pageTitle = null;
@@ -117,7 +117,12 @@ class WorkingItem extends React.Component {
       pixelHeight = (tempImages.length * 750) + 'px';
     }
     return (
-      <div className={styles.workingItemContainer + ' pure-u-1'}>
+      <div className={
+        managerView
+        ? styles.managerView
+        :
+        styles.workingItemContainer + ' pure-u-1'
+        }>
         {
         selectedDeclaration || newDeclaration == true 
           ? 

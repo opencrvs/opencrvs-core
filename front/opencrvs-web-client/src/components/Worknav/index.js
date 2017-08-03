@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:13 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 23:41:55
+ * @Last Modified time: 2017-08-02 16:17:37
  */
 import React from 'react';
 import styles from './styles.css';
@@ -30,7 +30,7 @@ class Worknav extends React.Component {
 
     const { role, given, family, avatar, menuOpened, workView } = this.props;
     let headerClassString = '';
-    if (!workView) {
+    if (workView == null) {
       headerClassString = ' ' + styles.homeHeader;
     }
 
@@ -47,7 +47,7 @@ class Worknav extends React.Component {
             <div className={styles.burgerMenu}></div>
           </div>
           <div className={
-              !workView
+              workView == null
                 ? styles.splashSubhead + ' pure-u-1'
                 : styles.homeHide
               }>
@@ -57,7 +57,7 @@ class Worknav extends React.Component {
 
             
             <div className={
-                !workView
+                workView == null
                   ? styles.homeHide + ' pure-g'
                   : styles.avatarString + ' pure-g'
                 }>
@@ -77,7 +77,7 @@ class Worknav extends React.Component {
             {
               role == 'clerk' || role == 'validator' || role == 'registrar'
               ? <ul className={
-                  !workView
+                  workView == null
                     ? styles.homeHide + ' pure-menu-list'
                     : styles.workIcons + ' pure-menu-list'
                   }>
@@ -186,7 +186,7 @@ class Worknav extends React.Component {
                 </ul>
               : 
                 <ul className={
-                  !workView
+                  workView == null
                     ? styles.homeHide + ' pure-menu-list'
                     : styles.workIcons + ' pure-menu-list'
                   }>
@@ -365,12 +365,9 @@ class Worknav extends React.Component {
     );
   }
 }
-const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) => {
-  const {
-    workView,
-  } = declarationsReducer;
+const mapStateToProps = ({ userReducer, globalReducer }) => {
 
-  const { menuOpened } = globalReducer;
+  const { menuOpened, workView } = globalReducer;
   const { given, family, avatar, role } = userReducer;
 
   return {

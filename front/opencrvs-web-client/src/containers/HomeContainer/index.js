@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 23:43:11
+ * @Last Modified time: 2017-08-02 16:10:45
  */
 import React from 'react';
 import Worknav from 'components/Worknav';
@@ -13,8 +13,8 @@ import { Button } from 'react-toolbox/lib/button';
 import { connect } from 'react-redux';
 import styles from './styles.css';
 import theme from './getStartedButton.css';
+import { deselectWorkView } from 'actions/global-actions';
 import { updateUserDetails } from 'actions/user-actions';
-import { deselctWorkView } from 'actions/declaration-actions';
 
 
 class HomeContainer extends React.Component {
@@ -23,11 +23,7 @@ class HomeContainer extends React.Component {
   }
 
   componentWillMount() {
-    let token = localStorage.getItem('token') || null;
-    if (token) {
-      this.props.fetchData(token);
-      this.props.onHome();
-    }
+    this.props.fetchUserDetails();
   }
   
   handleClick = (event) => {
@@ -170,12 +166,11 @@ class HomeContainer extends React.Component {
 
 const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) => {
   const {
-    workView,
     authenticated,
     isFetchingDeclaration,
   } = declarationsReducer;
 
-  const { menuOpened } = globalReducer;
+  const { menuOpened, workView } = globalReducer;
   const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar, role } = userReducer;
 
   return {
@@ -195,9 +190,9 @@ const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) =>
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchData: token => {dispatch(updateUserDetails(token));},
-    onHome: () => {
-      dispatch(deselctWorkView());
+    fetchUserDetails: () => {
+      dispatch(updateUserDetails());
+      dispatch(deselectWorkView());
     },
   };
 };

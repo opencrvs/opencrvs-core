@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:35 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 16:11:05
+ * @Last Modified time: 2017-07-28 16:22:49
  */
 import React from 'react';
 import styles from './styles.css';
@@ -32,11 +32,17 @@ class WorkList extends React.Component {
       onWorkItemClick,
       role,
       onSearchRequest,
+      managerView,
     } = this.props;
    
 
     return (
-      <div className={styles.list + ' pure-u-1'}>
+      <div className={
+        managerView
+        ? styles.managerView
+        :
+        styles.list + ' pure-u-1'
+        }>
         <SearchForm role={role} onSearchRequest={onSearchRequest} />
         <section className={styles.newDecl}>
           <Button icon="add" floating accent mini onClick={this.openNewModal} />

@@ -81,11 +81,18 @@
 }
 
 .smsMother {
-    position: relative;
-    left: 81%;
-    top: -3.5em;
+    position: absolute;
+    left: 38%;
+    top: 7.5em;
     cursor: pointer;
 }
+
+
+
+.managerView {
+    display: none;
+}
+
 
 .stopWatch {
     position: relative;
@@ -105,6 +112,10 @@
     }
     .wiContentHeader {
         height: 6.6em;
+    }
+
+    .stopWatch {
+        top: -2.6em;
     }
 
 
@@ -140,6 +151,11 @@
     .newWorkItem {
         position: relative;
         top: 0.25em;
+    }
+
+    .smsMother {
+        left: 68%;
+        top: 1em;
     }
 
 }

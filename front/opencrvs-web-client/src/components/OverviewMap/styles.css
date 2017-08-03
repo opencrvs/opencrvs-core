@@ -1,0 +1,23 @@
+.mapSvgContainer {
+  display: inline-block;
+	position: relative;
+	width: 100%;
+	padding-bottom: 100%; 
+	vertical-align: middle; 
+	overflow: hidden; 
+}
+
+.mapSvg {
+  width: 100%;
+}
+
+.svgG {
+}
+
+.defaultTint {
+  fill: white;
+}
+
+.selectedTint {
+  fill: #666666;
+}

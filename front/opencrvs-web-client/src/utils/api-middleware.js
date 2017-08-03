@@ -1,8 +1,6 @@
-
-
 import { logoutUser } from 'actions/user-actions';
 
-export const apiMiddleware = function(config, url, dispatch) {
+export const apiMiddleware = function(config, url, dispatch = null) {
 
   return fetch(url, config)
     .then(response =>
@@ -16,10 +14,9 @@ export const apiMiddleware = function(config, url, dispatch) {
       }
     })
     .catch(err => {
-      if (err.message == 'Invalid token') {
+      console.log('BAD IMPLEMENTATION: ' + err);
+      if (dispatch != null) {
         dispatch(logoutUser());
-      } else {
-        console.log(err);
       }
     });
 };

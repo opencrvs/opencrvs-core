@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 14:05:03
+ * @Last Modified time: 2017-07-28 19:55:19
  */
 import React from 'react';
 import styles from './styles.css';
@@ -45,18 +45,14 @@ class ImageZoom extends React.Component {
         actions={dialogueActions}
         active={!!imageZoom}
         onEscKeyDown={this.closeImageModal}
-        title={
-            imageZoomID != 0
-            ? imageObj.oldName
-            : ''
-          }
+        title={imageZoomID > 0 && imageObj.oldName}
       >
         <section className={styles.zoomWindow}>
           <div className={styles.zoomed}>
           {
-            imageZoomID != 0
+            imageZoomID !== 0
             ? <img onLoad={this.onImgLoad} src={UPLOADS_URL + imageObj.staticFile} />
-            : ''
+            : null
           }
             
           </div>

@@ -2,12 +2,13 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:18 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 15:44:25
+ * @Last Modified time: 2017-08-02 16:09:24
  */
 var jwtDecode = require('jwt-decode');
 
 import { UNPROTECTED_URL } from 'constants/urls';
-import { deselctWorkView } from 'actions/declaration-actions';
+import { fetchDeclarations } from 'actions/declaration-actions';
+import { fetchMapViewData } from 'actions/manager-actions';
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
@@ -88,9 +89,22 @@ function receiveLogout() {
   };
 }
 
-export function updateUserDetails(token) {
+export function updateUserDetails() {
+  let token = localStorage.getItem('token') || null;
   return dispatch => {
-    dispatch(updateUser(token));
+    if (token) {
+      const decoded = jwtDecode(token);
+      const role = decoded.role;
+      if (role != 'admin' && role != 'manager' ) {
+        dispatch(updateUser(token));
+        dispatch(fetchDeclarations());
+      } else {
+        dispatch(updateUser(token));
+        dispatch(fetchMapViewData());
+      }
+    } else {
+      dispatch(logoutUser());
+    }
   };
 }
 
@@ -133,7 +147,6 @@ export function loginUser(creds) {
 export function logoutUser() {
   return dispatch => {
     dispatch(requestLogout());
-    dispatch(deselctWorkView());
     console.log('Logging out.  Removing tokens.');
     localStorage.removeItem('token');
     dispatch(receiveLogout());

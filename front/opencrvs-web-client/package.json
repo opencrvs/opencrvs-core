@@ -7,6 +7,7 @@
   "author": "Euan Millar",
   "license": "Apache-2.0",
   "dependencies": {
+    "d3-geo": "^1.6.4",
     "express": "^4.15.3",
     "form-data": "^2.2.0",
     "fs": "^0.0.1-security",
@@ -32,6 +33,7 @@
     "redux-thunk": "^2.2.0",
     "redux-thunk-actions": "^1.1.6",
     "stream-http": "^2.7.2",
+    "topojson-client": "^3.0.0",
     "uuid": "^3.1.0"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-13 11:58:11 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 12:51:56
+ * @Last Modified time: 2017-08-02 15:37:11
  */
 import React from 'react';
 import styles from './styles.css';
@@ -24,8 +24,8 @@ const UserAvatar = ({
     src={'static/img/avatars/' + avatar}
   />
 );
-const mapStateToProps = ({ declarationsReducer }) => {
-  const { workView } = declarationsReducer;
+const mapStateToProps = ({ globalReducer }) => {
+  const { workView } = globalReducer;
   return {
     workView,
   };

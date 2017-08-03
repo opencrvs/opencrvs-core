@@ -22,6 +22,10 @@
 }
 
 
+.managerView {
+    display: none;
+}
+
 
 
 @media (min-width: 55em) {
