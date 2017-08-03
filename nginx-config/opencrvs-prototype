@@ -64,6 +64,13 @@ server {
 		client_max_body_size 20M;
 	}
 
+	location /api/documents/uploads/ {
+    root /var/www/OpenCRVS-production/server/authorisation/src/routes/documents/uploads/;
+    try_files $uri $uri/ /index.html;
+
+    expires max;
+    access_log off;
+	}
 
 	location /api {
 		proxy_set_header Access-Control-Allow-Origin *;
