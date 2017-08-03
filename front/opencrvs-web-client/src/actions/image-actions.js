@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 14:04:42
+ * @Last Modified time: 2017-08-03 10:32:32
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
@@ -21,6 +21,7 @@ export const IMAGE_DELETE_SUCCESS = 'IMAGE_DELETE_SUCCESS';
 export const IMAGE_DELETE_FAILURE = 'IMAGE_DELETE_FAILURE';
 export const CLEAR_TEMP_IMAGES = 'CLEAR_TEMP_IMAGES';
 export const IMAGE_TO_DELETE = 'IMAGE_TO_DELETE';
+export const RESET_DELETE_IMAGE_FLAG = 'RESET_DELETE_IMAGE_FLAG';
 import { map } from 'lodash';
 
 
@@ -66,6 +67,12 @@ export function imageOptionToggle() {
 export function clearTempImages() {
   return {
     type: CLEAR_TEMP_IMAGES,
+  };
+}
+
+export function resetDeleteImageFlag() {
+  return {
+    type: RESET_DELETE_IMAGE_FLAG,
   };
 }
 
@@ -128,6 +135,7 @@ export function deleteImage() {
         imagePromises.push(apiMiddleware(config, imageURL, dispatch));
         Promise.all(imagePromises).then(response => { 
           dispatch(submitModalOpened());
+          dispatch(resetDeleteImageFlag());
           if (spliceFromTemp) {
             dispatch(imageDeleted(tempImageIndex));
           } else if (spliceFromDocs) {

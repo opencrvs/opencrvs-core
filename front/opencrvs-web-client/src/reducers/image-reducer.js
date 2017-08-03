@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:23 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 13:21:46
+ * @Last Modified time: 2017-08-03 10:46:31
  */
 import {
   IMAGE_REQUEST,
@@ -18,6 +18,7 @@ import {
   IMAGE_DELETE_FAILURE,
   CLEAR_TEMP_IMAGES,
   IMAGE_TO_DELETE,
+  RESET_DELETE_IMAGE_FLAG,
 } from '../actions/image-actions';
 
 
@@ -79,11 +80,15 @@ function imageReducer(
         ...state,
         imageFetching: true,
       };
+    case RESET_DELETE_IMAGE_FLAG:
+      return {
+        ...state,
+        imageToDelete: 0,
+      };
     case IMAGE_DELETE_SUCCESS:
       return {
         ...state,
         imageFetching: false,
-        imageToDelete: 0,
         tempImages: [...state.tempImages.slice(0, action.index),
           ...state.tempImages.slice(action.index + 1)],
       };
@@ -112,7 +117,7 @@ function imageReducer(
       return {
         ...state,
         imageZoomID: action.index,
-        imageZoom: state.imageOption == 0 ? 1 : 0,
+        imageZoom: state.imageZoom == 0 ? 1 : 0,
       };
     case IMAGE_UPLOADING:
       return {

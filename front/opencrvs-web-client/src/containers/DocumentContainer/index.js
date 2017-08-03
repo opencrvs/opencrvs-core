@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-14 20:45:09 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 12:34:10
+ * @Last Modified time: 2017-08-03 10:21:23
  */
 import React from 'react';
 import ImageCard from 'components/ImageCard';
@@ -40,7 +40,7 @@ class DocumentContainer extends React.Component {
             id={image.id} 
             key={index} 
             imageUrl={UPLOADS_URL + image.staticFile}
-            imageTitle={image.oldName}
+            imageTitle={image.name}
             imageSubtitle={image.staticFile}
             onZoomImage={onZoomImage}
             onDeleteImage={onDeleteImage}

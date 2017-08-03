@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 16:25:51
+ * @Last Modified time: 2017-08-03 10:14:42
  */
 import { BASE_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
@@ -264,8 +264,9 @@ export function submitDeclaration() {
 
   return (dispatch, getState) => {
     const {selectedDeclaration, newDeclaration, submitValues} = getState().declarationsReducer;
+    // check that this is not a confirmation from the delete image modal
     const {imageToDelete} = getState().imageReducer;
-    if (imageToDelete != 0) {
+    if (imageToDelete == 0) {
       const {tempImages} = getState().imageReducer;
       
       let childConfig = {};
@@ -567,9 +568,9 @@ export function submitDeclaration() {
             informantsData.append('given', get(submitValues, 'informant_firstName') + ', ' +  get(submitValues, 'informant_middleName'));
             informantsData.append('family', get(submitValues, 'informant_family'));
             informantsData.append('relationship', get(submitValues, 'informant_relationship'));
-            informantsData.append('informant_phone', get(submitValues, 'informant_phone'));
-            informantsData.append('informant_email', get(submitValues, 'informant_email'));
-            informantsData.append('informant_personalIDNummber', get(submitValues, 'informant_personalIDNummber'));
+            informantsData.append('phone', get(submitValues, 'informant_phone'));
+            informantsData.append('email', get(submitValues, 'informant_email'));
+            informantsData.append('personalIDNummber', get(submitValues, 'informant_personalIDNummber'));
             informantsData.append('addressLine1', get(submitValues, 'addressLine1'));
             informantsData.append('addressLine2', get(submitValues, 'addressLine2'));
             informantsData.append('addressLine3', get(submitValues, 'addressLine3'));

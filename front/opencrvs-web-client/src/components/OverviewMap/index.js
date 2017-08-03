@@ -32,6 +32,7 @@ class OverviewMap extends React.Component {
     const { selectedLocation,
             subLocation,
             selectedLocationMapData } = this.props;
+    
     return (
       <div className="pure-g">
         <div className={ styles.mapSvgContainer + ' pure-u-1 pure-u-md-1-1'}>

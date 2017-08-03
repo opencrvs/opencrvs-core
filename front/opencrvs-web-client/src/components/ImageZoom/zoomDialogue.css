@@ -6,3 +6,15 @@
 .navigation {
     margin-top: -3em;
 }
+
+
+@media (min-width: 55em) {
+
+    .dialog {
+        height: 80%;
+        top: 3em;
+        position: relative;
+    }
+
+}
+    

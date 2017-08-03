@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:35 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 16:22:49
+ * @Last Modified time: 2017-08-03 09:41:31
  */
 import React from 'react';
 import styles from './styles.css';
@@ -55,6 +55,7 @@ class WorkList extends React.Component {
             code={declaration.code}
             given={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.given') }
             family={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.family') }
+            address={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.address') }
             tracking={declaration.tracking}
             created={declaration.created_at}
             birthDate={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.birthDate') }

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 09:14:11
+ * @Last Modified time: 2017-08-03 10:29:03
  */
 import React from 'react';
 import styles from './styles.css';
@@ -31,7 +31,7 @@ class ImageLoader extends React.Component {
       .then(res => res.blob())
       .then(blob => {
 
-        const filename = 'Camera-' +  Moment().format('MMM Do YY') + '-at-' + Moment().format('h.mm.ss') + '.jpg';
+        const filename = 'Camera-' +  Moment().format('MMM-Do-YY') + '-at-' + Moment().format('h-mm-ss') + '.jpg';
         const file = new File([blob], filename, {type: 'image/jpeg', lastModified: Date.now()});
         const fileArray = [];
         fileArray.push(file);

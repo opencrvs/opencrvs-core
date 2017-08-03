@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 22:56:00
+ * @Last Modified time: 2017-08-03 09:48:07
  */
 import React from 'react';
 import styles from './styles.css';
@@ -16,6 +16,7 @@ import JudicialIcon from 'components/icons/JudicialIcon';
 import LegitimationIcon from 'components/icons/LegitimationIcon';
 import MarriageIcon from 'components/icons/MarriageIcon';
 import RecognitionIcon from 'components/icons/RecognitionIcon';
+import { get, head } from 'lodash';
 const Moment = require('moment');
 
 
@@ -32,9 +33,12 @@ class WorkListItem extends React.Component {
       birthDate,
       tracking,
       created,
+      address,
       id,
       selectedDeclaration } = this.props;
     const category = code.slice(0, code.indexOf('-'));
+    const location = get(head(address), 'county');
+    //const location = address.county;
     let iconType = null;
     switch (category) {
       case 'birth':
@@ -88,6 +92,7 @@ class WorkListItem extends React.Component {
                 <br />Created:&nbsp;
 
                 {Moment(created).format('MMM Do YY')}
+                <br />{location}
               </h5>
               <div className={
                   Moment().diff(created, 'days') > 1

@@ -2,14 +2,14 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 19:55:19
+ * @Last Modified time: 2017-08-03 10:41:04
  */
 import React from 'react';
 import styles from './styles.css';
 import Dialog from 'react-toolbox/lib/dialog';
 import { UPLOADS_URL } from 'constants/urls';
 import theme from './zoomDialogue.css';
-import { find } from 'lodash';
+import { map, find } from 'lodash';
 
 class ImageZoom extends React.Component {
   constructor(props) {
@@ -27,18 +27,29 @@ class ImageZoom extends React.Component {
 
   render = () => {
     const { imageZoom, tempImages, selectedDeclaration, imageZoomID } = this.props;
-    let imageArray = null;
+
+    let imageObj = {};
     if (selectedDeclaration) {
-      imageArray = selectedDeclaration.documents;
-    } else {
-      imageArray = tempImages;
+      map(selectedDeclaration.documents, (image, index ) => {
+        if (image.id == imageZoomID) {
+          imageObj = image;
+        }
+      });
     }
+
+    map(tempImages, (image, index ) => {
+      if (image.id == imageZoomID) {
+        imageObj = image;
+      }
+    });
+
+
     const dialogueActions = [
       { label: 'Close', onClick: this.closeImageModal },
     ];
-    let imageObj = {};
-    imageObj = find(imageArray, {'id': imageZoomID});
-
+    
+    
+    console.log(JSON.stringify(imageObj));
     return (
       <Dialog
         theme={theme}

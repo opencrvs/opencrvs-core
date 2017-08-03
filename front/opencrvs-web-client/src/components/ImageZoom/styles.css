@@ -16,3 +16,11 @@
   vertical-align: top;
 }
 
+@media (min-width: 55em) {
+
+    .zoomed {
+        height: 476px;
+    }
+
+}
+    
