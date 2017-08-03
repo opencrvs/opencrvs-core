@@ -4,10 +4,15 @@ server {
 	listen [::]:443 ssl http2;
 	client_max_body_size 20M;
 	server_name opencrvs.jembi.org;
+
+	error_log /var/log/nginx/error.log debug;
 	
 	# Use the Let’s Encrypt certificates
 	ssl_certificate /etc/letsencrypt/live/opencrvs.jembi.org/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/opencrvs.jembi.org/privkey.pem;
+
+	access_log /home/webroots/default/logs/access.log;
+  error_log  /home/webroots/default/logs/error.log;
 
 	# Include the SSL configuration from cipherli.st
 	include snippets/ssl-params.conf;
