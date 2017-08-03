@@ -1,38 +1,45 @@
 
 server {
 	listen 443 ssl http2;
-  listen [::]:443 ssl http2;
+	listen [::]:443 ssl http2;
 	client_max_body_size 20M;
 	server_name opencrvs.jembi.org;
-	ssl_dhparam /etc/ssl/certs/dhparam.pem;
-  root /var/www/OpenCRVS-production/front/opencrvs-web-client/build;
-  index index.html index.htm;
+	
+	# Use the Let’s Encrypt certificates
+	ssl_certificate /etc/letsencrypt/live/opencrvs.jembi.org/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/opencrvs.jembi.org/privkey.pem;
 
-  location ~* \.(?:manifest|appcache|html?|xml|json)$ {
-    add_header Access-Control-Allow-Origin *;
-    expires -1;
+	# Include the SSL configuration from cipherli.st
+	include snippets/ssl-params.conf;
+
+	root /var/www/OpenCRVS-production/front/opencrvs-web-client/build;
+	index index.html index.htm;
+
+	location ~* \.(?:manifest|appcache|html?|xml|json)$ {
+		add_header Access-Control-Allow-Origin *;
+		expires -1;
 		client_max_body_size 20M;
-  }
+	}
 
-  location ~* \.(?:css|js)$ {
-    add_header Access-Control-Allow-Origin *;
-    try_files $uri =404;
-    expires 1y;
-    access_log off;
-    add_header Cache-Control "public";
+	location ~* \.(?:css|js)$ {
+		add_header Access-Control-Allow-Origin *;
+		try_files $uri =404;
+		expires 1y;
+		access_log off;
+		add_header Cache-Control "public";
 		client_max_body_size 20M;
-  }
+	}
 
-  location ~ ^.+\..+$ {
-    add_header Access-Control-Allow-Origin *;
-    try_files $uri =404;
-  }
+	location ~ ^.+\..+$ {
+		add_header Access-Control-Allow-Origin *;
+		try_files $uri =404;
+	}
 
-  location / {
+	location / {
 		add_header Access-Control-Allow-Origin *;
 		try_files $uri $uri/ /index.html;
 		client_max_body_size 20M;
-  }
+	}
 
 
 	location /api {
@@ -45,7 +52,7 @@ server {
 		proxy_cache_bypass $http_upgrade;
 
 		client_max_body_size 20M;
-		
+
 		client_body_buffer_size 128k;
 		client_body_temp_path /var/nginx/client_body_temp;
 		proxy_connect_timeout 70;
