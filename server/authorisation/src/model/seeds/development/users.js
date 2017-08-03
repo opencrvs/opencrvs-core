@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:04 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-13 09:28:22
+ * @Last Modified time: 2017-08-03 14:23:55
  */
 const Bcrypt = require('bcryptjs');
 const salt = Bcrypt.genSaltSync();
@@ -117,7 +117,7 @@ const users = [
         email: 'euan@yumeteki.io',
         username: 'euanmillar',
         password: euanHash,
-        role: 'clerk',
+        role: 'field officer',
         given: 'Euan',
         family: 'Millar',
         avatar: 'euan-millar.jpg',

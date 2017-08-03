@@ -1,8 +1,8 @@
 /*
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:16:29 
- * @Last Modified by:   Euan Millar 
- * @Last Modified time: 2017-07-05 01:16:29 
+ * @Last Modified by: Euan Millar
+ * @Last Modified time: 2017-08-03 15:56:04
  */
 const { resolve } = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -15,7 +15,7 @@ module.exports = {
     output: {
       filename: 'static/js/bundle.[name].[chunkhash].js',
       path: resolve(__dirname, 'build/'),
-      publicPath: 'http://46.101.36.211/',
+      publicPath: 'https://46.101.36.211/',
     },
     context: resolve(__dirname, 'src'),
     resolve: {
