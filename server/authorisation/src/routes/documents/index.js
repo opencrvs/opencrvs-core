@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 17:50:28
+ * @Last Modified time: 2017-08-03 18:09:01
  */
 
 const Joi = require('joi');
@@ -35,17 +35,6 @@ exports.register = (server, options, next) => {
             }
         },
         handler: require('./post')
-    });
-
-    server.route({
-
-        path: '/documents/uploads/{file*}',
-        method: 'GET',
-        handler: {
-            directory: {
-                path: 'uploads'
-            }
-        }
     });
 
     server.route({
