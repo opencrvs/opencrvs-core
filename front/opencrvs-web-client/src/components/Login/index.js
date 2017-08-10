@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:02 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 23:54:46
+ * @Last Modified time: 2017-08-04 11:32:46
  */
 import React from 'react';
 import styles from './styles.css';
@@ -64,7 +64,10 @@ class Login extends React.Component {
             </svg>
             Login
           </Button>
-          <p className={styles.errorMessageSplash + ' pure-form-message'}>{errorMessage}</p>
+          </div>
+          <div className="pure-u-1 pure-u-md-1-3"></div>
+          <div className="pure-u-1 pure-u-md-1-3">
+            <p className={styles.errorMessageSplash + ' pure-form-message'}>{errorMessage}</p>
           </div>
           <div className="pure-u-1 pure-u-md-1-3"></div>
         </div>

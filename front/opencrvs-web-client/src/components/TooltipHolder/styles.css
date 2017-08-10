@@ -1,0 +1,66 @@
+.tooltipHolder {
+  display: block;
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 500;
+}
+
+.tooltipHolderHide {
+  display: none;
+}
+
+.tooltip {
+  width: auto;
+  border: 1px solid #666666;
+  background-color: white;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  top: 100%;
+  left: 50%; 
+  margin-left: -120px;
+}
+
+.tooltip:after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;  /* At the top of the tooltip */
+    left: 50%;
+    margin-left: -65px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #666666 transparent;
+}
+
+.percentage {
+  font-size: 3.4rem;
+  letter-spacing: 0rem;
+  font-weight: 300;
+  color: #757575;
+  text-transform: none;
+
+    margin-top: -0.2em;
+
+    margin-bottom: 0.1em;
+}
+    
+.title {
+  font-size: 2rem;
+  letter-spacing: 0.005rem;
+  font-weight: 400;
+  color: #212121;
+  text-transform: none;
+    margin-top: 0.2em;
+}
+
+.certification {
+  font-size: 1rem;
+  letter-spacing: 0.01rem;
+  font-weight: 300;
+  color: #212121;
+  text-transform: uppercase;
+  padding-left: 1em;
+  padding-right: 1em;
+    margin-bottom: -0.2em;
+}

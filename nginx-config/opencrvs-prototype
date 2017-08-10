@@ -11,9 +11,6 @@ server {
 	ssl_certificate /etc/letsencrypt/live/opencrvs.jembi.org/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/opencrvs.jembi.org/privkey.pem;
 
-	access_log /home/webroots/default/logs/access.log;
-  error_log  /home/webroots/default/logs/error.log;
-
 	# Include the SSL configuration from cipherli.st
 	include snippets/ssl-params.conf;
 
@@ -35,9 +32,12 @@ server {
 		client_max_body_size 20M;
 	}
 
-	location ~ ^.+\..+$ {
-		add_header Access-Control-Allow-Origin *;
-		try_files $uri =404;
+	location /api/documents/uploads {
+    root /var/www/OpenCRVS-production/server/authorisation/src/routes/documents/uploads;
+    try_files $uri $uri/ ;
+
+    expires max;
+    access_log off;
 	}
 
 	location /auth {
@@ -69,13 +69,7 @@ server {
 		client_max_body_size 20M;
 	}
 
-	location /api/documents/uploads {
-    root /var/www/OpenCRVS-production/server/authorisation/src/routes/documents/uploads;
-    try_files $uri $uri/ ;
-
-    expires max;
-    access_log off;
-	}
+	
 
 	location /api {
 		proxy_set_header Access-Control-Allow-Origin *;

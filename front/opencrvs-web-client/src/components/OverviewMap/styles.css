@@ -1,4 +1,4 @@
-.mapSvgContainer {
+.mapSvgContainerCountry {
 	position: absolute;
   width: 100%;
   height: 100%;
@@ -7,11 +7,37 @@
   left: 2em;
 }
 
+.mapSvgContainerRegion {
+	position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  top: 6em;
+  left: 2em;
+}
+
+.totalCerts {
+
+  font-size: 3.4em;
+  letter-spacing: 0rem;
+  font-weight: 300;
+  color: #757575;
+  margin-top: 0.5em;
+}
+
 .mapSvg {
   width: 100%;
 }
 
-.svgG {
+
+.dropdownOption {
+  position: relative;
+  left: 0.8em;
+  top: 1em;
+}
+
+.title {
+  color: #bbbbbb;
 }
 
 .defaultTint {
@@ -23,7 +49,11 @@
 }
 
 @media (min-width: 55em) {
-  .mapSvgContainer {
+  .mapSvgContainerCountry {
+    top: 6em;
+    left: 5em;
+  }
+  .mapSvgContainerRegion {
     top: 6em;
     left: 5em;
   }

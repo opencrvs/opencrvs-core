@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 12:57:25
+ * @Last Modified time: 2017-08-09 17:26:52
  */
 import React from 'react';
 import styles from './styles.css';
@@ -13,7 +13,13 @@ import TrackerGraph from 'components/TrackerGraph';
 import TrackerDetails from 'components/TrackerDetails';
 import {Tab, Tabs} from 'react-toolbox';
 import { connect } from 'react-redux';
-import { selectRegion } from 'actions/manager-actions';
+import { selectRegion,
+         selectCountry,
+         selectEvent,
+         selectPeriod,
+         updateTooltipOrigin,
+         setTooltipData,
+         disableTooltip } from 'actions/manager-actions';
 
 class LocationContainer extends React.Component {
   constructor(props) {
@@ -89,7 +95,25 @@ const mapDispatchToProps = dispatch => {
     
     onRegionClick: name => {
       dispatch(selectRegion(name));
-    }
+    },
+    onCountryClick: () => {
+      dispatch(selectCountry());
+    },
+    onEventChange: value => {
+      dispatch(selectEvent(value));
+    },
+    onPeriodChange: value => {
+      dispatch(selectPeriod(value));
+    },
+    updateOrigin: newProps => {
+      dispatch(updateTooltipOrigin(newProps));
+    },
+    updateTooltipData: name => {
+      dispatch(setTooltipData(name));
+    },
+    disableTooltipData: () => {
+      dispatch(disableTooltip());
+    },
   };
 };
 

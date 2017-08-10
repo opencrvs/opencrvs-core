@@ -1,19 +1,26 @@
-.openedLocationItem {
-
+.rolledOver {
+  color: white;
+  background-color: #222;
+  border-bottom: 1px solid #ddd;
 }
 
 .locationItem {
-
+  background-color: white;
+  color: #333;
+  border-bottom: 1px solid #ddd;
 }
 
-.locationItemHolder {
-
+.title {
+  font-size: 0.9em;
+  margin-top: 0.2em;
+  font-weight: 600;
+  margin-left: 0.6em;
 }
 
-.locationItemTitle {
-
-}
-
-.locationItemDesc {
-  
+.sub {
+  font-size: 0.7em;
+  font-weight: 500;
+  margin-left: 0.8em;
+  margin-top: -2.1em;
+  margin-bottom: 0.2em;
 }

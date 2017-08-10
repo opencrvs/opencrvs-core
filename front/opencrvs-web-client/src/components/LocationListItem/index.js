@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 14:45:11
+ * @Last Modified time: 2017-08-10 17:07:14
  */
 import React from 'react';
 import styles from './styles.css';
@@ -17,35 +17,36 @@ class LocationListItem extends React.Component {
     const { onClick,
       title,
       sub,
-      id,
-      selectedSubLocation } = this.props;
+      rolloverMapData,
+      rag } = this.props;
     
-    
+    const ragStyle = {
+      borderLeft: '6px solid ' + rag,
+    };
+    let defaultStyle = null;
+    if (rolloverMapData) {
+      if (rolloverMapData.title == title) {
+        defaultStyle = styles.rolledOver;
+      } else {
+        defaultStyle = styles.locationItem;
+      }
+    } else {
+      defaultStyle = styles.locationItem;
+    }
     return (
         <div
           onClick={onClick}
-          className={
-            id == selectedSubLocation.id
-              ? styles.openedLocationItem + ' ' + styles.locationItem + ' pure-g'
-              : styles.locationItem + ' pure-g'
-          }
+          style={ragStyle}
+          className={ defaultStyle + ' pure-g' }
         >
           
           <div className={styles.locationItemHolder + ' pure-u-1-1'}>
-            <h1 className={styles.locationItemTitle}>{ title }</h1>
-            <h5 className={styles.locationItemDesc}>{ sub }</h5>
+            <p className={styles.title}>{ title }</p>
+            <p className={styles.sub}>{ sub }</p>
           </div>
         </div>
     );
   }
 }
 
-
-const mapStateToProps = ({ managerReducer }) => {
-  const { selectedSubLocation } = managerReducer;
-  return {
-    selectedSubLocation,
-  };
-};
-
-export default connect(mapStateToProps, null)(LocationListItem);
+export default LocationListItem;

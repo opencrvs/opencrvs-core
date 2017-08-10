@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:18 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 15:05:32
+ * @Last Modified time: 2017-08-09 19:53:48
  */
 import { combineReducers } from 'redux';
 import declarationsReducer from './declarations-reducer';

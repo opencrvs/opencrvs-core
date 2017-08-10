@@ -97,7 +97,7 @@ export function updateUserDetails() {
       const role = decoded.role;
       if (role != 'admin' && role != 'manager' ) {
         dispatch(updateUser(token));
-        dispatch(fetchDeclarations());
+        dispatch(fetchDeclarations(role));
       } else {
         dispatch(updateUser(token));
         dispatch(fetchMapViewData());

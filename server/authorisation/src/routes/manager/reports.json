@@ -10,7 +10,8 @@
           "family": "Gbedema",
           "title": "National Operations Manager",
           "email": "schrute@acme.com",
-          "phone": "555-555-555"
+          "phone": "555-555-555",
+          "avatar": "male"
         },
         "team": [
           {
@@ -124,7 +125,8 @@
                 "family": "Dotse",
                 "title": "Regional Operations Manager",
                 "email": "j-dotse@acme.com",
-                "phone": "333-333-333"
+                "phone": "333-333-333",
+                "avatar": "female"
               },
               "team": [
                 {
@@ -231,6 +233,22 @@
                 {
                   "title": "Adaklu Anyigbe",
                   "sub": "Adaklu Waya",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Coujoe",
+                      "family": "Nkrumah",
+                      "title": "District Operations Manager",
+                      "email": "Coujoe-Nkrumah@acme.com",
+                      "phone": "989-165-245",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -329,6 +347,22 @@
                 {
                   "title": "Akatsi",
                   "sub": "Ave-Dakpa",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Adeben",
+                      "family": "Ampofo",
+                      "title": "District Operations Manager",
+                      "email": "a-ampofio@acme.com",
+                      "phone": "656-165-125",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -427,6 +461,22 @@
                 {
                   "title": "Ho",
                   "sub": "Ho",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Yaa",
+                      "family": "Kaledzi",
+                      "title": "District Operations Manager",
+                      "email": "y-kaledzi@acme.com",
+                      "phone": "454-165-365",
+                      "avatar": "female"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -524,6 +574,22 @@
                 {
                   "title": "Hohoe",
                   "sub": "Hohoe",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Cameron",
+                      "family": "Addo",
+                      "title": "District Operations Manager",
+                      "email": "c-addo@acme.com",
+                      "phone": "555-165-111",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -621,6 +687,22 @@
                 {
                   "title": "Jasikan",
                   "sub": "Jasikan",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Abam",
+                      "family": "Dansua",
+                      "title": "District Operations Manager",
+                      "email": "a-dansua@acme.com",
+                      "phone": "558-165-312",
+                      "avatar": "female"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -718,6 +800,22 @@
                 {
                   "title": "Kadjebi",
                   "sub": "Kadjebi",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Donkor",
+                      "family": "Agyapong",
+                      "title": "District Operations Manager",
+                      "email": "d-agyap@acme.com",
+                      "phone": "168-739-658",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -815,6 +913,22 @@
                 {
                   "title": "Keta",
                   "sub": "Keta",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Kweku",
+                      "family": "Adarkwa",
+                      "title": "District Operations Manager",
+                      "email": "k-adarkwa@acme.com",
+                      "phone": "222-739-888",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -912,6 +1026,22 @@
                 {
                   "title": "Ketu",
                   "sub": "Dzodze",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Kobena",
+                      "family": "Adjei",
+                      "title": "District Operations Manager",
+                      "email": "k-adjei@acme.com",
+                      "phone": "762-739-356",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -1009,6 +1139,22 @@
                 {
                   "title": "Kpandu",
                   "sub": "Kpandu",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Kojo",
+                      "family": "Adjei",
+                      "title": "District Operations Manager",
+                      "email": "k-adjei2@acme.com",
+                      "phone": "111-739-987",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -1106,6 +1252,22 @@
                 {
                   "title": "Krachi East",
                   "sub": "Dambai",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Naana",
+                      "family": "Ayim",
+                      "title": "District Operations Manager",
+                      "email": "n-ayim@acme.com",
+                      "phone": "689-739-123",
+                      "avatar": "female"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -1203,6 +1365,22 @@
                 {
                   "title": "Krachi",
                   "sub": "Kete Krachi",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Kisi",
+                      "family": "Dansua",
+                      "title": "District Operations Manager",
+                      "email": "k-dansua@acme.com",
+                      "phone": "689-739-123",
+                      "avatar": "female"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -1300,6 +1478,22 @@
                 {
                   "title": "Nkwanta",
                   "sub": "Kpassa",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Jane",
+                      "family": "Adarkwa",
+                      "title": "District Operations Manager",
+                      "email": "j-adarkwa@acme.com",
+                      "phone": "845-125-365",
+                      "avatar": "female"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -1397,6 +1591,22 @@
                 {
                   "title": "North Tongu",
                   "sub": "Battor Dugame",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Dommie",
+                      "family": "Adjei",
+                      "title": "District Operations Manager",
+                      "email": "d-adjei@acme.com",
+                      "phone": "469-77-548",
+                      "avatar": "male"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -1494,6 +1704,22 @@
                 {
                   "title": "South Dayi",
                   "sub": "Kpeve New Town",
+                  "staff": {
+                    "manager": {
+                      "uuid": "uuid",
+                      "given": "Oforiatta",
+                      "family": "Ayim",
+                      "title": "District Operations Manager",
+                      "email": "o-ayim@acme.com",
+                      "phone": "444-252-777",
+                      "avatar": "female"
+                    },
+                    "team": [
+                      {
+
+                      }
+                    ]
+                  },
                   "events": [
     
                     {
@@ -1598,7 +1824,8 @@
                       "family": "Dede",
                       "title": "District Operations Manager",
                       "email": "k-dede@acme.com",
-                      "phone": "777-777-777"
+                      "phone": "777-777-777",
+                      "avatar": "male"
                     },
                     "team": [
                       {
@@ -1722,6 +1949,22 @@
           {
             "title": "Brong Ahafo",
             "sub": "Sunyani",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Nana",
+                "family": "Adjei",
+                "title": "Regional Operations Manager",
+                "email": "n-adjei@acme.com",
+                "phone": "888-555-888",
+                "avatar": "female"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -1819,6 +2062,22 @@
           {
             "title": "Eastern",
             "sub": "Koforidua",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Kwazi",
+                "family": "Adarkwa",
+                "title": "Regional Operations Manager",
+                "email": "k-adarkwa@acme.com",
+                "phone": "111-245-457",
+                "avatar": "male"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -1916,6 +2175,22 @@
           {
             "title": "Greater Accra",
             "sub": "Accra",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Nana",
+                "family": "Ayim",
+                "title": "Regional Operations Manager",
+                "email": "k-adarkwa@acme.com",
+                "phone": "989-367-165",
+                "avatar": "female"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -2013,6 +2288,22 @@
           {
             "title": "Upper East",
             "sub": "Bolgatanga",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Jojn",
+                "family": "Dansua",
+                "title": "Regional Operations Manager",
+                "email": "j-dansua@acme.com",
+                "phone": "962-687-345",
+                "avatar": "male"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -2110,6 +2401,22 @@
           {
             "title": "Upper West",
             "sub": "Wa",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Frederick",
+                "family": "Akufo-Addo",
+                "title": "Regional Operations Manager",
+                "email": "f-aa@acme.com",
+                "phone": "125-654-333",
+                "avatar": "male"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -2207,6 +2514,22 @@
           {
             "title": "Northern",
             "sub": "Tamale",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Isaac",
+                "family": "Kaledzio",
+                "title": "Regional Operations Manager",
+                "email": "I-kaledze@acme.com",
+                "phone": "665-125-777",
+                "avatar": "male"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -2304,6 +2627,22 @@
           {
             "title": "Central",
             "sub": "Cape Coast",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Shafiq",
+                "family": "Ampofo",
+                "title": "Regional Operations Manager",
+                "email": "s-ampofo@acme.com",
+                "phone": "545-125-555",
+                "avatar": "male"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -2401,6 +2740,22 @@
           {
             "title": "Western",
             "sub": "Sekondi-Takoradi",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Bashirah",
+                "family": "Nkrumah",
+                "title": "Regional Operations Manager",
+                "email": "B-Nkrumah@acme.com",
+                "phone": "454-125-989",
+                "avatar": "female"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",
@@ -2498,6 +2853,22 @@
           {
             "title": "Ashanti",
             "sub": "Kumasi",
+            "staff": {
+              "manager": {
+                "uuid": "uuid",
+                "given": "Baba",
+                "family": "Konadu",
+                "title": "Regional Operations Manager",
+                "email": "b-konadu@acme.com",
+                "phone": "858-125-146",
+                "avatar": "male"
+              },
+              "team": [
+                {
+
+                }
+              ]
+            },
             "events": [
               {
                 "type": "marriage",

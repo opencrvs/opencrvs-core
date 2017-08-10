@@ -2,9 +2,9 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 10:14:42
+ * @Last Modified time: 2017-08-10 10:45:51
  */
-import { BASE_URL } from 'constants/urls';
+import { BASE_URL, OPEN_HIM_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
 import { logoutUser } from 'actions/user-actions';
 import { selectWorkView } from 'actions/global-actions';
@@ -197,12 +197,12 @@ function declarationError(message) {
   };
 }
 
-export function fetchDeclarations() {
+export function fetchDeclarations(roleType) {
   let token = localStorage.getItem('token') || null;
   let config = {};
   return dispatch => {
     dispatch(requestDeclaration());
-    if (token) {
+    if (roleType != 'field officer') {
       config = {
         headers: { Authorization: `Bearer ${token}` },
       };
@@ -233,8 +233,29 @@ export function fetchDeclarations() {
           }
         });
     } else {
-      dispatch(declarationError('No token saved!'));
-      return false;
+      return fetch(OPEN_HIM_URL + 'Composition?entry=Location/123&type=birth-notification')
+        .then(response =>
+          response.json().then(payload => ({ payload, response }))
+        )
+        .then(({ payload, response }) => {
+          console.log(JSON.stringify(payload));
+          /*if (!response.ok) {
+            dispatch(declarationError(payload.message));
+            return Promise.reject(payload);
+          }
+          dispatch(receiveDeclaration(payload));
+          
+          payload.declaration.forEach((declaration) => {
+            dispatch(fetchPatients(declaration.childDetails));
+            dispatch(fetchPatients(declaration.motherDetails));
+            dispatch(fetchPatients(declaration.fatherDetails));
+          });*/
+          dispatch(selectWorkView('work'));
+          return true;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   };
 }
