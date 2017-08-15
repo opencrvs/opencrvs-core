@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-20 22:57:36
+ * @Last Modified time: 2017-08-15 18:46:32
  */
 
 const Joi = require('joi');
@@ -11,7 +11,7 @@ exports.register = (server, options, next) => {
 
     server.route({
 
-        path: '/declarations',
+        path: '/declarations/{roleType}',
         method: 'GET',
         config: {
             auth: 'jwt',
@@ -21,6 +21,11 @@ exports.register = (server, options, next) => {
             plugins: {
                 'hapi-swagger': {
                     payloadType: 'form'
+                }
+            },
+            validate: {
+                params: {
+                    roleType: Joi.string()
                 }
             }
         },
@@ -50,7 +55,8 @@ exports.register = (server, options, next) => {
                     tracking: Joi.string(),
                     motherDetails: Joi.number(),
                     fatherDetails: Joi.number(),
-                    childDetails: Joi.number()
+                    childDetails: Joi.number(),
+                    birthRegistrationNumber: Joi.string()
                 }
             }
         },
@@ -74,7 +80,8 @@ exports.register = (server, options, next) => {
             validate: {
                 params: {
                     status: Joi.string(),
-                    id: Joi.number()
+                    id: Joi.number(),
+                    birthRegistrationNumber: Joi.string()
                 }
             }
         },

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 11:42:19
+ * @Last Modified time: 2017-08-15 17:03:54
  */
 import React from 'react';
 import styles from './styles.css';
@@ -22,7 +22,7 @@ class SubmitModal extends React.Component {
   };
 
   render = () => {
-    const { submitModal, imageToDelete } = this.props;
+    const { submitModal, imageToDelete, newNotification } = this.props;
     const dialogueActions = [
       { label: 'No', onClick: this.closeImageModal },
       { label: 'Yes', onClick: this.handleSubmit },
@@ -33,8 +33,10 @@ class SubmitModal extends React.Component {
         active={submitModal}
         onEscKeyDown={this.closeImageModal}
         title={
-          imageToDelete > 0
-          ? 'Delete image'
+          imageToDelete > 0 ? 
+            'Delete image'
+          : newNotification ?
+            'Submit notification'
           : 'Submit declaration'
         }
       >

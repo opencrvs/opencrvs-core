@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:23 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 18:53:52
+ * @Last Modified time: 2017-08-15 22:42:35
  */
 
 const Moment = require('moment');
@@ -16,8 +16,9 @@ const declarations = [
         childDetails: '1',
         motherDetails: '2',
         fatherDetails: '3',
-        code: 'birth-notification',
-        status: 'new',
+        code: 'birth-declaration',
+        status: 'declared',
+        birthRegistrationNumber: '',
         created_at: Moment().subtract(1, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
@@ -58,8 +59,9 @@ const declarations = [
         childDetails: '4',
         motherDetails: '5',
         fatherDetails: '6',
-        code: 'birth-notification',
-        status: 'new',
+        code: 'birth-declaration',
+        status: 'declared',
+        birthRegistrationNumber: '',
         created_at: Moment().subtract(2, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
@@ -101,7 +103,8 @@ const declarations = [
         motherDetails: '8',
         fatherDetails: '9',
         code: 'birth-declaration',
-        status: 'new',
+        status: 'declared',
+        birthRegistrationNumber: '',
         created_at: Moment().subtract(3, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
@@ -145,7 +148,8 @@ const declarations = [
         motherDetails: '11',
         fatherDetails: '12',
         code: 'birth-declaration',
-        status: 'new',
+        status: 'declared',
+        birthRegistrationNumber: '',
         created_at: Moment().subtract(1, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
@@ -187,7 +191,8 @@ const declarations = [
         motherDetails: '14',
         fatherDetails: '15',
         code: 'birth-declaration',
-        status: 'new',
+        status: 'validated',
+        birthRegistrationNumber: '516437',
         created_at: Moment().subtract(2, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
@@ -228,8 +233,9 @@ const declarations = [
         childDetails: '16',
         motherDetails: '17',
         fatherDetails: '18',
-        code: 'birth-notification',
-        status: 'new',
+        code: 'birth-declaration',
+        status: 'validated',
+        birthRegistrationNumber: '985125',
         created_at: Moment().subtract(3, 'days').utc().format('ddd MMM DD YYYY HH:mm:ss z'),
         locations: [
             {
@@ -292,6 +298,7 @@ const createDeclaration = function (knex, declaration) {
                 childDetails: declaration.childDetails,
                 code: declaration.code,
                 status: declaration.status,
+                birthRegistrationNumber: declaration.birthRegistrationNumber,
                 created_at: declaration.created_at
             })
         .then((id) => {

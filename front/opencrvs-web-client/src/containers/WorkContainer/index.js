@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 11:46:40
+ * @Last Modified time: 2017-08-15 22:06:56
  */
 import React from 'react';
 import styles from './styles.css';
@@ -43,6 +43,9 @@ import {  imageModalOpened,
 import {
   mobileMenuControl,
 } from 'actions/global-actions';
+import {
+  updateCertNumber,
+} from 'actions/certification-actions';
 
 class WorkContainer extends React.Component {
 
@@ -106,11 +109,14 @@ const mapStateToProps = ({
     selectedDeclaration,
     newDeclarationModal,
     newDeclaration,
+    newNotification,
     category,
     submitModal,
     trackingModal,
     trackingID,
     reqDocsModal,
+    newChildPersonalID,
+    newBirthRegistrationNumber,
   } = declarationsReducer;
   const { isAuthenticated,
     role,
@@ -146,6 +152,7 @@ const mapStateToProps = ({
     isAuthenticated,
     imageModal,
     imageOption,
+    newNotification,
     tempImages,
     imageFetching,
     imageErrorMessage,
@@ -160,6 +167,8 @@ const mapStateToProps = ({
     imageZoom,
     imageZoomID,
     menuOpened,
+    newChildPersonalID,
+    newBirthRegistrationNumber,
   };
 };
 
@@ -231,6 +240,9 @@ const mapDispatchToProps = dispatch => {
     },
     toggleMobileMenu: () => {
       dispatch(mobileMenuControl());
+    },
+    onUpdateCertNumber: value => {
+      dispatch(updateCertNumber(value));
     },
   };
 };

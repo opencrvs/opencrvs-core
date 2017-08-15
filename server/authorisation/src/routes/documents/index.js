@@ -2,10 +2,11 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 18:14:11
+ * @Last Modified time: 2017-08-15 15:45:44
  */
 
 const Joi = require('joi');
+const Path = require('path');
 
 const documentsSchema = Joi.object().keys({
     declaration_id: Joi.number()
@@ -43,7 +44,7 @@ exports.register = (server, options, next) => {
         method: 'GET',
         handler: {
             directory: {
-                path: __dirname + 'uploads'
+                path: __dirname + '/uploads'
             }
         }
     });

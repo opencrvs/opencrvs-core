@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:16:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 16:48:12
+ * @Last Modified time: 2017-08-15 21:48:03
  */
 const { resolve } = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');

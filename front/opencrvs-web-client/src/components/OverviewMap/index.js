@@ -7,6 +7,7 @@ import { geoMercator, geoPath } from 'd3-geo';
 import Navigation from 'react-toolbox/lib/navigation';
 import Link from 'react-toolbox/lib/link';
 import Dropdown from 'react-toolbox/lib/dropdown';
+import { calculateRagStatusOnMap } from 'utils/manager-utils';
 import TooltipHolder from 'components/TooltipHolder';
 import { get, map, head } from 'lodash';
 
@@ -28,7 +29,7 @@ class OverviewMap extends React.Component {
     this.props.disableTooltipData();
   }
   onMouseOver(e, mapData, regionIndex) {
-    e.target.setAttribute('style', 'opacity: 0.5');
+    e.target.setAttribute('style', 'opacity: 0.70');
     if (this.props.countryLevel) {
       this.props.updateTooltipData(mapData[regionIndex].properties.HRname);
     }
@@ -164,7 +165,14 @@ class OverviewMap extends React.Component {
                   <path
                     key={ `path-${ i }` }
                     d={ geoPath().projection(this.projection(scale, transX, transY))(d) }
-                    fill="#FFFFFF"
+                    fill={calculateRagStatusOnMap(
+                      selectedLocationMapData, 
+                      i, 
+                      selectedLocation.subEntries.entries,
+                      mapEvent, 
+                      mapTimePeriod, 
+                      countryLevel, 
+                      regionLevel)}
                     style={{ opacity: 1 }}
                     stroke="#000000"
                     strokeWidth={ 0.5 }

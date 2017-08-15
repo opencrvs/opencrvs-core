@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 22:55:28
+ * @Last Modified time: 2017-08-15 19:44:35
  */
 import React from 'react';
 import styles from './styles.css';
@@ -77,7 +77,6 @@ class WorkingItemForm extends React.Component {
           <section>
             <Field component={renderDatePicker} name="birthDate" label="Date of birth" validate={[required]} />
           </section>
-          <Field component={renderInput} name="personalIDNummber" placeholder="Personal ID number" label="Personal ID Number" validate={[required]} />
           <Field component={renderDropdown} name="typeOfBirth" label="Type of birth" source={ typesOfBirth } />
           <Field component={renderDropdown} name="placeOfDelivery" label="Place of delivery" source={ placesOfDeliveryReference } />
           <Field component={renderDropdown} name="attendantAtBirth" label="Attendant at birth" source={ attendantsAtBirthReference } />
@@ -184,7 +183,7 @@ class WorkingItemForm extends React.Component {
             "
           >
             <Field component={renderInput} name="informant_firstName" placeholder="First name" label="First name" validate={[required]} />
-            <Field component={renderInput} name="informant_middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
+            <Field component={renderInput} name="informant_middleName" placeholder="Middle name" label="Middle names" />
             <Field component={renderInput} name="informant_family" placeholder="Last name" label="Last name" validate={[required]} />
             <Field component={renderInput} name="informant_relationship" placeholder="Relationship" label="Relationship" validate={[required]} />
             <Field component={renderInput} name="informant_personalIDNummber" placeholder="Personal ID number" label="Personal ID Number" validate={[required]} />

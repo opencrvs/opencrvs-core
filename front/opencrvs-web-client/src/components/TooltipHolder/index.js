@@ -15,7 +15,7 @@ class TooltipHolder extends React.Component {
             mapEvent,
             rolloverMapData } = this.props;
     return (
-      <div style={{top: originY - 150 + 'px', left: originX - 70 + 'px' }} className={ rolloverMapData
+      <div style={{top: originY - 250 + 'px', left: originX + 170  + 'px' }} className={ rolloverMapData
           ? styles.tooltipHolder
           : styles.tooltipHolderHide }>
         <div className={styles.tooltip}>

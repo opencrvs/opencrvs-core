@@ -140,7 +140,7 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 3,
                     "certificationsKpi": 15,
                     "registrations": 10,
                     "registrationsKpi": 15,
@@ -153,7 +153,7 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 28,
                     "certificationsKpi": 90,
                     "registrations": 60,
                     "registrationsKpi": 90,
@@ -166,7 +166,7 @@
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 280,
                     "certificationsKpi": 900,
                     "registrations": 500,
                     "registrationsKpi": 900,
@@ -185,7 +185,7 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 3,
                     "certificationsKpi": 15,
                     "registrations": 10,
                     "registrationsKpi": 15,
@@ -198,7 +198,7 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 22,
                     "certificationsKpi": 90,
                     "registrations": 60,
                     "registrationsKpi": 90,
@@ -211,7 +211,7 @@
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 280,
                     "certificationsKpi": 900,
                     "registrations": 500,
                     "registrationsKpi": 900,
@@ -256,7 +256,7 @@
                       "timePeriod": [
                         {
                           "title": "This week",
-                          "certifications": 1,
+                          "certifications": 0,
                           "certificationsKpi": 1,
                           "registrations": 1,
                           "registrationsKpi": 1,
@@ -269,7 +269,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 2,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -282,7 +282,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 5,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -301,7 +301,7 @@
                       "timePeriod": [
                         {
                           "title": "This week",
-                          "certifications": 1,
+                          "certifications": 0,
                           "certificationsKpi": 1,
                           "registrations": 1,
                           "registrationsKpi": 1,
@@ -314,7 +314,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 1,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -327,7 +327,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 5,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -383,7 +383,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 8,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -396,7 +396,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 75,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -428,7 +428,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 7,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -441,7 +441,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 76,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -497,7 +497,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 8,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -510,7 +510,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 67,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -542,7 +542,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 8,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -555,7 +555,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 76,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -610,7 +610,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 3,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -623,7 +623,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 78,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -736,7 +736,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 80,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -768,7 +768,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 5,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -781,7 +781,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 79,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -849,7 +849,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 87,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -949,7 +949,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 6,
+                          "certifications": 4,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -962,7 +962,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 45,
+                          "certifications": 66,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -1971,39 +1971,39 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 14,
                     "certificationsKpi": 15,
-                    "registrations": 10,
+                    "registrations": 13,
                     "registrationsKpi": 15,
                     "validations": 11,
                     "validationsKpi": 15,
-                    "declarations": 11,
+                    "declarations": 13,
                     "declarationsKpi": 15,
                     "notifications": 14,
                     "notificationsKpi": 15
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 84,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 69,
                     "registrationsKpi": 90,
-                    "validations": 60,
+                    "validations": 71,
                     "validationsKpi": 90,
-                    "declarations": 70,
+                    "declarations": 78,
                     "declarationsKpi": 90,
-                    "notifications": 80,
+                    "notifications": 83,
                     "notificationsKpi": 90
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 850,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 786,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 694,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 700,
                     "declarationsKpi": 900,
                     "notifications": 850,
                     "notificationsKpi": 900
@@ -2016,9 +2016,9 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 14,
                     "certificationsKpi": 15,
-                    "registrations": 10,
+                    "registrations": 14,
                     "registrationsKpi": 15,
                     "validations": 11,
                     "validationsKpi": 15,
@@ -2029,11 +2029,11 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 80,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 67,
                     "registrationsKpi": 90,
-                    "validations": 60,
+                    "validations": 87,
                     "validationsKpi": 90,
                     "declarations": 70,
                     "declarationsKpi": 90,
@@ -2042,15 +2042,15 @@
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 790,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 800,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 790,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 790,
                     "declarationsKpi": 900,
-                    "notifications": 850,
+                    "notifications": 890,
                     "notificationsKpi": 900
                   }
 
@@ -2197,7 +2197,7 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 13,
                     "certificationsKpi": 15,
                     "registrations": 10,
                     "registrationsKpi": 15,
@@ -2210,28 +2210,28 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 83,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 76,
                     "registrationsKpi": 90,
-                    "validations": 60,
+                    "validations": 88,
                     "validationsKpi": 90,
-                    "declarations": 70,
+                    "declarations": 65,
                     "declarationsKpi": 90,
                     "notifications": 80,
                     "notificationsKpi": 90
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 788,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 812,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 765,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 812,
                     "declarationsKpi": 900,
-                    "notifications": 850,
+                    "notifications": 768,
                     "notificationsKpi": 900
                   }
 
@@ -2242,9 +2242,9 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 14,
                     "certificationsKpi": 15,
-                    "registrations": 10,
+                    "registrations": 13,
                     "registrationsKpi": 15,
                     "validations": 11,
                     "validationsKpi": 15,
@@ -2255,11 +2255,11 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications":78,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 77,
                     "registrationsKpi": 90,
-                    "validations": 60,
+                    "validations": 83,
                     "validationsKpi": 90,
                     "declarations": 70,
                     "declarationsKpi": 90,
@@ -2268,15 +2268,15 @@
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 795,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 742,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 699,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 734,
                     "declarationsKpi": 900,
-                    "notifications": 850,
+                    "notifications": 890,
                     "notificationsKpi": 900
                   }
 
@@ -2310,7 +2310,7 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 14,
                     "certificationsKpi": 15,
                     "registrations": 10,
                     "registrationsKpi": 15,
@@ -2323,9 +2323,9 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 82,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 73,
                     "registrationsKpi": 90,
                     "validations": 60,
                     "validationsKpi": 90,
@@ -2336,13 +2336,13 @@
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 789,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 856,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 678,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 891,
                     "declarationsKpi": 900,
                     "notifications": 850,
                     "notificationsKpi": 900
@@ -2355,11 +2355,11 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 14,
                     "certificationsKpi": 15,
-                    "registrations": 10,
+                    "registrations": 14,
                     "registrationsKpi": 15,
-                    "validations": 11,
+                    "validations": 12,
                     "validationsKpi": 15,
                     "declarations": 11,
                     "declarationsKpi": 15,
@@ -2368,26 +2368,26 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 80,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 79,
                     "registrationsKpi": 90,
-                    "validations": 60,
+                    "validations": 88,
                     "validationsKpi": 90,
-                    "declarations": 70,
+                    "declarations": 72,
                     "declarationsKpi": 90,
                     "notifications": 80,
                     "notificationsKpi": 90
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 789,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 781,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 678,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 897,
                     "declarationsKpi": 900,
                     "notifications": 850,
                     "notificationsKpi": 900
@@ -2649,9 +2649,9 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 13,
                     "certificationsKpi": 15,
-                    "registrations": 10,
+                    "registrations": 13,
                     "registrationsKpi": 15,
                     "validations": 11,
                     "validationsKpi": 15,
@@ -2662,26 +2662,26 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 89,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 87,
                     "registrationsKpi": 90,
-                    "validations": 60,
+                    "validations": 79,
                     "validationsKpi": 90,
-                    "declarations": 70,
+                    "declarations": 84,
                     "declarationsKpi": 90,
-                    "notifications": 80,
+                    "notifications": 88,
                     "notificationsKpi": 90
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 798,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 699,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 789,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 850,
                     "declarationsKpi": 900,
                     "notifications": 850,
                     "notificationsKpi": 900
@@ -2694,11 +2694,11 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 9,
+                    "certifications": 15,
                     "certificationsKpi": 15,
-                    "registrations": 10,
+                    "registrations": 14,
                     "registrationsKpi": 15,
-                    "validations": 11,
+                    "validations": 13,
                     "validationsKpi": 15,
                     "declarations": 11,
                     "declarationsKpi": 15,
@@ -2707,28 +2707,28 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 60,
+                    "certifications": 83,
                     "certificationsKpi": 90,
-                    "registrations": 60,
+                    "registrations": 89,
                     "registrationsKpi": 90,
-                    "validations": 60,
+                    "validations": 78,
                     "validationsKpi": 90,
-                    "declarations": 70,
+                    "declarations": 81,
                     "declarationsKpi": 90,
-                    "notifications": 80,
+                    "notifications": 84,
                     "notificationsKpi": 90
                   },
                   {
                     "title": "This year",
-                    "certifications": 450,
+                    "certifications": 876,
                     "certificationsKpi": 900,
-                    "registrations": 500,
+                    "registrations": 891,
                     "registrationsKpi": 900,
-                    "validations": 560,
+                    "validations": 768,
                     "validationsKpi": 900,
-                    "declarations": 650,
+                    "declarations": 768,
                     "declarationsKpi": 900,
-                    "notifications": 850,
+                    "notifications": 870,
                     "notificationsKpi": 900
                   }
 

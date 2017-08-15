@@ -2,13 +2,13 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:35 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 09:41:31
+ * @Last Modified time: 2017-08-15 18:30:09
  */
 import React from 'react';
 import styles from './styles.css';
 import SearchForm from 'components/SearchForm';
 import WorkListItem from 'components/WorkListItem';
-import { map, filter, get, head } from 'lodash';
+import { map, filter, get, head, orderBy } from 'lodash';
 import { Button } from 'react-toolbox/lib/button';
 import { connect } from 'react-redux';
 import { 
@@ -34,7 +34,13 @@ class WorkList extends React.Component {
       onSearchRequest,
       managerView,
     } = this.props;
-   
+    let itemArray = declarationsList;
+    if (declarationsList.length > 0) {
+      itemArray = orderBy(declarationsList, function(e) { 
+        return e.created_at;
+      }, ['asc']);
+    }
+    
 
     return (
       <div className={
@@ -48,7 +54,7 @@ class WorkList extends React.Component {
           <Button icon="add" floating accent mini onClick={this.openNewModal} />
         </section>
         {
-          map(declarationsList, (declaration, index ) => (
+          map(itemArray, (declaration, index ) => (
           <WorkListItem 
             key={declaration.id} 
             id={declaration.id} 

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:13 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 16:17:37
+ * @Last Modified time: 2017-08-14 13:09:30
  */
 import React from 'react';
 import styles from './styles.css';
@@ -75,7 +75,7 @@ class Worknav extends React.Component {
 
           <div className="pure-u-1  pure-u-md-1-2">
             {
-              role == 'clerk' || role == 'validator' || role == 'registrar'
+              role == 'field officer' || role == 'certification clerk' || role == 'registrar'
               ? <ul className={
                   workView == null
                     ? styles.homeHide + ' pure-menu-list'

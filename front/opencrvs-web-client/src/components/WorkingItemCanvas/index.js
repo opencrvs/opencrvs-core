@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:43 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 22:03:00
+ * @Last Modified time: 2017-08-15 19:43:45
  */
 import React from 'react';
 import {connect} from 'react-redux';
@@ -16,9 +16,9 @@ class WorkingItemCanvas extends React.Component {
   }
 
   render = () => {
-    const { selectedDeclaration, patients, newDeclaration, category } = this.props;
+    const { selectedDeclaration, patients, newDeclaration, newNotification, category } = this.props;
     let myInitialValues = null;
-    if (newDeclaration == false && selectedDeclaration) {
+    if (newDeclaration == false && selectedDeclaration && newNotification == false) {
       const childPatient = head(filter(patients,
         function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
       const motherPatient = head(filter(patients,
@@ -68,7 +68,6 @@ class WorkingItemCanvas extends React.Component {
         family: get(childPatient, 'patient.family'),
         gender: get(childPatient, 'patient.gender'),
         birthDate: new Date(get(childPatient, 'patient.birthDate')),
-        personalIDNummber: get(childExtra, 'personalIDNummber'),
         //TODO - add a 'same as mothers address switch' 
         // currently the below is not used in form but is required for submission - temp fix
         child_telecom_id: get(childTelecom, 'id'),
@@ -180,13 +179,136 @@ class WorkingItemCanvas extends React.Component {
         informant_email: head(selectedDeclaration.informant).email,
         informant_phone: head(selectedDeclaration.informant).phone,
       };
-    } else if (newDeclaration == true) {
+    } else if (newNotification == true) {
+      const motherPatient = head(filter(patients,
+        function(patient) { return patient.patient.id == selectedDeclaration.motherDetails; }));
+      const motherGiven = get(motherPatient, 'patient.given').toString().split(',').map(function(item) {
+        return item.trim();
+      });
+      const motherAddress = head(get(motherPatient, 'patient.address')); 
+      const motherTelecom = head(get(motherPatient, 'patient.telecom'));
+      const childPatient = head(filter(patients,
+        function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
+      const childGiven = get(childPatient, 'patient.given').toString().split(',').map(function(item) {
+        return item.trim();
+      });
       myInitialValues = {
-        status: 'new',
+        // Mother
+        code: selectedDeclaration.code,
+        tracking: selectedDeclaration.tracking,
+        mother_firstName: motherGiven.shift(),
+        mother_middleName: motherGiven.toString().replace(/,/g, ''),
+        mother_family: get(motherPatient, 'patient.family'),
+        mother_maidenName: '',
+        mother_birthDate: '',
+        mother_personalIDNummber: '',
+        mother_maritalStatus: '',
+        mother_marriageDate: '',
+        mother_nationality: '',
+        mother_telecom_id: get(motherTelecom, 'id'),
+        mother_phone: get(motherTelecom, 'phone'),
+        mother_email: '',
+        mother_use: '',
+        mother_address_id: motherAddress.id,
+        mother_addressLine1: motherAddress.addressLine1,
+        mother_addressLine2: motherAddress.addressLine2,
+        mother_addressLine3: motherAddress.addressLine3,
+        mother_city: motherAddress.city,
+        mother_county: motherAddress.county,
+        mother_postalCode: motherAddress.postalCode,
+        mother_state: motherAddress.state,
+        // Extra
+        childrenBornAlive: '',
+        childrenBornLiving: '',
+        foetalDeaths: '',
+        birthDateLast: '',
+        mother_gender: 'female',
+        mother_religion: '',
+        mother_formalEducation: '',
+        mother_occupation: '',
+        mother_employment: '',
+        
+        child_phone: get(motherTelecom, 'phone'),
+        firstName: childGiven.shift(),
+        middleName: childGiven.toString().replace(/,/g, ''),
+        family: get(childPatient, 'patient.family'),
+        birthDate: new Date(get(childPatient, 'patient.birthDate')),
+        // currently the below is not used in form but is required for submission - temp fix
+        
+        child_email: '',
+        child_use: '',
+        child_addressLine1: '',
+        child_addressLine2: '',
+        child_addressLine3: '',
+        child_city: '',
+        child_county: '',
+        child_postalCode: '',
+        child_state: '',
+        // TODO: Type of birth outstanding
+        placeOfDelivery: '',
+        attendantAtBirth: '',
+        addressLine1: '',
+        addressLine2: '',
+        addressLine3: '',
+        city: '',
+        county: '',
+        hospitalName: '',
+        postalCode: '',
+        state: '',
+        // Father,
+        father_firstName: '',
+        father_middleName: '',
+        father_family: '',
+        father_birthDate: '',
+
+        // Extra
+        father_personalIDNummber: '',
+        father_maritalStatus: '',
+        father_marriageDate: '',
+        father_nationality: '',
+        
+        father_phone: '',
+        father_email: '',
+        father_use: '',
+        
+        father_addressLine1: '',
+        father_addressLine2: '',
+        father_addressLine3: '',
+        father_city: '',
+        father_county: '',
+        father_postalCode: '',
+        father_state: '',
+        father_gender: 'male',
+        father_religion: '',
+        father_formalEducation: '',
+        father_occupation: '',
+        father_employment: '',
+
+        // Informant 
+        informant_firstName: '',
+        informant_middleName: '',
+        informant_family: '',
+        informant_relationship: '', 
+        informant_addressLine1: '', 
+        informant_addressLine2: '', 
+        informant_addressLine3: '', 
+        informant_city: '', 
+        informant_county: '', 
+        informant_state: '', 
+        informant_postalCode: '', 
+        informant_personalIDNummber: '', 
+        informant_email: '', 
+        informant_phone: '', 
+      };
+
+    } else if (newDeclaration == true) {
+      
+      myInitialValues = {
+        
         code: category.toLowerCase() + '-declaration',
         //TODO - add a 'same as mothers address switch' 
         // currently the below is not used in form but is required for submission - temp fix
-       
+        
         child_phone: '',
         child_email: '',
         child_use: '',
@@ -208,6 +330,7 @@ class WorkingItemCanvas extends React.Component {
         hospitalName: '',
         postalCode: '',
         state: '',
+
         // Mother
         mother_firstName: '',
         mother_middleName: '',
@@ -301,6 +424,7 @@ const mapStateToProps = ({ declarationsReducer, patientsReducer }) => {
   const {
     selectedDeclaration,
     newDeclaration,
+    newNotification,
     category,
   } = declarationsReducer;
   const {
@@ -309,6 +433,7 @@ const mapStateToProps = ({ declarationsReducer, patientsReducer }) => {
   return {
     selectedDeclaration,
     newDeclaration,
+    newNotification,
     category,
     patients,
   };

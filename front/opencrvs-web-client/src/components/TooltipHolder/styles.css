@@ -25,12 +25,12 @@
 .tooltip:after {
     content: " ";
     position: absolute;
-    bottom: 100%;  /* At the top of the tooltip */
-    left: 50%;
-    margin-left: -65px;
+    top: 50%;
+    margin-top: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent #666666 transparent;
+    left: -130px;
+    border-color: transparent #666666 transparent transparent;
 }
 
 .percentage {

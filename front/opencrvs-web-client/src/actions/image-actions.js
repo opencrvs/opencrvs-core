@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 10:32:32
+ * @Last Modified time: 2017-08-15 14:48:53
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
@@ -173,10 +173,10 @@ function imageError(message) {
 
 export function uploadImageFile(image) {
   return (dispatch, getState) => {
-    const {selectedDeclaration} = getState().declarationsReducer;
+    const {selectedDeclaration, newNotification} = getState().declarationsReducer;
     let addToExisting = false;
     let declarationID = 0;
-    if (selectedDeclaration.id) {
+    if (selectedDeclaration.id && newNotification == false) {
       addToExisting = true;
       declarationID = selectedDeclaration.id;
     }

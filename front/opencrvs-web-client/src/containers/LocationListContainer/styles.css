@@ -13,7 +13,7 @@
     overflow: scroll;
     z-index: 20; /* Sit on top */
     background-color: white;
-    max-height: 35.8em;
+   
 }
 
 
@@ -26,7 +26,7 @@
         top: 6em;
         height: 100%;
         border-left: 1px solid #ddd;
-        max-height: 100%;
+        position: absolute;
     }
 
 }

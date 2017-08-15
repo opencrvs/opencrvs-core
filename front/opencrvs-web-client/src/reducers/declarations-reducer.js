@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 15:39:50
+ * @Last Modified time: 2017-08-15 19:00:16
  */
 import {
   DECLARATION_REQUEST,
@@ -21,6 +21,9 @@ import {
   REQD_MODAL_TOGGLE,
   DECLARATION_SEARCH,
   OLD_DOCUMENT_DELETED,
+  NOTIFICATION_SELECTED,
+  CERTIFICATION_SELECTED,
+  REMOVE_NOTIFICATION,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -29,6 +32,7 @@ function declarationsReducer(
     isSubmitting: false,
     declarations: '',
     selectedDeclaration: '',
+    selectedCertification: '',
     newDeclarationModal: false,
     newDeclaration: false,
     category: '',
@@ -39,6 +43,9 @@ function declarationsReducer(
     reqDocsModal: 0,
     searchTerm: '',
     declarationsList: '',
+    newNotification: false,
+    newBirthRegistrationNumber: null,
+    newChildPersonalID: null,
   },
   action
 ) {
@@ -58,10 +65,13 @@ function declarationsReducer(
         ...state,
         isSubmitting: false,
         trackingID: action.trackingID,
+        newBirthRegistrationNumber: action.newBirthRegistrationNumber,
+        newChildPersonalID: action.newChildPersonalID,
         selectedDeclaration: '',
         submitValues: '',
         submitModal: 0,
         newDeclaration: false,
+        newNotification: false,
         category: '',
       };
     case DECLARATION_SUBMIT_FAILURE:
@@ -112,6 +122,22 @@ function declarationsReducer(
         ...state,
         selectedDeclaration: action.selectedDeclaration,
         newDeclaration: false,
+        newNotification: false,
+        category: '',
+      };
+    case CERTIFICATION_SELECTED:
+      return {
+        ...state,
+        selectedCertification: action.selectedCertification,
+        newDeclaration: false,
+        newNotification: false,
+        category: '',
+      };
+    case NOTIFICATION_SELECTED:
+      return {
+        ...state,
+        selectedDeclaration: action.selectedDeclaration,
+        newNotification: true,
         category: '',
       };
     case NEW_DECL_MODAL_OPENED:
@@ -128,6 +154,7 @@ function declarationsReducer(
       return {
         ...state,
         newDeclaration: true,
+        newNotification: false,
         selectedDeclaration: '',
         category: action.category,
       };
@@ -141,6 +168,14 @@ function declarationsReducer(
             ...state.selectedDeclaration[action.reference].slice(action.index + 1),
           ],
         },
+      };
+    case REMOVE_NOTIFICATION:
+      return {
+        ...state, 
+        declarations: [
+          ...state.declarations.slice(0, action.index),
+          ...state.declarations.slice(action.index + 1),
+        ],
       };
     default:
       return state;

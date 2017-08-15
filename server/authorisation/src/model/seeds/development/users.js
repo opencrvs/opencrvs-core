@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:04 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 14:23:55
+ * @Last Modified time: 2017-08-14 13:21:48
  */
 const Bcrypt = require('bcryptjs');
 const salt = Bcrypt.genSaltSync();
@@ -17,7 +17,7 @@ const users = [
         email: 'linda@jembi.org',
         username: 'lindataylor',
         password: lindaHash,
-        role: 'validator',
+        role: 'registrar',
         given: 'Linda',
         family: 'Taylor',
         avatar: 'linda-taylor.jpg',
@@ -42,7 +42,7 @@ const users = [
         email: 'Annina.Wersun@plan-international.org',
         username: 'anninawersun',
         password: anninaHash,
-        role: 'registrar',
+        role: 'certification clerk',
         given: 'Annina',
         family: 'Wersun',
         avatar: 'annina-wersun.jpg',

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:18 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 16:09:24
+ * @Last Modified time: 2017-08-11 08:03:12
  */
 var jwtDecode = require('jwt-decode');
 

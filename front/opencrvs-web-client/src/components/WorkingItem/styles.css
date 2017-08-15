@@ -18,7 +18,7 @@
     height: 100%;
 }
 
-.wiContentHeader, .wiContentBody, .wiContentFooter {
+.wiContentHeader, .wiContentBody, .wiContentFooter, .printPreview {
     padding: 1em 2em;
 }
 
@@ -30,6 +30,12 @@
     padding: 1em 1em;
     height: 573px;
     overflow: scroll;
+}
+
+.printPreview {
+    padding: 1em 1em;
+    overflow: scroll;
+    height: auto;
 }
 
 .noSelectedMessage {
@@ -171,4 +177,38 @@
 .titleText {
     position: relative;
     left: -1em;
+}
+
+.certInfo {
+    color: rgb(255, 64, 129);
+    font-size: .66em;
+    text-transform: uppercase;
+    font-family: 'Roboto';
+    position: relative;
+    top:-0.5em;
+}
+
+.certInfo p{
+    float: left;
+    display: block;
+    width: 80%; 
+}
+
+
+.certInfo svg{
+    display: block;
+    fill: currentColor;
+    height: 36px;
+    width: 20%;
+    overflow: hidden;
+    color: green;
+    position: relative;
+    top: 0.7em;
+    left: 0.5em;
+}
+
+.alignRight {
+    position: relative;
+    top: 1.1em;
+    text-align: right;
 }

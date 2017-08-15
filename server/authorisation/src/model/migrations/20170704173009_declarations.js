@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:31 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 18:33:34
+ * @Last Modified time: 2017-08-15 18:47:37
  */
 exports.up = function (knex, Promise) {
 
@@ -16,6 +16,7 @@ exports.up = function (knex, Promise) {
         table.string('childDetails').notNullable();
         table.string('code').notNullable();
         table.string('status').notNullable();
+        table.string('birthRegistrationNumber').nullable();
         table.timestamp('created_at').notNullable().index().defaultTo(knex.raw('now()'));
         table.timestamp('updated_at').notNullable().index().defaultTo(knex.raw('now()'));
     })
@@ -47,17 +48,17 @@ exports.up = function (knex, Promise) {
         .createTable('informant', (table) => {
 
             table.increments('id').primary();
-            table.string('uuid').notNullable();
-            table.string('prefix').notNullable();
-            table.string('given').notNullable();
-            table.string('family').notNullable();
-            table.string('relationship').notNullable();
-            table.string('addressLine1').notNullable();
+            table.string('uuid').nullable();
+            table.string('prefix').nullable();
+            table.string('given').nullable();
+            table.string('family').nullable();
+            table.string('relationship').nullable();
+            table.string('addressLine1').nullable();
             table.string('addressLine2').nullable();
             table.string('addressLine3').nullable();
             table.string('city').nullable();
-            table.string('county').notNullable();
-            table.string('state').notNullable();
+            table.string('county').nullable();
+            table.string('state').nullable();
             table.string('postalCode').nullable();
             table.string('personalIDNummber').nullable();
             table.string('email').nullable();

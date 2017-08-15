@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 16:34:07
+ * @Last Modified time: 2017-08-15 22:34:48
  */
 import React from 'react';
 import styles from './styles.css';
@@ -20,7 +20,11 @@ import JudicialIcon from 'components/icons/JudicialIcon';
 import LegitimationIcon from 'components/icons/LegitimationIcon';
 import MarriageIcon from 'components/icons/MarriageIcon';
 import RecognitionIcon from 'components/icons/RecognitionIcon';
+import PrintPreview from 'components/PrintPreview';
+import Input from 'react-toolbox/lib/input';
+import theme from './printPreviewInput.css';
 const Moment = require('moment');
+const PrintTemplate = require('react-print');
 
 class WorkingItem extends React.Component {
   constructor(props) {
@@ -51,18 +55,49 @@ class WorkingItem extends React.Component {
     } 
   }
 
+  handleChange(name, value) {
+    this.props.onUpdateCertNumber(value);
+  }
+
   render = () => {
-    const { selectedDeclaration, patients, role, category, newDeclaration, tempImages, managerView } = this.props;
+    const { selectedDeclaration, 
+      selectedCertification,
+      patients, 
+      role, 
+      category, 
+      newDeclaration, 
+      tempImages, 
+      managerView } = this.props;
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
-    let pageTitle = null;
+    let declarationTitle = null;
+    const RejectIcon = () => (
+      <svg viewBox="0 0 284 277">
+        <g>
+          <g>
+            <g>
+              <path d="M143.5,67.8H94.8l36.1-36.1c6.3-6.3,6.3-15.7,0-22s-15.7-6.3-22,0L46.1,72.5c-6.3,6.3-6.3,15.7,0,22l62.8,62.8
+                c6.3,6.3,15.7,6.3,22,0s6.3-15.7,0-22L94.8,99.2h48.7c39.3,0,70.7,31.4,70.7,70.7s-31.4,70.7-70.7,70.7
+                c-9.4,0-15.7,6.3-15.7,15.7s6.3,15.7,15.7,15.7c56.5,0,102.1-45.5,102.1-102.1S200,67.8,143.5,67.8z"/>
+            </g>
+          </g>
+        </g>  
+      </svg>
+    );
+    const TickIcon = () => (
+      <svg viewBox="0 0 512 524">
+      <path d="M433.8,2H78.2c-14,0-25.4,11.4-25.4,25.4v279.4C52.8,419,143.8,510,256,510s203.2-91,203.2-203.2V27.4
+        C459.2,13.4,447.8,2,433.8,2z M375.6,172.4L223.2,324.7c-5,5-11.5,7.4-18,7.4s-13-2.5-18-7.4l-50.8-50.8c-9.9-9.9-9.9-26,0-35.9
+        s26-9.9,35.9,0l32.8,32.8l134.4-134.4c9.9-9.9,26-9.9,35.9,0C385.5,146.4,385.5,162.4,375.6,172.4z"/>
+      </svg>
+    );
     let birthDate = null;
 
     if (selectedDeclaration) {
-      pageTitle = get(childPatient, 'patient.given').toString().replace(/,/g, '') + ' ' + get(childPatient, 'patient.family');
+      declarationTitle = get(childPatient, 'patient.given').toString().replace(/,/g, '') + ' ' + get(childPatient, 'patient.family');
       birthDate = get(childPatient, 'patient.birthDate');
     } else {
-      pageTitle = 'New ' + category + ' Declaration';
+      declarationTitle = 'New ' + category + ' Declaration';
       birthDate = '';
     }
     let iconType = null;
@@ -135,9 +170,9 @@ class WorkingItem extends React.Component {
                         ? styles.newWorkItem + ' ' + styles.wiContentTitle
                         : styles.wiContentTitle
                     }
-                >{ pageTitle }</h1>
+                >{ declarationTitle }</h1>
                 <p className={styles.wiContentSubtitle}>
-                  <span>{' ' + birthDate }</span>
+                  <span>{' ' + Moment(birthDate).format('Do MMMM YYYY') }</span>
                 </p>
                 <div className={styles.smsMother}>
                 
@@ -197,7 +232,14 @@ class WorkingItem extends React.Component {
                   <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                 </div>
                 <div className="pure-u-1-2 pure-u-md-1-4">
-                  <Button icon="delete" label="Trash" flat />
+                  {
+                    role == 'registrar' ?
+                      <Button flat>
+                        <RejectIcon /> Investigate
+                      </Button>
+                    :
+                      <Button icon="delete" label="Trash" flat />
+                  }
                 </div>
                 <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
@@ -205,28 +247,68 @@ class WorkingItem extends React.Component {
               </div>
             </div>
           </div> 
-          : 
-            ''
+          : selectedCertification ?
+            <div className={styles.wiContentHeader + ' pure-g'}>
+              <div className="pure-u-1 pure-u-md-1-2">
+                <div className="pure-g">
+                  <div className="pure-u-1 pure-u-md-1-2">
+                    <form>
+                    {
+                      <Input theme={theme} type="text" label="Available certificate number" onChange={this.handleChange.bind(this, 'setCertNumber')} />
+                    }
+                    </form>
+                  </div>
+                  <div className={styles.alignRight + ' pure-u-1 pure-u-md-1-2'}>
+                    <Button flat>
+                      <RejectIcon /> Investigate
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.wiContentControls + ' pure-u-1 pure-u-md-1-2'}>
+                <div className="pure-g">
+                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}><p>National ID</p><TickIcon /></div>
+                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}><p>Payment</p><TickIcon /></div>
+                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}><p>Status</p><TickIcon /></div>
+                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}>
+                    <Button icon="print" label="Print" flat onClick={this.displayPrintPreview} />
+                  </div>
+                </div>
+              </div>
+            </div> 
+          : ''
         }
-        <div className={ !selectedDeclaration && newDeclaration == false 
+        <div className={ !selectedDeclaration && newDeclaration == false && !selectedCertification
                 ? styles.noSelectedDeclaration + ' pure-g'
                 : styles.formOpen + ' pure-g'}>
           {
-            !selectedDeclaration && newDeclaration == false
+            !selectedDeclaration && newDeclaration == false && !selectedCertification
             ?
               <div className={'pure-u-1 pure-u-md-1-1 ' + styles.noSelectedMessage}>
                 <h1 className={styles.wiContentTitle}>
                   {
-                    role == 'validator' 
-                      ? 
+                    role == 'registrar' ? 
                         <div><p>Select a declaration to validate,</p><p>or create a new declaration</p></div>
-                      : 
+                      : role == 'field officer' ?
                         <div><p>Select a notification to declare,</p><p>or create a new declaration</p></div>
+                      :
+                        <div><p>Select a validated declaration,</p><p>to prepare the birth certificate</p></div>
                   }
                 
                 </h1>
               </div>
-            :
+            : selectedCertification ?
+            <div className={'pure-u-1 pure-u-md-1-1 ' + styles.printPreview}>
+              <PrintPreview 
+                selectedCertification={selectedCertification} 
+              />
+                <PrintTemplate>
+                  <PrintPreview 
+                    selectedCertification={selectedCertification} 
+                  />
+                </PrintTemplate>
+            </div>
+            : 
             <div className={
               (showPics == true)
               ? 'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody
@@ -241,8 +323,7 @@ class WorkingItem extends React.Component {
             </div>
           }
           {
-            (showPics == true)
-            ? 
+            showPics == true ? 
               <div className={'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody} style={{ height: pixelHeight }}>
                 <div className="pure-g">
                   <div className="pure-u-1">
@@ -266,12 +347,14 @@ const mapStateToProps = ({ declarationsReducer, imageReducer }) => {
   const {
     selectedDeclaration,
     newDeclaration,
+    selectedCertification,
   } = declarationsReducer;
   const {
     tempImages,
   } = imageReducer;
   return {
     selectedDeclaration,
+    selectedCertification,
     newDeclaration,
     tempImages,
   };
