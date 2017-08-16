@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 22:34:48
+ * @Last Modified time: 2017-08-16 13:49:33
  */
 import React from 'react';
 import styles from './styles.css';
@@ -150,6 +150,8 @@ class WorkingItem extends React.Component {
     } else if (tempImages.length > 0) {
       showPics = true;
       pixelHeight = (tempImages.length * 750) + 'px';
+    } else {
+      showPics = false;
     }
     return (
       <div className={

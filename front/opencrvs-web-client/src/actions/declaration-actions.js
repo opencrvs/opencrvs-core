@@ -2,9 +2,9 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-16 11:47:34
+ * @Last Modified time: 2017-08-16 14:03:55
  */
-import { BASE_URL, OPEN_HIM_URL, SMS_API_URL } from 'constants/urls';
+import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
 import { logoutUser } from 'actions/user-actions';
 import { selectWorkView } from 'actions/global-actions';
@@ -355,13 +355,28 @@ export function fetchDeclarations(roleType) {
 }
 
 function sendSMS(motherPhone, smsMessage) {
-  const config = {
+  doCORSRequest({
     method: 'GET',
-  };
-  apiMiddleware(config, SMS_API_URL + 'to=' + motherPhone + '&text=' + smsMessage, null).then(response => {
-    console.log(JSON.stringify(response));
-    console.log('SMS sent to: ' + motherPhone + '&text=' + smsMessage);
+    url: SMS_API_URL + 'to=' + motherPhone + '&text=' + smsMessage,
+  }, function printResult(result) {
+    console.log(result);
   });
+}
+
+function doCORSRequest(options, printResult) {
+  var x = new XMLHttpRequest();
+  x.open(options.method, CORS_API_URL + options.url);
+  x.onload = x.onerror = function() {
+    printResult(
+      options.method + ' ' + options.url + '\n' +
+      x.status + ' ' + x.statusText + '\n\n' +
+      (x.responseText || '')
+    );
+  };
+  if (/^POST/i.test(options.method)) {
+    x.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  }
+  x.send(options.data);
 }
 
 
@@ -794,12 +809,15 @@ export function submitDeclaration() {
                     + 'Once payment is received, the birth certificate will be available for collection after '
                     + '3 days from Agona West Civil Registration Centre';
                   dispatch(sendSMS(motherPhone, smsMessage));
+                  dispatch(clearTempImages());
+                  dispatch(fetchDeclarations(role));
+                  dispatch(trackingModalOpened());
                 } else {
                   dispatch(submitDeclarationSuccess(trackingID));
+                  dispatch(clearTempImages());
+                  dispatch(fetchDeclarations(role));
+                  dispatch(trackingModalOpened());
                 }
-                dispatch(clearTempImages());
-                dispatch(fetchDeclarations(role));
-                dispatch(trackingModalOpened());
               }
             });
           });
