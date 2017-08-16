@@ -61,14 +61,6 @@ server {
 		proxy_temp_path /var/nginx/proxy_temp;
 	}
 
-	location /api/documents/uploads {
-    root /var/www/OpenCRVS-production/server/authorisation/src/routes/documents/uploads;
-    try_files $uri $uri/ ;
-
-    expires max;
-    access_log off;
-	}
-
 	location / {
 		add_header Access-Control-Allow-Origin *;
 		try_files $uri $uri/ /index.html;
