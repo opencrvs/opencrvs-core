@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "name": "open-crvs-dev-backend",
+      "script": "./src/server.js",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}
