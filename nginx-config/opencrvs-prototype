@@ -17,29 +17,6 @@ server {
 	root /var/www/OpenCRVS-production/front/opencrvs-web-client/build;
 	index index.html index.htm;
 
-	location ~* \.(?:manifest|appcache|html?|xml|json)$ {
-		add_header Access-Control-Allow-Origin *;
-		expires -1;
-		client_max_body_size 20M;
-	}
-
-	location ~* \.(?:css|js)$ {
-		add_header Access-Control-Allow-Origin *;
-		try_files $uri =404;
-		expires 1y;
-		access_log off;
-		add_header Cache-Control "public";
-		client_max_body_size 20M;
-	}
-
-	location /api/documents/uploads {
-    root /var/www/OpenCRVS-production/server/authorisation/src/routes/documents/uploads;
-    try_files $uri $uri/ ;
-
-    expires max;
-    access_log off;
-	}
-
 	location /auth {
 		proxy_set_header Access-Control-Allow-Origin *;
 		proxy_pass http://46.101.36.211:3000;
@@ -63,14 +40,6 @@ server {
 		proxy_temp_path /var/nginx/proxy_temp;
 	}
 
-	location / {
-		add_header Access-Control-Allow-Origin *;
-		try_files $uri $uri/ /index.html;
-		client_max_body_size 20M;
-	}
-
-	
-
 	location /api {
 		proxy_set_header Access-Control-Allow-Origin *;
 		proxy_pass http://46.101.36.211:3000;
@@ -93,4 +62,23 @@ server {
 		proxy_temp_file_write_size 64k;
 		proxy_temp_path /var/nginx/proxy_temp;
 	}
+
+	location /api/documents/uploads {
+    root /var/www/OpenCRVS-production/server/authorisation/src/routes/documents/uploads;
+    try_files $uri $uri/ ;
+
+    expires max;
+    access_log off;
+	}
+
+	location / {
+		add_header Access-Control-Allow-Origin *;
+		try_files $uri $uri/ /index.html;
+		client_max_body_size 20M;
+	}
+
+
 }
+
+	
+
