@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-16 14:03:55
+ * @Last Modified time: 2017-08-16 14:13:38
  */
 import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
@@ -799,6 +799,8 @@ export function submitDeclaration() {
                   console.log('error no images in declaration');
                 }
               } else {
+                dispatch(clearTempImages());
+                console.log('images cleared');
                 if (role == 'registrar') {
                   dispatch(submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID));
                   const smsMessage = 'The registration process for tracking number '
@@ -809,12 +811,10 @@ export function submitDeclaration() {
                     + 'Once payment is received, the birth certificate will be available for collection after '
                     + '3 days from Agona West Civil Registration Centre';
                   dispatch(sendSMS(motherPhone, smsMessage));
-                  dispatch(clearTempImages());
                   dispatch(fetchDeclarations(role));
                   dispatch(trackingModalOpened());
                 } else {
                   dispatch(submitDeclarationSuccess(trackingID));
-                  dispatch(clearTempImages());
                   dispatch(fetchDeclarations(role));
                   dispatch(trackingModalOpened());
                 }
