@@ -6,9 +6,6 @@
 # testing
 /coverage
 
-# production user knex seeds
-/src/model/seeds/production/users.js
-
 # misc
 .DS_Store
 .env
