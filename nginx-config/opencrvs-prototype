@@ -48,9 +48,7 @@ server {
 		proxy_set_header Connection 'upgrade';
 		proxy_set_header Host $host;
 		proxy_cache_bypass $http_upgrade;
-
 		client_max_body_size 20M;
-
 		client_body_buffer_size 128k;
 		client_body_temp_path /var/nginx/client_body_temp;
 		proxy_connect_timeout 70;
