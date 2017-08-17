@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 22:06:56
+ * @Last Modified time: 2017-08-16 15:29:30
  */
 import React from 'react';
 import styles from './styles.css';
@@ -42,6 +42,7 @@ import {  imageModalOpened,
           resetDeleteImageFlag } from 'actions/image-actions';
 import {
   mobileMenuControl,
+  reportOptionToggle,
 } from 'actions/global-actions';
 import {
   updateCertNumber,
@@ -243,6 +244,9 @@ const mapDispatchToProps = dispatch => {
     },
     onUpdateCertNumber: value => {
       dispatch(updateCertNumber(value));
+    },
+    onReportOptionClick: () => {
+      dispatch(reportOptionToggle());
     },
   };
 };

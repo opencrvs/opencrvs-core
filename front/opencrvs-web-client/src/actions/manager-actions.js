@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-10 16:49:37
+ * @Last Modified time: 2017-08-16 15:29:58
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -18,6 +18,8 @@ export const SET_REGION_MANAGER = 'SET_REGION_MANAGER';
 export const SET_DISTRICT_MANAGER = 'SET_DISTRICT_MANAGER';
 export const SET_LIST_FILTER = 'SET_LIST_FILTER';
 export const SET_LIST_ORDER = 'SET_LIST_ORDER';
+
+
 
 import { apiMiddleware } from 'utils/api-middleware';
 import { selectWorkView } from 'actions/global-actions';
@@ -298,4 +300,3 @@ function regionSelected(obj, title, newMap, totalCerts) {
     totalCerts,
   };
 }
-

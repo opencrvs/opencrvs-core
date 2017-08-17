@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-09 17:26:52
+ * @Last Modified time: 2017-08-16 15:28:04
  */
 import React from 'react';
 import styles from './styles.css';
@@ -19,7 +19,8 @@ import { selectRegion,
          selectPeriod,
          updateTooltipOrigin,
          setTooltipData,
-         disableTooltip } from 'actions/manager-actions';
+         disableTooltip,
+         reportOptionToggle } from 'actions/manager-actions';
 
 class LocationContainer extends React.Component {
   constructor(props) {
@@ -73,12 +74,10 @@ const mapStateToProps = ({
   } = managerReducer;
   const { 
     country,
-    region,
-    reportOption } = globalReducer;
+    region } = globalReducer;
   return {
     
     mapLocations,
-    reportOption,
     fetchingMapView,
     subLocations,
     selectedLocation,
@@ -113,7 +112,7 @@ const mapDispatchToProps = dispatch => {
     },
     disableTooltipData: () => {
       dispatch(disableTooltip());
-    },
+    }
   };
 };
 

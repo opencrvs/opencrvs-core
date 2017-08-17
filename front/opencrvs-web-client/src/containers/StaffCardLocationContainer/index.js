@@ -50,9 +50,9 @@ class StaffCardLocationContainer extends React.Component {
     }
     return (
       <div className={styles.staffCardLocationContainer + ' pure-g'}>
-        { countryManager != null && <StaffCard cardType={topCard} managerData={countryManager} />}
-        { middleCard != 'I' && <StaffCard cardType={middleCard} managerData={regionManager} />}
-        { bottomCard != 'I' && <StaffCard cardType={bottomCard} managerData={districtManager} />}
+        { countryManager && <StaffCard cardType={topCard} managerData={countryManager} />}
+        { regionManager &&  <StaffCard cardType={middleCard} managerData={regionManager} />}
+        { districtManager && <StaffCard cardType={bottomCard} managerData={districtManager} />}
       </div>
     );
   }
