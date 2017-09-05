@@ -9,7 +9,7 @@ import { apiMiddleware } from 'utils/api-middleware';
 import { logoutUser } from 'actions/user-actions';
 import { selectWorkView } from 'actions/global-actions';
 import { clearTempImages } from 'actions/image-actions';
-import { get, head, map, filter, nth } from 'lodash';
+import { get, head, map, filter } from 'lodash';
 const Moment = require('moment');
 const Fuzzysearch = require('fuzzysearch');
 import { fetchPatients } from 'actions/patient-actions';
@@ -304,7 +304,7 @@ export function fetchDeclarations(roleType) {
           }
         });
     } else {
-      return fetch(OPEN_HIM_URL + 'Composition?entry=Location/ee772aa3-81aa-11e7-a8e1-59c809792454&status=preliminary')
+      return fetch(OPEN_HIM_URL + 'Composition?status=preliminary&type=birth-notification&entry=Location/ae150380-8329-11e7-82fe-a5724c7e1e43')
         .then(response =>
           response.json().then(payload => ({ payload, response }))
         )
@@ -326,20 +326,23 @@ export function fetchDeclarations(roleType) {
           map(get(payload, 'entry'), (notification, index ) => {
             const childIDArray = notification.resource.subject.reference.split('/');
             const childID = childIDArray[1];
-            const motherIDArray = nth(notification.resource.section.entry, 1).reference.split('/');
-            const motherID = motherIDArray[1];
+
+            const mother = notification.resource.section.entry
+              .find((entry) => entry.text === 'Mother\'s Details' )
+              .reference
+
             let newDeclaration = {
               id: index,
               code: 'birth-notification',
               created_at: notification.resource.meta.lastUpdated,
               updated_at: notification.resource.meta.lastUpdated,
-              motherDetails: motherID,
+              motherDetails: mother.split('/')[1],
               childDetails: childID,
               tracking: 'BN-' + notification.resource.id.substring(0, 12),
               documents:[],
             };
             const child = notification.resource.subject.reference;
-            const mother = nth(notification.resource.section.entry, 1).reference;
+
 
             dispatch(fetchPatients(child, true));
             dispatch(fetchPatients(mother, true));
