@@ -9,6 +9,7 @@
   width: 100%;
   padding: 1em;
   border-bottom: 1px solid #ddd;
+  min-height: 7em;
 }
 .smallCard {
   display: block;

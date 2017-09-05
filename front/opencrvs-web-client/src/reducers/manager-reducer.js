@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:14 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-16 15:30:18
+ * @Last Modified time: 2017-09-05 13:53:48
  */
 import {
   REQUEST_MAPVIEW_DATA,
@@ -19,6 +19,8 @@ import {
   SET_DISTRICT_MANAGER,
   SET_LIST_FILTER,
   SET_LIST_ORDER,
+  CASE_TRACKING,
+  CASE_TRACKING_CLEAR,
 } from '../actions/manager-actions';
 
 function managerReducer(
@@ -46,6 +48,10 @@ function managerReducer(
     countryManager: null,
     listFilter: 'none',
     listOrder: 'asc',
+    caseData: null,
+    caseManager: null,
+    caseNotes: null,
+    caseGraphData: null,
   },
   action
 ) {
@@ -142,6 +148,22 @@ function managerReducer(
       return {
         ...state,
         listOrder: action.listOrder,
+      };
+    case CASE_TRACKING:
+      return {
+        ...state,
+        caseData: action.caseData,
+        caseManager: action.caseManager,
+        caseNotes: action.caseNotes,
+        caseGraphData: action.caseGraphData,
+      };
+    case CASE_TRACKING_CLEAR:
+      return {
+        ...state,
+        caseData: null,
+        caseManager: null,
+        caseNotes: null,
+        caseGraphData: null,
       };
     default:
       return state;

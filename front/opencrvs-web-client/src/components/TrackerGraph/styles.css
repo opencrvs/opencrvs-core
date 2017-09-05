@@ -8,6 +8,12 @@
 .yAxisTitle {
   position: absolute;
   display: block;
-  transform: rotate(90deg);
-	transform-origin: left top 0;
+  transform: rotate(-90deg);
+  transform-origin: left top 0;
+  top: 11.3em;
+  left: 11%;
+
+}
+.centerChart {
+  margin: 0 auto;
 }

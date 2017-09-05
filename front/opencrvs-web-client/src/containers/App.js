@@ -2,12 +2,15 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:32 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 17:58:17
+ * @Last Modified time: 2017-09-05 15:23:59
  */
 import React from 'react';
 import { connect } from 'react-redux';
 import HomeContainer from 'containers/HomeContainer';
 import WorkContainer from 'containers/WorkContainer';
+import ReportsContainer from 'containers/ReportsContainer';
+import SettingsContainer from 'containers/SettingsContainer';
+import StatsContainer from 'containers/StatsContainer';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
 
@@ -21,6 +24,24 @@ const App = props => (
         redirectTo="/"
         isAuthenticated={props.isAuthenticated}
         component={WorkContainer}
+      />
+      <PrivateRoute
+        path="/reports"
+        redirectTo="/"
+        isAuthenticated={props.isAuthenticated}
+        component={ReportsContainer}
+      />
+      <PrivateRoute
+        path="/statistics"
+        redirectTo="/"
+        isAuthenticated={props.isAuthenticated}
+        component={StatsContainer}
+      />
+      <PrivateRoute
+        path="/settings"
+        redirectTo="/"
+        isAuthenticated={props.isAuthenticated}
+        component={SettingsContainer}
       />
     </Switch>
   </BrowserRouter>

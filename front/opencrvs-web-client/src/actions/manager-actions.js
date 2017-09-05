@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-16 15:29:58
+ * @Last Modified time: 2017-09-05 15:39:48
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -18,14 +18,16 @@ export const SET_REGION_MANAGER = 'SET_REGION_MANAGER';
 export const SET_DISTRICT_MANAGER = 'SET_DISTRICT_MANAGER';
 export const SET_LIST_FILTER = 'SET_LIST_FILTER';
 export const SET_LIST_ORDER = 'SET_LIST_ORDER';
+export const CASE_TRACKING = 'CASE_TRACKING';
+export const CASE_TRACKING_CLEAR = 'CASE_TRACKING_CLEAR';
 
 
 
 import { apiMiddleware } from 'utils/api-middleware';
-import { selectWorkView } from 'actions/global-actions';
 import { BASE_URL } from 'constants/urls';
 import { feature } from 'topojson-client';
 import { filter, head, map, get } from 'lodash';
+const Moment = require('moment');
 
 export function fetchMapViewData() {
   
@@ -39,7 +41,6 @@ export function fetchMapViewData() {
     apiMiddleware(config, BASE_URL + 'manager', dispatch).then(items => {
       dispatch(mapViewDataSuccess(items));
       dispatch(getMapData());
-      dispatch(selectWorkView('manager'));
     });
   };
 }
@@ -272,6 +273,66 @@ function setEvent(event, totalCerts) {
     type: EVENT_SELECTED,
     mapEvent: event,
     totalCerts,
+  };
+}
+
+export function caseTracking() {
+  return {
+    type: CASE_TRACKING,
+    caseData: {
+      firstName: 'Bashirah',
+      middleName: 'Awo',
+      family: 'Nkrumah',
+      personalIDNummber: 'GH99856325',
+      phone: '024 965 1365',
+      addressLine1: 'P.O. Box 7986',
+      addressLine2: '',
+      addressLine3: '',
+      county: 'Hohoe',
+      state: 'Volta',
+    },
+    caseManager: {
+      given: 'Cameron',
+      family: 'Addo',
+      title: 'District Operations Manager',
+      email: 'c-addo@acme.com',
+      phone: '555-165-111',
+      avatar: 'male',
+    },
+    caseNotes: [
+      {title: 'NOTIFICATION', notes: [
+        {note: 'Power cut in the office.', date: Moment().subtract(29, 'days').format('Do MMM')},
+      ]},
+      {title: 'DECLARATION', notes: [
+        {note: 'Power cut in the office', date: Moment().subtract(23, 'days').format('Do MMM')},
+        {note: 'No ID document supplied.', date: Moment().subtract(20, 'days').format('Do MMM')},
+      ]},
+      {title: 'VALIDATION', notes: [
+      ]},
+      {title: 'SMS', notes: [
+      ]},
+      {title: 'PAYMENT', notes: [
+        {note: 'MTN Mobile money payment', date: Moment().subtract(11, 'days').format('Do MMM')},
+      ]},
+      {title: 'CERTIFICATION', notes: [
+      ]},
+    ],
+    caseGraphData: [
+      {name: Moment().subtract(30, 'days').format('Do MMM'), kpi: 0, actual: 0, amt: 2400},
+      {name: Moment().subtract(23, 'days').format('Do MMM'), kpi: 5, actual: 7, amt: 2210},
+      {name: Moment().subtract(17, 'days').format('Do MMM'), kpi: 3, actual: 6, amt: 2290},
+      {name: Moment().subtract(14, 'days').format('Do MMM'), kpi: 3, actual: 3, amt: 2000},
+      {name: Moment().subtract(13, 'days').format('Do MMM'), kpi: 1, actual: 1, amt: 2181},
+      {name: Moment().subtract(11, 'days').format('Do MMM'), kpi: 7, actual: 2, amt: 2500},
+      {name: Moment().subtract(8, 'days').format('Do MMM'), kpi: 2, actual: 3, amt: 2100},
+    ],
+  };
+
+}
+
+export function caseTrackingClear() {
+  return {
+    type: CASE_TRACKING_CLEAR
   };
 }
 

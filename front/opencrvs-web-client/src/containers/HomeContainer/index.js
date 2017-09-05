@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 11:38:35
+ * @Last Modified time: 2017-09-05 15:38:15
  */
 import React from 'react';
 import Worknav from 'components/Worknav';
@@ -15,6 +15,7 @@ import styles from './styles.css';
 import theme from './getStartedButton.css';
 import { deselectWorkView } from 'actions/global-actions';
 import { updateUserDetails } from 'actions/user-actions';
+var jwtDecode = require('jwt-decode');
 
 
 class HomeContainer extends React.Component {
@@ -27,7 +28,14 @@ class HomeContainer extends React.Component {
   }
   
   handleClick = (event) => {
-    window.location.href = '/work';
+    let token = localStorage.getItem('token') || null;
+    const decoded = jwtDecode(token);
+    const role = decoded.role;
+    if (role != 'admin' && role != 'manager' ) {
+      window.location.href = '/work';
+    } else {
+      window.location.href = '/reports';
+    }
   }
 
   render = () => {

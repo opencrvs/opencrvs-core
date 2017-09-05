@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-17 13:47:28
+ * @Last Modified time: 2017-09-05 08:58:54
  */
 import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
@@ -310,9 +310,11 @@ export function fetchDeclarations(roleType) {
         )
         .then(({ payload, response }) => {
           if (!response.ok) {
+            console.log("error");
             dispatch(declarationError(payload.message));
             return Promise.reject(payload);
           }
+          console.log(JSON.stringify(payload));
 
           //temporary reformat until declarations exists in FHIR
           //at which point refactor across the app will be required

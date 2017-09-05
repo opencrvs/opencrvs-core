@@ -1,0 +1,15 @@
+.settingsContainer {
+  margin: 0;
+  padding: 0;
+  color: #333;
+  text-decoration: none;
+}
+
+
+.settingsContent {
+  width: 100%;
+  height: auto;
+  top: 6em;
+  position: relative;
+  margin: 3em;
+}

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:13 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-14 13:09:30
+ * @Last Modified time: 2017-09-05 15:58:52
  */
 import React from 'react';
 import styles from './styles.css';
@@ -20,6 +20,18 @@ class Worknav extends React.Component {
 
   logout = (event) => {
     this.props.onLogout();
+  }
+  
+  settings = (event) => {
+    window.location.href = '/settings';
+  }
+  
+  stats = (event) => {
+    window.location.href = '/statistics';
+  }
+  
+  reports = (event) => {
+    window.location.href = '/reports';
   }
 
   toggleMobileMenu = (event) => {
@@ -192,7 +204,7 @@ class Worknav extends React.Component {
                   }>
                  <li className={styles.menuItem + ' pure-menu-item ' + styles.reportsItem}>
                     <ReactTooltip place="top" type="dark" effect="float"/>
-                    <a href="#" className="pure-menu-link" data-tip="Reporting">
+                    <a href="#" className="pure-menu-link" onClick={this.reports} data-tip="Reporting">
                       <svg
                         className={styles.reportsIcon}
                         fill="#FFFFFF"
@@ -224,7 +236,7 @@ class Worknav extends React.Component {
                   </li>
                   <li className={styles.menuItem + ' pure-menu-item'}>
                     <ReactTooltip place="top" type="dark" effect="float"/>
-                    <a href="#" className="pure-menu-link" data-tip="Download statistics">
+                    <a href="#" className="pure-menu-link" onClick={this.stats} data-tip="Download statistics">
                       <svg
                         className={styles.statsIcon}
                         fill="#FFFFFF"
@@ -310,7 +322,7 @@ class Worknav extends React.Component {
                   </li>
                   <li className={styles.menuItem + ' pure-menu-item'}>
                     <ReactTooltip place="top" type="dark" effect="float"/>
-                    <a href="#" className="pure-menu-link" data-tip="Settings">
+                    <a href="#" className="pure-menu-link" onClick={this.settings} data-tip="Settings">
                       <svg
                         className={styles.settingIcon}
                         fill="#FFFFFF"

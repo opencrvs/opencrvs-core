@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-10 18:07:27
+ * @Last Modified time: 2017-09-05 15:46:34
  */
 import React from 'react';
 import styles from './styles.css';
@@ -73,12 +73,7 @@ class LocationListContainer extends React.Component {
 
     
     return (
-      <div className={
-        managerView
-        ? styles.list + ' pure-u-1'
-        :
-          styles.registrationView
-        }>
+      <div className={styles.list + ' pure-u-1'}>
         <StaffCardLocationContainer {...this.props} />
         <LocationListFilters {...this.props} />
 

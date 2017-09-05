@@ -2,13 +2,14 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:18 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-11 08:03:12
+ * @Last Modified time: 2017-09-05 15:44:03
  */
 var jwtDecode = require('jwt-decode');
 
 import { UNPROTECTED_URL } from 'constants/urls';
 import { fetchDeclarations } from 'actions/declaration-actions';
 import { fetchMapViewData } from 'actions/manager-actions';
+import { selectWorkView } from 'actions/global-actions';
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
@@ -89,7 +90,7 @@ function receiveLogout() {
   };
 }
 
-export function updateUserDetails() {
+export function updateUserDetails(location) {
   let token = localStorage.getItem('token') || null;
   return dispatch => {
     if (token) {
@@ -100,7 +101,16 @@ export function updateUserDetails() {
         dispatch(fetchDeclarations(role));
       } else {
         dispatch(updateUser(token));
-        dispatch(fetchMapViewData());
+        dispatch(selectWorkView('manager'));
+        switch (location){
+          case 'reports':
+            dispatch(fetchMapViewData());
+            break;
+          case 'stats':
+            break;
+          case 'settings':
+            break;
+        }
       }
     } else {
       dispatch(logoutUser());

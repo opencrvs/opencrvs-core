@@ -1,7 +1,3 @@
-.registrationView {
-  display: none;
-}
-
 .list {
     margin: 0;
     padding: 0;
@@ -13,20 +9,23 @@
     overflow: scroll;
     z-index: 20; /* Sit on top */
     background-color: white;
-    max-height: 35.8em;
-}
-
-
-
-@media (min-width: 55em) {
-
+   
+  }
+  
+  .searchContainer {
+    padding: 0.9em 1em;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  @media (min-width: 55em) {
+  
     .list {
         width:25%;
         left: 75%;
         top: 6em;
         height: 100%;
-        border-right: 1px solid #ddd;
-        max-height: 100%;
+        border-left: 1px solid #ddd;
+        position: absolute;
     }
-
-}
+  
+  }

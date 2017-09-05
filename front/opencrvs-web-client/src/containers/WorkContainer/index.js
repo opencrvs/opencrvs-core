@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:38 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-16 15:29:30
+ * @Last Modified time: 2017-09-05 15:50:09
  */
 import React from 'react';
 import styles from './styles.css';
@@ -15,9 +15,6 @@ import ImageZoom from 'components/ImageZoom';
 import SubmitModal from 'components/SubmitModal';
 import TrackingModal from 'components/TrackingModal';
 import ReqDocsModal from 'components/ReqDocsModal';
-import LocationContainer from 'containers/LocationContainer';
-import LocationListContainer from 'containers/LocationListContainer';
-import TrackingSearchContainer from 'containers/TrackingSearchContainer';
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
 import { 
@@ -42,7 +39,6 @@ import {  imageModalOpened,
           resetDeleteImageFlag } from 'actions/image-actions';
 import {
   mobileMenuControl,
-  reportOptionToggle,
 } from 'actions/global-actions';
 import {
   updateCertNumber,
@@ -66,8 +62,6 @@ class WorkContainer extends React.Component {
       imageToDelete,
       trackingModal,
       role,
-      selectedLocationMapData,
-      reportOption,
       reqDocsModal } = this.props;
     let managerView = false;
     if (role == 'admin' || role == 'manager' ) {
@@ -79,13 +73,6 @@ class WorkContainer extends React.Component {
         <div className=" pure-g">
           <WorkList {...this.props} managerView={managerView}/>
           <WorkingItem {...this.props} managerView={managerView}/>
-
-          { selectedLocationMapData && <LocationContainer {...this.props}  managerView={managerView}/> }
-          {
-            reportOption == 0
-            ? <LocationListContainer {...this.props}  managerView={managerView}/>
-            : <TrackingSearchContainer {...this.props}  managerView={managerView}/>
-          }
           <NewVitalEvent {...this.props} />
           { imageModal && <ImageLoader {...this.props} /> }
           { imageZoomID > 0 && <ImageZoom {...this.props} /> }
@@ -125,11 +112,9 @@ const mapStateToProps = ({
     given,
     family,
     avatar } = userReducer;
-  const { selectedLocationMapData } = managerReducer;
   const { patients } = patientsReducer;
   const { 
-    menuOpened,
-    reportOption } = globalReducer;
+    menuOpened } = globalReducer;
   const { imageModal,
     imageOption,
     imageFetching,
@@ -141,7 +126,6 @@ const mapStateToProps = ({
      } = imageReducer;
   return {
     declarations,
-    selectedLocationMapData,
     trackingID,
     reqDocsModal,
     trackingModal,
@@ -158,7 +142,6 @@ const mapStateToProps = ({
     imageFetching,
     imageErrorMessage,
     patients,
-    reportOption,
     role,
     username,
     given,
@@ -244,9 +227,6 @@ const mapDispatchToProps = dispatch => {
     },
     onUpdateCertNumber: value => {
       dispatch(updateCertNumber(value));
-    },
-    onReportOptionClick: () => {
-      dispatch(reportOptionToggle());
     },
   };
 };

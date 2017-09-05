@@ -6,7 +6,7 @@ import Dropdown from 'react-toolbox/lib/dropdown';
 import { connect } from 'react-redux';
 
 const listFilters = [
-  { value: 'none', label: 'No filter applied' },
+  { value: 'none', label: 'Alphabetical' },
   { value: 'density', label: 'Population density'},
   { value: 'certifications', label: 'Number of certifications' },
 ];

@@ -1,0 +1,25 @@
+.sub {
+  padding: 0.2em;
+  background-color: #CCCCCC;
+  margin-bottom: 0.3em;
+  font-size: 0.7em;
+  font-weight: 500;
+  margin-left: 0.8em;
+  margin-right: 0.8em;
+  line-height: 1em;
+  margin-bottom: 1em;
+  display: block;
+  height:auto;
+}
+
+.title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.3em;
+  text-align: center;
+  font-size: 0.6em;
+}
+
+.column {
+  border-left: 1px solid #666666;
+}
