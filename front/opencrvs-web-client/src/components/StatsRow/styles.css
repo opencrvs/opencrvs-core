@@ -1,0 +1,18 @@
+.checkBoxes {
+  position: relative;
+  top: 1.1em;
+}
+
+.itemText {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-size: 14px;
+}
+
+.subjectTitle {
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+.statsRow:nth-child(even) {
+  background: #dcdcdc;
+}
