@@ -47,37 +47,57 @@ StatsRow.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-class StatsContainer extends React.Component {
-  state = {
-    check1: false,
-    check2: true,
-    check3: false,
-    check4: false,
-    check5: false,
-    check6: false,
-    check7: false,
-    check8: false,
-    check9: false,
-    check10: false,
-    check11: false,
-    check12: false,
-    check13: false,
-    check14: false,
-    check15: false,
-    check16: false,
-    check17: false,
-    check18: false,
-    check19: false,
-    check20: false
-  };
+const subjects = [
+  'Live births by place of occurrence and sex of child',
+  'Live births by place of occurrence and place of usual residence of mother',
+  'Live births by place of registration, month of occurrence and month of registration',
+  'Live births by month, place of occurrence and place of usual residence of mother',
+  'Live births by age, place of usual residence and marital status of mother',
+  'Live births by age of father',
+  'Live births by place of usual residence, age and educational attainment of mother',
+  'Live births by educational attainment and age of mother and live-birth order',
+  'Live births by place of usual residence and age of mother, sex of child and live-birth order',
+  'Live births by live-birth order and interval between last and previous live-births to mother',
+  'Live births by ethnic and/or national group and place of usual residence and age of mother',
+  'Live births by place of usual residence and age of mother and legitimacy status',
+  'Live births by place of occurrence, site of delivery and attendant at birth',
+  'Live births by site of delivery, attendant at birth and birth weight',
+  'Live births by birth weight and place of usual residence and educational attainment of mother',
+  'Live births by gestational age and birth weight',
+  'Live births by birth weight, place of usual residence of mother and month in which prenatal care began',
+  'Live births by age and place of usual residence of mother and month in which prenatal care began',
+  'Live births by live-birth order, place of usual residence of mother and month in which prenatal care',
+  'Live births by place of usual residence of mother and duration of residence at the current usual residence',
+];
 
+function constructCheckName(index) {
+  return `check${index}`;
+}
+
+function constructCheckHandlerName(index) {
+  return `handleCheck${index}Change`;
+}
+
+class StatsContainer extends React.Component {
   constructor(props) {
     super(props);
-    
+
+    this.state = {};
+
+    subjects.forEach((subject, i) => {
+      let checked = false;
+      if (i === 1) {
+        // Select the second row by default
+        checked = true;
+      }
+      const field = constructCheckName(i);
+      this.state[field] = checked;
+      this[constructCheckHandlerName(i)] = this.handleChange.bind(this, field);
+    });
   }
 
   handleChange = (field, value) => {
-    this.setState({...this.state, [field]: value});
+    this.setState({[field]: value});
   };
 
   componentWillMount() {
@@ -111,146 +131,16 @@ class StatsContainer extends React.Component {
                 <h3 className={styles.title}>Select</h3>
               </div>
             </div>
-            <StatsRow
-              text="Live births by place of occurrence and sex of child"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check1}
-              onChange={this.handleChange.bind(this, 'check1')}
-            />
-            <StatsRow
-              text="Live births by place of occurrence and place of usual residence of mother"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check2}
-              onChange={this.handleChange.bind(this, 'check2')}
-            />
-            <StatsRow
-              text="Live births by place of registration, month of occurrence and month of registration"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check3}
-              onChange={this.handleChange.bind(this, 'check3')}
-            />
-            <StatsRow
-              text="Live births by month, place of occurrence and place of usual residence of mother"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check4}
-              onChange={this.handleChange.bind(this, 'check4')}
-            />
-            <StatsRow
-              text="Live births by age, place of usual residence and marital status of mother"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check5}
-              onChange={this.handleChange.bind(this, 'check5')}
-            />
-            <StatsRow
-              text="Live births by age of father"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check6}
-              onChange={this.handleChange.bind(this, 'check6')}
-            />
-            <StatsRow
-              text="Live births by place of usual residence, age and educational attainment of mother"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check7}
-              onChange={this.handleChange.bind(this, 'check7')}
-            />
-            <StatsRow
-              text="Live births by educational attainment and age of mother and live-birth order"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check8}
-              onChange={this.handleChange.bind(this, 'check8')}
-            />
-            <StatsRow
-              text="Live births by place of usual residence and age of mother, sex of child and live-birth order"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check9}
-              onChange={this.handleChange.bind(this, 'check9')}
-            />
-            <StatsRow
-              text="Live births by live-birth order and interval between last and previous live-births to mother"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check10}
-              onChange={this.handleChange.bind(this, 'check10')}
-            />
-            <StatsRow
-              text="Live births by ethnic and/or national group and place of usual residence and age of mother"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check11}
-              onChange={this.handleChange.bind(this, 'check11')}
-            />
-            <StatsRow
-              text="Live births by place of usual residence and age of mother and legitimacy status"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check12}
-              onChange={this.handleChange.bind(this, 'check12')}
-            />
-            <StatsRow
-              text="Live births by place of occurrence, site of delivery and attendant at birth"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check13}
-              onChange={this.handleChange.bind(this, 'check13')}
-            />
-            <StatsRow
-              text="Live births by site of delivery, attendant at birth and birth weight"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check14}
-              onChange={this.handleChange.bind(this, 'check14')}
-            />
-            <StatsRow
-              text="Live births by birth weight and place of usual residence and educational attainment of mother"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check15}
-              onChange={this.handleChange.bind(this, 'check15')}
-            />
-            <StatsRow
-              text="Live births by gestational age and birth weight"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check16}
-              onChange={this.handleChange.bind(this, 'check16')}
-            />
-            <StatsRow
-              text="Live births by birth weight, place of usual residence of mother and month in which prenatal care began"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check17}
-              onChange={this.handleChange.bind(this, 'check17')}
-            />
-            <StatsRow
-              text="Live births by age and place of usual residence of mother and month in which prenatal care began"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check18}
-              onChange={this.handleChange.bind(this, 'check18')}
-            />
-            <StatsRow
-              text="Live births by live-birth order, place of usual residence of mother and month in which prenatal care"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check19}
-              onChange={this.handleChange.bind(this, 'check19')}
-            />
-            <StatsRow
-              text="Live births by place of usual residence of mother and duration of residence at the current usual residence"
-              fromDate={fromDate}
-              toDate={toDate}
-              checked={this.state.check20}
-              onChange={this.handleChange.bind(this, 'check20')}
-            />
+            {subjects.map((subject, i) => (
+              <StatsRow
+                key={i}
+                text={subject}
+                fromDate={fromDate}
+                toDate={toDate}
+                checked={this.state[constructCheckName(i)]}
+                onChange={this[constructCheckHandlerName(i)]}
+              />)
+            )}
             <div className="pure-g">
               <div className="pure-u-3-4"></div>
               <div className={styles.saveButton + ' pure-u-1-4'}>
@@ -288,10 +178,8 @@ const mapDispatchToProps = dispatch => {
     },
     fetchUserDetails: () => {
       dispatch(updateUserDetails('settings'));
-    }
-    ////
+    },
   };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(StatsContainer);
-
