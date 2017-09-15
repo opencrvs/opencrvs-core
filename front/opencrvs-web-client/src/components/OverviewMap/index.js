@@ -145,10 +145,10 @@ class OverviewMap extends React.Component {
               onChange={this.handlePeriodFilter}
               source={timePeriods}
               value={mapTimePeriod}
-              label="Coverage"
+              label="Timeframe"
             />
             <div className={styles.certifications}>
-              <p className={styles.title}>Total certifications:</p>
+              <p className={styles.title}>Total registrations:</p>
               <p className={styles.totalCerts}>{ totalCerts }</p>
             </div>
           </div>
