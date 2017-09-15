@@ -1,6 +1,7 @@
 .checkBoxes {
   position: relative;
   top: 1.1em;
+  padding-top: 1em;
 }
 
 .itemText {

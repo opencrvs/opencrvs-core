@@ -75,8 +75,8 @@ class StatsContainer extends React.Component {
   }
 
   render = () => {
-    const fromDate = Moment().subtract(28, 'days').format('Do MMM');
-    const toDate = Moment().subtract(14, 'days').format('Do MMM');
+    const fromDate = Moment().subtract(28, 'days').toDate();
+    const toDate = Moment().subtract(14, 'days').toDate();
     return (
       <div className={styles.statsContainer}>
         <Worknav {...this.props} />
@@ -105,8 +105,8 @@ class StatsContainer extends React.Component {
               <StatsRow
                 key={i}
                 text={subject}
-                fromDate={fromDate}
-                toDate={toDate}
+                initialFromDate={fromDate}
+                initialToDate={toDate}
                 checked={this.state[constructCheckName(i)]}
                 onChange={this[constructCheckHandlerName(i)]}
               />)
