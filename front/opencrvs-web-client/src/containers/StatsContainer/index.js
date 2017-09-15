@@ -32,7 +32,7 @@ function StatsRow({text, fromDate, toDate, checked, onChange}) {
       </div>
       <div className="pure-u-1-4">
         <div className={styles.checkBoxes}>
-          <Checkbox checked={checked} label="Download" onChange={onChange} />
+          <Checkbox checked={checked} onChange={onChange} />
         </div>
       </div>
     </div>
@@ -93,7 +93,7 @@ class StatsContainer extends React.Component {
         <div className={styles.statsContent + ' pure-g'}>
           <div className="pure-u-1-1">
             <div className="pure-u-3-4">
-              <h3>Download anonymised statistic reports as .xls or .pdf</h3>
+              <h3>Export anonymised vital statistic reports in Excel or PDF format</h3>
             </div>
           </div>
           <div className={styles.statsTable + ' pure-u-1-1'}>
