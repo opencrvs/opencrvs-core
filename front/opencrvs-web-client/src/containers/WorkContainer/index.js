@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:38 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 15:50:09
  */
@@ -17,8 +17,8 @@ import TrackingModal from 'components/TrackingModal';
 import ReqDocsModal from 'components/ReqDocsModal';
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
-import { 
-  selectDeclaration, 
+import {
+  selectDeclaration,
   newDeclarationModalOpened,
   newDeclarationModalClosed,
   newDeclarationEdit,
@@ -29,8 +29,8 @@ import {
 } from 'actions/declaration-actions';
 import { logoutUser,
   updateUserDetails } from 'actions/user-actions';
-import {  imageModalOpened, 
-          imageModalClosed, 
+import {  imageModalOpened,
+          imageModalClosed,
           imageOptionToggle,
           uploadImageFile,
           clearTempImages,
@@ -55,9 +55,9 @@ class WorkContainer extends React.Component {
   }
 
   render = () => {
-    const { 
-      imageZoomID, 
-      submitModal, 
+    const {
+      imageZoomID,
+      submitModal,
       imageModal,
       imageToDelete,
       trackingModal,
@@ -78,18 +78,18 @@ class WorkContainer extends React.Component {
           { imageZoomID > 0 && <ImageZoom {...this.props} /> }
           { submitModal > 0 && <SubmitModal {...this.props} /> }
           { trackingModal > 0 && <TrackingModal {...this.props} /> }
-          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }        
+          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }
         </div>
       </div>
     );
   };
 }
 
-const mapStateToProps = ({ 
-  declarationsReducer, 
-  userReducer, 
-  imageReducer, 
-  patientsReducer, 
+const mapStateToProps = ({
+  declarationsReducer,
+  userReducer,
+  imageReducer,
+  patientsReducer,
   managerReducer,
   globalReducer }) => {
   const {
@@ -114,7 +114,7 @@ const mapStateToProps = ({
     avatar,
     location } = userReducer;
   const { patients } = patientsReducer;
-  const { 
+  const {
     menuOpened } = globalReducer;
   const { imageModal,
     imageOption,
@@ -160,7 +160,7 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    
+
     onModalOpenClick: context => {
       switch (context) {
         case 'image':

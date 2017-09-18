@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:38 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 15:43:18
  */
@@ -33,7 +33,7 @@ class ReportsContainer extends React.Component {
   }
 
   render = () => {
-    const { 
+    const {
       selectedLocationMapData,
       reportOption } = this.props;
     let managerView = false;
@@ -47,19 +47,19 @@ class ReportsContainer extends React.Component {
             reportOption === 0
             ? <LocationListContainer {...this.props}  managerView={managerView}/>
             : <TrackingSearchContainer {...this.props}  managerView={managerView}/>
-          }  
+          }
         </div>
       </div>
     );
   };
 }
 
-const mapStateToProps = ({ 
+const mapStateToProps = ({
   managerReducer,
   globalReducer,
   userReducer }) => {
   const { selectedLocationMapData } = managerReducer;
-  const { 
+  const {
     menuOpened,
     reportOption } = globalReducer;
   const { location } = userReducer;
