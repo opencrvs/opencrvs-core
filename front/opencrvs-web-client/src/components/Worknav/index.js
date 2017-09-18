@@ -115,8 +115,8 @@ class Worknav extends React.Component {
                               L51,46.3z"/>
                           </g>
                           <g>
-                            <circle cx={50} cy={50} r={10} />
-                            <text textAnchor='middle' x={50} y={57} fill='#2d3e50' style={{fontSize: 20, fontWeight: 'bold'}}>{this.props.workQueueItems}</text>
+                            <circle cx={50} cy={50} r={10} fill="rgb(255, 64, 129)" />
+                            <text textAnchor="middle" x={50} y={57} style={{fontSize: 20, fontWeight: 'bold'}}>{this.props.workQueueItems}</text>
                           </g>
                         </g>
                       </svg>
