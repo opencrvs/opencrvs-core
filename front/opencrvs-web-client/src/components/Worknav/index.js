@@ -40,7 +40,7 @@ class Worknav extends React.Component {
 
   render = () => {
 
-    const { role, given, family, avatar, menuOpened, workView } = this.props;
+    const { role, given, family, avatar, menuOpened, workView, location } = this.props;
     let headerClassString = '';
     if (workView == null) {
       headerClassString = ' ' + styles.homeHeader;
@@ -80,7 +80,7 @@ class Worknav extends React.Component {
                   avatar={avatar}
                 />
                 <div className={styles.avatarName}>{given + ' ' + family + ' - ' + role}</div>
-                <div className={styles.avatarLocation}>Central Region - Ghana</div>
+                <div className={styles.avatarLocation}>{location || ''}</div>
               </div>
             </div>
           </div>

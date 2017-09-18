@@ -179,7 +179,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) =>
   } = declarationsReducer;
 
   const { menuOpened, workView } = globalReducer;
-  const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar, role } = userReducer;
+  const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar, role, location } = userReducer;
 
   return {
     workView,
@@ -193,6 +193,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) =>
     avatar,
     menuOpened,
     role,
+    location,
   };
 };
 

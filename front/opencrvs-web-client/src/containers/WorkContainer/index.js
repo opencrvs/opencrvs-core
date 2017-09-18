@@ -111,7 +111,8 @@ const mapStateToProps = ({
     username,
     given,
     family,
-    avatar } = userReducer;
+    avatar,
+    location } = userReducer;
   const { patients } = patientsReducer;
   const { 
     menuOpened } = globalReducer;
@@ -147,6 +148,7 @@ const mapStateToProps = ({
     given,
     family,
     avatar,
+    location,
     newDeclarationModal,
     imageZoom,
     imageZoomID,

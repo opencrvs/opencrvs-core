@@ -41,15 +41,18 @@ class SettingsContainer extends React.Component {
 
 const mapStateToProps = ({ 
   managerReducer,
-  globalReducer }) => {
+  globalReducer,
+  userReducer }) => {
   const { selectedLocationMapData } = managerReducer;
   const { 
     menuOpened,
     reportOption } = globalReducer;
+  const { location } = userReducer;
   return {
     selectedLocationMapData,
     reportOption,
     menuOpened,
+    location,
   };
 };
 

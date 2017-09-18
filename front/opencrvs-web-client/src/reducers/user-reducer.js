@@ -29,6 +29,7 @@ function userReducer(
     scopes: '',
     user_id: '',
     username: '',
+    location: '',
   },
   action
 ) {
@@ -55,6 +56,7 @@ function userReducer(
         scopes: action.scopes,
         user_id: action.user_id,
         username: action.username,
+        location: action.location,
       };
     case USER_UPDATE:
       return {
@@ -70,6 +72,7 @@ function userReducer(
         scopes: action.scopes,
         user_id: action.user_id,
         username: action.username,
+        location: action.location,
       };
     case LOGIN_FAILURE:
       return {

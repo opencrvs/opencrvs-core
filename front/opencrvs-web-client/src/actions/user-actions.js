@@ -19,6 +19,25 @@ export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
 export const USER_UPDATE = 'USER_UPDATE';
 //actions
 
+function getMockLocationBasedOnRole(role) {
+  let location = null;
+  switch (role) {
+    case 'field officer':
+    case 'registrar':
+      location = 'Agona East';
+      break;
+    case 'certification clerk':
+      location = 'Central Region';
+      break;
+    case 'admin':
+      location = 'Ghana';
+      break;
+    default:
+      location = '';
+  }
+  return location;
+}
+
 function requestLogin(creds) {
   return {
     type: LOGIN_REQUEST,
@@ -44,6 +63,7 @@ function receiveLogin(user) {
     scopes: decoded.scopes,
     user_id: decoded.user_id,
     username: decoded.username,
+    location: getMockLocationBasedOnRole(decoded.role),
   };
 }
 
@@ -62,6 +82,7 @@ function updateUser(token) {
     scopes: decoded.scopes,
     user_id: decoded.user_id,
     username: decoded.username,
+    location: getMockLocationBasedOnRole(decoded.role),
   };
 }
 
