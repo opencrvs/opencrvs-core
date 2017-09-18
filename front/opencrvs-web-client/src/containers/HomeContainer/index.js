@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:48 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:48
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 15:38:15
  */
@@ -26,7 +26,7 @@ class HomeContainer extends React.Component {
   componentWillMount() {
     this.props.fetchUserDetails();
   }
-  
+
   handleClick = (event) => {
     let token = localStorage.getItem('token') || null;
     const decoded = jwtDecode(token);
@@ -39,7 +39,7 @@ class HomeContainer extends React.Component {
   }
 
   render = () => {
-    const { 
+    const {
       isAuthenticated,
       given,
       family,
@@ -61,16 +61,16 @@ class HomeContainer extends React.Component {
                   <div className="pure-u-1 pure-u-md-1-3"></div>
                   <div className="pure-u-1 pure-u-md-1-3">
                   <Button theme={theme} onClick={this.handleClick} raised >
-                    <UserAvatar 
+                    <UserAvatar
                       isAuthenticated={isAuthenticated}
                       given={given}
                       family={family}
                       avatar={avatar}
                       workView={workView}
                     />
-                     Get Started 
+                     Get Started
 
-                  </Button> 
+                  </Button>
                   </div>
                   <div className="pure-u-1 pure-u-md-1-3"></div>
                 </div>
@@ -179,7 +179,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) =>
   } = declarationsReducer;
 
   const { menuOpened, workView } = globalReducer;
-  const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar, role } = userReducer;
+  const { isAuthenticated, isFetchingUser, errorMessage, given, family, avatar, role, location } = userReducer;
 
   return {
     workView,
@@ -193,6 +193,7 @@ const mapStateToProps = ({ declarationsReducer, userReducer, globalReducer }) =>
     avatar,
     menuOpened,
     role,
+    location,
   };
 };
 

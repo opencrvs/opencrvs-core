@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:19:18 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:19:18
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 15:44:03
  */
@@ -18,6 +18,25 @@ export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
 export const USER_UPDATE = 'USER_UPDATE';
 //actions
+
+function getMockLocationBasedOnRole(role) {
+  let location = null;
+  switch (role) {
+    case 'field officer':
+    case 'registrar':
+      location = 'Agona East';
+      break;
+    case 'certification clerk':
+      location = 'Central Region';
+      break;
+    case 'admin':
+      location = 'Ghana';
+      break;
+    default:
+      location = '';
+  }
+  return location;
+}
 
 function requestLogin(creds) {
   return {
@@ -44,6 +63,7 @@ function receiveLogin(user) {
     scopes: decoded.scopes,
     user_id: decoded.user_id,
     username: decoded.username,
+    location: getMockLocationBasedOnRole(decoded.role),
   };
 }
 
@@ -62,6 +82,7 @@ function updateUser(token) {
     scopes: decoded.scopes,
     user_id: decoded.user_id,
     username: decoded.username,
+    location: getMockLocationBasedOnRole(decoded.role),
   };
 }
 
