@@ -23,10 +23,15 @@ import RecognitionIcon from 'components/icons/RecognitionIcon';
 import PrintPreview from 'components/PrintPreview';
 import Input from 'react-toolbox/lib/input';
 import theme from './printPreviewInput.css';
+import InvestigationModal from 'components/InvestigationModal';
 const Moment = require('moment');
 const PrintTemplate = require('react-print');
 
 class WorkingItem extends React.Component {
+  state = {
+    investigating: false,
+  };
+
   constructor(props) {
     super(props);
   }
@@ -53,6 +58,19 @@ class WorkingItem extends React.Component {
         this.props.onNavSubmitClick();
       }
     } 
+  }
+
+  startInvestigating = () => {
+    this.setState({investigating: true});
+  }
+
+  stopInvestigating = () => {
+    this.setState({investigating: false});
+  }
+
+  handleInvestigationSubmit = (investigation) => {
+    // TODO: Handle investigation
+    this.stopInvestigating();
   }
 
   handleChange(name, value) {
@@ -266,9 +284,14 @@ class WorkingItem extends React.Component {
                     </form>
                   </div>
                   <div className={styles.alignRight + ' pure-u-1 pure-u-md-1-2'}>
-                    <Button flat>
+                    <Button flat onClick={this.startInvestigating}>
                       <RejectIcon /> Investigate
                     </Button>
+                    <InvestigationModal
+                      active={this.state.investigating}
+                      onSubmit={this.handleInvestigationSubmit}
+                      onCancel={this.stopInvestigating}
+                    />
                   </div>
                 </div>
               </div>
