@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:51 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 22:48:02
+ * @Last Modified time: 2017-09-19 13:31:27
  */
 import React from 'react';
 import styles from './styles.css';
@@ -29,6 +29,9 @@ class PrintPreview extends React.Component {
     const childExtra = head(get(childPatient, 'patient.extra'));
     const motherExtra = head(get(motherPatient, 'patient.extra'));
     const fatherExtra = head(get(fatherPatient, 'patient.extra'));
+    const county = head(selectedCertification.locations).county;
+    const state = head(selectedCertification.locations).state;
+    const tracking = selectedCertification.tracking;
     const childGiven = get(childPatient, 'patient.given').toString().split(',').map(function(item) {
       return item.trim();
     });
@@ -54,6 +57,7 @@ class PrintPreview extends React.Component {
     const birthDate = new Date(get(childPatient, 'patient.birthDate'));
 
     const birthRegistrationNumber = selectedCertification.birthRegistrationNumber;
+
     return (
       <div id="print-mount" className={styles.certificatePaper + ' pure-g'}>
         <div className="pure-u-1 pure-u-md-1-2">
@@ -64,7 +68,7 @@ class PrintPreview extends React.Component {
         <div className={styles.rightAlign + ' pure-u-1 pure-u-md-1-2'}>
           <p><strong>C.R. FORM I. B. 3</strong></p>
           <p>Office of Chief Registrar</p>
-          <p>Ministry of Health</p>
+          <p>Births and Deaths Registry</p>
           <p>Ghana</p>
         </div>
         <div className={styles.logo + ' pure-u-1'}>
@@ -76,7 +80,7 @@ class PrintPreview extends React.Component {
           />
         </div>
         <div className={styles.logo + ' pure-u-1'}>
-          <p>Birth Certificate No: {birthRegistrationNumber}</p>
+          <p>Birth Registration No: {birthRegistrationNumber}</p>
         </div>
         <div className={styles.rightAlign + ' ' + styles.original + ' pure-u-1 pure-u-md-1-2'}>
           <p><strong>ORIGINAL </strong>&nbsp;</p>
@@ -104,34 +108,22 @@ class PrintPreview extends React.Component {
           <p>Nationality <span className={styles.dataItem}>{ father_nationality }</span></p>
           <div className={styles.info}>Nationality of Father</div>
         </div>
-        <div className="pure-u-1 pure-u-md-1-2">
+        <div className="pure-u-1 pure-u-md-1-1">
           <p>Was born on <span className={styles.dataItem}>{ 
             Moment(birthDate).format('Do MMMM YYYY') }</span></p>
           <div className={styles.info}>Day Month Year</div>
         </div>
-        <div className="pure-u-1 pure-u-md-1-2">
-          <p>at <span className={styles.dataItem}>{ 
-            Moment(birthDate).format('kk:mm a') }</span></p>
-          <div className={styles.info}>Time of birth</div>
+        <div className={styles.eventRegistered + ' pure-u-1'}>
+          <p>This event was registered at { county } registration office, { state }, Ghana</p>
         </div>
-        <div className={styles.ending + ' pure-u-1'}>
-          <p>This event was registered at Volta, Registration Centre, Ghana in Registry Volume No:  
-          <span className={styles.dataItem}> 374 </span></p>
-          <p>Page No: <span className={styles.dataItem}> 78 </span>, No: 
-          <span className={styles.dataItem}> {birthRegistrationNumber} </span> 
-           of the Register of Births in the Republic of Ghana</p>
-        </div>
-        <div className={styles.ending + ' pure-u-1 pure-u-md-1-1'}>
-          <p>Witness my hand this <span className={styles.dataItem}>{Moment().format('Do')}</span> day of 
+        <div className={styles.witness + ' pure-u-1 pure-u-md-1-2'}>
+          <p className={styles.witnessStatement}>Witness my hand this <span className={styles.dataItem}>{Moment().format('Do')}</span> day of 
           <span className={styles.dataItem}>{Moment().format('MMMM')}</span> <span className={styles.dataItem}>{Moment().format('YYYY')}</span></p>
         </div>
-        <div className={styles.ending + ' pure-u-1 pure-u-md-1-2'}>
-          <p>Official Seal</p>
-        </div>
-        <div className={styles.finalEnding + ' pure-u-1 pure-u-md-1-2'}>
+        <div className={styles.signatureField + ' pure-u-1 pure-u-md-1-2'}>
           <span className={styles.signature}>&nbsp;&nbsp;&nbsp;&nbsp;
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-          <div className={styles.info}>Chief Registrar</div>
+          <div className={styles.info}>Registrar</div>
         </div>
       </div>
     );
