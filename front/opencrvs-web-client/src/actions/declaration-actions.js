@@ -26,6 +26,7 @@ export const DECLARATION_SUBMIT_SUCCESS = 'DECLARATION_SUBMIT_SUCCESS';
 export const DECLARATION_SUBMIT_FAILURE = 'DECLARATION_SUBMIT_FAILURE';
 export const TRACKING_MODAL_TOGGLE = 'TRACKING_MODAL_TOGGLE';
 export const REQD_MODAL_TOGGLE = 'REQD_MODAL_TOGGLE';
+export const SMS_MODAL_TOGGLE = 'SMS_MODAL_TOGGLE';
 export const DECLARATION_SEARCH = 'DECLARATION_SEARCH';
 export const OLD_DOCUMENT_DELETED = 'OLD_DOCUMENT_DELETED';
 export const DECLARATION_READY_TO_CONFIRM = 'DECLARATION_READY_TO_CONFIRM';
@@ -184,6 +185,12 @@ export function trackingModalOpened() {
 export function reqModalToggle() {
   return {
     type: REQD_MODAL_TOGGLE,
+  };
+}
+
+export function smsModalToggle() {
+  return {
+    type: SMS_MODAL_TOGGLE,
   };
 }
 
@@ -359,10 +366,10 @@ export function fetchDeclarations(roleType) {
   };
 }
 
-function sendSMS(motherPhone, smsMessage) {
+export function sendSMS(phoneNumber, smsMessage) {
   doCORSRequest({
     method: 'GET',
-    url: SMS_API_URL + 'to=' + motherPhone + '&text=' + smsMessage,
+    url: SMS_API_URL + 'to=' + phoneNumber + '&text=' + smsMessage,
   }, function printResult(result) {
     console.log(result);
   });

@@ -15,10 +15,11 @@ import ImageZoom from 'components/ImageZoom';
 import SubmitModal from 'components/SubmitModal';
 import TrackingModal from 'components/TrackingModal';
 import ReqDocsModal from 'components/ReqDocsModal';
+import SMSModal from 'components/SMSModal';
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
-import { 
-  selectDeclaration, 
+import {
+  selectDeclaration,
   newDeclarationModalOpened,
   newDeclarationModalClosed,
   newDeclarationEdit,
@@ -26,6 +27,8 @@ import {
   trackingModalOpened,
   submitDeclaration,
   reqModalToggle,
+  smsModalToggle,
+  sendSMS,
 } from 'actions/declaration-actions';
 import { logoutUser,
   updateUserDetails } from 'actions/user-actions';
@@ -78,20 +81,22 @@ class WorkContainer extends React.Component {
           { imageZoomID > 0 && <ImageZoom {...this.props} /> }
           { submitModal > 0 && <SubmitModal {...this.props} /> }
           { trackingModal > 0 && <TrackingModal {...this.props} /> }
-          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }        
+          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }
+          <SMSModal {...this.props} />
         </div>
       </div>
     );
   };
 }
 
-const mapStateToProps = ({ 
-  declarationsReducer, 
-  userReducer, 
-  imageReducer, 
-  patientsReducer, 
+const mapStateToProps = ({
+  declarationsReducer,
+  userReducer,
+  imageReducer,
+  patientsReducer,
   managerReducer,
-  globalReducer }) => {
+  globalReducer,
+  form }) => {
   const {
     declarations,
     selectedDeclaration,
@@ -105,6 +110,7 @@ const mapStateToProps = ({
     reqDocsModal,
     newChildPersonalID,
     newBirthRegistrationNumber,
+    smsModal,
   } = declarationsReducer;
   const { isAuthenticated,
     role,
@@ -124,6 +130,7 @@ const mapStateToProps = ({
     imageToDelete,
     imageZoomID,
      } = imageReducer;
+  const { activeDeclaration } = form;
   return {
     declarations,
     trackingID,
@@ -153,6 +160,9 @@ const mapStateToProps = ({
     menuOpened,
     newChildPersonalID,
     newBirthRegistrationNumber,
+    smsModal,
+    sendSMS,
+    activeDeclaration,
   };
 };
 
@@ -169,6 +179,9 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'req':
           dispatch(reqModalToggle());
+          break;
+        case 'sms':
+          dispatch(smsModalToggle());
           break;
       }
     },
@@ -192,6 +205,9 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'req':
           dispatch(reqModalToggle());
+          break;
+        case 'sms':
+          dispatch(smsModalToggle());
           break;
       }
     },

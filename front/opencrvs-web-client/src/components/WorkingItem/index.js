@@ -35,6 +35,10 @@ class WorkingItem extends React.Component {
     this.props.onModalOpenClick('image');
   }
 
+  openSMSModal = () => {
+    this.props.onModalOpenClick('sms');
+  }
+
   openSubmit = (event) => {
     if (this.props.newDeclaration) {
       if (this.props.tempImages.length == 0) {
@@ -177,29 +181,15 @@ class WorkingItem extends React.Component {
                 <p className={styles.wiContentSubtitle}>
                   <span>{' ' + Moment(birthDate).format('Do MMMM YYYY') }</span>
                 </p>
-                <div className={styles.smsMother}>
-                
-                  <svg
-                    fill="#2d3e50"
-                    viewBox="0 0 100 103"
-                    height="30"
-                    width="30"
-                  >
-                    <path d="M79.2,5.2H20.8C9.3,5.2,0,14.5,0,26v29.1C0,66.7,9.3,76,20.9,76c2.9,0,5.2,2.3,5.2,5.2v9.5c0,3.7,4.5,5.5,7.1,2.9l15.2-15.1
-    c1.6-1.6,3.7-2.4,5.9-2.4h24.9c11.5,0,20.8-9.3,20.8-20.8V26C100,14.5,90.7,5.2,79.2,5.2z M29.2,46.8c-3.4,0-6.3-2.8-6.3-6.2
-    s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2S32.6,46.8,29.2,46.8z M50,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2
-    c3.4,0,6.2,2.8,6.2,6.2S53.4,46.8,50,46.8z M70.8,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2
-    S74.3,46.8,70.8,46.8z"/>
-                  </svg>
-                </div>
-                  <div className={
-                    Moment().diff(selectedDeclaration.created_at, 'days') > 1
-                    ?
-                      styles.stopWatch
-                    :
-                      styles.stopWatchHidden
+
+                <div className={
+                  Moment().diff(selectedDeclaration.created_at, 'days') > 1
+                  ?
+                    styles.stopWatch
+                  :
+                    styles.stopWatchHidden
                 }>
-                
+
                   <svg
                     fill="#ff4081"
                     viewBox="0 0 100 101"
@@ -224,36 +214,54 @@ class WorkingItem extends React.Component {
                     </g>
                   </svg>
                 </div>
+
               </div>
             </div>
             <div className={styles.wiContentControls + ' pure-u-1 pure-u-md-1-2'}>
               <div className="pure-g">
                 {
                   !showTrash ? (
-                    <div className="pure-u-1-2 pure-u-md-1-4">
+                    <div className="pure-u-1-2 pure-u-md-1-5">
                       {/* Empty placeholder to fix button alignment */}
                     </div>
                   ) : null
                 }
-                <div className="pure-u-1-2 pure-u-md-1-4">
+                <div className={styles.smsMother + 'pure-u-1-2 pure-u-md-1-5'}>
+                  <Button onClick={this.openSMSModal}>
+                    <svg
+                      fill="#2d3e50"
+                      viewBox="0 0 100 103"
+                      height="30"
+                      width="30"
+                    >
+                      <path d="M79.2,5.2H20.8C9.3,5.2,0,14.5,0,26v29.1C0,66.7,9.3,76,20.9,76c2.9,0,5.2,2.3,5.2,5.2v9.5c0,3.7,4.5,5.5,7.1,2.9l15.2-15.1
+                        c1.6-1.6,3.7-2.4,5.9-2.4h24.9c11.5,0,20.8-9.3,20.8-20.8V26C100,14.5,90.7,5.2,79.2,5.2z M29.2,46.8c-3.4,0-6.3-2.8-6.3-6.2
+                        s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2S32.6,46.8,29.2,46.8z M50,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2
+                        c3.4,0,6.2,2.8,6.2,6.2S53.4,46.8,50,46.8z M70.8,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2
+                        S74.3,46.8,70.8,46.8z"/>
+                    </svg>
+                    Contact
+                  </Button>
+                </div>
+                <div className="pure-u-1-2 pure-u-md-1-5">
                   <Button icon="save" label="Save" flat />
                 </div>
-                <div className="pure-u-1-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-5">
                   <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                 </div>
                 {
                   showTrash ? (
-                    <div className="pure-u-1-2 pure-u-md-1-4">
+                    <div className="pure-u-1-2 pure-u-md-1-5">
                       <Button icon="delete" label="Trash" flat />
                     </div>
                   ) : null
                 }
-                <div className="pure-u-1-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-5">
                   <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
                 </div>
               </div>
             </div>
-          </div> 
+          </div>
           : selectedCertification ?
             <div className={styles.wiContentHeader + ' pure-g'}>
               <div className="pure-u-1 pure-u-md-1-2">
