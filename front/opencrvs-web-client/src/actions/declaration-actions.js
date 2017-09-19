@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 08:58:54
+ * @Last Modified time: 2017-09-07 15:25:35
  */
 import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
@@ -32,6 +32,9 @@ export const DECLARATION_READY_TO_CONFIRM = 'DECLARATION_READY_TO_CONFIRM';
 export const NOTIFICATION_SELECTED = 'NOTIFICATION_SELECTED';
 export const CERTIFICATION_SELECTED = 'CERTIFICATION_SELECTED';
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
+export const CHECK_CERTIFICATION = 'CHECK_CERTIFICATION';
+export const CLOSE_CERTIFICATION_MODAL = 'CLOSE_CERTIFICATION_MODAL';
+
 
 
 const uuidv4 = require('uuid/v4');
@@ -218,6 +221,19 @@ function loadNotification(declaration) {
   };
 }
 
+function loadCertCheck(declaration) {
+  return {
+    type: CHECK_CERTIFICATION,
+    declarationToCheckAgainst: declaration,
+  };
+}
+
+export function certCheckModalClosed() {
+  return {
+    type: CLOSE_CERTIFICATION_MODAL,
+  };
+}
+
 export function selectDeclaration(declaration) {
 
   return (dispatch, getState) => {
@@ -226,7 +242,11 @@ export function selectDeclaration(declaration) {
     if (code == 'birth-declaration' && role == 'registrar') {
       dispatch(loadDeclaration(declaration));
     } else if (code == 'birth-declaration' && role == 'certification clerk') {
-      dispatch(loadCertification(declaration));
+      // instead of loading a cert into print
+      //I want to open a modal overlay
+      //dispatch(loadCertification(declaration));
+      dispatch(loadCertCheck(declaration));
+
     } else if (role == 'field officer') {
       dispatch(loadNotification(declaration));
     }

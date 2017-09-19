@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-05-25 22:14:06 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 20:09:34
+ * @Last Modified time: 2017-09-07 12:54:03
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -12,6 +12,9 @@ import App from 'containers/App';
 import reducer from 'reducers/index';
 import thunk from 'redux-thunk';
 import styles from 'index.css';
+
+// apply redux thunk middleware for exporting actions
+// set up redux devtools for Chrome
 
 const composeEnhancers =
   typeof window === 'object' &&
