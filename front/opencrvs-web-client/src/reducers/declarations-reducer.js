@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:28
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 19:00:16
+ * @Last Modified time: 2017-09-07 15:26:40
  */
 import {
   DECLARATION_REQUEST,
@@ -25,6 +25,8 @@ import {
   NOTIFICATION_SELECTED,
   CERTIFICATION_SELECTED,
   REMOVE_NOTIFICATION,
+  CHECK_CERTIFICATION,
+  CLOSE_CERTIFICATION_MODAL,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -42,12 +44,14 @@ function declarationsReducer(
     trackingModal: 0,
     submitValues: '',
     reqDocsModal: 0,
+    certIDCheckModal: 0,
     smsModal: 0,
     searchTerm: '',
     declarationsList: '',
     newNotification: false,
     newBirthRegistrationNumber: null,
     newChildPersonalID: null,
+    declarationToCheckAgainst: null,
   },
   action
 ) {
@@ -103,6 +107,18 @@ function declarationsReducer(
       return {
         ...state,
         isFetching: false,
+      };
+    case CLOSE_CERTIFICATION_MODAL:
+      return {
+        ...state,
+        certIDCheckModal: state.certIDCheckModal == 0 ? 1 : 0,
+        declarationToCheckAgainst: null,
+      };
+    case CHECK_CERTIFICATION:
+      return {
+        ...state,
+        certIDCheckModal: state.certIDCheckModal == 0 ? 1 : 0,
+        declarationToCheckAgainst: action.declarationToCheckAgainst,
       };
     case SUBMIT_MODAL_TOGGLE:
       return {

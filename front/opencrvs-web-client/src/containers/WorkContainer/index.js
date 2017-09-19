@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 15:50:09
+ * @Last Modified time: 2017-09-19 10:38:13
  */
 import React from 'react';
 import styles from './styles.css';
@@ -15,7 +15,9 @@ import ImageZoom from 'components/ImageZoom';
 import SubmitModal from 'components/SubmitModal';
 import TrackingModal from 'components/TrackingModal';
 import ReqDocsModal from 'components/ReqDocsModal';
+import CertCheckModal from 'components/CertCheckModal';
 import SMSModal from 'components/SMSModal';
+
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
 import {
@@ -27,6 +29,7 @@ import {
   trackingModalOpened,
   submitDeclaration,
   reqModalToggle,
+  certCheckModalClosed,
   smsModalToggle,
   sendSMS,
 } from 'actions/declaration-actions';
@@ -64,8 +67,10 @@ class WorkContainer extends React.Component {
       imageModal,
       imageToDelete,
       trackingModal,
+      certIDCheckModal,
       role,
-      reqDocsModal } = this.props;
+      reqDocsModal,
+      smsModal } = this.props;
     let managerView = false;
     if (role == 'admin' || role == 'manager' ) {
       managerView = true;
@@ -82,7 +87,9 @@ class WorkContainer extends React.Component {
           { submitModal > 0 && <SubmitModal {...this.props} /> }
           { trackingModal > 0 && <TrackingModal {...this.props} /> }
           { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }
-          <SMSModal {...this.props} />
+          { certIDCheckModal > 0 && <CertCheckModal {...this.props} /> }
+          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }
+          { smsModal > 0 && <SMSModal {...this.props} /> }
         </div>
       </div>
     );
@@ -106,18 +113,21 @@ const mapStateToProps = ({
     category,
     submitModal,
     trackingModal,
+    certIDCheckModal,
     trackingID,
     reqDocsModal,
     newChildPersonalID,
     newBirthRegistrationNumber,
     smsModal,
   } = declarationsReducer;
+
   const { isAuthenticated,
     role,
     username,
     given,
     family,
-    avatar } = userReducer;
+    avatar,
+    location } = userReducer;
   const { patients } = patientsReducer;
   const {
     menuOpened } = globalReducer;
@@ -136,6 +146,7 @@ const mapStateToProps = ({
     trackingID,
     reqDocsModal,
     trackingModal,
+    certIDCheckModal,
     imageToDelete,
     submitModal,
     selectedDeclaration,
@@ -154,6 +165,7 @@ const mapStateToProps = ({
     given,
     family,
     avatar,
+    location,
     newDeclarationModal,
     imageZoom,
     imageZoomID,
@@ -202,6 +214,9 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'tracking':
           dispatch(trackingModalOpened());
+          break;
+        case 'certCheck':
+          dispatch(certCheckModalClosed());
           break;
         case 'req':
           dispatch(reqModalToggle());

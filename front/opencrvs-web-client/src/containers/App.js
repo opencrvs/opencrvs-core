@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:32 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 15:23:59
+ * @Last Modified time: 2017-09-07 13:35:57
  */
 import React from 'react';
 import { connect } from 'react-redux';
@@ -13,6 +13,8 @@ import SettingsContainer from 'containers/SettingsContainer';
 import StatsContainer from 'containers/StatsContainer';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
+
+// Combine React router with redux and add paths
 
 const App = props => (
   <BrowserRouter>

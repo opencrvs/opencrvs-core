@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 
 const listFilters = [
   { value: 'none', label: 'Alphabetical' },
-  { value: 'density', label: 'Population density'},
   { value: 'certifications', label: 'Number of certifications' },
 ];
 

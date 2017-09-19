@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:14 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:14
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-07-06 09:24:59
  */
@@ -29,6 +29,7 @@ function userReducer(
     scopes: '',
     user_id: '',
     username: '',
+    location: '',
   },
   action
 ) {
@@ -55,6 +56,7 @@ function userReducer(
         scopes: action.scopes,
         user_id: action.user_id,
         username: action.username,
+        location: action.location,
       };
     case USER_UPDATE:
       return {
@@ -70,6 +72,7 @@ function userReducer(
         scopes: action.scopes,
         user_id: action.user_id,
         username: action.username,
+        location: action.location,
       };
     case LOGIN_FAILURE:
       return {
