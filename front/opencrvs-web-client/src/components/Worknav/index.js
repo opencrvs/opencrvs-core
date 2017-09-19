@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:13 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:13
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 15:58:52
  */
@@ -21,15 +21,15 @@ class Worknav extends React.Component {
   logout = (event) => {
     this.props.onLogout();
   }
-  
+
   settings = (event) => {
     window.location.href = '/settings';
   }
-  
+
   stats = (event) => {
     window.location.href = '/statistics';
   }
-  
+
   reports = (event) => {
     window.location.href = '/reports';
   }
@@ -40,7 +40,7 @@ class Worknav extends React.Component {
 
   render = () => {
 
-    const { role, given, family, avatar, menuOpened, workView } = this.props;
+    const { role, given, family, avatar, menuOpened, workView, location } = this.props;
     let headerClassString = '';
     if (workView == null) {
       headerClassString = ' ' + styles.homeHeader;
@@ -63,24 +63,24 @@ class Worknav extends React.Component {
                 ? styles.splashSubhead + ' pure-u-1'
                 : styles.homeHide
               }>
-            The <strong>free</strong> civil registration and vital statistics platform 
+            The <strong>free</strong> civil registration and vital statistics platform
           </div>
           <div className="pure-u-1 pure-u-md-1-2">
 
-            
+
             <div className={
                 workView == null
                   ? styles.homeHide + ' pure-g'
                   : styles.avatarString + ' pure-g'
                 }>
               <div className="pure-u-1-1">
-                <UserAvatar 
+                <UserAvatar
                   given={given}
                   family={family}
                   avatar={avatar}
                 />
                 <div className={styles.avatarName}>{given + ' ' + family + ' - ' + role}</div>
-                <div className={styles.avatarLocation}>Central Region - Ghana</div>
+                <div className={styles.avatarLocation}>{location || ''}</div>
               </div>
             </div>
           </div>
@@ -95,9 +95,9 @@ class Worknav extends React.Component {
                   }>
                   <li className={styles.menuItem + ' pure-menu-item ' + styles.inboxItem}>
                     <ReactTooltip place="top" type="dark" effect="float"/>
-                    <a href="#" className="pure-menu-link" 
+                    <a href="#" className="pure-menu-link"
                         data-tip="Inbox">
-                      <svg className={styles.inboxIcon} 
+                      <svg className={styles.inboxIcon}
                         fill="#FFFFFF"
                         viewBox="0 0 60 60"
                         height="30"
@@ -196,7 +196,7 @@ class Worknav extends React.Component {
                     </a>
                   </li>
                 </ul>
-              : 
+              :
                 <ul className={
                   workView == null
                     ? styles.homeHide + ' pure-menu-list'
@@ -370,7 +370,7 @@ class Worknav extends React.Component {
                   </li>
                 </ul>
               }
-              
+
           </div>
         </div>
       </div>

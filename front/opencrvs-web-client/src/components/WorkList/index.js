@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:35 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:35
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-17 13:31:45
  */
@@ -11,8 +11,8 @@ import WorkListItem from 'components/WorkListItem';
 import { map, filter, get, head, orderBy } from 'lodash';
 import { Button } from 'react-toolbox/lib/button';
 import { connect } from 'react-redux';
-import { 
-  searchDeclarations, 
+import {
+  searchDeclarations,
 } from 'actions/declaration-actions';
 
 
@@ -37,7 +37,7 @@ class WorkList extends React.Component {
     console.log("DeclarationsList: " + JSON.stringify(declarationsList))
     let itemArray = declarationsList;
     if (declarationsList.length > 0) {
-      itemArray = orderBy(declarationsList, function(e) { 
+      itemArray = orderBy(declarationsList, function(e) {
         return e.created_at;
       }, ['asc']);
     }
@@ -48,7 +48,7 @@ class WorkList extends React.Component {
       console.log('worklist: ' + declaration.family);
       console.log('worklist: ' + declaration.given);
     });
-    
+
 
     return (
       <div className={
@@ -58,14 +58,15 @@ class WorkList extends React.Component {
         styles.list + ' pure-u-1'
         }>
         <SearchForm role={role} onSearchRequest={onSearchRequest} />
-        <section className={styles.newDecl}>
-          <Button icon="add" floating accent mini onClick={this.openNewModal} />
+        <section className={styles.newDecl + ' pure-g'}>
+          <span className={styles.title + ' pure-u-4-5'}>Work queue</span>
+          <Button className={styles.addButton + 'pure-u-1-5'} icon="add" floating accent mini onClick={this.openNewModal} />
         </section>
         {
           map(itemArray, (declaration, index ) => (
-          <WorkListItem 
-            key={declaration.id} 
-            id={declaration.id} 
+          <WorkListItem
+            key={declaration.id}
+            id={declaration.id}
             code={declaration.code}
             given={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.given') }
             family={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.family') }

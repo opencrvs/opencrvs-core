@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:38 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 16:04:33
  */
@@ -39,17 +39,20 @@ class SettingsContainer extends React.Component {
   };
 }
 
-const mapStateToProps = ({ 
+const mapStateToProps = ({
   managerReducer,
-  globalReducer }) => {
+  globalReducer,
+  userReducer }) => {
   const { selectedLocationMapData } = managerReducer;
-  const { 
+  const {
     menuOpened,
     reportOption } = globalReducer;
+  const { location } = userReducer;
   return {
     selectedLocationMapData,
     reportOption,
     menuOpened,
+    location,
   };
 };
 

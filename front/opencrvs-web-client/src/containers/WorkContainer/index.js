@@ -1,8 +1,8 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:38 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-07 15:27:26
+ * @Last Modified time: 2017-09-19 10:38:13
  */
 import React from 'react';
 import styles from './styles.css';
@@ -19,8 +19,8 @@ import CertCheckModal from 'components/CertCheckModal';
 
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
-import { 
-  selectDeclaration, 
+import {
+  selectDeclaration,
   newDeclarationModalOpened,
   newDeclarationModalClosed,
   newDeclarationEdit,
@@ -32,8 +32,8 @@ import {
 } from 'actions/declaration-actions';
 import { logoutUser,
   updateUserDetails } from 'actions/user-actions';
-import {  imageModalOpened, 
-          imageModalClosed, 
+import {  imageModalOpened,
+          imageModalClosed,
           imageOptionToggle,
           uploadImageFile,
           clearTempImages,
@@ -58,9 +58,9 @@ class WorkContainer extends React.Component {
   }
 
   render = () => {
-    const { 
-      imageZoomID, 
-      submitModal, 
+    const {
+      imageZoomID,
+      submitModal,
       imageModal,
       imageToDelete,
       trackingModal,
@@ -90,11 +90,11 @@ class WorkContainer extends React.Component {
   };
 }
 
-const mapStateToProps = ({ 
-  declarationsReducer, 
-  userReducer, 
-  imageReducer, 
-  patientsReducer, 
+const mapStateToProps = ({
+  declarationsReducer,
+  userReducer,
+  imageReducer,
+  patientsReducer,
   managerReducer,
   globalReducer }) => {
   const {
@@ -118,9 +118,10 @@ const mapStateToProps = ({
     username,
     given,
     family,
-    avatar } = userReducer;
+    avatar,
+    location } = userReducer;
   const { patients } = patientsReducer;
-  const { 
+  const {
     menuOpened } = globalReducer;
   const { imageModal,
     imageOption,
@@ -155,6 +156,7 @@ const mapStateToProps = ({
     given,
     family,
     avatar,
+    location,
     newDeclarationModal,
     imageZoom,
     imageZoomID,
@@ -166,7 +168,7 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    
+
     onModalOpenClick: context => {
       switch (context) {
         case 'image':

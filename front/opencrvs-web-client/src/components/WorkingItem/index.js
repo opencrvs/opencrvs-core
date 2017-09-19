@@ -153,6 +153,7 @@ class WorkingItem extends React.Component {
     } else {
       showPics = false;
     }
+    const showTrash = role !== 'registrar';
     return (
       <div className={
         managerView
@@ -227,22 +228,26 @@ class WorkingItem extends React.Component {
             </div>
             <div className={styles.wiContentControls + ' pure-u-1 pure-u-md-1-2'}>
               <div className="pure-g">
+                {
+                  !showTrash ? (
+                    <div className="pure-u-1-2 pure-u-md-1-4">
+                      {/* Empty placeholder to fix button alignment */}
+                    </div>
+                  ) : null
+                }
                 <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="save" label="Save" flat />
                 </div>
                 <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                 </div>
-                <div className="pure-u-1-2 pure-u-md-1-4">
-                  {
-                    role == 'registrar' ?
-                      <Button flat>
-                        <RejectIcon /> Investigate
-                      </Button>
-                    :
+                {
+                  showTrash ? (
+                    <div className="pure-u-1-2 pure-u-md-1-4">
                       <Button icon="delete" label="Trash" flat />
-                  }
-                </div>
+                    </div>
+                  ) : null
+                }
                 <div className="pure-u-1-2 pure-u-md-1-4">
                   <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
                 </div>

@@ -17,10 +17,17 @@
 }
 
 .newDecl {
-    text-align: center;
-    margin: 2em;
+  margin: 2em;
 }
 
+.title {
+  font-size: 2em;
+  margin: auto;
+}
+
+.addButton {
+  margin: auto;
+}
 
 .managerView {
     display: none;
