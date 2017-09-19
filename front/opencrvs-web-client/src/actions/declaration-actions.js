@@ -246,7 +246,7 @@ export function selectDeclaration(declaration) {
   return (dispatch, getState) => {
     const {role} = getState().userReducer;
     const code = declaration.code;
-    if (code == 'birth-declaration' && role == 'registrar') {
+    if ((code == 'birth-declaration' || code == 'birth-notification') && role == 'registrar') {
       dispatch(loadDeclaration(declaration));
     } else if (code == 'birth-declaration' && role == 'certification clerk') {
       // instead of loading a cert into print
