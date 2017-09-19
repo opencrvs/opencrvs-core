@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:38 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 15:50:09
  */
@@ -32,8 +32,8 @@ import {
 } from 'actions/declaration-actions';
 import { logoutUser,
   updateUserDetails } from 'actions/user-actions';
-import {  imageModalOpened, 
-          imageModalClosed, 
+import {  imageModalOpened,
+          imageModalClosed,
           imageOptionToggle,
           uploadImageFile,
           clearTempImages,
@@ -58,9 +58,9 @@ class WorkContainer extends React.Component {
   }
 
   render = () => {
-    const { 
-      imageZoomID, 
-      submitModal, 
+    const {
+      imageZoomID,
+      submitModal,
       imageModal,
       imageToDelete,
       trackingModal,
@@ -119,7 +119,7 @@ const mapStateToProps = ({
     family,
     avatar } = userReducer;
   const { patients } = patientsReducer;
-  const { 
+  const {
     menuOpened } = globalReducer;
   const { imageModal,
     imageOption,
@@ -168,7 +168,7 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    
+
     onModalOpenClick: context => {
       switch (context) {
         case 'image':

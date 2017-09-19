@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:48 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-16 13:49:33
  */
@@ -30,7 +30,7 @@ class WorkingItem extends React.Component {
   constructor(props) {
     super(props);
   }
-  
+
   openImageModal = (event) => {
     this.props.onModalOpenClick('image');
   }
@@ -56,7 +56,7 @@ class WorkingItem extends React.Component {
       } else {
         this.props.onNavSubmitClick();
       }
-    } 
+    }
   }
 
   handleChange(name, value) {
@@ -64,13 +64,13 @@ class WorkingItem extends React.Component {
   }
 
   render = () => {
-    const { selectedDeclaration, 
+    const { selectedDeclaration,
       selectedCertification,
-      patients, 
-      role, 
-      category, 
-      newDeclaration, 
-      tempImages, 
+      patients,
+      role,
+      category,
+      newDeclaration,
+      tempImages,
       managerView } = this.props;
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
@@ -85,7 +85,7 @@ class WorkingItem extends React.Component {
                 c-9.4,0-15.7,6.3-15.7,15.7s6.3,15.7,15.7,15.7c56.5,0,102.1-45.5,102.1-102.1S200,67.8,143.5,67.8z"/>
             </g>
           </g>
-        </g>  
+        </g>
       </svg>
     );
     const TickIcon = () => (
@@ -139,7 +139,7 @@ class WorkingItem extends React.Component {
     }
     let pixelHeight = 0;
     let showPics = false;
-    if (selectedDeclaration) {  
+    if (selectedDeclaration) {
       if (tempImages.length > 0 && selectedDeclaration.documents.length > 0) {
         showPics = true;
         let multiplier = tempImages.length + selectedDeclaration.documents.length;
@@ -166,8 +166,8 @@ class WorkingItem extends React.Component {
         styles.workingItemContainer + ' pure-u-1'
         }>
         {
-        selectedDeclaration || newDeclaration == true 
-          ? 
+        selectedDeclaration || newDeclaration == true
+          ?
           <div className={styles.wiContentHeader + ' pure-g'}>
             <div className="pure-u-1 pure-u-md-1-2">
               <div className={styles.iconHolder}>{iconType}</div>
@@ -290,7 +290,7 @@ class WorkingItem extends React.Component {
                   </div>
                 </div>
               </div>
-            </div> 
+            </div>
           : ''
         }
         <div className={ !selectedDeclaration && newDeclaration == false && !selectedCertification
@@ -302,48 +302,48 @@ class WorkingItem extends React.Component {
               <div className={'pure-u-1 pure-u-md-1-1 ' + styles.noSelectedMessage}>
                 <h1 className={styles.wiContentTitle}>
                   {
-                    role == 'registrar' ? 
+                    role == 'registrar' ?
                         <div><p>Select a declaration to validate,</p><p>or create a new declaration</p></div>
                       : role == 'field officer' ?
                         <div><p>Select a notification to declare,</p><p>or create a new declaration</p></div>
                       :
                         <div><p>Select a validated declaration,</p><p>to prepare the birth certificate</p></div>
                   }
-                
+
                 </h1>
               </div>
             : selectedCertification ?
             <div className={'pure-u-1 pure-u-md-1-1 ' + styles.printPreview}>
-              <PrintPreview 
-                selectedCertification={selectedCertification} 
+              <PrintPreview
+                selectedCertification={selectedCertification}
               />
                 <PrintTemplate>
-                  <PrintPreview 
-                    selectedCertification={selectedCertification} 
+                  <PrintPreview
+                    selectedCertification={selectedCertification}
                   />
                 </PrintTemplate>
             </div>
-            : 
+            :
             <div className={
               (showPics == true)
               ? 'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody
               : 'pure-u-1 pure-u-md-1-1 ' + styles.wiContentBody
               }>
-              <WorkingItemCanvas 
-                selectedDeclaration={selectedDeclaration} 
-                newDeclaration={newDeclaration} 
-                patients={patients} 
-                category={category} 
+              <WorkingItemCanvas
+                selectedDeclaration={selectedDeclaration}
+                newDeclaration={newDeclaration}
+                patients={patients}
+                category={category}
               />
             </div>
           }
           {
-            showPics == true ? 
+            showPics == true ?
               <div className={'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody} style={{ height: pixelHeight }}>
                 <div className="pure-g">
                   <div className="pure-u-1">
-                    <DocumentContainer 
-                      selectedDeclaration={selectedDeclaration} 
+                    <DocumentContainer
+                      selectedDeclaration={selectedDeclaration}
                       newDeclaration={newDeclaration}
                       tempImages={tempImages}
                     />

@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:19:30 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:19:30
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 08:58:54
  */
@@ -59,7 +59,7 @@ function submitDeclarationProcessed(trackingID, newBirthRegistrationNumber, newC
     newBirthRegistrationNumber,
     newChildPersonalID,
   };
-  
+
 }
 
 function removeNotification(index) {
@@ -72,7 +72,7 @@ function removeNotification(index) {
 function submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID) {
   //  remove the notification from the list
   // prototype approach only
-  
+
   const prefix = trackingID.substring(0, 1);
   const suffix = trackingID.substring(3, 8);
   const oldTrackID = prefix + 'n-' + suffix;
@@ -89,7 +89,7 @@ function submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChi
     }
     dispatch(submitDeclarationProcessed(trackingID, newBirthRegistrationNumber, newChildPersonalID));
   };
-  
+
 }
 
 export function newDeclarationEdit(category) {
@@ -139,15 +139,15 @@ export function searchDeclarations(value) {
 
     map(declarations.declaration, (declaration, index ) => {
       let addToList = false;
-      let given = get(head(filter(patients, function(patient) { 
-        return patient.patient.id == declaration.childDetails; 
+      let given = get(head(filter(patients, function(patient) {
+        return patient.patient.id == declaration.childDetails;
       })), 'patient.given');
-      let family = get(head(filter(patients, function(patient) { 
-        return patient.patient.id == declaration.childDetails; 
+      let family = get(head(filter(patients, function(patient) {
+        return patient.patient.id == declaration.childDetails;
       })), 'patient.family');
 
-      let dob = get(head(filter(patients, function(patient) { 
-        return patient.patient.id == declaration.childDetails; 
+      let dob = get(head(filter(patients, function(patient) {
+        return patient.patient.id == declaration.childDetails;
       })), 'patient.birthDate');
 
       const dobFormat = Moment(dob).format('MMM Do YY');
@@ -238,7 +238,7 @@ export function selectDeclaration(declaration) {
       dispatch(loadNotification(declaration));
     }
   };
-  
+
 }
 
 export function oldImageDeleted(index) {
@@ -294,7 +294,7 @@ export function fetchDeclarations(roleType) {
           }
           console.log(JSON.stringify(payload));
           dispatch(receiveDeclaration(payload));
-          
+
           payload.declaration.forEach((declaration) => {
             dispatch(fetchPatients(declaration.childDetails, false));
             dispatch(fetchPatients(declaration.motherDetails, false));
@@ -422,7 +422,7 @@ export function submitDeclaration() {
     const {imageToDelete} = getState().imageReducer;
     if (imageToDelete == 0) {
       const {tempImages} = getState().imageReducer;
-      
+
       let childConfig = {};
 
       const childData = new FormData();
@@ -454,12 +454,12 @@ export function submitDeclaration() {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` },
         };
-        
-        
+
+
         childData.append('id', get(submitValues, 'child_id'));
         motherData.append('id', get(submitValues, 'mother_id'));
         fatherData.append('id', get(submitValues, 'father_id'));
-        
+
       }
 
       let motherConfig = Object.assign({}, childConfig);
@@ -480,13 +480,13 @@ export function submitDeclaration() {
       let locationsConfig = Object.assign({}, childConfig);
       let informantsConfig = Object.assign({}, childConfig);
 
-      if (get(submitValues, 'child_id')) { 
+      if (get(submitValues, 'child_id')) {
         childPatientURL += '/' + get(submitValues, 'child_id');
       } else {
         childData.append('uuid', uuidv4());
         childData.append('prefix', 'ch');
       }
-      
+
       childData.append('given', get(submitValues, 'firstName') + ', ' +  get(submitValues, 'middleName'));
       childData.append('family', get(submitValues, 'family'));
       childData.append('birthDate', get(submitValues, 'birthDate').toDateString());
@@ -495,7 +495,7 @@ export function submitDeclaration() {
       childData.append('nationality', 'Ghana');
       childConfig.body = childData;
 
-      if (get(submitValues, 'mother_id')) { 
+      if (get(submitValues, 'mother_id')) {
         motherPatientURL += '/' + get(submitValues, 'mother_id');
       } else {
         motherData.append('uuid', uuidv4());
@@ -509,7 +509,7 @@ export function submitDeclaration() {
       motherData.append('nationality', get(submitValues, 'mother_nationality'));
       motherConfig.body = motherData;
 
-      if (get(submitValues, 'father_id')) { 
+      if (get(submitValues, 'father_id')) {
         fatherPatientURL += '/' + get(submitValues, 'father_id');
       } else {
         fatherData.append('uuid', uuidv4());
@@ -528,17 +528,17 @@ export function submitDeclaration() {
       patientPromises.push(apiMiddleware(motherConfig, motherPatientURL, dispatch));
       patientPromises.push(apiMiddleware(fatherConfig, fatherPatientURL, dispatch));
 
-      Promise.all(patientPromises).then(updatedPatient => { 
+      Promise.all(patientPromises).then(updatedPatient => {
 
         const subPromises = [];
 
         const childID = get(updatedPatient[0], 'updated.id');
         const motherID = get(updatedPatient[1], 'updated.id');
         const fatherID = get(updatedPatient[2], 'updated.id');
-        
+
         // set up addresses
 
-        if (get(submitValues, 'child_address_id')) { 
+        if (get(submitValues, 'child_address_id')) {
           childAddressURL += '/' + get(submitValues, 'child_address_id');
         }
         childAddressData.append('addressLine1', get(submitValues, 'mother_addressLine1'));
@@ -553,7 +553,7 @@ export function submitDeclaration() {
 
         childAddressConfig.body = childAddressData;
 
-        if (get(submitValues, 'mother_address_id')) { 
+        if (get(submitValues, 'mother_address_id')) {
           motherAddressURL += '/' + get(submitValues, 'mother_address_id');
         }
         motherAddressData.append('addressLine1', get(submitValues, 'mother_addressLine1'));
@@ -568,7 +568,7 @@ export function submitDeclaration() {
 
         motherAddressConfig.body = motherAddressData;
 
-        if (get(submitValues, 'father_address_id')) { 
+        if (get(submitValues, 'father_address_id')) {
           fatherAddressURL += '/' + get(submitValues, 'father_address_id');
         }
         fatherAddressData.append('addressLine1', get(submitValues, 'father_addressLine1'));
@@ -587,7 +587,7 @@ export function submitDeclaration() {
         subPromises.push(apiMiddleware(motherAddressConfig, motherAddressURL, dispatch));
         subPromises.push(apiMiddleware(fatherAddressConfig, fatherAddressURL, dispatch));
         //set up telecom
-        if (get(submitValues, 'child_telecom_id')) { 
+        if (get(submitValues, 'child_telecom_id')) {
           childTelecomURL += '/' + get(submitValues, 'child_telecom_id');
         }
         childTelecomData.append('email', get(submitValues, 'mother_email'));
@@ -598,7 +598,7 @@ export function submitDeclaration() {
 
         childTelecomConfig.body = childTelecomData;
 
-        if (get(submitValues, 'mother_telecom_id')) { 
+        if (get(submitValues, 'mother_telecom_id')) {
           motherTelecomURL += '/' + get(submitValues, 'mother_telecom_id');
         }
         motherTelecomData.append('email', get(submitValues, 'mother_email'));
@@ -609,7 +609,7 @@ export function submitDeclaration() {
 
         motherTelecomConfig.body = motherTelecomData;
 
-        if (get(submitValues, 'father_telecom_id')) { 
+        if (get(submitValues, 'father_telecom_id')) {
           fatherTelecomURL += '/' + get(submitValues, 'father_telecom_id');
         }
         fatherTelecomData.append('email', get(submitValues, 'father_email'));
@@ -644,7 +644,7 @@ export function submitDeclaration() {
 
 
 
-        if (get(submitValues, 'mother_extra_id')) { 
+        if (get(submitValues, 'mother_extra_id')) {
           motherExtraURL += '/' + get(submitValues, 'mother_extra_id');
         }
         motherExtraData.append('childrenBornAlive', get(submitValues, 'mother_childrenBornAlive'));
@@ -663,7 +663,7 @@ export function submitDeclaration() {
 
         motherExtraConfig.body = motherExtraData;
 
-        if (get(submitValues, 'father_extra_id')) { 
+        if (get(submitValues, 'father_extra_id')) {
           fatherExtraURL += '/' + get(submitValues, 'father_extra_id');
         }
 
@@ -688,13 +688,13 @@ export function submitDeclaration() {
         if (role == 'registrar') {
           subPromises.push(apiMiddleware(childExtraConfig, childExtraURL, dispatch));
         }
-        
-        Promise.all(subPromises).then(updatedItems => { 
+
+        Promise.all(subPromises).then(updatedItems => {
 
           const declarationPromises = [];
           let newBirthRegistrationNumber = null;
 
-          if (newDeclaration) { 
+          if (newDeclaration) {
             const newUuid = uuidv4();
             const prefix = get(submitValues, 'code').substring(0, 1);
             const suffix1 = get(submitValues, 'tracking').substring(3, 8);
@@ -730,19 +730,19 @@ export function submitDeclaration() {
               newBirthRegistrationNumber = uuidv4().substring(0, 6).toUpperCase();
               // temporarily create a dummy birth registration number
               childData.append('birthRegistrationNumber', newBirthRegistrationNumber);
-              
-            } 
+
+            }
           }
 
           declarationsConfig.body = declarationsData;
 
           declarationPromises.push(apiMiddleware(declarationsConfig, declarationsURL, dispatch));
-          Promise.all(declarationPromises).then(updatedDeclaration => { 
+          Promise.all(declarationPromises).then(updatedDeclaration => {
 
             const declarationID = updatedDeclaration[0].updated.id;
             const trackingID = updatedDeclaration[0].updated.tracking;
             const declarationExtraPromises = [];
-            if (get(submitValues, 'location_id')) { 
+            if (get(submitValues, 'location_id')) {
               locationsURL += '/' + get(submitValues, 'location_id');
             }
             locationsData.append('placeOfDelivery', get(submitValues, 'placeOfDelivery'));
@@ -759,7 +759,7 @@ export function submitDeclaration() {
             locationsConfig.body = locationsData;
 
 
-            if (get(submitValues, 'informant_id')) { 
+            if (get(submitValues, 'informant_id')) {
               informantsURL += '/' + get(submitValues, 'informant_id');
             } else {
               informantsData.append('uuid', uuidv4());
@@ -783,8 +783,8 @@ export function submitDeclaration() {
             declarationExtraPromises.push(apiMiddleware(locationsConfig, locationsURL, dispatch));
             declarationExtraPromises.push(apiMiddleware(informantsConfig, informantsURL, dispatch));
 
-            
-            Promise.all(declarationExtraPromises).then(updatedDeclaration => { 
+
+            Promise.all(declarationExtraPromises).then(updatedDeclaration => {
               const imagePromises = [];
               if (newDeclaration) {
                 if (tempImages.length > 0) {
@@ -800,8 +800,8 @@ export function submitDeclaration() {
                     imagePromises.push(apiMiddleware(documentsConfig, newDocURL, dispatch));
                   });
 
-                  Promise.all(imagePromises).then(updatedImage => { 
-                    
+                  Promise.all(imagePromises).then(updatedImage => {
+
                     dispatch(submitDeclarationSuccess(trackingID));
                     dispatch(clearTempImages());
                     dispatch(fetchDeclarations(role));
@@ -833,7 +833,7 @@ export function submitDeclaration() {
               }
             });
           });
-          
+
         });
       });
     }

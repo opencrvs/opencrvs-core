@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:28 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:28
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-15 19:00:16
  */
@@ -178,7 +178,7 @@ function declarationsReducer(
       };
     case REMOVE_NOTIFICATION:
       return {
-        ...state, 
+        ...state,
         declarations: [
           ...state.declarations.slice(0, action.index),
           ...state.declarations.slice(action.index + 1),
