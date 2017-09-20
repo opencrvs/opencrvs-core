@@ -115,14 +115,6 @@ function setDistrictManager(districtManager) {
   };
 }
 
-export function updateTooltipOrigin(obj) {
-  return {
-    type: UPDATE_ORIGIN,
-    originX: obj.x,
-    originY: obj.y,
-  };
-}
-
 export function disableTooltip() {
   return {
     type: REMOVE_TOOLTIP_MAP_DATA,

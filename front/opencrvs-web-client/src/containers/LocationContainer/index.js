@@ -16,7 +16,6 @@ import { selectRegion,
          selectCountry,
          selectEvent,
          selectPeriod,
-         updateTooltipOrigin,
          setTooltipData,
          disableTooltip } from 'actions/manager-actions';
 
@@ -100,9 +99,6 @@ const mapDispatchToProps = dispatch => {
     },
     onPeriodChange: value => {
       dispatch(selectPeriod(value));
-    },
-    updateOrigin: newProps => {
-      dispatch(updateTooltipOrigin(newProps));
     },
     updateTooltipData: name => {
       dispatch(setTooltipData(name));
