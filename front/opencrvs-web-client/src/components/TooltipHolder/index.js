@@ -9,29 +9,26 @@ class TooltipHolder extends React.Component {
   }
 
   render = () => {
-    
-    const { originX,
-            originY,
-            mapEvent,
+    const { mapEvent,
             rolloverMapData } = this.props;
     return (
-      <div style={{top: originY - 250 + 'px', left: originX + 170  + 'px' }} className={ rolloverMapData
-          ? styles.tooltipHolder
-          : styles.tooltipHolderHide }>
+      <div className={styles.tooltipHolder}>
         <div className={styles.tooltip}>
           <div className={styles.tooltipText}>
             <p className={styles.title}>{ rolloverMapData.title }</p>
-            <p className={styles.percentage}>{ Math.round(( rolloverMapData.certs / rolloverMapData.kpi ) * 100) }%</p>
-              <p className={styles.certification}>
-                { mapEvent } certs: { rolloverMapData.certs } / { rolloverMapData.kpi }
-              </p>
+            <p className={styles.percentage}>
+              Coverage {
+                Math.round(( rolloverMapData.certs / rolloverMapData.kpi ) * 100)
+              }%
+            </p>
+            <p className={styles.certification}>
+              { mapEvent } registration rate: { rolloverMapData.certs } / { rolloverMapData.kpi }
+            </p>
           </div>
         </div>
       </div>
     );
   }
 }
-
-   
 
 export default TooltipHolder;

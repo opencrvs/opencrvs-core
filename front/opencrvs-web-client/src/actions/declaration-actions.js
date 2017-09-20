@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:30
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-07 15:25:35
+ * @Last Modified time: 2017-09-19 12:45:02
  */
 import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
@@ -225,6 +225,13 @@ function loadCertCheck(declaration) {
   return {
     type: CHECK_CERTIFICATION,
     declarationToCheckAgainst: declaration,
+  };
+}
+
+export function proceedToPrintView() {
+  return (dispatch, getState) => {
+    const {declarationToCheckAgainst} = getState().declarationsReducer;
+    dispatch(loadCertification(declarationToCheckAgainst));
   };
 }
 

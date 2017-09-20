@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 09:48:07
+ * @Last Modified time: 2017-09-19 13:47:20
  */
 import React from 'react';
 import styles from './styles.css';
@@ -35,7 +35,8 @@ class WorkListItem extends React.Component {
       created,
       address,
       id,
-      selectedDeclaration } = this.props;
+      selectedDeclaration,
+      selectedCertification } = this.props;
     const category = code.slice(0, code.indexOf('-'));
     const location = get(head(address), 'county');
     //const location = address.county;
@@ -76,7 +77,7 @@ class WorkListItem extends React.Component {
         <div
           onClick={onClick}
           className={
-            id == selectedDeclaration.id
+            id == selectedDeclaration.id || id == selectedCertification.id
               ? styles.openedWorkItem + ' ' + styles.workItem + ' pure-g'
               : styles.workItem + ' pure-g'
           }
@@ -134,9 +135,9 @@ class WorkListItem extends React.Component {
 
 
 const mapStateToProps = ({ declarationsReducer }) => {
-  const { selectedDeclaration } = declarationsReducer;
+  const { selectedDeclaration, selectedCertification } = declarationsReducer;
   return {
-    selectedDeclaration,
+    selectedDeclaration, selectedCertification,
   };
 };
 
