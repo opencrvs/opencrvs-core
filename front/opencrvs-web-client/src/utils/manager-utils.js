@@ -18,6 +18,20 @@ export const calculateRagStatus = function(data, mapEvent, timePeriod) {
   return status;
 };
 
+export const calculateRagStatusOnBar = function(min, max) {
+  let status = null;
+  let total = min + max;
+  let percentage = Math.round(( min / total ) * 100);
+  if ( percentage <= 33) {
+    status = '#FF6427';
+  } else if ( percentage > 33 && percentage <= 66) {
+    status = '#FFA327';
+  } else if ( percentage > 66 ) {
+    status = '#179999';
+  }
+  return status;
+};
+
 export const calculateRagStatusOnMap = function(mapData, 
   regionIndex, 
   data, 
