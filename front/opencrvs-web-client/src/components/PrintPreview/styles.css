@@ -29,7 +29,6 @@
 
 .certificatePaper {
   background-color: #fffbe6;
-
   padding: 4em;
 }
 
@@ -49,9 +48,16 @@
 .info {
   font-size: 0.8em;
   font-style: italic;
-
   position: relative;
   left: 6em;
+  top: -0.6em;
+}
+
+.infoRight {
+  font-size: 0.8em;
+  font-style: italic;
+
+  position: relative;
   top: -0.6em;
 }
 
@@ -61,7 +67,6 @@
 }
 
 .witness {
-
   margin-bottom: 8em;
 }
 

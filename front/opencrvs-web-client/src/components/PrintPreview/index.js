@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:51 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-19 13:31:27
+ * @Last Modified time: 2017-09-20 15:11:20
  */
 import React from 'react';
 import styles from './styles.css';
@@ -96,17 +96,17 @@ class PrintPreview extends React.Component {
           <p>Child of <span className={styles.dataItem}>{ mother_firstName + ' ' + mother_middleName + ' ' + mother_family }</span></p>
           <div className={styles.info}>Full Name of Mother</div>
         </div>
-        <div className="pure-u-1 pure-u-md-1-2">
+        <div className={styles.rightAlign + ' pure-u-1 pure-u-md-1-2'}>
           <p>Nationality <span className={styles.dataItem}>{ mother_nationality }</span></p>
-          <div className={styles.info}>Nationality of Mother</div>
+          <div className={styles.infoRight}>Nationality of Mother</div>
         </div>
         <div className="pure-u-1 pure-u-md-1-2">
           <p>and of <span className={styles.dataItem}>{ father_firstName + ' ' + father_middleName + ' ' + father_family }</span></p>
           <div className={styles.info}>Full Name of Father</div>
         </div>
-        <div className="pure-u-1 pure-u-md-1-2">
+        <div className={styles.rightAlign + ' pure-u-1 pure-u-md-1-2'}>
           <p>Nationality <span className={styles.dataItem}>{ father_nationality }</span></p>
-          <div className={styles.info}>Nationality of Father</div>
+          <div className={styles.infoRight}>Nationality of Father</div>
         </div>
         <div className="pure-u-1 pure-u-md-1-1">
           <p>Was born on <span className={styles.dataItem}>{ 
@@ -120,10 +120,10 @@ class PrintPreview extends React.Component {
           <p className={styles.witnessStatement}>Witness my hand this <span className={styles.dataItem}>{Moment().format('Do')}</span> day of 
           <span className={styles.dataItem}>{Moment().format('MMMM')}</span> <span className={styles.dataItem}>{Moment().format('YYYY')}</span></p>
         </div>
-        <div className={styles.signatureField + ' pure-u-1 pure-u-md-1-2'}>
+        <div className={styles.signatureField + ' ' + styles.rightAlign + ' pure-u-1 pure-u-md-1-2'}>
           <span className={styles.signature}>&nbsp;&nbsp;&nbsp;&nbsp;
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-          <div className={styles.info}>Registrar</div>
+          <div className={styles.infoRight}>Registrar</div>
         </div>
       </div>
     );
