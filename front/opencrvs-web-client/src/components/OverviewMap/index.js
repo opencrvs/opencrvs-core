@@ -16,8 +16,6 @@ class OverviewMap extends React.Component {
     super(props);
   }
 
-  
-
   projection(scale, transX, transY) {
     return geoMercator()
       .scale(scale)
@@ -110,7 +108,7 @@ class OverviewMap extends React.Component {
         <div className="pure-u-1 pure-u-md-1-6">
           <Navigation type="horizontal">
             <Link label={
-              regionLevel 
+              regionLevel
               ? myCountry + ' > '
               : myCountry
             } active={countryLevel}
@@ -143,7 +141,7 @@ class OverviewMap extends React.Component {
             </div>
           </div>
         </div>
-        <div className={ 
+        <div className={
           countryLevel
           ? styles.mapSvgContainerCountry + ' pure-u-1 pure-u-md-4-6'
           : styles.mapSvgContainerRegion + ' pure-u-1 pure-u-md-4-6'
@@ -156,12 +154,12 @@ class OverviewMap extends React.Component {
                     key={ `path-${ i }` }
                     d={ geoPath().projection(this.projection(scale, transX, transY))(d) }
                     fill={calculateRagStatusOnMap(
-                      selectedLocationMapData, 
-                      i, 
+                      selectedLocationMapData,
+                      i,
                       selectedLocation.subEntries.entries,
-                      mapEvent, 
-                      mapTimePeriod, 
-                      countryLevel, 
+                      mapEvent,
+                      mapTimePeriod,
+                      countryLevel,
                       regionLevel)}
                     style={{ opacity: 1 }}
                     stroke="#000000"
@@ -183,7 +181,7 @@ class OverviewMap extends React.Component {
   }
 }
 
-   
+
 const mapStateToProps = ({ managerReducer, globalReducer }) => {
   const { selectedLocation,
           subLocation,

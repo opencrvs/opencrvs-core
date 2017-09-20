@@ -27,6 +27,4 @@ class TooltipHolder extends React.Component {
   }
 }
 
-   
-
 export default TooltipHolder;

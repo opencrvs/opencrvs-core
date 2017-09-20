@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:14 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:14
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 13:53:48
  */
@@ -62,10 +62,10 @@ function managerReducer(
       return {
         ...state,
         fetchingMapView: false,
-        mapLocations: action.mapLocations, 
-        subLocations: action.subLocations, 
-        selectedLocation: action.selectedLocation, 
-        countryLocation: action.selectedLocation, 
+        mapLocations: action.mapLocations,
+        subLocations: action.subLocations,
+        selectedLocation: action.selectedLocation,
+        countryLocation: action.selectedLocation,
         totalCerts: action.totalCerts,
         countryManager: action.countryManager,
       };
