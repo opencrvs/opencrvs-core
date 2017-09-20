@@ -161,7 +161,7 @@ export function searchDeclarations(value) {
       tests.push(Fuzzysearch(value, dobFormat));
 
       tests.forEach((test) => {
-        if ( test == true) {
+        if (test == true) {
           addToList = true;
         }
       });
@@ -256,6 +256,8 @@ export function selectDeclaration(declaration) {
 
     } else if (role == 'field officer') {
       dispatch(loadNotification(declaration));
+    } else {
+      console.error(`Inconsitent state, could not select declaration: declaration code ${code}, user role ${role}`);
     }
   };
 
@@ -292,96 +294,103 @@ function declarationError(message) {
   };
 }
 
+function fetchDeclarationsFromAPI(dispatch, roleType, config, token) {
+  config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  const data = {roleType:roleType};
+
+  return fetch(BASE_URL + `declarations/${data.roleType}`, config)
+    .then(response =>
+      response.json().then(payload => ({ payload, response }))
+    )
+    .then(({ payload, response }) => {
+      if (!response.ok) {
+        dispatch(declarationError(payload.message));
+        return Promise.reject(payload);
+      }
+
+      dispatch(receiveDeclaration(payload));
+
+      payload.declaration.forEach((declaration) => {
+        dispatch(fetchPatients(declaration.childDetails, false));
+        dispatch(fetchPatients(declaration.motherDetails, false));
+        dispatch(fetchPatients(declaration.fatherDetails, false));
+      });
+      dispatch(selectWorkView('work'));
+      return true;
+    })
+    .catch(err => {
+      if (err.message == 'Invalid token') {
+        dispatch(logoutUser());
+      } else {
+        console.log(err);
+      }
+    });
+}
+
+function fetchNotificationsFromHearth(dispatch) {
+  return fetch(OPEN_HIM_URL + 'Composition?status=preliminary&type=birth-notification&entry=Location/ae150380-8329-11e7-82fe-a5724c7e1e43')
+    .then(response =>
+      response.json().then(payload => ({ payload, response }))
+    )
+    .then(({ payload, response }) => {
+      if (!response.ok) {
+        dispatch(declarationError(payload.message));
+        return Promise.reject(payload);
+      }
+
+      //temporary reformat until declarations exists in FHIR
+      //at which point refactor across the app will be required
+      // transitioning between euan's assumed data and true standards
+      let newPayload = {
+        message: 'Declarations success',
+        declaration: [],
+      };
+      map(get(payload, 'entry'), (notification, index ) => {
+        const childIDArray = notification.resource.subject.reference.split('/');
+        const childID = childIDArray[1];
+
+        const mother = notification.resource.section.entry
+          .find((entry) => entry.text === 'Mother\'s Details' )
+          .reference;
+
+        let newDeclaration = {
+          id: index,
+          code: 'birth-notification',
+          created_at: notification.resource.meta.lastUpdated,
+          updated_at: notification.resource.meta.lastUpdated,
+          motherDetails: mother.split('/')[1],
+          childDetails: childID,
+          tracking: 'BN-' + notification.resource.id.substring(0, 12),
+          documents:[],
+        };
+        const child = notification.resource.subject.reference;
+
+
+        dispatch(fetchPatients(child, true));
+        dispatch(fetchPatients(mother, true));
+        newPayload.declaration.push(newDeclaration);
+      });
+      dispatch(receiveDeclaration(newPayload));
+      dispatch(selectWorkView('work'));
+      return true;
+    })
+    .catch(err => {
+      console.log(err);
+    });
+}
+
 export function fetchDeclarations(roleType) {
   let token = localStorage.getItem('token') || null;
   let config = {};
   return dispatch => {
     dispatch(requestDeclaration());
     if (roleType != 'field officer') {
-      config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
-
-      const data = {roleType:roleType};
-      return fetch(BASE_URL + `declarations/${data.roleType}`, config)
-        .then(response =>
-          response.json().then(payload => ({ payload, response }))
-        )
-        .then(({ payload, response }) => {
-          if (!response.ok) {
-            dispatch(declarationError(payload.message));
-            return Promise.reject(payload);
-          }
-          console.log(JSON.stringify(payload));
-          dispatch(receiveDeclaration(payload));
-
-          payload.declaration.forEach((declaration) => {
-            dispatch(fetchPatients(declaration.childDetails, false));
-            dispatch(fetchPatients(declaration.motherDetails, false));
-            dispatch(fetchPatients(declaration.fatherDetails, false));
-          });
-          dispatch(selectWorkView('work'));
-          return true;
-        })
-        .catch(err => {
-          if (err.message == 'Invalid token') {
-            dispatch(logoutUser());
-          } else {
-            console.log(err);
-          }
-        });
+      fetchDeclarationsFromAPI(dispatch, roleType, config, token);
     } else {
-      return fetch(OPEN_HIM_URL + 'Composition?status=preliminary&type=birth-notification&entry=Location/ae150380-8329-11e7-82fe-a5724c7e1e43')
-        .then(response =>
-          response.json().then(payload => ({ payload, response }))
-        )
-        .then(({ payload, response }) => {
-          if (!response.ok) {
-            console.log("error");
-            dispatch(declarationError(payload.message));
-            return Promise.reject(payload);
-          }
-          console.log(JSON.stringify(payload));
-
-          //temporary reformat until declarations exists in FHIR
-          //at which point refactor across the app will be required
-          // transitioning between euan's assumed data and true standards
-          let newPayload = {
-            message: 'Declarations success',
-            declaration: [],
-          };
-          map(get(payload, 'entry'), (notification, index ) => {
-            const childIDArray = notification.resource.subject.reference.split('/');
-            const childID = childIDArray[1];
-
-            const mother = notification.resource.section.entry
-              .find((entry) => entry.text === 'Mother\'s Details' )
-              .reference
-
-            let newDeclaration = {
-              id: index,
-              code: 'birth-notification',
-              created_at: notification.resource.meta.lastUpdated,
-              updated_at: notification.resource.meta.lastUpdated,
-              motherDetails: mother.split('/')[1],
-              childDetails: childID,
-              tracking: 'BN-' + notification.resource.id.substring(0, 12),
-              documents:[],
-            };
-            const child = notification.resource.subject.reference;
-
-
-            dispatch(fetchPatients(child, true));
-            dispatch(fetchPatients(mother, true));
-            newPayload.declaration.push(newDeclaration);
-          });
-          dispatch(receiveDeclaration(newPayload));
-          dispatch(selectWorkView('work'));
-          return true;
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      fetchNotificationsFromHearth(dispatch);
     }
   };
 }
@@ -475,11 +484,9 @@ export function submitDeclaration() {
           headers: { Authorization: `Bearer ${token}` },
         };
 
-
         childData.append('id', get(submitValues, 'child_id'));
         motherData.append('id', get(submitValues, 'mother_id'));
         fatherData.append('id', get(submitValues, 'father_id'));
-
       }
 
       let motherConfig = Object.assign({}, childConfig);
@@ -643,10 +650,8 @@ export function submitDeclaration() {
         subPromises.push(apiMiddleware(childTelecomConfig, childTelecomURL, dispatch));
         subPromises.push(apiMiddleware(motherTelecomConfig, motherTelecomURL, dispatch));
         subPromises.push(apiMiddleware(fatherTelecomConfig, fatherTelecomURL, dispatch));
+
         //set up extra
-
-
-
         const childExtraConfig = {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
@@ -660,9 +665,6 @@ export function submitDeclaration() {
           childExtraData.append('patient_id', childID);
           childExtraConfig.body = childExtraData;
         }
-
-
-
 
         if (get(submitValues, 'mother_extra_id')) {
           motherExtraURL += '/' + get(submitValues, 'mother_extra_id');
@@ -741,7 +743,7 @@ export function submitDeclaration() {
             declarationsData.append('motherDetails', motherID);
             declarationsData.append('fatherDetails', fatherID);
             declarationsData.append('childDetails', childID);
-            declarationsData.append('code', get(submitValues, 'code'));
+            declarationsData.append('code', 'birth-declaration');
             declarationsData.append('status', 'declared');
           } else {
             declarationsURL += '/' + selectedDeclaration.id;
@@ -750,7 +752,6 @@ export function submitDeclaration() {
               newBirthRegistrationNumber = uuidv4().substring(0, 6).toUpperCase();
               // temporarily create a dummy birth registration number
               childData.append('birthRegistrationNumber', newBirthRegistrationNumber);
-
             }
           }
 
@@ -853,10 +854,8 @@ export function submitDeclaration() {
               }
             });
           });
-
         });
       });
     }
   };
 }
-
