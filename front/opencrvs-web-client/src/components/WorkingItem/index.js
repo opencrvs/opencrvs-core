@@ -27,6 +27,7 @@ import InvestigationModal from 'components/InvestigationModal';
 const Moment = require('moment');
 const PrintTemplate = require('react-print');
 import SmsIcon from 'components/icons/SmsIcon';
+import RejectIcon from 'components/icons/RejectIcon';
 
 class WorkingItem extends React.Component {
   state = {
@@ -90,19 +91,6 @@ class WorkingItem extends React.Component {
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
     let declarationTitle = null;
-    const RejectIcon = () => (
-      <svg viewBox="0 0 284 277">
-        <g>
-          <g>
-            <g>
-              <path d="M143.5,67.8H94.8l36.1-36.1c6.3-6.3,6.3-15.7,0-22s-15.7-6.3-22,0L46.1,72.5c-6.3,6.3-6.3,15.7,0,22l62.8,62.8
-                c6.3,6.3,15.7,6.3,22,0s6.3-15.7,0-22L94.8,99.2h48.7c39.3,0,70.7,31.4,70.7,70.7s-31.4,70.7-70.7,70.7
-                c-9.4,0-15.7,6.3-15.7,15.7s6.3,15.7,15.7,15.7c56.5,0,102.1-45.5,102.1-102.1S200,67.8,143.5,67.8z"/>
-            </g>
-          </g>
-        </g>  
-      </svg>
-    );
     const TickIcon = () => (
       <svg viewBox="0 0 512 524">
       <path d="M433.8,2H78.2c-14,0-25.4,11.4-25.4,25.4v279.4C52.8,419,143.8,510,256,510s203.2-91,203.2-203.2V27.4
