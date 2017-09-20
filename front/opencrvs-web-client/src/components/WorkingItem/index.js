@@ -23,10 +23,16 @@ import RecognitionIcon from 'components/icons/RecognitionIcon';
 import PrintPreview from 'components/PrintPreview';
 import Input from 'react-toolbox/lib/input';
 import theme from './printPreviewInput.css';
+import InvestigationModal from 'components/InvestigationModal';
 const Moment = require('moment');
 const PrintTemplate = require('react-print');
+import SmsIcon from 'components/icons/SmsIcon';
 
 class WorkingItem extends React.Component {
+  state = {
+    investigating: false,
+  };
+
   constructor(props) {
     super(props);
   }
@@ -53,6 +59,19 @@ class WorkingItem extends React.Component {
         this.props.onNavSubmitClick();
       }
     } 
+  }
+
+  startInvestigating = () => {
+    this.setState({investigating: true});
+  }
+
+  stopInvestigating = () => {
+    this.setState({investigating: false});
+  }
+
+  handleInvestigationSubmit = (investigation) => {
+    // TODO: Handle investigation
+    this.stopInvestigating();
   }
 
   handleChange(name, value) {
@@ -177,27 +196,19 @@ class WorkingItem extends React.Component {
                 <p className={styles.wiContentSubtitle}>
                   <span>{' ' + Moment(birthDate).format('Do MMMM YYYY') }</span>
                 </p>
-                <div className={styles.smsMother}>
-                
-                  <svg
-                    fill="#2d3e50"
-                    viewBox="0 0 100 103"
-                    height="30"
-                    width="30"
-                  >
-                    <path d="M79.2,5.2H20.8C9.3,5.2,0,14.5,0,26v29.1C0,66.7,9.3,76,20.9,76c2.9,0,5.2,2.3,5.2,5.2v9.5c0,3.7,4.5,5.5,7.1,2.9l15.2-15.1
-    c1.6-1.6,3.7-2.4,5.9-2.4h24.9c11.5,0,20.8-9.3,20.8-20.8V26C100,14.5,90.7,5.2,79.2,5.2z M29.2,46.8c-3.4,0-6.3-2.8-6.3-6.2
-    s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2S32.6,46.8,29.2,46.8z M50,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2
-    c3.4,0,6.2,2.8,6.2,6.2S53.4,46.8,50,46.8z M70.8,46.8c-3.4,0-6.3-2.8-6.3-6.2s2.8-6.2,6.3-6.2c3.4,0,6.2,2.8,6.2,6.2
-    S74.3,46.8,70.8,46.8z"/>
-                  </svg>
-                </div>
-                  <div className={
-                    Moment().diff(selectedDeclaration.created_at, 'days') > 1
-                    ?
-                      styles.stopWatch
-                    :
-                      styles.stopWatchHidden
+                {
+                  role !== 'field officer' ? (
+                    <div className={styles.smsMother}>
+                      <SmsIcon />
+                    </div>
+                  ) : null
+                }
+                <div className={
+                  Moment().diff(selectedDeclaration.created_at, 'days') > 1
+                  ?
+                    styles.stopWatch
+                  :
+                    styles.stopWatchHidden
                 }>
                 
                   <svg
@@ -266,9 +277,14 @@ class WorkingItem extends React.Component {
                     </form>
                   </div>
                   <div className={styles.alignRight + ' pure-u-1 pure-u-md-1-2'}>
-                    <Button flat>
+                    <Button flat onClick={this.startInvestigating}>
                       <RejectIcon /> Investigate
                     </Button>
+                    <InvestigationModal
+                      active={this.state.investigating}
+                      onSubmit={this.handleInvestigationSubmit}
+                      onCancel={this.stopInvestigating}
+                    />
                   </div>
                 </div>
               </div>
