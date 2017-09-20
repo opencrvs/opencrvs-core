@@ -53,9 +53,9 @@ class SMSModal extends React.Component {
         active={smsModal}
         actions={dialogueActions}
         onEscKeyDown={this.cancel}
+        title="Contact participants"
       >
         <section>
-          <h1 className={styles.submitConfirmHeader}>Contact participants</h1>
           <p>Send an SMS message to the participants of this declaration.</p>
           <p>Which participant would you like to contact?</p>
           <Dropdown
@@ -64,6 +64,7 @@ class SMSModal extends React.Component {
             label="Select the person you want to contact"
             onChange={this.onDropdownChange}
             value={this.state.contactPerson}
+            required="true"
           />
           <p>What message would you like to send to them?</p>
           <Input
@@ -71,6 +72,7 @@ class SMSModal extends React.Component {
             label="Enter the message to send"
             value={this.state.message}
             onChange={this.onInputChange.bind(this, 'message')}
+            required="true"
           />
         </section>
       </Dialog>
