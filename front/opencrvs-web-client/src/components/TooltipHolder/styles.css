@@ -1,36 +1,20 @@
 .tooltipHolder {
   display: block;
-  /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 500;
-}
-
-.tooltipHolderHide {
-  display: none;
+  bottom: 200px;
+  right: 200px;
 }
 
 .tooltip {
   width: auto;
-  border: 1px solid #666666;
   background-color: white;
   color: #fff;
   text-align: center;
   padding: 5px 0;
-  border-radius: 6px;
   top: 100%;
-  left: 50%; 
+  left: 50%;
   margin-left: -120px;
-}
-
-.tooltip:after {
-    content: " ";
-    position: absolute;
-    top: 50%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    left: -130px;
-    border-color: transparent #666666 transparent transparent;
 }
 
 .percentage {
