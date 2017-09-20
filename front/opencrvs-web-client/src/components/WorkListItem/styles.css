@@ -1,9 +1,6 @@
 .iconHolder {
-    width: 4em;
-    float: left;
-    top: 0.5em;
-    position: relative;
-    left: -0.6em;
+  margin-top: 1.5em;
+  padding: 0 1em;
 }
 
 .copyHolder {
@@ -14,11 +11,10 @@
 }
 
 .workItem {
-    padding: 0.9em 1em;
+    padding: 0.5em 0;
     border-bottom: 1px solid #ddd;
     border-left: 6px solid transparent;
     cursor: pointer;
-        height: 7em;
 }
 
 .openedWorkItem {
@@ -52,27 +48,4 @@
     color: #34495e;
     opacity: 0.7;
     text-transform: capitalize;
-}
-
-.stopWatch {
-    position: relative;
-    top: -4em;
-    left: 100%;
-    border: none !important;
-}
-
-.stopWatchHidden {
-    display: none;
-}
-
-@media (min-width: 55em) {
-
-    .iconHolder {
-        width: 3em;
-        float: left;
-        top: 0.5em;
-        position: relative;
-        left: -0.6em;
-    }
-
 }
