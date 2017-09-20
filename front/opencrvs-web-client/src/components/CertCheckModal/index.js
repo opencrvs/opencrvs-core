@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-07 15:28:31
+ * @Last Modified time: 2017-09-20 15:13:17
  */
 import React from 'react';
 import styles from './styles.css';
@@ -16,6 +16,15 @@ class CertCheckModal extends React.Component {
   closeCertCheckModal = (event) => {
     this.props.onModalCloseClick('certCheck');
   }
+  
+  rejectCert = (event) => {
+    this.props.onModalCloseClick('certCheck');
+  }
+
+  continueToPrintCert = (event) => {
+    this.props.onPrintProceed();
+    this.props.onModalCloseClick('certCheck');
+  }
 
   render = () => {
     const { 
@@ -23,6 +32,8 @@ class CertCheckModal extends React.Component {
        } = this.props;
     const dialogueActions = [
       { label: 'Close', onClick: this.closeCertCheckModal },
+      { label: 'Reject', onClick: this.rejectCert },
+      { label: 'Continue', onClick: this.continueToPrintCert },
     ];
     return (
       <Dialog
@@ -32,7 +43,10 @@ class CertCheckModal extends React.Component {
         title="Check Certification"
       >
 
-       
+      <section className={styles.detailsSection}>
+        <h1 className={ styles.submitConfirmHeader }>Enter details form as per ticket OCRVS-109.</h1>
+        <p>Grey out print and reject buttons until form successfully completed.</p>
+      </section>
 
       </Dialog>
     );
