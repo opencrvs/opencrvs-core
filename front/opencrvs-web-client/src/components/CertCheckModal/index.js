@@ -2,12 +2,11 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-20 15:05:20
+ * @Last Modified time: 2017-09-20 15:13:17
  */
 import React from 'react';
 import styles from './styles.css';
 import Dialog from 'react-toolbox/lib/dialog';
-import { Button } from 'react-toolbox/lib/button';
 
 class CertCheckModal extends React.Component {
   constructor(props) {
