@@ -5,14 +5,12 @@ import Dialog from 'react-toolbox/lib/dialog';
 import Input from 'react-toolbox/lib/input';
 import Dropdown from 'react-toolbox/lib/dropdown';
 
-import styles from './styles.css';
-
 class SMSModal extends React.Component {
   constructor(props) {
     super(props);
   }
 
-  state = { contactPerson: '', message: '' }
+  state = { contactPerson: null, message: '' }
 
   send = () => {
     this.props.sendSMS(this.state.contactPerson, this.state.message);
@@ -50,7 +48,7 @@ class SMSModal extends React.Component {
 
     return (
       <Dialog
-        active={smsModal}
+        active={smsModal > 0}
         actions={dialogueActions}
         onEscKeyDown={this.cancel}
         title="Contact participants"
@@ -64,7 +62,7 @@ class SMSModal extends React.Component {
             label="Select the person you want to contact"
             onChange={this.onDropdownChange}
             value={this.state.contactPerson}
-            required="true"
+            required
           />
           <p>What message would you like to send to them?</p>
           <Input
@@ -72,7 +70,7 @@ class SMSModal extends React.Component {
             label="Enter the message to send"
             value={this.state.message}
             onChange={this.onInputChange.bind(this, 'message')}
-            required="true"
+            required
           />
         </section>
       </Dialog>
