@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:48 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-05 15:46:34
  */
@@ -34,12 +34,20 @@ class LocationListContainer extends React.Component {
   onMouseOut(e) {
     this.props.disableTooltipData();
   }
+
   onMouseOver(e, title) {
     this.props.updateTooltipData(title);
   }
 
+  fetchStat(location, mapEvent, mapTimePeriod, statProp) {
+    return location.events
+      .find(e => e.type === mapEvent).timePeriod
+      .find(tp => tp.title === mapTimePeriod)
+      [statProp]
+  }
+
   render = () => {
-    const { managerView, 
+    const { managerView,
             selectedLocation,
             disableTooltipData,
             selectedRegion,
@@ -59,33 +67,36 @@ class LocationListContainer extends React.Component {
       let obj = null;
       let filteredObj = null;
       if (listFilter == 'certifications') {
-        itemArray = orderBy(selectedLocation.subEntries.entries, function(e) { 
+        itemArray = orderBy(selectedLocation.subEntries.entries, function(e) {
           obj = get(head(filter(e.events, {type: mapEvent})), 'timePeriod');
           filteredObj = head(filter(obj, {title: mapTimePeriod}));
           return filteredObj.certifications;
         }, [listOrder]);
       } else {
-        itemArray = orderBy(selectedLocation.subEntries.entries, function(e) { 
+        itemArray = orderBy(selectedLocation.subEntries.entries, function(e) {
           return e.title;
         }, [listOrder]);
       }
     }
 
-    
+
     return (
       <div className={styles.list + ' pure-u-1'}>
         <StaffCardLocationContainer {...this.props} />
         <LocationListFilters {...this.props} />
 
-        
+
         {
-          map(itemArray, (location, index ) => (
-          <LocationListItem 
-            key={index} 
+          map(itemArray, (location, index) => (
+          <LocationListItem
+            key={index}
             title={location.title}
             sub={location.sub}
             rolloverMapData={rolloverMapData}
             rag={calculateRagStatus(location.events, mapEvent, mapTimePeriod)}
+            mapEvent={mapEvent}
+            registrationsActual={this.fetchStat(location, mapEvent, mapTimePeriod, 'certifications')}
+            registrationsKpi={this.fetchStat(location, mapEvent, mapTimePeriod, 'certificationsKpi')}
             onClick={ (e) => this.handleRegionClick(e, location.title) }
             onMouseOut={ (e) => this.onMouseOut(e, location.title) }
             onMouseOver={ (e) => this.onMouseOver(e, location.title) }
@@ -96,7 +107,7 @@ class LocationListContainer extends React.Component {
   }
 }
 
-   
+
 
 const mapStateToProps = ({ managerReducer }) => {
   const { selectedLocation,
@@ -127,7 +138,7 @@ const mapStateToProps = ({ managerReducer }) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    
+
     onListFilterChange: value => {
       dispatch(selectListFilter(value));
     },

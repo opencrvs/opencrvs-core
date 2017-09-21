@@ -1,12 +1,11 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:30 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:30
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-10 17:07:14
  */
 import React from 'react';
 import styles from './styles.css';
-import { connect } from 'react-redux';
 
 class LocationListItem extends React.Component {
   constructor(props) {
@@ -18,8 +17,10 @@ class LocationListItem extends React.Component {
       title,
       sub,
       rolloverMapData,
-      rag } = this.props;
-    
+      rag,
+      registrationsActual,
+      registrationsKpi } = this.props;
+
     const ragStyle = {
       borderLeft: '6px solid ' + rag,
     };
@@ -39,10 +40,18 @@ class LocationListItem extends React.Component {
           style={ragStyle}
           className={ defaultStyle + ' pure-g' }
         >
-          
-          <div className={styles.locationItemHolder + ' pure-u-1-1'}>
+
+          <div className={'pure-u-1-2'}>
             <p className={styles.title}>{ title }</p>
             <p className={styles.sub}>{ sub }</p>
+          </div>
+          <div className={styles.pullRight + ' pure-u-1-2'}>
+            <p className={styles.title}>
+              Coverage { Math.round((registrationsActual / registrationsKpi) * 100) }%
+            </p>
+            <p className={styles.sub}>
+              Registration rate {registrationsActual} / {registrationsKpi}
+            </p>
           </div>
         </div>
     );
