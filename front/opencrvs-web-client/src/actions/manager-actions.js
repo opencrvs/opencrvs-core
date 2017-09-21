@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:19:24 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-20 14:37:04
  */
@@ -30,14 +30,14 @@ import { filter, head, map, get } from 'lodash';
 const Moment = require('moment');
 
 export function fetchMapViewData() {
-  
+
   return dispatch => {
     dispatch(requestMapViewData());
     const config = {
       method: 'GET',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     };
-    
+
     apiMiddleware(config, BASE_URL + 'manager', dispatch).then(items => {
       dispatch(mapViewDataSuccess(items));
       dispatch(getMapData());
@@ -46,7 +46,7 @@ export function fetchMapViewData() {
 }
 
 export function getMapData() {
-  
+
   return (dispatch, getState) => {
     const {country, regions } = getState().globalReducer;
     const config = {
@@ -68,7 +68,7 @@ export function getMapData() {
         dispatch(setMapViewMapData(countryMapData, regionMapData, ));
       });
     });
-    
+
   };
 }
 
@@ -115,14 +115,6 @@ function setDistrictManager(districtManager) {
   };
 }
 
-export function updateTooltipOrigin(obj) {
-  return {
-    type: UPDATE_ORIGIN,
-    originX: obj.x,
-    originY: obj.y,
-  };
-}
-
 export function disableTooltip() {
   return {
     type: REMOVE_TOOLTIP_MAP_DATA,
@@ -148,11 +140,11 @@ export function selectListOrder(listOrder) {
 export function setTooltipData(name) {
   // get data by name
   return (dispatch, getState) => {
-    const { mapEvent, 
-      subLocations, 
-      mapTimePeriod, 
-      countryLevel, 
-      regionLevel, 
+    const { mapEvent,
+      subLocations,
+      mapTimePeriod,
+      countryLevel,
+      regionLevel,
       selectedRegion } = getState().managerReducer;
     const title = name.charAt(0).toUpperCase() + name.slice(1);
     const tooltipObj = {
@@ -200,8 +192,8 @@ function tooltipDataReady(rolloverMapData) {
 
 export function selectCountry() {
   return (dispatch, getState) => {
-    const { mapLocations, 
-      mapEvent, 
+    const { mapLocations,
+      mapEvent,
       mapTimePeriod } = getState().managerReducer;
     let obj = {};
     obj = mapLocations.country;
@@ -221,8 +213,8 @@ function setCountry(totalCerts) {
 
 export function selectPeriod(period) {
   return (dispatch, getState) => {
-    const { mapLocations, 
-      mapEvent, 
+    const { mapLocations,
+      mapEvent,
       selectedRegion,
       countryLevel,
       regionLevel } = getState().managerReducer;
@@ -250,8 +242,8 @@ function setPeriod(period, totalCerts) {
 
 export function selectEvent(event) {
   return (dispatch, getState) => {
-    const { mapLocations, 
-      mapTimePeriod, 
+    const { mapLocations,
+      mapTimePeriod,
       selectedRegion,
       countryLevel,
       regionLevel } = getState().managerReducer;
