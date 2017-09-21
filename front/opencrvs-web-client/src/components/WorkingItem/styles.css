@@ -18,7 +18,7 @@
     height: 100%;
 }
 
-.wiContentHeader, .wiContentBody, .wiContentFooter, .printPreview {
+.wiContentBody, .wiContentFooter, .printPreview {
     padding: 1em 2em;
 }
 
@@ -51,7 +51,10 @@
 
 .wiContentHeader {
     border-bottom: 1px solid #ddd;
-    height: 13.6em;
+}
+
+.wiContentHeader > div {
+    padding: 0.5em;
 }
 
 .wiContentTitle {
@@ -82,44 +85,40 @@
     display: block;
 }
 
-.smsMother {
-    position: absolute;
-    left: 38%;
-    top: 7.5em;
-    cursor: pointer;
-}
-
-
-
 .managerView {
     display: none;
 }
 
-
-.stopWatch {
-    position: relative;
-    top: -3em;
-    left: 81%;
-    border: none !important;
+.titleText {
+    flex-grow: 1;
 }
 
-.stopWatchHidden {
-    display: none;
+.wiContentDetails {
+    display: flex;
+    align-items: center;
+}
+
+.wiContentControls {
+    display: flex;
+    flex-flow: row wrap;
+    text-align: center;
+    justify-content: space-between;
+    align-items: center;
 }
 
 @media (min-width: 55em) {
-    .wiContentControls {
-        text-align: right;
-        margin-top: 1.2em;
-    }
     .wiContentHeader {
-        height: 6.6em;
+        padding: 0.5em;
+    }
+
+    .wiContentControls {
+        height: 100%;
+        justify-content: space-around;
     }
 
     .stopWatch {
         top: -2.6em;
     }
-
 
     .noSelectedDeclaration {
         position: fixed;
@@ -154,53 +153,30 @@
         position: relative;
         top: 0.25em;
     }
-
-    .smsMother {
-        left: 68%;
-        top: 1em;
-    }
-
 }
 
 .iconHolder {
     width: 3em;
-    float: left;
-    top: 0.5em;
-    position: relative;
-    left: -1.5em;
-}
-
-.titleText {
-    position: relative;
-    left: -1em;
 }
 
 .certInfo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     color: rgb(255, 64, 129);
     font-size: .66em;
     text-transform: uppercase;
     font-family: 'Roboto';
-    position: relative;
-    top:-0.5em;
 }
 
-.certInfo p{
-    float: left;
-    display: block;
-    width: 80%; 
+.certInfo > span {
+    padding-right: 0.5em;
 }
 
-
-.certInfo svg{
-    display: block;
-    fill: currentColor;
-    height: 36px;
-    width: 20%;
-    overflow: hidden;
+.certInfo > svg {
+    width: 3em;
     color: green;
-    position: relative;
-    top: 0.7em;
-    left: 0.5em;
+    fill: currentColor;
 }
 
 .alignRight {
