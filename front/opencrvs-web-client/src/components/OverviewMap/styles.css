@@ -7,6 +7,10 @@
   left: 2em;
 }
 
+.overviewMap {
+  z-index: 5;
+}
+
 .mapSvgContainerRegion {
 	position: absolute;
   width: 100%;

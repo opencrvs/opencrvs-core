@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-20 14:37:04
+ * @Last Modified time: 2017-09-21 11:54:42
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -20,6 +20,8 @@ export const SET_LIST_FILTER = 'SET_LIST_FILTER';
 export const SET_LIST_ORDER = 'SET_LIST_ORDER';
 export const CASE_TRACKING = 'CASE_TRACKING';
 export const CASE_TRACKING_CLEAR = 'CASE_TRACKING_CLEAR';
+export const TOGGLE_PERFORMANCE = 'TOGGLE_PERFORMANCE';
+
 
 
 
@@ -375,6 +377,13 @@ export function caseTracking() {
 export function caseTrackingClear() {
   return {
     type: CASE_TRACKING_CLEAR
+  };
+}
+
+export function togglePerformanceReport() {
+
+  return {
+    type: TOGGLE_PERFORMANCE
   };
 }
 

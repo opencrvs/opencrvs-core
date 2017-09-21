@@ -104,7 +104,7 @@ class OverviewMap extends React.Component {
       timePeriods.push(obj);
     });
     return (
-      <div className="pure-g">
+      <div className={styles.overviewMap + ' pure-g'}>
         <div className="pure-u-1 pure-u-md-1-6">
           <Navigation type="horizontal">
             <Link label={

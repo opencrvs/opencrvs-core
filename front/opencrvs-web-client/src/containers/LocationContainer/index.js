@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-20 10:48:36
+ * @Last Modified time: 2017-09-21 11:54:05
  */
 import React from 'react';
 import styles from './styles.css';
@@ -10,6 +10,7 @@ import OverviewFilter from 'components/OverviewFilter';
 import OverviewMap from 'components/OverviewMap';
 import OverviewDetails from 'components/OverviewDetails';
 import TrackerTimeline from 'components/TrackerTimeline';
+import OverviewPerformance from 'components/OverviewPerformance';
 import {Tab, Tabs} from 'react-toolbox';
 import { connect } from 'react-redux';
 import { selectRegion,
@@ -17,7 +18,8 @@ import { selectRegion,
          selectEvent,
          selectPeriod,
          setTooltipData,
-         disableTooltip } from 'actions/manager-actions';
+         disableTooltip,
+         togglePerformanceReport } from 'actions/manager-actions';
 
 class LocationContainer extends React.Component {
   constructor(props) {
@@ -37,14 +39,13 @@ class LocationContainer extends React.Component {
       <div className={styles.locationContainer + ' pure-u-1'}>
         <Tabs index={reportOption} onChange={this.handleOptionChange} className={styles.tabs}>
           <Tab label="Overview" className={styles.tab}>
-            <OverviewFilter {...this.props} />
             <OverviewMap {...this.props} />
-            <OverviewDetails {...this.props} />
           </Tab>
           <Tab label="Case Tracker">
             { caseData && <TrackerTimeline {...this.props}/> }
           </Tab>
         </Tabs>
+        { reportOption == 0 && <OverviewPerformance {...this.props} />}
       </div>
     );
   }
@@ -105,6 +106,9 @@ const mapDispatchToProps = dispatch => {
     },
     disableTooltipData: () => {
       dispatch(disableTooltip());
+    },
+    togglePerformance: () => {
+      dispatch(togglePerformanceReport());
     }
   };
 };
