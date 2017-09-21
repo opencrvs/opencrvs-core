@@ -5,6 +5,8 @@ import Dialog from 'react-toolbox/lib/dialog';
 import Input from 'react-toolbox/lib/input';
 import Dropdown from 'react-toolbox/lib/dropdown';
 
+const errMsg = ' (Warning: no contact number available)';
+
 class SMSModal extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +24,9 @@ class SMSModal extends React.Component {
   }
 
   onDropdownChange = (value) => {
-    this.setState({ ...this.state, contactPerson: value });
+    if (value) {
+      this.setState({ ...this.state, contactPerson: value });
+    }
   }
 
   onInputChange = (name, value) => {
@@ -35,9 +39,18 @@ class SMSModal extends React.Component {
     let participantTypes = [];
     if (activeDeclaration) {
       participantTypes = [
-        { value: activeDeclaration.values.mother_phone, label: 'Mother' },
-        { value: activeDeclaration.values.father_phone, label: 'Father' },
-        { value: activeDeclaration.values.informant_phone, label: 'Informant' },
+        {
+          value: activeDeclaration.values.mother_phone,
+          label: 'Mother' + (activeDeclaration.values.mother_phone ? '' : errMsg),
+        },
+        {
+          value: activeDeclaration.values.father_phone,
+          label: 'Father' + (activeDeclaration.values.father_phone ? '' : errMsg),
+        },
+        {
+          value: activeDeclaration.values.informant_phone,
+          label: 'Informant' + (activeDeclaration.values.informant_phone ? '' : errMsg),
+        },
       ];
     }
 
