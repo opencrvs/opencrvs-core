@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:28 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:28
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-09-19 12:51:51
  */
@@ -19,6 +19,7 @@ import {
   TRACKING_MODAL_TOGGLE,
   DECLARATION_READY_TO_CONFIRM,
   REQD_MODAL_TOGGLE,
+  SMS_MODAL_TOGGLE,
   DECLARATION_SEARCH,
   OLD_DOCUMENT_DELETED,
   NOTIFICATION_SELECTED,
@@ -44,6 +45,7 @@ function declarationsReducer(
     submitValues: '',
     reqDocsModal: 0,
     certIDCheckModal: 0,
+    smsModal: 0,
     searchTerm: '',
     declarationsList: '',
     newNotification: false,
@@ -133,6 +135,11 @@ function declarationsReducer(
         ...state,
         trackingModal: state.trackingModal == 0 ? 1 : 0,
       };
+    case SMS_MODAL_TOGGLE:
+      return {
+        ...state,
+        smsModal: state.smsModal == 0 ? 1 : 0,
+      };
     case DECLARATION_SELECTED:
       return {
         ...state,
@@ -177,7 +184,7 @@ function declarationsReducer(
       };
     case OLD_DOCUMENT_DELETED:
       return {
-        ...state, 
+        ...state,
         selectedDeclaration: {
           ...state.selectedDeclaration,
           [action.reference] : [
@@ -188,7 +195,7 @@ function declarationsReducer(
       };
     case REMOVE_NOTIFICATION:
       return {
-        ...state, 
+        ...state,
         declarations: [
           ...state.declarations.slice(0, action.index),
           ...state.declarations.slice(action.index + 1),

@@ -16,6 +16,7 @@ import SubmitModal from 'components/SubmitModal';
 import TrackingModal from 'components/TrackingModal';
 import ReqDocsModal from 'components/ReqDocsModal';
 import CertCheckModal from 'components/CertCheckModal';
+import SMSModal from 'components/SMSModal';
 
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
@@ -30,6 +31,8 @@ import {
   reqModalToggle,
   certCheckModalClosed,
   proceedToPrintView,
+  smsModalToggle,
+  sendSMS,
 } from 'actions/declaration-actions';
 import { logoutUser,
   updateUserDetails } from 'actions/user-actions';
@@ -67,7 +70,8 @@ class WorkContainer extends React.Component {
       trackingModal,
       certIDCheckModal,
       role,
-      reqDocsModal } = this.props;
+      reqDocsModal,
+      smsModal } = this.props;
     let managerView = false;
     if (role == 'admin' || role == 'manager' ) {
       managerView = true;
@@ -83,8 +87,10 @@ class WorkContainer extends React.Component {
           { imageZoomID > 0 && <ImageZoom {...this.props} /> }
           { submitModal > 0 && <SubmitModal {...this.props} /> }
           { trackingModal > 0 && <TrackingModal {...this.props} /> }
-          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }   
-          { certIDCheckModal > 0 && <CertCheckModal {...this.props} /> }        
+          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }
+          { certIDCheckModal > 0 && <CertCheckModal {...this.props} /> }
+          { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }
+          { smsModal > 0 && <SMSModal {...this.props} /> }
         </div>
       </div>
     );
@@ -97,7 +103,8 @@ const mapStateToProps = ({
   imageReducer,
   patientsReducer,
   managerReducer,
-  globalReducer }) => {
+  globalReducer,
+  form }) => {
   const {
     declarations,
     selectedDeclaration,
@@ -112,6 +119,7 @@ const mapStateToProps = ({
     reqDocsModal,
     newChildPersonalID,
     newBirthRegistrationNumber,
+    smsModal,
   } = declarationsReducer;
 
   const { isAuthenticated,
@@ -133,6 +141,7 @@ const mapStateToProps = ({
     imageToDelete,
     imageZoomID,
      } = imageReducer;
+  const { activeDeclaration } = form;
   return {
     declarations,
     trackingID,
@@ -164,6 +173,9 @@ const mapStateToProps = ({
     menuOpened,
     newChildPersonalID,
     newBirthRegistrationNumber,
+    smsModal,
+    sendSMS,
+    activeDeclaration,
   };
 };
 
@@ -180,6 +192,9 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'req':
           dispatch(reqModalToggle());
+          break;
+        case 'sms':
+          dispatch(smsModalToggle());
           break;
       }
     },
@@ -206,6 +221,9 @@ const mapDispatchToProps = dispatch => {
           break;
         case 'req':
           dispatch(reqModalToggle());
+          break;
+        case 'sms':
+          dispatch(smsModalToggle());
           break;
       }
     },

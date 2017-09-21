@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:48 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-16 13:49:33
  */
@@ -26,7 +26,7 @@ import theme from './printPreviewInput.css';
 import InvestigationModal from 'components/InvestigationModal';
 const Moment = require('moment');
 const PrintTemplate = require('react-print');
-import SmsIcon from 'components/icons/SmsIcon';
+import SmsButton from 'components/buttons/SmsButton';
 import RejectIcon from 'components/icons/RejectIcon';
 
 class WorkingItem extends React.Component {
@@ -37,9 +37,13 @@ class WorkingItem extends React.Component {
   constructor(props) {
     super(props);
   }
-  
+
   openImageModal = (event) => {
     this.props.onModalOpenClick('image');
+  }
+
+  openSMSModal = () => {
+    this.props.onModalOpenClick('sms');
   }
 
   openSubmit = (event) => {
@@ -59,7 +63,7 @@ class WorkingItem extends React.Component {
       } else {
         this.props.onNavSubmitClick();
       }
-    } 
+    }
   }
 
   startInvestigating = () => {
@@ -80,13 +84,13 @@ class WorkingItem extends React.Component {
   }
 
   render = () => {
-    const { selectedDeclaration, 
+    const { selectedDeclaration,
       selectedCertification,
-      patients, 
-      role, 
-      category, 
-      newDeclaration, 
-      tempImages, 
+      patients,
+      role,
+      category,
+      newDeclaration,
+      tempImages,
       managerView } = this.props;
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
@@ -142,7 +146,7 @@ class WorkingItem extends React.Component {
     }
     let pixelHeight = 0;
     let showPics = false;
-    if (selectedDeclaration) {  
+    if (selectedDeclaration) {
       if (tempImages.length > 0 && selectedDeclaration.documents.length > 0) {
         showPics = true;
         let multiplier = tempImages.length + selectedDeclaration.documents.length;
@@ -169,8 +173,8 @@ class WorkingItem extends React.Component {
         styles.workingItemContainer + ' pure-u-1'
         }>
         {
-        selectedDeclaration || newDeclaration == true 
-          ? 
+        selectedDeclaration || newDeclaration == true
+          ?
           <div className={styles.wiContentHeader + ' pure-g'}>
             <div className="pure-u-1 pure-u-md-1-2">
               <div className={styles.iconHolder}>{iconType}</div>
@@ -184,13 +188,7 @@ class WorkingItem extends React.Component {
                 <p className={styles.wiContentSubtitle}>
                   <span>{' ' + Moment(birthDate).format('Do MMMM YYYY') }</span>
                 </p>
-                {
-                  role !== 'field officer' ? (
-                    <div className={styles.smsMother}>
-                      <SmsIcon />
-                    </div>
-                  ) : null
-                }
+
                 <div className={
                   Moment().diff(selectedDeclaration.created_at, 'days') > 1
                   ?
@@ -198,7 +196,7 @@ class WorkingItem extends React.Component {
                   :
                     styles.stopWatchHidden
                 }>
-                
+
                   <svg
                     fill="#ff4081"
                     viewBox="0 0 100 101"
@@ -223,36 +221,51 @@ class WorkingItem extends React.Component {
                     </g>
                   </svg>
                 </div>
+
               </div>
             </div>
             <div className={styles.wiContentControls + ' pure-u-1 pure-u-md-1-2'}>
               <div className="pure-g">
                 {
                   !showTrash ? (
-                    <div className="pure-u-1-2 pure-u-md-1-4">
+                    <div className="pure-u-1-2 pure-u-md-1-5">
                       {/* Empty placeholder to fix button alignment */}
                     </div>
                   ) : null
                 }
-                <div className="pure-u-1-2 pure-u-md-1-4">
+                {
+                  role === 'field officer' ? (
+                    <div className="pure-u-1-2 pure-u-md-1-5">
+                      {/* Empty placeholder to fix button alignment */}
+                    </div>
+                  ) : null
+                }
+                {
+                  role !== 'field officer' ? (
+                    <div className={styles.smsMother + 'pure-u-1-2 pure-u-md-1-5'}>
+                      <SmsButton openSMSModal={this.openSMSModal} />
+                    </div>
+                  ) : null
+                }
+                <div className="pure-u-1-2 pure-u-md-1-5">
                   <Button icon="save" label="Save" flat />
                 </div>
-                <div className="pure-u-1-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-5">
                   <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                 </div>
                 {
                   showTrash ? (
-                    <div className="pure-u-1-2 pure-u-md-1-4">
+                    <div className="pure-u-1-2 pure-u-md-1-5">
                       <Button icon="delete" label="Trash" flat />
                     </div>
                   ) : null
                 }
-                <div className="pure-u-1-2 pure-u-md-1-4">
+                <div className="pure-u-1-2 pure-u-md-1-5">
                   <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
                 </div>
               </div>
             </div>
-          </div> 
+          </div>
           : selectedCertification ?
             <div className={styles.wiContentHeader + ' pure-g'}>
               <div className="pure-u-1 pure-u-md-1-2">
@@ -286,7 +299,7 @@ class WorkingItem extends React.Component {
                   </div>
                 </div>
               </div>
-            </div> 
+            </div>
           : ''
         }
         <div className={ !selectedDeclaration && newDeclaration == false && !selectedCertification
@@ -298,48 +311,48 @@ class WorkingItem extends React.Component {
               <div className={'pure-u-1 pure-u-md-1-1 ' + styles.noSelectedMessage}>
                 <h1 className={styles.wiContentTitle}>
                   {
-                    role == 'registrar' ? 
+                    role == 'registrar' ?
                         <div><p>Select a declaration to validate,</p><p>or create a new declaration</p></div>
                       : role == 'field officer' ?
                         <div><p>Select a notification to declare,</p><p>or create a new declaration</p></div>
                       :
                         <div><p>Select a validated declaration,</p><p>to prepare the birth certificate</p></div>
                   }
-                
+
                 </h1>
               </div>
             : selectedCertification ?
             <div className={'pure-u-1 pure-u-md-1-1 ' + styles.printPreview}>
-              <PrintPreview 
-                selectedCertification={selectedCertification} 
+              <PrintPreview
+                selectedCertification={selectedCertification}
               />
                 <PrintTemplate>
-                  <PrintPreview 
-                    selectedCertification={selectedCertification} 
+                  <PrintPreview
+                    selectedCertification={selectedCertification}
                   />
                 </PrintTemplate>
             </div>
-            : 
+            :
             <div className={
               (showPics == true)
               ? 'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody
               : 'pure-u-1 pure-u-md-1-1 ' + styles.wiContentBody
               }>
-              <WorkingItemCanvas 
-                selectedDeclaration={selectedDeclaration} 
-                newDeclaration={newDeclaration} 
-                patients={patients} 
-                category={category} 
+              <WorkingItemCanvas
+                selectedDeclaration={selectedDeclaration}
+                newDeclaration={newDeclaration}
+                patients={patients}
+                category={category}
               />
             </div>
           }
           {
-            showPics == true ? 
+            showPics == true ?
               <div className={'pure-u-1 pure-u-md-1-2 ' + styles.wiContentBody} style={{ height: pixelHeight }}>
                 <div className="pure-g">
                   <div className="pure-u-1">
-                    <DocumentContainer 
-                      selectedDeclaration={selectedDeclaration} 
+                    <DocumentContainer
+                      selectedDeclaration={selectedDeclaration}
                       newDeclaration={newDeclaration}
                       tempImages={tempImages}
                     />

@@ -26,6 +26,7 @@ export const DECLARATION_SUBMIT_SUCCESS = 'DECLARATION_SUBMIT_SUCCESS';
 export const DECLARATION_SUBMIT_FAILURE = 'DECLARATION_SUBMIT_FAILURE';
 export const TRACKING_MODAL_TOGGLE = 'TRACKING_MODAL_TOGGLE';
 export const REQD_MODAL_TOGGLE = 'REQD_MODAL_TOGGLE';
+export const SMS_MODAL_TOGGLE = 'SMS_MODAL_TOGGLE';
 export const DECLARATION_SEARCH = 'DECLARATION_SEARCH';
 export const OLD_DOCUMENT_DELETED = 'OLD_DOCUMENT_DELETED';
 export const DECLARATION_READY_TO_CONFIRM = 'DECLARATION_READY_TO_CONFIRM';
@@ -190,6 +191,12 @@ export function reqModalToggle() {
   };
 }
 
+export function smsModalToggle() {
+  return {
+    type: SMS_MODAL_TOGGLE,
+  };
+}
+
 export function newDeclarationModalClosed() {
   return {
     type: NEW_DECL_MODAL_CLOSED,
@@ -246,7 +253,7 @@ export function selectDeclaration(declaration) {
   return (dispatch, getState) => {
     const {role} = getState().userReducer;
     const code = declaration.code;
-    if (code == 'birth-declaration' && role == 'registrar') {
+    if ((code == 'birth-declaration' || code == 'birth-notification') && role == 'registrar') {
       dispatch(loadDeclaration(declaration));
     } else if (code == 'birth-declaration' && role == 'certification clerk') {
       // instead of loading a cert into print
@@ -395,10 +402,10 @@ export function fetchDeclarations(roleType) {
   };
 }
 
-function sendSMS(motherPhone, smsMessage) {
+export function sendSMS(phoneNumber, smsMessage) {
   doCORSRequest({
     method: 'GET',
-    url: SMS_API_URL + 'to=' + motherPhone + '&text=' + smsMessage,
+    url: SMS_API_URL + 'to=' + phoneNumber + '&text=' + smsMessage,
   }, function printResult(result) {
     console.log(result);
   });
