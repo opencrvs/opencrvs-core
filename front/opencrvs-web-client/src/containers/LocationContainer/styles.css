@@ -15,6 +15,11 @@
 .tabs section {
   outline: none !important;
   border: none !important;
+  height: 100%;
+}
+
+.tabs {
+    height: 100%;
 }
 
 

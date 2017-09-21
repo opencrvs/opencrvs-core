@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 15:39:48
+ * @Last Modified time: 2017-09-20 14:37:04
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -300,22 +300,72 @@ export function caseTracking() {
       avatar: 'male',
     },
     caseNotes: [
-      {title: 'NOTIFICATION', notes: [
-        {note: 'Power cut in the office.', date: Moment().subtract(29, 'days').format('Do MMM')},
-      ]},
-      {title: 'DECLARATION', notes: [
-        {note: 'Power cut in the office', date: Moment().subtract(23, 'days').format('Do MMM')},
-        {note: 'No ID document supplied.', date: Moment().subtract(20, 'days').format('Do MMM')},
-      ]},
-      {title: 'VALIDATION', notes: [
-      ]},
-      {title: 'SMS', notes: [
-      ]},
-      {title: 'PAYMENT', notes: [
-        {note: 'MTN Mobile money payment', date: Moment().subtract(11, 'days').format('Do MMM')},
-      ]},
-      {title: 'CERTIFICATION', notes: [
-      ]},
+      {
+        id: 1,
+        title: 'NOTIFICATION', 
+        note: 'Mankrong village polio immunisation', 
+        createdAt: Moment().subtract(29, 'days').format('Do MMM'),
+        icon: 'notifications',
+        iconAlt: 'notifications',
+        kpiData: [
+          {name: 'Page A', uv: 4990, pv: 10},
+        ],
+      },
+      {
+        id: 2,
+        title: 'DECLARATION', 
+        note: 'Agona West Municipal registration office', 
+        createdAt: Moment().subtract(23, 'days').format('Do MMM'),
+        icon: 'input',
+        iconAlt: 'input',
+        kpiData: [
+          {name: 'Page A', uv: 1500, pv: 3500},
+        ],
+      },
+      {
+        id: 3,
+        title: 'VALIDATION', 
+        note: 'Agona West Municipal registration office', 
+        createdAt: Moment().subtract(20, 'days').format('Do MMM'),
+        icon: 'check',
+        iconAlt: 'check',
+        kpiData: [
+          {name: 'Page A', uv: 2500, pv: 2500},
+        ],
+      },
+      {
+        id: 4,
+        title: 'SMS', 
+        note: 'Mother contacted', 
+        createdAt: Moment().subtract(20, 'days').format('Do MMM'),
+        icon: 'sms',
+        iconAlt: 'sms',
+        kpiData: [
+          {name: 'Page A', uv: 4990, pv: 10},
+        ],
+      },
+      {
+        id: 5,
+        title: 'PAYMENT', 
+        note: 'Payment received by Airtel mobile money', 
+        createdAt: Moment().subtract(11, 'days').format('Do MMM'),
+        icon: 'payment',
+        iconAlt: 'payment',
+        kpiData: [
+          {name: 'Page A', uv: 4000, pv: 1000},
+        ],
+      },
+      {
+        id: 6,
+        title: 'CERTIFICATION', 
+        note: 'Certificate printed and accepted by informant', 
+        createdAt: Moment().subtract(10, 'days').format('Do MMM'),
+        icon: 'print',
+        iconAlt: 'print',
+        kpiData: [
+          {name: 'Page A', uv: 4500, pv: 500},
+        ],
+      },
     ],
     caseGraphData: [
       {name: Moment().subtract(30, 'days').format('Do MMM'), kpi: 0, actual: 0, amt: 2400},

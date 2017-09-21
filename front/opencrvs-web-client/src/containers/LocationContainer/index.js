@@ -2,14 +2,14 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 15:47:41
+ * @Last Modified time: 2017-09-20 10:48:36
  */
 import React from 'react';
 import styles from './styles.css';
 import OverviewFilter from 'components/OverviewFilter';
 import OverviewMap from 'components/OverviewMap';
 import OverviewDetails from 'components/OverviewDetails';
-import TrackerGraph from 'components/TrackerGraph';
+import TrackerTimeline from 'components/TrackerTimeline';
 import {Tab, Tabs} from 'react-toolbox';
 import { connect } from 'react-redux';
 import { selectRegion,
@@ -31,7 +31,7 @@ class LocationContainer extends React.Component {
 
   render = () => {
     const { reportOption,
-      caseGraphData,
+      caseData,
       caseNotes } = this.props;
    
     return (
@@ -43,7 +43,7 @@ class LocationContainer extends React.Component {
             <OverviewDetails {...this.props} />
           </Tab>
           <Tab label="Case Tracker">
-            { caseGraphData && <TrackerGraph {...this.props}/> }
+            { caseData && <TrackerTimeline {...this.props}/> }
           </Tab>
         </Tabs>
       </div>
@@ -65,7 +65,7 @@ const mapStateToProps = ({
     regionMapData,
     selectedLocationMapData,
     caseNotes,
-    caseGraphData,
+    caseData,
   } = managerReducer;
   const { 
     country,
@@ -80,7 +80,7 @@ const mapStateToProps = ({
     regionMapData,
     selectedLocationMapData,
     caseNotes,
-    caseGraphData,
+    caseData,
     country,
     region,
   };
