@@ -3,6 +3,9 @@
 import React from 'react';
 import styles from './styles.css';
 import { connect } from 'react-redux';
+import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell} from 'recharts';
+import { calculateRagStatusOnBar } from 'utils/manager-utils';
+import { map } from 'lodash';
 
 class OverviewPerformance extends React.Component {
   constructor(props) {
@@ -14,7 +17,7 @@ class OverviewPerformance extends React.Component {
   }
 
   render = () => {
-    const { perfOpened } = this.props;
+    const { perfOpened, performanceData } = this.props;
     return (
 
       
@@ -27,9 +30,34 @@ class OverviewPerformance extends React.Component {
           <div className={styles.toggle}>
             PERFORMANCE
           </div>
-          <div className={styles.upArrow}>
+          <div className={
+        perfOpened == 0
+        ? styles.upArrow + ' pure-g'
+        : styles.downArrow + ' pure-g'
+      }>
           </div>
           
+        </div>
+        <div className="pure-u-1">
+          {performanceData && <ResponsiveContainer minHeight={200}>
+              <BarChart layout="horizontal" data={performanceData}
+                margin={{top: 0, right: 90, left: 60, bottom: 5}}>
+                <XAxis dataKey="name"/>
+                <YAxis/>
+                <CartesianGrid strokeDasharray="3 3"/>
+                <Tooltip/>
+                <Bar dataKey="achieved" stackId="a"  >
+                    {
+                      performanceData.map((entry, index) => (
+                        <Cell fill={calculateRagStatusOnBar(performanceData[index].achieved, 
+                        performanceData[index].kpi)}/>
+                      ))
+                    }
+                </Bar>
+                <Bar dataKey="kpi" stackId="a" fill="#2d3e50" />
+              </BarChart>
+            </ResponsiveContainer>
+            }
         </div>
       </div>
     );
@@ -40,10 +68,11 @@ class OverviewPerformance extends React.Component {
 
 const mapStateToProps = ({ managerReducer }) => {
   
-  const { perfOpened } = managerReducer;
+  const { perfOpened, performanceData } = managerReducer;
 
   return {
     perfOpened,
+    performanceData,
   };
 };
 

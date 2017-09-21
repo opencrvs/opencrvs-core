@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-21 11:54:42
+ * @Last Modified time: 2017-09-21 16:54:02
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -21,6 +21,7 @@ export const SET_LIST_ORDER = 'SET_LIST_ORDER';
 export const CASE_TRACKING = 'CASE_TRACKING';
 export const CASE_TRACKING_CLEAR = 'CASE_TRACKING_CLEAR';
 export const TOGGLE_PERFORMANCE = 'TOGGLE_PERFORMANCE';
+export const PERFORMANCE_METRICS = 'PERFORMANCE_METRICS';
 
 
 
@@ -87,6 +88,8 @@ function mapViewDataSuccess(mapLocations) {
   const subLocations = mapLocations.country.subEntries.entries;
   const countryManager = mapLocations.country.staff.manager;
   const totalCerts = updateTotalCerts(mapLocations.country, 'birth', 'This year');
+  const performanceData = updatePerformanceMetrics(mapLocations.country, 'birth', 'This year');
+  console.log(JSON.stringify(performanceData));
   return {
     type: MAPVIEW_DATA_SUCCESS,
     mapLocations,
@@ -94,6 +97,7 @@ function mapViewDataSuccess(mapLocations) {
     subLocations,
     totalCerts,
     countryManager,
+    performanceData,
   };
 }
 
@@ -117,11 +121,12 @@ function setDistrictManager(districtManager) {
   };
 }
 
-export function disableTooltip() {
+function removeTooltip() {
   return {
     type: REMOVE_TOOLTIP_MAP_DATA,
   };
 }
+
 
 
 export function selectListFilter(listFilter) {
@@ -138,6 +143,30 @@ export function selectListOrder(listOrder) {
     listOrder,
   };
 }
+
+
+export function disableTooltip() {
+  return (dispatch, getState) => {
+    const { 
+      countryLevel,
+      regionLevel,
+      mapLocations,
+      mapEvent, 
+      mapTimePeriod,
+      selectedLocation } = getState().managerReducer;
+    let performanceData = null;
+    if (countryLevel) {
+      performanceData = updatePerformanceMetrics(mapLocations.country, mapEvent, mapTimePeriod);
+    }
+    if (regionLevel) {
+      performanceData = updatePerformanceMetrics(selectedLocation, mapEvent, mapTimePeriod);
+    }
+    dispatch(setPerformanceMetrics(performanceData));
+    dispatch(removeTooltip());
+  };
+}
+
+
 
 export function setTooltipData(name) {
   // get data by name
@@ -156,22 +185,41 @@ export function setTooltipData(name) {
     };
     let regionManager = null;
     let districtManager = null;
+    let obj = {};
     if (countryLevel) {
-      let regions = {};
-      regions = head(filter(get(head(filter(subLocations, { title: title })), 'events'), { type: mapEvent }));
-      tooltipObj.certs = get(head(filter(regions.timePeriod, { title: mapTimePeriod })), 'certifications');
-      tooltipObj.kpi = get(head(filter(regions.timePeriod, { title: mapTimePeriod })), 'certificationsKpi');
+      obj = head(filter(get(head(filter(subLocations, { title: title })), 'events'), { type: mapEvent }));
       regionManager = get(head(filter(subLocations, { title: title })), 'staff.manager');
     }
     if (regionLevel) {
       const districtsUnfiltered = get(head(filter(subLocations, { title: selectedRegion })), 'subEntries').entries;
-      let districts = {};
-      districts = head(filter(get(head(filter(districtsUnfiltered, {title: title })), 'events'), { type: mapEvent }));
-      tooltipObj.certs = get(head(filter(districts.timePeriod, { title: mapTimePeriod })), 'certifications');
-      tooltipObj.kpi = get(head(filter(districts.timePeriod, { title: mapTimePeriod })), 'certificationsKpi');
+      obj = head(filter(get(head(filter(districtsUnfiltered, {title: title })), 'events'), { type: mapEvent }));
       regionManager = get(head(filter(subLocations, { title: selectedRegion })), 'staff.manager');
       districtManager = head(filter(districtsUnfiltered, {title: title })).staff.manager;
     }
+    tooltipObj.certs = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'certifications');
+    tooltipObj.kpi = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'certificationsKpi');
+    // performance graph
+    let registrations = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'registrations');
+    let registrationsKpi = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'registrationsKpi');
+    let validations = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'validations');
+    let validationsKpi = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'validationsKpi');
+    let declarations = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'declarations');
+    let declarationsKpi = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'declarationsKpi');
+    let notifications = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'notifications');
+    let notificationsKpi = get(head(filter(obj.timePeriod, { title: mapTimePeriod })), 'notificationsKpi');
+    let notificationsKpiStacked = (notificationsKpi - notifications);
+    let declarationsKpiStacked = (declarationsKpi - declarations);
+    let validationsKpiStacked = (validationsKpi - validations);
+    let registrationsKpiStacked = (registrationsKpi - registrations);
+    let certificationsKpiStacked = (tooltipObj.kpi - tooltipObj.certs);
+    let performanceData = [
+      {name: 'Notifications', achieved: notifications, kpi: notificationsKpiStacked},
+      {name: 'Declarations', achieved: declarations, kpi: declarationsKpiStacked},
+      {name: 'Validations', achieved: validations, kpi: validationsKpiStacked},
+      {name: 'Registrations', achieved: registrations, kpi: registrationsKpiStacked},
+      {name: 'Certifications', achieved: tooltipObj.certs, kpi: certificationsKpiStacked},
+    ];
+    dispatch(setPerformanceMetrics(performanceData));
     dispatch(tooltipDataReady(tooltipObj));
     dispatch(setDistrictManager(districtManager));
     dispatch(setRegionManager(regionManager));
@@ -183,6 +231,23 @@ function updateTotalCerts(data, mapEvent, mapTimePeriod) {
   let obj = head(filter(head(filter(data.events, {type: mapEvent})).timePeriod, {title: mapTimePeriod}));
   certs = obj.certifications;
   return certs;
+}
+
+function updatePerformanceMetrics(data, mapEvent, mapTimePeriod) {
+  let obj = head(filter(head(filter(data.events, {type: mapEvent})).timePeriod, {title: mapTimePeriod}));
+  let notificationsKpiStacked = (obj.notificationsKpi - obj.notifications);
+  let declarationsKpiStacked = (obj.declarationsKpi - obj.declarations);
+  let validationsKpiStacked = (obj.validationsKpi - obj.validations);
+  let registrationsKpiStacked = (obj.registrationsKpi - obj.registrations);
+  let certificationsKpiStacked = (obj.certificationsKpi - obj.certifications);
+  let performanceData = [
+    {name: 'Notifications', achieved: obj.notifications, kpi: notificationsKpiStacked},
+    {name: 'Declarations', achieved: obj.declarations, kpi: declarationsKpiStacked},
+    {name: 'Validations', achieved: obj.validations, kpi: validationsKpiStacked},
+    {name: 'Registrations', achieved: obj.registrations, kpi: registrationsKpiStacked},
+    {name: 'Certifications', achieved: obj.certifications, kpi: certificationsKpiStacked},
+  ];
+  return performanceData;
 }
 
 function tooltipDataReady(rolloverMapData) {
@@ -200,9 +265,19 @@ export function selectCountry() {
     let obj = {};
     obj = mapLocations.country;
     let certs = updateTotalCerts(obj, mapEvent, mapTimePeriod);
+    let performanceData = updatePerformanceMetrics(obj, mapEvent, mapTimePeriod);
+    dispatch(setPerformanceMetrics(performanceData));
     dispatch(setCountry(certs));
     dispatch(setDistrictManager(null));
     dispatch(setRegionManager(null));
+  };
+}
+
+
+function setPerformanceMetrics(performanceData) {
+  return {
+    type: PERFORMANCE_METRICS,
+    performanceData,
   };
 }
 
@@ -229,6 +304,8 @@ export function selectPeriod(period) {
     }
 
     let certs = updateTotalCerts(obj, mapEvent, period);
+    let performanceData = updatePerformanceMetrics(obj, mapEvent, period);
+    dispatch(setPerformanceMetrics(performanceData));
     dispatch(setPeriod(period, certs));
   };
 }
@@ -258,6 +335,8 @@ export function selectEvent(event) {
     }
 
     let certs = updateTotalCerts(obj, event, mapTimePeriod);
+    let performanceData = updatePerformanceMetrics(obj, event, mapTimePeriod);
+    dispatch(setPerformanceMetrics(performanceData));
     dispatch(setEvent(event, certs));
   };
 }
@@ -376,14 +455,14 @@ export function caseTracking() {
 
 export function caseTrackingClear() {
   return {
-    type: CASE_TRACKING_CLEAR
+    type: CASE_TRACKING_CLEAR,
   };
 }
 
 export function togglePerformanceReport() {
 
   return {
-    type: TOGGLE_PERFORMANCE
+    type: TOGGLE_PERFORMANCE,
   };
 }
 
@@ -399,6 +478,8 @@ export function selectRegion(name) {
       }
     });
     let certs = updateTotalCerts(obj, mapEvent, mapTimePeriod);
+    let performanceData = updatePerformanceMetrics(obj, mapEvent, mapTimePeriod);
+    dispatch(setPerformanceMetrics(performanceData));
     dispatch(regionSelected(obj, title, newMap, certs));
   };
 }
