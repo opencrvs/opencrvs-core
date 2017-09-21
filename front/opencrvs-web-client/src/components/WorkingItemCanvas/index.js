@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:43 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:43
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-15 19:43:45
  */
@@ -13,6 +13,42 @@ import { initialize } from 'redux-form';
 class WorkingItemCanvas extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      openChild: false,
+      openMother: false,
+      openFather: false,
+      openInformant: false,
+      openNotes: false,
+    };
+  }
+
+  scrollToFirstError = (errors) => {
+    let ms = 0;
+    if (!(this.state.openChild && this.state.openMother && this.state.openFather
+        && this.state.openInformant && this.state.openNotes)) {
+      this.setState({
+        openChild: true,
+        openMother: true,
+        openFather: true,
+        openInformant: true,
+        openNotes: true,
+      });
+      ms = 750;
+    }
+
+    // give collapsibles time to open
+    setTimeout(() => {
+      const firstErrorField = Object.keys(errors)[0];
+      const element = document.querySelector(`[name="${firstErrorField}"]`);
+      element.scrollIntoView();
+    }, ms);
+  };
+
+  onToggle = (field) => {
+    this.setState({
+      [field]: !this.state[field],
+    });
   }
 
   render = () => {
@@ -68,7 +104,7 @@ class WorkingItemCanvas extends React.Component {
         family: get(childPatient, 'patient.family'),
         gender: get(childPatient, 'patient.gender'),
         birthDate: new Date(get(childPatient, 'patient.birthDate')),
-        //TODO - add a 'same as mothers address switch' 
+        //TODO - add a 'same as mothers address switch'
         // currently the below is not used in form but is required for submission - temp fix
         child_telecom_id: get(childTelecom, 'id'),
         child_phone: get(motherTelecom, 'phone'),
@@ -185,7 +221,7 @@ class WorkingItemCanvas extends React.Component {
       const motherGiven = get(motherPatient, 'patient.given').toString().split(',').map(function(item) {
         return item.trim();
       });
-      const motherAddress = head(get(motherPatient, 'patient.address')); 
+      const motherAddress = head(get(motherPatient, 'patient.address'));
       const motherTelecom = head(get(motherPatient, 'patient.telecom'));
       const childPatient = head(filter(patients,
         function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
@@ -227,14 +263,14 @@ class WorkingItemCanvas extends React.Component {
         mother_formalEducation: '',
         mother_occupation: '',
         mother_employment: '',
-        
+
         child_phone: get(motherTelecom, 'phone'),
         firstName: childGiven.shift(),
         middleName: childGiven.toString().replace(/,/g, ''),
         family: get(childPatient, 'patient.family'),
         birthDate: new Date(get(childPatient, 'patient.birthDate')),
         // currently the below is not used in form but is required for submission - temp fix
-        
+
         child_email: '',
         child_use: '',
         child_addressLine1: '',
@@ -266,11 +302,11 @@ class WorkingItemCanvas extends React.Component {
         father_maritalStatus: '',
         father_marriageDate: '',
         father_nationality: '',
-        
+
         father_phone: '',
         father_email: '',
         father_use: '',
-        
+
         father_addressLine1: '',
         father_addressLine2: '',
         father_addressLine3: '',
@@ -284,31 +320,31 @@ class WorkingItemCanvas extends React.Component {
         father_occupation: '',
         father_employment: '',
 
-        // Informant 
+        // Informant
         informant_firstName: '',
         informant_middleName: '',
         informant_family: '',
-        informant_relationship: '', 
-        informant_addressLine1: '', 
-        informant_addressLine2: '', 
-        informant_addressLine3: '', 
-        informant_city: '', 
-        informant_county: '', 
-        informant_state: '', 
-        informant_postalCode: '', 
-        informant_personalIDNummber: '', 
-        informant_email: '', 
-        informant_phone: '', 
+        informant_relationship: '',
+        informant_addressLine1: '',
+        informant_addressLine2: '',
+        informant_addressLine3: '',
+        informant_city: '',
+        informant_county: '',
+        informant_state: '',
+        informant_postalCode: '',
+        informant_personalIDNummber: '',
+        informant_email: '',
+        informant_phone: '',
       };
 
     } else if (newDeclaration == true) {
-      
+
       myInitialValues = {
-        
+
         code: category.toLowerCase() + '-declaration',
-        //TODO - add a 'same as mothers address switch' 
+        //TODO - add a 'same as mothers address switch'
         // currently the below is not used in form but is required for submission - temp fix
-        
+
         child_phone: '',
         child_email: '',
         child_use: '',
@@ -337,7 +373,7 @@ class WorkingItemCanvas extends React.Component {
         mother_family: '',
 
         mother_maidenName: '',
-    
+
         mother_birthDate: '',
         mother_personalIDNummber: '',
         mother_maritalStatus: '',
@@ -374,11 +410,11 @@ class WorkingItemCanvas extends React.Component {
         father_maritalStatus: '',
         father_marriageDate: '',
         father_nationality: '',
-        
+
         father_phone: '',
         father_email: '',
         father_use: '',
-        
+
         father_addressLine1: '',
         father_addressLine2: '',
         father_addressLine3: '',
@@ -392,29 +428,36 @@ class WorkingItemCanvas extends React.Component {
         father_occupation: '',
         father_employment: '',
 
-        // Informant 
+        // Informant
         informant_firstName: '',
         informant_middleName: '',
         informant_family: '',
-        informant_relationship: '', 
-        informant_addressLine1: '', 
-        informant_addressLine2: '', 
-        informant_addressLine3: '', 
-        informant_city: '', 
-        informant_county: '', 
-        informant_state: '', 
-        informant_postalCode: '', 
-        informant_personalIDNummber: '', 
-        informant_email: '', 
-        informant_phone: '', 
+        informant_relationship: '',
+        informant_addressLine1: '',
+        informant_addressLine2: '',
+        informant_addressLine3: '',
+        informant_city: '',
+        informant_county: '',
+        informant_state: '',
+        informant_postalCode: '',
+        informant_personalIDNummber: '',
+        informant_email: '',
+        informant_phone: '',
       };
     }
     this.props.onFormUpdate(myInitialValues);
-    
+
     return (
-      <WorkingItemForm 
+      <WorkingItemForm
         newDeclaration={newDeclaration}
-        selectedDeclaration={selectedDeclaration} 
+        selectedDeclaration={selectedDeclaration}
+        onSubmitFail={this.scrollToFirstError}
+        openChild={this.state.openChild}
+        openMother={this.state.openMother}
+        openFather={this.state.openFather}
+        openInformant={this.state.openInformant}
+        openNotes={this.state.openNotes}
+        onToggle={this.onToggle}
       />
     );
   };

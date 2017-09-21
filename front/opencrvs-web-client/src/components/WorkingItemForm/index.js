@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:43 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:43
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-15 19:44:35
  */
@@ -12,7 +12,7 @@ import Dropdown from 'react-toolbox/lib/dropdown';
 import DatePicker from 'react-toolbox/lib/date_picker';
 import Collapsible from 'react-collapsible';
 import submit from './submit';
-import { 
+import {
   genderReference,
   typesOfBirth,
   placesOfDeliveryReference,
@@ -51,11 +51,15 @@ class WorkingItemForm extends React.Component {
   }
 
   render = () => {
-    
-
-    const { 
-      handleSubmit, 
+    const {
+      handleSubmit,
       error,
+      openChild,
+      openMother,
+      openFather,
+      openInformant,
+      openNotes,
+      onToggle,
     } = this.props;
 
     return (
@@ -69,6 +73,8 @@ class WorkingItemForm extends React.Component {
           trigger="
             Particulars of child
           "
+          open={openChild}
+          handleTriggerClick={() => {onToggle('openChild');}}
         >
           <Field component={renderInput} name="firstName" placeholder="First name" label="First name" validate={[required]} />
           <Field component={renderInput} name="middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
@@ -80,7 +86,7 @@ class WorkingItemForm extends React.Component {
           <Field component={renderDropdown} name="typeOfBirth" label="Type of birth" source={ typesOfBirth } />
           <Field component={renderDropdown} name="placeOfDelivery" label="Place of delivery" source={ placesOfDeliveryReference } />
           <Field component={renderDropdown} name="attendantAtBirth" label="Attendant at birth" source={ attendantsAtBirthReference } />
-          
+
           <Field component={renderInput} name="hospitalName" placeholder="Hospital name" label="Hospital name" validate={[required]}/>
           <Field component={renderInput} name="addressLine1" placeholder="Address line 1" label="Address line 1" validate={[required]} />
           <Field component={renderInput} name="addressLine2" placeholder="Address line 2" label="Address line 2" />
@@ -98,6 +104,8 @@ class WorkingItemForm extends React.Component {
           trigger="
             Particulars of mother
           "
+          open={openMother}
+          handleTriggerClick={() => {onToggle('openMother');}}
         >
           <Field component={renderInput} name="mother_firstName" placeholder="First name" label="First name" validate={[required]} />
           <Field component={renderInput} name="mother_middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
@@ -124,7 +132,7 @@ class WorkingItemForm extends React.Component {
           <Field component={renderDropdown} name="mother_county" label="County or district" source={ districtsReference } validate={[required]}/>
           <Field component={renderInput} name="mother_postalCode" placeholder="Postal code" label="Postal code"  />
           <Field component={renderDropdown} name="mother_state" label="State or region" source={ regionsReference } validate={[required]}/>
-          
+
           <Field component={renderDropdown} name="childrenBornAlive" label="Number of children ever born alive (including this birth)" source={ numbersReference } />
           <Field component={renderDropdown} name="childrenBornLiving" label="Number of children born alive and now living" source={ numbersReference } />
           <Field component={renderDropdown} name="foetalDeaths" label="Foetal deaths to mother" source={ numbersReference } />
@@ -145,6 +153,8 @@ class WorkingItemForm extends React.Component {
             trigger="
               Particulars of father
             "
+            open={openFather}
+            handleTriggerClick={() => {onToggle('openFather');}}
           >
             <Field component={renderInput} name="father_firstName" placeholder="First name" label="First name" validate={[required]} />
             <Field component={renderInput} name="father_middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
@@ -179,8 +189,10 @@ class WorkingItemForm extends React.Component {
             triggerOpenedClassName={styles.collapsibleOpened}
             overflowWhenOpen={styles.scroll}
             trigger="
-              Particulars of informant 
+              Particulars of informant
             "
+            open={openInformant}
+            handleTriggerClick={() => {onToggle('openInformant');}}
           >
             <Field component={renderInput} name="informant_firstName" placeholder="First name" label="First name" validate={[required]} />
             <Field component={renderInput} name="informant_middleName" placeholder="Middle name" label="Middle names" />
@@ -205,6 +217,8 @@ class WorkingItemForm extends React.Component {
             trigger="
               Notes
             "
+            open={openNotes}
+            handleTriggerClick={() => {onToggle('openNotes');}}
           >
             <Field component={renderTextArea} name="notes" type="text" placeholder="Notes" label="Notes" />
         </Collapsible>
