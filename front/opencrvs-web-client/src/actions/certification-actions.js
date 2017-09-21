@@ -2,11 +2,12 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 22:08:53
+ * @Last Modified time: 2017-09-21 17:42:16
  */
 export const PRINT_SELECTED = 'PRINT_SELECTED';
 export const PRINT_DESELECTED = 'PRINT_DESELECTED';
 export const UPDATE_CERT_NUMBER = 'UPDATE_CERT_NUMBER';
+export const UPDATE_COLLECTOR = 'UPDATE_COLLECTOR';
 
 
 
@@ -23,9 +24,17 @@ export function closePrintModal() {
 }
 
 export function updateCertNumber(certificateNumber) {
-  console.log(certificateNumber);
   return {
     type: UPDATE_CERT_NUMBER,
     certificateNumber,
   };
 }
+
+export function updateCollector(collector) {
+  console.log(collector);
+  return {
+    type: UPDATE_COLLECTOR,
+    collector,
+  };
+}
+

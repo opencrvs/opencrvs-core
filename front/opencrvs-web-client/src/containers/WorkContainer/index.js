@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-19 12:45:26
+ * @Last Modified time: 2017-09-21 18:04:53
  */
 import React from 'react';
 import styles from './styles.css';
@@ -46,6 +46,7 @@ import {
 } from 'actions/global-actions';
 import {
   updateCertNumber,
+  updateCollector,
 } from 'actions/certification-actions';
 
 class WorkContainer extends React.Component {
@@ -93,6 +94,7 @@ class WorkContainer extends React.Component {
 
 const mapStateToProps = ({
   declarationsReducer,
+  certificationReducer,
   userReducer,
   imageReducer,
   patientsReducer,
@@ -112,8 +114,11 @@ const mapStateToProps = ({
     reqDocsModal,
     newChildPersonalID,
     newBirthRegistrationNumber,
+    declarationToCheckAgainst,
   } = declarationsReducer;
-
+  const {
+    collector,
+  } = certificationReducer;
   const { isAuthenticated,
     role,
     username,
@@ -140,8 +145,10 @@ const mapStateToProps = ({
     trackingModal,
     certIDCheckModal,
     imageToDelete,
+    declarationToCheckAgainst,
     submitModal,
     selectedDeclaration,
+    collector,
     newDeclaration,
     category,
     isAuthenticated,
@@ -244,6 +251,9 @@ const mapDispatchToProps = dispatch => {
     },
     onPrintProceed: () => {
       dispatch(proceedToPrintView());
+    },
+    setCollector: value => {
+      dispatch(updateCollector(value));
     },
   };
 };
