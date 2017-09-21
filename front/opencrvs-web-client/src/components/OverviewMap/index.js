@@ -16,8 +16,6 @@ class OverviewMap extends React.Component {
     super(props);
   }
 
-  
-
   projection(scale, transX, transY) {
     return geoMercator()
       .scale(scale)
@@ -26,7 +24,6 @@ class OverviewMap extends React.Component {
 
   onMouseOut(e) {
     e.target.setAttribute('style', 'opacity: 1');
-    this.props.disableTooltipData();
   }
   onMouseOver(e, mapData, regionIndex) {
     e.target.setAttribute('style', 'opacity: 0.70');
@@ -48,13 +45,6 @@ class OverviewMap extends React.Component {
     if (this.props.regionLevel) {
       this.props.updateTooltipData(mapData[regionIndex].properties.NAME_2);
     }
-  }
-  onMouseMoveTooltip(e) {
-    let newProps = {
-      x: e.pageX,
-      y: e.pageY,
-    }
-    this.props.updateOrigin(newProps);
   }
 
   handleEventFilter = (value) => {
@@ -82,13 +72,11 @@ class OverviewMap extends React.Component {
             mapLocations,
             mapEvent,
             mapTimePeriod,
-            originX,
             totalCerts,
-            originY,
             rolloverMapData,
             country } = this.props;
     const myCountry = country.charAt(0).toUpperCase() + country.slice(1);
-    
+
     let scale;
     let transX;
     let transY;
@@ -120,7 +108,7 @@ class OverviewMap extends React.Component {
         <div className="pure-u-1 pure-u-md-1-6">
           <Navigation type="horizontal">
             <Link label={
-              regionLevel 
+              regionLevel
               ? myCountry + ' > '
               : myCountry
             } active={countryLevel}
@@ -153,7 +141,7 @@ class OverviewMap extends React.Component {
             </div>
           </div>
         </div>
-        <div className={ 
+        <div className={
           countryLevel
           ? styles.mapSvgContainerCountry + ' pure-u-1 pure-u-md-4-6'
           : styles.mapSvgContainerRegion + ' pure-u-1 pure-u-md-4-6'
@@ -166,12 +154,12 @@ class OverviewMap extends React.Component {
                     key={ `path-${ i }` }
                     d={ geoPath().projection(this.projection(scale, transX, transY))(d) }
                     fill={calculateRagStatusOnMap(
-                      selectedLocationMapData, 
-                      i, 
+                      selectedLocationMapData,
+                      i,
                       selectedLocation.subEntries.entries,
-                      mapEvent, 
-                      mapTimePeriod, 
-                      countryLevel, 
+                      mapEvent,
+                      mapTimePeriod,
+                      countryLevel,
                       regionLevel)}
                     style={{ opacity: 1 }}
                     stroke="#000000"
@@ -179,15 +167,12 @@ class OverviewMap extends React.Component {
                     onClick={ (e) => this.handleRegionClick(e, selectedLocationMapData, i) }
                     onMouseOut={ (e) => this.onMouseOut(e, selectedLocationMapData, i) }
                     onMouseOver={ (e) => this.onMouseOver(e, selectedLocationMapData, i) }
-                    onMouseMove={this.onMouseMoveTooltip.bind(this)}
                   />
                 ))
               }
               </g>
           </svg>
-          { rolloverMapData && <TooltipHolder 
-            originX={originX} 
-            originY={originY}
+          { rolloverMapData && <TooltipHolder
             mapEvent={mapEvent}
             rolloverMapData={rolloverMapData} /> }
         </div>
@@ -196,7 +181,7 @@ class OverviewMap extends React.Component {
   }
 }
 
-   
+
 const mapStateToProps = ({ managerReducer, globalReducer }) => {
   const { selectedLocation,
           subLocation,
@@ -205,12 +190,9 @@ const mapStateToProps = ({ managerReducer, globalReducer }) => {
           selectedDistrict,
           countryLevel,
           regionLevel,
-          mapLocations,
           mapEvent,
           mapTimePeriod,
           districtLevel,
-          originX,
-          originY,
           totalCerts,
           rolloverMapData } = managerReducer;
   const { country } = globalReducer;
@@ -226,8 +208,6 @@ const mapStateToProps = ({ managerReducer, globalReducer }) => {
     districtLevel,
     mapEvent,
     mapTimePeriod,
-    originX,
-    originY,
     totalCerts,
     rolloverMapData,
   };

@@ -1,22 +1,21 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:48 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 15:47:41
+ * @Last Modified time: 2017-09-20 10:48:36
  */
 import React from 'react';
 import styles from './styles.css';
 import OverviewFilter from 'components/OverviewFilter';
 import OverviewMap from 'components/OverviewMap';
 import OverviewDetails from 'components/OverviewDetails';
-import TrackerGraph from 'components/TrackerGraph';
+import TrackerTimeline from 'components/TrackerTimeline';
 import {Tab, Tabs} from 'react-toolbox';
 import { connect } from 'react-redux';
 import { selectRegion,
          selectCountry,
          selectEvent,
          selectPeriod,
-         updateTooltipOrigin,
          setTooltipData,
          disableTooltip } from 'actions/manager-actions';
 
@@ -31,9 +30,9 @@ class LocationContainer extends React.Component {
 
   render = () => {
     const { reportOption,
-      caseGraphData,
+      caseData,
       caseNotes } = this.props;
-   
+
     return (
       <div className={styles.locationContainer + ' pure-u-1'}>
         <Tabs index={reportOption} onChange={this.handleOptionChange} className={styles.tabs}>
@@ -43,7 +42,7 @@ class LocationContainer extends React.Component {
             <OverviewDetails {...this.props} />
           </Tab>
           <Tab label="Case Tracker">
-            { caseGraphData && <TrackerGraph {...this.props}/> }
+            { caseData && <TrackerTimeline {...this.props}/> }
           </Tab>
         </Tabs>
       </div>
@@ -51,12 +50,12 @@ class LocationContainer extends React.Component {
   }
 }
 
-   
 
-const mapStateToProps = ({  
+
+const mapStateToProps = ({
   managerReducer,
   globalReducer }) => {
-  const { 
+  const {
     mapLocations,
     fetchingMapView,
     subLocations,
@@ -65,13 +64,13 @@ const mapStateToProps = ({
     regionMapData,
     selectedLocationMapData,
     caseNotes,
-    caseGraphData,
+    caseData,
   } = managerReducer;
-  const { 
+  const {
     country,
     region } = globalReducer;
   return {
-    
+
     mapLocations,
     fetchingMapView,
     subLocations,
@@ -80,7 +79,7 @@ const mapStateToProps = ({
     regionMapData,
     selectedLocationMapData,
     caseNotes,
-    caseGraphData,
+    caseData,
     country,
     region,
   };
@@ -88,7 +87,7 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    
+
     onRegionClick: name => {
       dispatch(selectRegion(name));
     },
@@ -100,9 +99,6 @@ const mapDispatchToProps = dispatch => {
     },
     onPeriodChange: value => {
       dispatch(selectPeriod(value));
-    },
-    updateOrigin: newProps => {
-      dispatch(updateTooltipOrigin(newProps));
     },
     updateTooltipData: name => {
       dispatch(setTooltipData(name));

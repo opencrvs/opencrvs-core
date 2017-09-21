@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   z-index: 20;
-  top: 6em;
+  top: 2em;
   left: 2em;
 }
 
@@ -12,12 +12,11 @@
   width: 100%;
   height: 100%;
   z-index: 20;
-  top: 6em;
+  top: 2em;
   left: 2em;
 }
 
 .totalCerts {
-
   font-size: 3.4em;
   letter-spacing: 0rem;
   font-weight: 300;
@@ -28,7 +27,6 @@
 .mapSvg {
   width: 100%;
 }
-
 
 .dropdownOption {
   position: relative;
@@ -50,11 +48,11 @@
 
 @media (min-width: 55em) {
   .mapSvgContainerCountry {
-    top: 6em;
+    top: 2em;
     left: 5em;
   }
   .mapSvgContainerRegion {
-    top: 6em;
+    top: 2em;
     left: 5em;
   }
 }

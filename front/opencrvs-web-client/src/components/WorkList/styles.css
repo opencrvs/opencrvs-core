@@ -12,7 +12,7 @@
     max-height: 35.8em;
 }
 
-.list div:nth-child(3) {
+.list > div:nth-child(3) {
     border-top: 1px solid #ddd;
 }
 

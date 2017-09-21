@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:28
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-07 15:26:40
+ * @Last Modified time: 2017-09-19 12:51:51
  */
 import {
   DECLARATION_REQUEST,
@@ -152,6 +152,7 @@ function declarationsReducer(
       return {
         ...state,
         selectedCertification: action.selectedCertification,
+        declarationToCheckAgainst: null,
         newDeclaration: false,
         newNotification: false,
         category: '',

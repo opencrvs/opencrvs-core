@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-19 10:38:13
+ * @Last Modified time: 2017-09-19 12:45:26
  */
 import React from 'react';
 import styles from './styles.css';
@@ -30,6 +30,7 @@ import {
   submitDeclaration,
   reqModalToggle,
   certCheckModalClosed,
+  proceedToPrintView,
   smsModalToggle,
   sendSMS,
 } from 'actions/declaration-actions';
@@ -258,6 +259,9 @@ const mapDispatchToProps = dispatch => {
     },
     onUpdateCertNumber: value => {
       dispatch(updateCertNumber(value));
+    },
+    onPrintProceed: () => {
+      dispatch(proceedToPrintView());
     },
   };
 };

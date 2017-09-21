@@ -1,8 +1,8 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:19:24 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 15:39:48
+ * @Last Modified time: 2017-09-20 14:37:04
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -30,14 +30,14 @@ import { filter, head, map, get } from 'lodash';
 const Moment = require('moment');
 
 export function fetchMapViewData() {
-  
+
   return dispatch => {
     dispatch(requestMapViewData());
     const config = {
       method: 'GET',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     };
-    
+
     apiMiddleware(config, BASE_URL + 'manager', dispatch).then(items => {
       dispatch(mapViewDataSuccess(items));
       dispatch(getMapData());
@@ -46,7 +46,7 @@ export function fetchMapViewData() {
 }
 
 export function getMapData() {
-  
+
   return (dispatch, getState) => {
     const {country, regions } = getState().globalReducer;
     const config = {
@@ -68,7 +68,7 @@ export function getMapData() {
         dispatch(setMapViewMapData(countryMapData, regionMapData, ));
       });
     });
-    
+
   };
 }
 
@@ -115,14 +115,6 @@ function setDistrictManager(districtManager) {
   };
 }
 
-export function updateTooltipOrigin(obj) {
-  return {
-    type: UPDATE_ORIGIN,
-    originX: obj.x,
-    originY: obj.y,
-  };
-}
-
 export function disableTooltip() {
   return {
     type: REMOVE_TOOLTIP_MAP_DATA,
@@ -148,11 +140,11 @@ export function selectListOrder(listOrder) {
 export function setTooltipData(name) {
   // get data by name
   return (dispatch, getState) => {
-    const { mapEvent, 
-      subLocations, 
-      mapTimePeriod, 
-      countryLevel, 
-      regionLevel, 
+    const { mapEvent,
+      subLocations,
+      mapTimePeriod,
+      countryLevel,
+      regionLevel,
       selectedRegion } = getState().managerReducer;
     const title = name.charAt(0).toUpperCase() + name.slice(1);
     const tooltipObj = {
@@ -200,8 +192,8 @@ function tooltipDataReady(rolloverMapData) {
 
 export function selectCountry() {
   return (dispatch, getState) => {
-    const { mapLocations, 
-      mapEvent, 
+    const { mapLocations,
+      mapEvent,
       mapTimePeriod } = getState().managerReducer;
     let obj = {};
     obj = mapLocations.country;
@@ -221,8 +213,8 @@ function setCountry(totalCerts) {
 
 export function selectPeriod(period) {
   return (dispatch, getState) => {
-    const { mapLocations, 
-      mapEvent, 
+    const { mapLocations,
+      mapEvent,
       selectedRegion,
       countryLevel,
       regionLevel } = getState().managerReducer;
@@ -250,8 +242,8 @@ function setPeriod(period, totalCerts) {
 
 export function selectEvent(event) {
   return (dispatch, getState) => {
-    const { mapLocations, 
-      mapTimePeriod, 
+    const { mapLocations,
+      mapTimePeriod,
       selectedRegion,
       countryLevel,
       regionLevel } = getState().managerReducer;
@@ -300,22 +292,72 @@ export function caseTracking() {
       avatar: 'male',
     },
     caseNotes: [
-      {title: 'NOTIFICATION', notes: [
-        {note: 'Power cut in the office.', date: Moment().subtract(29, 'days').format('Do MMM')},
-      ]},
-      {title: 'DECLARATION', notes: [
-        {note: 'Power cut in the office', date: Moment().subtract(23, 'days').format('Do MMM')},
-        {note: 'No ID document supplied.', date: Moment().subtract(20, 'days').format('Do MMM')},
-      ]},
-      {title: 'VALIDATION', notes: [
-      ]},
-      {title: 'SMS', notes: [
-      ]},
-      {title: 'PAYMENT', notes: [
-        {note: 'MTN Mobile money payment', date: Moment().subtract(11, 'days').format('Do MMM')},
-      ]},
-      {title: 'CERTIFICATION', notes: [
-      ]},
+      {
+        id: 1,
+        title: 'NOTIFICATION', 
+        note: 'Mankrong village polio immunisation', 
+        createdAt: Moment().subtract(29, 'days').format('Do MMM'),
+        icon: 'notifications',
+        iconAlt: 'notifications',
+        kpiData: [
+          {name: 'Page A', uv: 4990, pv: 10},
+        ],
+      },
+      {
+        id: 2,
+        title: 'DECLARATION', 
+        note: 'Agona West Municipal registration office', 
+        createdAt: Moment().subtract(23, 'days').format('Do MMM'),
+        icon: 'input',
+        iconAlt: 'input',
+        kpiData: [
+          {name: 'Page A', uv: 1500, pv: 3500},
+        ],
+      },
+      {
+        id: 3,
+        title: 'VALIDATION', 
+        note: 'Agona West Municipal registration office', 
+        createdAt: Moment().subtract(20, 'days').format('Do MMM'),
+        icon: 'check',
+        iconAlt: 'check',
+        kpiData: [
+          {name: 'Page A', uv: 2500, pv: 2500},
+        ],
+      },
+      {
+        id: 4,
+        title: 'SMS', 
+        note: 'Mother contacted', 
+        createdAt: Moment().subtract(20, 'days').format('Do MMM'),
+        icon: 'sms',
+        iconAlt: 'sms',
+        kpiData: [
+          {name: 'Page A', uv: 4990, pv: 10},
+        ],
+      },
+      {
+        id: 5,
+        title: 'PAYMENT', 
+        note: 'Payment received by Airtel mobile money', 
+        createdAt: Moment().subtract(11, 'days').format('Do MMM'),
+        icon: 'payment',
+        iconAlt: 'payment',
+        kpiData: [
+          {name: 'Page A', uv: 4000, pv: 1000},
+        ],
+      },
+      {
+        id: 6,
+        title: 'CERTIFICATION', 
+        note: 'Certificate printed and accepted by informant', 
+        createdAt: Moment().subtract(10, 'days').format('Do MMM'),
+        icon: 'print',
+        iconAlt: 'print',
+        kpiData: [
+          {name: 'Page A', uv: 4500, pv: 500},
+        ],
+      },
     ],
     caseGraphData: [
       {name: Moment().subtract(30, 'days').format('Do MMM'), kpi: 0, actual: 0, amt: 2400},
