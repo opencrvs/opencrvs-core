@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-22 10:47:40
+ * @Last Modified time: 2017-09-22 12:06:03
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -88,7 +88,6 @@ function mapViewDataSuccess(mapLocations) {
   const countryManager = mapLocations.country.staff.manager;
   const totalCerts = updateTotalCerts(mapLocations.country, 'birth', 'This year');
   const performanceData = updatePerformanceMetrics(mapLocations.country, 'birth', 'This year');
-  console.log(JSON.stringify(performanceData));
   return {
     type: MAPVIEW_DATA_SUCCESS,
     mapLocations,
