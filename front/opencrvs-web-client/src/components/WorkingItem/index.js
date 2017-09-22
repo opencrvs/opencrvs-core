@@ -28,6 +28,7 @@ const Moment = require('moment');
 const PrintTemplate = require('react-print');
 import SmsButton from 'components/buttons/SmsButton';
 import RejectIcon from 'components/icons/RejectIcon';
+import StopWatchIcon from 'components/icons/StopWatchIcon';
 
 class WorkingItem extends React.Component {
   state = {
@@ -177,92 +178,54 @@ class WorkingItem extends React.Component {
           ?
           <div className={styles.wiContentHeader + ' pure-g'}>
             <div className="pure-u-1 pure-u-md-1-2">
-              <div className={styles.iconHolder}>{iconType}</div>
-              <div className={styles.titleText}>
-                <h1 className={
-                      newDeclaration == true
-                        ? styles.newWorkItem + ' ' + styles.wiContentTitle
-                        : styles.wiContentTitle
-                    }
-                >{ declarationTitle }</h1>
-                <p className={styles.wiContentSubtitle}>
-                  <span>{' ' + Moment(birthDate).format('Do MMMM YYYY') }</span>
-                </p>
-
-                <div className={
-                  Moment().diff(selectedDeclaration.created_at, 'days') > 1
-                  ?
-                    styles.stopWatch
-                  :
-                    styles.stopWatchHidden
-                }>
-
-                  <svg
-                    fill="#ff4081"
-                    viewBox="0 0 100 101"
-                    height="30"
-                    width="30"
-                  >
-                    <g>
-                      <g>
-                        <path d="M61.7,57.1h-13c-0.6,0-1-0.4-1-1V39.7c0-0.6,0.4-1,1-1s1,0.4,1,1v15.4h12c0.6,0,1,0.4,1,1S62.3,57.1,61.7,57.1z"/>
-                      </g>
-                      <g>
-                        <path d="M54,16.8H43.4c-0.6,0-1-0.4-1-1s0.4-1,1-1H54c0.6,0,1,0.4,1,1S54.5,16.8,54,16.8z"/>
-                      </g>
-                      <g>
-                        <path d="M80.3,32.6c-0.3,0-0.5-0.1-0.7-0.3l-6.8-6.8c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l6.8,6.8c0.4,0.4,0.4,1,0,1.4
-                          C80.8,32.5,80.6,32.6,80.3,32.6z"/>
-                      </g>
-                      <g>
-                        <path d="M48.7,85.2c-16.5,0-30-13.5-30-30s13.5-30,30-30s30,13.5,30,30S65.2,85.2,48.7,85.2z M48.7,27.2c-15.4,0-28,12.6-28,28
-                          s12.6,28,28,28s28-12.6,28-28S64.1,27.2,48.7,27.2z"/>
-                      </g>
-                    </g>
-                  </svg>
+              <div className={styles.wiContentDetails}>
+                <div className={styles.iconHolder}>{iconType}</div>
+                <div className={styles.titleText}>
+                  <h1 className={
+                    newDeclaration == true
+                      ? styles.newWorkItem + ' ' + styles.wiContentTitle
+                      : styles.wiContentTitle
+                  }>
+                    {declarationTitle}
+                  </h1>
+                  <p className={styles.wiContentSubtitle}>
+                    <span>{' ' + Moment(birthDate).format('Do MMMM YYYY') }</span>
+                  </p>
                 </div>
-
+                {
+                  Moment().diff(selectedDeclaration.created_at, 'days') > 1
+                    ? <StopWatchIcon />
+                    : null
+                }
               </div>
             </div>
-            <div className={styles.wiContentControls + ' pure-u-1 pure-u-md-1-2'}>
-              <div className="pure-g">
+            <div className={'pure-u-1 pure-u-md-1-2'}>
+              <div className={styles.wiContentControls}>
                 {
-                  !showTrash ? (
-                    <div className="pure-u-1-2 pure-u-md-1-5">
-                      {/* Empty placeholder to fix button alignment */}
-                    </div>
-                  ) : null
+                  role !== 'field officer' && (
+                    <SmsButton openSMSModal={this.openSMSModal} />
+                  )
                 }
                 {
                   role === 'field officer' ? (
-                    <div className="pure-u-1-2 pure-u-md-1-5">
-                      {/* Empty placeholder to fix button alignment */}
-                    </div>
-                  ) : null
+                    <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
+                  ) : (
+                    <Button icon="save" label="Save" flat />
+                  )
                 }
                 {
-                  role !== 'field officer' ? (
-                    <div className={styles.smsMother + 'pure-u-1-2 pure-u-md-1-5'}>
-                      <SmsButton openSMSModal={this.openSMSModal} />
-                    </div>
-                  ) : null
+                  role === 'field officer' ? (
+                    <Button icon="save" label="Save" flat />
+                  ) : (
+                    <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
+                  )
                 }
-                <div className="pure-u-1-2 pure-u-md-1-5">
-                  <Button icon="save" label="Save" flat />
-                </div>
-                <div className="pure-u-1-2 pure-u-md-1-5">
-                  <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
-                </div>
                 {
-                  showTrash ? (
-                    <div className="pure-u-1-2 pure-u-md-1-5">
-                      <Button icon="delete" label="Trash" flat />
-                    </div>
-                  ) : null
+                  showTrash && (
+                    <Button icon="delete" label="Trash" flat />
+                  )
                 }
-                <div className="pure-u-1-2 pure-u-md-1-5">
-                  <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
-                </div>
+                <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
               </div>
             </div>
           </div>
@@ -289,12 +252,12 @@ class WorkingItem extends React.Component {
                   </div>
                 </div>
               </div>
-              <div className={styles.wiContentControls + ' pure-u-1 pure-u-md-1-2'}>
-                <div className="pure-g">
-                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}><p>National ID</p><TickIcon /></div>
-                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}><p>Payment</p><TickIcon /></div>
-                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}><p>Status</p><TickIcon /></div>
-                  <div className={styles.certInfo + ' pure-u-1-2 pure-u-md-1-4'}>
+              <div className={'pure-u-1 pure-u-md-1-2'}>
+                <div className={styles.wiContentControls}>
+                  <div className={styles.certInfo}><span>National ID</span><TickIcon /></div>
+                  <div className={styles.certInfo}><span>Payment</span><TickIcon /></div>
+                  <div className={styles.certInfo}><span>Status</span><TickIcon /></div>
+                  <div className={styles.certInfo}>
                     <Button icon="print" label="Print" flat onClick={this.displayPrintPreview} />
                   </div>
                 </div>

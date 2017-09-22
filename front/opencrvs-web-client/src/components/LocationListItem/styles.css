@@ -24,3 +24,8 @@
   margin-top: -2.1em;
   margin-bottom: 0.2em;
 }
+
+.pullRight {
+  text-align: right;
+  padding-right: 2em;
+}
