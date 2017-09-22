@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-21 17:46:22
+ * @Last Modified time: 2017-09-22 10:13:12
  */
 import {
   PRINT_SELECTED,
@@ -10,6 +10,7 @@ import {
   UPDATE_CERT_NUMBER,
   UPDATE_REG_NUMBER,
   UPDATE_COLLECTOR,
+  SUBMIT_COLLECTOR,
 } from '../actions/certification-actions';
 
 function globalReducer(
@@ -40,6 +41,11 @@ function globalReducer(
       return {
         ...state,
         collector: action.collector,
+      };
+    case SUBMIT_COLLECTOR:
+      return {
+        ...state,
+        collector: 'none',
       };
     default:
       return state;

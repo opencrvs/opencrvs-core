@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-21 18:41:32
+ * @Last Modified time: 2017-09-22 10:20:05
  */
 import React from 'react';
 import styles from './styles.css';
@@ -35,9 +35,11 @@ class CertCheckModal extends React.Component {
     this.props.onModalCloseClick('certCheck');
   }
 
-  printCert = (event) => {
-    this.props.onPrintProceed();
-    this.props.onModalCloseClick('certCheck');
+  continueToPrintCert = (event) => {
+    if (this.props.collector != 'none') {
+      this.props.onPrintProceed();
+      this.props.onModalCloseClick('certCheck');
+    }
   }
 
   handleChange = (value) => {
@@ -106,26 +108,36 @@ class CertCheckModal extends React.Component {
         {collector != 'other' && collector != 'none' && <div className="pure-u-1">
           <p className={styles.checkHeading}>Click 'Continue' if the individual's ID matches the following data</p>
           { myPatient && <div className={styles.patientData}>
-            <p><span className={styles.info}>First name:</span> {details.firstName}</p>
-            <p><span className={styles.info}>Middle name:</span> {details.middleName}</p>
-            <p><span className={styles.info}>Family name:</span> {details.family}</p>
-            <p><span className={styles.info}>Date of birth:</span> {Moment(details.birthDate).format('MMMM Do YYYY')}</p>
-            <p><span className={styles.info}>Personal ID Number:</span> {details.personalIDNummber}</p>
+            <p className={styles.checkInfo}>
+              <span className={styles.info}>First name:</span> {details.firstName}
+            </p>
+            <p className={styles.checkInfo}>
+              <span className={styles.info}>Middle name:</span> {details.middleName}
+            </p>
+            <p className={styles.checkInfo}>
+              <span className={styles.info}>Family name:</span> {details.family}
+            </p>
+            <p className={styles.checkInfo}>
+              <span className={styles.info}>Date of birth:</span> {Moment(details.birthDate).format('MMMM Do YYYY')}
+            </p>
+            <p className={styles.checkInfo}>
+              <span className={styles.info}>Personal ID Number:</span> {details.personalIDNummber}
+            </p>
           </div>
 
           }
         </div>}
         {collector === 'other' && <div className="pure-u-1">
-          <p className={styles.checkHeading}>Search the national ID database to confirm the person's identity</p>
+          <p className={styles.checkHeading}>1. Search the national ID database to confirm the person's identity</p>
           <div className="pure-u-1 pure-u-md-1-2">
           <Input theme={theme} type="text" label="Individual's National ID" icon="search" />
           </div>
           
-          <div className="pure-u-1 pure-u-md-1-2">
+          <div className={styles.nationalIDButton + ' pure-u-1 pure-u-md-1-2'}>
             <Button label="Check National ID" raised primary />
           </div>
           <div className="pure-u-1">
-            <p className={styles.checkHeading}>Upload a signed affidavit from the mother of the child.</p>
+            <p className={styles.checkHeading}>2. Upload a signed affidavit from the mother of the child.</p>
             <Button icon="image" label="Upload affidavit" raised />
           </div>
         </div>}
