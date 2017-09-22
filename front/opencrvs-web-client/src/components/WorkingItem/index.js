@@ -202,16 +202,28 @@ class WorkingItem extends React.Component {
             <div className={'pure-u-1 pure-u-md-1-2'}>
               <div className={styles.wiContentControls}>
                 {
-                  role !== 'field officer' ? (
+                  role !== 'field officer' && (
                     <SmsButton openSMSModal={this.openSMSModal} />
-                  ) : null
+                  )
                 }
-                <Button icon="save" label="Save" flat />
-                <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                 {
-                  showTrash ? (
+                  role === 'field officer' ? (
+                    <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
+                  ) : (
+                    <Button icon="save" label="Save" flat />
+                  )
+                }
+                {
+                  role === 'field officer' ? (
+                    <Button icon="save" label="Save" flat />
+                  ) : (
+                    <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
+                  )
+                }
+                {
+                  showTrash && (
                     <Button icon="delete" label="Trash" flat />
-                  ) : null
+                  )
                 }
                 <Button icon="send" label="Submit" flat onClick={this.openSubmit} />
               </div>
