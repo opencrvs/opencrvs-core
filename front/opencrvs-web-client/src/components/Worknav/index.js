@@ -9,6 +9,7 @@ import styles from './styles.css';
 import UserAvatar from 'components/UserAvatar';
 import ReactTooltip from 'react-tooltip';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 class Worknav extends React.Component {
   constructor(props) {
@@ -112,6 +113,10 @@ class Worknav extends React.Component {
                               c0-0.5-0.3-0.8-0.9-0.8l-14-0.1L14.7,13.3z M51,46.3c0,0.4,0,0.8-1.6,0.9l-0.1,0l-38.9,0c-0.7,0-1.1-0.1-1.4-0.2
                               c-0.2-0.1-0.3-0.2-0.3-0.6l0-15.2l13.6,0c0.4,3.8,3.6,6.8,7.5,6.8l0.1,0c2,0,3.9-0.8,5.3-2.3c1.3-1.2,2-2.8,2.1-4.5l13.6,0
                               L51,46.3z"/>
+                          </g>
+                          <g>
+                            <circle cx={50} cy={50} r={10} fill="rgb(255, 64, 129)" />
+                            <text textAnchor="middle" x={50} y={57} style={{fontSize: 20, fontWeight: 'bold'}}>{this.props.workQueueItems}</text>
                           </g>
                         </g>
                       </svg>
@@ -377,10 +382,26 @@ class Worknav extends React.Component {
     );
   }
 }
-const mapStateToProps = ({ userReducer, globalReducer }) => {
+
+Worknav.propTypes = {
+  workView: PropTypes.string,
+  given: PropTypes.string.isRequired,
+  family: PropTypes.string.isRequired,
+  avatar: PropTypes.string.isRequired,
+  menuOpened: PropTypes.number.isRequired,
+  role: PropTypes.string.isRequired,
+  workQueueItems: PropTypes.number,
+};
+
+Worknav.defaultProps = {
+  workQueueItems: 0,
+};
+
+const mapStateToProps = ({ userReducer, globalReducer, declarationsReducer }) => {
 
   const { menuOpened, workView } = globalReducer;
   const { given, family, avatar, role } = userReducer;
+  const { declarationsList = [] } = declarationsReducer;
 
   return {
     workView,
@@ -389,6 +410,7 @@ const mapStateToProps = ({ userReducer, globalReducer }) => {
     avatar,
     menuOpened,
     role,
+    workQueueItems: declarationsList.length,
   };
 };
 

@@ -7,9 +7,23 @@
 
 
 .settingsContent {
-  width: 100%;
+  width: 80%;
   height: auto;
   top: 6em;
   position: relative;
-  margin: 3em;
+  margin: 0 auto;
+  margin-top: 3em;
+}
+
+.title {
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.settingsTitles {
+  border-bottom: 1px solid #333;
+}
+
+.rightAlign {
+  text-align: right;
 }

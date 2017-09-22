@@ -2,11 +2,16 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
+<<<<<<< HEAD
  * @Last Modified time: 2017-09-22 10:20:05
+=======
+ * @Last Modified time: 2017-09-22 10:22:47
+>>>>>>> 206f8fa7b386cb6a561ed07d3e620f6c7db3e97e
  */
 import React from 'react';
 import styles from './styles.css';
 import Dialog from 'react-toolbox/lib/dialog';
+<<<<<<< HEAD
 import { Button, IconButton } from 'react-toolbox/lib/button';
 import { filter, get, head } from 'lodash';
 import Dropdown from 'react-toolbox/lib/dropdown';
@@ -21,6 +26,8 @@ const individuals = [
   { value: 'informant', label: 'Informant' },
   { value: 'other', label: 'Other'},
 ];
+=======
+>>>>>>> 206f8fa7b386cb6a561ed07d3e620f6c7db3e97e
 
 class CertCheckModal extends React.Component {
   constructor(props) {
@@ -36,10 +43,15 @@ class CertCheckModal extends React.Component {
   }
 
   continueToPrintCert = (event) => {
+<<<<<<< HEAD
     if (this.props.collector != 'none') {
       this.props.onPrintProceed();
       this.props.onModalCloseClick('certCheck');
     }
+=======
+    this.props.onPrintProceed();
+    this.props.onModalCloseClick('certCheck');
+>>>>>>> 206f8fa7b386cb6a561ed07d3e620f6c7db3e97e
   }
 
   handleChange = (value) => {

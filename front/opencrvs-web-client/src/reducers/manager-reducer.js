@@ -1,8 +1,8 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:17:14 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:17:14
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 13:53:48
+ * @Last Modified time: 2017-09-21 11:56:09
  */
 import {
   REQUEST_MAPVIEW_DATA,
@@ -12,7 +12,6 @@ import {
   COUNTRY_SELECTED,
   EVENT_SELECTED,
   PERIOD_SELECTED,
-  UPDATE_ORIGIN,
   SET_TOOLTIP_MAP_DATA,
   REMOVE_TOOLTIP_MAP_DATA,
   SET_REGION_MANAGER,
@@ -21,6 +20,7 @@ import {
   SET_LIST_ORDER,
   CASE_TRACKING,
   CASE_TRACKING_CLEAR,
+  TOGGLE_PERFORMANCE,
 } from '../actions/manager-actions';
 
 function managerReducer(
@@ -39,8 +39,6 @@ function managerReducer(
     countryLevel: true,
     regionLevel: false,
     districtLevel:false,
-    originX: null,
-    originY: null,
     rolloverMapData: null,
     totalCerts: null,
     regionManager: null,
@@ -52,6 +50,7 @@ function managerReducer(
     caseManager: null,
     caseNotes: null,
     caseGraphData: null,
+    perfOpened: 0,
   },
   action
 ) {
@@ -65,10 +64,10 @@ function managerReducer(
       return {
         ...state,
         fetchingMapView: false,
-        mapLocations: action.mapLocations, 
-        subLocations: action.subLocations, 
-        selectedLocation: action.selectedLocation, 
-        countryLocation: action.selectedLocation, 
+        mapLocations: action.mapLocations,
+        subLocations: action.subLocations,
+        selectedLocation: action.selectedLocation,
+        countryLocation: action.selectedLocation,
         totalCerts: action.totalCerts,
         countryManager: action.countryManager,
       };
@@ -112,12 +111,6 @@ function managerReducer(
         ...state,
         mapTimePeriod: action.mapTimePeriod,
         totalCerts: action.totalCerts,
-      };
-    case UPDATE_ORIGIN:
-      return {
-        ...state,
-        originX: action.originX,
-        originY: action.originY,
       };
     case SET_TOOLTIP_MAP_DATA:
       return {
@@ -165,6 +158,11 @@ function managerReducer(
         caseNotes: null,
         caseGraphData: null,
       };
+    case TOGGLE_PERFORMANCE:
+    return {
+      ...state,
+      perfOpened: state.perfOpened == 0 ? 1 : 0,
+    };
     default:
       return state;
   }

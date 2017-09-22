@@ -11,6 +11,12 @@
   border-bottom: 1px solid #ddd;
   min-height: 7em;
 }
+
+.mediumCard svg{ 
+  max-height: 5em;
+}
+
+
 .smallCard {
   display: block;
   width: 100%;
