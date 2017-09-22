@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-21 11:54:05
+ * @Last Modified time: 2017-09-22 10:47:08
  */
 import React from 'react';
 import styles from './styles.css';
@@ -18,8 +18,8 @@ import { selectRegion,
          selectEvent,
          selectPeriod,
          setTooltipData,
-         disableTooltip,
-         togglePerformanceReport } from 'actions/manager-actions';
+         disableTooltip, 
+        } from 'actions/manager-actions';
 
 class LocationContainer extends React.Component {
   constructor(props) {
@@ -106,9 +106,6 @@ const mapDispatchToProps = dispatch => {
     },
     disableTooltipData: () => {
       dispatch(disableTooltip());
-    },
-    togglePerformance: () => {
-      dispatch(togglePerformanceReport());
     }
   };
 };

@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:14
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-21 11:56:09
+ * @Last Modified time: 2017-09-22 10:48:03
  */
 import {
   REQUEST_MAPVIEW_DATA,
@@ -20,7 +20,7 @@ import {
   SET_LIST_ORDER,
   CASE_TRACKING,
   CASE_TRACKING_CLEAR,
-  TOGGLE_PERFORMANCE,
+  PERFORMANCE_METRICS,
 } from '../actions/manager-actions';
 
 function managerReducer(
@@ -50,7 +50,7 @@ function managerReducer(
     caseManager: null,
     caseNotes: null,
     caseGraphData: null,
-    perfOpened: 0,
+    performanceData: null,
   },
   action
 ) {
@@ -70,6 +70,7 @@ function managerReducer(
         countryLocation: action.selectedLocation,
         totalCerts: action.totalCerts,
         countryManager: action.countryManager,
+        performanceData: action.performanceData,
       };
     case MAPVIEW_MAPDATA_SUCCESS:
       return {
@@ -158,11 +159,11 @@ function managerReducer(
         caseNotes: null,
         caseGraphData: null,
       };
-    case TOGGLE_PERFORMANCE:
-    return {
-      ...state,
-      perfOpened: state.perfOpened == 0 ? 1 : 0,
-    };
+    case PERFORMANCE_METRICS:
+      return {
+        ...state,
+        performanceData: action.performanceData,
+      };
     default:
       return state;
   }

@@ -4,9 +4,8 @@ import React from 'react';
 import styles from './styles.css';
 import {Timeline, TimelineEvent} from 'react-event-timeline';
 import { BarChart, Bar } from 'recharts';
-import { map } from 'lodash';
+import { map, head, get } from 'lodash';
 import { calculateRagStatusOnBar } from 'utils/manager-utils';
-import { head, get } from 'lodash';
 
 
 class TrackerTimeline extends React.Component {
