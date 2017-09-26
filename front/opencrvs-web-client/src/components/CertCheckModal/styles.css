@@ -1,0 +1,44 @@
+.checkHeader {
+  color: #34495e;
+  text-align: center;
+}
+
+.checkCert {
+  min-height: 25em;
+}
+
+.checkHeading {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
+  color: rgb(0, 0, 0) !important;
+  -webkit-box-flex: 0 !important;
+  flex-grow: 0 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1 !important;
+  margin-top: 4em !important;
+  margin-bottom: 1em !important;
+}
+
+.checkInfo {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
+  color: rgb(0, 0, 0) !important;
+  -webkit-box-flex: 0 !important;
+  flex-grow: 0 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1 !important;
+  margin-top: 2em !important;
+  margin-bottom: 1em !important;
+}
+
+.info {
+  font-weight: 300 !important;
+}
+
+.nationalIDButton {
+  position: relative;
+  top: 1.2em;
+  left: 1em;
+}
