@@ -38,7 +38,6 @@ export function updateCertNumber(certificateNumber) {
 }
 
 export function updateCollector(collector) {
-  console.log(collector);
   return {
     type: UPDATE_COLLECTOR,
     collector,
