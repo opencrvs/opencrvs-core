@@ -16,14 +16,14 @@ class TooltipHolder extends React.Component {
         <div className={styles.tooltip}>
           <div className={styles.tooltipText}>
             <p className={styles.title}>{ rolloverMapData.title }</p>
-            <p className={styles.percentage}>
+            <h1 className={styles.percentage}>
               Coverage {
                 Math.round(( rolloverMapData.certs / rolloverMapData.kpi ) * 100)
               }%
-            </p>
-            <p className={styles.certification}>
+            </h1>
+            <h1 className={styles.certification}>
               { mapEvent } registration rate: { rolloverMapData.certs } / { rolloverMapData.kpi }
-            </p>
+            </h1>
           </div>
         </div>
       </div>
