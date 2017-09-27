@@ -21,7 +21,7 @@
 }
 
 .title {
-  font-size: 2em;
+  font-size: 1.5em;
   margin: auto;
 }
 
@@ -32,8 +32,6 @@
 .managerView {
     display: none;
 }
-
-
 
 @media (min-width: 55em) {
 

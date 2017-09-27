@@ -1,6 +1,6 @@
 /*
- * @Author: Euan Millar 
- * @Date: 2017-07-05 01:18:51 
+ * @Author: Euan Millar
+ * @Date: 2017-07-05 01:18:51
  * @Last Modified by: Euan Millar
  * @Last Modified time: 2017-08-14 13:13:43
  */
@@ -33,9 +33,9 @@ class SearchForm extends React.Component {
         <div className="pure-u-1">
           <form>
             {
-              role != 'field officer' ? 
-              <Input theme={theme} type="text" label="Search declarations" hint="Notification ID" icon="search" onChange={this.handleChange.bind(this, 'search')} />
-              : <Input theme={theme} type="text" label="Search notifications" hint="Notification ID" icon="search" onChange={this.handleChange.bind(this, 'search')} /> 
+              role != 'field officer' ?
+              <Input theme={theme} type="text" label="Search" hint="Notification ID" icon="search" onChange={this.handleChange.bind(this, 'search')} />
+              : <Input theme={theme} type="text" label="Search" hint="Notification ID" icon="search" onChange={this.handleChange.bind(this, 'search')} /> 
             }
           </form>
         </div>

@@ -24,10 +24,10 @@ function getMockLocationBasedOnRole(role) {
   switch (role) {
     case 'field officer':
     case 'registrar':
-      location = 'Agona East';
+      location = 'Ghana - Central Region - Agona East';
       break;
     case 'certification clerk':
-      location = 'Central Region';
+      location = 'Ghana - Central Region - Agona East';
       break;
     case 'admin':
       location = 'Ghana';
