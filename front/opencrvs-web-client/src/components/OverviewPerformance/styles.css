@@ -1,48 +1,16 @@
-.closed {
-  height: 30em;
-  top: -9em;
+
+
+.graphHolder {
+  height: 25em;
+  top: -22em;
   position: relative;
   border-top: 1px solid rgb(238, 238, 238);
   background-color: white;
   z-index: 10;
-  width: 100%;
-  -webkit-transition-property: top;
-  -moz-transition-property: top;
-  -o-transition-property: top;
-  transition-property: top;
-  -webkit-transition-duration: 0.25s;
-  -moz-transition-duration: 0.25s;
-  -o-transition-duration: 0.25s;
-  transition-duration: 0.25s;
-  -webkit-transition-timing-function: linear;
-  -moz-transition-timing-function: linear;
-  -o-transition-timing-function: linear;
-  transition-timing-function: linear;
+  width: 30%;
 }
 
-.open {
-  height: 30em;
-  top: -39em;
-  position: relative;
-  border-top: 1px solid rgb(238, 238, 238);
-  background-color: white;
-  z-index: 10;
-  width: 100%;
-  -webkit-transition-property: top;
-  -moz-transition-property: top;
-  -o-transition-property: top;
-  transition-property: top;
-  -webkit-transition-duration: 0.25s;
-  -moz-transition-duration: 0.25s;
-  -o-transition-duration: 0.25s;
-  transition-duration: 0.25s;
-  -webkit-transition-timing-function: linear;
-  -moz-transition-timing-function: linear;
-  -o-transition-timing-function: linear;
-  transition-timing-function: linear;
-}
-
-.toggle {
+.title {
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
   color: rgba(0, 0, 0, 0.7);
   font-size: 14px;
@@ -52,25 +20,9 @@
   position: relative;
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
-  cursor: pointer;
 }
 
-.upArrow {
-  width: 0; 
-  height: 0; 
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 5px solid rgba(0, 0, 0, 0.7);
-  cursor: pointer;
-  position: relative;
-  top: -1.7em;
-  right: -96%;
-}
-
-.downArrow {
-  width: 0; 
-  height: 0; 
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid rgba(0, 0, 0, 0.7);
+.labels {
+  font-size: 0.7em;
+  transform: translate(-14px, 5px) rotate(-90deg);
 }

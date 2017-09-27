@@ -24,6 +24,7 @@ class OverviewMap extends React.Component {
 
   onMouseOut(e) {
     e.target.setAttribute('style', 'opacity: 1');
+    this.props.disableTooltipData();
   }
   onMouseOver(e, mapData, regionIndex) {
     e.target.setAttribute('style', 'opacity: 0.70');
