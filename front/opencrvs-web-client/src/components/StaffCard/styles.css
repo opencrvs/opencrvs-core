@@ -12,7 +12,7 @@
   min-height: 7em;
 }
 
-.mediumCard svg{ 
+.mediumCard svg{
   max-height: 5em;
 }
 
@@ -73,7 +73,7 @@
   margin-top: 0.5em;
 }
 
-    
+
 .mediumText {
   position: relative;
   margin-top: -1.6em;
@@ -126,4 +126,8 @@
   font-weight: 500;
   margin-left: 0.5em;
   display: block;
+}
+
+.avatarImg {
+  border-radius: 10px;
 }
