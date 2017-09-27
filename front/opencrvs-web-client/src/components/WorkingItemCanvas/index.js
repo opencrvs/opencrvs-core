@@ -13,42 +13,6 @@ import { initialize } from 'redux-form';
 class WorkingItemCanvas extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      openChild: false,
-      openMother: false,
-      openFather: false,
-      openInformant: false,
-      openNotes: false,
-    };
-  }
-
-  scrollToFirstError = (errors) => {
-    let ms = 0;
-    if (!(this.state.openChild && this.state.openMother && this.state.openFather
-        && this.state.openInformant && this.state.openNotes)) {
-      this.setState({
-        openChild: true,
-        openMother: true,
-        openFather: true,
-        openInformant: true,
-        openNotes: true,
-      });
-      ms = 750;
-    }
-
-    // give collapsibles time to open
-    setTimeout(() => {
-      const firstErrorField = Object.keys(errors)[0];
-      const element = document.querySelector(`[name="${firstErrorField}"]`);
-      element.scrollIntoView();
-    }, ms);
-  };
-
-  onToggle = (field) => {
-    this.setState({
-      [field]: !this.state[field],
-    });
   }
 
   render = () => {
@@ -451,13 +415,6 @@ class WorkingItemCanvas extends React.Component {
       <WorkingItemForm
         newDeclaration={newDeclaration}
         selectedDeclaration={selectedDeclaration}
-        onSubmitFail={this.scrollToFirstError}
-        openChild={this.state.openChild}
-        openMother={this.state.openMother}
-        openFather={this.state.openFather}
-        openInformant={this.state.openInformant}
-        openNotes={this.state.openNotes}
-        onToggle={this.onToggle}
       />
     );
   };
