@@ -222,7 +222,7 @@ class WorkingItem extends React.Component {
                 }
                 {
                   showTrash && (
-                    <Button icon="delete" label="Trash" flat />
+                    <Button icon="delete" label="Reject" flat />
                   )
                 }
                 <Button icon="send" label="Submit" flat onClick={this.openSubmit} />

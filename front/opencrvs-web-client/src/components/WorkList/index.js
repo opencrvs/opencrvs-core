@@ -57,11 +57,11 @@ class WorkList extends React.Component {
         :
         styles.list + ' pure-u-1'
         }>
-        <SearchForm role={role} onSearchRequest={onSearchRequest} />
         <section className={styles.newDecl + ' pure-g'}>
           <span className={styles.title + ' pure-u-4-5'}>Work queue</span>
           <Button className={styles.addButton + 'pure-u-1-5'} icon="add" floating accent mini onClick={this.openNewModal} />
         </section>
+        <SearchForm role={role} onSearchRequest={onSearchRequest} />
         {
           map(itemArray, (declaration, index ) => (
           <WorkListItem
