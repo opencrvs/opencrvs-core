@@ -3,7 +3,7 @@
   position: absolute;
   z-index: 500;
   bottom: 200px;
-  right: 200px;
+  left: 600px;
 }
 
 .tooltip {
@@ -18,15 +18,13 @@
 }
 
 .percentage {
-  font-size: 3.4rem;
+  font-size: 1.5rem;
   letter-spacing: 0rem;
   font-weight: 300;
   color: #757575;
   text-transform: none;
-
-    margin-top: -0.2em;
-
-    margin-bottom: 0.1em;
+  margin-top: -0.2em;
+  margin-bottom: 0.1em;
 }
 
 .title {
@@ -35,7 +33,7 @@
   font-weight: 400;
   color: #212121;
   text-transform: none;
-    margin-top: 0.2em;
+  margin-top: 0.2em;
 }
 
 .certification {
@@ -46,5 +44,5 @@
   text-transform: uppercase;
   padding-left: 1em;
   padding-right: 1em;
-    margin-bottom: -0.2em;
+  margin-bottom: -0.2em;
 }
