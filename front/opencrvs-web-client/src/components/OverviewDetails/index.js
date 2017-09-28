@@ -17,6 +17,4 @@ class OverviewDetails extends React.Component {
   }
 }
 
-   
-
 export default OverviewDetails;
