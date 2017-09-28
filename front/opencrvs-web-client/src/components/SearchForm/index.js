@@ -27,16 +27,11 @@ class SearchForm extends React.Component {
   }
 
   render = () => {
-    const { role } = this.props;
     return (
       <div className={styles.searchContainer + ' pure-g'}>
         <div className="pure-u-1">
           <form>
-            {
-              role != 'field officer' ?
-              <Input theme={theme} type="text" label="Search" hint="Notification ID" icon="search" onChange={this.handleChange.bind(this, 'search')} />
-              : <Input theme={theme} type="text" label="Search" hint="Notification ID" icon="search" onChange={this.handleChange.bind(this, 'search')} /> 
-            }
+            <Input theme={theme} type="text" label="Search" icon="search" onChange={this.handleChange.bind(this, 'search')} />
           </form>
         </div>
       </div>
