@@ -340,7 +340,7 @@ function fetchDeclarationsFromAPI(dispatch, roleType, config, token) {
 }
 
 function fetchNotificationsFromHearth(dispatch) {
-  return fetch(OPEN_HIM_URL + 'Composition?status=preliminary&type=birth-notification&entry=Location/ae150380-8329-11e7-82fe-a5724c7e1e43')
+  return fetch(OPEN_HIM_URL + 'Composition?status=preliminary&type=birth-notification&entry=Location/ae150380-8329-11e7-82fe-a5724c7e1e43&_count=999')
     .then(response =>
       response.json().then(payload => ({ payload, response }))
     )
