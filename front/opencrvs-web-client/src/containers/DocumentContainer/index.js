@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-14 20:45:09 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 10:21:23
+ * @Last Modified time: 2017-10-09 11:04:58
  */
 import React from 'react';
 import ImageCard from 'components/ImageCard';
@@ -24,11 +24,17 @@ class DocumentContainer extends React.Component {
   }
 
   render = () => {
-    const { tempImages, onZoomImage, onDeleteImage, selectedDeclaration} = this.props;
+    const { tempImages, tempImageIds, onZoomImage, onDeleteImage, selectedDeclaration} = this.props;
 
     let imageArray = null;
     if (selectedDeclaration) {
-      imageArray = selectedDeclaration.documents.concat(tempImages);
+      let tempImagesBySelectedId = [];
+      map(tempImageIds, (id, index ) => {
+        if ( id == selectedDeclaration.id) {
+          tempImagesBySelectedId.push(tempImages[index]);
+        }
+      });
+      imageArray = selectedDeclaration.documents.concat(tempImagesBySelectedId);
     } else {
       imageArray = tempImages;
     }

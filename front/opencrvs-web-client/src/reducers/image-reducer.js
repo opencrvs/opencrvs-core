@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:23 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-08 17:40:04
+ * @Last Modified time: 2017-10-09 10:57:07
  */
 import {
   IMAGE_REQUEST,
@@ -25,6 +25,7 @@ function imageReducer(
   state = {
     imageFetching: false,
     tempImages: [],
+    tempImageIds: [],
     imageModal: false,
     newImage: '',
     imageOption: 0,
@@ -48,6 +49,7 @@ function imageReducer(
           ...state,
           imageFetching: false,
           tempImages: [...state.tempImages, action.image],
+          tempImageIds: [...state.tempImageIds, action.itemId],
         };
       } else {
         return {
@@ -66,6 +68,7 @@ function imageReducer(
         ...state,
         imageFetching: false,
         tempImages: [],
+        tempImageIds: [],
       };
     case IMAGE_TO_DELETE:
       return {
@@ -88,6 +91,8 @@ function imageReducer(
         imageFetching: false,
         tempImages: [...state.tempImages.slice(0, action.index),
           ...state.tempImages.slice(action.index + 1)],
+        tempImageIds: [...state.tempImageIds.slice(0, action.index),
+          ...state.tempImageIds.slice(action.index + 1)],
       };
     case IMAGE_DELETE_FAILURE:
       return {

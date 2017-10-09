@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-16 13:49:33
+ * @Last Modified time: 2017-10-09 10:58:02
  */
 import React from 'react';
 import styles from './styles.css';
@@ -92,6 +92,7 @@ class WorkingItem extends React.Component {
       category,
       newDeclaration,
       tempImages,
+      tempImageIds,
       managerView } = this.props;
     const childPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedDeclaration.childDetails; }));
@@ -318,6 +319,7 @@ class WorkingItem extends React.Component {
                       selectedDeclaration={selectedDeclaration}
                       newDeclaration={newDeclaration}
                       tempImages={tempImages}
+                      tempImageIds={tempImageIds}
                     />
                   </div>
                 </div>
@@ -338,12 +340,14 @@ const mapStateToProps = ({ declarationsReducer, imageReducer }) => {
   } = declarationsReducer;
   const {
     tempImages,
+    tempImageIds,
   } = imageReducer;
   return {
     selectedDeclaration,
     selectedCertification,
     newDeclaration,
     tempImages,
+    tempImageIds,
   };
 };
 
