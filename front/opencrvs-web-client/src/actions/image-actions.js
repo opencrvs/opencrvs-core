@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-09 11:56:04
+ * @Last Modified time: 2017-10-09 11:56:59
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
@@ -199,9 +199,10 @@ export function uploadImageFile(image) {
           'Authorization': token,
         },
       };
-      for (var pair of formData.entries()) {
+      //debugging image upload - breaks Microsoft Edge
+      /*for (var pair of formData.entries()) {
         console.log(pair[0]+ ', ' + pair[1]); 
-      }
+      }*/
       instance.post(BASE_URL + 'documents', formData, config)
         .then((response) => {
           dispatch(imageModalClosed());
