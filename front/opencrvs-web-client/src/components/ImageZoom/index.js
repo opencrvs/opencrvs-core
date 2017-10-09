@@ -2,14 +2,14 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 10:41:04
+ * @Last Modified time: 2017-10-08 18:15:02
  */
 import React from 'react';
 import styles from './styles.css';
 import Dialog from 'react-toolbox/lib/dialog';
 import { UPLOADS_URL } from 'constants/urls';
 import theme from './zoomDialogue.css';
-import { map, find } from 'lodash';
+import { map } from 'lodash';
 
 class ImageZoom extends React.Component {
   constructor(props) {
@@ -47,8 +47,7 @@ class ImageZoom extends React.Component {
     const dialogueActions = [
       { label: 'Close', onClick: this.closeImageModal },
     ];
-    
-    
+
     console.log(JSON.stringify(imageObj));
     return (
       <Dialog
@@ -62,8 +61,7 @@ class ImageZoom extends React.Component {
           <div className={styles.zoomed}>
           {
             imageZoomID !== 0
-            ? <img onLoad={this.onImgLoad} src={UPLOADS_URL + imageObj.staticFile} />
-            : null
+            && <img onLoad={this.onImgLoad} src={UPLOADS_URL + imageObj.staticFile} />
           }
             
           </div>

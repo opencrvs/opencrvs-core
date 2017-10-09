@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 10:29:03
+ * @Last Modified time: 2017-10-09 10:00:19
  */
 import React from 'react';
 import styles from './styles.css';
@@ -31,7 +31,7 @@ class ImageLoader extends React.Component {
       .then(res => res.blob())
       .then(blob => {
 
-        const filename = 'Camera-' +  Moment().format('MMM-Do-YY') + '-at-' + Moment().format('h-mm-ss') + '.jpg';
+        const filename = `Camera-${Moment().format('MMM-Do-YY')}-at-${Moment().format('h-mm-ss')}.jpg`;
         const file = new File([blob], filename, {type: 'image/jpeg', lastModified: Date.now()});
         const fileArray = [];
         fileArray.push(file);
@@ -64,6 +64,7 @@ class ImageLoader extends React.Component {
     const dialogueActions = [
       { label: 'Cancel', onClick: this.closeImageModal },
     ];
+
     return (
       <Dialog
         actions={dialogueActions}
@@ -105,14 +106,12 @@ class ImageLoader extends React.Component {
               </div>
             </Tab>
             <Tab label="Camera" onActive={this.handleActive}>
-              <div className={
-                !imageFetching
-                  ?
-                  styles.cameraTarget + ' pure-g'
-                  :
-                  styles.cameraTargetUploading + ' pure-g'
-                }>
-                {!imageFetching
+              <div className={!imageFetching
+              
+                ? `${styles.cameraTarget} pure-g` 
+                : `${styles.cameraTargetUploading} pure-g'`}>
+                {
+                  !imageFetching
                   ?
                     <div className="pure-u-1">
                       <Webcam
@@ -129,7 +128,6 @@ class ImageLoader extends React.Component {
                       <ProgressBar type="circular" mode="indeterminate" multicolor />
                     </div>
                 }
-               
               </div>
             </Tab>
           </Tabs>
@@ -140,4 +138,3 @@ class ImageLoader extends React.Component {
 }
 
 export default ImageLoader;
-

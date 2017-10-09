@@ -1,19 +1,16 @@
-import React from 'react';
+import React, { Component } from 'react';
 import styles from './styles.css';
 import { map } from 'lodash';
 import NotesColumn from 'components/NotesColumn';
 
-class CaseNotes extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  handleChange(name, value) {
+class CaseNotes extends Component {
+  handleChange = (name, value) => {
     console.log(value);
   }
 
   render = () => {
     const { caseNotes } = this.props;
+
     return (
       <div className="pure-u-1-1 pure-u-md-1-1">
         <div className={styles.caseNotesTable}>
@@ -26,14 +23,11 @@ class CaseNotes extends React.Component {
                 notes={note.notes}
               />
           ))}
-            
           </div>
         </div>
       </div>
     );
   }
 }
-
-   
 
 export default CaseNotes;

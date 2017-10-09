@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-14 20:45:00 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-28 19:42:18
+ * @Last Modified time: 2017-10-08 18:00:15
  */
 
 import React from 'react';
@@ -11,22 +11,9 @@ import { Card, CardMedia, CardTitle, CardActions } from 'react-toolbox/lib/card'
 import { Button } from 'react-toolbox/lib/button';
 
 class ImageCard extends React.Component {
- /* static defaultProps = {
-    imageUrl: 'blah',
-    imageTitle: 'blah',
-    imageSubtitle: 'blah',
-  }
-
-  static propTypes = {
-    imageUrl: PropTypes.string.isRequired,
-    imageTitle: PropTypes.string,
-    imageSubtitle: PropTypes.string,
-  }
-*/
   handleZoom = (event) => {
     this.props.onZoomImage(this.props.id);
   }
-
 
   handleDelete = (event) => {
     this.props.onDeleteImage(this.props.id);

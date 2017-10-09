@@ -1,9 +1,6 @@
-
-
 import React from 'react';
 import styles from './styles.css';
 import Dropdown from 'react-toolbox/lib/dropdown';
-import { connect } from 'react-redux';
 
 const listFilters = [
   { value: 'none', label: 'Alphabetical' },
@@ -29,11 +26,10 @@ class LocationListFilters extends React.Component {
   }
 
   render = () => {
-
-    const { listFilter,
-            listOrder,
-            onListFilterChange,
-            onListOrderChange, } = this.props;
+    const {
+      listFilter,
+      listOrder,
+    } = this.props;
    
     return (
       <div className={styles.locationListFilters}>
@@ -60,14 +56,4 @@ class LocationListFilters extends React.Component {
   }
 }
 
-   
-const mapStateToProps = ({ managerReducer }) => {
-  const { listFilter,
-          listOrder } = managerReducer;
-  return {
-    listFilter,
-    listOrder,
-  };
-};
-
-export default connect(mapStateToProps, null)(LocationListFilters);
+export default LocationListFilters;

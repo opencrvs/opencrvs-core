@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:32 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-07 13:35:57
+ * @Last Modified time: 2017-10-08 17:38:15
  */
 import React from 'react';
 import { connect } from 'react-redux';
@@ -56,10 +56,7 @@ const mapStateToProps = ({ userReducer, declarationsReducer }) => {
   };
 };
 
-const renderMergedProps = (component, ...rest) => {
-  const finalProps = Object.assign({}, ...rest);
-  return React.createElement(component, finalProps);
-};
+const renderMergedProps = (component, ...restProps) => React.createElement(component, ...restProps);
 
 const PrivateRoute = ({ component, redirectTo, isAuthenticated, ...rest }) => {
   return (

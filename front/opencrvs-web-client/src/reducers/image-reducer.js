@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:23 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-03 10:46:31
+ * @Last Modified time: 2017-10-08 17:40:04
  */
 import {
   IMAGE_REQUEST,
@@ -20,9 +20,6 @@ import {
   IMAGE_TO_DELETE,
   RESET_DELETE_IMAGE_FLAG,
 } from '../actions/image-actions';
-
-
-
 
 function imageReducer(
   state = {

@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:35
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-17 13:31:45
+ * @Last Modified time: 2017-10-09 10:03:09
  */
 import React from 'react';
 import styles from './styles.css';
@@ -34,7 +34,6 @@ class WorkList extends React.Component {
       onSearchRequest,
       managerView,
     } = this.props;
-    console.log("DeclarationsList: " + JSON.stringify(declarationsList))
     let itemArray = declarationsList;
     if (declarationsList.length > 0) {
       itemArray = orderBy(declarationsList, function(e) {
@@ -42,12 +41,12 @@ class WorkList extends React.Component {
       }, ['asc']);
     }
     const wait = false;
-    map(itemArray, (declaration, index ) => {
+    /*map(itemArray, (declaration, index ) => {
       console.log('worklist: ' + declaration.code);
       console.log('worklist: ' + declaration.id);
       console.log('worklist: ' + declaration.family);
       console.log('worklist: ' + declaration.given);
-    });
+    });*/
 
 
     return (

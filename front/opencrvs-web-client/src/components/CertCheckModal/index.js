@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:12 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-22 10:25:13
+ * @Last Modified time: 2017-10-08 17:58:39
  */
 import React from 'react';
 import styles from './styles.css';
@@ -53,6 +53,7 @@ class CertCheckModal extends React.Component {
       declarationToCheckAgainst,
       patients,
        } = this.props;
+    const isCollector = (collector !== 'other' && collector !== 'none');
     const dialogueActions = [
       { label: 'Close', onClick: this.closeCertCheckModal },
       { label: 'Reject', onClick: this.rejectCert },
@@ -60,6 +61,7 @@ class CertCheckModal extends React.Component {
     ];
     let details = {};
     let myPatient = null;
+
     switch (collector) {
       case 'mother':
         myPatient = head(filter(patients,
@@ -95,54 +97,59 @@ class CertCheckModal extends React.Component {
         onEscKeyDown={this.closeCertCheckModal}
         title="Enter details for the collecting individual"
       >
-
-      <section className={styles.checkCert + ' pure-g'}>
-        <div className="pure-u-1">
-          <Dropdown
-            auto
-            onChange={this.handleChange}
-            source={individuals}
-            value={collector}
-          />
-        </div>
-        {collector != 'other' && collector != 'none' && <div className="pure-u-1">
-          <p className={styles.checkHeading}>Click 'Continue' if the individual's ID matches the following data</p>
-          { myPatient && <div className={styles.patientData}>
-            <p className={styles.checkInfo}>
-              <span className={styles.info}>First name:</span> {details.firstName}
-            </p>
-            <p className={styles.checkInfo}>
-              <span className={styles.info}>Middle name:</span> {details.middleName}
-            </p>
-            <p className={styles.checkInfo}>
-              <span className={styles.info}>Family name:</span> {details.family}
-            </p>
-            <p className={styles.checkInfo}>
-              <span className={styles.info}>Date of birth:</span> {Moment(details.birthDate).format('MMMM Do YYYY')}
-            </p>
-            <p className={styles.checkInfo}>
-              <span className={styles.info}>Personal ID Number:</span> {details.personalIDNummber}
-            </p>
-          </div>
-
-          }
-        </div>}
-        {collector === 'other' && <div className="pure-u-1">
-          <p className={styles.checkHeading}>1. Search the national ID database to confirm the person's identity</p>
-          <div className="pure-u-1 pure-u-md-1-2">
-          <Input theme={theme} type="text" label="Individual's National ID" icon="search" />
-          </div>
-          
-          <div className={styles.nationalIDButton + ' pure-u-1 pure-u-md-1-2'}>
-            <Button label="Check National ID" raised primary />
-          </div>
+        <section className={styles.checkCert + ' pure-g'}>
           <div className="pure-u-1">
-            <p className={styles.checkHeading}>2. Upload a signed affidavit from the mother of the child.</p>
-            <Button icon="image" label="Upload affidavit" raised />
+            <Dropdown
+              auto
+              onChange={this.handleChange}
+              source={individuals}
+              value={collector}
+            />
           </div>
-        </div>}
-      </section>
-
+          {
+            isCollector &&
+            <div className="pure-u-1">
+              <p className={styles.checkHeading}>Click 'Continue' if the individual's ID matches the following data</p>
+              {
+                myPatient &&
+                <div className={styles.patientData}>
+                  <p className={styles.checkInfo}>
+                    <span className={styles.info}>First name:</span> {details.firstName}
+                  </p>
+                  <p className={styles.checkInfo}>
+                    <span className={styles.info}>Middle name:</span> {details.middleName}
+                  </p>
+                  <p className={styles.checkInfo}>
+                    <span className={styles.info}>Family name:</span> {details.family}
+                  </p>
+                  <p className={styles.checkInfo}>
+                    <span className={styles.info}>Date of birth:</span> {Moment(details.birthDate).format('MMMM Do YYYY')}
+                  </p>
+                  <p className={styles.checkInfo}>
+                    <span className={styles.info}>Personal ID Number:</span> {details.personalIDNummber}
+                  </p>
+                </div>
+              }
+            </div>
+          }
+          {
+            (collector === 'other') &&
+            <div className="pure-u-1">
+              <p className={styles.checkHeading}>1. Search the national ID database to confirm the person's identity</p>
+              <div className="pure-u-1 pure-u-md-1-2">
+              <Input theme={theme} type="text" label="Individual's National ID" icon="search" />
+              </div>
+              
+              <div className={styles.nationalIDButton + ' pure-u-1 pure-u-md-1-2'}>
+                <Button label="Check National ID" raised primary />
+              </div>
+              <div className="pure-u-1">
+                <p className={styles.checkHeading}>2. Upload a signed affidavit from the mother of the child.</p>
+                <Button icon="image" label="Upload affidavit" raised />
+              </div>
+            </div>
+          }
+        </section>
       </Dialog>
     );
   }

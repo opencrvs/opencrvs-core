@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-16 17:45:21 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-16 19:19:59
+ * @Last Modified time: 2017-10-09 10:15:03
  */
 /*
  * @Author: Euan Millar 
@@ -27,6 +27,7 @@ const imageFilter = function (fileName: string) {
 
 module.exports = (request, reply) => {
 
+    console.log('help');
     const data = request.payload;
     const file = data.uploadFile;
     if (!file) {

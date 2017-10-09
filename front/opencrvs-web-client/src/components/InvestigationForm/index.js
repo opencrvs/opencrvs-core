@@ -11,20 +11,16 @@ const reasons = [
 ];
 
 class InvestigationForm extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      reason: null,
-      notes: '',
-    };
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleReasonChange = this.handleReasonChange.bind(this);
-    this.handleNotesChange = this.handleNotesChange.bind(this);
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
   }
 
-  handleSubmit(ev) {
+  state = {
+    reason: null,
+    notes: '',
+  }
+
+  handleSubmit = ev => {
     ev.preventDefault();
     this.props.onSubmit({
       reason: this.state.reason,
@@ -32,11 +28,11 @@ class InvestigationForm extends React.Component {
     });
   }
 
-  handleReasonChange(reason) {
+  handleReasonChange = reason => {
     this.setState({reason});
   }
 
-  handleNotesChange(notes) {
+  handleNotesChange = notes => {
     this.setState({notes});
   }
 
@@ -66,9 +62,5 @@ class InvestigationForm extends React.Component {
     );
   }
 }
-
-InvestigationForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
 
 export default InvestigationForm;
