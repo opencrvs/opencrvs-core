@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-14 20:45:09 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-09 11:04:58
+ * @Last Modified time: 2017-10-09 11:49:32
  */
 import React from 'react';
 import ImageCard from 'components/ImageCard';
@@ -27,6 +27,7 @@ class DocumentContainer extends React.Component {
     const { tempImages, tempImageIds, onZoomImage, onDeleteImage, selectedDeclaration} = this.props;
 
     let imageArray = null;
+    console.log("hi: " + selectedDeclaration);
     if (selectedDeclaration) {
       let tempImagesBySelectedId = [];
       map(tempImageIds, (id, index ) => {
