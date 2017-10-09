@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-09 11:13:47
+ * @Last Modified time: 2017-10-09 11:38:01
  */
 import { BASE_URL } from 'constants/urls';
 import { logoutUser } from 'actions/user-actions';
@@ -199,10 +199,9 @@ export function uploadImageFile(image) {
           'Authorization': token,
         },
       };
-      //debugging image upload on chrome only - breaks Microsoft Edge!
-      /*for (var pair of formData.entries()) {
+      for (var pair of formData.entries()) {
         console.log(pair[0]+ ', ' + pair[1]); 
-      }*/
+      }
       instance.post(BASE_URL + 'documents', formData, config)
         .then((response) => {
           dispatch(imageModalClosed());
