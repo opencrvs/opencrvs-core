@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-17 13:44:33
+ * @Last Modified time: 2017-10-10 15:16:43
  */
 import { BASE_URL } from 'constants/urls';
 import { OPEN_HIM_URL } from 'constants/urls';
@@ -81,12 +81,48 @@ export function fetchPatients(id, notificationCase) {
             }
             const iDArray = id.split('/');
             const iD = iDArray[1];
+            let addressLine1 = '';
+            let addressLine2 = '';
+            let addressLine3 = '';
+            let city = '';
+            let district = '';
+            let state = '';
+            let postalCode = '';
+            if (payload.address) {
+              if (head(payload.address).line) {
+                const addressArray = head(payload.address).line;
+                if (addressArray[0]) {
+                  addressLine1 = addressArray[0];
+                }
+                if (addressArray[1]) {
+                  addressLine2 = addressArray[1];
+                }
+                if (addressArray[2]) {
+                  addressLine3 = addressArray[2];
+                }
+              }
+              if (head(payload.address).state) {
+                state = head(payload.address).state;
+              }
+              if (head(payload.address).district) {
+                district = head(payload.address).district;
+              }
+              if (head(payload.address).city) {
+                city = head(payload.address).city;
+              }
+              if (head(payload.address).postalCode) {
+                postalCode = head(payload.address).postalCode;
+              }
+            }
+            
+            console.log(JSON.stringify(payload));
             let newPayload = {
               message: 'Patient success',
               patient: {
                 id: iD,
                 given: given,
                 family: family,
+                gender: payload.gender,
                 birthDate: payload.birthDate,
                 telecom: [
                   {
@@ -95,10 +131,13 @@ export function fetchPatients(id, notificationCase) {
                 ],
                 address: [
                   {
-                    addressLine1: 'P.O. Box 78',
-                    city: 'Swedru',
-                    county: 'Agona West Municipal',
-                    state: 'Central Region',
+                    addressLine1: addressLine1,
+                    addressLine2: addressLine2,
+                    addressLine3: addressLine3,
+                    city: city,
+                    county: district,
+                    state: state,
+                    postalCode: postalCode,
                   },
                 ],
               },

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:34 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-26 19:47:29
+ * @Last Modified time: 2017-10-10 15:45:41
  */
 exports.up = function (knex, Promise) {
 
@@ -56,6 +56,7 @@ exports.up = function (knex, Promise) {
             table.string('personalIDNummber').nullable();
             table.string('maidenName').nullable();
             table.string('marriageDate').nullable();
+            table.string('typeOfBirth').nullable();
             table.integer('patient_id').notNullable();
             table.timestamps();
         });

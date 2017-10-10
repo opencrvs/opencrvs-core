@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-27 18:25:44
+ * @Last Modified time: 2017-10-10 15:49:01
  */
 
 
@@ -49,7 +49,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -92,7 +93,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'G120603',
                 maidenName: 'Ayittey',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -135,7 +137,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH37874872',
                 maidenName: '',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -178,7 +181,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -221,7 +225,8 @@ const patients = [
                 employment: 'part-time',
                 personalIDNummber: 'GH37494872',
                 maidenName: 'Jackson',
-                marriageDate: '2006-06-15'
+                marriageDate: '2006-06-15',
+                typeOfBirth: ''
             }
         ]
     },
@@ -264,7 +269,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH37826031',
                 maidenName: '',
-                marriageDate: '2006-06-15'
+                marriageDate: '2006-06-15',
+                typeOfBirth: ''
             }
         ]
     },
@@ -307,7 +313,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -350,7 +357,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH37888795',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -393,7 +401,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH50025698',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -436,7 +445,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -479,7 +489,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH12587965',
                 maidenName: 'Adu',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -522,7 +533,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH49652387',
                 maidenName: '',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -565,7 +577,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -608,7 +621,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH37379465',
                 maidenName: 'Nikrumah',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -651,7 +665,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH1398563',
                 maidenName: '',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -695,7 +710,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -738,7 +754,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH39136587',
                 maidenName: 'Dumor',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -781,7 +798,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH13659877',
                 maidenName: '',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -825,7 +843,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -868,7 +887,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH36562567',
                 maidenName: 'Mensa',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -911,7 +931,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH13956264',
                 maidenName: '',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -954,7 +975,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -997,7 +1019,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH99856325',
                 maidenName: 'Attoh',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -1040,7 +1063,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH1968576',
                 maidenName: '',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -1083,7 +1107,8 @@ const patients = [
                 employment: '',
                 personalIDNummber: '',
                 maidenName: '',
-                marriageDate: ''
+                marriageDate: '',
+                typeOfBirth: ''
             }
         ]
     },
@@ -1126,7 +1151,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH99658745',
                 maidenName: 'Afrira',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     },
@@ -1169,7 +1195,8 @@ const patients = [
                 employment: 'full-time',
                 personalIDNummber: 'GH65487965',
                 maidenName: '',
-                marriageDate: '2007-09-23'
+                marriageDate: '2007-09-23',
+                typeOfBirth: ''
             }
         ]
     }
@@ -1257,6 +1284,7 @@ const createExtra = function (knex, patient, patientID) {
             personalIDNummber: patient.extra[0].personalIDNummber,
             maidenName: patient.extra[0].maidenName,
             marriageDate: patient.extra[0].marriageDate,
+            typeOfBirth: patient.extra[0].typeOfBirth,
             patient_id: patientID
         });
 

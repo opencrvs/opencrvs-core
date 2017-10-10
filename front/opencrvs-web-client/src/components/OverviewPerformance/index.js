@@ -5,11 +5,10 @@ import styles from './styles.css';
 import { connect } from 'react-redux';
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell} from 'recharts';
 import { calculateRagStatusOnBar } from 'utils/manager-utils';
-import { map } from 'lodash';
 
 const CustomizedAxisTick = React.createClass({
   render() {
-    const {x, y, stroke, payload} = this.props;
+    const {x, y, payload} = this.props;
 		
     return (
       <g transform={`translate(${x},${y})`}>

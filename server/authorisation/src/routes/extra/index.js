@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 14:12:53
+ * @Last Modified time: 2017-10-10 16:22:05
  */
 
 const Joi = require('joi');
@@ -19,6 +19,7 @@ const extraSchema = Joi.object().keys({
     personalIDNummber: Joi.string(),
     maidenName: Joi.string(),
     marriageDate: Joi.string(),
+    typeOfBirth: Joi.string(),
     patient_id: Joi.number()
 });
 

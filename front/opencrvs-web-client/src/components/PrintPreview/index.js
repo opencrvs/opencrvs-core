@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:51 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-20 15:11:20
+ * @Last Modified time: 2017-10-10 12:08:09
  */
 import React from 'react';
 import styles from './styles.css';
@@ -26,12 +26,8 @@ class PrintPreview extends React.Component {
       function(patient) { return patient.patient.id == selectedCertification.motherDetails; }));
     const fatherPatient = head(filter(patients,
       function(patient) { return patient.patient.id == selectedCertification.fatherDetails; }));
-    const childExtra = head(get(childPatient, 'patient.extra'));
-    const motherExtra = head(get(motherPatient, 'patient.extra'));
-    const fatherExtra = head(get(fatherPatient, 'patient.extra'));
     const county = head(selectedCertification.locations).county;
     const state = head(selectedCertification.locations).state;
-    const tracking = selectedCertification.tracking;
     const childGiven = get(childPatient, 'patient.given').toString().split(',').map(function(item) {
       return item.trim();
     });
@@ -45,7 +41,6 @@ class PrintPreview extends React.Component {
     const firstName = childGiven.shift();
     const middleName = childGiven.toString().replace(/,/g, '');
     const family = get(childPatient, 'patient.family');
-    const gender = get(childPatient, 'patient.gender');
     const mother_firstName = motherGiven.shift();
     const mother_middleName = motherGiven.toString().replace(/,/g, '');
     const mother_family = get(motherPatient, 'patient.family');

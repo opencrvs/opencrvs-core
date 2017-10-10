@@ -14,7 +14,7 @@ class TrackerTimeline extends React.Component {
   }
 
   render = () => {
-    const {caseNotes, caseData} = this.props;
+    const {caseNotes} = this.props;
    
     return (
       <div className={styles.trackerTimeline + ' pure-g'}>

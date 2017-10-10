@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:51
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-14 13:13:43
+ * @Last Modified time: 2017-10-10 18:05:36
  */
 import React from 'react';
 import styles from './styles.css';
@@ -12,6 +12,7 @@ import theme from './searchInput.css';
 class SearchForm extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {value: ''};
   }
 
   handleClick = event => {
@@ -23,6 +24,7 @@ class SearchForm extends React.Component {
   };
 
   handleChange(name, value) {
+    this.setState({value: value});
     this.props.onSearchRequest(value);
   }
 
@@ -31,7 +33,7 @@ class SearchForm extends React.Component {
       <div className={styles.searchContainer + ' pure-g'}>
         <div className="pure-u-1">
           <form>
-            <Input theme={theme} type="text" label="Search" icon="search" onChange={this.handleChange.bind(this, 'search')} />
+            <Input theme={theme} type="text" label="Search" icon="search" value={this.state.value} onChange={this.handleChange.bind(this, 'search')} />
           </form>
         </div>
       </div>

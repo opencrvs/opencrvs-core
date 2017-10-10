@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 13:41:25
+ * @Last Modified time: 2017-10-10 18:13:12
  */
 import React from 'react';
 import styles from './styles.css';
@@ -16,6 +16,7 @@ import { connect } from 'react-redux';
 class TrackingSearchContainer extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {value: ''};
   }
 
 
@@ -27,15 +28,19 @@ class TrackingSearchContainer extends React.Component {
     this.props.onCaseTrackingClear();
   }
 
+  handleChange(name, value) {
+    this.setState({value: value});
+  }
+
   render = () => {
-    const { managerView, caseData, caseManager } = this.props;
+    const { caseData, caseManager } = this.props;
    
     return (
       <div className={styles.list}>
         <div className={styles.searchContainer + ' pure-g'}>
           <div className="pure-u-1">
             <form>
-              <Input theme={theme} type="text" label="BD-F08IDBIU" icon="search" />
+              <Input theme={theme} type="text" label="E.G. BD-F08IDBIU" icon="search" value={this.state.value} onChange={this.handleChange.bind(this, 'search')} />
               <div className="pure-g">
                 <div className="pure-u-1-2">
                   <Button icon="search" label="Check Status" flat onClick={this.checkStatus} />

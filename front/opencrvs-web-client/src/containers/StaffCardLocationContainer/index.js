@@ -11,8 +11,7 @@ class StaffCardLocationContainer extends React.Component {
   }
 
   render = () => {
-    const { mapLocations,
-            countryLevel,
+    const { countryLevel,
             regionLevel,
             rolloverMapData,
             regionManager,
@@ -27,7 +26,7 @@ class StaffCardLocationContainer extends React.Component {
       bottomCard = 'I';
       middleCard = 'I';
     }
-    if (regionLevel){
+    if (regionLevel) {
       topCard = 'S';
       middleCard = 'M';
       bottomCard = 'I';

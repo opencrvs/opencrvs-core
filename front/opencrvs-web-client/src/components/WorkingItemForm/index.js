@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:43
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 19:44:35
+ * @Last Modified time: 2017-10-10 17:42:05
  */
 import React from 'react';
 import styles from './styles.css';
@@ -88,7 +88,7 @@ class WorkingItemForm extends React.Component {
           open={open}
         >
           <Field component={renderInput} name="firstName" placeholder="First name" label="First name" validate={[required]} />
-          <Field component={renderInput} name="middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
+          <Field component={renderInput} name="middleName" placeholder="Middle name" label="Middle names" />
           <Field component={renderInput} name="family" placeholder="Last name" label="Last name" validate={[required]} />
           <Field component={renderDropdown} name="gender" label="Gender" source={ genderReference } validate={[required]}/>
           <section>
@@ -118,7 +118,7 @@ class WorkingItemForm extends React.Component {
           open={open}
         >
           <Field component={renderInput} name="mother_firstName" placeholder="First name" label="First name" validate={[required]} />
-          <Field component={renderInput} name="mother_middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
+          <Field component={renderInput} name="mother_middleName" placeholder="Middle name" label="Middle names" />
           <Field component={renderInput} name="mother_family" placeholder="Last name" label="Last name" validate={[required]} />
 
           <Field component={renderInput} name="mother_maidenName" placeholder="Maiden name" label="Maiden name" />
@@ -134,7 +134,7 @@ class WorkingItemForm extends React.Component {
           <Field component={renderDropdown} name="mother_nationality" label="Nationality" source={ countriesReference } validate={[required]}/>
           <Field component={renderInput} name="mother_phone" placeholder="Mobile number" label="Mobile number" />
           <Field component={renderInput} name="mother_email" placeholder="Email address" label="Email address" />
-          <Field component={renderDropdown} name="mother_use" label="Use" source={ telecomReference } />
+          <Field component={renderDropdown} name="mother_use" label="Contact preference" source={ telecomReference } />
           <Field component={renderInput} name="mother_addressLine1" placeholder="Address line 1" label="Address line 1"  />
           <Field component={renderInput} name="mother_addressLine2" placeholder="Address line 2" label="Address line 2"  />
           <Field component={renderInput} name="mother_addressLine3" placeholder="Address line 3" label="Address line 3"  />
@@ -166,7 +166,7 @@ class WorkingItemForm extends React.Component {
             open={open}
           >
             <Field component={renderInput} name="father_firstName" placeholder="First name" label="First name" validate={[required]} />
-            <Field component={renderInput} name="father_middleName" placeholder="Middle name" label="Middle names" validate={[required]} />
+            <Field component={renderInput} name="father_middleName" placeholder="Middle name" label="Middle names" />
             <Field component={renderInput} name="father_family" placeholder="Last name" label="Last name" validate={[required]} />
             <section>
               <Field component={renderDatePicker} name="father_birthDate" label="Date of birth" validate={[required]}/>
@@ -179,7 +179,7 @@ class WorkingItemForm extends React.Component {
             <Field component={renderDropdown} name="father_nationality" label="Nationality" source={ countriesReference } validate={[required]} />
             <Field component={renderInput} name="father_phone" placeholder="Mobile number" label="Mobile number" />
             <Field component={renderInput} name="father_email" placeholder="Email address" label="Email address" />
-            <Field component={renderDropdown} name="father_use" label="Use" source={ telecomReference } />
+            <Field component={renderDropdown} name="father_use" label="Contact preference" source={ telecomReference } />
             <Field component={renderInput} name="father_addressLine1" placeholder="Address line 1" label="Address line 1" validate={[required]} />
             <Field component={renderInput} name="father_addressLine2" placeholder="Address line 2" label="Address line 2"  />
             <Field component={renderInput} name="father_addressLine3" placeholder="Address line 3" label="Address line 3"  />

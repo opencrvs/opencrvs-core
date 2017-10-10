@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:30
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-22 10:14:00
+ * @Last Modified time: 2017-10-10 18:11:08
  */
 import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
@@ -143,21 +143,31 @@ export function searchDeclarations(value) {
 
     map(declarations.declaration, (declaration, index ) => {
       let addToList = false;
-      let given = get(head(filter(patients, function(patient) {
+      const given = get(head(filter(patients, function(patient) {
         return patient.patient.id == declaration.childDetails;
       })), 'patient.given');
-      let family = get(head(filter(patients, function(patient) {
+      const family = get(head(filter(patients, function(patient) {
         return patient.patient.id == declaration.childDetails;
       })), 'patient.family');
 
-      let dob = get(head(filter(patients, function(patient) {
+      const dob = get(head(filter(patients, function(patient) {
         return patient.patient.id == declaration.childDetails;
       })), 'patient.birthDate');
+
+      const address = get(head(filter(patients, function(patient) {
+        return patient.patient.id == declaration.childDetails;
+      })), 'patient.address');
+      const county = get(head(address), 'county');
+      const state = get(head(address), 'state');
+      const city = get(head(address), 'city');
 
       const dobFormat = Moment(dob).format('MMM Do YY');
       const tests = [];
       tests.push(Fuzzysearch(value.toUpperCase(), given.toUpperCase()));
       tests.push(Fuzzysearch(value.toUpperCase(), family.toUpperCase()));
+      tests.push(Fuzzysearch(value.toUpperCase(), county.toUpperCase()));
+      tests.push(Fuzzysearch(value.toUpperCase(), state.toUpperCase()));
+      tests.push(Fuzzysearch(value.toUpperCase(), city.toUpperCase()));
       tests.push(Fuzzysearch(value.toUpperCase(), declaration.tracking.toUpperCase()));
       tests.push(Fuzzysearch(value, dobFormat));
 
@@ -407,13 +417,14 @@ export function fetchDeclarations(roleType) {
 export function sendSMS(phoneNumber, smsMessage) {
   doCORSRequest({
     method: 'GET',
-    url: SMS_API_URL + 'to=' + phoneNumber + '&text=' + smsMessage,
+    url: SMS_API_URL + 'to=' + phoneNumber + '&concat=4&text=' + smsMessage,
   }, function printResult(result) {
     console.log(result);
   });
 }
 
 function doCORSRequest(options, printResult) {
+  // TODO:  Error: Actions must be plain objects. Use custom middleware for async
   var x = new XMLHttpRequest();
   x.open(options.method, CORS_API_URL + options.url);
   x.onload = x.onerror = function() {
@@ -475,6 +486,7 @@ export function submitDeclaration() {
       const motherTelecomData = new FormData();
       const fatherTelecomData = new FormData();
 
+      const childExtraData = new FormData();
       const motherExtraData = new FormData();
       const fatherExtraData = new FormData();
 
@@ -509,6 +521,7 @@ export function submitDeclaration() {
       let motherTelecomConfig = Object.assign({}, childConfig);
       let fatherTelecomConfig = Object.assign({}, childConfig);
 
+      let childExtraConfig = Object.assign({}, childConfig);
       let motherExtraConfig = Object.assign({}, childConfig);
       let fatherExtraConfig = Object.assign({}, childConfig);
 
@@ -661,27 +674,24 @@ export function submitDeclaration() {
         subPromises.push(apiMiddleware(fatherTelecomConfig, fatherTelecomURL, dispatch));
 
         //set up extra
-        const childExtraConfig = {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-        };
-        let newChildPersonalID = null;
-        // temporarily create a dummy personal ID number
-        if (role == 'registrar') {
-          const childExtraData = new FormData();
-          newChildPersonalID = 'G' + uuidv4().substring(0, 6).toUpperCase();
-          childExtraData.append('personalIDNummber', newChildPersonalID);
-          childExtraData.append('patient_id', childID);
-          childExtraConfig.body = childExtraData;
+        if (get(submitValues, 'child_extra_id')) {
+          childExtraURL += '/' + get(submitValues, 'child_extra_id');
         }
+        let newChildPersonalID = null;
+        // temporarily create a dummy personal ID number.  Should be generated in the backend
+        newChildPersonalID = 'G' + uuidv4().substring(0, 6).toUpperCase();
+        childExtraData.append('personalIDNummber', newChildPersonalID);
+        childExtraData.append('patient_id', childID);
+        childExtraData.append('typeOfBirth', get(submitValues, 'typeOfBirth'));
+        childExtraConfig.body = childExtraData;
 
         if (get(submitValues, 'mother_extra_id')) {
           motherExtraURL += '/' + get(submitValues, 'mother_extra_id');
         }
-        motherExtraData.append('childrenBornAlive', get(submitValues, 'mother_childrenBornAlive'));
-        motherExtraData.append('childrenBornLiving', get(submitValues, 'mother_childrenBornLiving'));
-        motherExtraData.append('foetalDeaths', get(submitValues, 'mother_foetalDeaths'));
-        motherExtraData.append('birthDateLast', get(submitValues, 'mother_birthDateLast'));
+        motherExtraData.append('childrenBornAlive', get(submitValues, 'childrenBornAlive'));
+        motherExtraData.append('childrenBornLiving', get(submitValues, 'childrenBornLiving'));
+        motherExtraData.append('foetalDeaths', get(submitValues, 'foetalDeaths'));
+        motherExtraData.append('birthDateLast', get(submitValues, 'birthDateLast'));
         motherExtraData.append('formalEducation', get(submitValues, 'mother_formalEducation'));
         motherExtraData.append('occupation', get(submitValues, 'mother_occupation'));
         motherExtraData.append('religion', get(submitValues, 'mother_religion'));
@@ -689,6 +699,7 @@ export function submitDeclaration() {
         motherExtraData.append('personalIDNummber', get(submitValues, 'mother_personalIDNummber'));
         motherExtraData.append('maidenName', get(submitValues, 'mother_maidenName'));
         motherExtraData.append('marriageDate', get(submitValues, 'mother_marriageDate'));
+        
 
         motherExtraData.append('patient_id', motherID);
 
@@ -698,10 +709,7 @@ export function submitDeclaration() {
           fatherExtraURL += '/' + get(submitValues, 'father_extra_id');
         }
 
-        fatherExtraData.append('childrenBornAlive', get(submitValues, 'father_childrenBornAlive'));
-        fatherExtraData.append('childrenBornLiving', get(submitValues, 'father_childrenBornLiving'));
-        fatherExtraData.append('foetalDeaths', get(submitValues, 'father_foetalDeaths'));
-        fatherExtraData.append('birthDateLast', get(submitValues, 'father_birthDateLast'));
+        
         fatherExtraData.append('formalEducation', get(submitValues, 'father_formalEducation'));
         fatherExtraData.append('occupation', get(submitValues, 'father_occupation'));
         fatherExtraData.append('religion', get(submitValues, 'father_religion'));
@@ -716,9 +724,7 @@ export function submitDeclaration() {
 
         subPromises.push(apiMiddleware(motherExtraConfig, motherExtraURL, dispatch));
         subPromises.push(apiMiddleware(fatherExtraConfig, fatherExtraURL, dispatch));
-        if (role == 'registrar') {
-          subPromises.push(apiMiddleware(childExtraConfig, childExtraURL, dispatch));
-        }
+        subPromises.push(apiMiddleware(childExtraConfig, childExtraURL, dispatch));
 
         Promise.all(subPromises).then(updatedItems => {
 
@@ -816,7 +822,7 @@ export function submitDeclaration() {
 
             Promise.all(declarationExtraPromises).then(updatedDeclaration => {
               const imagePromises = [];
-              if (newDeclaration) {
+              if (newDeclaration || newNotification) {
                 if (tempImages.length > 0) {
                   tempImages.forEach((image) => {
                     let newDocURL = BASE_URL + 'documents/' + image.id;
@@ -842,19 +848,18 @@ export function submitDeclaration() {
                 }
               } else {
                 dispatch(clearTempImages());
-                console.log('images cleared');
                 if (role == 'registrar') {
                   dispatch(submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID));
                   const smsMessage = 'The registration process for tracking number '
-                    + trackingID.toUpperCase() + ' is now complete. The birth registration number is '
-                    + newBirthRegistrationNumber + '. Please now pay $15 for the birth certificate by mobile money transfer:'
-                    + 'Mobile payment partners: Airtel, Mpesa Payee:'
-                    + ' 98766 Reference: ' + trackingID.toUpperCase()
-                    + 'Once payment is received, the birth certificate will be available for collection after '
-                    + '3 days from Agona West Civil Registration Centre';
-                  dispatch(sendSMS(motherPhone, smsMessage));
+                    + trackingID.toUpperCase() + ' is now complete. The birth is now registered with birth registration number '
+                    + newBirthRegistrationNumber + '. Please now pay 10 GH₵ for the birth certificate by mobile money,'
+                    + ' using transfer agents Airtel or Mpesa. Payee reference:'
+                    + ' 98766 Your reference: ' + trackingID.toUpperCase()
+                    + ' Once payment is received, the birth certificate will be available after 3 working days'
+                    + ' from Agona West Civil Registration Centre, High Street, Agona West, Central Region.';
                   dispatch(fetchDeclarations(role));
                   dispatch(trackingModalOpened());
+                  dispatch(sendSMS(motherPhone, smsMessage));
                 } else {
                   dispatch(submitDeclarationSuccess(trackingID));
                   dispatch(fetchDeclarations(role));

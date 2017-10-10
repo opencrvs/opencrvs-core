@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-09 10:58:02
+ * @Last Modified time: 2017-10-10 18:16:45
  */
 import React from 'react';
 import styles from './styles.css';
@@ -33,7 +33,9 @@ import StopWatchIcon from 'components/icons/StopWatchIcon';
 class WorkingItem extends React.Component {
   state = {
     investigating: false,
+    certNumber: '',
   };
+  
 
   constructor(props) {
     super(props);
@@ -81,6 +83,7 @@ class WorkingItem extends React.Component {
   }
 
   handleChange(name, value) {
+    this.setState({certNumber: value});
     this.props.onUpdateCertNumber(value);
   }
 
@@ -237,7 +240,7 @@ class WorkingItem extends React.Component {
                   <div className="pure-u-1 pure-u-md-1-2">
                     <form>
                     {
-                      <Input theme={theme} type="text" label="Available certificate number" onChange={this.handleChange.bind(this, 'setCertNumber')} />
+                      <Input theme={theme} type="text" label="Available certificate number"  value={this.state.certNumber} onChange={this.handleChange.bind(this, 'setCertNumber')} />
                     }
                     </form>
                   </div>

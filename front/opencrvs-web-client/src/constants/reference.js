@@ -101,7 +101,7 @@ export const countriesReference = [
   { value: 'Andorra', label: 'Andorra' },
   { value: 'Angola', label: 'Angola' },
   { value: 'Anguilla', label: 'Anguilla' },
-  { value: 'Antigua Barbuda', label: 'Antigua &amp; Barbuda' },
+  { value: 'Antigua Barbuda', label: 'Antigua & Barbuda' },
   { value: 'Argentina', label: 'Argentina' },
   { value: 'Armenia', label: 'Armenia' },
   { value: 'Aruba', label: 'Aruba' },
@@ -119,7 +119,7 @@ export const countriesReference = [
   { value: 'Bermuda', label: 'Bermuda' },
   { value: 'Bhutan', label: 'Bhutan' },
   { value: 'Bolivia', label: 'Bolivia' },
-  { value: 'Bosnia Herzegovina', label: 'Bosnia &amp; Herzegovina' },
+  { value: 'Bosnia Herzegovina', label: 'Bosnia & Herzegovina' },
   { value: 'Botswana', label: 'Botswana' },
   { value: 'Brazil', label: 'Brazil' },
   { value: 'British Virgin Islands', label: 'British Virgin Islands' },
@@ -256,7 +256,7 @@ export const countriesReference = [
   { value: 'Romania', label: 'Romania' },
   { value: 'Russia', label: 'Russia' },
   { value: 'Rwanda', label: 'Rwanda' },
-  { value: 'Saint Pierre Miquelon', label: 'Saint Pierre &amp; Miquelon' },
+  { value: 'Saint Pierre Miquelon', label: 'Saint Pierre & Miquelon' },
   { value: 'Samoa', label: 'Samoa' },
   { value: 'San Marino', label: 'San Marino' },
   { value: 'Satellite', label: 'Satellite' },
@@ -288,7 +288,7 @@ export const countriesReference = [
   { value: 'East Timor', label: "Timor L'Este" },
   { value: 'Togo', label: 'Togo' },
   { value: 'Tonga', label: 'Tonga' },
-  { value: 'TrinidadTobago', label: 'Trinidad &amp; Tobago' },
+  { value: 'TrinidadTobago', label: 'Trinidad & Tobago' },
   { value: 'Tunisia', label: 'Tunisia' },
   { value: 'Turkey', label: 'Turkey' },
   { value: 'Turkmenistan', label: 'Turkmenistan' },
@@ -311,9 +311,11 @@ export const countriesReference = [
 export const telecomReference = [
   { value: 'email', label: 'Email' },
   { value: 'phone', label: 'Phone' },
+  { value: 'none', label: 'None' },
 ];
 
 export const numbersReference = [
+  { value: '0', label: '0' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },

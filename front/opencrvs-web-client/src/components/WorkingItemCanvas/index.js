@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:43
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 19:43:45
+ * @Last Modified time: 2017-10-10 16:47:17
  */
 import React from 'react';
 import {connect} from 'react-redux';
@@ -82,9 +82,12 @@ class WorkingItemCanvas extends React.Component {
         child_county: motherAddress.county,
         child_postalCode: motherAddress.postalCode,
         child_state: motherAddress.state,
-        // TODO: Type of birth outstanding
         location_id: head(selectedDeclaration.locations).id,
         placeOfDelivery: head(selectedDeclaration.locations).placeOfDelivery,
+        // Extra
+        child_extra_id: get(childExtra, 'id'),
+        typeOfBirth: get(childExtra, 'typeOfBirth'),
+
         attendantAtBirth: head(selectedDeclaration.locations).attendantAtBirth,
         addressLine1: head(selectedDeclaration.locations).addressLine1,
         addressLine2: head(selectedDeclaration.locations).addressLine2,
@@ -204,7 +207,7 @@ class WorkingItemCanvas extends React.Component {
         mother_personalIDNummber: '',
         mother_maritalStatus: '',
         mother_marriageDate: '',
-        mother_nationality: '',
+        mother_nationality: 'Ghana',
         mother_telecom_id: get(motherTelecom, 'id'),
         mother_phone: get(motherTelecom, 'phone'),
         mother_email: '',
@@ -233,28 +236,28 @@ class WorkingItemCanvas extends React.Component {
         middleName: childGiven.toString().replace(/,/g, ''),
         family: get(childPatient, 'patient.family'),
         birthDate: new Date(get(childPatient, 'patient.birthDate')),
+        gender: get(childPatient, 'patient.gender'),
         // currently the below is not used in form but is required for submission - temp fix
-
         child_email: '',
         child_use: '',
         child_addressLine1: '',
         child_addressLine2: '',
         child_addressLine3: '',
-        child_city: '',
-        child_county: '',
+        child_city: 'Swedru',
+        child_county: 'Agona West Municipal',
         child_postalCode: '',
-        child_state: '',
+        child_state: 'Central Region',
         // TODO: Type of birth outstanding
-        placeOfDelivery: '',
+        placeOfDelivery: 'clinic',
         attendantAtBirth: '',
-        addressLine1: '',
+        addressLine1: '168 Adeiso Road',
         addressLine2: '',
         addressLine3: '',
-        city: '',
-        county: '',
-        hospitalName: '',
+        city: 'Swedru',
+        county: 'Agona West Municipal',
+        hospitalName: 'Akai House Clinic',
         postalCode: '',
-        state: '',
+        state: 'Central Region',
         // Father,
         father_firstName: '',
         father_middleName: '',
@@ -265,7 +268,7 @@ class WorkingItemCanvas extends React.Component {
         father_personalIDNummber: '',
         father_maritalStatus: '',
         father_marriageDate: '',
-        father_nationality: '',
+        father_nationality: 'Ghana',
 
         father_phone: '',
         father_email: '',
@@ -342,7 +345,7 @@ class WorkingItemCanvas extends React.Component {
         mother_personalIDNummber: '',
         mother_maritalStatus: '',
         mother_marriageDate: '',
-        mother_nationality: '',
+        mother_nationality: 'Ghana',
         mother_phone: '',
         mother_email: '',
         mother_use: '',
@@ -373,7 +376,7 @@ class WorkingItemCanvas extends React.Component {
         father_personalIDNummber: '',
         father_maritalStatus: '',
         father_marriageDate: '',
-        father_nationality: '',
+        father_nationality: 'Ghana',
 
         father_phone: '',
         father_email: '',
