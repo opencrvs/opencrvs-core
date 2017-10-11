@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-22 10:47:08
+ * @Last Modified time: 2017-10-11 11:13:44
  */
 import React from 'react';
 import styles from './styles.css';
@@ -10,7 +10,6 @@ import OverviewFilter from 'components/OverviewFilter';
 import OverviewMap from 'components/OverviewMap';
 import OverviewDetails from 'components/OverviewDetails';
 import TrackerTimeline from 'components/TrackerTimeline';
-import OverviewPerformance from 'components/OverviewPerformance';
 import {Tab, Tabs} from 'react-toolbox';
 import { connect } from 'react-redux';
 import { selectRegion,
@@ -32,8 +31,7 @@ class LocationContainer extends React.Component {
 
   render = () => {
     const { reportOption,
-      caseData,
-      caseNotes } = this.props;
+      caseData } = this.props;
 
     return (
       <div className={styles.locationContainer + ' pure-u-1'}>
@@ -45,7 +43,6 @@ class LocationContainer extends React.Component {
             { caseData && <TrackerTimeline {...this.props}/> }
           </Tab>
         </Tabs>
-        { reportOption == 0 && <OverviewPerformance {...this.props} />}
       </div>
     );
   }

@@ -5,6 +5,7 @@ import styles from './styles.css';
 import { connect } from 'react-redux';
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell} from 'recharts';
 import { calculateRagStatusOnBar } from 'utils/manager-utils';
+import TooltipHolder from 'components/TooltipHolder';
 
 const CustomizedAxisTick = React.createClass({
   render() {
@@ -25,18 +26,18 @@ class OverviewPerformance extends React.Component {
   }
 
   render = () => {
-    const { performanceData } = this.props;
+    const { performanceData, rolloverMapData, countryLevel } = this.props;
     return (
 
       
-      <div className={styles.graphHolder + ' pure-g'}>
+      <div className="pure-g">
         <div className="pure-u-1">
           <div className={styles.title}>
-            PERFORMANCE
+            Registration process performance:
           </div>
         </div>
-        <div className="pure-u-1">
-          {performanceData && <BarChart width={400} height={200} layout="horizontal" data={performanceData}
+        <div className={styles.performanceGraph +' pure-u-1'}>
+          {performanceData && <BarChart width={380} height={200} layout="horizontal" data={performanceData}
                 margin={{top: 0, right: 0, left: 5, bottom: 50}}>
                 <XAxis interval={0} dataKey="name" tick={<CustomizedAxisTick/>}/>
                 <YAxis/>
@@ -53,6 +54,11 @@ class OverviewPerformance extends React.Component {
                 <Bar dataKey="kpi" stackId="a" fill="#2d3e50" />
               </BarChart>
             }
+        </div>
+        <div className="pure-u-1">
+        { rolloverMapData && <TooltipHolder
+            rolloverMapData={rolloverMapData}
+            countryLevel={countryLevel} /> }
         </div>
       </div>
     );

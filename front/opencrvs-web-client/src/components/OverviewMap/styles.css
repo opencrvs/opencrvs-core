@@ -21,14 +21,16 @@
 }
 
 .totalCerts {
-  font-size: 2.5em;
-  letter-spacing: 0rem;
-  font-weight: 300;
-  color: #757575;
-  position: relative;
-  top: -1.85em;
-  left: 80%;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  color: #bbbbbb;
+  font-size: 16px;
+  padding: 5px;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(0, 0, 0);
 }
+
 
 .mapSvg {
   width: 100%;
@@ -38,6 +40,7 @@
   position: relative;
   left: 0.8em;
   top: 1em;
+  padding-right: 5em;
 }
 
 .title {

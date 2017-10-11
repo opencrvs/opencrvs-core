@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:14
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-22 10:48:03
+ * @Last Modified time: 2017-10-11 12:14:39
  */
 import {
   REQUEST_MAPVIEW_DATA,

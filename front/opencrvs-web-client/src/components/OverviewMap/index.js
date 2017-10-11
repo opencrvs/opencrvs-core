@@ -8,7 +8,7 @@ import Navigation from 'react-toolbox/lib/navigation';
 import Link from 'react-toolbox/lib/link';
 import Dropdown from 'react-toolbox/lib/dropdown';
 import { calculateRagStatusOnMap } from 'utils/manager-utils';
-import TooltipHolder from 'components/TooltipHolder';
+import OverviewPerformance from 'components/OverviewPerformance';
 import { get, map, head } from 'lodash';
 
 class OverviewMap extends React.Component {
@@ -106,7 +106,7 @@ class OverviewMap extends React.Component {
     });
     return (
       <div className={styles.overviewMap + ' pure-g'}>
-        <div className="pure-u-1 pure-u-md-1-6">
+        <div className="pure-u-1-3">
           <Navigation type="horizontal">
             <Link label={
               regionLevel
@@ -137,45 +137,47 @@ class OverviewMap extends React.Component {
               label="Timeframe"
             />
             <div className={styles.certifications}>
-              <p className={styles.title}>Total registrations:</p>
-              <p className={styles.totalCerts}>{ totalCerts }</p>
+              <p className={styles.title}>Total registrations: 
+              <span className={styles.totalCerts}>{ totalCerts }</span></p>
             </div>
           </div>
         </div>
-        <div className={
+        <div className="pure-u-1-3">
+          <div className={
           countryLevel
-          ? styles.mapSvgContainerCountry + ' pure-u-1 pure-u-md-4-6'
-          : styles.mapSvgContainerRegion + ' pure-u-1 pure-u-md-4-6'
+          ? styles.mapSvgContainerCountry
+          : styles.mapSvgContainerRegion
           }>
-          <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 800 450" className={styles.mapSvg}  >
-            <g className={styles.svgG}>
-              {
-                selectedLocationMapData.map((d, i) => (
-                  <path
-                    key={ `path-${ i }` }
-                    d={ geoPath().projection(this.projection(scale, transX, transY))(d) }
-                    fill={calculateRagStatusOnMap(
-                      selectedLocationMapData,
-                      i,
-                      selectedLocation.subEntries.entries,
-                      mapEvent,
-                      mapTimePeriod,
-                      countryLevel,
-                      regionLevel)}
-                    style={{ opacity: 1 }}
-                    stroke="#000000"
-                    strokeWidth={ 0.5 }
-                    onClick={ (e) => this.handleRegionClick(e, selectedLocationMapData, i) }
-                    onMouseOut={ (e) => this.onMouseOut(e, selectedLocationMapData, i) }
-                    onMouseOver={ (e) => this.onMouseOver(e, selectedLocationMapData, i) }
-                  />
-                ))
-              }
-              </g>
-          </svg>
-          { rolloverMapData && <TooltipHolder
-            mapEvent={mapEvent}
-            rolloverMapData={rolloverMapData} /> }
+            <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 800 450" className={styles.mapSvg}  >
+              <g className={styles.svgG}>
+                {
+                  selectedLocationMapData.map((d, i) => (
+                    <path
+                      key={ `path-${ i }` }
+                      d={ geoPath().projection(this.projection(scale, transX, transY))(d) }
+                      fill={calculateRagStatusOnMap(
+                        selectedLocationMapData,
+                        i,
+                        selectedLocation.subEntries.entries,
+                        mapEvent,
+                        mapTimePeriod,
+                        countryLevel,
+                        regionLevel)}
+                      style={{ opacity: 1 }}
+                      stroke="#000000"
+                      strokeWidth={ 0.5 }
+                      onClick={ (e) => this.handleRegionClick(e, selectedLocationMapData, i) }
+                      onMouseOut={ (e) => this.onMouseOut(e, selectedLocationMapData, i) }
+                      onMouseOver={ (e) => this.onMouseOver(e, selectedLocationMapData, i) }
+                    />
+                  ))
+                }
+                </g>
+            </svg>
+          </div>
+        </div>
+        <div className="pure-u-1-3">
+          <OverviewPerformance {...this.props} />
         </div>
       </div>
     );

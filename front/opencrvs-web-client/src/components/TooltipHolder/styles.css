@@ -1,39 +1,20 @@
 .tooltipHolder {
-  display: block;
-  position: absolute;
-  z-index: 500;
-  bottom: 200px;
-  left: 600px;
+  position: relative;
+  margin-top: 2em;
 }
 
-.tooltip {
-  width: auto;
-  background-color: white;
-  color: #fff;
-  text-align: center;
-  padding: 5px 0;
-  top: 100%;
-  left: 50%;
-  margin-left: -120px;
+.tooltipText {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  color: #bbbbbb;
+  font-size: 16px;
+  padding: 5px;
+  -webkit-font-smoothing: antialiased;
 }
 
-.percentage {
-  font-size: 1.5rem;
-  letter-spacing: 0rem;
-  font-weight: 300;
-  color: #757575;
-  text-transform: none;
-  margin-top: -0.2em;
-  margin-bottom: 0.1em;
-}
-
-.title {
-  font-size: 2rem;
-  letter-spacing: 0.005rem;
-  font-weight: 400;
-  color: #212121;
-  text-transform: none;
-  margin-top: 0.2em;
+.bold {
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(0, 0, 0);
 }
 
 .certification {

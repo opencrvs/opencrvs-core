@@ -12,17 +12,19 @@
 
 .title {
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  color: rgba(0, 0, 0, 0.7);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  padding: 17px 12px;
-  position: relative;
-  text-transform: uppercase;
+  color: #bbbbbb;
+  font-size: 16px;
+  padding: 5px;
   -webkit-font-smoothing: antialiased;
 }
 
 .labels {
   font-size: 0.7em;
-  transform: translate(-14px, 5px) rotate(-90deg);
+  letter-spacing: 0.1em;
+  transform: translate(-14px, 5px) rotate(-45deg);
+}
+
+.performanceGraph {
+  position: relative;
+  top: 2em;
 }
