@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-11 17:29:57
+ * @Last Modified time: 2017-10-12 14:20:44
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -370,23 +370,20 @@ export function caseTracking() {
       {
         id: 1,
         title: 'NOTIFICATION', 
-        note: 'Swedru village polio immunisation', 
+        note: 'Received from Good health Immunisation Application, Rabito Clinic, Swedru, Agona West Municipal.', 
         createdAt: Moment().subtract(29, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'notifications',
         iconAlt: 'notifications',
-        kpiData: [
-          {value: 1, minValue: 1, maxValue: 5},
-        ],
       },
       {
         id: 2,
         title: 'DECLARATION', 
-        note: 'Field officer John Adarkwa. Declaration performed in Swedru village', 
+        note: 'Field officer John Adarkwa. Declaration performed in Swedru village" should be "Declaration captured by Field officer John Adarkwa in Swedru, Agona West Municipal.', 
         createdAt: Moment().subtract(23, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'input',
         iconAlt: 'input',
         kpiData: [
-          {value: 6, minValue: 1, maxValue: 10},
+          {value: 10, minValue: 1, maxValue: 60},
         ],
         caseManager: {
           given: 'John',
@@ -405,12 +402,12 @@ export function caseTracking() {
         icon: 'check',
         iconAlt: 'check',
         kpiData: [
-          {value: 3, minValue: 1, maxValue: 5},
+          {value: 10, minValue: 1, maxValue: 14},
         ],
         caseManager: {
           given: 'Cameron',
           family: 'Addo',
-          title: 'District Operations Manager',
+          title: 'District Registar',
           email: 'cameron@acme.com',
           phone: '555-165-111',
           avatar: 'male',
@@ -423,17 +420,6 @@ export function caseTracking() {
         createdAt: Moment().subtract(20, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'check',
         iconAlt: 'check',
-        kpiData: [
-          {value: 1, minValue: 1, maxValue: 5},
-        ],
-        caseManager: {
-          given: 'Sylvia',
-          family: 'Miller',
-          title: 'District Operations Manager',
-          email: 'sylvia@acme.com',
-          phone: '555-165-111',
-          avatar: 'female',
-        },
       },
       {
         id: 5,
@@ -442,9 +428,6 @@ export function caseTracking() {
         createdAt: Moment().subtract(11, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'payment',
         iconAlt: 'payment',
-        kpiData: [
-          {value: 9, minValue: 1, maxValue: 30},
-        ],
       },
       {
         id: 6,
@@ -454,7 +437,7 @@ export function caseTracking() {
         icon: 'print',
         iconAlt: 'print',
         kpiData: [
-          {value: 1, minValue: 1, maxValue: 30},
+          {value: 5, minValue: 1, maxValue: 14},
         ],
         caseManager: {
           given: 'James',

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-10 15:16:43
+ * @Last Modified time: 2017-10-12 15:16:15
  */
 import { BASE_URL } from 'constants/urls';
 import { OPEN_HIM_URL } from 'constants/urls';
@@ -115,7 +115,7 @@ export function fetchPatients(id, notificationCase) {
               }
             }
             
-            console.log(JSON.stringify(payload));
+            console.log(JSON.stringify(head(payload.address)));
             let newPayload = {
               message: 'Patient success',
               patient: {

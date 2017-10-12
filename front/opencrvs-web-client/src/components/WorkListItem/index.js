@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-20 15:24:32
+ * @Last Modified time: 2017-10-12 15:07:23
  */
 import React from 'react';
 import styles from './styles.css';
@@ -88,14 +88,15 @@ class WorkListItem extends React.Component {
           <div className={`pure-u-1-6 ${styles.iconHolder}`}>{iconType}</div>
           
           <div className="pure-u-7-12">
-            <div className={styles.tracking}>{ tracking }</div>
+           
             <h1 className={styles.workItemTitle}>{  given ? given.toString().replace(/,/g, '')  + ' ' + family : '' }</h1>
             <h5 className={styles.workItemDesc}>d.o.b:&nbsp;
-              {Moment(birthDate).format('MMM Do YY')}
+              {Moment(birthDate).format('MMM Do YYYY')}
               <br />Created:&nbsp;
 
-              {Moment(created).format('MMM Do YY')}
+              {Moment(created).format('MMM Do YYYY')}
               <br />{location}
+              <br /><span className={styles.tracking}>{ tracking }</span>
             </h5>
           </div>
 

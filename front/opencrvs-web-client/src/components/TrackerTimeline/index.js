@@ -14,12 +14,26 @@ class TrackerTimeline extends React.Component {
     super(props);
   }
 
+  
+  isOnTime = ( val, max ) => {
+    const result = (val * 100) / max;
+    const onTime = result > 50 ? 'Late' : 'On Time';
+    return onTime;
+  }
+
   render = () => {
     const {caseNotes} = this.props;
    
     return (
       <div className={styles.trackerTimeline + ' pure-g'}>
         <div className={styles.timeline + ' pure-u-1-1 pure-u-md-1-1'}>
+
+          
+                   
+              <div className={styles.processPerformance}>
+                Process performance:
+              </div>
+          
           <Timeline>
 
           {
@@ -31,32 +45,51 @@ class TrackerTimeline extends React.Component {
               icon={<i className={ 'material-icons ' + caseEvent.icon + ' ' + styles.timelineIcon}>{caseEvent.iconAlt}</i>}
             >
               <div className="pure-g">
-                <div className="pure-u-1-3">
+                <div className={ caseEvent.id != 1 && caseEvent.id != 4 && caseEvent.id != 5
+                  ? styles.notes + ' pure-u-1-3'
+                  : styles.notes + ' pure-u-1-1'
+                  }>
+                  { caseEvent.id == 4 && 
+                    <div className={styles.onTime}><strong>On Time</strong></div>
+                  }
                   {caseEvent.note}
                 </div>
-                <div className="pure-u-1-3">
-                  <div className="pure-g">
-                    {caseEvent.caseManager && <StaffCard cardType="M" managerData={caseEvent.caseManager}/> }
+                { caseEvent.id != 1 && caseEvent.id != 4 && caseEvent.id != 5 && 
+                  <div className="pure-u-1-3">
+                    <div className="pure-g">
+                      {caseEvent.caseManager && <StaffCard cardType="P" managerData={caseEvent.caseManager}/> }
+                    </div>
                   </div>
-                </div>
-                <div className="pure-u-1-3">
-                <div className={styles.speedometer}>
-                  <div className={styles.title}>
-                    Process performance:
+                  
+                }
+                  
+                { caseEvent.id != 1 && caseEvent.id != 4 && caseEvent.id != 5 && 
+                  <div className="pure-u-1-3">
+                    <div className={styles.speedometer}>
+                      <p>Days</p>
+                      <ReactSpeedometer
+                        maxValue={get(head(caseEvent.kpiData), 'maxValue')}
+                        minValue={get(head(caseEvent.kpiData), 'minValue')}
+                        value={get(head(caseEvent.kpiData), 'value')}
+                        needleColor="black"
+                        startColor="green"
+                        segments={5}
+                        width="200"
+                        height="150"
+                        endColor="red"
+                        />
+                    </div>
+                    <div className={styles.perfTarget}>Target:&nbsp;   
+                      <strong>
+                        {get(head(caseEvent.kpiData), 'maxValue')}
+                      </strong> 
+                      &nbsp;&nbsp;Actual:&nbsp;
+                      <strong>
+                        {get(head(caseEvent.kpiData), 'value')}
+                      </strong>
+                    </div>
                   </div>
-                  <ReactSpeedometer
-                    maxValue={get(head(caseEvent.kpiData), 'maxValue')}
-                    minValue={get(head(caseEvent.kpiData), 'minValue')}
-                    value={get(head(caseEvent.kpiData), 'value')}
-                    needleColor="black"
-                    startColor="green"
-                    segments={5}
-                    width="200"
-                    height="150"
-                    endColor="red"
-                    />
-                  </div>
-                </div>
+                }
               </div>
               
             </TimelineEvent>

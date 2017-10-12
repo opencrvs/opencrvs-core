@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-10 18:16:45
+ * @Last Modified time: 2017-10-12 15:11:17
  */
 import React from 'react';
 import styles from './styles.css';
@@ -181,7 +181,7 @@ class WorkingItem extends React.Component {
         selectedDeclaration || newDeclaration == true
           ?
           <div className={styles.wiContentHeader + ' pure-g'}>
-            <div className="pure-u-1 pure-u-md-1-2">
+            <div className="pure-u-1 pure-u-md-1-3">
               <div className={styles.wiContentDetails}>
                 <div className={styles.iconHolder}>{iconType}</div>
                 <div className={styles.titleText}>
@@ -203,7 +203,7 @@ class WorkingItem extends React.Component {
                 }
               </div>
             </div>
-            <div className={'pure-u-1 pure-u-md-1-2'}>
+            <div className={'pure-u-1 pure-u-md-2-3'}>
               <div className={styles.wiContentControls}>
                 {
                   role !== 'field officer' && (
@@ -237,7 +237,7 @@ class WorkingItem extends React.Component {
             <div className={styles.wiContentHeader + ' pure-g'}>
               <div className="pure-u-1 pure-u-md-1-2">
                 <div className="pure-g">
-                  <div className="pure-u-1 pure-u-md-1-2">
+                  <div className="pure-u-1 pure-u-md-1-3">
                     <form>
                     {
                       <Input theme={theme} type="text" label="Available certificate number"  value={this.state.certNumber} onChange={this.handleChange.bind(this, 'setCertNumber')} />
@@ -256,7 +256,7 @@ class WorkingItem extends React.Component {
                   </div>
                 </div>
               </div>
-              <div className={'pure-u-1 pure-u-md-1-2'}>
+              <div className={'pure-u-1 pure-u-md-2-3'}>
                 <div className={styles.wiContentControls}>
                   <div className={styles.certInfo}><span>National ID</span><TickIcon /></div>
                   <div className={styles.certInfo}><span>Payment</span><TickIcon /></div>

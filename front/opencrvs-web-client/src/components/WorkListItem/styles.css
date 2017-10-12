@@ -1,6 +1,5 @@
 .iconHolder {
-  margin-top: 1.5em;
-  padding: 0 1em;
+    margin-top: 1.05em;
 }
 
 .copyHolder {
@@ -29,8 +28,6 @@
 .tracking {
     font-style: italic;
     font-size: 0.8em;
-    position: relative;
-    bottom: -5.4em;
     opacity: 0.5;
     text-transform: uppercase;
 }
@@ -39,7 +36,8 @@
     color: #34495e;
     font-size: 0.9em;
     line-height: 1.2em;
-    margin-top: -1.8em;
+    margin-top: 0.5em;
+    margin-bottom: 1em;
 }
 
 .workItemDesc {

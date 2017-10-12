@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:15:04 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-14 13:21:48
+ * @Last Modified time: 2017-10-12 15:52:25
  */
 const Bcrypt = require('bcryptjs');
 const salt = Bcrypt.genSaltSync();
@@ -12,7 +12,111 @@ const edHash = Bcrypt.hashSync('plan2017', salt);
 const carlHash = Bcrypt.hashSync('plan2017', salt);
 const euanHash = Bcrypt.hashSync('plan2017', salt);
 const ryanHash = Bcrypt.hashSync('plan2017', salt);
+const freddyHash = Bcrypt.hashSync('plan2017', salt);
+const kokoHash = Bcrypt.hashSync('plan2017', salt);
+const sallyHash = Bcrypt.hashSync('plan2017', salt);
+const akuaHash = Bcrypt.hashSync('plan2017', salt);
 const users = [
+    {
+        email: 'freddy@mills.com',
+        username: 'freddymills',
+        password: freddyHash,
+        role: 'field officer',
+        given: 'Freddy',
+        family: 'Mills',
+        avatar: 'african-male-2.jpg',
+        claims: [
+            {
+                claim: 'post:verifyCredentials'
+            },
+            {
+                claim: 'post:login'
+            },
+            {
+                claim: 'post:declaration'
+            },
+            {
+                claim: 'store:image'
+            },
+            {
+                claim: 'notification:search'
+            }]
+    },
+    {
+        email: 'koko@jembi.org',
+        username: 'kokorawlings',
+        password: kokoHash,
+        role: 'admin',
+        given: 'Koko',
+        family: 'Rawlings',
+        avatar: 'african-male-1.jpg',
+        claims: [
+            {
+                claim: 'post:verifyCredentials'
+            },
+            {
+                claim: 'post:login'
+            },
+            {
+                claim: 'post:declaration'
+            },
+            {
+                claim: 'store:image'
+            },
+            {
+                claim: 'notification:search'
+            }]
+    },
+    {
+        email: 'akua@jembi.org',
+        username: 'akuatettey',
+        password: akuaHash,
+        role: 'certification clerk',
+        given: 'Akua',
+        family: 'Tettey',
+        avatar: 'african-female-1.jpg',
+        claims: [
+            {
+                claim: 'post:verifyCredentials'
+            },
+            {
+                claim: 'post:login'
+            },
+            {
+                claim: 'post:declaration'
+            },
+            {
+                claim: 'store:image'
+            },
+            {
+                claim: 'notification:search'
+            }]
+    },
+    {
+        email: 'sally@jembi.org',
+        username: 'sallydansua',
+        password: sallyHash,
+        role: 'registrar',
+        given: 'Sally',
+        family: 'Dansua',
+        avatar: 'african-female-2.jpg',
+        claims: [
+            {
+                claim: 'post:verifyCredentials'
+            },
+            {
+                claim: 'post:login'
+            },
+            {
+                claim: 'post:declaration'
+            },
+            {
+                claim: 'store:image'
+            },
+            {
+                claim: 'notification:search'
+            }]
+    },
     {
         email: 'linda@jembi.org',
         username: 'lindataylor',

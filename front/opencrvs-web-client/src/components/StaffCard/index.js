@@ -53,6 +53,11 @@ class StaffCard extends React.Component {
       case 'I':
         cardStyle = styles.invisibleCard;
         break;
+      case 'P':
+        svgStyle = styles.mediumSvg;
+        cardStyle = styles.mediumCardPerformance;
+        textStyle = styles.mediumTextPerformance;
+        break;
     }
     return (
       <div className={cardStyle}>
