@@ -4,7 +4,7 @@ import Dropdown from 'react-toolbox/lib/dropdown';
 
 const listFilters = [
   { value: 'none', label: 'Alphabetical' },
-  { value: 'certifications', label: 'Number of certifications' },
+  { value: 'certifications', label: 'Registration coverage' },
 ];
 
 const listOrders = [

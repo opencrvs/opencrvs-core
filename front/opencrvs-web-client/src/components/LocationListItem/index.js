@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:30
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-11 15:54:31
+ * @Last Modified time: 2017-10-12 10:31:12
  */
 import React from 'react';
 import styles from './styles.css';
@@ -64,8 +64,8 @@ class LocationListItem extends React.Component {
           </div>
           <div className={styles.listData + ' pure-u-1-1'}>
             <p className={styles.title}>
-              Registration coverage: <span className={styles.bold}>
-                { Math.round((registrationsActual / registrationsKpi) * 100) }%</span>
+              Registration coverage: <strong>
+                { Math.round((registrationsActual / registrationsKpi) * 100) }%</strong>
             </p>
             <p className={styles.title}>
               On time registrations: <span className={styles.bold}>{ this.randomIntFromInterval(60, 95) }%</span>

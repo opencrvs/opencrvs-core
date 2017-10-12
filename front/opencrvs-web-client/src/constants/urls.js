@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:05 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-12 10:09:40
+ * @Last Modified time: 2017-10-12 10:34:16
  */
 
 export const BASE_URL = 'https://opencrvs.jembi.org/api/';

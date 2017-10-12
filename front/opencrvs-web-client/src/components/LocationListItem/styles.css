@@ -13,7 +13,6 @@
 
 .title {
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  color: #bbbbbb;
   font-size: 16px;
   padding: 5px;
   margin-top: 0.2em;
@@ -24,7 +23,6 @@
 .bold{
   font-size: 0.9em;
   font-weight: 600;
-  color: #000000;
 }
 
 .sub {
