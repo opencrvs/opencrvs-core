@@ -62,6 +62,10 @@ class OverviewMap extends React.Component {
     }
   }
 
+  randomIntFromInterval = ( min, max ) => {
+    return Math.floor(Math.random() * ( max - min + 1 ) + min);
+  }
+
   render = () => {
     const { selectedLocation,
             selectedLocationMapData,
@@ -77,7 +81,7 @@ class OverviewMap extends React.Component {
             rolloverMapData,
             country } = this.props;
     const myCountry = country.charAt(0).toUpperCase() + country.slice(1);
-
+    
     let scale;
     let transX;
     let transY;
@@ -137,8 +141,22 @@ class OverviewMap extends React.Component {
               label="Timeframe"
             />
             <div className={styles.certifications}>
-              <p className={styles.title}>Total registrations: 
-              <span className={styles.totalCerts}>{ totalCerts }</span></p>
+              <p className={styles.title}>Registration coverage:  
+              <span className={styles.totalCerts}>
+                {Math.round((totalCerts.registrations / totalCerts.registrationsKpi) * 100)}%
+              </span></p>
+              <p className={styles.title}>Certification coverage:  
+              <span className={styles.totalCerts}>
+                {Math.round((totalCerts.certifications / totalCerts.certificationsKpi) * 100)}%
+              </span></p>
+              <p className={styles.title}>Children under 5 coverage:  
+              <span className={styles.totalCerts}>
+              { this.randomIntFromInterval(60, 80) }%
+              </span></p>
+              <p className={styles.title}>Coverage of all individuals:  
+              <span className={styles.totalCerts}>
+              { this.randomIntFromInterval(40, 50) }%
+              </span></p>
             </div>
           </div>
         </div>

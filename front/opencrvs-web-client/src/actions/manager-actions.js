@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-22 12:06:03
+ * @Last Modified time: 2017-10-11 17:29:57
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -225,10 +225,14 @@ export function setTooltipData(name) {
 }
 
 function updateTotalCerts(data, mapEvent, mapTimePeriod) {
-  let certs = 0;
   let obj = head(filter(head(filter(data.events, {type: mapEvent})).timePeriod, {title: mapTimePeriod}));
-  certs = obj.certifications;
-  return certs;
+  const totalsObj = {
+    certifications: obj.certifications,
+    certificationsKpi: obj.certificationsKpi,
+    registrations: obj.registrations,
+    registrationsKpi: obj.registrationsKpi,
+  }
+  return totalsObj;
 }
 
 function updatePerformanceMetrics(data, mapEvent, mapTimePeriod) {
@@ -362,80 +366,104 @@ export function caseTracking() {
       county: 'Hohoe',
       state: 'Volta',
     },
-    caseManager: {
-      given: 'Cameron',
-      family: 'Addo',
-      title: 'District Operations Manager',
-      email: 'c-addo@acme.com',
-      phone: '555-165-111',
-      avatar: 'male',
-    },
     caseNotes: [
       {
         id: 1,
         title: 'NOTIFICATION', 
-        note: 'Mankrong village polio immunisation', 
-        createdAt: Moment().subtract(29, 'days').format('Do MMM'),
+        note: 'Swedru village polio immunisation', 
+        createdAt: Moment().subtract(29, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'notifications',
         iconAlt: 'notifications',
         kpiData: [
-          {name: 'Page A', uv: 4990, pv: 10},
+          {value: 1, minValue: 1, maxValue: 5},
         ],
       },
       {
         id: 2,
         title: 'DECLARATION', 
-        note: 'Agona West Municipal registration office', 
-        createdAt: Moment().subtract(23, 'days').format('Do MMM'),
+        note: 'Field officer John Adarkwa. Declaration performed in Swedru village', 
+        createdAt: Moment().subtract(23, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'input',
         iconAlt: 'input',
         kpiData: [
-          {name: 'Page A', uv: 1500, pv: 3500},
+          {value: 6, minValue: 1, maxValue: 10},
         ],
+        caseManager: {
+          given: 'John',
+          family: 'Adarkwa',
+          title: 'Field Officer',
+          email: 'john@acme.com',
+          phone: '555-165-111',
+          avatar: 'male',
+        },
       },
       {
         id: 3,
         title: 'VALIDATION', 
         note: 'Agona West Municipal registration office', 
-        createdAt: Moment().subtract(20, 'days').format('Do MMM'),
+        createdAt: Moment().subtract(20, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'check',
         iconAlt: 'check',
         kpiData: [
-          {name: 'Page A', uv: 2500, pv: 2500},
+          {value: 3, minValue: 1, maxValue: 5},
         ],
+        caseManager: {
+          given: 'Cameron',
+          family: 'Addo',
+          title: 'District Operations Manager',
+          email: 'cameron@acme.com',
+          phone: '555-165-111',
+          avatar: 'male',
+        },
       },
       {
         id: 4,
-        title: 'SMS', 
-        note: 'Mother contacted', 
-        createdAt: Moment().subtract(20, 'days').format('Do MMM'),
-        icon: 'sms',
-        iconAlt: 'sms',
+        title: 'REGISTRATION', 
+        note: 'Mother contacted via SMS', 
+        createdAt: Moment().subtract(20, 'days').format('MMMM Do YYYY, h:mm:ss'),
+        icon: 'check',
+        iconAlt: 'check',
         kpiData: [
-          {name: 'Page A', uv: 4990, pv: 10},
+          {value: 1, minValue: 1, maxValue: 5},
         ],
+        caseManager: {
+          given: 'Sylvia',
+          family: 'Miller',
+          title: 'District Operations Manager',
+          email: 'sylvia@acme.com',
+          phone: '555-165-111',
+          avatar: 'female',
+        },
       },
       {
         id: 5,
         title: 'PAYMENT', 
-        note: 'Payment received by Airtel mobile money', 
-        createdAt: Moment().subtract(11, 'days').format('Do MMM'),
+        note: 'Payment received by Airtel.  Reference: 108736986', 
+        createdAt: Moment().subtract(11, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'payment',
         iconAlt: 'payment',
         kpiData: [
-          {name: 'Page A', uv: 4000, pv: 1000},
+          {value: 9, minValue: 1, maxValue: 30},
         ],
       },
       {
         id: 6,
         title: 'CERTIFICATION', 
-        note: 'Certificate printed and accepted by informant', 
-        createdAt: Moment().subtract(10, 'days').format('Do MMM'),
+        note: 'Certificate no: 0879887, printed and accepted by informant: Mary Mensua', 
+        createdAt: Moment().subtract(10, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'print',
         iconAlt: 'print',
         kpiData: [
-          {name: 'Page A', uv: 4500, pv: 500},
+          {value: 1, minValue: 1, maxValue: 30},
         ],
+        caseManager: {
+          given: 'James',
+          family: 'Francis',
+          title: 'Certification Clerk',
+          email: 'james@acme.com',
+          phone: '555-165-111',
+          avatar: 'male',
+        },
       },
     ],
     caseGraphData: [

@@ -2,14 +2,19 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:30
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-10 17:07:14
+ * @Last Modified time: 2017-10-11 15:54:31
  */
 import React from 'react';
 import styles from './styles.css';
+import ReactStars from 'react-stars'
 
 class LocationListItem extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  randomIntFromInterval = ( min, max ) => {
+    return Math.floor(Math.random() * ( max - min + 1 ) + min);
   }
 
   render = () => {
@@ -42,15 +47,28 @@ class LocationListItem extends React.Component {
         >
 
           <div className={'pure-u-1-2'}>
-            <p className={styles.title}>{ title }</p>
+            <p className={styles.title}><span className={styles.bold}>{ title }</span></p>
             <p className={styles.sub}>{ sub }</p>
           </div>
-          <div className={styles.pullRight + ' pure-u-1-2'}>
+          <div className={'pure-u-1-2'}>
+            <div className={styles.satisfaction}>Satisfaction:</div>
+            <div className={styles.rating}>
+            <ReactStars
+              count="5"
+              value={this.randomIntFromInterval(2, 5)}
+              size={16}
+              edit="false"
+              color2={'#ffd700'} 
+              color1={'gray'} />
+            </div>
+          </div>
+          <div className={styles.listData + ' pure-u-1-1'}>
             <p className={styles.title}>
-              Coverage { Math.round((registrationsActual / registrationsKpi) * 100) }%
+              Registration coverage: <span className={styles.bold}>
+                { Math.round((registrationsActual / registrationsKpi) * 100) }%</span>
             </p>
-            <p className={styles.sub}>
-              Registration rate {registrationsActual} / {registrationsKpi}
+            <p className={styles.title}>
+              On time registrations: <span className={styles.bold}>{ this.randomIntFromInterval(60, 95) }%</span>
             </p>
           </div>
         </div>

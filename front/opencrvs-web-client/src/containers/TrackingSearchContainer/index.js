@@ -2,11 +2,10 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:48 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-10 18:13:12
+ * @Last Modified time: 2017-10-11 17:32:39
  */
 import React from 'react';
 import styles from './styles.css';
-import StaffCard from 'components/StaffCard';
 import TrackerDetails from 'components/TrackerDetails';
 import Input from 'react-toolbox/lib/input';
 import theme from './searchInput.css';
@@ -33,7 +32,7 @@ class TrackingSearchContainer extends React.Component {
   }
 
   render = () => {
-    const { caseData, caseManager } = this.props;
+    const { caseData } = this.props;
    
     return (
       <div className={styles.list}>
@@ -54,7 +53,6 @@ class TrackingSearchContainer extends React.Component {
           </div>
         </div>
         {caseData && <TrackerDetails caseData={caseData}/>}
-        {caseManager && <StaffCard cardType="M" managerData={caseManager}/> }
       </div>
     );
   }
@@ -67,12 +65,10 @@ const mapStateToProps = ({
   managerReducer}) => {
   const { 
     caseData,
-    caseManager,
   } = managerReducer;
   
   return {
     caseData,
-    caseManager,
   };
 };
 

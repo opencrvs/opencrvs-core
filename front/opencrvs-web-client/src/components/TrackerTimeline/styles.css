@@ -27,13 +27,15 @@
 }
 
 .title {
-  font-size: 0.9em;
-  margin-top: 0.2em;
-  font-weight: 600;
-  margin-left: 0.6em;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  color: #bbbbbb;
+  font-size: 16px;
+  text-align: center;
+  margin-left: -2.5em;
+  padding: 5px;
+  -webkit-font-smoothing: antialiased;
 }
 
-.timelinePerfTitle {
-  position: absolute;
-  right: 12%;
+.speedometer {
+  margin-left: 3em;
 }

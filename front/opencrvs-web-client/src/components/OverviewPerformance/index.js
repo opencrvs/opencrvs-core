@@ -37,10 +37,10 @@ class OverviewPerformance extends React.Component {
           </div>
         </div>
         <div className={styles.performanceGraph +' pure-u-1'}>
-          {performanceData && <BarChart width={380} height={200} layout="horizontal" data={performanceData}
+          {performanceData && <BarChart width={350} height={300} layout="horizontal" data={performanceData}
                 margin={{top: 0, right: 0, left: 5, bottom: 50}}>
                 <XAxis interval={0} dataKey="name" tick={<CustomizedAxisTick/>}/>
-                <YAxis/>
+                <YAxis />
                 <CartesianGrid strokeDasharray="3 3"/>
                 <Tooltip/>
                 <Bar dataKey="achieved" stackId="a"  >

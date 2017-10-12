@@ -10,22 +10,50 @@
   border-bottom: 1px solid #ddd;
 }
 
+
 .title {
-  font-size: 0.9em;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  color: #bbbbbb;
+  font-size: 16px;
+  padding: 5px;
   margin-top: 0.2em;
-  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
   margin-left: 0.6em;
+}
+
+.bold{
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #000000;
 }
 
 .sub {
   font-size: 0.7em;
   font-weight: 500;
-  margin-left: 0.8em;
+  margin-left: 1.2em;
   margin-top: -2.1em;
   margin-bottom: 0.2em;
+}
+
+.satisfaction {
+  font-size: 0.7em;
+  font-weight: 500;
+  margin-top: 0.7em;
+  text-align: right;
+  margin-right: 2em;
 }
 
 .pullRight {
   text-align: right;
   padding-right: 2em;
+}
+
+.listData {
+  line-height: 0.5em;
+}
+
+.rating {
+  position: absolute;
+  width: 5em;
+  right: 1.5em;
 }

@@ -3,10 +3,11 @@
 import React from 'react';
 import styles from './styles.css';
 import {Timeline, TimelineEvent} from 'react-event-timeline';
-import { BarChart, Bar } from 'recharts';
-import { map, head, get } from 'lodash';
-import { calculateRagStatusOnBar } from 'utils/manager-utils';
-
+import ReactSpeedometer from 'react-d3-speedometer';
+import StaffCard from 'components/StaffCard';
+import head from 'lodash/head';
+import get from 'lodash/get';
+import map from 'lodash/map';
 
 class TrackerTimeline extends React.Component {
   constructor(props) {
@@ -19,9 +20,6 @@ class TrackerTimeline extends React.Component {
     return (
       <div className={styles.trackerTimeline + ' pure-g'}>
         <div className={styles.timeline + ' pure-u-1-1 pure-u-md-1-1'}>
-          <div className={styles.timelinePerfTitle}>
-            <p className={styles.title}>Performance</p>
-          </div>
           <Timeline>
 
           {
@@ -31,11 +29,36 @@ class TrackerTimeline extends React.Component {
               title={caseEvent.title}
               createdAt={caseEvent.createdAt}
               icon={<i className={ 'material-icons ' + caseEvent.icon + ' ' + styles.timelineIcon}>{caseEvent.iconAlt}</i>}
-            >{caseEvent.note}
-            <BarChart width={40} height={150} data={caseEvent.kpiData} className={styles.kpiChart}>
-              <Bar dataKey="pv" stackId="a" fill="#2d3e50" />
-              <Bar dataKey="uv" stackId="a" fill={calculateRagStatusOnBar(get(head(caseEvent.kpiData), 'uv'), get(head(caseEvent.kpiData), 'pv'))} />
-            </BarChart>
+            >
+              <div className="pure-g">
+                <div className="pure-u-1-3">
+                  {caseEvent.note}
+                </div>
+                <div className="pure-u-1-3">
+                  <div className="pure-g">
+                    {caseEvent.caseManager && <StaffCard cardType="M" managerData={caseEvent.caseManager}/> }
+                  </div>
+                </div>
+                <div className="pure-u-1-3">
+                <div className={styles.speedometer}>
+                  <div className={styles.title}>
+                    Process performance:
+                  </div>
+                  <ReactSpeedometer
+                    maxValue={get(head(caseEvent.kpiData), 'maxValue')}
+                    minValue={get(head(caseEvent.kpiData), 'minValue')}
+                    value={get(head(caseEvent.kpiData), 'value')}
+                    needleColor="black"
+                    startColor="green"
+                    segments={5}
+                    width="200"
+                    height="150"
+                    endColor="red"
+                    />
+                  </div>
+                </div>
+              </div>
+              
             </TimelineEvent>
 
 

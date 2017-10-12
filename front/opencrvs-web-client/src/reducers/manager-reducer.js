@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:14
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-11 12:14:39
+ * @Last Modified time: 2017-10-11 17:30:13
  */
 import {
   REQUEST_MAPVIEW_DATA,
@@ -47,7 +47,6 @@ function managerReducer(
     listFilter: 'none',
     listOrder: 'asc',
     caseData: null,
-    caseManager: null,
     caseNotes: null,
     caseGraphData: null,
     performanceData: null,
@@ -147,7 +146,6 @@ function managerReducer(
       return {
         ...state,
         caseData: action.caseData,
-        caseManager: action.caseManager,
         caseNotes: action.caseNotes,
         caseGraphData: action.caseGraphData,
       };
@@ -155,7 +153,6 @@ function managerReducer(
       return {
         ...state,
         caseData: null,
-        caseManager: null,
         caseNotes: null,
         caseGraphData: null,
       };

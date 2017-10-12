@@ -21,7 +21,7 @@ class TooltipHolder extends React.Component {
       <div className={styles.tooltipHolder}>
         <div className={styles.tooltipText}>
           <p>{areaMessage}<span className={styles.bold}>{ rolloverMapData.title }</span></p>
-          <p>Coverage: <span className={styles.bold}>{
+          <p>Registration coverage: <span className={styles.bold}>{
             Math.round(( rolloverMapData.certs / rolloverMapData.kpi ) * 100)
           }%</span></p>
         </div>
