@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-13 12:39:26
+ * @Last Modified time: 2017-10-14 18:39:46
  */
 export const MOBILE_MENU = 'MOBILE_MENU';
 export const CONFIRMATION_CASE = 'CONFIRMATION_CASE';
@@ -38,7 +38,6 @@ export function selectWorkView(type) {
     workView: type,
   };
 }
-
 
 export function deselectWorkView() {
   return {

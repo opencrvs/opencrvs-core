@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-12 16:53:45
+ * @Last Modified time: 2017-10-14 18:39:51
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -21,9 +21,6 @@ export const SET_LIST_ORDER = 'SET_LIST_ORDER';
 export const CASE_TRACKING = 'CASE_TRACKING';
 export const CASE_TRACKING_CLEAR = 'CASE_TRACKING_CLEAR';
 export const PERFORMANCE_METRICS = 'PERFORMANCE_METRICS';
-
-
-
 
 import { apiMiddleware } from 'utils/api-middleware';
 import { BASE_URL } from 'constants/urls';

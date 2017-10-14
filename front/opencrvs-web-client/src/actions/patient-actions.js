@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-14 18:02:53
+ * @Last Modified time: 2017-10-14 18:40:07
  */
 import { BASE_URL } from 'constants/urls';
 import { OPEN_HIM_URL } from 'constants/urls';
@@ -75,6 +75,8 @@ export function fetchPatients(id, notificationCase) {
             return Promise.reject(payload);
           }
           if (notificationCase) {
+
+            
             // temporary reformat until declarations exists in FHIR
             // at which point refactor across the app will be required
             // transitioning between euan's assumed data and true standards
