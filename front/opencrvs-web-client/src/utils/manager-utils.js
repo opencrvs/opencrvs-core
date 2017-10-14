@@ -11,11 +11,11 @@ export const calculateRagStatus = (data, mapEvent, timePeriod) => {
   const percentage = Math.round(( certs / kpi ) * 100);
 
   if ( percentage <= 33) {
-    status = '#FF6427';
+    status = '#e45d1c';
   } else if (percentage > 33 && percentage <= 66) {
-    status = '#FFA327';
+    status = '#e0a82f';
   } else if (percentage > 66 ) {
-    status = '#179999';
+    status = '#419718';
   }
 
   return status;
@@ -35,11 +35,11 @@ export const calculateRagStatusOnBar = (min, max) => {
   let percentage = Math.round(( min / total ) * 100);
 
   if ( percentage <= 33) {
-    status = '#FF6427';
+    status = '#e45d1c';
   } else if ( percentage > 33 && percentage <= 66) {
-    status = '#FFA327';
+    status = '#e0a82f';
   } else if ( percentage > 66 ) {
-    status = '#179999';
+    status = '#419718';
   }
 
   return status;
@@ -71,12 +71,14 @@ export const calculateRagStatusOnMap = (mapData,
   let percentage = Math.round(( certs / kpi ) * 100);
 
   if ( percentage <= 33) {
-    status = '#FF6427';
+    status = '#e45d1c';
   } else if ( percentage > 33 && percentage <= 66) {
-    status = '#FFA327';
+    status = '#e0a82f';
   } else if ( percentage > 66 ) {
-    status = '#179999';
+    status = '#419718';
   }
+
+  
 
   return status;
 };

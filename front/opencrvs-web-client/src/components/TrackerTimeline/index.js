@@ -26,14 +26,7 @@ class TrackerTimeline extends React.Component {
    
     return (
       <div className={styles.trackerTimeline + ' pure-g'}>
-        <div className={styles.timeline + ' pure-u-1-1 pure-u-md-1-1'}>
-
-          
-                   
-              <div className={styles.processPerformance}>
-                Process performance:
-              </div>
-          
+        <div className={styles.timeline + ' pure-u-1-1 pure-u-md-1-1'}>    
           <Timeline>
 
           {
@@ -45,10 +38,7 @@ class TrackerTimeline extends React.Component {
               icon={<i className={ 'material-icons ' + caseEvent.icon + ' ' + styles.timelineIcon}>{caseEvent.iconAlt}</i>}
             >
               <div className="pure-g">
-                <div className={ caseEvent.id != 1 && caseEvent.id != 4 && caseEvent.id != 5
-                  ? styles.notes + ' pure-u-1-3'
-                  : styles.notes + ' pure-u-1-1'
-                  }>
+                <div className="pure-u-1-3">
                   { caseEvent.id == 4 && 
                     <div className={styles.onTime}><strong>On Time</strong></div>
                   }
@@ -67,6 +57,7 @@ class TrackerTimeline extends React.Component {
                   <div className="pure-u-1-3">
                     <div className={styles.speedometer}>
                       <p>Days</p>
+                      <div className={styles.circle}></div>
                       <ReactSpeedometer
                         maxValue={get(head(caseEvent.kpiData), 'maxValue')}
                         minValue={get(head(caseEvent.kpiData), 'minValue')}
