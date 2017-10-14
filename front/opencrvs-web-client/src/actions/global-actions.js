@@ -2,13 +2,15 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:24 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-02 15:44:25
+ * @Last Modified time: 2017-10-13 12:39:26
  */
 export const MOBILE_MENU = 'MOBILE_MENU';
 export const CONFIRMATION_CASE = 'CONFIRMATION_CASE';
 export const REPORT_OPTION_TOGGLE = 'REPORT_OPTION_TOGGLE';
 export const SELECT_WORK_VIEW = 'SELECT_WORK_VIEW';
 export const DESELECT_WORK_VIEW = 'DESELECT_WORK_VIEW';
+export const LAUNCH_SNACK = 'LAUNCH_SNACK';
+export const HIDE_SNACK = 'HIDE_SNACK';
 
 
 export function mobileMenuControl() {
@@ -43,3 +45,18 @@ export function deselectWorkView() {
     type: DESELECT_WORK_VIEW,
   };
 }
+
+export function launchSnack(snackMessage) {
+  return {
+    type: LAUNCH_SNACK,
+    snackMessage,
+  };
+}
+
+export function clearSnackbar() {
+  return {
+    type: HIDE_SNACK,
+  };
+}
+
+

@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:43
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-10 16:47:17
+ * @Last Modified time: 2017-10-13 14:58:13
  */
 import React from 'react';
 import {connect} from 'react-redux';
@@ -62,6 +62,7 @@ class WorkingItemCanvas extends React.Component {
         child_id: get(childPatient, 'patient.id'),
         status: selectedDeclaration.status,
         code: selectedDeclaration.code,
+        uuid: selectedDeclaration.uuid,
         tracking: selectedDeclaration.tracking,
         firstName: childGiven.shift(),
         middleName: childGiven.toString().replace(/,/g, ''),
@@ -199,6 +200,7 @@ class WorkingItemCanvas extends React.Component {
         // Mother
         code: selectedDeclaration.code,
         tracking: selectedDeclaration.tracking,
+        uuid: selectedDeclaration.uuid,
         mother_firstName: motherGiven.shift(),
         mother_middleName: motherGiven.toString().replace(/,/g, ''),
         mother_family: get(motherPatient, 'patient.family'),

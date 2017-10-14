@@ -2,13 +2,15 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:30
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-10 18:11:08
+ * @Last Modified time: 2017-10-14 18:23:00
  */
 import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
 import { logoutUser } from 'actions/user-actions';
 import { submitCollector } from 'actions/certification-actions';
 import { selectWorkView } from 'actions/global-actions';
+import { launchSnack } from 'actions/global-actions';
+import { resetPatients } from 'actions/patient-actions';
 import { clearTempImages } from 'actions/image-actions';
 import { get, head, map, filter } from 'lodash';
 const Moment = require('moment');
@@ -36,7 +38,10 @@ export const CERTIFICATION_SELECTED = 'CERTIFICATION_SELECTED';
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const CHECK_CERTIFICATION = 'CHECK_CERTIFICATION';
 export const CLOSE_CERTIFICATION_MODAL = 'CLOSE_CERTIFICATION_MODAL';
-
+export const STORE_NOTIFICATIONS = 'STORE_NOTIFICATIONS';
+export const STORE_SAVED_DECLARATIONS = 'STORE_SAVED_DECLARATIONS';
+export const BEGIN_SAVING = 'BEGIN_SAVING';
+export const SAVING_COMPLETED = 'SAVING_COMPLETED';
 
 
 const uuidv4 = require('uuid/v4');
@@ -111,6 +116,12 @@ export function newDeclarationModalOpened() {
   };
 }
 
+export function setSaving() {
+  return {
+    type: BEGIN_SAVING,
+  };
+}
+
 function setFormSubmitValues(values) {
   return {
     type: DECLARATION_READY_TO_CONFIRM,
@@ -119,9 +130,14 @@ function setFormSubmitValues(values) {
 }
 
 export function submitModalOpen(values) {
-  return dispatch => {
-    dispatch(submitModalOpened());
+  return (dispatch, getState) => {
     dispatch(setFormSubmitValues(values));
+    const {beginSaving} = getState().declarationsReducer;
+    if (beginSaving) {
+      dispatch(submitDeclaration(true));
+    } else {
+      dispatch(submitModalOpened());
+    }
   };
 }
 
@@ -274,7 +290,11 @@ export function selectDeclaration(declaration) {
       dispatch(loadCertCheck(declaration));
 
     } else if (role == 'field officer') {
-      dispatch(loadNotification(declaration));
+      if (code == 'birth-declaration') {
+        dispatch(loadDeclaration(declaration));
+      } else {
+        dispatch(loadNotification(declaration));
+      }
     } else {
       console.error(`Inconsitent state, could not select declaration: declaration code ${code}, user role ${role}`);
     }
@@ -320,7 +340,7 @@ function fetchDeclarationsFromAPI(dispatch, roleType, config, token) {
 
   const data = {roleType:roleType};
 
-  return fetch(BASE_URL + `declarations/${data.roleType}`, config)
+  return fetch(BASE_URL + `declarations/${data.roleType}/context/`, config)
     .then(response =>
       response.json().then(payload => ({ payload, response }))
     )
@@ -337,7 +357,14 @@ function fetchDeclarationsFromAPI(dispatch, roleType, config, token) {
         dispatch(fetchPatients(declaration.motherDetails, false));
         dispatch(fetchPatients(declaration.fatherDetails, false));
       });
-      dispatch(selectWorkView('work'));
+      if (roleType == 'registrar') {
+
+        dispatch(checkSavedDeclarations(roleType));
+      } else if (roleType == 'certification clerk') {
+        dispatch(selectWorkView('work'));
+      }
+
+
       return true;
     })
     .catch(err => {
@@ -349,7 +376,7 @@ function fetchDeclarationsFromAPI(dispatch, roleType, config, token) {
     });
 }
 
-function fetchNotificationsFromHearth(dispatch) {
+function fetchNotificationsFromHearth(dispatch, roleType) {
   return fetch(OPEN_HIM_URL + 'Composition?status=preliminary&type=birth-notification&entry=Location/ae150380-8329-11e7-82fe-a5724c7e1e43&_count=999')
     .then(response =>
       response.json().then(payload => ({ payload, response }))
@@ -359,46 +386,29 @@ function fetchNotificationsFromHearth(dispatch) {
         dispatch(declarationError(payload.message));
         return Promise.reject(payload);
       }
+      dispatch(storeAllNotifications(payload));
+      dispatch(checkSavedDeclarations(roleType));
 
-      //temporary reformat until declarations exists in FHIR
-      //at which point refactor across the app will be required
-      // transitioning between euan's assumed data and true standards
-      let newPayload = {
-        message: 'Declarations success',
-        declaration: [],
-      };
-      map(get(payload, 'entry'), (notification, index ) => {
-        const childIDArray = notification.resource.subject.reference.split('/');
-        const childID = childIDArray[1];
-
-        const mother = notification.resource.section.entry
-          .find((entry) => entry.text === 'Mother\'s Details' )
-          .reference;
-
-        let newDeclaration = {
-          id: index,
-          code: 'birth-notification',
-          created_at: notification.resource.meta.lastUpdated,
-          updated_at: notification.resource.meta.lastUpdated,
-          motherDetails: mother.split('/')[1],
-          childDetails: childID,
-          tracking: 'BN-' + notification.resource.id.substring(0, 12),
-          documents:[],
-        };
-        const child = notification.resource.subject.reference;
-
-
-        dispatch(fetchPatients(child, true));
-        dispatch(fetchPatients(mother, true));
-        newPayload.declaration.push(newDeclaration);
-      });
-      dispatch(receiveDeclaration(newPayload));
-      dispatch(selectWorkView('work'));
       return true;
     })
     .catch(err => {
       console.log(err);
     });
+}
+
+function storeAllNotifications(payload) {
+  return {
+    type: STORE_NOTIFICATIONS,
+    notificationData: payload,
+  };
+}
+
+function storeSavedDeclarations(payload) {
+  
+  return {
+    type: STORE_SAVED_DECLARATIONS,
+    savedDeclarations: payload,
+  };
 }
 
 export function fetchDeclarations(roleType) {
@@ -409,8 +419,160 @@ export function fetchDeclarations(roleType) {
     if (roleType != 'field officer') {
       fetchDeclarationsFromAPI(dispatch, roleType, config, token);
     } else {
-      fetchNotificationsFromHearth(dispatch);
+      fetchNotificationsFromHearth(dispatch, roleType);
     }
+  };
+}
+
+export function checkSavedDeclarations(roleType) {
+  let token = localStorage.getItem('token') || null;
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  return (dispatch, getState) => {
+    
+    
+    return fetch(BASE_URL + `declarations/${roleType}/context/saved`, config)
+    .then(response =>
+      response.json().then(payload => ({ payload, response }))
+    )
+    .then(({ payload, response }) => {
+      if (!response.ok) {
+        dispatch(declarationError(payload.message));
+        return Promise.reject(payload);
+      }
+      if (roleType == 'field officer') {
+        dispatch(storeSavedDeclarations(payload));
+        dispatch(fetchAndCompareProcessedNotifications());
+      } else if (roleType == 'registrar') {
+        const {declarations} = getState().declarationsReducer;
+        map(payload.declaration, (savedDeclaration, index ) => {
+          dispatch(fetchPatients(savedDeclaration.childDetails, false));
+          dispatch(fetchPatients(savedDeclaration.motherDetails, false));
+          dispatch(fetchPatients(savedDeclaration.fatherDetails, false));
+          declarations.declaration.push(savedDeclaration);
+        });
+        dispatch(receiveDeclaration(declarations));
+        dispatch(selectWorkView('work'));
+      }
+      return true;
+    })
+    .catch(err => {
+      if (err.message == 'Invalid token') {
+        dispatch(logoutUser());
+      } else {
+        console.log(err);
+      }
+    });
+    
+  };
+}
+
+export function fetchAndCompareProcessedNotifications() {
+  let token = localStorage.getItem('token') || null;
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  return (dispatch, getState) => {
+    
+    return fetch(BASE_URL + 'notifications', config)
+    .then(response =>
+      response.json().then(payload => ({ payload, response }))
+    )
+    .then(({ payload, response }) => {
+      if (!response.ok) {
+        dispatch(declarationError(payload.message));
+        return Promise.reject(payload);
+      }
+      let newPayload = {
+        message: 'Unprocessed notifications success',
+        declaration: [],
+      };
+      // Todo compare uuids and remove any that are already processed
+      // merge remaining with any that are saved
+      const {notificationData, savedDeclarations} = getState().declarationsReducer;
+      if (payload.notification.length > 0) {
+        map(get(notificationData, 'entry'), (notification, index ) => {
+          const notificationID = notification.resource.id;
+          let insert = true;
+          payload.notification.forEach((processedNotification) => {
+            if (notificationID == processedNotification.uuid) {
+              insert = false;
+            }
+          });
+          if (insert) {
+            const childIDArray = notification.resource.subject.reference.split('/');
+            const childID = childIDArray[1];
+            const mother = notification.resource.section.entry
+              .find((entry) => entry.text === 'Mother\'s Details' )
+              .reference;
+            let newDeclaration = {
+              id: index,
+              code: 'birth-notification',
+              uuid: notification.resource.id,
+              created_at: notification.resource.meta.lastUpdated,
+              updated_at: notification.resource.meta.lastUpdated,
+              motherDetails: mother.split('/')[1],
+              childDetails: childID,
+              tracking: 'BN-' + notification.resource.id.substring(0, 12),
+              documents:[],
+            };
+            const child = notification.resource.subject.reference;
+            dispatch(fetchPatients(child, true));
+            dispatch(fetchPatients(mother, true));
+            console.log('PUSHING: ' + JSON.stringify(newDeclaration));
+            newPayload.declaration.push(newDeclaration);
+          }
+        });
+      } else {
+        map(get(notificationData, 'entry'), (notification, index ) => {
+          const childIDArray = notification.resource.subject.reference.split('/');
+          const childID = childIDArray[1];
+  
+          const mother = notification.resource.section.entry
+            .find((entry) => entry.text === 'Mother\'s Details' )
+            .reference;
+          let newDeclaration = {
+            id: index,
+            code: 'birth-notification',
+            uuid: notification.resource.id,
+            created_at: notification.resource.meta.lastUpdated,
+            updated_at: notification.resource.meta.lastUpdated,
+            motherDetails: mother.split('/')[1],
+            childDetails: childID,
+            tracking: 'BN-' + notification.resource.id.substring(0, 12),
+            documents:[],
+          };
+          const child = notification.resource.subject.reference;
+  
+  
+          dispatch(fetchPatients(child, true));
+          dispatch(fetchPatients(mother, true));
+          newPayload.declaration.push(newDeclaration);
+        }); 
+      }
+      
+      map(savedDeclarations.declaration, (declaration, index ) => {
+        console.log('SAVED DECLARATIONS:' + JSON.stringify(declaration));
+        dispatch(fetchPatients(declaration.childDetails, false));
+        dispatch(fetchPatients(declaration.motherDetails, false));
+        dispatch(fetchPatients(declaration.fatherDetails, false));
+        newPayload.declaration.push(declaration);
+      });
+      console.log(JSON.stringify(newPayload));
+      dispatch(receiveDeclaration(newPayload));
+      dispatch(selectWorkView('work'));
+      
+      return true;
+    })
+    .catch(err => {
+      if (err.message == 'Invalid token') {
+        dispatch(logoutUser());
+      } else {
+        console.log(err);
+      }
+    });
+    
   };
 }
 
@@ -421,6 +583,12 @@ export function sendSMS(phoneNumber, smsMessage) {
   }, function printResult(result) {
     console.log(result);
   });
+}
+
+function savingCompleted() {
+  return {
+    type: SAVING_COMPLETED,
+  };
 }
 
 function doCORSRequest(options, printResult) {
@@ -441,7 +609,8 @@ function doCORSRequest(options, printResult) {
 }
 
 
-export function submitDeclaration() {
+
+export function submitDeclaration(saving) {
 
   let token = localStorage.getItem('token') || null;
   let childPatientURL = BASE_URL + 'patient';
@@ -463,6 +632,8 @@ export function submitDeclaration() {
   let declarationsURL = BASE_URL + 'declarations';
   let locationsURL = BASE_URL + 'locations';
   let informantsURL = BASE_URL + 'informant';
+
+  let notificationsURL = BASE_URL + 'notifications';
 
   return (dispatch, getState) => {
     const {selectedDeclaration, newDeclaration, submitValues, newNotification} = getState().declarationsReducer;
@@ -494,6 +665,8 @@ export function submitDeclaration() {
       const locationsData = new FormData();
       const informantsData = new FormData();
 
+      const notificationsData = new FormData();
+
       if (newDeclaration || newNotification) {
         childConfig = {
           method: 'POST',
@@ -512,6 +685,7 @@ export function submitDeclaration() {
 
       let motherConfig = Object.assign({}, childConfig);
       let fatherConfig = Object.assign({}, childConfig);
+      let notificationsConfig = Object.assign({}, childConfig);
 
       let childAddressConfig = Object.assign({}, childConfig);
       let motherAddressConfig = Object.assign({}, childConfig);
@@ -538,7 +712,9 @@ export function submitDeclaration() {
 
       childData.append('given', get(submitValues, 'firstName') + ', ' +  get(submitValues, 'middleName'));
       childData.append('family', get(submitValues, 'family'));
-      childData.append('birthDate', get(submitValues, 'birthDate').toDateString());
+      if (get(submitValues, 'birthDate')) {
+        childData.append('birthDate', get(submitValues, 'birthDate').toDateString());
+      }
       childData.append('gender', get(submitValues, 'gender'));
       childData.append('maritalStatus', 'single');
       childData.append('nationality', 'Ghana');
@@ -550,9 +726,12 @@ export function submitDeclaration() {
         motherData.append('uuid', uuidv4());
         motherData.append('prefix', 'Mrs');
       }
-      motherData.append('given', get(submitValues, 'mother_firstName') + ', ' +  get(submitValues, 'mother_middleName'));
+      motherData.append('given', get(submitValues, 'mother_firstName')
+       + ', ' +  get(submitValues, 'mother_middleName'));
       motherData.append('family', get(submitValues, 'mother_family'));
-      motherData.append('birthDate', get(submitValues, 'mother_birthDate').toDateString());
+      if (get(submitValues, 'mother_birthDate')) {
+        motherData.append('birthDate', get(submitValues, 'mother_birthDate').toDateString());
+      }
       motherData.append('gender', get(submitValues, 'mother_gender'));
       motherData.append('maritalStatus', get(submitValues, 'mother_maritalStatus'));
       motherData.append('nationality', get(submitValues, 'mother_nationality'));
@@ -564,9 +743,12 @@ export function submitDeclaration() {
         fatherData.append('uuid', uuidv4());
         fatherData.append('prefix', 'Mr');
       }
-      fatherData.append('given', get(submitValues, 'father_firstName') + ', ' +  get(submitValues, 'father_middleName'));
+      fatherData.append('given', get(submitValues, 'father_firstName')
+       + ', ' +  get(submitValues, 'father_middleName'));
       fatherData.append('family', get(submitValues, 'father_family'));
-      fatherData.append('birthDate', get(submitValues, 'father_birthDate').toDateString());
+      if (get(submitValues, 'father_birthDate')) {
+        fatherData.append('birthDate', get(submitValues, 'father_birthDate').toDateString());
+      }
       fatherData.append('gender', get(submitValues, 'father_gender'));
       fatherData.append('maritalStatus', get(submitValues, 'father_maritalStatus'));
       fatherData.append('nationality', get(submitValues, 'father_nationality'));
@@ -738,14 +920,33 @@ export function submitDeclaration() {
             const suffix2 = get(submitValues, 'firstName').substring(0, 1);
             const suffix3 = get(submitValues, 'family').substring(0, 1);
             const newTrackID = prefix + 'd-' + suffix1 + suffix2 + suffix3;
-
-            declarationsData.append('uuid', newUuid);
+            if (get(submitValues, 'uuid')) {
+              declarationsData.append('uuid', get(submitValues, 'uuid'));
+            } else {
+              declarationsData.append('uuid', newUuid);
+            }
             declarationsData.append('tracking', newTrackID.toUpperCase());
             declarationsData.append('motherDetails', motherID);
             declarationsData.append('fatherDetails', fatherID);
             declarationsData.append('childDetails', childID);
             declarationsData.append('code', get(submitValues, 'code'));
-            declarationsData.append('status', 'declared');
+            if (saving) {
+              if (role == 'registrar') {
+                declarationsData.append('status', 'declared-saved');
+                console.log('declared-saved');
+              } else if (role == 'field officer') {
+                declarationsData.append('status', 'notified-saved');
+                console.log('notified-saved');
+              }
+            } else {
+              if (role == 'field officer') {
+                declarationsData.append('status', 'declared');
+                console.log('declared');
+              } else if (role == 'registrar') {
+                declarationsData.append('status', 'validated');
+                console.log('validated');
+              }
+            }
           } else if (newNotification) {
             const newUuid = uuidv4();
             const prefix = get(submitValues, 'tracking').substring(0, 1);
@@ -753,20 +954,40 @@ export function submitDeclaration() {
             const suffix2 = get(submitValues, 'family').substring(0, 1);
             const newTrackID = prefix + 'd-' + newUuid.substring(0, 8) + suffix1 + suffix2;
 
-            declarationsData.append('uuid', newUuid);
+            declarationsData.append('uuid', get(submitValues, 'uuid'));
             declarationsData.append('tracking', newTrackID);
             declarationsData.append('motherDetails', motherID);
             declarationsData.append('fatherDetails', fatherID);
             declarationsData.append('childDetails', childID);
             declarationsData.append('code', 'birth-declaration');
-            declarationsData.append('status', 'declared');
+            if (saving) {
+              console.log('notified-saved');
+              declarationsData.append('status', 'notified-saved');
+            } else {
+              console.log('declared');
+              declarationsData.append('status', 'declared');
+            }
           } else {
             declarationsURL += '/' + selectedDeclaration.id;
-            if (role == 'registrar') {
-              declarationsData.append('status', 'validated');
-              newBirthRegistrationNumber = uuidv4().substring(0, 6).toUpperCase();
-              // temporarily create a dummy birth registration number
-              childData.append('birthRegistrationNumber', newBirthRegistrationNumber);
+            if (saving) {
+              if (role == 'registrar') {
+                declarationsData.append('status', 'declared-saved');
+                console.log('declared-saved');
+              } else if (role == 'field officer') {
+                declarationsData.append('status', 'notified-saved');
+                console.log('notified-saved');
+              }
+            } else {
+              if (role == 'field officer') {
+                declarationsData.append('status', 'declared');
+                console.log('declared');
+              } else if (role == 'registrar') {
+                declarationsData.append('status', 'validated');
+                newBirthRegistrationNumber = uuidv4().substring(0, 6).toUpperCase();
+                // temporarily create a dummy birth registration number
+                childData.append('birthRegistrationNumber', newBirthRegistrationNumber);
+                console.log('validated');
+              }
             }
           }
 
@@ -800,7 +1021,8 @@ export function submitDeclaration() {
             } else {
               informantsData.append('uuid', uuidv4());
             }
-            informantsData.append('given', get(submitValues, 'informant_firstName') + ', ' +  get(submitValues, 'informant_middleName'));
+            informantsData.append('given', get(submitValues, 'informant_firstName')
+               + ', ' +  get(submitValues, 'informant_middleName'));
             informantsData.append('family', get(submitValues, 'informant_family'));
             informantsData.append('relationship', get(submitValues, 'informant_relationship'));
             informantsData.append('phone', get(submitValues, 'informant_phone'));
@@ -816,9 +1038,16 @@ export function submitDeclaration() {
             informantsData.append('declaration_id', declarationID);
             informantsConfig.body = informantsData;
 
+            if (newNotification) {
+              notificationsData.append('uuid', get(submitValues, 'uuid'));
+              notificationsConfig.body = notificationsData;
+            }
+
             declarationExtraPromises.push(apiMiddleware(locationsConfig, locationsURL, dispatch));
             declarationExtraPromises.push(apiMiddleware(informantsConfig, informantsURL, dispatch));
-
+            if (newNotification) {
+              declarationExtraPromises.push(apiMiddleware(notificationsConfig, notificationsURL, dispatch));
+            }
 
             Promise.all(declarationExtraPromises).then(updatedDeclaration => {
               const imagePromises = [];
@@ -837,30 +1066,49 @@ export function submitDeclaration() {
                   });
 
                   Promise.all(imagePromises).then(updatedImage => {
-
-                    dispatch(submitDeclarationSuccess(trackingID));
+                    if (saving == true) {
+                      dispatch(savingCompleted());
+                      dispatch(launchSnack('Your progress has been saved'));
+                    } else {
+                      dispatch(trackingModalOpened());
+                    }
+                    dispatch(resetPatients());
                     dispatch(clearTempImages());
+                    dispatch(submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID));
                     dispatch(fetchDeclarations(role));
-                    dispatch(trackingModalOpened());
                   });
                 } else {
-                  console.log('error no images in declaration');
+                  if (saving == true) {
+                    dispatch(resetPatients());
+                    dispatch(savingCompleted());
+                    dispatch(submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID));
+                    dispatch(fetchDeclarations(role));
+                    dispatch(launchSnack('Your progress has been saved'));
+                  }
                 }
               } else {
                 dispatch(clearTempImages());
-                if (role == 'registrar') {
+                if (saving == true) {
+                  dispatch(savingCompleted());
+                  dispatch(resetPatients());
                   dispatch(submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID));
-                  const smsMessage = 'The registration process for tracking number '
-                    + trackingID.toUpperCase() + ' is now complete. The birth is now registered with birth registration number '
+                  dispatch(fetchDeclarations(role));
+                  dispatch(launchSnack('Your progress has been saved'));
+                } else if (role == 'registrar' && saving == false) {
+                  dispatch(submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID));
+                  const smsMessage = 'The registration process for tracking number ' + trackingID.toUpperCase() 
+                    + ' is now complete. The birth is now registered with birth registration number '
                     + newBirthRegistrationNumber + '. Please now pay 10 GH₵ for the birth certificate by mobile money,'
                     + ' using transfer agents Airtel or Mpesa. Payee reference:'
                     + ' 98766 Your reference: ' + trackingID.toUpperCase()
                     + ' Once payment is received, the birth certificate will be available after 3 working days'
                     + ' from Agona West Civil Registration Centre, High Street, Agona West, Central Region.';
+                  dispatch(resetPatients());
                   dispatch(fetchDeclarations(role));
                   dispatch(trackingModalOpened());
                   dispatch(sendSMS(motherPhone, smsMessage));
                 } else {
+                  dispatch(resetPatients());
                   dispatch(submitDeclarationSuccess(trackingID));
                   dispatch(fetchDeclarations(role));
                   dispatch(trackingModalOpened());
@@ -870,6 +1118,7 @@ export function submitDeclaration() {
           });
         });
       });
-    }
+    }  
+  
   };
 }

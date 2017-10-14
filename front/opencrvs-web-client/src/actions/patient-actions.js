@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:19:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-12 15:16:15
+ * @Last Modified time: 2017-10-14 18:02:53
  */
 import { BASE_URL } from 'constants/urls';
 import { OPEN_HIM_URL } from 'constants/urls';
@@ -10,12 +10,19 @@ import { logoutUser } from 'actions/user-actions';
 export const PATIENT_REQUEST = 'PATIENT_REQUEST';
 export const PATIENT_SUCCESS = 'PATIENT_SUCCESS';
 export const PATIENT_FAILURE = 'PATIENT_FAILURE';
+export const RESET_PATIENTS = 'RESET_PATIENTS';
 import { filter, get, head } from 'lodash';
 
 function requestPatient() {
   return {
     type: PATIENT_REQUEST,
     isFetching: true,
+  };
+}
+
+export function resetPatients() {
+  return {
+    type: RESET_PATIENTS,
   };
 }
 
@@ -40,6 +47,7 @@ export function fetchPatients(id, notificationCase) {
   // still migrate from Euan's prototype server to FHIR: see variable temporaryURLSwitch
   // to date, only notifications are possible in FHIR
   let token = localStorage.getItem('token') || null;
+  console.log('FETCHING PATIENT WITH ID: ' + id);
   let config = {};
   return dispatch => {
     dispatch(requestPatient());

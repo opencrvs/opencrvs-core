@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-12 14:20:44
+ * @Last Modified time: 2017-10-12 16:53:45
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';
@@ -378,7 +378,7 @@ export function caseTracking() {
       {
         id: 2,
         title: 'DECLARATION', 
-        note: 'Field officer John Adarkwa. Declaration performed in Swedru village" should be "Declaration captured by Field officer John Adarkwa in Swedru, Agona West Municipal.', 
+        note: 'Declaration captured by Field officer John Adarkwa in Swedru, Agona West Municipal.', 
         createdAt: Moment().subtract(23, 'days').format('MMMM Do YYYY, h:mm:ss'),
         icon: 'input',
         iconAlt: 'input',

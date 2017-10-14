@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:35
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-09 10:03:09
+ * @Last Modified time: 2017-10-14 17:38:13
  */
 import React from 'react';
 import styles from './styles.css';
@@ -67,12 +67,11 @@ class WorkList extends React.Component {
             key={declaration.id}
             id={declaration.id}
             code={declaration.code}
-            given={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.given') }
-            family={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.family') }
-            address={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.address') }
+            patients={patients}
+            childDetails={declaration.childDetails}
             tracking={declaration.tracking}
             created={declaration.created_at}
-            birthDate={ get(head(filter(patients, function(patient) { return patient.patient.id == declaration.childDetails; })), 'patient.birthDate') }
+            status={declaration.status}
             onClick={() => onWorkItemClick(declaration)} />
         ))}
       </div>
@@ -80,14 +79,18 @@ class WorkList extends React.Component {
   }
 }
 
-const mapStateToProps = ({ declarationsReducer }) => {
+const mapStateToProps = ({ declarationsReducer, patientsReducer }) => {
   const {
     searchTerm,
     declarationsList,
   } = declarationsReducer;
+  const {
+    patients,
+  } = patientsReducer;
   return {
     declarationsList,
     searchTerm,
+    patients,
   };
 };
 

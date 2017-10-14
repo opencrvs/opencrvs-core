@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:28
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-19 12:51:51
+ * @Last Modified time: 2017-10-14 16:30:18
  */
 import {
   DECLARATION_REQUEST,
@@ -26,7 +26,12 @@ import {
   CERTIFICATION_SELECTED,
   REMOVE_NOTIFICATION,
   CHECK_CERTIFICATION,
+  STORE_NOTIFICATIONS,
   CLOSE_CERTIFICATION_MODAL,
+  BEGIN_SAVING,
+  STORE_SAVED_DECLARATIONS,
+  STORE_NEW_DECLARATIONS,
+  SAVING_COMPLETED,
 } from '../actions/declaration-actions';
 
 function declarationsReducer(
@@ -38,6 +43,7 @@ function declarationsReducer(
     selectedCertification: '',
     newDeclarationModal: false,
     newDeclaration: false,
+    newDeclarations: false,
     category: '',
     trackingID: '',
     submitModal: 0,
@@ -52,10 +58,38 @@ function declarationsReducer(
     newBirthRegistrationNumber: null,
     newChildPersonalID: null,
     declarationToCheckAgainst: null,
+    notificationData: null,
+    savedDeclarations: null,
+    beginSaving: false,
   },
   action
 ) {
   switch (action.type) {
+    case SAVING_COMPLETED:
+      return {
+        ...state,
+        beginSaving: false,
+      };
+    case BEGIN_SAVING:
+      return {
+        ...state,
+        beginSaving: true,
+      };
+    case STORE_NEW_DECLARATIONS:
+      return {
+        ...state,
+        newDeclarations: action.newDeclarations,
+      };
+    case STORE_SAVED_DECLARATIONS:
+      return {
+        ...state,
+        savedDeclarations: action.savedDeclarations,
+      };
+    case STORE_NOTIFICATIONS:
+      return {
+        ...state,
+        notificationData: action.notificationData,
+      };
     case DECLARATION_READY_TO_CONFIRM:
       return {
         ...state,
@@ -102,6 +136,8 @@ function declarationsReducer(
         isFetching: false,
         declarations: action.declarations,
         declarationsList: action.declarationsList,
+        savedDeclarations: null,
+        newDeclarations: null,
       };
     case DECLARATION_FAILURE:
       return {

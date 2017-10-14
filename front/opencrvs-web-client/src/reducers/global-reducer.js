@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-05 12:41:35
+ * @Last Modified time: 2017-10-13 12:40:17
  */
 import {
   MOBILE_MENU,
@@ -10,6 +10,8 @@ import {
   REPORT_OPTION_TOGGLE,
   SELECT_WORK_VIEW,
   DESELECT_WORK_VIEW,
+  LAUNCH_SNACK,
+  HIDE_SNACK,
 } from '../actions/global-actions';
 
 function globalReducer(
@@ -20,10 +22,24 @@ function globalReducer(
     workView: null,
     country: 'ghana',
     regions: ['volta'],
+    snackMessage: null,
+    snackActive: false,
   },
   action
 ) {
   switch (action.type) {
+    case LAUNCH_SNACK:
+      return {
+        ...state,
+        snackMessage: action.snackMessage,
+        snackActive: true,
+      };
+    case HIDE_SNACK:
+      return {
+        ...state,
+        snackMessage: null,
+        snackActive: false,
+      };
     case DESELECT_WORK_VIEW:
       return {
         ...state,

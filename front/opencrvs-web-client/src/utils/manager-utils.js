@@ -21,6 +21,14 @@ export const calculateRagStatus = (data, mapEvent, timePeriod) => {
   return status;
 };
 
+export const clean = (obj) => {
+  for (var propName in obj) { 
+    if (obj[propName] === null || obj[propName] === undefined) {
+      delete obj[propName];
+    }
+  }
+};
+
 export const calculateRagStatusOnBar = (min, max) => {
   let status = null;
   let total = min + max;

@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-12 15:11:17
+ * @Last Modified time: 2017-10-14 18:28:29
  */
 import React from 'react';
 import styles from './styles.css';
@@ -45,6 +45,10 @@ class WorkingItem extends React.Component {
     this.props.onModalOpenClick('image');
   }
 
+  saveProgress = (event) => {
+    this.props.onNavSubmitClick(true);
+  }
+
   openSMSModal = () => {
     this.props.onModalOpenClick('sms');
   }
@@ -54,17 +58,17 @@ class WorkingItem extends React.Component {
       if (this.props.tempImages.length == 0) {
         this.props.onModalOpenClick('req');
       } else {
-        this.props.onNavSubmitClick();
+        this.props.onNavSubmitClick(false);
       }
     } else if (this.props.selectedDeclaration) {
       if (this.props.selectedDeclaration.documents.length == 0) {
         if (this.props.tempImages.length == 0) {
           this.props.onModalOpenClick('req');
         } else {
-          this.props.onNavSubmitClick();
+          this.props.onNavSubmitClick(false);
         }
       } else {
-        this.props.onNavSubmitClick();
+        this.props.onNavSubmitClick(false);
       }
     }
   }
@@ -214,12 +218,12 @@ class WorkingItem extends React.Component {
                   role === 'field officer' ? (
                     <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                   ) : (
-                    <Button icon="save" label="Save" flat />
+                    <Button icon="save" label="Save" flat onClick={this.saveProgress} />
                   )
                 }
                 {
                   role === 'field officer' ? (
-                    <Button icon="save" label="Save" flat />
+                    <Button icon="save" label="Save" flat onClick={this.saveProgress}/>
                   ) : (
                     <Button icon="image" label="Upload" flat onClick={this.openImageModal} />
                   )
@@ -235,12 +239,12 @@ class WorkingItem extends React.Component {
           </div>
           : selectedCertification ?
             <div className={styles.wiContentHeader + ' pure-g'}>
-              <div className="pure-u-1 pure-u-md-1-2">
+              <div className="pure-u-1 pure-u-md-1-3">
                 <div className="pure-g">
-                  <div className="pure-u-1 pure-u-md-1-3">
+                  <div className="pure-u-1 pure-u-md-1-2">
                     <form>
                     {
-                      <Input theme={theme} type="text" label="Available certificate number"  value={this.state.certNumber} onChange={this.handleChange.bind(this, 'setCertNumber')} />
+                      <Input theme={theme} type="text" label="Certificate number"  value={this.state.certNumber} onChange={this.handleChange.bind(this, 'setCertNumber')} />
                     }
                     </form>
                   </div>

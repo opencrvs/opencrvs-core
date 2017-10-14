@@ -2,12 +2,13 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:17:28 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-07-05 19:42:22
+ * @Last Modified time: 2017-10-14 18:01:24
  */
 import {
   PATIENT_REQUEST,
   PATIENT_SUCCESS,
   PATIENT_FAILURE,
+  RESET_PATIENTS,
 } from '../actions/patient-actions';
 
 function patientsReducer(
@@ -18,6 +19,11 @@ function patientsReducer(
   action
 ) {
   switch (action.type) {
+    case RESET_PATIENTS:
+      return {
+        ...state,
+        patients: [],
+      };
     case PATIENT_REQUEST:
       return {
         ...state,

@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:14:16 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-08-15 18:46:32
+ * @Last Modified time: 2017-10-14 13:45:54
  */
 
 const Joi = require('joi');
@@ -11,7 +11,7 @@ exports.register = (server, options, next) => {
 
     server.route({
 
-        path: '/declarations/{roleType}',
+        path: '/declarations/{roleType}/context/{context?}',
         method: 'GET',
         config: {
             auth: 'jwt',
@@ -25,7 +25,8 @@ exports.register = (server, options, next) => {
             },
             validate: {
                 params: {
-                    roleType: Joi.string()
+                    roleType: Joi.string(),
+                    context: Joi.string().allow('').optional()
                 }
             }
         },

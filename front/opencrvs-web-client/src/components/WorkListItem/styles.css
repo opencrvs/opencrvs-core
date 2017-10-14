@@ -47,3 +47,15 @@
     opacity: 0.7;
     text-transform: capitalize;
 }
+.newAlarm {
+    text-transform: uppercase;
+    color: white;
+    margin-top: -1.3em;
+    border-radius: 7px;
+    background: green;
+    padding-left: .3em;
+    padding-right: .3em;
+    padding-top: .07em;
+    position: absolute;
+    margin-top: 2em;
+}

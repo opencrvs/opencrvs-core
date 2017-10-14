@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:17:38
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-09-22 10:22:26
+ * @Last Modified time: 2017-10-14 18:14:19
  */
 import React from 'react';
 import styles from './styles.css';
@@ -17,6 +17,7 @@ import TrackingModal from 'components/TrackingModal';
 import ReqDocsModal from 'components/ReqDocsModal';
 import CertCheckModal from 'components/CertCheckModal';
 import SMSModal from 'components/SMSModal';
+import SnackHolder from 'components/SnackHolder';
 
 import { submit } from 'redux-form';
 import { connect } from 'react-redux';
@@ -33,6 +34,7 @@ import {
   proceedToPrintView,
   smsModalToggle,
   sendSMS,
+  setSaving,
 } from 'actions/declaration-actions';
 import { logoutUser,
   updateUserDetails } from 'actions/user-actions';
@@ -46,6 +48,7 @@ import {  imageModalOpened,
           resetDeleteImageFlag } from 'actions/image-actions';
 import {
   mobileMenuControl,
+  clearSnackbar,
 } from 'actions/global-actions';
 import {
   updateCertNumber,
@@ -57,6 +60,8 @@ class WorkContainer extends React.Component {
   constructor(props) {
     super(props);
   }
+
+
 
   componentWillMount() {
     this.props.fetchUserDetails();
@@ -70,7 +75,10 @@ class WorkContainer extends React.Component {
       imageToDelete,
       trackingModal,
       certIDCheckModal,
+      snackActive,
+      snackMessage,
       role,
+      patients,
       reqDocsModal,
       smsModal } = this.props;
     let managerView = false;
@@ -82,7 +90,7 @@ class WorkContainer extends React.Component {
         <Worknav {...this.props} />
         <div className=" pure-g">
           <WorkList {...this.props} managerView={managerView}/>
-          <WorkingItem {...this.props} managerView={managerView}/>
+          { patients.length > 0 && <WorkingItem {...this.props} managerView={managerView}/> }
           <NewVitalEvent {...this.props} />
           { imageModal && <ImageLoader {...this.props} /> }
           { imageZoomID > 0 && <ImageZoom {...this.props} /> }
@@ -93,6 +101,8 @@ class WorkContainer extends React.Component {
           { reqDocsModal > 0 && <ReqDocsModal {...this.props} /> }
           { smsModal > 0 && <SMSModal {...this.props} /> }
         </div>
+        <SnackHolder {...this.props} />
+        
       </div>
     );
   };
@@ -136,7 +146,9 @@ const mapStateToProps = ({
     location } = userReducer;
   const { patients } = patientsReducer;
   const {
-    menuOpened } = globalReducer;
+    menuOpened,
+    snackActive,
+    snackMessage } = globalReducer;
   const { imageModal,
     imageOption,
     imageFetching,
@@ -149,6 +161,8 @@ const mapStateToProps = ({
   const { activeDeclaration } = form;
   return {
     declarations,
+    snackActive,
+    snackMessage,
     trackingID,
     reqDocsModal,
     trackingModal,
@@ -237,7 +251,10 @@ const mapDispatchToProps = dispatch => {
     onWorkItemClick: declaration => {
       dispatch(selectDeclaration(declaration));
     },
-    onNavSubmitClick: () => {
+    onNavSubmitClick: (save) => {
+      if (save) {
+        dispatch(setSaving());
+      }
       dispatch(submit('activeDeclaration'));
     },
     onImageOptionClick: () => {
@@ -259,13 +276,16 @@ const mapDispatchToProps = dispatch => {
     },
     onSubmitModalConfirm: context => {
       dispatch(deleteImage());
-      dispatch(submitDeclaration());
+      dispatch(submitDeclaration(false));
     },
     toggleMobileMenu: () => {
       dispatch(mobileMenuControl());
     },
     onUpdateCertNumber: value => {
       dispatch(updateCertNumber(value));
+    },
+    hideSnackbar: () => {
+      dispatch(clearSnackbar());
     },
     onPrintProceed: () => {
       dispatch(proceedToPrintView());

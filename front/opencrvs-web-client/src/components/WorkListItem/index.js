@@ -2,7 +2,7 @@
  * @Author: Euan Millar 
  * @Date: 2017-07-05 01:18:30 
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-12 15:07:23
+ * @Last Modified time: 2017-10-14 17:46:39
  */
 import React from 'react';
 import styles from './styles.css';
@@ -18,7 +18,7 @@ import MarriageIcon from 'components/icons/MarriageIcon';
 import RecognitionIcon from 'components/icons/RecognitionIcon';
 import RejectIcon from 'components/icons/RejectIcon';
 import StopWatchIcon from 'components/icons/StopWatchIcon';
-import { get, head } from 'lodash';
+import { get, head, filter } from 'lodash';
 const Moment = require('moment');
 
 
@@ -30,17 +30,22 @@ class WorkListItem extends React.Component {
   render = () => {
     const { onClick,
       code,
-      given,
-      family,
-      birthDate,
       tracking,
       created,
-      address,
       id,
       selectedDeclaration,
       role,
-      selectedCertification } = this.props;
+      status,
+      selectedCertification,
+      patients,
+      childDetails } = this.props;
     const category = code.slice(0, code.indexOf('-'));
+
+    const given = get(head(filter(patients, function(patient) { return patient.patient.id == childDetails; })), 'patient.given');
+    const family = get(head(filter(patients, function(patient) { return patient.patient.id == childDetails; })), 'patient.family');
+    const address = get(head(filter(patients, function(patient) { return patient.patient.id == childDetails; })), 'patient.address');
+    const birthDate = get(head(filter(patients, function(patient) { return patient.patient.id == childDetails; })), 'patient.birthDate');
+    
     const location = get(head(address), 'county');
     //const location = address.county;
     let iconType = null;
@@ -97,6 +102,7 @@ class WorkListItem extends React.Component {
               {Moment(created).format('MMM Do YYYY')}
               <br />{location}
               <br /><span className={styles.tracking}>{ tracking }</span>
+              
             </h5>
           </div>
 
@@ -106,6 +112,12 @@ class WorkListItem extends React.Component {
             }
             {
               role === 'field officer' && id === 1 ? <RejectIcon width={20} /> : null
+            }
+            {
+              role === 'field officer' && status != 'notified-saved' && <div className={styles.newAlarm}><strong>NEW</strong></div>
+            }
+            {
+              role === 'registrar' && status != 'declared-saved' && <div className={styles.newAlarm}><strong>NEW</strong></div>
             }
           </div>
         </div>
