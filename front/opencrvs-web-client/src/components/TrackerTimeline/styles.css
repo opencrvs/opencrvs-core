@@ -67,12 +67,19 @@
 }
 
 .circle {
-  position: absolute;
+  
+  position: relative;
+  z-index: 20;
   background-color: black;
 	border-radius: 50%; 
   width: 2em;
   height: 2em;
-  margin-left: 11.6em;
-  margin-top: 7em;
+  top: 9em;
+  left: 45.655%;
 	/* width and height can be anything, as long as they're equal */
+}
+
+.speedometerItem {
+  position: relative;
+  z-index: 10;
 }

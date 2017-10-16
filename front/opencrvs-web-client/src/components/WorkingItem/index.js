@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:48
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-14 18:28:29
+ * @Last Modified time: 2017-10-16 20:44:52
  */
 import React from 'react';
 import styles from './styles.css';
@@ -173,7 +173,7 @@ class WorkingItem extends React.Component {
     } else {
       showPics = false;
     }
-    const showTrash = role !== 'registrar';
+    const showTrash = role !== 'certification clerk';
     return (
       <div className={
         managerView

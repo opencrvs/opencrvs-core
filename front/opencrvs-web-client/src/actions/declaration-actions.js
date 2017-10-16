@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:30
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-14 18:39:42
+ * @Last Modified time: 2017-10-16 20:47:23
  */
 import { BASE_URL, OPEN_HIM_URL, SMS_API_URL, CORS_API_URL } from 'constants/urls';
 import { apiMiddleware } from 'utils/api-middleware';
@@ -1097,7 +1097,7 @@ export function submitDeclaration(saving) {
                   dispatch(submitDeclarationSuccess(trackingID, newBirthRegistrationNumber, newChildPersonalID));
                   const smsMessage = 'The registration process for tracking number ' + trackingID.toUpperCase() 
                     + ' is now complete. The birth is now registered with birth registration number '
-                    + newBirthRegistrationNumber + '. Please now pay 10 GH₵ for the birth certificate by mobile money,'
+                    + newBirthRegistrationNumber + '. Please now pay 10 Cedis for the birth certificate by mobile money,'
                     + ' using transfer agents Airtel or Mpesa. Payee reference:'
                     + ' 98766 Your reference: ' + trackingID.toUpperCase()
                     + ' Once payment is received, the birth certificate will be available after 3 working days'

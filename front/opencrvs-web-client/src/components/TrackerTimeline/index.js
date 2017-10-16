@@ -58,17 +58,19 @@ class TrackerTimeline extends React.Component {
                     <div className={styles.speedometer}>
                       <p>Days</p>
                       <div className={styles.circle}></div>
-                      <ReactSpeedometer
-                        maxValue={get(head(caseEvent.kpiData), 'maxValue')}
-                        minValue={get(head(caseEvent.kpiData), 'minValue')}
-                        value={get(head(caseEvent.kpiData), 'value')}
-                        needleColor="black"
-                        startColor="green"
-                        segments={5}
-                        width="200"
-                        height="150"
-                        endColor="red"
-                        />
+                      <div className={styles.speedometerItem}>
+                        <ReactSpeedometer
+                          maxValue={get(head(caseEvent.kpiData), 'maxValue')}
+                          minValue={get(head(caseEvent.kpiData), 'minValue')}
+                          value={get(head(caseEvent.kpiData), 'value')}
+                          needleColor="black"
+                          startColor="green"
+                          segments={5}
+                          width="200"
+                          height="150"
+                          endColor="red"
+                          />
+                        </div>
                     </div>
                     <div className={styles.perfTarget}>Target:&nbsp;   
                       <strong>
