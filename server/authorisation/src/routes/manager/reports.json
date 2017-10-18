@@ -6,10 +6,10 @@
       "staff": {
         "manager": {
           "uuid": "uuid",
-          "given": "Daniel",
-          "family": "Gbedema",
+          "given": "Koko",
+          "family": "Rawlings",
           "title": "National Operations Manager",
-          "email": "schrute@acme.com",
+          "email": "krawlings@gmail.com",
           "phone": "555-555-555",
           "avatar": "male"
         },
@@ -70,7 +70,7 @@
           "timePeriod": [
             {
               "title": "This week",
-              "certifications": 9000,
+              "certifications": 12000,
               "certificationsKpi": 15000,
               "registrations": 10000,
               "registrationsKpi": 15000,
@@ -83,7 +83,7 @@
             },
             {
               "title": "This month",
-              "certifications": 60000,
+              "certifications": 58000,
               "certificationsKpi": 90000,
               "registrations": 60000,
               "registrationsKpi": 90000,
@@ -96,7 +96,7 @@
             },
             {
               "title": "This year",
-              "certifications": 450000,
+              "certifications": 400000,
               "certificationsKpi": 900000,
               "registrations": 500000,
               "registrationsKpi": 900000,
@@ -166,7 +166,7 @@
                   },
                   {
                     "title": "This year",
-                    "certifications": 280,
+                    "certifications": 180,
                     "certificationsKpi": 900,
                     "registrations": 500,
                     "registrationsKpi": 900,
@@ -185,7 +185,7 @@
                 "timePeriod": [
                   {
                     "title": "This week",
-                    "certifications": 300,
+                    "certifications": 495,
                     "certificationsKpi": 1500,
                     "registrations": 1000,
                     "registrationsKpi": 1500,
@@ -198,7 +198,7 @@
                   },
                   {
                     "title": "This month",
-                    "certifications": 2200,
+                    "certifications": 3300,
                     "certificationsKpi": 9000,
                     "registrations": 6000,
                     "registrationsKpi": 9000,
@@ -269,7 +269,7 @@
                         },
                         {
                           "title": "This month",
-                          "certifications": 2,
+                          "certifications": 3,
                           "certificationsKpi": 9,
                           "registrations": 6,
                           "registrationsKpi": 9,
@@ -282,7 +282,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 5,
+                          "certifications": 27,
                           "certificationsKpi": 90,
                           "registrations": 50,
                           "registrationsKpi": 90,
@@ -327,7 +327,7 @@
                         },
                         {
                           "title": "This year",
-                          "certifications": 500,
+                          "certifications": 900,
                           "certificationsKpi": 9000,
                           "registrations": 5000,
                           "registrationsKpi": 9000,

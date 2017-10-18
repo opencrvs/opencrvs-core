@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:18:30
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-12 10:31:12
+ * @Last Modified time: 2017-10-18 13:38:38
  */
 import React from 'react';
 import styles from './styles.css';
@@ -64,7 +64,7 @@ class LocationListItem extends React.Component {
           </div>
           <div className={styles.listData + ' pure-u-1-1'}>
             <p className={styles.title}>
-              Registration coverage: <strong>
+              Registration of all individuals: <strong>
                 { Math.round((registrationsActual / registrationsKpi) * 100) }%</strong>
             </p>
             <p className={styles.title}>

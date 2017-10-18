@@ -2,7 +2,7 @@
  * @Author: Euan Millar
  * @Date: 2017-07-05 01:19:24
  * @Last Modified by: Euan Millar
- * @Last Modified time: 2017-10-14 18:39:51
+ * @Last Modified time: 2017-10-18 13:42:22
  */
 export const REQUEST_MAPVIEW_DATA = 'REQUEST_MAPVIEW_DATA';
 export const MAPVIEW_DATA_SUCCESS = 'MAPVIEW_DATA_SUCCESS';

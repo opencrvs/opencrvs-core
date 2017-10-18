@@ -45,6 +45,11 @@
 
 .title {
   color: #bbbbbb;
+  font-size:12px;
+}
+
+.titleBlack {
+  color: black;
 }
 
 .defaultTint {

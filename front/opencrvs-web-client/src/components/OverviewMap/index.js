@@ -81,7 +81,53 @@ class OverviewMap extends React.Component {
             rolloverMapData,
             country } = this.props;
     const myCountry = country.charAt(0).toUpperCase() + country.slice(1);
-    
+    let reg28Days = null;
+    let reg1Year = null;
+    let certRate = null;
+    let regUnder5 = null;
+    let regAllIndividuals = null;
+    if (selectedLocation && rolloverMapData == null) {
+      if (selectedLocation.title == 'Ghana') {
+        reg28Days = 20;
+        reg1Year = 56;
+        certRate = 80;
+        regUnder5 = 70;
+        regAllIndividuals = 41;
+      } else if (selectedLocation.title == 'Volta') {
+        reg28Days = 10;
+        reg1Year = 31;
+        certRate = 60;
+        regUnder5 = 42;
+        regAllIndividuals = 31;
+      } else {
+        reg28Days = this.randomIntFromInterval(20, 30);
+        reg1Year = this.randomIntFromInterval(50, 60);
+        certRate = this.randomIntFromInterval(78, 85);
+        regUnder5 = this.randomIntFromInterval(68, 80);
+        regAllIndividuals = Math.round((totalCerts.registrations / totalCerts.registrationsKpi) * 100);
+      }
+      
+    } else if (rolloverMapData) {
+      
+      if (rolloverMapData.title == 'Volta' || rolloverMapData.title == 'Adaklu Anyigbe') {
+        reg28Days = 10;
+        reg1Year = 31;
+        certRate = 60;
+        regUnder5 = 42;
+        regAllIndividuals = 31;
+      } else {
+        reg28Days = this.randomIntFromInterval(20, 30);
+        reg1Year = this.randomIntFromInterval(50, 60);
+        certRate = this.randomIntFromInterval(78, 85);
+        regUnder5 = this.randomIntFromInterval(68, 80);
+        regAllIndividuals = Math.round((totalCerts.registrations / totalCerts.registrationsKpi) * 100);
+      }
+      if (rolloverMapData.title == 'Adaklu Anyigbe') {
+        regAllIndividuals = 10;
+      }
+    }
+
+
     let scale;
     let transX;
     let transY;
@@ -141,21 +187,26 @@ class OverviewMap extends React.Component {
               label="Timeframe"
             />
             <div className={styles.certifications}>
-              <p className={styles.title}>Registration coverage:  
+              <p className={styles.title}>Registration within 28 days of birth:  
               <span className={styles.totalCerts}>
-                {Math.round((totalCerts.registrations / totalCerts.registrationsKpi) * 100)}%
+              { reg28Days }%
               </span></p>
-              <p className={styles.title}>Certification coverage:  
+              <p className={styles.title}>Registration within 1 year of birth:  
               <span className={styles.totalCerts}>
-                {Math.round((totalCerts.certifications / totalCerts.certificationsKpi) * 100)}%
+              { reg1Year }%
               </span></p>
-              <p className={styles.title}>Children under 5 coverage:  
+              <p className={styles.title}>Rate of certification:  
               <span className={styles.totalCerts}>
-              { this.randomIntFromInterval(60, 80) }%
+                { certRate }%
               </span></p>
-              <p className={styles.title}>Coverage of all individuals:  
+              <p classname={styles.titleBlack}>As of 19/10/2017:</p>
+              <p className={styles.title}>Registration of children under 5:  
               <span className={styles.totalCerts}>
-              { this.randomIntFromInterval(40, 50) }%
+              { regUnder5 }%
+              </span></p>
+              <p className={styles.title}>Registration of all individuals:  
+              <span className={styles.totalCerts}>
+              { regAllIndividuals }%
               </span></p>
             </div>
           </div>

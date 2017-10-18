@@ -16,6 +16,8 @@ class StaffCard extends React.Component {
     switch (managerData.given) {
       case 'Daniel':
         return '/static/img/avatars/staffcard/dm.jpg';
+      case 'Koko':
+        return 'static/img/avatars/african-male-1.jpg';
       case 'Janice':
         return '/static/img/avatars/staffcard/volta-rm.jpg';
       default:
