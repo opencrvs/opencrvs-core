@@ -44,7 +44,7 @@ class ImportContainer extends React.Component {
               <h3>
                 Click <a className={styles.link} onClick={importData}>
                   here
-                </a> to load saved notification for David Mensah into prototype
+                </a> to load saved notification for David Idirisu into prototype
               </h3>
             </div>}
         </div>
