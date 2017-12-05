@@ -21,6 +21,7 @@ import {
   CASE_TRACKING,
   CASE_TRACKING_CLEAR,
   PERFORMANCE_METRICS,
+  RATES_MODAL_TOGGLE,
 } from '../actions/manager-actions';
 
 function managerReducer(
@@ -50,6 +51,21 @@ function managerReducer(
     caseNotes: null,
     caseGraphData: null,
     performanceData: null,
+    ratesOverTimeModal: 0,
+    registrationRateData: [
+      {name: 'January', percentage: 45},
+      {name: 'February', percentage: 56},
+      {name: 'March', percentage: 50},
+      {name: 'April', percentage: 67},
+      {name: 'May', percentage: 63},
+      {name: 'June', percentage: 67},
+      {name: 'July', percentage: 56},
+      {name: 'August', percentage: 64},
+      {name: 'September', percentage: 67},
+      {name: 'October', percentage: 65},
+      {name: 'November', percentage: 69},
+      {name: 'December', percentage: 70},
+    ],
   },
   action
 ) {
@@ -161,6 +177,8 @@ function managerReducer(
         ...state,
         performanceData: action.performanceData,
       };
+    case RATES_MODAL_TOGGLE:
+      return { ...state, ratesOverTimeModal: state.ratesOverTimeModal == 0 ? 1 : 0 };
     default:
       return state;
   }

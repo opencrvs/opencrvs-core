@@ -1,0 +1,23 @@
+.labels {
+    font-size: 0.7em;
+    letter-spacing: 0.1em;
+    transform: translate(-14px, 5px) rotate(-45deg);
+}
+.graphHolder {
+    margin: 0 auto;
+    width: 640px;
+    height: 380px;
+    position: relative;
+    top: 1em;
+}
+
+.dropDowns {
+position: relative;
+top: 1em;
+}
+.percentageLabel {
+    position: relative;
+    left: -48%;
+    top: -110px;
+    transform: translate(-5px, 5px) rotate(-90deg);
+}

@@ -13,6 +13,7 @@ import TrackingSearchContainer from 'containers/TrackingSearchContainer';
 import { connect } from 'react-redux';
 import { logoutUser,
   updateUserDetails } from 'actions/user-actions';
+import RatesOverTimeModal from 'components/RatesOverTimeModal';
 import {
   reportOptionToggle,
   mobileMenuControl,
@@ -20,6 +21,7 @@ import {
 import {
   caseTracking,
   caseTrackingClear,
+  ratesModalToggle,
 } from 'actions/manager-actions';
 
 class ReportsContainer extends React.Component {
@@ -33,9 +35,7 @@ class ReportsContainer extends React.Component {
   }
 
   render = () => {
-    const {
-      selectedLocationMapData,
-      reportOption } = this.props;
+    const { selectedLocationMapData, reportOption, ratesOverTimeModal } = this.props;
     let managerView = false;
     return (
       <div className={styles.reportsContainer}>
@@ -48,6 +48,7 @@ class ReportsContainer extends React.Component {
             ? <LocationListContainer {...this.props}  managerView={managerView}/>
             : <TrackingSearchContainer {...this.props}  managerView={managerView}/>
           }
+          { ratesOverTimeModal > 0 && <RatesOverTimeModal {...this.props} />}
         </div>
       </div>
     );
@@ -58,7 +59,7 @@ const mapStateToProps = ({
   managerReducer,
   globalReducer,
   userReducer }) => {
-  const { selectedLocationMapData } = managerReducer;
+  const { selectedLocationMapData, ratesOverTimeModal, registrationRateData } = managerReducer;
   const {
     menuOpened,
     reportOption } = globalReducer;
@@ -67,6 +68,8 @@ const mapStateToProps = ({
     selectedLocationMapData,
     reportOption,
     menuOpened,
+    ratesOverTimeModal,
+    registrationRateData,
     location,
   };
 };
@@ -90,6 +93,20 @@ const mapDispatchToProps = dispatch => {
     },
     onCaseTrackingClear: () => {
       dispatch(caseTrackingClear());
+    },
+    onModalOpenClick: context => {
+      switch (context) {
+        case 'rates':
+          dispatch(ratesModalToggle());
+          break;
+      }
+    },
+    onModalCloseClick: context => {
+      switch (context) {
+        case 'rates':
+          dispatch(ratesModalToggle());
+          break;
+      }
     },
   };
 };

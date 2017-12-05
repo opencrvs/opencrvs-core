@@ -21,6 +21,7 @@ export const SET_LIST_ORDER = 'SET_LIST_ORDER';
 export const CASE_TRACKING = 'CASE_TRACKING';
 export const CASE_TRACKING_CLEAR = 'CASE_TRACKING_CLEAR';
 export const PERFORMANCE_METRICS = 'PERFORMANCE_METRICS';
+export const RATES_MODAL_TOGGLE = 'RATES_MODAL_TOGGLE';
 
 import { apiMiddleware } from 'utils/api-middleware';
 import { BASE_URL } from 'constants/urls';
@@ -490,5 +491,11 @@ function regionSelected(obj, title, newMap, totalCerts) {
     selectedRegion: title,
     selectedLocationMapData: newMap,
     totalCerts,
+  };
+}
+
+export function ratesModalToggle() {
+  return {
+    type: RATES_MODAL_TOGGLE
   };
 }

@@ -10,6 +10,7 @@ import Dropdown from 'react-toolbox/lib/dropdown';
 import { calculateRagStatusOnMap } from 'utils/manager-utils';
 import OverviewPerformance from 'components/OverviewPerformance';
 import { get, map, head } from 'lodash';
+import { ratesModalToggle } from 'actions/manager-actions';
 
 class OverviewMap extends React.Component {
   constructor(props) {
@@ -60,6 +61,10 @@ class OverviewMap extends React.Component {
     if (name == this.props.country && this.props.regionLevel) {
       this.props.onCountryClick();
     }
+  }
+
+  handleRegistrationRatesClick(e) {
+    this.props.onModalOpenClick('rates');
   }
 
   randomIntFromInterval = ( min, max ) => {
@@ -187,23 +192,28 @@ class OverviewMap extends React.Component {
               label="Timeframe"
             />
             <div className={styles.certifications}>
-              <p className={styles.title}>Registration within 28 days of birth:  
+              <p className={styles.title}>Registration rates within 28 days of birth:  
               <span className={styles.totalCerts}>
               { reg28Days }%
               </span></p>
-              <p className={styles.title}>Registration within 1 year of birth:  
+              <p className={styles.title}>Registration rates within 1 year of birth:  
               <span className={styles.totalCerts}>
               { reg1Year }%
               </span></p>
-              <p className={styles.title}>Rate of certification:  
+              <p className={styles.title}>Rate of certifications:  
               <span className={styles.totalCerts}>
                 { certRate }%
               </span></p>
               <p classname={styles.titleBlack}>As of 19/10/2017:</p>
-              <p className={styles.title}>Registration of children under 5:  
-              <span className={styles.totalCerts}>
+              <p className={styles.title}>
+                <a className={styles.textLink} onClick={e => this.handleRegistrationRatesClick(e)}>
+                  Registration rates of children under 5:
+                  
+                </a>
+                <span className={styles.totalCerts}>
               { regUnder5 }%
-              </span></p>
+              </span>
+              </p>
               <p className={styles.title}>Registration of all individuals:  
               <span className={styles.totalCerts}>
               { regAllIndividuals }%
@@ -285,4 +295,17 @@ const mapStateToProps = ({ managerReducer, globalReducer }) => {
   };
 };
 
-export default connect(mapStateToProps, null)(OverviewMap);
+const mapDispatchToProps = dispatch => {
+  return {
+    onModalOpenClick: context => {
+      switch (context) {
+        case 'rates':
+          dispatch(ratesModalToggle());
+          break;
+      }
+    },
+  };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(OverviewMap);

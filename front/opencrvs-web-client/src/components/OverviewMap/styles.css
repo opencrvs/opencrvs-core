@@ -41,6 +41,7 @@
   left: 0.8em;
   top: 1em;
   padding-right: 5em;
+  z-index: 10;
 }
 
 .title {
@@ -64,9 +65,17 @@
   .mapSvgContainerCountry {
     top: 2em;
     left: 5em;
+    z-index: 5;
   }
   .mapSvgContainerRegion {
     top: 2em;
     left: 5em;
+    z-index: 5;
   }
+}
+
+.textLink {
+      cursor: pointer;
+      color: #2d3e50;
+      text-decoration: underline;
 }
