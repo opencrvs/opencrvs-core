@@ -1,0 +1,21 @@
+.importContainer {
+    margin: 0;
+    padding: 0;
+    color: #333;
+    text-decoration: none;
+}
+
+.importContent {
+    width: 80%;
+    height: auto;
+    top: 6em;
+    position: relative;
+    margin: 0 auto;
+    margin-top: 3em;
+}
+
+.link {
+    text-decoration: underline;
+    color: red;
+    cursor: pointer;
+}

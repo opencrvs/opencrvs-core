@@ -98,7 +98,28 @@ exports.register = (server, options, next) => {
         },
         handler: require('./get')
     });
+    server.route({
 
+        path: '/patient/{id}',
+        method: 'DELETE',
+        config: {
+            auth: 'jwt',
+            description: 'Protected route to delete patient.',
+            notes: 'Token and message scopes are required.',
+            tags: ['api'],
+            plugins: {
+                'hapi-swagger': {
+                    payloadType: 'form'
+                }
+            },
+            validate: {
+                params: {
+                    id: Joi.number()
+                }
+            }
+        },
+        handler: require('./delete')
+    });
     next();
 };
 

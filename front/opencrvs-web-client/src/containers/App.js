@@ -10,6 +10,7 @@ import HomeContainer from 'containers/HomeContainer';
 import WorkContainer from 'containers/WorkContainer';
 import ReportsContainer from 'containers/ReportsContainer';
 import SettingsContainer from 'containers/SettingsContainer';
+import ImportContainer from 'containers/ImportContainer';
 import StatsContainer from 'containers/StatsContainer';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
@@ -44,6 +45,12 @@ const App = props => (
         redirectTo="/"
         isAuthenticated={props.isAuthenticated}
         component={SettingsContainer}
+      />
+      <PrivateRoute
+        path="/load"
+        redirectTo="/"
+        isAuthenticated={props.isAuthenticated}
+        component={ImportContainer}
       />
     </Switch>
   </BrowserRouter>

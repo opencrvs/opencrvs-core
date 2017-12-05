@@ -11,6 +11,7 @@ import imageReducer from './image-reducer';
 import patientsReducer from './patients-reducer';
 import managerReducer from './manager-reducer';
 import globalReducer from './global-reducer';
+import importReducer from './import-reducer';
 import certificationReducer from './certification-reducer';
 import { reducer as formReducer } from 'redux-form';
 
@@ -22,5 +23,6 @@ export default combineReducers({
   globalReducer,
   certificationReducer,
   managerReducer,
+  importReducer,
   form: formReducer,
 });

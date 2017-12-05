@@ -487,9 +487,22 @@ export function fetchAndCompareProcessedNotifications() {
         message: 'Unprocessed notifications success',
         declaration: [],
       };
-      // Todo compare uuids and remove any that are already processed
-      // merge remaining with any that are saved
+      
       const {notificationData, savedDeclarations} = getState().declarationsReducer;
+      let nextDeclarationID = 0;
+      map(savedDeclarations.declaration, (declaration, index) => {
+        dispatch(fetchPatients(declaration.childDetails, false));
+        dispatch(fetchPatients(declaration.motherDetails, false));
+        dispatch(fetchPatients(declaration.fatherDetails, false));
+        // TODO - critical issue here in blending id's in the worklist
+        // need to ensure backend only saves based on uuid not id
+        if (declaration.id > nextDeclarationID){
+          nextDeclarationID = declaration.id;
+        } 
+        newPayload.declaration.push(declaration);
+      });
+      nextDeclarationID++;
+      console.log('nextDeclarationID' + nextDeclarationID);
       if (payload.notification.length > 0) {
         map(get(notificationData, 'entry'), (notification, index ) => {
           const notificationID = notification.resource.id;
@@ -506,7 +519,7 @@ export function fetchAndCompareProcessedNotifications() {
               .find((entry) => entry.text === 'Mother\'s Details' )
               .reference;
             let newDeclaration = {
-              id: index,
+              id: nextDeclarationID + (index + 1),
               code: 'birth-notification',
               uuid: notification.resource.id,
               created_at: notification.resource.meta.lastUpdated,
@@ -519,7 +532,6 @@ export function fetchAndCompareProcessedNotifications() {
             const child = notification.resource.subject.reference;
             dispatch(fetchPatients(child, true));
             dispatch(fetchPatients(mother, true));
-            console.log('PUSHING: ' + JSON.stringify(newDeclaration));
             newPayload.declaration.push(newDeclaration);
           }
         });
@@ -532,7 +544,7 @@ export function fetchAndCompareProcessedNotifications() {
             .find((entry) => entry.text === 'Mother\'s Details' )
             .reference;
           let newDeclaration = {
-            id: index,
+            id: nextDeclarationID + (index + 1),
             code: 'birth-notification',
             uuid: notification.resource.id,
             created_at: notification.resource.meta.lastUpdated,
@@ -551,14 +563,6 @@ export function fetchAndCompareProcessedNotifications() {
         }); 
       }
       
-      map(savedDeclarations.declaration, (declaration, index ) => {
-        console.log('SAVED DECLARATIONS:' + JSON.stringify(declaration));
-        dispatch(fetchPatients(declaration.childDetails, false));
-        dispatch(fetchPatients(declaration.motherDetails, false));
-        dispatch(fetchPatients(declaration.fatherDetails, false));
-        newPayload.declaration.push(declaration);
-      });
-      console.log(JSON.stringify(newPayload));
       dispatch(receiveDeclaration(newPayload));
       dispatch(selectWorkView('work'));
       

@@ -11,6 +11,7 @@ import WorkContainer from 'containers/WorkContainer';
 import ReportsContainer from 'containers/ReportsContainer';
 import SettingsContainer from 'containers/SettingsContainer';
 import StatsContainer from 'containers/StatsContainer';
+import ImportContainer from 'containers/ImportContainer';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Redirect } from 'react-router';
 

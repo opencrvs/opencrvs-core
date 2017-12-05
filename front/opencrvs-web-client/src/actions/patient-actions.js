@@ -47,7 +47,6 @@ export function fetchPatients(id, notificationCase) {
   // still migrate from Euan's prototype server to FHIR: see variable temporaryURLSwitch
   // to date, only notifications are possible in FHIR
   let token = localStorage.getItem('token') || null;
-  console.log('FETCHING PATIENT WITH ID: ' + id);
   let config = {};
   return dispatch => {
     dispatch(requestPatient());
@@ -124,8 +123,6 @@ export function fetchPatients(id, notificationCase) {
                 postalCode = head(payload.address).postalCode;
               }
             }
-            
-            console.log(JSON.stringify(head(payload.address)));
             let newPayload = {
               message: 'Patient success',
               patient: {

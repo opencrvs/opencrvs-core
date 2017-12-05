@@ -188,6 +188,15 @@ const internals = {
                     prefix: '/api'
                 }
             }
+        },
+        {
+            plugin: './routes/clear',
+            options: {
+                select: ['api'],
+                routes: {
+                    prefix: '/api'
+                }
+            }
         }
     ]
 };
