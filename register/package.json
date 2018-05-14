@@ -14,6 +14,8 @@
     "precommit": "lint-staged",
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
+    "docker-build": "docker build -t register .",
+    "docker-run": "docker run -it --rm -p 5000:5000 --name register register",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
