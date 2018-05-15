@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "build/dist",
+    "module": "esnext",
+    "target": "es5",
+    "lib": ["es6"],
+    "allowJs": true,
+    "moduleResolution": "node",
+    "rootDir": "src",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true
+  },
+  "exclude": [
+    "node_modules",
+    "scripts",
+    "acceptance-tests",
+    "jest",
+    "src/setupTests.ts"
+  ]
+}
