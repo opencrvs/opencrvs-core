@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "eslint:recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "rules": {
+    "quotes": ["error", "single"],
+    "no-console": 2,
+    "no-trailing-spaces": 2,
+    "no-unused-vars": [2, {
+      "vars": "all",
+      "args": "after-used"
+    }]
+  }
+}

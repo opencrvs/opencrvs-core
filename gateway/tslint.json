@@ -1,29 +1,11 @@
 {
   "extends": ["tslint:recommended", "tslint-config-prettier"],
-  "defaultSeverity": "error",
   "rules": {
-    "no-trailing-whitespace": false,
-    "object-literal-key-quotes": false,
+    "no-duplicate-variable": true,
+    "no-unused-variable": [true],
     "object-literal-sort-keys": false,
-    "no-string-literal": false,
-    "ordered-imports": false,
-    "variable-name": false,
-    "arrow-parens": false,
-    "quotemark": false,
-    "trailing-comma": false,
-    "semicolon": [
-      false,
-      "never"
-    ],
-    "member-ordering": [
-      true,
-      "variables-before-functions"
-    ]
+    "semicolon": [false, "never"]
   },
   "rulesDirectory": [],
-  "linterOptions": {
-    "exclude": [
-      "node_modules/**/*.ts"
-    ]
-  }
+  "exclude": ["config/**/*.js", "node_modules/**/*.ts"]
 }

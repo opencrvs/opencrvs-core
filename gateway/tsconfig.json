@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "target": "es6",
+    "module": "commonjs",
     "outDir": "build/dist",
-    "module": "esnext",
-    "target": "es5",
-    "lib": ["es6"],
-    "allowJs": true,
+    "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
@@ -15,11 +15,12 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
+  "include": ["src", "typings", "tslint-rules"],
   "exclude": [
     "node_modules",
+    "build",
     "scripts",
     "acceptance-tests",
-    "jest",
     "src/setupTests.ts"
   ]
 }
