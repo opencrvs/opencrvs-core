@@ -1,0 +1,37 @@
+{
+  "name": "common",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "husky": "^0.14.3",
+    "lint-staged": "^7.1.0",
+    "prettier": "^1.12.1",
+    "react": "^16.3.2",
+    "react-docgen-typescript": "^1.5.0",
+    "react-dom": "^16.3.2",
+    "react-scripts-ts": "2.16.0",
+    "react-styleguidist": "^7.0.13"
+  },
+  "scripts": {
+    "precommit": "lint-staged",
+    "start": "styleguidist server",
+    "build": "styleguidist build",
+    "docker-build": "docker build -t common .",
+    "docker-run": "docker run -it --rm -p 5000:5000 --name common common",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^22.2.3",
+    "@types/node": "^10.0.8",
+    "@types/react": "^16.3.14",
+    "@types/react-dom": "^16.0.5",
+    "typescript": "^2.8.3"
+  }
+}
