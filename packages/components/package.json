@@ -1,5 +1,5 @@
 {
-  "name": "register",
+  "name": "@opencrvs/components",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -7,17 +7,17 @@
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
     "react": "^16.3.2",
+    "react-docgen-typescript": "^1.5.0",
     "react-dom": "^16.3.2",
-    "react-scripts-ts": "2.16.0"
+    "react-styleguidist": "^7.0.13",
+    "styled-components": "^3.2.6"
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "docker-build": "docker build -t register .",
-    "docker-run": "docker run -it --rm -p 5000:5000 --name register register",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "start": "concurrently 'styleguidist server' 'tsc -w'",
+    "build": "styleguidist build && tsc",
+    "docker-build": "docker build -t components .",
+    "docker-run": "docker run -it --rm -p 5000:5000 --name components components"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,json,css}": [
@@ -30,6 +30,8 @@
     "@types/node": "^10.0.8",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
+    "concurrently": "^3.5.1",
+    "react-scripts-ts": "^2.16.0",
     "typescript": "^2.8.3"
   }
 }
