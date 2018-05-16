@@ -7,6 +7,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": "src",
+    "lib": ["esnext.asynciterable", "es2015", "es6"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -15,7 +16,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
-  "include": ["src", "typings", "tslint-rules"],
+  "include": ["src/**/*.ts", "typings", "tslint-rules"],
   "exclude": [
     "node_modules",
     "build",
