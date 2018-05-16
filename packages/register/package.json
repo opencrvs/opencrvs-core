@@ -1,8 +1,9 @@
 {
-  "name": "register",
+  "name": "@opencrvs/register",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@opencrvs/components": "^0.1.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
@@ -14,6 +15,8 @@
     "precommit": "lint-staged",
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
+    "docker-build": "docker build -t register .",
+    "docker-run": "docker run -it --rm -p 5000:5000 --name register register",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
