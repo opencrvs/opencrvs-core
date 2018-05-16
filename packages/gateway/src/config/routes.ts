@@ -16,7 +16,7 @@ export const getRoutes = () => {
     }
   ]
   // add all routes from all modules to the routes array manually or write your routes inside a folder inside the server folder
-  // with suffix as Routes.js e.g weatherRoutes.js
+  // with suffix as -routes.ts
   glob.sync('./routes/**/*-route.ts').forEach(file => {
     routes.push(require(path.resolve(file)))
   })

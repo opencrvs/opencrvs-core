@@ -1,12 +1,13 @@
-import { graphiqlHapi } from 'apollo-server-hapi'
+import { graphiqlHapi, graphqlHapi } from 'apollo-server-hapi'
 import * as Good from 'good'
 import * as HapiSwagger from 'hapi-swagger'
 import * as Inert from 'inert'
 import * as Vision from 'vision'
-// import { executableSchema} from '../graphql/config'
+import { getExecutableSchema } from '../graphql/config'
 
-export const getPlugins = (env: string | undefined) => {
+export const getPlugins = (env: string | undefined, schemaPath: string) => {
   const plugins: any[] = []
+  const executableSchema = getExecutableSchema(schemaPath)
 
   if (env === 'DEVELOPMENT') {
     plugins.push(
@@ -61,29 +62,22 @@ export const getPlugins = (env: string | undefined) => {
         },
         name: 'graphiql',
         version: '1.3.6'
+      },
+      {
+        plugin: graphqlHapi,
+        options: {
+          path: '/graphql',
+          graphqlOptions: (request: any) => ({
+            pretty: true,
+            schema: executableSchema,
+            // this is where you add anything you want attached to context in resolvers
+            context: {}
+          })
+        },
+        name: 'graphqlHapi',
+        version: '1.3.6'
       }
     )
   }
-  /* plugins.push({
-    register: graphqlHapi,
-    options: {
-      path: '/graphql',
-      graphqlOptions: (request: any) => ({
-        pretty: true,
-        schema: executableSchema,
-        // this is where you add anything you want attached to context in resolvers
-        context: {}
-      })
-    }
-  })
-  plugins.push({
-    register: graphiqlHapi,
-    options: {
-      path: '/graphiql',
-      graphiqlOptions: {
-        endpointURL: '/graphql'
-      }
-    }
-  })*/
   return plugins
 }

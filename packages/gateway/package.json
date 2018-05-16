@@ -79,7 +79,7 @@
     "typestyle": "^1.3.7"
   },
   "lint-staged": {
-    "src/**/*.ts": ["pretty-quick --staged", "tsc", "git add"]
+    "src/**/*.ts": ["prettier --write", "git add"]
   },
   "keywords": ["api", "nodejs", "hapi", "typescript"]
 }
