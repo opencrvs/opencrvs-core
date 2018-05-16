@@ -1,9 +1,15 @@
 {
 	"scripts": {
 		"postinstall": "lerna bootstrap",
-		"start": "lerna run --parallel start"
+		"start": "lerna run --parallel start",
+		"dev": "concurrently \"yarn run start\" \"yarn run compose\"",
+		"compose": "yarn run compose:build && yarn run compose:up",
+		"compose:up": "docker-compose -p ocrvs up",
+		"compose:down": "docker-compose -p ocrvs down",
+		"compose:build": "docker-compose build"
 	},
 	"devDependencies": {
+		"concurrently": "^3.5.1",
 		"lerna": "^2.11.0"
 	}
 }
