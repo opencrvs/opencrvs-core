@@ -8,7 +8,7 @@ ENV NPM_CONFIG_LOGLEVEL warn
 
 # Install and configure `serve`.
 RUN yarn global add serve
-CMD serve -s build
+CMD serve -s lib
 EXPOSE 5000
 
 # Install all dependencies of the current project.
