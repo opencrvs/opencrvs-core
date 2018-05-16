@@ -6,7 +6,6 @@
     "@opencrvs/components": "^0.1.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
-    "prettier": "^1.12.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-scripts-ts": "2.16.0"
@@ -21,8 +20,9 @@
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,json,css}": [
+    "src/**/*.{ts,tsx,json}": [
       "prettier --write",
+      "tslint",
       "git add"
     ]
   },

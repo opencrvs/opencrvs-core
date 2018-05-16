@@ -5,7 +5,6 @@
   "dependencies": {
     "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
-    "prettier": "^1.12.1",
     "react": "^16.3.2",
     "react-docgen-typescript": "^1.5.0",
     "react-dom": "^16.3.2",
@@ -20,8 +19,9 @@
     "docker-run": "docker run -it --rm -p 5000:5000 --name components components"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,json,css}": [
+    "src/**/*.{ts,tsx,json}": [
       "prettier --write",
+      "tslint",
       "git add"
     ]
   },
