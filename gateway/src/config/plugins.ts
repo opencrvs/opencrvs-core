@@ -1,4 +1,5 @@
 import { graphiqlHapi, graphqlHapi } from 'apollo-server-hapi'
+import { Plugin } from 'glue'
 import { executableSchema } from '../graphql/config'
 
 export const graphqlPlugin = {
@@ -14,8 +15,8 @@ export const graphqlPlugin = {
   }
 }
 
-export const graphiqlPlugin = {
-  plugin: graphiqlHapi,
+export const graphiqlPlugin: Plugin = {
+  plugin: graphiqlHapi as any,
   options: {
     path: '/graphiql',
     graphiqlOptions: {

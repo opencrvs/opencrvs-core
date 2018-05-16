@@ -12,7 +12,7 @@ async function startServer() {
   const manifest = getManifest(process.env.PORT)
 
   try {
-    const server = await Glue.compose(manifest, options)
+    const server = await Glue.compose(manifest as any, options)
     await server.start()
     console.log(`Gateway Server running at: ${server.info.uri}`)
   } catch (err) {
