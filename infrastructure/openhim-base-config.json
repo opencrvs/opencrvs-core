@@ -1,0 +1,54 @@
+{
+  "Users": [],
+  "Clients": [],
+  "Channels": [
+    {
+      "requestBody": true,
+      "responseBody": true,
+      "name": "Hearth passthrough",
+      "urlPattern": "^.*$",
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "pollingSchedule": null,
+      "tcpHost": null,
+      "tcpPort": null,
+      "autoRetryPeriodMinutes": 60,
+      "autoRetryEnabled": false,
+      "rewriteUrlsConfig": [],
+      "addAutoRewriteRules": true,
+      "rewriteUrls": false,
+      "status": "enabled",
+      "alerts": [],
+      "txRerunAcl": [],
+      "txViewFullAcl": [],
+      "txViewAcl": [],
+      "properties": [],
+      "matchContentTypes": [],
+      "routes": [
+        {
+          "name": "Hearth",
+          "secured": false,
+          "host": "hearth",
+          "port": 3447,
+          "path": "",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": "",
+          "forwardAuthHeader": true,
+          "status": "enabled",
+          "type": "http"
+        }
+      ],
+      "authType": "public",
+      "whitelist": [],
+      "allow": [],
+      "type": "http"
+    }
+  ],
+  "Mediators": [],
+  "ContactGroups": [],
+  "Keystore": []
+}

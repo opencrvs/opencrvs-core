@@ -13,7 +13,5 @@ build
 # misc
 .DS_Store
 .env
-npm-debug.log
-yarn-error.log
+*.log
 .vscode
-lerna-debug.log
