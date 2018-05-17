@@ -1,5 +1,6 @@
 {
 	"scripts": {
+		"precommit": "lerna run --parallel precommit",
 		"postinstall": "lerna bootstrap",
 		"start": "lerna run --parallel start",
 		"dev": "concurrently \"yarn run start\" \"yarn run compose\"",
@@ -10,6 +11,9 @@
 	},
 	"devDependencies": {
 		"concurrently": "^3.5.1",
-		"lerna": "^2.11.0"
+		"husky": "^0.14.3",
+		"lerna": "^2.11.0",
+		"lint-staged": "^7.1.0",
+		"prettier": "^1.12.1"
 	}
 }
