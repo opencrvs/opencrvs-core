@@ -1,19 +1,12 @@
 {
-  "name": "gateway",
+  "name": "@opencrvs/gateway",
   "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "docker:logs": "docker-compose logs",
-    "docker:ps": "docker-compose ps",
-    "docker:start": "docker-compose up",
-    "docker:stop":
-      "docker-compose -f docker-compose.yml down -v --remove-orphans",
     "nodemon:build":
       "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts build/dist",
-    "start": "npm run nodemon:build",
-    "precommit": "lint-staged",
-    "test":
-      "NODE_ENV=test nyc --reporter=lcov --require ts-node/register tape test/**/*.spec.{ts,js} | tap-spec"
+    "start": "yarn nodemon:build",
+    "precommit": "lint-staged"
   },
   "nyc": {
     "include": ["src/**/*.ts"],
