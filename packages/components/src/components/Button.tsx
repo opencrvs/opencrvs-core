@@ -1,6 +1,13 @@
 import * as React from 'react';
-import styled, { StyledComponentClass } from 'styled-components';
+import { Text } from 'react-native';
+import styled from 'styled-components/native';
 
-export const Button = styled.button`
-  background: red;
+const StyledButton = styled.TouchableHighlight`
+  background-color: green;
 `;
+
+export const Button = (props: any) => (
+  <StyledButton onPress={props.onPress}>
+    <Text>{props.title}</Text>
+  </StyledButton>
+);
