@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "nodemon:build":
-      "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts build/dist",
+    "nodemon:build": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts build/dist",
     "start": "yarn nodemon:build",
     "precommit": "lint-staged"
   },
   "nyc": {
-    "include": ["src/**/*.ts"],
-    "extension": [".ts"]
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ]
   },
   "dependencies": {
     "@types/glob": "^5.0.35",
@@ -36,9 +39,7 @@
     "lodash": "^4.17.10",
     "mongoose": "^5.1.1",
     "nedb": "^1.8.0",
-    "vision": "^5.3.2",
-    "winston": "^2.3.1",
-    "winston-daily-rotate-file": "^1.4.6"
+    "vision": "^5.3.2"
   },
   "devDependencies": {
     "@types/bunyan": "^1.8.4",
@@ -49,9 +50,7 @@
     "@types/mongoose": "^5.0.13",
     "@types/nedb": "^1.8.3",
     "@types/node": "^8.0.6",
-    "@types/tape": "^4.2.31",
     "@types/vision": "^5.3.2",
-    "@types/winston": "^2.3.3",
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
@@ -64,7 +63,6 @@
     "prettier": "1.12.1",
     "pretty-quick": "^1.4.1",
     "tap-spec": "^4.1.1",
-    "tape": "^4.8.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.4.3",
     "tslint-config-prettier": "^1.12.0",
@@ -72,7 +70,15 @@
     "typestyle": "^1.3.7"
   },
   "lint-staged": {
-    "src/**/*.ts": ["prettier --write", "git add"]
+    "src/**/*.ts": [
+      "prettier --write",
+      "git add"
+    ]
   },
-  "keywords": ["api", "nodejs", "hapi", "typescript"]
+  "keywords": [
+    "api",
+    "nodejs",
+    "hapi",
+    "typescript"
+  ]
 }
