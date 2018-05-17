@@ -1,0 +1,17 @@
+type User {
+  id: ID!
+  name: String
+  info: {
+    fisrtName: String
+    role: [UserRole]!
+  }
+}
+
+type UserRole {}
+
+
+type Query {
+  user(id: Int!): User
+  role(id: Int!): [UserRole]
+}
+
