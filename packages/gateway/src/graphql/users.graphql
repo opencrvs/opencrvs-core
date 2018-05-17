@@ -1,17 +1,26 @@
 type User {
   id: ID!
-  name: String
-  info: {
-    fisrtName: String
-    role: [UserRole]!
+  userName: String
+  created: Date
+  lastLoggedIn: Date
+  firstName: String
+  lastName: String
+  email: String
+  telecom: [ContactPoint]
+  role: [UserRole]!
+  locationInfo: {
+    primaryOffice: Location
+    currentLocation: Location
+    catchmentArea: [Location]
   }
 }
 
-type UserRole {}
+type UserRole {
+  id: ID!
+  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
+}
 
 
 type Query {
   user(id: Int!): User
-  role(id: Int!): [UserRole]
 }
-

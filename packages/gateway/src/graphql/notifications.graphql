@@ -21,6 +21,7 @@ type NotificationGroup {
 type Notification {}
 
 type Query {
-  notificationGroup(id: Int!): [NotificationGroup]
+  user(id: Int!): User
+  role(id: Int!): [UserRole]
 }
 
