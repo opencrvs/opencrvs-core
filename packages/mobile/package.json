@@ -1,17 +1,43 @@
 {
   "name": "@opencrvs/mobile",
   "version": "0.1.0",
-  "main": "node_modules/expo/AppEntry.js",
   "private": true,
-  "dependencies": {
-    "expo": "^27.0.1",
-    "react": "16.3.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-27.0.0.tar.gz",
-    "tslib": "^1.9.1"
+  "devDependencies": {
+    "@types/jest": "^22.2.3",
+    "@types/react": "^16.3.14",
+    "@types/react-dom": "^16.0.5",
+    "@types/react-native": "^0.55.14",
+    "@types/react-test-renderer": "^16.0.1",
+    "concurrently": "^3.5.1",
+    "husky": "^0.14.3",
+    "jest-expo": "~27.0.0",
+    "lint-staged": "^7.1.0",
+    "prettier": "^1.12.1",
+    "react-native-scripts": "1.14.0",
+    "react-test-renderer": "16.3.1",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^22.4.6",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3"
   },
+  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "scripts": {
-    "start": "exp start --clear --lan --dev",
-    "precommit": "lint-staged"
+    "buildAndStart": "react-native-scripts start",
+    "eject": "react-native-scripts eject",
+    "android": "react-native-scripts android",
+    "ios": "react-native-scripts ios",
+    "test": "jest",
+    "lint": "tslint src/**/*.ts",
+    "tsc": "tsc",
+    "clean": "rimraf build",
+    "build": "yarn run clean && yarn run tsc --",
+    "watch": "yarn run build -- -w",
+    "watchAndRunAndroid": "concurrently \"yarn run watch\" \"yarn run android\"",
+    "buildRunAndroid": "yarn run build && yarn run watchAndRunAndroid ",
+    "watchAndRunIOS": "concurrently \"yarn run watch\" \"yarn run ios\"",
+    "buildRunIOS": "yarn run build && yarn run watchAndRunIOS ",
+    "watchAndStart": "concurrently \"yarn run watch\" \"yarn run buildAndStart\"",
+    "start": "yarn run build && yarn run watchAndStart "
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -19,15 +45,12 @@
       "git add"
     ]
   },
-  "devDependencies": {
-    "@types/react": "16.3.14",
-    "@types/react-native": "0.55.14",
-    "husky": "^0.14.3",
-    "lint-staged": "^7.1.0",
-    "prettier": "^1.12.1",
-    "react-native-typescript-transformer": "1.2.5",
-    "tslint": "5.10.0",
-    "tslint-config-prettier": "1.12.0",
-    "typescript": "2.8.3"
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "expo": "^27.0.1",
+    "react": "16.3.1",
+    "react-native": "~0.55.2"
   }
 }

@@ -1,27 +1,18 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
+# expo
+.expo/
+
 # dependencies
 /node_modules
-node_modules/**/*
-.expo/*
-
-# testing
-/coverage
-
-# production
-/build
 
 # misc
-.DS_Store
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.DS_Store
 
-npm-debug.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-.vscode
-

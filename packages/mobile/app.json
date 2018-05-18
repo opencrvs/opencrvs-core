@@ -3,26 +3,6 @@
     "name": "@opencrvs/mobile",
     "description": "The android mobile declaration application for OpenCRVS.",
     "slug": "mobile",
-    "privacy": "public",
-    "sdkVersion": "27.0.0",
-    "platforms": ["android"],
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "packagerOpts": {
-      "sourceExts": [
-        "ts",
-        "tsx"
-      ],
-      "transformer": "node_modules/react-native-typescript-transformer/index.js"
-    }
+    "sdkVersion": "27.0.0"
   }
 }
