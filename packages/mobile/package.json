@@ -37,7 +37,8 @@
     "watchAndRunIOS": "concurrently \"yarn run watch\" \"yarn run ios\"",
     "buildRunIOS": "yarn run build && yarn run watchAndRunIOS ",
     "watchAndStart": "concurrently \"yarn run watch\" \"yarn run buildAndStart\"",
-    "start": "yarn run build && yarn run watchAndStart "
+    "start": "yarn run build && yarn run watchAndStart ",
+    "precommit": "lint-staged"
   },
   "lint-staged": {
     "src/**/*.ts": [
