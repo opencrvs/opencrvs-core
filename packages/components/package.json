@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "react": "^16.3.2",
-    "react-dom": "^16.3.2",
     "react-docgen-typescript": "^1.5.0",
+    "react-dom": "^16.3.2",
     "react-styleguidist": "^7.0.13",
     "styled-components": "^3.2.6"
   },
@@ -28,9 +28,9 @@
     "@types/node": "^10.0.8",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
+    "concurrently": "^3.5.1",
     "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
-    "concurrently": "^3.5.1",
     "prettier": "^1.12.1",
     "react-scripts-ts": "^2.16.0",
     "typescript": "^2.8.3"
