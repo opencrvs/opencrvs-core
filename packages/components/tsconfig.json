@@ -10,7 +10,7 @@
     "declaration": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDir": "src/components",
+    "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -27,6 +27,11 @@
     // differently, so there's a conflict.
     "skipLibCheck": true
   },
+  "include": [
+    "src/**/*.ts",
+    "typings",
+    "tslint-rules"
+  ],
   "exclude": [
     "node_modules",
     "lib"

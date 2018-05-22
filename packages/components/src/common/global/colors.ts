@@ -9,8 +9,8 @@ export const globalColors = {
   headerBurgerMenu: '#608FCC',
   headerNavyGradDark: '#485F88',
   headerNavyGradLight: '#42506B',
-  linkSkyBlue: '#4CA1F2',
   primaryNavy: '#35495D',
+  secondarySkyBlue: '#4CA1F2', // for links
   successGreen: '#49B78D',
   warningAmberGradDark: '#EEB268',
   warningAmberGradLight: '#D9BE9A'
