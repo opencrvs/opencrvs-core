@@ -1,5 +1,5 @@
 {
-  "name": "@opencrvs/register",
+  "name": "@opencrvs/client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
