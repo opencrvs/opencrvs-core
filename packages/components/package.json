@@ -11,6 +11,7 @@
   },
   "scripts": {
     "precommit": "lint-staged",
+    "postinstall": "yarn build",
     "start": "concurrently 'styleguidist server' 'tsc -w'",
     "build": "styleguidist build && tsc",
     "docker-build": "docker build -t components .",
