@@ -1,0 +1,126 @@
+# automatically map from FHIR
+
+scalar Date
+
+input HumanNameInput {
+  use: String # traditional (Bangla) or English
+  value: String
+}
+
+type HumanName {
+  use: String # traditional (Bangla) or English
+  value: String
+}
+
+input PersonInput {
+  identifier: [ID]
+  name:[HumanNameInput]
+  telecom: [ContactPointInput]
+  gender: String
+  birthDate: String
+  address: [AddressInput]
+  photo: AttachmentInput
+}
+
+type Person {
+  id: ID
+  identifier: [ID]
+  name:[HumanName]
+  telecom: [ContactPoint]
+  gender: String
+  birthDate: String
+  address: [Address]
+  photo: Attachment
+}
+
+input ContactPointInput {
+  system: String # phone | fax | email | pager | url | sms | other
+  value: String # The actual contact point details
+  use: String # home | work | temp | old | mobile - purpose of this contact point
+}
+
+type ContactPoint {
+  system: String # phone | fax | email | pager | url | sms | other
+  value: String # The actual contact point details
+  use: String # home | work | temp | old | mobile - purpose of this contact point
+}
+
+input LocationInput {
+  identifier: [ID]
+  status: String
+  name: String
+  alias: [String]
+  description: String
+  telecom: [ContactPointInput]
+  address: AddressInput
+  longitude: Float
+  latitude: Float
+  altitude: Float
+}
+
+type Location {
+  id: ID!
+  identifier: [ID]
+  status: String
+  name: String
+  alias: [String]
+  description: String
+  telecom: [ContactPoint]
+  address: Address
+  longitude: Float
+  latitude: Float
+  altitude: Float
+}
+
+input AddressInput {
+  use: String
+  type: String
+  text: String
+  line: [String]
+  city: String
+  district: String
+  state: String
+  postalCode: String
+  country: String
+  from: Date
+  to: Date
+}
+
+type Address {
+  use: String
+  type: String
+  text: String
+  line: [String]
+  city: String
+  district: String
+  state: String
+  postalCode: String
+  country: String
+  from: Date
+  to: Date
+}
+
+# TODO: Move to user feature when built out
+type User {
+  id: ID!
+  userName: String
+  created: Date
+  lastLoggedIn: Date
+  firstName: String
+  lastName: String
+  email: String
+  telecom: [ContactPoint]
+  role: [UserRole]!
+  primaryOffice: Location
+  currentLocation: Location
+  catchmentArea: [Location]
+}
+
+type UserRole {
+  id: ID!
+  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
+}
+
+type Query {
+  user(id: Int!): User
+}

@@ -7,8 +7,8 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, reply: any) => {
-        return reply('pong')
+      handler: (request: any, h: any) => {
+        return 'pong'
       },
       config: {
         tags: ['api']
