@@ -11,9 +11,9 @@ module.exports = {
   propsParser: require('react-docgen-typescript').parse,
   styleguideDir: './lib',
   webpackConfig: require('react-scripts-ts/config/webpack.config.dev.js'),
-  /* styleguideComponents: {
-    Wrapper: path.join(__dirname, 'src/themes')
-  }, */
+  styleguideComponents: {
+    Wrapper: path.join(__dirname, 'src/ThemeWrapper')
+  },
   styles,
   theme
 };

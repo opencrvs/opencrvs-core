@@ -1,3 +1,3 @@
-declare module 'themes' {
+declare module 'src/themes/index' {
 	export var OpenCRVSTheme
 }
