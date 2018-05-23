@@ -15,3 +15,11 @@ E.G. test by setting to "bd" for bangladesh
 For REACT_APP_LANGUAGE, use lowercase two-letter [ISO 639-1 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 
 E.G. test by setting to "bn" for bangladesh
+
+## Running the styleguide 
+
+```
+yarn start
+```
+
+to launch project with nodemon running.
