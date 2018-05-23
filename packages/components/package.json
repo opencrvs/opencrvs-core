@@ -3,16 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "husky": "^0.14.3",
-    "lint-staged": "^7.1.0",
     "react": "^16.3.2",
-    "react-docgen-typescript": "^1.5.0",
     "react-dom": "^16.3.2",
+    "react-docgen-typescript": "^1.5.0",
     "react-styleguidist": "^7.0.13",
     "styled-components": "^3.2.6"
   },
   "scripts": {
     "precommit": "lint-staged",
+    "postinstall": "yarn build",
     "start": "concurrently 'styleguidist server' 'tsc -w'",
     "build": "styleguidist build && tsc",
     "docker-build": "docker build -t components .",
@@ -30,7 +29,10 @@
     "@types/node": "^10.0.8",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.1.0",
     "concurrently": "^3.5.1",
+    "prettier": "^1.12.1",
     "react-scripts-ts": "^2.16.0",
     "typescript": "^2.8.3"
   }
