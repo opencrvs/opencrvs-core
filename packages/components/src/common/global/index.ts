@@ -1,5 +1,4 @@
 import { injectGlobal } from 'styled-components'
-import { resolve } from 'url'
 import { globalColors } from './colors'
 
 const globalStyles = injectGlobal`
