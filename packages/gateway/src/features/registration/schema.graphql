@@ -58,7 +58,7 @@ type Query {
 
 type Mutation {
   # Registration are the core entity. They can be created out of notifications and are updated as throughout the registration process
-  createRegistration(details: RegistrationInput!): Registration!
+  createRegistration(details: RegistrationInput!): ID!
   updateRegistration(id: ID!, details: RegistrationInput!): Registration!
 
   # process transitions

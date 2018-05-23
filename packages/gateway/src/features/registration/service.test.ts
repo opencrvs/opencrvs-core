@@ -2,9 +2,12 @@ import { toFHIR } from './service'
 
 test('should build a correct FHIR registration document without error', () => {
   const fhir = toFHIR({
-    mother: { gender: 'female', givenName: 'Jane', familyName: 'Doe' },
-    father: { gender: 'male' },
-    child: { gender: 'male' },
+    mother: {
+      gender: 'female',
+      name: [{ givenName: 'Jane', familyName: 'Doe' }]
+    },
+    father: { gender: 'male', name: [] },
+    child: { gender: 'male', name: [] },
     createdAt: new Date()
   })
   expect(fhir).toBeDefined()

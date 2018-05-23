@@ -111,8 +111,8 @@ function createPersonEntry(person: any, refUuid: string) {
       name: [
         {
           use: 'english',
-          family: [person.familyName],
-          given: [person.givenName]
+          family: [person.name[0] ? person.name[0].familyName : undefined],
+          given: [person.name[0] ? person.name[0].givenName : undefined]
         }
       ],
       gender: person.gender
