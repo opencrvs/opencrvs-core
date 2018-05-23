@@ -1,11 +1,45 @@
 import fetch from 'node-fetch'
-import { toFHIR } from './service'
+import { fromFHIR, toFHIR } from './service'
+
+const statusMap = {
+  declared: 'preliminary',
+  registered: 'final'
+}
 
 export const resolvers = {
   Query: {
-    listRegistrations(_: any, { locations, status }: any) {
-      // query composition
-      return [{ trackingID: '123' }, { trackingID: '321' }]
+    async listRegistrations(_: any, { locations, status }: any) {
+      const res = await fetch(
+        `http://localhost:5001/fhir/Composition?status=${statusMap[status]}`,
+        {
+          headers: { 'Content-Type': 'application/fhir+json' }
+        }
+      )
+
+      const bundle = await res.json()
+
+      // resolve composition references inline
+      await Promise.all(
+        bundle.entry.map(async (compEntry: any) => {
+          return Promise.all(
+            compEntry.resource.section.map(async (section: any) => {
+              return Promise.all(
+                section.entry.map(async (sectionEntry: any) => {
+                  const sectionResourceRes = await fetch(
+                    `http://localhost:5001/fhir/${sectionEntry.reference}`,
+                    {
+                      headers: { 'Content-Type': 'application/fhir+json' }
+                    }
+                  )
+                  sectionEntry.resource = await sectionResourceRes.json()
+                })
+              )
+            })
+          )
+        })
+      )
+
+      return fromFHIR(bundle)
     }
   },
   Mutation: {
