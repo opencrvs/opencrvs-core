@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import { toFHIR, fromFHIR } from './service'
+import { fromFHIR, toFHIR } from './service'
 
 test('should build a correct FHIR registration document without error', () => {
   const fhir = toFHIR({
