@@ -2,7 +2,7 @@
 require('dotenv').config()
 const {
   OpenCRVSTheme
-} = require('./src/themes')
+} = require('./src/components/themes')
 
 const locale = process.env.REACT_APP_LOCALE || 'gb'
 
