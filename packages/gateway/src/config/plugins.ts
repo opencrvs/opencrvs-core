@@ -3,7 +3,7 @@ import * as Good from 'good'
 import * as HapiSwagger from 'hapi-swagger'
 import * as Inert from 'inert'
 import * as Vision from 'vision'
-import { getExecutableSchema } from '../graphql/config'
+import { getExecutableSchema } from 'src/graphql/config'
 
 export const getPlugins = (env: string | undefined, schemaPath: string) => {
   const plugins: any[] = []

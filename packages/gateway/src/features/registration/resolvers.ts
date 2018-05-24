@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 
-import { fhirUrl } from '../../constants'
+import { fhirUrl } from 'src/constants'
 import { fromFHIR, toFHIR } from './service'
 
 const statusMap = {
