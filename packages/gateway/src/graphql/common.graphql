@@ -16,7 +16,7 @@ type HumanName {
 
 input PersonInput {
   identifier: [ID]
-  name:[HumanNameInput]
+  name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: String
   birthDate: String
@@ -27,7 +27,7 @@ input PersonInput {
 type Person {
   id: ID
   identifier: [ID]
-  name:[HumanName]
+  name: [HumanName]
   telecom: [ContactPoint]
   gender: String
   birthDate: String
