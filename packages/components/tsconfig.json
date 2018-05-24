@@ -28,6 +28,7 @@
     "skipLibCheck": true
   },
   "include": [
+    "src/**/*.tsx",
     "src/**/*.ts",
     "typings",
     "tslint-rules"
