@@ -1,0 +1,69 @@
+enum RegStatus {
+  DECLARED, VERIFIED, REGISTERED, CERTIFIED
+}
+
+input RegistrationInput {
+  trackingID: String # short uuid easy to remember
+  registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
+  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
+  status: RegStatus
+  child: PersonInput
+  mother: PersonInput
+  father: PersonInput
+  informant: PersonInput
+  attachments: [AttachmentInput]
+  location: LocationInput
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Registration {
+  id: ID! # long uuid
+  trackingID: String # short uuid easy to remember
+  registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
+  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
+  status: RegStatus
+  child: Person
+  mother: Person
+  father: Person
+  informant: Person
+  attachments: [Attachment]
+  location: Location
+  createdAt: Date
+  updatedAt: Date
+}
+
+input AttachmentInput {
+  data: String # base64
+  status: String # approved/validated deleted
+  originalFileName: String
+  systemFileName: String
+  # rest of the stuff
+  createdAt: Date
+}
+
+type Attachment {
+  id: ID! # uuid
+  data: String # base64
+  status: String # approved/validated deleted
+  originalFileName: String
+  systemFileName: String
+  # rest of the stuff
+  createdAt: Date
+}
+
+type Query {
+  listRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Registration]
+}
+
+type Mutation {
+  # Registration are the core entity. They can be created out of notifications and are updated as throughout the registration process
+  createRegistration(details: RegistrationInput!): ID!
+  updateRegistration(id: ID!, details: RegistrationInput!): Registration!
+
+  # process transitions
+  markAsVerified(id: ID!): Registration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markAsRegistered(id: ID!): Registration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markAsCertified(id: ID!): Registration # updates status to 'certified' - a printed certificate has been produced
+  markAsVoided(id: ID!, reason: String!): Registration # updated status to 'voided' - the registration was captured in error
+}

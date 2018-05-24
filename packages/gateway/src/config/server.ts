@@ -17,5 +17,15 @@ export const getServer = (
   const routes = getRoutes()
   server.route(routes)
 
+  // setup default error handling
+  const preResponse = (request: any, h: any) => {
+    const response = request.response
+    if (response.isBoom) {
+      logger.error(response.stack)
+    }
+    return response
+  }
+  server.ext('onPreResponse', preResponse)
+
   return server
 }

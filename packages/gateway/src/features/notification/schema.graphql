@@ -1,0 +1,30 @@
+input NotificationInput {
+  child: PersonInput
+  mother: PersonInput
+  father: PersonInput
+  informant: PersonInput
+  location: LocationInput
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Notification {
+  id: ID!
+  child: Person
+  mother: Person
+  father: Person
+  informant: Person
+  location: Location
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Query {
+  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
+}
+
+type Mutation {
+  # Notification as a separate entity as they can be capture by a 3rd party and may be unreliable
+  createNotification(details: NotificationInput!): Notification!
+  voidNotification(id: ID!): Notification
+}

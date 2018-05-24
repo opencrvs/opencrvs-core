@@ -1,12 +1,15 @@
+// tslint:disable-next-line no-var-requires
+require('app-module-path').addPath(require('path').join(__dirname, '../'))
+
 import * as DotEnv from 'dotenv'
-import { getPlugins } from './config/plugins'
-import { getServer } from './config/server'
-import { getLogger } from './utils/logger'
+import { getPlugins } from 'src/config/plugins'
+import { getServer } from 'src/config/server'
+import { getLogger } from 'src/utils/logger'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
 })
-const graphQLSchemaPath = `${process.cwd()}/src/graphql/schema.graphql`
+const graphQLSchemaPath = `${process.cwd()}/src/graphql/index.graphql`
 const logger = getLogger(Number(process.env.LOG_LEVEL), process.env.APP_NAME)
 const server = getServer(process.env.NODE_ENV, process.env.PORT, logger)
 const plugins = getPlugins(process.env.NODE_ENV, graphQLSchemaPath)
