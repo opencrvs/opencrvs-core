@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "@opencrvs/mobile",
+    "description": "The android mobile declaration application for OpenCRVS.",
+    "slug": "mobile",
+    "sdkVersion": "27.0.0"
+  }
+}
