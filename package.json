@@ -11,6 +11,7 @@
 		"compose:build": "docker-compose build"
 	},
 	"devDependencies": {
+		"@types/dotenv": "^4.0.3",
 		"concurrently": "^3.5.1",
 		"husky": "^0.14.3",
 		"lerna": "^2.11.0",

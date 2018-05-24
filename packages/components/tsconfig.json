@@ -27,6 +27,12 @@
     // differently, so there's a conflict.
     "skipLibCheck": true
   },
+  "include": [
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    "typings",
+    "tslint-rules"
+  ],
   "exclude": [
     "node_modules",
     "lib"
