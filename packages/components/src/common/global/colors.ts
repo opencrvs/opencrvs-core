@@ -1,17 +1,13 @@
 export const globalColors = {
-  backgroundGray: '#F4F4F4',
-  backgroundPink: '#F6F1F1',
-  backgroundSilver: '#EEF2F4',
-  buttonMidnightBlue: '#35495D',
-  buttonSkyBlue: '#4CA1F2',
-  disabledGray: '#D2D2D2',
-  error: '#D77160',
-  headerBurgerMenu: '#608FCC',
-  headerNavyGradDark: '#485F88',
-  headerNavyGradLight: '#42506B',
-  primaryNavy: '#35495D',
-  secondarySkyBlue: '#4CA1F2', // for links
-  successGreen: '#49B78D',
-  warningAmberGradDark: '#EEB268',
-  warningAmberGradLight: '#D9BE9A'
+	accent: '#4CA1F2', // for links
+	accentGradientDark: '#628FCC',
+	accentGradientLight: '#7DC1EA',
+	disabled: '#D2D2D2',
+	error: '#D77160',
+	headerGradientDark: '#42506B',
+	headerGradientLight: '#485F88',
+	primary: '#608FCC',
+	secondary: '#35495D',
+	success: '#49B78D',
+	warning: '#EEB268'
 }
