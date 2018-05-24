@@ -4,13 +4,21 @@
   "private": true,
   "dependencies": {
     "@opencrvs/components": "^0.1.0",
+    "@types/history": "^4.6.2",
     "@types/react-intl": "^2.3.8",
+    "@types/react-redux": "^6.0.0",
+    "@types/react-router-redux": "^5.0.14",
+    "history": "^4.7.2",
     "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-intl": "^2.4.0",
-    "react-scripts-ts": "2.16.0"
+    "react-redux": "^5.0.7",
+    "react-router": "^4.2.0",
+    "react-router-redux": "next",
+    "react-scripts-ts": "2.16.0",
+    "redux": "^4.0.0"
   },
   "scripts": {
     "precommit": "lint-staged",
