@@ -15,10 +15,10 @@ const globalStyles = injectGlobal`
   }
 
   body {
-    background-color: ${globalColors.backgroundGray};
+    background-color: ${globalColors.background};
   }
 
 `
 export const addGlobalStyles = () => {
-  return globalStyles
+	return globalStyles
 }
