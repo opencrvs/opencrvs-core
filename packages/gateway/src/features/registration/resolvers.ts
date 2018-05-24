@@ -1,4 +1,6 @@
 import fetch from 'node-fetch'
+
+import { fhirUrl } from '../../constants'
 import { fromFHIR, toFHIR } from './service'
 
 const statusMap = {
@@ -10,7 +12,7 @@ export const resolvers = {
   Query: {
     async listRegistrations(_: any, { locations, status }: any) {
       const res = await fetch(
-        `http://localhost:5001/fhir/Composition?status=${statusMap[status]}`,
+        `${fhirUrl}/Composition?status=${statusMap[status]}`,
         {
           headers: { 'Content-Type': 'application/fhir+json' }
         }
@@ -26,7 +28,7 @@ export const resolvers = {
               return Promise.all(
                 section.entry.map(async (sectionEntry: any) => {
                   const sectionResourceRes = await fetch(
-                    `http://localhost:5001/fhir/${sectionEntry.reference}`,
+                    `${fhirUrl}/${sectionEntry.reference}`,
                     {
                       headers: { 'Content-Type': 'application/fhir+json' }
                     }
@@ -46,7 +48,7 @@ export const resolvers = {
     async createRegistration(_: any, { details }: any) {
       const doc: any = toFHIR(details)
 
-      const res = await fetch('http://localhost:5001/fhir', {
+      const res = await fetch(fhirUrl, {
         method: 'POST',
         body: JSON.stringify(doc),
         headers: { 'Content-Type': 'application/fhir+json' }
