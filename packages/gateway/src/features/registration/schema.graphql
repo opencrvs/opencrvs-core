@@ -2,17 +2,35 @@ enum RegStatus {
   DECLARED, VERIFIED, REGISTERED, CERTIFIED
 }
 
+type RegWorkflow {
+  type: RegStatus
+  user: User
+  timestamp: Date
+  location: Location
+}
+
+type Certificate {
+  id: ID!
+  paperId: ID!
+  reciever: Person
+  location: Location
+  User: User
+  createdAt: Date
+}
+
 input RegistrationInput {
   trackingID: String # short uuid easy to remember
   registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
   paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  status: RegStatus
+  bookId: ID
+  status: [RegWorkflow]
   child: PersonInput
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
   attachments: [AttachmentInput]
   location: LocationInput
+  certificates: [Certificate]
   createdAt: Date
   updatedAt: Date
 }
@@ -22,11 +40,13 @@ type Registration {
   trackingID: String # short uuid easy to remember
   registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
   paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  status: RegStatus
+  bookId: ID
+  status: [RegWorkflow]
   child: Person
   mother: Person
   father: Person
-  informant: Person
+  informant: Person # TODO: CHange to related person so we can capture the relationship - https://www.hl7.org/fhir/relatedperson.html
+  registrationType: string # self | stateless | refugee
   attachments: [Attachment]
   location: Location
   createdAt: Date
@@ -62,8 +82,8 @@ type Mutation {
   updateRegistration(id: ID!, details: RegistrationInput!): Registration!
 
   # process transitions
-  markAsVerified(id: ID!): Registration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
-  markAsRegistered(id: ID!): Registration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
-  markAsCertified(id: ID!): Registration # updates status to 'certified' - a printed certificate has been produced
-  markAsVoided(id: ID!, reason: String!): Registration # updated status to 'voided' - the registration was captured in error
+  markAsVerified(id: ID!, location: Location): Registration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markAsRegistered(id: ID!, location: Location)): Registration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markAsCertified(id: ID!, location: Location)): Registration # updates status to 'certified' - a printed certificate has been produced
+  markAsVoided(id: ID!, reason: String!, location: Location): Registration # updated status to 'voided' - the registration was captured in error
 }
