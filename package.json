@@ -11,7 +11,11 @@
     "compose": "yarn run compose:build && yarn run compose:up",
     "compose:up": "docker-compose -p ocrvs -f docker-compose.deps.yml up",
 		"compose:down": "docker-compose -p ocrvs -f docker-compose.deps.yml down",
-		"compose:build": "docker-compose -f docker-compose.deps.yml build"
+		"compose:build": "docker-compose -f docker-compose.deps.yml build",
+    "compose:all": "yarn run compose:all:build && yarn run compose:all:up",
+    "compose:all:up": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml up",
+		"compose:all:down": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml down",
+		"compose:all:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.yml build"
   },
   "devDependencies": {
     "@types/dotenv": "^4.0.3",
