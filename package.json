@@ -1,22 +1,25 @@
 {
-	"scripts": {
-		"precommit": "lerna run --parallel precommit",
-		"postinstall": "lerna bootstrap",
-		"start": "lerna run --parallel start",
-		"test": "lerna run --parallel test",
-		"dev": "concurrently \"yarn run start\" \"yarn run compose\"",
-		"compose": "yarn run compose:build && yarn run compose:up",
-		"compose:up": "docker-compose -p ocrvs -f docker-compose.deps.yml up",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "precommit": "lerna run --parallel precommit",
+    "start": "lerna run --parallel start",
+    "test": "lerna run --parallel test",
+    "dev": "concurrently \"yarn run start\" \"yarn run compose\"",
+    "compose": "yarn run compose:build && yarn run compose:up",
+    "compose:up": "docker-compose -p ocrvs -f docker-compose.deps.yml up",
 		"compose:down": "docker-compose -p ocrvs -f docker-compose.deps.yml down",
 		"compose:build": "docker-compose -f docker-compose.deps.yml build"
-	},
-	"devDependencies": {
-		"@types/dotenv": "^4.0.3",
-		"concurrently": "^3.5.1",
-		"husky": "^0.14.3",
-		"lerna": "^2.11.0",
-		"lint-staged": "^7.1.0",
-		"prettier": "^1.12.1"
-	},
-	"dependencies": {}
+  },
+  "devDependencies": {
+    "@types/dotenv": "^4.0.3",
+    "concurrently": "^3.5.1",
+    "husky": "^0.14.3",
+    "lerna": "^2.11.0",
+    "lint-staged": "^7.1.0",
+    "prettier": "^1.12.1"
+  },
+  "dependencies": {}
 }
