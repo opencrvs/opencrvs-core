@@ -26,13 +26,14 @@ input PersonInput {
 
 type Person {
   id: ID
-  identifier: [ID]
+  identifier: [ID] # Change ot ID object with type
   name: [HumanName]
   telecom: [ContactPoint]
   gender: String
   birthDate: String
   address: [Address]
   photo: Attachment
+  nationality: string # use https://www.hl7.org/fhir/extension-patient-nationality.html
 }
 
 input ContactPointInput {
@@ -102,7 +103,7 @@ type Address {
   to: Date
 }
 
-# TODO: Move to user feature when built out
+# TODO: Move to user feature when built out - manage through a user management microservice
 type User {
   id: ID!
   userName: String
@@ -113,6 +114,7 @@ type User {
   email: String
   telecom: [ContactPoint]
   role: [UserRole]!
+  address: Address
   primaryOffice: Location
   currentLocation: Location
   catchmentArea: [Location]
