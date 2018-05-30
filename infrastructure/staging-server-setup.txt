@@ -1,0 +1,22 @@
+# add users
+curl https://github.com/rcrichton.keys >> ~/.ssh/authorized_keys
+curl https://github.com/euanmillar.keys >> ~/.ssh/authorized_keys
+curl https://github.com/rikukissa.keys >> ~/.ssh/authorized_keys
+
+# prevent password login
+sed -i 's/PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+
+# install docker
+curl -fsSL get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+# create swarm
+# on manger:
+docker swarm init --advertise-addr <MANAGER-IP>
+
+# on workers (the command is given to you when the manager inits, but something like):
+docker swarm join --token <TOKEN> 209.97.128.246:2377
+
+# check state from manager:
+docker node ls
