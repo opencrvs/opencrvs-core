@@ -11,7 +11,7 @@
   "scripts": {
     "start": "lerna run --parallel start",
     "dev": "concurrently \"yarn run start\" \"yarn run compose\"",
-    "test": "lerna run --parallel test",
+    "test": "lerna run --parallel test -- --watchAll=false",
     "compose": "yarn run compose:build && yarn run compose:up",
     "compose:up": "docker-compose -p ocrvs up",
     "compose:down": "docker-compose -p ocrvs down",
