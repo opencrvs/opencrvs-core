@@ -8,16 +8,17 @@ ENV NPM_CONFIG_LOGLEVEL warn
 
 # Install and configure `serve`.
 RUN yarn global add serve
-CMD serve -s build
+CMD cd packages/client; serve -s build
 EXPOSE 5000
 
-# Install all dependencies of the current project.
-COPY package.json package.json
-COPY yarn.lock yarn.lock
-RUN yarn install
-
-# Copy all local files into the image.
+# Copy all local files into the image (including all packages in the repo)
 COPY . .
 
+# Install all dependencies of the current project (for all packages so dependant pacakges are built and linked)
+COPY package.json package.json
+COPY yarn.lock yarn.lock
+COPY lerna.json lerna.json
+RUN yarn install
+
 # Build for production.
-RUN yarn build --production
+RUN cd packages/client; yarn build --production

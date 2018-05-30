@@ -6,9 +6,9 @@
 		"test": "lerna run --parallel test",
 		"dev": "concurrently \"yarn run start\" \"yarn run compose\"",
 		"compose": "yarn run compose:build && yarn run compose:up",
-		"compose:up": "docker-compose -p ocrvs up",
-		"compose:down": "docker-compose -p ocrvs down",
-		"compose:build": "docker-compose build"
+		"compose:up": "docker-compose -p ocrvs -f docker-compose.deps.yml up",
+		"compose:down": "docker-compose -p ocrvs -f docker-compose.deps.yml down",
+		"compose:build": "docker-compose -f docker-compose.deps.yml build"
 	},
 	"devDependencies": {
 		"@types/dotenv": "^4.0.3",

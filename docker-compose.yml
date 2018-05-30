@@ -1,47 +1,11 @@
-version: "3"
+version: '3'
 
 services:
-  mongo:
-    container_name: ocrvs-mongo
-    image: mongo
+  client:
+    container_name: ocrvs-client
+    build:
+      context: .
+      dockerfile: packages/client/Dockerfile
     restart: unless-stopped
-    logging:
-      driver: none
-
-  hearth:
-    container_name: ocrvs-hearth
-    image: jembi/hearth:latest
-    environment:
-      - mongodb__url=mongodb://ocrvs-mongo/hearth-dev
-      - logger__level=error
-      - authentication__type=disabled
-      - idGenerator=uuidv4
     ports:
-      - "3447:3447"
-    restart: unless-stopped
-
-  openhim-core:
-    container_name: ocrvs-openhim-core
-    image: jembi/openhim-core
-    environment:
-      - mongo_url=mongodb://ocrvs-mongo/openhim-dev
-      - mongo_atnaUrl=mongodb://ocrvs-mongo/openhim-dev
-      - logger_level=error
-    ports:
-      - "8080:8080"
       - "5000:5000"
-      - "5001:5001"
-    depends_on:
-      - mongo
-    restart: unless-stopped
-
-  openhim-console:
-    container_name: ocrvs-openhim-console
-    image: jembi/openhim-console
-    ports:
-      - "8888:80"
-    volumes:
-      - ./infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json
-    restart: unless-stopped
-
-
