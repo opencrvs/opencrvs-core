@@ -20,3 +20,5 @@ docker swarm join --token <TOKEN> 209.97.128.246:2377
 
 # check state from manager:
 docker node ls
+# login to private registry on manager
+docker login

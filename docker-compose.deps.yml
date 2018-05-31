@@ -1,31 +1,35 @@
-version: "3"
+version: "3.3"
 
 services:
   mongo:
-    container_name: ocrvs-mongo
     image: mongo
     restart: unless-stopped
     logging:
       driver: none
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
 
   hearth:
-    container_name: ocrvs-hearth
     image: jembi/hearth:latest
     environment:
-      - mongodb__url=mongodb://ocrvs-mongo/hearth-dev
+      - mongodb__url=mongodb://mongo/hearth-dev
       - logger__level=error
       - authentication__type=disabled
       - idGenerator=uuidv4
     ports:
       - "3447:3447"
     restart: unless-stopped
+    deploy:
+      replicas: 2
 
   openhim-core:
-    container_name: ocrvs-openhim-core
     image: jembi/openhim-core
     environment:
-      - mongo_url=mongodb://ocrvs-mongo/openhim-dev
-      - mongo_atnaUrl=mongodb://ocrvs-mongo/openhim-dev
+      - mongo_url=mongodb://mongo/openhim-dev
+      - mongo_atnaUrl=mongodb://mongo/openhim-dev
       - logger_level=error
     ports:
       - "8080:8080"
@@ -34,14 +38,20 @@ services:
     depends_on:
       - mongo
     restart: unless-stopped
+    deploy:
+      replicas: 2
 
   openhim-console:
-    container_name: ocrvs-openhim-console
     image: jembi/openhim-console
     ports:
       - "8888:80"
-    volumes:
-      - ./infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json
+    configs:
+      - source: openhim-console-conf
+        target: /usr/share/nginx/html/config/default.json
     restart: unless-stopped
+    deploy:
+      replicas: 2
 
-
+configs:
+  openhim-console-conf:
+    file: ./infrastructure/openhim-console-config.json

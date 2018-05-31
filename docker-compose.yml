@@ -1,17 +1,19 @@
-version: "3"
+version: "3.3"
 
 services:
   client:
-    container_name: ocrvs-client
+    image: jembi/ocrvs-client:latest
     build:
       context: .
       dockerfile: packages/client/Dockerfile
     restart: unless-stopped
     ports:
       - "5050:5000"
+    deploy:
+      replicas: 2
 
   gateway:
-    container_name: ocrvs-gateway
+    image: jembi/ocrvs-gateway:wip
     build: packages/gateway
     restart: unless-stopped
     ports:
@@ -19,3 +21,5 @@ services:
     environment:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://openhim-core:5001/fhir
+    deploy:
+      replicas: 2
