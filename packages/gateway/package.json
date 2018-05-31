@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "nodemon:build": "nodemon --exec ts-node -- src/index.ts",
-    "start": "yarn nodemon:build",
+    "start": "nodemon --exec ts-node -- src/index.ts",
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
