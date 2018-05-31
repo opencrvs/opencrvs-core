@@ -2,7 +2,10 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { IntlProvider, injectIntl, defineMessages } from 'react-intl'
 import { ConnectedRouter } from 'react-router-redux'
-
+import ApolloClient from 'apollo-boost'
+import { ApolloProvider, Query } from 'react-apollo'
+import { resolve } from 'url'
+import gql from 'graphql-tag'
 import { Button } from '@opencrvs/components/lib/Button'
 import './App.css'
 
@@ -24,6 +27,55 @@ const Title = injectIntl(({ intl }) => (
   <h1 className="App-title">{intl.formatMessage(messages.welcome)}</h1>
 ))
 
+const Declarations = () => (
+  <Query
+    query={gql`
+      {
+        listRegistrations(status: "declared") {
+          id
+          mother {
+            gender
+            name {
+              givenName
+              familyName
+            }
+          }
+          father {
+            gender
+            name {
+              givenName
+              familyName
+            }
+          }
+          child {
+            gender
+            name {
+              givenName
+              familyName
+            }
+          }
+          createdAt
+        }
+      }
+    `}
+  >
+    {({ loading, error, data }) => {
+      if (loading) {
+        return <p>Loading...</p>
+      }
+      if (error) {
+        return <p>Error :(</p>
+      }
+
+      return (
+        <p>
+          Mother's name: {data.listRegistrations[0].mother.name[0].givenName}
+        </p>
+      )
+    }}
+  </Query>
+)
+
 const Home = () => (
   <div className="App">
     <header className="App-header">
@@ -34,6 +86,7 @@ const Home = () => (
     <p className="App-intro">
       To get started, edit <code>src/App.tsx</code> and save to reload.
     </p>
+    <Declarations />
   </div>
 )
 const Other = () => (
@@ -42,19 +95,29 @@ const Other = () => (
   </div>
 )
 
+const GRAPHQL_URL = `${process.env.REACT_APP_API_GATEWAY_IP}:${
+  process.env.REACT_APP_API_GATEWAY_PORT
+}/`
+
+const client = new ApolloClient({
+  uri: resolve(GRAPHQL_URL, 'graphql')
+})
+
 export class App extends React.Component<{}, {}> {
   public render() {
     return (
-      <Provider store={store}>
-        <IntlProvider locale="en">
-          <ConnectedRouter history={history}>
-            <div>
-              <Route exact path="/" component={Home} />
-              <Route exact path="/other" component={Other} />
-            </div>
-          </ConnectedRouter>
-        </IntlProvider>
-      </Provider>
+      <ApolloProvider client={client}>
+        <Provider store={store}>
+          <IntlProvider locale="en">
+            <ConnectedRouter history={history}>
+              <div>
+                <Route exact path="/" component={Home} />
+                <Route exact path="/other" component={Other} />
+              </div>
+            </ConnectedRouter>
+          </IntlProvider>
+        </Provider>
+      </ApolloProvider>
     )
   }
 }
