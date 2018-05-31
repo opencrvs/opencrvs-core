@@ -103,10 +103,10 @@ const client = new ApolloClient({
   uri: resolve(GRAPHQL_URL, 'graphql')
 })
 
-export class App extends React.Component<{}, {}> {
+export class App extends React.Component<{ client?: ApolloClient<{}> }, {}> {
   public render() {
     return (
-      <ApolloProvider client={client}>
+      <ApolloProvider client={this.props.client || client}>
         <Provider store={store}>
           <IntlProvider locale="en">
             <ConnectedRouter history={history}>
