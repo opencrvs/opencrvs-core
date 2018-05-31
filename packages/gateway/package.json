@@ -54,7 +54,6 @@
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
-    "husky": "^0.14.3",
     "jest": "^22.4.4",
     "lab": "^15.1.2",
     "lab-transform-typescript": "^3.0.1",
