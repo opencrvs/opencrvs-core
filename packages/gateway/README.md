@@ -23,7 +23,7 @@ In this early stage two demonstrative graphQL queries exist that can be tried ou
 
 ```graphql
 mutation create {
-  createRegistration(details: {
+  createBirthRegistration(details: {
     mother: {gender: "female", name: [{givenName: "Jane", familyName: "Doe"}]},
     father: {gender: "male",name: [{givenName: "Jack", familyName: "Doe"}]},
     child: {gender: "male",name: [{givenName: "Baby", familyName: "Doe"}]},
@@ -32,7 +32,7 @@ mutation create {
 }
 
 query list {
-  listRegistrations(status: "declared") {
+  listBirthRegistrations(status: "declared") {
     id
     mother {
       gender

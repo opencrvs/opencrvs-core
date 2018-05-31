@@ -151,7 +151,20 @@ type Attachment {
 }
 
 type Query {
-	listRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Registration]
+	listBirthRegistrations(
+		locationIds: [String]
+		status: String
+		userId: String
+		from: Date
+		to: Date
+	): [BirthRegistration]
+	listDeathRegistrations(
+		locationIds: [String]
+		status: String
+		userId: String
+		from: Date
+		to: Date
+	): [BirthRegistration]
 }
 
 type Mutation {
