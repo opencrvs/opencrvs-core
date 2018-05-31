@@ -1,89 +1,91 @@
 enum RegStatus {
-  DECLARED, VERIFIED, REGISTERED, CERTIFIED
+	DECLARED
+	VERIFIED
+	REGISTERED
+	CERTIFIED
 }
 
 type RegWorkflow {
-  type: RegStatus
-  user: User
-  timestamp: Date
-  location: Location
+	type: RegStatus
+	user: User
+	timestamp: Date
+	location: Location
 }
 
 type Certificate {
-  id: ID!
-  paperId: ID!
-  reciever: Person
-  location: Location
-  User: User
-  createdAt: Date
+	id: ID!
+	paperId: ID!
+	reciever: Person
+	location: Location
+	User: User
+	createdAt: Date
 }
 
 input RegistrationInput {
-  trackingID: String # short uuid easy to remember
-  registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
-  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  bookId: ID
-  status: [RegWorkflow]
-  child: PersonInput
-  mother: PersonInput
-  father: PersonInput
-  informant: PersonInput
-  attachments: [AttachmentInput]
-  location: LocationInput
-  certificates: [Certificate]
-  createdAt: Date
-  updatedAt: Date
+	trackingID: String # short uuid easy to remember
+	registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
+	paperFormID: String # assumption based on "Number of the application (5 digit) ???"
+	bookId: ID
+	status: [RegWorkflow]
+	child: PersonInput
+	mother: PersonInput
+	father: PersonInput
+	informant: PersonInput
+	attachments: [AttachmentInput]
+	location: LocationInput
+	certificates: [Certificate]
+	createdAt: Date
+	updatedAt: Date
 }
 
 type Registration {
-  id: ID! # long uuid
-  trackingID: String # short uuid easy to remember
-  registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
-  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  bookId: ID
-  status: [RegWorkflow]
-  child: Person
-  mother: Person
-  father: Person
-  informant: Person # TODO: CHange to related person so we can capture the relationship - https://www.hl7.org/fhir/relatedperson.html
-  registrationType: string # self | stateless | refugee
-  attachments: [Attachment]
-  location: Location
-  createdAt: Date
-  updatedAt: Date
+	id: ID! # long uuid
+	trackingID: String # short uuid easy to remember
+	registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
+	paperFormID: String # assumption based on "Number of the application (5 digit) ???"
+	bookId: ID
+	status: [RegWorkflow]
+	child: Person
+	mother: Person
+	father: Person
+	informant: Person # TODO: CHange to related person so we can capture the relationship - https://www.hl7.org/fhir/relatedperson.html
+	registrationType: String # self | stateless | refugee
+	attachments: [Attachment]
+	location: Location
+	createdAt: Date
+	updatedAt: Date
 }
 
 input AttachmentInput {
-  data: String # base64
-  status: String # approved/validated deleted
-  originalFileName: String
-  systemFileName: String
-  # rest of the stuff
-  createdAt: Date
+	data: String # base64
+	status: String # approved/validated deleted
+	originalFileName: String
+	systemFileName: String
+	# rest of the stuff
+	createdAt: Date
 }
 
 type Attachment {
-  id: ID! # uuid
-  data: String # base64
-  status: String # approved/validated deleted
-  originalFileName: String
-  systemFileName: String
-  # rest of the stuff
-  createdAt: Date
+	id: ID! # uuid
+	data: String # base64
+	status: String # approved/validated deleted
+	originalFileName: String
+	systemFileName: String
+	# rest of the stuff
+	createdAt: Date
 }
 
 type Query {
-  listRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Registration]
+	listRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Registration]
 }
 
 type Mutation {
-  # Registration are the core entity. They can be created out of notifications and are updated as throughout the registration process
-  createRegistration(details: RegistrationInput!): ID!
-  updateRegistration(id: ID!, details: RegistrationInput!): Registration!
-
-  # process transitions
-  markAsVerified(id: ID!, location: Location): Registration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
-  markAsRegistered(id: ID!, location: Location)): Registration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
-  markAsCertified(id: ID!, location: Location)): Registration # updates status to 'certified' - a printed certificate has been produced
-  markAsVoided(id: ID!, reason: String!, location: Location): Registration # updated status to 'voided' - the registration was captured in error
+	# Registration are the core entity. They can be created out of notifications and are updated as throughout the registration process
+	createRegistration(details: RegistrationInput!): ID!
+	updateRegistration(id: ID!, details: RegistrationInput!): Registration!
+	# process transitions
+	markAsVerified(id: ID!, location: Location): Registration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+	markAsRegistered(id: ID!, location: Location): Registration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+	markAsCertified(id: ID!, location: Location): Registration # updates status to 'certified' - a printed certificate has been produced
+	markAsVoided(id: ID!, reason: String!, location: Location): Registration # updated status to 'voided' - the registration was captured in error
 }
