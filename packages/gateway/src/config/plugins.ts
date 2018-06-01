@@ -62,22 +62,24 @@ export const getPlugins = (env: string | undefined, schemaPath: string) => {
         },
         name: 'graphiql',
         version: '1.3.6'
-      },
-      {
-        plugin: graphqlHapi,
-        options: {
-          path: '/graphql',
-          graphqlOptions: (request: any) => ({
-            pretty: true,
-            schema: executableSchema,
-            // this is where you add anything you want attached to context in resolvers
-            context: {}
-          })
-        },
-        name: 'graphqlHapi',
-        version: '1.3.6'
       }
     )
   }
+
+  plugins.push({
+    plugin: graphqlHapi,
+    options: {
+      path: '/graphql',
+      graphqlOptions: (request: any) => ({
+        pretty: true,
+        schema: executableSchema,
+        // this is where you add anything you want attached to context in resolvers
+        context: {}
+      })
+    },
+    name: 'graphqlHapi',
+    version: '1.3.6'
+  })
+
   return plugins
 }
