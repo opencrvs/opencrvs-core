@@ -23,3 +23,19 @@ yarn start
 ```
 
 to launch project with nodemon running.
+
+## Making changes to the styleguide 
+
+During development to add new styles, create a module in the components folder, and then run the following command to build the module into the lib directory:
+
+```
+yarn build
+```
+
+To then use the component in development of OpenCRVS, you will need to re-install all dependencies by running this command in the OpenCRVS application root directory:
+
+```
+yarn --force
+```
+
+The component will not be available to other developers until a successful pull request has been merged into master and the style been submitted to NPM.
