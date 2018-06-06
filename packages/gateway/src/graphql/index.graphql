@@ -3,3 +3,10 @@
 # import Query.* from '../features/registration/schema.graphql'
 # import Mutation.* from '../features/registration/schema.graphql'
 # import * from 'common.graphql'
+
+# TODO
+# https://github.com/prismagraphql/graphql-import/issues/180
+# https://github.com/prismagraphql/graphql-import/issues/45
+type Dummy {
+  dummy: String!
+}

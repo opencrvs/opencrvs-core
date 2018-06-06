@@ -20,7 +20,13 @@ type Notification {
 }
 
 type Query {
-  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
+  listNotifications(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [Notification]
 }
 
 type Mutation {
