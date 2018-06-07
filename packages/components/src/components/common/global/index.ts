@@ -1,7 +1,9 @@
 import { theme } from '@opencrvs/components/lib/themes/theme'
 import { globalColors } from './colors'
 
-const locale = process.env.REACT_APP_LOCALE ? process.env.REACT_APP_LOCALE : 'gb'
+const locale = process.env.REACT_APP_LOCALE
+  ? process.env.REACT_APP_LOCALE
+  : 'gb'
 
 export const globalStyles = `
   * {
@@ -13,20 +15,26 @@ export const globalStyles = `
 
   @font-face {
     font-family: ${theme[locale].lightFontFamily};
-    src: url('/fonts/notosans-light-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff');
+    src: url('/fonts/notosans-light-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff');
     font-weight: 300;
     font-style: normal;
   }
 
   @font-face {
     font-family: ${theme[locale].regularFontFamily};
-    src: url('/fonts/notosans-regular-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff');
+    src: url('/fonts/notosans-regular-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff');
     font-style: normal;
   }
 
   @font-face {
     font-family: ${theme[locale].boldFontFamily};
-    src: url('/fonts/notosans-bold-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff');
+    src: url('/fonts/notosans-bold-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff');
     font-style: normal;
   }
 
