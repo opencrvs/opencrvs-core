@@ -31,7 +31,8 @@
     "build": "react-scripts-ts build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-client -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-client ocrvs-client",
-    "test": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom",
+    "test": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/",
+
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
@@ -48,5 +49,11 @@
     "@types/react-dom": "^16.0.5",
     "prettier": "^1.12.1",
     "typescript": "^2.8.3"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!<rootDir>/node_modules/"
+    ]
   }
 }

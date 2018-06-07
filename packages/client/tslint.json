@@ -9,6 +9,7 @@
   "rules": {
     "ordered-imports": false,
     "object-literal-sort-keys": false,
-    "jsx-boolean-value": false
+    "jsx-boolean-value": false,
+    "member-access": false
   }
 }

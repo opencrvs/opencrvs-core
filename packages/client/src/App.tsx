@@ -3,11 +3,10 @@ import { Provider } from 'react-redux'
 import { IntlProvider, injectIntl, defineMessages } from 'react-intl'
 import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
-import { ApolloProvider, Query } from 'react-apollo'
+import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import gql from 'graphql-tag'
 import { Button } from '@opencrvs/components/lib/Button'
-import styled, { injectGlobal } from 'styled-components'
+import { injectGlobal } from 'styled-components'
 import { globalStyles } from '@opencrvs/components/lib/common/global'
 import { theme } from '@opencrvs/components/lib/themes/theme'
 import './App.css'
@@ -16,6 +15,7 @@ import logo from './logo.svg'
 import { store, history } from './store'
 import { Route } from 'react-router'
 import { ThemeProvider } from 'styled-components'
+import { RegistrationList } from './registrations/RegistrationList'
 
 const GRAPHQL_URL = `${process.env.REACT_APP_API_GATEWAY_URL}`
 const LANGUAGE = `${process.env.REACT_APP_LANGUAGE}`
@@ -37,56 +37,6 @@ const messages = defineMessages({
 
 const Title = injectIntl(({ intl }) => <h1 className="App-title">{intl.formatMessage(messages.welcome)}</h1>)
 
-const Declarations = () => (
-	<Query
-		query={gql`
-			{
-				listRegistrations(status: "declared") {
-					id
-					mother {
-						gender
-						name {
-							givenName
-							familyName
-						}
-					}
-					father {
-						gender
-						name {
-							givenName
-							familyName
-						}
-					}
-					child {
-						gender
-						name {
-							givenName
-							familyName
-						}
-					}
-					createdAt
-				}
-			}
-		`}
-	>
-		{({ loading, error, data }) => {
-			if (loading) {
-				return <p>Loading...</p>
-			}
-			if (error) {
-				return <p>Error :(</p>
-			}
-
-			return <p>Mother's name: {data.listRegistrations[0].mother.name[0].givenName}</p>
-		}}
-	</Query>
-)
-
-const StyledDeclarations = styled(Declarations)`
-  color: red;
-  text-decoration: underline;
-`
-
 const Home = () => (
 	<div className="App">
 		<header className="App-header">
@@ -97,7 +47,7 @@ const Home = () => (
 		<p className="App-intro">
 			To get started, edit <code>src/App.tsx</code> and save to reload.
 		</p>
-		<StyledDeclarations />
+		<RegistrationList />
 	</div>
 )
 const Other = () => (
