@@ -28,58 +28,64 @@ injectGlobal`${globalStyles}`
 const foo = () => alert('sdf')
 
 const messages = defineMessages({
-	welcome: {
-		id: 'app.welcome',
-		defaultMessage: 'Welcome',
-		description: 'Test text'
-	}
+  welcome: {
+    id: 'app.welcome',
+    defaultMessage: 'Welcome',
+    description: 'Test text'
+  }
 })
 
-const Title = injectIntl(({ intl }) => <h1 className="App-title">{intl.formatMessage(messages.welcome)}</h1>)
+const Title = injectIntl(({ intl }) => (
+  <h1 className="App-title">{intl.formatMessage(messages.welcome)}</h1>
+))
 
 const Declarations = () => (
-	<Query
-		query={gql`
-			{
-				listRegistrations(status: "declared") {
-					id
-					mother {
-						gender
-						name {
-							givenName
-							familyName
-						}
-					}
-					father {
-						gender
-						name {
-							givenName
-							familyName
-						}
-					}
-					child {
-						gender
-						name {
-							givenName
-							familyName
-						}
-					}
-					createdAt
-				}
-			}
-		`}
-	>
-		{({ loading, error, data }) => {
-			if (loading) {
-				return <p>Loading...</p>
-			}
-			if (error) {
-				return <p>Error :(</p>
-			}
+  <Query
+    query={gql`
+      {
+        listRegistrations(status: "declared") {
+          id
+          mother {
+            gender
+            name {
+              givenName
+              familyName
+            }
+          }
+          father {
+            gender
+            name {
+              givenName
+              familyName
+            }
+          }
+          child {
+            gender
+            name {
+              givenName
+              familyName
+            }
+          }
+          createdAt
+        }
+      }
+    `}
+  >
+    {({ loading, error, data }) => {
+      if (loading) {
+        return <p>Loading...</p>
+      }
+      if (error) {
+        return <p>Error :(</p>
+      }
 
-			return <p>Mother's name: {data.listRegistrations[0].mother.name[0].givenName}</p>
-		}}
-	</Query>
+      return (
+        <p>
+          Mother's name: {data.listRegistrations[0].mother.name[0].givenName}
+        </p>
+      )
+    }}
+  </Query>
 )
 
 const StyledDeclarations = styled(Declarations)`
@@ -88,45 +94,45 @@ const StyledDeclarations = styled(Declarations)`
 `
 
 const Home = () => (
-	<div className="App">
-		<header className="App-header">
-			<img src={logo} className="App-logo" alt="logo" />
-			<Title />
-			<Button onClick={foo}>Hello</Button>
-		</header>
-		<p className="App-intro">
-			To get started, edit <code>src/App.tsx</code> and save to reload.
-		</p>
-		<StyledDeclarations />
-	</div>
+  <div className="App">
+    <header className="App-header">
+      <img src={logo} className="App-logo" alt="logo" />
+      <Title />
+      <Button onClick={foo}>Hello</Button>
+    </header>
+    <p className="App-intro">
+      To get started, edit <code>src/App.tsx</code> and save to reload.
+    </p>
+    <StyledDeclarations />
+  </div>
 )
 const Other = () => (
-	<div className="App">
-		<h1>page 2</h1>
-	</div>
+  <div className="App">
+    <h1>page 2</h1>
+  </div>
 )
 
 const client = new ApolloClient({
-	uri: resolve(GRAPHQL_URL, 'graphql')
+  uri: resolve(GRAPHQL_URL, 'graphql')
 })
 
 export class App extends React.Component<{ client?: ApolloClient<{}> }, {}> {
-	public render() {
-		return (
-			<ApolloProvider client={this.props.client || client}>
-				<Provider store={store}>
-					<IntlProvider locale={LANGUAGE}>
-						<ThemeProvider theme={theme[LOCALE]}>
-							<ConnectedRouter history={history}>
-								<div>
-									<Route exact path="/" component={Home} />
-									<Route exact path="/other" component={Other} />
-								</div>
-							</ConnectedRouter>
-						</ThemeProvider>
-					</IntlProvider>
-				</Provider>
-			</ApolloProvider>
-		)
-	}
+  public render() {
+    return (
+      <ApolloProvider client={this.props.client || client}>
+        <Provider store={store}>
+          <IntlProvider locale={LANGUAGE}>
+            <ThemeProvider theme={theme[LOCALE]}>
+              <ConnectedRouter history={history}>
+                <div>
+                  <Route exact path="/" component={Home} />
+                  <Route exact path="/other" component={Other} />
+                </div>
+              </ConnectedRouter>
+            </ThemeProvider>
+          </IntlProvider>
+        </Provider>
+      </ApolloProvider>
+    )
+  }
 }

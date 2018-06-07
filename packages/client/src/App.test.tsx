@@ -203,36 +203,36 @@ const schemaString = `
   }
   `
 const schema = makeExecutableSchema({
-	typeDefs: schemaString
+  typeDefs: schemaString
 })
 
 addMockFunctionsToSchema({
-	schema,
-	mocks: {
-		Date: () => {
-			return new Date()
-		}
-	}
+  schema,
+  mocks: {
+    Date: () => {
+      return new Date()
+    }
+  }
 })
 
 const client = new ApolloClient({
-	cache: new InMemoryCache(),
-	link: new ApolloLink((operation) => {
-		return new Observable((observer) => {
-			const { query, operationName, variables } = operation
+  cache: new InMemoryCache(),
+  link: new ApolloLink(operation => {
+    return new Observable(observer => {
+      const { query, operationName, variables } = operation
 
-			graphql(schema, print(query), null, null, variables, operationName)
-				.then((result) => {
-					observer.next(result)
-					observer.complete()
-				})
-				.catch(observer.error.bind(observer))
-		})
-	})
+      graphql(schema, print(query), null, null, variables, operationName)
+        .then(result => {
+          observer.next(result)
+          observer.complete()
+        })
+        .catch(observer.error.bind(observer))
+    })
+  })
 })
 
 it('renders without crashing', () => {
-	const div = document.createElement('div')
-	ReactDOM.render(<App client={client} />, div)
-	ReactDOM.unmountComponentAtNode(div)
+  const div = document.createElement('div')
+  ReactDOM.render(<App client={client} />, div)
+  ReactDOM.unmountComponentAtNode(div)
 })
