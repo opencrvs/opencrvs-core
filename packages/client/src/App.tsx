@@ -7,17 +7,23 @@ import { ApolloProvider, Query } from 'react-apollo'
 import { resolve } from 'url'
 import gql from 'graphql-tag'
 import { Button } from '@opencrvs/components/lib/Button'
+import styled, { injectGlobal } from 'styled-components'
+import { globalStyles } from '@opencrvs/components/lib/common/global'
 import { theme } from '@opencrvs/components/lib/themes/theme'
 import './App.css'
 
 import logo from './logo.svg'
 import { store, history } from './store'
 import { Route } from 'react-router'
-import styled, { ThemeProvider } from 'styled-components'
+import { ThemeProvider } from 'styled-components'
 
 const GRAPHQL_URL = `${process.env.REACT_APP_API_GATEWAY_URL}`
 const LANGUAGE = `${process.env.REACT_APP_LANGUAGE}`
 const LOCALE = `${process.env.REACT_APP_LOCALE}`
+
+// Injecting global styles for @font-face and the body tag - used only once per application
+// tslint:disable-next-line
+injectGlobal`${globalStyles}`
 
 const foo = () => alert('sdf')
 
@@ -77,7 +83,8 @@ const Declarations = () => (
 )
 
 const StyledDeclarations = styled(Declarations)`
-  font-family: ${theme[LOCALE].regularFontFamily};
+  color: red;
+  text-decoration: underline;
 `
 
 const Home = () => (
