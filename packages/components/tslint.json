@@ -7,6 +7,8 @@
     ]
   },
   "rules": {
-    "member-access": false
+    "member-access": false,
+    "object-literal-sort-keys": false,
+    "no-default-export": true
   }
 }

@@ -1,4 +1,20 @@
-export const globalColors = {
+export interface IColors {
+  accent: string
+  accentGradientDark: string
+  accentGradientLight: string
+  background: string
+  disabled: string
+  error: string
+  headerGradientDark: string
+  headerGradientLight: string
+  primary: string
+  secondary: string
+  success: string
+  warning: string
+}
+
+
+export const colors: IColors = {
   accent: '#4CA1F2', // for links
   accentGradientDark: '#628FCC',
   accentGradientLight: '#7DC1EA',
