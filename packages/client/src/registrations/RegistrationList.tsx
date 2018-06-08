@@ -53,7 +53,6 @@ class RegistrationsListQuery extends React.Component<IRegistration, {}> {
 					return (
 						<p className={this.props.className}>
 							Mother's name: {data.listRegistrations[0].mother.name[0].givenName}
-							{this.props.children}
 						</p>
 					)
 				}}
