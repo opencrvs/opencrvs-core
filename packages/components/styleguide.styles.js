@@ -1,26 +1,26 @@
 // default theme for style guide website in JSS - editing this file has no effect on the OpenCRVS application styles
 require('dotenv').config()
 const {
-  OpenCRVSTheme
-} = require('./src/components/themes')
+  StyleGuideLocaleFonts
+} = require('./styleguide.fonts')
 
 const locale = process.env.REACT_APP_LOCALE || 'gb'
 
 const fontFaces = [{
-    fontFamily: OpenCRVSTheme[locale].lightFontFamily,
+    fontFamily: StyleGuideLocaleFonts[locale].lightFontFamily,
     fontStyle: 'normal',
     fontWeight: '300',
     src: `url('${process.env.REACT_APP_CDN}notosans-light-webfont-${process.env
 			.REACT_APP_LANGUAGE}.woff') format('woff')`
   },
   {
-    fontFamily: OpenCRVSTheme[locale].regularFontFamily,
+    fontFamily: StyleGuideLocaleFonts[locale].regularFontFamily,
     fontStyle: 'normal',
     src: `url('
       ${process.env.REACT_APP_CDN}notosans-regular-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff')`
   },
   {
-    fontFamily: OpenCRVSTheme[locale].boldFontFamily,
+    fontFamily: StyleGuideLocaleFonts[locale].boldFontFamily,
     fontStyle: 'normal',
     src: `url('
       ${process.env.REACT_APP_CDN}notosans-bold-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff')`
@@ -57,23 +57,23 @@ const theme = {
   },
   fontFamily: {
     base: '"' +
-      OpenCRVSTheme[locale].lightFontFamily +
+      StyleGuideLocaleFonts[locale].lightFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     bold: '"' +
-      OpenCRVSTheme[locale].boldFontFamily +
+      StyleGuideLocaleFonts[locale].boldFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     light: '"' +
-      OpenCRVSTheme[locale].lightFontFamily +
+      StyleGuideLocaleFonts[locale].lightFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     monospace: 'Consolas, "Liberation Mono", Menlo, monospace',
     regular: '"' +
-      OpenCRVSTheme[locale].regularFontFamily +
+      StyleGuideLocaleFonts[locale].regularFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif'
