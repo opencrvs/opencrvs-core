@@ -49,7 +49,6 @@ class RegistrationsListQuery extends React.Component<IRegistration, {}> {
 					if (error) {
 						return <p className={this.props.className}>Error :(</p>
 					}
-
 					return (
 						<p className={this.props.className}>
 							Mother's name: {data.listRegistrations[0].mother.name[0].givenName}
@@ -66,6 +65,5 @@ const styledRegistrations: StyledFunction<IRegistration & React.HTMLProps<HTMLIn
 )
 
 export const RegistrationList = styledRegistrations`
-  color: red;
   text-decoration: underline;
 `
