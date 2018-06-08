@@ -9,7 +9,7 @@ interface IRegistration {
 }
 
 class RegistrationsListQuery extends React.Component<IRegistration, {}> {
-  render() {
+	render() {
 		return (
 			<Query
 				query={gql`
