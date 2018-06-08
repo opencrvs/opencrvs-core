@@ -65,5 +65,5 @@ const styledRegistrations: StyledFunction<IRegistration & React.HTMLProps<HTMLIn
 )
 
 export const RegistrationList = styledRegistrations`
-  text-decoration: underline;
+text-decoration: underline;
 `
