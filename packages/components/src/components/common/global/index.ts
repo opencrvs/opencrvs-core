@@ -1,4 +1,4 @@
-import {globalColors} from './colors'
+import {colors} from './colors'
 import {LocaleThemes} from './LocaleThemes'
 
 const locale = process.env.REACT_APP_LOCALE
@@ -38,7 +38,7 @@ export const globalStyles = `
   }
 
   body {
-    background-color: ${globalColors.background};
+    background-color: ${colors.background};
     margin: 0;
     padding: 0;
     font-family: ${LocaleThemes[locale].lightFontFamily};
