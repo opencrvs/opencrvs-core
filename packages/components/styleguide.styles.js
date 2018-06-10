@@ -1,29 +1,33 @@
 // default theme for style guide website in JSS - editing this file has no effect on the OpenCRVS application styles
 require('dotenv').config()
-const {
-  StyleGuideLocaleFonts
-} = require('./styleguide.fonts')
+const { styleGuideLocaleFonts } = require('./styleguide.fonts')
 
 const locale = process.env.REACT_APP_LOCALE || 'gb'
 
-const fontFaces = [{
-    fontFamily: StyleGuideLocaleFonts[locale].lightFontFamily,
+const fontFaces = [
+  {
+    fontFamily: styleGuideLocaleFonts[locale].lightFontFamily,
     fontStyle: 'normal',
     fontWeight: '300',
-    src: `url('${process.env.REACT_APP_CDN}notosans-light-webfont-${process.env
-			.REACT_APP_LANGUAGE}.woff') format('woff')`
+    src: `url('${process.env.REACT_APP_CDN}notosans-light-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff')`
   },
   {
-    fontFamily: StyleGuideLocaleFonts[locale].regularFontFamily,
+    fontFamily: styleGuideLocaleFonts[locale].regularFontFamily,
     fontStyle: 'normal',
     src: `url('
-      ${process.env.REACT_APP_CDN}notosans-regular-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff')`
+      ${process.env.REACT_APP_CDN}notosans-regular-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff')`
   },
   {
-    fontFamily: StyleGuideLocaleFonts[locale].boldFontFamily,
+    fontFamily: styleGuideLocaleFonts[locale].boldFontFamily,
     fontStyle: 'normal',
     src: `url('
-      ${process.env.REACT_APP_CDN}notosans-bold-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff')`
+      ${process.env.REACT_APP_CDN}notosans-bold-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff')`
   }
 ]
 
@@ -56,24 +60,28 @@ const theme = {
     type: colors.secondary
   },
   fontFamily: {
-    base: '"' +
-      StyleGuideLocaleFonts[locale].lightFontFamily +
+    base:
+      '"' +
+      styleGuideLocaleFonts[locale].lightFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
-    bold: '"' +
-      StyleGuideLocaleFonts[locale].boldFontFamily +
+    bold:
+      '"' +
+      styleGuideLocaleFonts[locale].boldFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
-    light: '"' +
-      StyleGuideLocaleFonts[locale].lightFontFamily +
+    light:
+      '"' +
+      styleGuideLocaleFonts[locale].lightFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     monospace: 'Consolas, "Liberation Mono", Menlo, monospace',
-    regular: '"' +
-      StyleGuideLocaleFonts[locale].regularFontFamily +
+    regular:
+      '"' +
+      styleGuideLocaleFonts[locale].regularFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif'
@@ -94,8 +102,9 @@ const theme = {
 }
 
 const rhythm = (value = 1, unit = 'rem', basis = 1.5) =>
-  Array.isArray(value) ? value.map((v) => `${basis * v}${unit}`).join(' ') :
-  `${basis * value}${unit}`
+  Array.isArray(value)
+    ? value.map(v => `${basis * v}${unit}`).join(' ')
+    : `${basis * value}${unit}`
 
 const styles = {
   ComponentsList: {
@@ -221,9 +230,7 @@ const styles = {
   Logo: {
     logo: {
       color: `${colors.light} !important`
-
     }
-
   },
   Table: {
     table: {
