@@ -51,7 +51,8 @@ class RegistrationsListQuery extends React.Component<IRegistration, {}> {
           }
           return (
             <p className={this.props.className}>
-              Mother's name: {data.listRegistrations[0].mother.name[0].givenName}
+              Mother's name:{' '}
+              {data.listRegistrations[0].mother.name[0].givenName}
             </p>
           )
         }}
@@ -60,9 +61,9 @@ class RegistrationsListQuery extends React.Component<IRegistration, {}> {
   }
 }
 
-const styledRegistrations: StyledFunction<IRegistration & React.HTMLProps<HTMLInputElement>> = styled(
-  RegistrationsListQuery
-)
+const styledRegistrations: StyledFunction<
+  IRegistration & React.HTMLProps<HTMLInputElement>
+> = styled(RegistrationsListQuery)
 
 export const RegistrationList = styledRegistrations`
 text-decoration: underline;
