@@ -11,8 +11,8 @@ export interface IGrid {
   minWidth: number
 }
 
-export const grid:IGrid = {
-  breakpoints:{
+export const grid: IGrid = {
+  breakpoints: {
     xs: 0,
     sm: 360,
     md: 600,
@@ -33,7 +33,7 @@ export interface IHeight {
   formElement: number
 }
 
-export const heights:IHeight = {
+export const heights: IHeight = {
   header: 80,
   menu: 48,
   accordionClosed: 96,
@@ -46,6 +46,6 @@ export interface IWidth {
   mobileMenu: number
 }
 
-export const widths:IWidth = {
+export const widths: IWidth = {
   mobileMenu: 200
 }

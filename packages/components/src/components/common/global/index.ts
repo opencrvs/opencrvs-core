@@ -1,5 +1,5 @@
-import {colors} from './colors'
-import {LocaleThemes} from './LocaleThemes'
+import { colors } from './colors'
+import { LocaleThemes } from './LocaleThemes'
 
 const locale = process.env.REACT_APP_LOCALE
   ? process.env.REACT_APP_LOCALE
@@ -15,20 +15,26 @@ export const globalStyles = `
 
   @font-face {
     font-family: ${LocaleThemes[locale].lightFontFamily};
-    src: url('/fonts/notosans-light-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff');
+    src: url('/fonts/notosans-light-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff');
     font-weight: 300;
     font-style: normal;
   }
 
   @font-face {
     font-family: ${LocaleThemes[locale].regularFontFamily};
-    src: url('/fonts/notosans-regular-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff');
+    src: url('/fonts/notosans-regular-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff');
     font-style: normal;
   }
 
   @font-face {
     font-family: ${LocaleThemes[locale].boldFontFamily};
-    src: url('/fonts/notosans-bold-webfont-${process.env.REACT_APP_LANGUAGE}.woff') format('woff');
+    src: url('/fonts/notosans-bold-webfont-${
+      process.env.REACT_APP_LANGUAGE
+    }.woff') format('woff');
     font-style: normal;
   }
 
