@@ -1,4 +1,4 @@
-export const globalColors = {
+export const Colors = {
   accent: '#4CA1F2', // for links
   accentGradientDark: '#628FCC',
   accentGradientLight: '#7DC1EA',

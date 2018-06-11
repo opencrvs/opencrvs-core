@@ -1,5 +1,6 @@
-import {globalColors} from './colors'
-import {LocaleThemes} from './LocaleThemes'
+
+import { Colors } from '@opencrvs/components/lib/Colors'
+import { LocaleThemes } from '@opencrvs/components/lib/LocaleThemes'
 
 const locale = process.env.REACT_APP_LOCALE
   ? process.env.REACT_APP_LOCALE
@@ -38,7 +39,7 @@ export const globalStyles = `
   }
 
   body {
-    background-color: ${globalColors.background};
+    background-color: ${Colors.background};
     margin: 0;
     padding: 0;
     font-family: ${LocaleThemes[locale].lightFontFamily};
