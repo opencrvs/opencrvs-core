@@ -5,23 +5,17 @@ import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import { injectGlobal } from 'styled-components'
-import { globalStyles } from '@opencrvs/components/lib/common/global'
-import { LocaleThemes } from '@opencrvs/components/lib/common/global/LocaleThemes'
-import { Page } from '@opencrvs/components/lib/common/Page'
-import { Header } from '@opencrvs/components/lib/common/Header'
-import { FlexWrapper } from '@opencrvs/components/lib/common/Flex'
-import { Main } from '@opencrvs/components/lib/common/Main'
-import { Nav } from '@opencrvs/components/lib/common/Nav'
+import { LocaleThemes } from '@opencrvs/components/lib/LocaleThemes'
+import { Page } from './common/Page'
+import { Header } from '@opencrvs/components/lib/Header'
+import { Wrapper } from './common/Wrapper'
+import { Main } from './common/Main'
+import { Nav } from '@opencrvs/components/lib/Nav'
 import { store, history } from './store'
 import { Route } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 import { RegistrationList } from './registrations/RegistrationList'
 import { config } from './config'
-
-// Injecting global styles for @font-face and the body tag - used only once
-// tslint:disable-next-line
-injectGlobal`${globalStyles}`
 
 const messages = defineMessages({
   welcome: {
@@ -38,23 +32,21 @@ const Title = injectIntl(({ intl }) => (
 const Home = () => (
   <div>
     <Header>
-      <FlexWrapper>
+      <Wrapper>
         <Nav>
           <Title />
         </Nav>
-<<<<<<< HEAD
-        </FlexWrapper>
-=======
-      </FlexWrapper>
->>>>>>> 0ef5bbc12bc670eb7a7f958afe90a0a71b8cf400
+      </Wrapper>
     </Header>
     <Main>
+      <Wrapper>
       <p>
         To get started, edit
         <code>src/App.tsx</code>
         and save to reload.
       </p>
       <RegistrationList />
+      </Wrapper>
     </Main>
   </div>
 )
@@ -65,11 +57,7 @@ const Other = () => (
 )
 
 const client = new ApolloClient({
-<<<<<<< HEAD
-  uri: resolve(GRAPHQL_URL, 'graphql')
-=======
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
->>>>>>> 0ef5bbc12bc670eb7a7f958afe90a0a71b8cf400
 })
 export class App extends React.Component<
   {
@@ -81,13 +69,8 @@ export class App extends React.Component<
     return (
       <ApolloProvider client={this.props.client || client}>
         <Provider store={store}>
-<<<<<<< HEAD
-          <IntlProvider locale={LANGUAGE}>
-            <ThemeProvider theme={LocaleThemes[LOCALE]}>
-=======
           <IntlProvider locale={config.LANGUAGE}>
             <ThemeProvider theme={LocaleThemes[config.LOCALE]}>
->>>>>>> 0ef5bbc12bc670eb7a7f958afe90a0a71b8cf400
               <ConnectedRouter history={history}>
                 <Page>
                   <Route exact path="/" component={Home} />

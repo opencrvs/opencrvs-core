@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ThemeProvider } from 'styled-components'
-import { LocaleThemes } from './common/global/LocaleThemes'
+import { LocaleThemes } from './LocaleThemes'
 const locale = process.env.REACT_APP_LOCALE
   ? process.env.REACT_APP_LOCALE
   : 'gb'
