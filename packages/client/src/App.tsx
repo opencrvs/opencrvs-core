@@ -11,6 +11,7 @@ import { Header } from '@opencrvs/components/lib/Header'
 import { Wrapper } from './common/Wrapper'
 import { Main } from './common/Main'
 import { Nav } from '@opencrvs/components/lib/Nav'
+import { Box } from '@opencrvs/components/lib/Box'
 import { store, history } from './store'
 import { Route } from 'react-router'
 import { ThemeProvider } from 'styled-components'
@@ -39,14 +40,14 @@ const Home = () => (
       </Wrapper>
     </Header>
     <Main>
-      <Wrapper>
+      <Box id="loginBox" columns={6}>
       <p>
         To get started, edit
         <code>src/App.tsx</code>
         and save to reload.
       </p>
       <RegistrationList />
-      </Wrapper>
+      </Box>
     </Main>
   </div>
 )

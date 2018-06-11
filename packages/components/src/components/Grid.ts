@@ -9,6 +9,7 @@ export interface IGrid {
   gutter: number
   mobileGutter: number
   minWidth: number
+  margin: number
 }
 
 export const Grid: IGrid = {
@@ -21,5 +22,6 @@ export const Grid: IGrid = {
   columns: 12,
   gutter: 12,
   mobileGutter: 8,
-  minWidth: 320
+  minWidth: 320,
+  margin: 20
 }
