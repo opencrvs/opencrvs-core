@@ -13,7 +13,6 @@ export interface IColors {
   warning: string
 }
 
-
 export const colors: IColors = {
   accent: '#4CA1F2', // for links
   accentGradientDark: '#628FCC',

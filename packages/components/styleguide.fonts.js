@@ -19,5 +19,5 @@ const fonts = {
 }
 
 module.exports = {
-  StyleGuideLocaleFonts: fonts
+  styleGuideLocaleFonts: fonts
 }
