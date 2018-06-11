@@ -5,7 +5,7 @@ import { Fonts } from '@opencrvs/components/lib/Fonts'
 
 // STYLED-COMPONENTS REQUIRE @font-face TO BE INJECTED.
 // DO NOT APPLY FURTHER STYLES TO OPENCRVS IN THIS FILE.
-// WE USE injectBodyStyle SUPPORT MULTIPLE LARGE LANUGAGE
+// WE USE injectBodyStyle SUPPORT MULTIPLE LARGE LANGUAGE
 // FONTS PER LOCALE e.g. ARABIC, BENGALI, MANDARIN ...
 
 export const injectBodyStyle = `
@@ -20,7 +20,7 @@ export const injectBodyStyle = `
   @font-face {
     font-family: ${LocaleThemes[config.LOCALE].lightFontFamily};
     src: url('/fonts/notosans-light-webfont-${
-      process.env.REACT_APP_LANGUAGE
+      config.LANGUAGE
     }.woff') format('woff');
     font-weight: 300;
     font-style: normal;
@@ -29,7 +29,7 @@ export const injectBodyStyle = `
   @font-face {
     font-family: ${LocaleThemes[config.LOCALE].regularFontFamily};
     src: url('/fonts/notosans-regular-webfont-${
-      process.env.REACT_APP_LANGUAGE
+      config.LANGUAGE
     }.woff') format('woff');
     font-style: normal;
   }
@@ -37,7 +37,7 @@ export const injectBodyStyle = `
   @font-face {
     font-family: ${LocaleThemes[config.LOCALE].boldFontFamily};
     src: url('/fonts/notosans-bold-webfont-${
-      process.env.REACT_APP_LANGUAGE
+      config.LANGUAGE
     }.woff') format('woff');
     font-style: normal;
   }
