@@ -12,7 +12,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "postinstall": "yarn build",
-    "start": "concurrently 'styleguidist server' 'tsc -w'",
+    "start": "concurrently 'styleguidist server' 'tsc -w' 'opener http://localhost:6060/'",
     "build": "styleguidist build && tsc",
     "docker-build": "docker build -t components .",
     "docker-run": "docker run -it --rm -p 5000:5000 --name components components"
@@ -32,6 +32,7 @@
     "concurrently": "^3.5.1",
     "dotenv": "^5.0.1",
     "lint-staged": "^7.1.0",
+    "opener": "^1.4.3",
     "prettier": "^1.12.1",
     "react-scripts-ts": "^2.16.0",
     "typescript": "^2.8.3"
