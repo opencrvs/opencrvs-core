@@ -17,6 +17,7 @@ import { Route } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 import { RegistrationList } from './registrations/RegistrationList'
 import { config } from './config'
+import { MobileNumberForm } from './login/MobileNumberForm';
 
 const messages = defineMessages({
   welcome: {
@@ -46,6 +47,7 @@ const Home = () => (
         <code>src/App.tsx</code>
         and save to reload.
       </p>
+      <MobileNumberForm />
       <RegistrationList />
       </Box>
     </Main>

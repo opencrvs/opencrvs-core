@@ -7,6 +7,7 @@ export interface IColors {
   error: string
   headerGradientDark: string
   headerGradientLight: string
+  placeholder: string
   primary: string
   secondary: string
   success: string
@@ -23,6 +24,7 @@ export const Colors: IColors = {
   error: '#D77160',
   headerGradientDark: '#42506B',
   headerGradientLight: '#485F88',
+  placeholder: '#969696',
   primary: '#608FCC',
   secondary: '#35495D',
   success: '#49B78D',

@@ -51,7 +51,7 @@ export const injectBodyStyle = `
     margin: 0;
     padding: 0;
     background-color: ${Colors.background};
-    font-family: ${Fonts.lightFont}
+    ${Fonts.defaultFontStyle}
   }
 
 `
