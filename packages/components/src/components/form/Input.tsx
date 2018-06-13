@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
 import { Colors } from '../Colors'
 import { Fonts } from '../Fonts'
+import { Grid } from '../Grid'
 
 export interface IInput {
   id: string
@@ -14,9 +15,7 @@ export interface IInput {
   disabled: boolean
 }
 
-const styledInput: StyledFunction<
-IInput & React.HTMLProps<HTMLInputElement>
-> = styled.input
+const styledInput = styled.input.attrs<IInput>({})
 
 const StyledInput = styledInput`
   width: 100%;
@@ -32,7 +31,7 @@ const StyledInput = styledInput`
         : Colors.disabled};
   padding: 0 2px;
   outline: none;
-  font-size: 18px;
+  ${Fonts.defaultFontStyle}
   color: ${Colors.secondary};
   &:focus {
     border-bottom: solid 1px ${Colors.accent};

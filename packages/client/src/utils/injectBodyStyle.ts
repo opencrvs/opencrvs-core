@@ -14,7 +14,6 @@ export const injectBodyStyle = `
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: grayscale;
-    -webkit-text-stroke: 0.45px;
   }
 
   @font-face {
@@ -53,5 +52,19 @@ export const injectBodyStyle = `
     background-color: ${Colors.background};
     ${Fonts.defaultFontStyle}
   }
+
+  h1 {
+    ${Fonts.h1FontStyle}
+  }
+
+  h2 {
+    ${Fonts.h2FontStyle}
+  }
+
+  h3 {
+    ${Fonts.h3FontStyle}
+  }
+
+
 
 `

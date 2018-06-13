@@ -12,9 +12,7 @@ export interface IBox {
   width?: string
 }
 
-const styledWrapper: StyledFunction<
-IBox & React.HTMLProps<HTMLInputElement>
-> = styled.div
+const styledWrapper = styled.div.attrs<IBox>({})
 
 const Wrapper = styledWrapper`
   margin: auto;

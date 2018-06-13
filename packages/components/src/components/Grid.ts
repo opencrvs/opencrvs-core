@@ -1,3 +1,5 @@
+import * as React from 'react'
+import styled, { StyledComponentClass } from 'styled-components'
 export interface IGrid {
   breakpoints: {
     xs: number
@@ -25,3 +27,8 @@ export const Grid: IGrid = {
   minWidth: 320,
   margin: 20
 }
+
+export const FlexGrid = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+`

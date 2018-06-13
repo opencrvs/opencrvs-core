@@ -13,11 +13,12 @@ export interface IColors {
   success: string
   warning: string
   copy: string
+  hoverGradientDark: string
 }
 
 export const Colors: IColors = {
   accent: '#4CA1F2', // for links
-  accentGradientDark: '#628FCC',
+  accentGradientDark: '#629FCC',
   accentGradientLight: '#7DC1EA',
   background: '#F4F4F4',
   disabled: '#D2D2D2',
@@ -29,5 +30,6 @@ export const Colors: IColors = {
   secondary: '#35495D',
   success: '#49B78D',
   warning: '#EEB268',
-  copy: '#35495D'
+  copy: '#35495D',
+  hoverGradientDark: '#376fb7',
 }
