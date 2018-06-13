@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import styled from 'styled-components'
 
 const FormWrapper = styled.div`
@@ -31,6 +32,7 @@ export class MobileNumberForm extends React.Component {
             disabled={false}
             meta={meta}
           />
+          <Spinner />
           <ActionWrapper>
             <Button id="login-mobile-submit">Submit</Button>
           </ActionWrapper>

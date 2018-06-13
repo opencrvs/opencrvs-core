@@ -11,7 +11,7 @@ export interface IButton {
 
 const styledButton = styled.button.attrs<IButton>({})
 
-export const StyledButton = styledButton`
+const StyledButton = styledButton`
   width: auto;
   min-height: 44px;
   color: ${({ secondary }) => (secondary ? Colors.accent : '#FFFFFF')};
