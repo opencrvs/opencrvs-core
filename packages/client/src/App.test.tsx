@@ -53,6 +53,45 @@ const schemaString = `
     createdAt: Date
   }
 
+  type BirthRegistration {
+    id: ID!
+    registration: Registration
+    child: Person
+    mother: Person
+    father: Person
+    informant: Person
+    birthLocation: Location
+    birthRegistrationType: BirthRegType
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  input BirthRegistrationInput {
+    registration: RegistrationInput
+    child: PersonInput
+    mother: PersonInput
+    father: PersonInput
+    informant: PersonInput
+    birthLocation: LocationInput
+    birthRegistrationType: BirthRegType
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  enum BirthRegType {
+    SELF
+    STATELESS
+    REFUGEE
+    INFORMANT_ONLY
+    SINGLE_PARENT
+    TEST
+  }
+
+  enum CauseOfDeath {
+    NATURAL
+    ACCIDENT
+  }
+
   type ContactPoint {
     system: String
     value: String
@@ -66,6 +105,37 @@ const schemaString = `
   }
 
   scalar Date
+
+  type DeathRegistration {
+    id: ID!
+    registration: Registration
+    deceased: Person
+    mother: Person
+    father: Person
+    informant: Person
+    spouse: Person
+    deathLocation: Location
+    causeOfDeath: CauseOfDeath
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  input DeathRegistrationInput {
+    registration: RegistrationInput
+    deceased: PersonInput
+    mother: PersonInput
+    father: PersonInput
+    informant: PersonInput
+    spouse: PersonInput
+    deathLocation: LocationInput
+    causeOfDeath: CauseOfDeath
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  type Dummy {
+    dummy: String!
+  }
 
   type HumanName {
     use: String
@@ -109,12 +179,18 @@ const schemaString = `
   type Mutation {
     createNotification(details: NotificationInput!): Notification!
     voidNotification(id: ID!): Notification
-    createRegistration(details: RegistrationInput!): ID!
-    updateRegistration(id: ID!, details: RegistrationInput!): Registration!
-    markAsVerified(id: ID!): Registration
-    markAsRegistered(id: ID!): Registration
-    markAsCertified(id: ID!): Registration
-    markAsVoided(id: ID!, reason: String!): Registration
+    createBirthRegistration(details: BirthRegistrationInput!): ID!
+    updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): BirthRegistration!
+    markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration
+    markBirthAsRegistered(id: ID!, location: LocationInput): BirthRegistration
+    markBirthAsCertified(id: ID!, location: LocationInput): BirthRegistration
+    markBirthAsVoided(id: ID!, reason: String!, location: LocationInput): BirthRegistration
+    createDeathRegistration(details: DeathRegistrationInput!): ID!
+    updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): DeathRegistration!
+    markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration
+    markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration
+    markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration
+    markDeathAsVoided(id: ID!, reason: String!, location: LocationInput): DeathRegistration
   }
 
   type Notification {
@@ -147,6 +223,7 @@ const schemaString = `
     birthDate: String
     address: [Address]
     photo: Attachment
+    nationality: String
   }
 
   input PersonInput {
@@ -161,7 +238,8 @@ const schemaString = `
 
   type Query {
     listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
-    listRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Registration]
+    listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [BirthRegistration]
+    listDeathRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [BirthRegistration]
   }
 
   type Registration {
@@ -169,30 +247,27 @@ const schemaString = `
     trackingID: String
     registrationNumber: String
     paperFormID: String
-    status: RegStatus
-    child: Person
-    mother: Person
-    father: Person
-    informant: Person
+    bookId: ID
+    status: [RegWorkflow]
+    type: RegistrationType
     attachments: [Attachment]
     location: Location
-    createdAt: Date
-    updatedAt: Date
   }
 
   input RegistrationInput {
     trackingID: String
     registrationNumber: String
     paperFormID: String
-    status: RegStatus
-    child: PersonInput
-    mother: PersonInput
-    father: PersonInput
-    informant: PersonInput
+    bookId: ID
+    status: [RegWorkflowInput]
+    type: RegistrationType
     attachments: [AttachmentInput]
     location: LocationInput
-    createdAt: Date
-    updatedAt: Date
+  }
+
+  enum RegistrationType {
+    BIRTH
+    DEATH
   }
 
   enum RegStatus {
@@ -200,6 +275,61 @@ const schemaString = `
     VERIFIED
     REGISTERED
     CERTIFIED
+  }
+
+  type RegWorkflow {
+    id: ID!
+    type: RegStatus
+    user: User
+    timestamp: Date
+    location: Location
+  }
+
+  input RegWorkflowInput {
+    type: RegStatus
+    user: UserInput
+    timestamp: Date
+    location: LocationInput
+  }
+
+  type User {
+    id: ID!
+    userName: String
+    created: Date
+    lastLoggedIn: Date
+    firstName: String
+    lastName: String
+    email: String
+    telecom: [ContactPoint]
+    role: [UserRole]!
+    address: Address
+    primaryOffice: Location
+    currentLocation: Location
+    catchmentArea: [Location]
+  }
+
+  input UserInput {
+    userName: String
+    created: Date
+    lastLoggedIn: Date
+    firstName: String
+    lastName: String
+    email: String
+    telecom: [ContactPointInput]
+    role: [UserRoleInput]!
+    address: AddressInput
+    primaryOffice: LocationInput
+    currentLocation: LocationInput
+    catchmentArea: [LocationInput]
+  }
+
+  type UserRole {
+    id: ID!
+    type: String
+  }
+
+  input UserRoleInput {
+    type: String
   }
   `
 const schema = makeExecutableSchema({

@@ -31,7 +31,7 @@ const Declarations = () => (
   <Query
     query={gql`
       {
-        listRegistrations(status: "declared") {
+        listBirthRegistrations(status: "declared") {
           id
           mother {
             gender
@@ -69,7 +69,8 @@ const Declarations = () => (
 
       return (
         <p>
-          Mother's name: {data.listRegistrations[0].mother.name[0].givenName}
+          Mother's name:{' '}
+          {data.listBirthRegistrations[0].mother.name[0].givenName}
         </p>
       )
     }}
