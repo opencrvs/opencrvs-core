@@ -5,7 +5,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import { LocaleThemes } from '@opencrvs/components/lib/LocaleThemes'
+import { localeThemes } from '@opencrvs/components/lib/localeThemes'
 import { Page } from './common/Page'
 import { Header } from '@opencrvs/components/lib/Header'
 import { Wrapper } from './common/Wrapper'
@@ -73,7 +73,7 @@ export class App extends React.Component<
       <ApolloProvider client={this.props.client || client}>
         <Provider store={store}>
           <IntlProvider locale={config.LANGUAGE}>
-            <ThemeProvider theme={LocaleThemes[config.LOCALE]}>
+            <ThemeProvider theme={localeThemes[config.LOCALE]}>
               <ConnectedRouter history={history}>
                 <Page>
                   <Route exact path="/" component={Home} />

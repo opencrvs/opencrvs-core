@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
-import { Colors } from '../Colors'
-import { Fonts } from '../Fonts'
+import { colors } from '../colors'
+import { fonts } from '../fonts'
 
 export interface IInputError {
   id: string
@@ -12,8 +12,8 @@ const InputErrorWrapper = styled.div`
   min-height: 18px;
   width: 100%;
   display: inline-block;
-  ${Fonts.infoFontStyle}
-  color: ${Colors.error};
+  ${fonts.infoFontStyle}
+  color: ${colors.error};
 `
 
 export class InputError extends React.Component<IInputError> {

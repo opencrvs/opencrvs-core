@@ -1,6 +1,6 @@
 // Use alpha-2 country codes
 
-export const LocaleThemes = {
+export const localeThemes = {
   bd: {
     boldFontFamily: 'noto_sans_bengalibold',
     lightFontFamily: 'noto_sans_bengalilight',

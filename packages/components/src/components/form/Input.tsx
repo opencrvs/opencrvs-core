@@ -1,8 +1,7 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
-import { Colors } from '../Colors'
-import { Fonts } from '../Fonts'
-import { Grid } from '../Grid'
+import { colors } from '../colors'
+import { fonts } from '../fonts'
 
 export interface IInput {
   id: string
@@ -27,26 +26,26 @@ const StyledInput = styledInput`
       props
     ) =>
       props.error && props.touched
-        ? Colors.error
-        : Colors.disabled};
+        ? colors.error
+        : colors.disabled};
   padding: 0 2px;
   outline: none;
-  ${Fonts.defaultFontStyle}
-  color: ${Colors.secondary};
+  ${fonts.defaultFontStyle}
+  color: ${colors.secondary};
   &:focus {
-    border-bottom: solid 1px ${Colors.accent};
+    border-bottom: solid 1px ${colors.accent};
   }
 
-  ${Fonts.defaultFontStyle} &::-webkit-input-placeholder {
-    color: ${Colors.placeholder};
+  ${fonts.defaultFontStyle} &::-webkit-input-placeholder {
+    color: ${colors.placeholder};
   }
 
   &::-moz-placeholder {
-    color: ${Colors.placeholder};
+    color: ${colors.placeholder};
   }
 
   &:-ms-input-placeholder {
-    color: ${Colors.placeholder};
+    color: ${colors.placeholder};
   }
 
   &::-webkit-outer-spin-button,

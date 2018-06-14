@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
-import { Colors } from './Colors'
+import { colors } from './colors'
 
 export interface ISpinner {
   baseColor?: string
@@ -14,11 +14,11 @@ const StyledSpinner = styledSpinner`
   width: 6em;
   height: 6em;
   border-radius: 50%;
-  background: ${Colors.accentGradientDark};
-  background: -moz-linear-gradient(left, ${Colors.accentGradientLight} 10%, ${Colors.accentGradientDark} 42%);
-  background: -webkit-linear-gradient(left, ${Colors.accentGradientLight} 10%, ${Colors.accentGradientDark} 42%);
-  background: -o-linear-gradient(left, ${Colors.accentGradientLight} 10%, ${Colors.accentGradientDark} 42%);
-  background: linear-gradient(to right, ${Colors.accentGradientLight} 10%, ${Colors.accentGradientDark} 42%);
+  background: ${colors.accentGradientDark};
+  background: -moz-linear-gradient(left, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
+  background: -webkit-linear-gradient(left, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
+  background: -o-linear-gradient(left, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
+  background: linear-gradient(to right, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
   position: relative;
   -webkit-animation: load3 0.8s infinite linear;
   animation: load3 0.8s infinite linear;

@@ -1,7 +1,7 @@
-import { LocaleThemes } from '@opencrvs/components/lib/LocaleThemes'
+import { localeThemes } from '@opencrvs/components/lib/localeThemes'
 import { config } from '../config'
-import { Colors } from '@opencrvs/components/lib/Colors'
-import { Fonts } from '@opencrvs/components/lib/Fonts'
+import { colors } from '@opencrvs/components/lib/colors'
+import { fonts } from '@opencrvs/components/lib/fonts'
 
 // STYLED-COMPONENTS REQUIRE @font-face TO BE INJECTED.
 // DO NOT APPLY FURTHER STYLES TO OPENCRVS IN THIS FILE.
@@ -17,7 +17,7 @@ export const injectBodyStyle = `
   }
 
   @font-face {
-    font-family: ${LocaleThemes[config.LOCALE].lightFontFamily};
+    font-family: ${localeThemes[config.LOCALE].lightFontFamily};
     src: url('/fonts/notosans-light-webfont-${
       config.LANGUAGE
     }.woff') format('woff');
@@ -26,7 +26,7 @@ export const injectBodyStyle = `
   }
 
   @font-face {
-    font-family: ${LocaleThemes[config.LOCALE].regularFontFamily};
+    font-family: ${localeThemes[config.LOCALE].regularFontFamily};
     src: url('/fonts/notosans-regular-webfont-${
       config.LANGUAGE
     }.woff') format('woff');
@@ -34,7 +34,7 @@ export const injectBodyStyle = `
   }
 
   @font-face {
-    font-family: ${LocaleThemes[config.LOCALE].boldFontFamily};
+    font-family: ${localeThemes[config.LOCALE].boldFontFamily};
     src: url('/fonts/notosans-bold-webfont-${
       config.LANGUAGE
     }.woff') format('woff');
@@ -49,20 +49,20 @@ export const injectBodyStyle = `
   body {
     margin: 0;
     padding: 0;
-    background-color: ${Colors.background};
-    ${Fonts.defaultFontStyle}
+    background-color: ${colors.background};
+    ${fonts.defaultFontStyle}
   }
 
   h1 {
-    ${Fonts.h1FontStyle}
+    ${fonts.h1FontStyle}
   }
 
   h2 {
-    ${Fonts.h2FontStyle}
+    ${fonts.h2FontStyle}
   }
 
   h3 {
-    ${Fonts.h3FontStyle}
+    ${fonts.h3FontStyle}
   }
 
 

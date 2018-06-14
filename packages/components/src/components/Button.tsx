@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
-import { Colors } from './Colors'
-import { Fonts } from './Fonts'
+import { colors } from './colors'
+import { fonts } from './fonts'
 
 export interface IButton {
   id: string
@@ -14,27 +14,27 @@ const styledButton = styled.button.attrs<IButton>({})
 const StyledButton = styledButton`
   width: auto;
   min-height: 44px;
-  color: ${({ secondary }) => (secondary ? Colors.accent : '#FFFFFF')};
-  background: ${({ secondary }) => (secondary ? '#FFFFFF' : Colors.primary)};
-  border: ${({ secondary }) => (secondary ? `2px solid ${Colors.accent}` : '#FFFFFF')};
+  color: ${({ secondary }) => (secondary ? colors.accent : '#FFFFFF')};
+  background: ${({ secondary }) => (secondary ? '#FFFFFF' : colors.primary)};
+  border: ${({ secondary }) => (secondary ? `2px solid ${colors.accent}` : '#FFFFFF')};
   border-radius: 2px;
-  ${Fonts.capsFontStyle}
+  ${fonts.capsFontStyle}
   cursor: pointer;
   padding: 4px 35px 0px 35px;
   &:hover {
-    background: linear-gradient(${Colors.hoverGradientDark}, ${Colors.primary});
+    background: linear-gradient(${colors.hoverGradientDark}, ${colors.primary});
     color: '#FFFFFF';
   }
 
   &:active {
-    color: ${Colors.accentGradientDark};
+    color: ${colors.accentGradientDark};
     outline: none;
   }
 
   &:disabled {
     background-color: '#FFFFFF';
     cursor: not-allowed;
-    color: ${Colors.disabled};
+    color: ${colors.disabled};
   }
 `
 export class Button extends React.Component<IButton> {

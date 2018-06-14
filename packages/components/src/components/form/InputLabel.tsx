@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
-import { Colors } from '../Colors'
-import { Fonts } from '../Fonts'
+import { colors } from '../colors'
+import { fonts } from '../fonts'
 
 export interface IInputLabel {
   disabled: boolean
@@ -13,8 +13,8 @@ const StyledInputLabel = styledInputLabel`
   min-height: 18px;
   width: 100%;
   display: inline-block;
-  ${Fonts.defaultFontStyle}
-  color: ${({ disabled }) => (disabled ? Colors.disabled : Colors.accent)};
+  ${fonts.defaultFontStyle}
+  color: ${({ disabled }) => (disabled ? colors.disabled : colors.accent)};
 `
 
 export class InputLabel extends React.Component<IInputLabel> {

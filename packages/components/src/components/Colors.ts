@@ -16,7 +16,7 @@ export interface IColors {
   hoverGradientDark: string
 }
 
-export const Colors: IColors = {
+export const colors: IColors = {
   accent: '#4CA1F2', // for links
   accentGradientDark: '#629FCC',
   accentGradientLight: '#7DC1EA',

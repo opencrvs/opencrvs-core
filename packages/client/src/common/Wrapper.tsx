@@ -1,7 +1,7 @@
 import styled from 'styled-components'
-import { Grid } from '@opencrvs/components/lib/Grid'
+import { grid } from '@opencrvs/components/lib/grid'
 
 export const Wrapper = styled.div`
   margin: auto;
-  max-width: ${Grid.breakpoints.lg}px;
+  max-width: ${grid.breakpoints.lg}px;
 `

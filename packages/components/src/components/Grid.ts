@@ -14,7 +14,7 @@ export interface IGrid {
   margin: number
 }
 
-export const Grid: IGrid = {
+export const grid: IGrid = {
   breakpoints: {
     xs: 0,
     sm: 360,

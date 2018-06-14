@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
-import { Grid } from './Grid'
+import { grid } from './grid'
 import { getPercentageWidthFromColumns } from './utils/grid'
 
 export interface IBox {
@@ -17,12 +17,12 @@ const styledWrapper = styled.div.attrs<IBox>({})
 const Wrapper = styledWrapper`
   margin: auto;
   width: ${({ width }) => (width ? width : `100%`)};
-  padding: 0px ${Grid.gutter}px 0px ${Grid.gutter}px;
-  margin: ${Grid.margin}px auto;
+  padding: 0px ${grid.gutter}px 0px ${grid.gutter}px;
+  margin: ${grid.margin}px auto;
   background: white;
-  max-width: ${Grid.breakpoints.lg}px;
+  max-width: ${grid.breakpoints.lg}px;
   box-shadow: 0 0 12px 0 rgba(0,0,0,0.11);
-  @media (max-width: ${Grid.breakpoints.lg}px) {
+  @media (max-width: ${grid.breakpoints.lg}px) {
     width: 98%;
     margin-left: 1%;
     margin-right: 1%;
@@ -32,12 +32,12 @@ const Wrapper = styledWrapper`
 export class Box extends React.Component<IBox> {
   render() {
     const { id, title, children, className, columns } = this.props
-    const requiredGridColumns:number = ( columns ? columns : Grid.columns)
+    const requiredgridColumns:number = ( columns ? columns : grid.columns)
     return (
       <Wrapper
         id={id}
         className={className}
-        width={getPercentageWidthFromColumns(requiredGridColumns, Grid.columns)}
+        width={getPercentageWidthFromColumns(requiredgridColumns, grid.columns)}
         >
         <h1>{title}</h1>
         {children}
