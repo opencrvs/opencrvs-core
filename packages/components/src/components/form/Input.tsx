@@ -12,6 +12,7 @@ export interface IInput {
   maxLength: number
   placeholder: string
   disabled: boolean
+  value?: string
 }
 
 const styledInput = styled.input.attrs<IInput>({})

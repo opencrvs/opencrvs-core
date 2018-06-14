@@ -16,16 +16,14 @@ const fontFaces = [
   {
     fontFamily: styleGuideLocaleFonts[locale].regularFontFamily,
     fontStyle: 'normal',
-    src: `url('
-      ${process.env.REACT_APP_CDN}notosans-regular-webfont-${
+    src: `url('${process.env.REACT_APP_CDN}notosans-regular-webfont-${
       process.env.REACT_APP_LANGUAGE
     }.woff') format('woff')`
   },
   {
     fontFamily: styleGuideLocaleFonts[locale].boldFontFamily,
     fontStyle: 'normal',
-    src: `url('
-      ${process.env.REACT_APP_CDN}notosans-bold-webfont-${
+    src: `url('${process.env.REACT_APP_CDN}notosans-bold-webfont-${
       process.env.REACT_APP_LANGUAGE
     }.woff') format('woff')`
   }

@@ -18,8 +18,8 @@ const ActionWrapper = styled.div`
 export class MobileNumberForm extends React.Component {
   render() {
     const meta = {
-      touched: true,
-      error: true
+      touched: false,
+      error: false
     }
     return (
       <FormWrapper>
@@ -32,7 +32,7 @@ export class MobileNumberForm extends React.Component {
             disabled={false}
             meta={meta}
           />
-          <Spinner />
+          <Spinner id="test-spinner"/>
           <ActionWrapper>
             <Button id="login-mobile-submit">Submit</Button>
           </ActionWrapper>

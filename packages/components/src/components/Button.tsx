@@ -7,6 +7,7 @@ export interface IButton {
   id: string
   secondary?: boolean
   children?: any
+  className?: string
 }
 
 const styledButton = styled.button.attrs<IButton>({})
@@ -16,14 +17,15 @@ const StyledButton = styledButton`
   min-height: 44px;
   color: ${({ secondary }) => (secondary ? colors.accent : '#FFFFFF')};
   background: ${({ secondary }) => (secondary ? '#FFFFFF' : colors.primary)};
-  border: ${({ secondary }) => (secondary ? `2px solid ${colors.accent}` : '#FFFFFF')};
+  border: ${({ secondary }) => (secondary ? `1px solid ${colors.accent}` : '#FFFFFF')};
   border-radius: 2px;
   ${fonts.capsFontStyle}
   cursor: pointer;
   padding: 4px 35px 0px 35px;
   &:hover {
     background: linear-gradient(${colors.hoverGradientDark}, ${colors.primary});
-    color: '#FFFFFF';
+    color: ${({ secondary }) => (secondary ? '#FFFFFF' : '#FFFFFF')};
+    border: ${({ secondary }) => (secondary ? '#FFFFFF' : '#FFFFFF')};
   }
 
   &:active {
@@ -39,9 +41,9 @@ const StyledButton = styledButton`
 `
 export class Button extends React.Component<IButton> {
   render() {
-    const { children } = this.props
+    const { children, secondary, id, className } = this.props
     return (
-      <StyledButton {...this.props}>
+      <StyledButton id={id} secondary={secondary} className={className}>
       {children}
       </StyledButton>
     )

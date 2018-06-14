@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
+import { fonts } from './fonts'
 import { grid } from './grid'
 import { getPercentageWidthFromColumns } from './utils/grid'
 
@@ -16,6 +17,7 @@ const styledWrapper = styled.div.attrs<IBox>({})
 
 const Wrapper = styledWrapper`
   margin: auto;
+  ${fonts.defaultFontStyle}
   width: ${({ width }) => (width ? width : `100%`)};
   padding: 0px ${grid.gutter}px 0px ${grid.gutter}px;
   margin: ${grid.margin}px auto;

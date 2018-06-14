@@ -8,6 +8,7 @@ export interface IInputField {
   id: string
   label: string
   type: string
+  value?: string
   placeholder?: string
   disabled: boolean
   meta: {
@@ -27,10 +28,12 @@ export class InputField extends React.Component<IInputField> {
       placeholder,
       disabled,
       meta,
+      value,
       errorMessage,
       maxLength = 50
     } = this.props
-
+    let defaultlabel: string
+    {disabled ? defaultlabel = '' : defaultlabel = label}
     return (
       <div>
         {label && <InputLabel disabled={disabled}>{label}</InputLabel>}
@@ -38,8 +41,9 @@ export class InputField extends React.Component<IInputField> {
           id={id}
           type={type}
           maxLength={maxLength}
-          placeholder={placeholder ? placeholder : label}
+          placeholder={placeholder ? placeholder : defaultlabel}
           error={meta.error}
+          value={value}
           touched={meta.touched}
           disabled={disabled}/>
           {meta.touched &&

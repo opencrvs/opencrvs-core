@@ -3,7 +3,10 @@ import styled, { StyledComponentClass } from 'styled-components'
 import { colors } from './colors'
 
 export interface ISpinner {
+  id: string
   baseColor?: string
+  children?: any
+  className?: string
 }
 
 const styledSpinner = styled.div.attrs<ISpinner>({})
@@ -20,8 +23,8 @@ const StyledSpinner = styledSpinner`
   background: -o-linear-gradient(left, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
   background: linear-gradient(to right, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
   position: relative;
-  -webkit-animation: load3 0.8s infinite linear;
-  animation: load3 0.8s infinite linear;
+  -webkit-animation: load3 0.4s infinite linear;
+  animation: load3 0.4s infinite linear;
   -webkit-transform: translateZ(0);
   -ms-transform: translateZ(0);
   transform: translateZ(0);
@@ -73,8 +76,9 @@ const StyledSpinner = styledSpinner`
 
 export class Spinner extends React.Component<ISpinner> {
   render() {
+    const { children, id, className, baseColor } = this.props
     return (
-      <StyledSpinner />
+      <StyledSpinner id={id} className={className} baseColor={baseColor}>{children}</StyledSpinner>
     )
   }
 }
