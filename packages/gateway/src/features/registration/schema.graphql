@@ -175,13 +175,13 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration!
   # process transitions
-  markBirthAsVerified(id: ID!, location: Location): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
-  markBirthAsRegistered(id: ID!, location: Location): BirthRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
-  markBirthAsCertified(id: ID!, location: Location): BirthRegistration # updates status to 'certified' - a printed certificate has been produced
+  markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markBirthAsRegistered(id: ID!, location: LocationInput): BirthRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markBirthAsCertified(id: ID!, location: LocationInput): BirthRegistration # updates status to 'certified' - a printed certificate has been produced
   markBirthAsVoided(
     id: ID!
     reason: String!
-    location: Location
+    location: LocationInput
   ): BirthRegistration # updated status to 'voided' - the registration was captured in error
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): ID!
@@ -190,12 +190,12 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration!
   # process transitions
-  markDeathAsVerified(id: ID!, location: Location): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
-  markDeathAsRegistered(id: ID!, location: Location): DeathRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
-  markDeathAsCertified(id: ID!, location: Location): DeathRegistration # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'certified' - a printed certificate has been produced
   markDeathAsVoided(
     id: ID!
     reason: String!
-    location: Location
+    location: LocationInput
   ): DeathRegistration # updated status to 'voided' - the registration was captured in error
 }

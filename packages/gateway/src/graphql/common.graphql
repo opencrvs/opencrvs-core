@@ -159,7 +159,7 @@ type User {
   firstName: String
   lastName: String
   email: String
-  telecom: [ContactPointInput]
+  telecom: [ContactPoint]
   role: [UserRole]!
   address: Address
   primaryOffice: Location
