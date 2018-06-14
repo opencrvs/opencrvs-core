@@ -25,10 +25,6 @@ type NotificationGroup {
   ): Notifications # notifications sent to the group
 }
 
-# type Notification {
-
-# }
-
 type Query {
   user(id: Int!): User
   role(id: Int!): [UserRole]
