@@ -31,7 +31,6 @@
     "@types/react-dom": "^16.0.5",
     "concurrently": "^3.5.1",
     "dotenv": "^5.0.1",
-    "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
     "react-scripts-ts": "^2.16.0",

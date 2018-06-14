@@ -1,12 +1,50 @@
 enum RegStatus {
-  DECLARED, VERIFIED, REGISTERED, CERTIFIED
+  DECLARED
+  VERIFIED
+  REGISTERED
+  CERTIFIED
+}
+
+enum BirthRegType {
+  SELF
+  STATELESS
+  REFUGEE
+  INFORMANT_ONLY
+  SINGLE_PARENT
+  TEST
+}
+
+enum RegistrationType {
+  BIRTH
+  DEATH
+}
+
+enum CauseOfDeath {
+  NATURAL
+  ACCIDENT
+}
+
+input RegWorkflowInput {
+  type: RegStatus
+  user: UserInput
+  timestamp: Date
+  location: LocationInput
 }
 
 type RegWorkflow {
+  id: ID!
   type: RegStatus
   user: User
   timestamp: Date
   location: Location
+}
+
+input CertificateInput {
+  paperId: ID!
+  reciever: PersonInput
+  location: LocationInput
+  User: UserInput
+  createdAt: Date
 }
 
 type Certificate {
@@ -18,39 +56,79 @@ type Certificate {
   createdAt: Date
 }
 
-input RegistrationInput {
-  trackingID: String # short uuid easy to remember
-  registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
-  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  bookId: ID
-  status: [RegWorkflow]
+input BirthRegistrationInput {
+  registration: RegistrationInput
   child: PersonInput
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  attachments: [AttachmentInput]
-  location: LocationInput
-  certificates: [Certificate]
+  birthLocation: LocationInput
+  birthRegistrationType: BirthRegType
   createdAt: Date
   updatedAt: Date
+}
+
+type BirthRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  child: Person
+  mother: Person
+  father: Person
+  informant: Person
+  birthLocation: Location
+  birthRegistrationType: BirthRegType
+  createdAt: Date
+  updatedAt: Date
+}
+
+input DeathRegistrationInput {
+  registration: RegistrationInput
+  deceased: PersonInput
+  mother: PersonInput
+  father: PersonInput
+  informant: PersonInput
+  spouse: PersonInput
+  deathLocation: LocationInput
+  causeOfDeath: CauseOfDeath
+  createdAt: Date
+  updatedAt: Date
+}
+
+type DeathRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  deceased: Person
+  mother: Person
+  father: Person
+  informant: Person
+  spouse: Person
+  deathLocation: Location
+  causeOfDeath: CauseOfDeath
+  createdAt: Date
+  updatedAt: Date
+}
+
+input RegistrationInput {
+  trackingID: String # short uuid easy to remember
+  registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
+  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
+  bookId: ID
+  status: [RegWorkflowInput]
+  type: RegistrationType
+  attachments: [AttachmentInput]
+  location: LocationInput
 }
 
 type Registration {
   id: ID! # long uuid
   trackingID: String # short uuid easy to remember
-  registrationNumber: String # BRN (Birth Registration Number) - Format to be decided
+  registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   paperFormID: String # assumption based on "Number of the application (5 digit) ???"
   bookId: ID
   status: [RegWorkflow]
-  child: Person
-  mother: Person
-  father: Person
-  informant: Person # TODO: CHange to related person so we can capture the relationship - https://www.hl7.org/fhir/relatedperson.html
-  registrationType: string # self | stateless | refugee
+  type: RegistrationType
   attachments: [Attachment]
   location: Location
-  createdAt: Date
-  updatedAt: Date
 }
 
 input AttachmentInput {
@@ -73,17 +151,51 @@ type Attachment {
 }
 
 type Query {
-  listRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Registration]
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
+  listDeathRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
 }
 
 type Mutation {
-  # Registration are the core entity. They can be created out of notifications and are updated as throughout the registration process
-  createRegistration(details: RegistrationInput!): ID!
-  updateRegistration(id: ID!, details: RegistrationInput!): Registration!
-
+  # BIRTH
+  createBirthRegistration(details: BirthRegistrationInput!): ID!
+  updateBirthRegistration(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): BirthRegistration!
   # process transitions
-  markAsVerified(id: ID!, location: Location): Registration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
-  markAsRegistered(id: ID!, location: Location)): Registration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
-  markAsCertified(id: ID!, location: Location)): Registration # updates status to 'certified' - a printed certificate has been produced
-  markAsVoided(id: ID!, reason: String!, location: Location): Registration # updated status to 'voided' - the registration was captured in error
+  markBirthAsVerified(id: ID!, location: Location): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markBirthAsRegistered(id: ID!, location: Location): BirthRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markBirthAsCertified(id: ID!, location: Location): BirthRegistration # updates status to 'certified' - a printed certificate has been produced
+  markBirthAsVoided(
+    id: ID!
+    reason: String!
+    location: Location
+  ): BirthRegistration # updated status to 'voided' - the registration was captured in error
+  # DEATH
+  createDeathRegistration(details: DeathRegistrationInput!): ID!
+  updateDeathRegistration(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): DeathRegistration!
+  # process transitions
+  markDeathAsVerified(id: ID!, location: Location): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markDeathAsRegistered(id: ID!, location: Location): DeathRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markDeathAsCertified(id: ID!, location: Location): DeathRegistration # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsVoided(
+    id: ID!
+    reason: String!
+    location: Location
+  ): DeathRegistration # updated status to 'voided' - the registration was captured in error
 }

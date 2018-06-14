@@ -9,7 +9,6 @@
     "@types/react-redux": "^6.0.0",
     "@types/react-router-redux": "^5.0.14",
     "history": "^4.7.2",
-    "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
@@ -24,8 +23,8 @@
     "precommit": "lint-staged",
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "docker-build": "docker build -t register .",
-    "docker-run": "docker run -it --rm -p 5000:5000 --name register register",
+    "docker:build": "docker build ../../ -f ./Dockerfile -t ocrvs-client",
+    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-client ocrvs-client",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
