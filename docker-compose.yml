@@ -13,7 +13,7 @@ services:
       replicas: 2
 
   gateway:
-    image: jembi/ocrvs-gateway:wip
+    image: jembi/ocrvs-gateway:latest
     build: packages/gateway
     restart: unless-stopped
     ports:
