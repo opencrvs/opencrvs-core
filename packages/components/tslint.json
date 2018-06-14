@@ -8,7 +8,6 @@
   },
   "rules": {
     "member-access": false,
-    "object-literal-sort-keys": false,
-    "no-default-export": true
+    "object-literal-sort-keys": false
   }
 }

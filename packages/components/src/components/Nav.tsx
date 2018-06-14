@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
-import { FlexGrid } from './Flex'
-import { Grid } from './Grid'
+import { FlexGrid, Grid } from './Grid'
 
 export const Nav = styled(FlexGrid)`
   flex-wrap: nowrap;

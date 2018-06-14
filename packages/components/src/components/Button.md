@@ -1,5 +1,5 @@
 React component example:
 
 ```js
-<Button onClick={() => alert("Hello")}>Hello</Button>
+<Button id="MyButton" onClick={() => alert("Hello")}>Hello</Button>
 ```
