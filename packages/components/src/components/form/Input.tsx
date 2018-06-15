@@ -1,7 +1,5 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
-import { colors } from '../colors'
-import { fonts } from '../fonts'
 
 export interface ICustomProps {
   error?: boolean
@@ -19,25 +17,26 @@ const StyledInput = styledInput`
   transition: border-color 500ms ease-out;
   border: 0px solid;
   border-bottom: solid 1px
-    ${props => (props.error && props.touched ? colors.error : colors.disabled)};
+    ${({ error, touched, theme }) =>
+      error && touched ? theme.colors.error : theme.colors.disabled};
   padding: 0 2px;
   outline: none;
-  ${fonts.defaultFontStyle}
-  color: ${colors.secondary};
+  ${({ theme }) => theme.fonts.defaultFontStyle};
+  color: ${({ theme }) => theme.colors.secondary};
   &:focus {
-    border-bottom: solid 1px ${colors.accent};
+    border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
   }
 
-  ${fonts.defaultFontStyle} &::-webkit-input-placeholder {
-    color: ${colors.placeholder};
+  &::-webkit-input-placeholder {
+    color: ${({ theme }) => theme.colors.placeholder};
   }
 
   &::-moz-placeholder {
-    color: ${colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholder};
   }
 
   &:-ms-input-placeholder {
-    color: ${colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholder};
   }
 
   &::-webkit-outer-spin-button,
