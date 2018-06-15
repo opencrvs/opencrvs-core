@@ -1,0 +1,54 @@
+{
+  "name": "@opencrvs/login",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@opencrvs/components": "^0.1.0",
+    "@types/history": "^4.6.2",
+    "@types/react-intl": "^2.3.8",
+    "@types/react-redux": "^6.0.0",
+    "@types/react-router-redux": "^5.0.14",
+    "history": "^4.7.2",
+    "lint-staged": "^7.1.0",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
+    "react-intl": "^2.4.0",
+    "react-redux": "^5.0.7",
+    "react-router": "^4.2.0",
+    "react-router-redux": "next",
+    "react-scripts-ts": "2.16.0",
+    "redux": "^4.0.0"
+  },
+  "scripts": {
+    "precommit": "lint-staged",
+    "start": "REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
+    "eject": "react-scripts-ts eject"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "git add"]
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.1.10",
+    "@types/enzyme-adapter-react-16": "^1.0.2",
+    "@types/jest": "^22.2.3",
+    "@types/node": "^10.0.8",
+    "@types/react": "^16.3.14",
+    "@types/react-dom": "^16.0.5",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "prettier": "^1.12.1",
+    "typescript": "^2.8.3"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!<rootDir>/node_modules/"
+    ]
+  },
+  "description": "The login application for OpenCRVS"
+}
