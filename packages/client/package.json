@@ -30,7 +30,7 @@
     "build": "react-scripts-ts build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-client -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-client ocrvs-client",
-    "test": "react-scripts-ts test --env=jsdom",
+    "test": "react-scripts-ts test --env=jsdom --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
