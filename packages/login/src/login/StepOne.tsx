@@ -15,7 +15,7 @@ const ActionWrapper = styled.div`
   position: absolute;
   right: 0px;
 `
-export class MobileNumberForm extends React.Component {
+export class StepOne extends React.Component {
   render() {
     const meta = {
       touched: false

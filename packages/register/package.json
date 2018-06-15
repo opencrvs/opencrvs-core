@@ -27,7 +27,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "start":
-      "PORT=3000 REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+      "PORT=3000 BROWSER=none REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "build": "react-scripts-ts build",
     "docker:build":
       "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
