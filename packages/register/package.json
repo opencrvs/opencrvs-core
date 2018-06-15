@@ -1,5 +1,5 @@
 {
-  "name": "@opencrvs/client",
+  "name": "@opencrvs/register",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -26,19 +26,19 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+    "start":
+      "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-client -t ocrvs-client",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-client ocrvs-client",
-    "test": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "test":
+      "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": [
-      "prettier --write",
-      "tslint",
-      "git add"
-    ]
+    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "git add"]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
