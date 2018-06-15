@@ -1,10 +1,9 @@
-
 import { grid } from './grid'
 import { localeThemes } from './localeThemes'
 
 const locale = process.env.REACT_APP_LOCALE
-? process.env.REACT_APP_LOCALE
-: 'gb'
+  ? process.env.REACT_APP_LOCALE
+  : 'gb'
 
 export interface IFonts {
   boldFont: string
