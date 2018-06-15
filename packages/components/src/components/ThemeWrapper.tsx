@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ThemeProvider } from 'styled-components'
-import { localeThemes } from './localeThemes'
+import { getTheme } from './theme'
 
 const locale = process.env.REACT_APP_LOCALE
   ? process.env.REACT_APP_LOCALE
@@ -9,7 +9,7 @@ const locale = process.env.REACT_APP_LOCALE
 export class ThemeWrapper extends React.Component {
   render() {
     return (
-      <ThemeProvider theme={localeThemes[locale]}>
+      <ThemeProvider theme={getTheme(locale)}>
         {this.props.children}
       </ThemeProvider>
     )
