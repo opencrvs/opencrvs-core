@@ -30,7 +30,7 @@
     "build": "react-scripts-ts build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-client -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-client ocrvs-client",
-    "test": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/",
+    "test": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
@@ -41,10 +41,14 @@
     ]
   },
   "devDependencies": {
+    "@types/enzyme": "^3.1.10",
+    "@types/enzyme-adapter-react-16": "^1.0.2",
     "@types/jest": "^22.2.3",
     "@types/node": "^10.0.8",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "prettier": "^1.12.1",
     "typescript": "^2.8.3"
   },

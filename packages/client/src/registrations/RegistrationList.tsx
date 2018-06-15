@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 import * as React from 'react'
-import styled, { StyledFunction } from 'styled-components'
+import styled from 'styled-components'
 import { Query } from 'react-apollo'
 
 interface IRegistration {
@@ -14,7 +14,7 @@ class RegistrationsListQuery extends React.Component<IRegistration, {}> {
       <Query
         query={gql`
           {
-            listRegistrations(status: "declared") {
+            listBirthRegistrations(status: "declared") {
               id
               mother {
                 gender
@@ -52,7 +52,7 @@ class RegistrationsListQuery extends React.Component<IRegistration, {}> {
           return (
             <p className={this.props.className}>
               Mother's name:{' '}
-              {data.listRegistrations[0].mother.name[0].givenName}
+              {data.listBirthRegistrations[0].mother.name[0].givenName}
             </p>
           )
         }}
@@ -61,10 +61,10 @@ class RegistrationsListQuery extends React.Component<IRegistration, {}> {
   }
 }
 
-const styledRegistrations: StyledFunction<
-  IRegistration & React.HTMLProps<HTMLInputElement>
-> = styled(RegistrationsListQuery)
+const styledRegistrations = styled(RegistrationsListQuery).attrs<IRegistration>(
+  {}
+)
 
 export const RegistrationList = styledRegistrations`
-text-decoration: underline;
+  text-decoration: underline;
 `

@@ -10,11 +10,13 @@ const statusMap = {
 
 export const resolvers = {
   Query: {
-    async listRegistrations(_: any, { locations, status }: any) {
+    async listBirthRegistrations(_: any, { locations, status }: any) {
       const res = await fetch(
         `${fhirUrl}/Composition?status=${statusMap[status]}`,
         {
-          headers: { 'Content-Type': 'application/fhir+json' }
+          headers: {
+            'Content-Type': 'application/fhir+json'
+          }
         }
       )
 
@@ -30,7 +32,9 @@ export const resolvers = {
                   const sectionResourceRes = await fetch(
                     `${fhirUrl}/${sectionEntry.reference}`,
                     {
-                      headers: { 'Content-Type': 'application/fhir+json' }
+                      headers: {
+                        'Content-Type': 'application/fhir+json'
+                      }
                     }
                   )
                   sectionEntry.resource = await sectionResourceRes.json()
@@ -45,13 +49,15 @@ export const resolvers = {
     }
   },
   Mutation: {
-    async createRegistration(_: any, { details }: any) {
+    async createBirthRegistration(_: any, { details }: any) {
       const doc: any = toFHIR(details)
 
       const res = await fetch(fhirUrl, {
         method: 'POST',
         body: JSON.stringify(doc),
-        headers: { 'Content-Type': 'application/fhir+json' }
+        headers: {
+          'Content-Type': 'application/fhir+json'
+        }
       })
 
       if (!res.ok) {
