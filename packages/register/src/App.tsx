@@ -5,19 +5,20 @@ import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import { localeThemes } from '@opencrvs/components/lib/localeThemes'
 import { Page } from './common/Page'
-import { Header } from '@opencrvs/components/lib/Header'
 import { Wrapper } from './common/Wrapper'
 import { Main } from './common/Main'
-import { Nav } from '@opencrvs/components/lib/Nav'
-import { Box } from '@opencrvs/components/lib/Box'
 import { store, history } from './store'
 import { Route } from 'react-router'
-import { ThemeProvider } from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { RegistrationList } from './registrations/RegistrationList'
 import { config } from './config'
 import { MobileNumberForm } from './login/MobileNumberForm'
+
+import { Header } from '@opencrvs/components/lib/Header'
+import { Nav } from '@opencrvs/components/lib/Nav'
+import { Box } from '@opencrvs/components/lib/Box'
+import { getTheme } from '@opencrvs/components/lib/theme'
 
 const messages = defineMessages({
   welcome: {
@@ -27,16 +28,58 @@ const messages = defineMessages({
   }
 })
 
-const Title = injectIntl(({ intl }) => (
-  <h1 className="App-title">{intl.formatMessage(messages.welcome)}</h1>
-))
+const Title = styled.h1`
+  ${({ theme }) => theme.fonts.h1FontStyle};
+`
 
-const Home = () => (
+const StyledPage = styled(Page)`
+  background-color: ${({ theme }) => theme.colors.background};
+  ${({ theme }) => theme.fonts.defaultFontStyle}
+
+  * {
+    box-sizing: border-box;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.lightFont};
+    src:
+      url('/fonts/notosans-light-webfont-${config.LANGUAGE}.woff')
+      format('woff');
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    src:
+      url('/fonts/notosans-regular-webfont-${config.LANGUAGE}.woff')
+      format('woff');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+    src:
+      url('/fonts/notosans-bold-webfont-${config.LANGUAGE}.woff')
+      format('woff');
+    font-style: normal;
+  }
+`
+
+const Home = injectIntl(({ intl }) => (
   <div>
     <Header>
       <Wrapper>
         <Nav>
-          <Title />
+          <Title>{intl.formatMessage(messages.welcome)}</Title>
         </Nav>
       </Wrapper>
     </Header>
@@ -52,11 +95,11 @@ const Home = () => (
       </Box>
     </Main>
   </div>
-)
+))
 
 const Other = () => (
   <div className="App">
-    <h1>page 2</h1>
+    <Title>page 2</Title>
   </div>
 )
 
@@ -74,12 +117,12 @@ export class App extends React.Component<IAppProps, {}> {
       <ApolloProvider client={this.props.client || client}>
         <Provider store={store}>
           <IntlProvider locale={config.LANGUAGE}>
-            <ThemeProvider theme={localeThemes[config.LOCALE]}>
+            <ThemeProvider theme={getTheme(config.LOCALE)}>
               <ConnectedRouter history={history}>
-                <Page>
+                <StyledPage>
                   <Route exact path="/" component={Home} />
                   <Route exact path="/other" component={Other} />
-                </Page>
+                </StyledPage>
               </ConnectedRouter>
             </ThemeProvider>
           </IntlProvider>

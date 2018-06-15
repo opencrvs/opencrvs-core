@@ -1,7 +1,7 @@
 import * as React from 'react'
-import styled, { StyledFunction } from 'styled-components'
-import { fonts } from './fonts'
-import { grid } from './grid'
+import styled, { StyledFunction, withTheme } from 'styled-components'
+
+import { IGrid } from './grid'
 import { getPercentageWidthFromColumns } from './utils/grid'
 
 export interface IBox {
@@ -17,30 +17,34 @@ const styledWrapper = styled.div.attrs<IBox>({})
 
 const Wrapper = styledWrapper`
   margin: auto;
-  ${fonts.defaultFontStyle}
+  ${({ theme }) => theme.fonts.defaultFontStyle}
   width: ${({ width }) => (width ? width : `100%`)};
-  padding: 0px ${grid.gutter}px 0px ${grid.gutter}px;
-  margin: ${grid.margin}px auto;
+  padding: 0px ${({ theme }) => theme.grid.gutter}px 0px ${({ theme }) =>
+  theme.grid.gutter}px;
+  margin: ${({ theme }) => theme.grid.margin}px auto;
   background: white;
-  max-width: ${grid.breakpoints.lg}px;
+  max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
   box-shadow: 0 0 12px 0 rgba(0,0,0,0.11);
-  @media (max-width: ${grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 98%;
     margin-left: 1%;
     margin-right: 1%;
   }
 `
 
-export class Box extends React.Component<IBox> {
+class Component extends React.Component<IBox & { theme: { grid: IGrid } }> {
   render() {
-    const { id, title, children, className, columns } = this.props
-    const requiredgridColumns:number = ( columns ? columns : grid.columns)
+    const { id, title, children, className, columns, theme } = this.props
+    const requiredGridColumns: number = columns ? columns : theme.grid.columns
     return (
       <Wrapper
         id={id}
         className={className}
-        width={getPercentageWidthFromColumns(requiredgridColumns, grid.columns)}
-        >
+        width={getPercentageWidthFromColumns(
+          requiredGridColumns,
+          theme.grid.columns
+        )}
+      >
         <h1>{title}</h1>
         {children}
       </Wrapper>
@@ -48,3 +52,4 @@ export class Box extends React.Component<IBox> {
   }
 }
 
+export const Box = withTheme(Component)

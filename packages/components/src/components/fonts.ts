@@ -1,9 +1,4 @@
 import { grid } from './grid'
-import { localeThemes } from './localeThemes'
-
-const locale = process.env.REACT_APP_LOCALE
-  ? process.env.REACT_APP_LOCALE
-  : 'gb'
 
 export interface IFonts {
   boldFont: string
@@ -18,32 +13,50 @@ export interface IFonts {
   h3FontStyle: string
 }
 
-export const fonts: IFonts = {
-  boldFont: localeThemes[locale].boldFontFamily,
-  lightFont: localeThemes[locale].lightFontFamily,
-  regularFont: localeThemes[locale].regularFontFamily,
-  defaultFontStyle: `font-family: ${localeThemes[locale].regularFontFamily};
+const localeFonts = {
+  bd: {
+    boldFontFamily: 'noto_sans_bengalibold',
+    lightFontFamily: 'noto_sans_bengalilight',
+    regularFontFamily: 'noto_sans_bengaliregular'
+  },
+  gb: {
+    boldFontFamily: 'noto_sansbold',
+    lightFontFamily: 'noto_sanslight',
+    regularFontFamily: 'noto_sansregular'
+  },
+  za: {
+    boldFontFamily: 'noto_sansbold',
+    lightFontFamily: 'noto_sanslight',
+    regularFontFamily: 'noto_sansregular'
+  }
+}
+
+export const fonts = (locale: string) => ({
+  boldFont: localeFonts[locale].boldFontFamily,
+  lightFont: localeFonts[locale].lightFontFamily,
+  regularFont: localeFonts[locale].regularFontFamily,
+  defaultFontStyle: `font-family: ${localeFonts[locale].regularFontFamily};
     font-weight: 300;
     font-size: 16px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 18px;
     }
     letter-spacing: 0.1px;`,
-  lightFontStyle: `font-family: ${localeThemes[locale].lightFontFamily};
+  lightFontStyle: `font-family: ${localeFonts[locale].lightFontFamily};
     font-weight: 300;
     font-size: 16px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 18px;
     }
     letter-spacing: 0.1px;`,
-  infoFontStyle: `font-family: ${localeThemes[locale].regularFontFamily};
+  infoFontStyle: `font-family: ${localeFonts[locale].regularFontFamily};
     font-weight: 300;
     font-size: 12px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 14px;
     }
     letter-spacing: 0.1px;`,
-  capsFontStyle: `font-family: ${localeThemes[locale].regularFontFamily};
+  capsFontStyle: `font-family: ${localeFonts[locale].regularFontFamily};
     font-weight: 300;
     font-size: 14px;
     @media (max-width: ${grid.breakpoints.lg}px) {
@@ -51,7 +64,7 @@ export const fonts: IFonts = {
     }
     letter-spacing: 2.5px;
     text-transform: uppercase;`,
-  h1FontStyle: `font-family: ${localeThemes[locale].lightFontFamily};
+  h1FontStyle: `font-family: ${localeFonts[locale].lightFontFamily};
     font-weight: 300;
     font-size: 30px;
     @media (max-width: ${grid.breakpoints.lg}px) {
@@ -59,7 +72,7 @@ export const fonts: IFonts = {
     }
     letter-spacing: 0.1px;
     text-transform: uppercase;`,
-  h2FontStyle: `font-family: ${localeThemes[locale].lightFontFamily};
+  h2FontStyle: `font-family: ${localeFonts[locale].lightFontFamily};
     font-weight: 300;
     font-size: 24px;
     @media (max-width: ${grid.breakpoints.lg}px) {
@@ -67,7 +80,7 @@ export const fonts: IFonts = {
     }
     letter-spacing: 0.1px;
     text-transform: uppercase;`,
-  h3FontStyle: `font-family: ${localeThemes[locale].lightFontFamily};
+  h3FontStyle: `font-family: ${localeFonts[locale].lightFontFamily};
     font-weight: 300;
     font-size: 20px;
     @media (max-width: ${grid.breakpoints.lg}px) {
@@ -75,4 +88,4 @@ export const fonts: IFonts = {
     }
     letter-spacing: 0.1px;
     text-transform: uppercase;`
-}
+})

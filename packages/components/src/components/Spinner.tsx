@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
-import { colors } from './colors'
 
 export interface ISpinner {
   id: string
@@ -17,11 +16,19 @@ const StyledSpinner = styledSpinner`
   width: 6em;
   height: 6em;
   border-radius: 50%;
-  background: ${colors.accentGradientDark};
-  background: -moz-linear-gradient(left, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
-  background: -webkit-linear-gradient(left, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
-  background: -o-linear-gradient(left, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
-  background: linear-gradient(to right, ${colors.accentGradientLight} 10%, ${colors.accentGradientDark} 42%);
+  background: ${({ theme }) => theme.colors.accentGradientDark};
+  background: -moz-linear-gradient(left, ${({ theme }) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  theme.colors.accentGradientDark} 42%);
+  background: -webkit-linear-gradient(left, ${({ theme }) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  theme.colors.accentGradientDark} 42%);
+  background: -o-linear-gradient(left, ${({ theme }) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  theme.colors.accentGradientDark} 42%);
+  background: linear-gradient(to right, ${({ theme }) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  theme.colors.accentGradientDark} 42%);
   position: relative;
   -webkit-animation: load3 0.4s infinite linear;
   animation: load3 0.4s infinite linear;
@@ -78,7 +85,9 @@ export class Spinner extends React.Component<ISpinner> {
   render() {
     const { children, id, className, baseColor } = this.props
     return (
-      <StyledSpinner id={id} className={className} baseColor={baseColor}>{children}</StyledSpinner>
+      <StyledSpinner id={id} className={className} baseColor={baseColor}>
+        {children}
+      </StyledSpinner>
     )
   }
 }
