@@ -1,7 +1,7 @@
 {
   "name": "@opencrvs/auth",
   "version": "1.0.0",
-  "description": "OpenCRVS authentiction service",
+  "description": "OpenCRVS authentication service",
   "main": "src/index.js",
   "license": "NONE",
   "private": true,
