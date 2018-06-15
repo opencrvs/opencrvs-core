@@ -1,0 +1,50 @@
+{
+  "name": "@opencrvs/auth",
+  "version": "1.0.0",
+  "description": "OpenCRVS authentiction service",
+  "main": "src/index.js",
+  "license": "NONE",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --exec ts-node -- src/index.ts",
+    "start:prod": "ts-node src/index.ts",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage",
+    "precommit": "lint-staged"
+  },
+  "dependencies": {
+    "@types/hapi": "^17.0.12",
+    "good": "^8.1.1",
+    "good-console": "^7.1.0",
+    "good-squeeze": "^5.1.0",
+    "hapi": "^17.5.1",
+    "typescript": "^2.9.2"
+  },
+  "devDependencies": {
+    "jest": "^23.1.0",
+    "nodemon": "^1.17.5",
+    "ts-jest": "^22.4.6",
+    "ts-node": "^6.1.1"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,graphql}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "testEnvironment": "node"
+  }
+}
