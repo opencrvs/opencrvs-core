@@ -31,7 +31,7 @@ const Declarations = () => (
   <Query
     query={gql`
       {
-        listRegistrations(status: "declared") {
+        listBirthRegistrations(status: "declared") {
           id
           mother {
             gender
@@ -69,7 +69,8 @@ const Declarations = () => (
 
       return (
         <p>
-          Mother's name: {data.listRegistrations[0].mother.name[0].givenName}
+          Mothers name:{' '}
+          {data.listBirthRegistrations[0].mother.name[0].givenName}
         </p>
       )
     }}
@@ -84,11 +85,14 @@ const Home = () => (
       <Button onClick={foo}>Hello</Button>
     </header>
     <p className="App-intro">
-      To get started, edit <code>src/App.tsx</code> and save to reload.
+      To get started, edit
+      <code>src/App.tsx</code>
+      and save to reload.
     </p>
     <Declarations />
   </div>
 )
+
 const Other = () => (
   <div className="App">
     <h1>page 2</h1>
@@ -98,12 +102,15 @@ const Other = () => (
 const GRAPHQL_URL = `${process.env.REACT_APP_API_GATEWAY_IP}:${
   process.env.REACT_APP_API_GATEWAY_PORT
 }/`
-
 const client = new ApolloClient({
   uri: resolve(GRAPHQL_URL, 'graphql')
 })
 
-export class App extends React.Component<{ client?: ApolloClient<{}> }, {}> {
+interface IAppProps {
+  client?: ApolloClient<{}>
+}
+
+export class App extends React.Component<IAppProps, {}> {
   public render() {
     return (
       <ApolloProvider client={this.props.client || client}>
