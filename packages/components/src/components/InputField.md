@@ -20,6 +20,7 @@ An Input Field with the custom and default HTML attributes:
   placeholder="e.g: +44-XXXX-XXXXXX"
   type="text"
   value="An input error"
+  onChange={() => {}}
   errorMessage="I think you made a mistake"
   meta={{
     touched: true,
