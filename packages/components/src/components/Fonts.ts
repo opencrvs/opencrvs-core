@@ -51,7 +51,7 @@ export const fonts: IFonts = {
       font-size: 16px;
     }
     letter-spacing: 2.5px;
-    text-transform: uppercase`,
+    text-transform: uppercase;`,
   h1FontStyle: `font-family: ${localeThemes[locale].lightFontFamily};
     font-weight: 300;
     font-size: 30px;
@@ -59,7 +59,7 @@ export const fonts: IFonts = {
       font-size: 32px;
     }
     letter-spacing: 0.1px;
-    text-transform: uppercase`,
+    text-transform: uppercase;`,
   h2FontStyle: `font-family: ${localeThemes[locale].lightFontFamily};
     font-weight: 300;
     font-size: 24px;
@@ -67,7 +67,7 @@ export const fonts: IFonts = {
       font-size: 26px;
     }
     letter-spacing: 0.1px;
-    text-transform: uppercase`,
+    text-transform: uppercase;`,
   h3FontStyle: `font-family: ${localeThemes[locale].lightFontFamily};
     font-weight: 300;
     font-size: 20px;
@@ -75,5 +75,5 @@ export const fonts: IFonts = {
       font-size: 22px;
     }
     letter-spacing: 0.1px;
-    text-transform: uppercase`
+    text-transform: uppercase;`
 }
