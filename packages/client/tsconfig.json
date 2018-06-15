@@ -33,6 +33,7 @@
     "acceptance-tests",
     "webpack",
     "jest",
+    "coverage",
     "src/setupTests.ts"
   ]
 }
