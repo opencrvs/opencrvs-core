@@ -27,14 +27,14 @@
   "scripts": {
     "precommit": "lint-staged",
     "start":
-      "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+      "PORT=3000 REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "build": "react-scripts-ts build",
     "docker:build":
       "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
     "docker:run":
       "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
     "test":
-      "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+      "PORT=3000 REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {

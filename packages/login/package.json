@@ -21,7 +21,8 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+    "start":
+      "PORT=3030 REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "build": "react-scripts-ts build",
     "docker:build":
       "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
