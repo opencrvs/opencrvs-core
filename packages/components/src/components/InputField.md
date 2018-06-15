@@ -7,8 +7,7 @@ An Input Field with the custom and default HTML attributes:
   placeholder="e.g: +44-XXXX-XXXXXX"
   type="text"
   meta={{
-    touched: false,
-    error: false
+    touched: false
   }}
 />
 ```
@@ -21,10 +20,9 @@ An Input Field with the custom and default HTML attributes:
   type="text"
   value="An input error"
   onChange={() => {}}
-  errorMessage="I think you made a mistake"
   meta={{
     touched: true,
-    error: true
+    error: "I think you made a mistake"
   }}
 />
 ```
@@ -36,8 +34,7 @@ An Input Field with the custom and default HTML attributes:
   type="text"
   disabled
   meta={{
-    touched: false,
-    error: false
+    touched: false
   }}
 />
 ```

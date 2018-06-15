@@ -1,58 +1,39 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
-import { Input } from './form/Input'
+import { IInputProps, Input } from './form/Input'
 import { InputError } from './form/InputError'
 import { InputLabel } from './form/InputLabel'
 
-export interface IInputField {
-  id: string
+export interface IInputFieldProps {
   label: string
-  type: string
-  value?: string
-  placeholder?: string
-  disabled: boolean
   meta: {
     touched: boolean
-    error: boolean
+    error?: string
   }
-  errorMessage?: string
   maxLength?: number
 }
 
-export class InputField extends React.Component<IInputField> {
+export class InputField extends React.Component<
+  IInputFieldProps & IInputProps
+> {
   render() {
-    const {
-      id,
-      label,
-      type,
-      placeholder,
-      disabled,
-      meta,
-      value,
-      errorMessage,
-      maxLength = 50
-    } = this.props
-    let defaultlabel: string
-    {disabled ? defaultlabel = '' : defaultlabel = label}
+    const { id, meta, disabled, label, placeholder, ...props } = this.props
+
+    const defaultLabel = disabled ? '' : label
+
     return (
       <div>
         {label && <InputLabel disabled={disabled}>{label}</InputLabel>}
         <Input
-          id={id}
-          type={type}
-          maxLength={maxLength}
-          placeholder={placeholder ? placeholder : defaultlabel}
-          error={meta.error}
-          value={value}
+          {...this.props}
+          placeholder={placeholder ? placeholder : defaultLabel}
+          error={Boolean(meta.error)}
           touched={meta.touched}
-          disabled={disabled}/>
-          {meta.touched &&
+        />
+        {meta.touched &&
           meta.error && (
-          <InputError
-            id={id + 'error'}
-            errorMessage={errorMessage}
-          />
-        )}
+            <InputError id={id + '_error'} errorMessage={meta.error} />
+          )}
       </div>
     )
   }

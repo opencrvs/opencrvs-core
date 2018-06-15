@@ -3,19 +3,15 @@ import styled, { StyledFunction } from 'styled-components'
 import { colors } from '../colors'
 import { fonts } from '../fonts'
 
-export interface IInput {
-  id: string
-  className?: string
+export interface ICustomProps {
   error?: boolean
   touched?: boolean
-  type: string
-  maxLength: number
-  placeholder: string
-  disabled: boolean
-  value?: string
 }
 
-const styledInput = styled.input.attrs<IInput>({})
+export type IInputProps = ICustomProps &
+  React.InputHTMLAttributes<HTMLInputElement>
+
+const styledInput = styled.input.attrs<IInputProps>({})
 
 const StyledInput = styledInput`
   width: 100%;
@@ -23,12 +19,7 @@ const StyledInput = styledInput`
   transition: border-color 500ms ease-out;
   border: 0px solid;
   border-bottom: solid 1px
-    ${(
-      props
-    ) =>
-      props.error && props.touched
-        ? colors.error
-        : colors.disabled};
+    ${props => (props.error && props.touched ? colors.error : colors.disabled)};
   padding: 0 2px;
   outline: none;
   ${fonts.defaultFontStyle}
@@ -61,11 +52,8 @@ const StyledInput = styledInput`
   }
 `
 
-export class Input extends React.Component<IInput> {
+export class Input extends React.Component<IInputProps> {
   render() {
-    return (
-      <StyledInput {...this.props} />
-    )
+    return <StyledInput {...this.props} />
   }
 }
-

@@ -3,9 +3,9 @@ import styled, { StyledFunction } from 'styled-components'
 import { colors } from '../colors'
 import { fonts } from '../fonts'
 
-export interface IInputLabel {
-  disabled: boolean
-}
+export type IInputLabel = { disabled?: boolean } & React.LabelHTMLAttributes<
+  HTMLLabelElement
+>
 
 const styledInputLabel = styled.label.attrs<IInputLabel>({})
 
@@ -19,8 +19,6 @@ const StyledInputLabel = styledInputLabel`
 
 export class InputLabel extends React.Component<IInputLabel> {
   render() {
-    return (
-      <StyledInputLabel {...this.props} />
-    )
+    return <StyledInputLabel {...this.props} />
   }
 }
