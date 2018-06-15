@@ -26,11 +26,11 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "REACT_APP_API_GATEWAY_IP=http://localhost REACT_APP_API_GATEWAY_PORT=7070 react-scripts-ts start",
+    "start": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "build": "react-scripts-ts build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-client -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-client ocrvs-client",
-    "test": "react-scripts-ts test --env=jsdom --coverage",
+    "test": "REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
@@ -51,5 +51,11 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "prettier": "^1.12.1",
     "typescript": "^2.8.3"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!<rootDir>/node_modules/"
+    ]
   }
 }

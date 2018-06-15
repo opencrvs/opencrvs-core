@@ -1,6 +1,6 @@
 // Use alpha-2 country codes
 
-const theme = {
+const fonts = {
   bd: {
     boldFontFamily: 'noto_sans_bengalibold',
     lightFontFamily: 'noto_sans_bengalilight',
@@ -19,5 +19,5 @@ const theme = {
 }
 
 module.exports = {
-  OpenCRVSTheme: theme
+  styleGuideLocaleFonts: fonts
 }

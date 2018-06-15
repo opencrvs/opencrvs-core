@@ -3,17 +3,22 @@ import { Provider } from 'react-redux'
 import { IntlProvider, injectIntl, defineMessages } from 'react-intl'
 import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
-import { ApolloProvider, Query } from 'react-apollo'
+import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import gql from 'graphql-tag'
-import { Button } from '@opencrvs/components/lib/Button'
-import './App.css'
-
-import logo from './logo.svg'
+import { Page } from './common/Page'
+import { Wrapper } from './common/Wrapper'
+import { Main } from './common/Main'
 import { store, history } from './store'
 import { Route } from 'react-router'
+import styled, { ThemeProvider } from 'styled-components'
+import { RegistrationList } from './registrations/RegistrationList'
+import { config } from './config'
+import { MobileNumberForm } from './login/MobileNumberForm'
 
-const foo = () => alert('sdf')
+import { Header } from '@opencrvs/components/lib/Header'
+import { Nav } from '@opencrvs/components/lib/Nav'
+import { Box } from '@opencrvs/components/lib/Box'
+import { getTheme } from '@opencrvs/components/lib/theme'
 
 const messages = defineMessages({
   welcome: {
@@ -23,87 +28,83 @@ const messages = defineMessages({
   }
 })
 
-const Title = injectIntl(({ intl }) => (
-  <h1 className="App-title">{intl.formatMessage(messages.welcome)}</h1>
-))
+const Title = styled.h1`
+  ${({ theme }) => theme.fonts.h1FontStyle};
+`
 
-const Declarations = () => (
-  <Query
-    query={gql`
-      {
-        listBirthRegistrations(status: "declared") {
-          id
-          mother {
-            gender
-            name {
-              givenName
-              familyName
-            }
-          }
-          father {
-            gender
-            name {
-              givenName
-              familyName
-            }
-          }
-          child {
-            gender
-            name {
-              givenName
-              familyName
-            }
-          }
-          createdAt
-        }
-      }
-    `}
-  >
-    {({ loading, error, data }) => {
-      if (loading) {
-        return <p>Loading...</p>
-      }
-      if (error) {
-        return <p>Error :(</p>
-      }
+const StyledPage = styled(Page)`
+  background-color: ${({ theme }) => theme.colors.background};
+  ${({ theme }) => theme.fonts.defaultFontStyle}
 
-      return (
+  * {
+    box-sizing: border-box;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.lightFont};
+    src:
+      url('/fonts/notosans-light-webfont-${config.LANGUAGE}.woff')
+      format('woff');
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    src:
+      url('/fonts/notosans-regular-webfont-${config.LANGUAGE}.woff')
+      format('woff');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+    src:
+      url('/fonts/notosans-bold-webfont-${config.LANGUAGE}.woff')
+      format('woff');
+    font-style: normal;
+  }
+`
+
+const Home = injectIntl(({ intl }) => (
+  <div>
+    <Header>
+      <Wrapper>
+        <Nav>
+          <Title>{intl.formatMessage(messages.welcome)}</Title>
+        </Nav>
+      </Wrapper>
+    </Header>
+    <Main>
+      <Box id="loginBox" columns={6}>
         <p>
-          Mothers name:{' '}
-          {data.listBirthRegistrations[0].mother.name[0].givenName}
+          To get started, edit
+          <code>src/App.tsx</code>
+          and save to reload.
         </p>
-      )
-    }}
-  </Query>
-)
-
-const Home = () => (
-  <div className="App">
-    <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <Title />
-      <Button onClick={foo}>Hello</Button>
-    </header>
-    <p className="App-intro">
-      To get started, edit
-      <code>src/App.tsx</code>
-      and save to reload.
-    </p>
-    <Declarations />
+        <MobileNumberForm />
+        <RegistrationList />
+      </Box>
+    </Main>
   </div>
-)
+))
 
 const Other = () => (
   <div className="App">
-    <h1>page 2</h1>
+    <Title>page 2</Title>
   </div>
 )
 
-const GRAPHQL_URL = `${process.env.REACT_APP_API_GATEWAY_IP}:${
-  process.env.REACT_APP_API_GATEWAY_PORT
-}/`
 const client = new ApolloClient({
-  uri: resolve(GRAPHQL_URL, 'graphql')
+  uri: resolve(config.API_GATEWAY_URL, 'graphql')
 })
 
 interface IAppProps {
@@ -115,13 +116,15 @@ export class App extends React.Component<IAppProps, {}> {
     return (
       <ApolloProvider client={this.props.client || client}>
         <Provider store={store}>
-          <IntlProvider locale="en">
-            <ConnectedRouter history={history}>
-              <div>
-                <Route exact path="/" component={Home} />
-                <Route exact path="/other" component={Other} />
-              </div>
-            </ConnectedRouter>
+          <IntlProvider locale={config.LANGUAGE}>
+            <ThemeProvider theme={getTheme(config.LOCALE)}>
+              <ConnectedRouter history={history}>
+                <StyledPage>
+                  <Route exact path="/" component={Home} />
+                  <Route exact path="/other" component={Other} />
+                </StyledPage>
+              </ConnectedRouter>
+            </ThemeProvider>
           </IntlProvider>
         </Provider>
       </ApolloProvider>
