@@ -69,7 +69,7 @@ const Declarations = () => (
 
       return (
         <p>
-          Mother's name:{' '}
+          Mothers name:{' '}
           {data.listBirthRegistrations[0].mother.name[0].givenName}
         </p>
       )

@@ -12,5 +12,5 @@ it('shows "Loading" text when data is loading', async () => {
 it(`shows mother's name text when data is loaded`, async () => {
   const app = createTestApp()
   await jest.clearAllTimers()
-  expect(app.text()).toMatch(/Mother's name/)
+  expect(app.text()).toMatch(/Mothers name/)
 })
