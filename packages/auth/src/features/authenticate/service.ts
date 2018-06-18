@@ -18,6 +18,7 @@ export async function authenticate(
   password: string
 ): Promise<IAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/authenticate')
+
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({ mobile, password })

@@ -1,14 +1,11 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import {
-  authenticate,
-  isUnauthorizedError
-} from 'src/features/authenticate/service'
+import { authenticate, isUnauthorizedError } from './service'
 import {
   generateVerificationCode,
   sendVerificationCode
 } from 'src/features/verifyCode/service'
-import { unauthorized, internal } from 'boom'
+import { unauthorized } from 'boom'
 
 interface IAuthPayload {
   mobile: string
