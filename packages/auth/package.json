@@ -17,6 +17,7 @@
     "@types/inert": "^5.1.1",
     "@types/joi": "^13.3.0",
     "@types/vision": "^5.3.4",
+    "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
@@ -31,6 +32,7 @@
     "hapi-swagger": "^9.1.1",
     "inert": "^5.1.0",
     "jest": "^23.1.0",
+    "jest-fetch-mock": "^1.6.5",
     "nodemon": "^1.17.5",
     "prettier": "^1.13.5",
     "ts-jest": "^22.4.6",
@@ -47,7 +49,13 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "modulePaths": [
+      "<rootDir>"
+    ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "setupFiles": [
+      "./setupJest.js"
+    ],
     "moduleFileExtensions": [
       "ts",
       "tsx",

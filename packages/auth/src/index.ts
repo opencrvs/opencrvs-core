@@ -11,7 +11,7 @@ import verifyCodeHandler, {
 } from './features/verifyCode/handler'
 import getPlugins from './config/plugins'
 
-const server = new Hapi.Server({
+export const server = new Hapi.Server({
   host: AUTH_HOST,
   port: AUTH_PORT,
   routes: {
