@@ -17,11 +17,13 @@
     "@types/inert": "^5.1.1",
     "@types/joi": "^13.3.0",
     "@types/vision": "^5.3.4",
+    "boom": "^7.2.0",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
     "joi": "^13.4.0",
+    "node-fetch": "^2.1.2",
     "typescript": "^2.9.2"
   },
   "devDependencies": {
