@@ -2,28 +2,15 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { IntlProvider, injectIntl } from 'react-intl'
 import { ConnectedRouter } from 'react-router-redux'
-import { Page } from './common/Page'
-import { Main } from './common/Main'
+import { Page } from '@opencrvs/components/lib/layout/Page'
+import { Content } from '@opencrvs/components/lib/layout/Content'
+import { Wrapper } from '@opencrvs/components/lib/layout/Wrapper'
 import { store, history } from './store'
 import { Route } from 'react-router'
 import styled, { ThemeProvider } from 'styled-components'
 import { config } from './config'
-import { StepOne } from './login/StepOne'
-import { Header } from '@opencrvs/components/lib/Header'
-import { Box } from '@opencrvs/components/lib/Box'
+import { StepOneContainer } from './login/StepOneContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
-
-/*const messages = defineMessages({
-  welcome: {
-    id: 'app.welcome',
-    defaultMessage: 'Welcome',
-    description: 'Test text'
-  }
-})
-
-const Title = styled.h1`
-  ${({ theme }) => theme.fonts.h1FontStyle};
-`*/
 
 const StyledPage = styled(Page)`
   background-color: ${({ theme }) => theme.colors.background};
@@ -68,15 +55,12 @@ const StyledPage = styled(Page)`
   }
 `
 
-const Home = injectIntl(({ intl }) => (
-  <div>
-    <Header />
-    <Main>
-      <Box id="loginBox" columns={6}>
-        <StepOne />
-      </Box>
-    </Main>
-  </div>
+const PageWrapper = injectIntl(({ intl }) => (
+  <Wrapper>
+    <Content>
+      <StepOneContainer />
+    </Content>
+  </Wrapper>
 ))
 
 export class App extends React.Component {
@@ -87,7 +71,7 @@ export class App extends React.Component {
           <ThemeProvider theme={getTheme(config.LOCALE)}>
             <ConnectedRouter history={history}>
               <StyledPage>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/" component={PageWrapper} />
               </StyledPage>
             </ConnectedRouter>
           </ThemeProvider>
