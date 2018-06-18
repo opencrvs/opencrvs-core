@@ -28,7 +28,8 @@
     "precommit": "lint-staged",
     "start":
       "PORT=3000 BROWSER=none REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "build": "yarn verify-build-config && react-scripts-ts build",
     "docker:build":
       "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
     "docker:run":
@@ -50,6 +51,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "prettier": "^1.12.1",
+    "ts-node": "^6.1.1",
     "typescript": "^2.8.3"
   },
   "jest": {
