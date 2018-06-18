@@ -1,4 +1,5 @@
 import * as Hapi from 'hapi'
+import * as redis from 'redis'
 
 import { AUTH_HOST, AUTH_PORT } from './constants'
 import authenticateHandler, {
@@ -11,83 +12,94 @@ import verifyCodeHandler, {
 } from './features/verifyCode/handler'
 import getPlugins from './config/plugins'
 
-export const server = new Hapi.Server({
-  host: AUTH_HOST,
-  port: AUTH_PORT,
-  routes: {
-    cors: { origin: ['*'] }
-  }
-})
+export async function createServer() {
+  let redisClient: redis.RedisClient
 
-async function init() {
+  const assignRedisClient = {
+    method: (request: Hapi.Request, h: Hapi.ResponseToolkit) => redisClient,
+    assign: 'redis'
+  }
+
+  const server = new Hapi.Server({
+    host: AUTH_HOST,
+    port: AUTH_PORT,
+    routes: {
+      cors: { origin: ['*'] }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{"mobile": "27845829934", "password": "test"}' http://localhost:4040/authenticate
+  server.route({
+    method: 'POST',
+    path: '/authenticate',
+    handler: authenticateHandler,
+    options: {
+      tags: ['api'],
+      description: 'Authenticate with username and password',
+      notes:
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication',
+      validate: {
+        payload: reqAuthSchema
+      },
+      pre: [assignRedisClient],
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            200: { description: 'User details are correct' },
+            400: { description: 'User details are incorrect' }
+          }
+        }
+      },
+      response: {
+        schema: resAuthSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{"code": "123456"}' http://localhost:4040/verifyCode
+  server.route({
+    method: 'POST',
+    path: '/verifyCode',
+    handler: verifyCodeHandler,
+    options: {
+      tags: ['api'],
+      description: 'Verify the 2 factor auth code',
+      notes:
+        'Verifies the 2 factor auth code and returns the JWT API token for future requests',
+      validate: {
+        payload: reqVerifySchema
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            200: { description: 'Code is valid' },
+            400: { description: 'Code is invalid' }
+          }
+        }
+      },
+      response: {
+        schema: resVerifySchema
+      }
+    }
+  })
+
   await server.register(getPlugins())
-}
 
-// curl -H 'Content-Type: application/json' -d '{"mobile": "27845829934", "password": "test"}' http://localhost:4040/authenticate
-server.route({
-  method: 'POST',
-  path: '/authenticate',
-  handler: authenticateHandler,
-  options: {
-    tags: ['api'],
-    description: 'Authenticate with username and password',
-    notes:
-      'Authenticates user and returns nonce to use for collating the login for 2 factor authentication',
-    validate: {
-      payload: reqAuthSchema
-    },
-    plugins: {
-      'hapi-swagger': {
-        responses: {
-          200: { description: 'User details are correct' },
-          400: { description: 'User details are incorrect' }
-        }
-      }
-    },
-    response: {
-      schema: resAuthSchema
-    }
+  async function stop() {
+    await server.stop()
+    redisClient.quit()
+    server.log('info', 'server stopped')
   }
-})
 
-// curl -H 'Content-Type: application/json' -d '{"code": "123456"}' http://localhost:4040/verifyCode
-server.route({
-  method: 'POST',
-  path: '/verifyCode',
-  handler: verifyCodeHandler,
-  options: {
-    tags: ['api'],
-    description: 'Verify the 2 factor auth code',
-    notes:
-      'Verifies the 2 factor auth code and returns the JWT API token for future requests',
-    validate: {
-      payload: reqVerifySchema
-    },
-    plugins: {
-      'hapi-swagger': {
-        responses: {
-          200: { description: 'Code is valid' },
-          400: { description: 'Code is invalid' }
-        }
-      }
-    },
-    response: {
-      schema: resVerifySchema
-    }
+  async function start() {
+    await server.start()
+    redisClient = redis.createClient()
+    server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
   }
-})
 
-export async function start() {
-  await init()
-  await server.start()
-  server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
-}
-
-export async function stop() {
-  await server.stop()
-  server.log('info', 'server stopped')
+  return { server, start, stop }
 }
 
 if (!module.parent) {
-  start()
+  createServer().then(server => server.start())
 }
