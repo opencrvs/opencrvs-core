@@ -25,10 +25,10 @@ const Wrapper = styledWrapper`
   background: white;
   max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
   box-shadow: 0 0 12px 0 rgba(0,0,0,0.11);
+  padding-top: 5px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 98%;
     margin-left: 1%;
-    margin-right: 1%;
   }
 `
 
