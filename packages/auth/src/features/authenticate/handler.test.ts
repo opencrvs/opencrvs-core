@@ -40,13 +40,9 @@ describe('authenticate handler receives a request', () => {
 
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
-    it('generates a mobile verification code and sends it to sms gateway', async done => {
+    it('generates a mobile verification code and sends it to sms gateway', async () => {
       fetch.mockResponse(JSON.stringify({ valid: true, nonce: '12345' }))
-
-      codeService.sendVerificationCode = (mobile: string, code: string) => {
-        expect(mobile).toBe('+345345343')
-        done()
-      }
+      const spy = jest.spyOn(codeService, 'sendVerificationCode')
 
       await server.server.inject({
         method: 'POST',
@@ -56,6 +52,10 @@ describe('authenticate handler receives a request', () => {
           password: '2r23432'
         }
       })
+
+      expect(spy).toHaveBeenCalled()
+      expect(spy.mock.calls[0]).toHaveLength(2)
+      expect(spy.mock.calls[0][0]).toBe('+345345343')
     })
   })
 })
