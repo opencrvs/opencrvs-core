@@ -1,11 +1,20 @@
-import { server } from 'src/index'
+import { createServer } from 'src/index'
 import * as fetch from 'jest-fetch-mock'
+import * as codeService from '../verifyCode/service'
 
 describe('authenticate handler receives a request', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+    await server.start()
+  })
+  afterEach(() => server.stop())
+
   describe('user management service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {
       fetch.mockResponse(JSON.stringify({ valid: false }))
-      const res = await server.inject({
+      const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
         payload: {
@@ -20,7 +29,7 @@ describe('authenticate handler receives a request', () => {
   describe('user management service says credentials are valid', () => {
     it('returns a nonce to the client', async () => {
       fetch.mockResponse(JSON.stringify({ valid: true, nonce: '12345' }))
-      const res = await server.inject({
+      const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
         payload: {
@@ -31,6 +40,22 @@ describe('authenticate handler receives a request', () => {
 
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
-    it('generates a mobile verification code and stores it with nonce', async () => {})
+    it('generates a mobile verification code and sends it to sms gateway', async done => {
+      fetch.mockResponse(JSON.stringify({ valid: true, nonce: '12345' }))
+
+      codeService.sendVerificationCode = (mobile: string, code: string) => {
+        expect(mobile).toBe('+345345343')
+        done()
+      }
+
+      await server.server.inject({
+        method: 'POST',
+        url: '/authenticate',
+        payload: {
+          mobile: '+345345343',
+          password: '2r23432'
+        }
+      })
+    })
   })
 })
