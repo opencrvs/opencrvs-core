@@ -6,16 +6,18 @@ import {
   CLICKATELL_PASSWORD,
   CLICKATELL_API_ID
 } from 'src/constants'
+import { promisify } from 'util'
 
 export async function generateVerificationCode(
   nonce: string,
   mobile: string,
   redisClient: RedisClient
 ) {
+  const set = promisify(redisClient.set).bind(redisClient)
   // TODO lets come back to how these are generated
   const code = Math.round(1000 + Math.random() * 8999).toString()
 
-  await redisClient.set(`verification_${nonce}`, code)
+  await set(`verification_${nonce}`, code)
   return code
 }
 
@@ -35,4 +37,14 @@ export async function sendVerificationCode(
     method: 'GET'
   })
   return undefined
+}
+
+export async function checkVerificationCode(
+  nonce: string,
+  code: string,
+  redisClient: RedisClient
+): Promise<boolean> {
+  const get = promisify(redisClient.get).bind(redisClient)
+  const storedCode = await get(`verification_${nonce}`)
+  return code === storedCode
 }

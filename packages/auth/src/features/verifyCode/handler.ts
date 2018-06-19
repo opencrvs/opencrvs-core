@@ -1,5 +1,12 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
+import { unauthorized } from 'boom'
+import { RedisClient } from 'redis'
+import { checkVerificationCode } from './service'
+import {
+  getStoredUserInformation,
+  createToken
+} from 'src/features/authenticate/service'
 
 interface IVerifyPayload {
   nonce: string
@@ -10,16 +17,24 @@ interface IVerifyResponse {
   token: string
 }
 
-export default function authenticateHandler(
-  request: Hapi.Request,
+export default async function authenticateHandler(
+  request: Hapi.Request & { pre: { redis: RedisClient } },
   h: Hapi.ResponseToolkit
 ) {
-  const payload = request.payload as IVerifyPayload
-  // @ts-ignore
-  const code = payload.code
-  // TODO OCRVS-327
-  const response: IVerifyResponse = { token: 'xyz.abc.sig' }
-  return response
+  const { code, nonce } = request.payload as IVerifyPayload
+
+  if (await checkVerificationCode(nonce, code, request.pre.redis)) {
+    const { userId, role } = await getStoredUserInformation(
+      nonce,
+      request.pre.redis
+    )
+
+    const token = await createToken(userId, role)
+    const response: IVerifyResponse = { token }
+    return response
+  }
+
+  return unauthorized()
 }
 
 export const requestSchema = Joi.object({

@@ -77,6 +77,7 @@ export async function createServer() {
       validate: {
         payload: reqVerifySchema
       },
+      pre: [assignRedisClient],
       plugins: {
         'hapi-swagger': {
           responses: {

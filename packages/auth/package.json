@@ -9,13 +9,14 @@
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
-    "test:watch": "jest --watch --coverage",
+    "test:watch": "jest --watch",
     "precommit": "lint-staged"
   },
   "dependencies": {
     "@types/hapi": "^17.0.12",
     "@types/inert": "^5.1.1",
     "@types/joi": "^13.3.0",
+    "@types/jsonwebtoken": "^7.2.7",
     "@types/redis": "^2.8.6",
     "@types/vision": "^5.3.4",
     "app-module-path": "^2.2.0",
@@ -26,6 +27,7 @@
     "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
     "joi": "^13.4.0",
+    "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.1.2",
     "redis": "^2.8.0",
     "typescript": "^2.9.2"
@@ -38,6 +40,7 @@
     "jest-fetch-mock": "^1.6.5",
     "nodemon": "^1.17.5",
     "prettier": "^1.13.5",
+    "redis-mock": "^0.27.0",
     "ts-jest": "^22.4.6",
     "ts-node": "^6.1.1",
     "vision": "^5.3.3"
@@ -57,7 +60,7 @@
     ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "setupFiles": [
-      "./setupJest.js"
+      "./test/setupJest.js"
     ],
     "moduleFileExtensions": [
       "ts",
