@@ -30,7 +30,7 @@ const StyledPage = styled(Page)`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.defaultFontStyle};
+    font-family: ${({ theme }) => theme.fonts.lightFont};
     src:
       url('/fonts/notosans-light-webfont-${config.LANGUAGE}.woff')
       format('woff');
