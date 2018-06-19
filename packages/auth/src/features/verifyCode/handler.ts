@@ -1,7 +1,6 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import { RedisClient } from 'redis'
 import { checkVerificationCode } from './service'
 import {
   getStoredUserInformation,
@@ -18,16 +17,13 @@ interface IVerifyResponse {
 }
 
 export default async function authenticateHandler(
-  request: Hapi.Request & { pre: { redis: RedisClient } },
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const { code, nonce } = request.payload as IVerifyPayload
 
-  if (await checkVerificationCode(nonce, code, request.pre.redis)) {
-    const { userId, role } = await getStoredUserInformation(
-      nonce,
-      request.pre.redis
-    )
+  if (await checkVerificationCode(nonce, code)) {
+    const { userId, role } = await getStoredUserInformation(nonce)
 
     const token = await createToken(userId, role)
     const response: IVerifyResponse = { token }

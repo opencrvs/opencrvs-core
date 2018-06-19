@@ -4,7 +4,7 @@ import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
-import { RedisClient } from 'redis'
+import { get, set } from 'src/database'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 
@@ -62,18 +62,12 @@ export async function createToken(
 export async function storeUserInformation(
   nonce: string,
   userId: string,
-  role: string,
-  redisClient: RedisClient
+  role: string
 ) {
-  const set = promisify(redisClient.set).bind(redisClient)
   return set(`user_information_${nonce}`, JSON.stringify({ userId, role }))
 }
 
-export async function getStoredUserInformation(
-  nonce: string,
-  redisClient: RedisClient
-) {
-  const get = promisify(redisClient.get).bind(redisClient)
+export async function getStoredUserInformation(nonce: string) {
   const record = await get(`user_information_${nonce}`)
 
   if (record === null) {

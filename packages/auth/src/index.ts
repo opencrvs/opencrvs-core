@@ -2,10 +2,9 @@
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
-import * as redis from 'redis'
 import * as DotEnv from 'dotenv'
 
-import { AUTH_HOST, AUTH_PORT, REDIS_HOST } from './constants'
+import { AUTH_HOST, AUTH_PORT } from './constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
@@ -16,18 +15,13 @@ import verifyCodeHandler, {
 } from './features/verifyCode/handler'
 import getPlugins from './config/plugins'
 
+import * as database from './database'
+
 DotEnv.config({
   path: `${process.cwd()}/.env`
 })
 
 export async function createServer() {
-  let redisClient: redis.RedisClient
-
-  const assignRedisClient = {
-    method: (request: Hapi.Request, h: Hapi.ResponseToolkit) => redisClient,
-    assign: 'redis'
-  }
-
   const server = new Hapi.Server({
     host: AUTH_HOST,
     port: AUTH_PORT,
@@ -49,7 +43,6 @@ export async function createServer() {
       validate: {
         payload: reqAuthSchema
       },
-      pre: [assignRedisClient],
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -77,7 +70,6 @@ export async function createServer() {
       validate: {
         payload: reqVerifySchema
       },
-      pre: [assignRedisClient],
       plugins: {
         'hapi-swagger': {
           responses: {
@@ -96,13 +88,13 @@ export async function createServer() {
 
   async function stop() {
     await server.stop()
-    redisClient.quit()
+    await database.stop()
     server.log('info', 'server stopped')
   }
 
   async function start() {
     await server.start()
-    redisClient = redis.createClient({ host: REDIS_HOST })
+    await database.start()
     server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
   }
 

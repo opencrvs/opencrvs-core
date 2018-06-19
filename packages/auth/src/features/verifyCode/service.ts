@@ -1,4 +1,3 @@
-import { RedisClient } from 'redis'
 import fetch from 'node-fetch'
 import { stringify } from 'querystring'
 import {
@@ -6,14 +5,9 @@ import {
   CLICKATELL_PASSWORD,
   CLICKATELL_API_ID
 } from 'src/constants'
-import { promisify } from 'util'
+import { set, get } from 'src/database'
 
-export async function generateVerificationCode(
-  nonce: string,
-  mobile: string,
-  redisClient: RedisClient
-) {
-  const set = promisify(redisClient.set).bind(redisClient)
+export async function generateVerificationCode(nonce: string, mobile: string) {
   // TODO lets come back to how these are generated
   const code = Math.round(1000 + Math.random() * 8999).toString()
 
@@ -41,10 +35,8 @@ export async function sendVerificationCode(
 
 export async function checkVerificationCode(
   nonce: string,
-  code: string,
-  redisClient: RedisClient
+  code: string
 ): Promise<boolean> {
-  const get = promisify(redisClient.get).bind(redisClient)
   const storedCode = await get(`verification_${nonce}`)
   return code === storedCode
 }
