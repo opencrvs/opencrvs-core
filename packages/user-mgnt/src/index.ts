@@ -7,55 +7,59 @@ import verifyPassHandler, {
 } from './features/verifyPassword/handler'
 import getPlugins from './config/plugins'
 
-const server = new Hapi.Server({
-  host: AUTH_HOST,
-  port: AUTH_PORT,
-  routes: {
-    cors: { origin: ['*'] }
-  }
-})
-
-async function init() {
-  await server.register(getPlugins())
-}
-
-// curl -H 'Content-Type: application/json' -d '{"mobile": "27845829934", "password": "test"}' http://localhost:3030/verifyPassword
-server.route({
-  method: 'POST',
-  path: '/verifyPassword',
-  handler: verifyPassHandler,
-  options: {
-    tags: ['api'],
-    description: 'Verify user password',
-    notes: 'Verify account exist and password is correct',
-    validate: {
-      payload: reqAuthSchema
-    },
-    plugins: {
-      'hapi-swagger': {
-        responses: {
-          200: { description: 'User details are correct' },
-          400: { description: 'User details are incorrect' }
-        }
-      }
-    },
-    response: {
-      schema: resAuthSchema
+export async function createServer() {
+  const server = new Hapi.Server({
+    host: AUTH_HOST,
+    port: AUTH_PORT,
+    routes: {
+      cors: { origin: ['*'] }
     }
+  })
+
+  async function init() {
+    await server.register(getPlugins())
   }
-})
 
-export async function start() {
-  await init()
-  await server.start()
-  server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
-}
+  // curl -H 'Content-Type: application/json' -d '{"mobile": "27845829934", "password": "test"}' http://localhost:3030/verifyPassword
+  server.route({
+    method: 'POST',
+    path: '/verifyPassword',
+    handler: verifyPassHandler,
+    options: {
+      tags: ['api'],
+      description: 'Verify user password',
+      notes: 'Verify account exist and password is correct',
+      validate: {
+        payload: reqAuthSchema
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            200: { description: 'User details are correct' },
+            400: { description: 'User details are incorrect' }
+          }
+        }
+      },
+      response: {
+        schema: resAuthSchema
+      }
+    }
+  })
 
-export async function stop() {
-  await server.stop()
-  server.log('info', 'server stopped')
+  async function start() {
+    await init()
+    await server.start()
+    server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
+  }
+
+  async function stop() {
+    await server.stop()
+    server.log('info', 'server stopped')
+  }
+
+  return { server, start, stop }
 }
 
 if (!module.parent) {
-  start()
+  createServer().then(server => server.start())
 }
