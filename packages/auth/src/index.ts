@@ -5,7 +5,7 @@ import * as Hapi from 'hapi'
 import * as redis from 'redis'
 import * as DotEnv from 'dotenv'
 
-import { AUTH_HOST, AUTH_PORT } from './constants'
+import { AUTH_HOST, AUTH_PORT, REDIS_HOST } from './constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
@@ -101,7 +101,7 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    redisClient = redis.createClient()
+    redisClient = redis.createClient({ host: REDIS_HOST })
     server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
   }
 

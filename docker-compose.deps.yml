@@ -11,7 +11,11 @@ services:
       placement:
         constraints:
           - node.role == manager
-
+  redis:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
   hearth:
     image: jembi/hearth:latest
     environment:
