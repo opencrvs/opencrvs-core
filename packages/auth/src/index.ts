@@ -1,5 +1,9 @@
+// tslint:disable-next-line no-var-requires
+require('app-module-path').addPath(require('path').join(__dirname, '../'))
+
 import * as Hapi from 'hapi'
 import * as redis from 'redis'
+import * as DotEnv from 'dotenv'
 
 import { AUTH_HOST, AUTH_PORT } from './constants'
 import authenticateHandler, {
@@ -11,6 +15,10 @@ import verifyCodeHandler, {
   responseSchma as resVerifySchema
 } from './features/verifyCode/handler'
 import getPlugins from './config/plugins'
+
+DotEnv.config({
+  path: `${process.cwd()}/.env`
+})
 
 export async function createServer() {
   let redisClient: redis.RedisClient
