@@ -1,4 +1,11 @@
 import { RedisClient } from 'redis'
+import fetch from 'node-fetch'
+import { stringify } from 'querystring'
+import {
+  CLICKATELL_USER,
+  CLICKATELL_PASSWORD,
+  CLICKATELL_API_ID
+} from 'src/constants'
 
 export async function generateVerificationCode(
   nonce: string,
@@ -16,6 +23,16 @@ export async function sendVerificationCode(
   mobile: string,
   verificationCode: string
 ): Promise<void> {
-  // TODO
+  const params = stringify({
+    user: CLICKATELL_USER,
+    password: CLICKATELL_PASSWORD,
+    api_id: CLICKATELL_API_ID,
+    to: mobile,
+    text: verificationCode
+  })
+
+  await fetch(`https://api.clickatell.com/http/sendmsg?${params}`, {
+    method: 'GET'
+  })
   return undefined
 }
