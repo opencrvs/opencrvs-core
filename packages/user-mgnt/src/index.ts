@@ -1,11 +1,14 @@
 import * as Hapi from 'hapi'
+import * as mongoose from 'mongoose'
 
-import { AUTH_HOST, AUTH_PORT } from './constants'
+import { AUTH_HOST, AUTH_PORT, MONGO_URL } from './constants'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from './features/verifyPassword/handler'
 import getPlugins from './config/plugins'
+
+mongoose.connect(MONGO_URL)
 
 export async function createServer() {
   const server = new Hapi.Server({
