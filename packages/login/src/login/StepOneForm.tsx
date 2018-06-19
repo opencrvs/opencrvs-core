@@ -5,10 +5,10 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box } from '@opencrvs/components/lib/Box'
 import styled from 'styled-components'
-import { stepOneFields } from './LoginFields'
+import { getFieldProps, stepOneFields } from '../utils/fields'
 import { Field } from 'redux-form'
 
-const messages = defineMessages({
+export const messages = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
     defaultMessage: 'Login to OpenCRVS',
@@ -19,13 +19,13 @@ const messages = defineMessages({
     defaultMessage: 'Please enter your mobile number and password.',
     description: 'The instruction that appears in step one of the form'
   },
-  mobileNumberLabel: {
-    id: 'login.mobileNumberLabel',
+  mobileLabel: {
+    id: 'login.mobileLabel',
     defaultMessage: 'Mobile number',
     description: 'The label that appears on the mobile number input'
   },
-  mobileNumberPlaceholder: {
-    id: 'login.mobileNumberPlaceholder',
+  mobilePlaceholder: {
+    id: 'login.mobilePlaceholder',
     defaultMessage: 'e.g: +44-7XXX-XXXXXX',
     description: 'The placeholder that appears on the mobile number input'
   },
@@ -38,6 +38,23 @@ const messages = defineMessages({
     id: 'login.submit',
     defaultMessage: 'Submit',
     description: 'The label that appears on the submit button'
+  },
+  required: {
+    id: 'login.required',
+    defaultMessage: 'Required',
+    description: 'The error message that appears on required fields'
+  },
+  minLength: {
+    id: 'login.minLength',
+    defaultMessage: 'Must be {min} characters or more',
+    description:
+      'The error message that appears on fields with a minimum length'
+  },
+  numberRequired: {
+    id: 'login.numberRequired',
+    defaultMessage: 'Must be a number',
+    description:
+      'The error message that appears on fields where the value must be a number'
   }
 })
 
@@ -101,34 +118,16 @@ export class StepOneForm extends React.Component<
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
             <Field
-              id={stepOneFields.mobile.id}
-              name={stepOneFields.mobile.name}
+              {...getFieldProps(intl, stepOneFields.mobile, messages)}
               component={InputField}
-              validate={stepOneFields.mobile.validate}
-              props={
-                {
-                  type: 'number',
-                  label: intl.formatMessage(messages.mobileNumberLabel),
-                  placeholder: intl.formatMessage(
-                    messages.mobileNumberPlaceholder
-                  ),
-                  minLength: stepOneFields.mobile.minLength
-                } as any
-              }
+              intl={intl}
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
-              id={stepOneFields.password.id}
-              name={stepOneFields.password.name}
+              {...getFieldProps(intl, stepOneFields.password, messages)}
               component={InputField}
-              validate={stepOneFields.password.validate}
-              props={
-                {
-                  type: 'password',
-                  label: intl.formatMessage(messages.passwordLabel)
-                } as any
-              }
+              intl={intl}
             />
           </FieldWrapper>
           <ActionWrapper>

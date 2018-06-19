@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { IAPIOptions } from './type/API'
 import { config } from '../config'
-import { IStepOne } from '../login/type/Login'
+import { IStepOneData } from '../login/type/Login'
 import { resolve } from 'url'
 
 const client = axios.create({
@@ -34,7 +34,7 @@ const request = (options: IAPIOptions) => {
     .catch(onError)
 }
 
-const submitStepOne = (data: IStepOne) => {
+const submitStepOne = (data: IStepOneData) => {
   return request({
     url: resolve(config.AUTH_API_URL, 'authenticate'),
     method: 'POST',

@@ -20,8 +20,7 @@ const mapDispatchToProps = {
 }
 
 const stepOneForm = reduxForm({
-  form: STEP_ONE_FORM,
-  destroyOnUnmount: true
+  form: STEP_ONE_FORM
 })(injectIntl(StepOneForm))
 
 export const StepOneContainer = connect<StateProps, DispatchProps>(
