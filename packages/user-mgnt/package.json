@@ -10,7 +10,8 @@
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "populate": "ts-node resources/populate.ts"
   },
   "dependencies": {
     "@types/hapi": "^17.0.12",
