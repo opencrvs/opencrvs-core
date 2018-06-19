@@ -10,7 +10,6 @@ import {
   sendVerificationCode
 } from 'src/features/verifyCode/service'
 import { unauthorized } from 'boom'
-import { RedisClient } from 'redis'
 
 interface IAuthPayload {
   mobile: string
@@ -23,7 +22,7 @@ interface IAuthResponse {
 }
 
 export default async function authenticateHandler(
-  request: Hapi.Request & { pre: { redis: RedisClient } },
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
@@ -38,17 +37,11 @@ export default async function authenticateHandler(
     throw err
   }
 
-  await storeUserInformation(
-    result.nonce,
-    result.userId,
-    result.role,
-    request.pre.redis
-  )
+  await storeUserInformation(result.nonce, result.userId, result.role)
 
   const verificationCode = await generateVerificationCode(
     result.nonce,
-    result.mobile,
-    request.pre.redis
+    result.mobile
   )
 
   await sendVerificationCode(result.mobile, verificationCode)
