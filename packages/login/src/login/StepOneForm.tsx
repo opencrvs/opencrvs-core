@@ -5,7 +5,8 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box } from '@opencrvs/components/lib/Box'
 import styled from 'styled-components'
-import { IStepOneFields } from './type/Login'
+import { stepOneFields } from './LoginFields'
+import { Field } from 'redux-form'
 
 const messages = defineMessages({
   stepOneTitle: {
@@ -81,22 +82,16 @@ const FieldWrapper = styled.div`
   margin-bottom: 30px;
 `
 
-export interface IStepOne {
+export interface IStepOneForm {
   formId: string
-  meta: IStepOneFields
-  initialValues: any
   submitAction: (values: any) => void
 }
 
-export class StepOne extends React.Component<
-  IStepOne & InjectedIntlProps & InjectedFormProps<{}, IStepOne>
+export class StepOneForm extends React.Component<
+  InjectedIntlProps & InjectedFormProps<{}, IStepOneForm> & IStepOneForm
 > {
   render() {
     const { intl, handleSubmit, formId, submitAction } = this.props
-    // TODO: will replace tempMeta with reduxForm meta once we figure out how to set up Fields from JSON
-    const tempMeta = {
-      touched: false
-    }
     return (
       <StyledBox id="login-step-one-box" columns={4}>
         <Title>
@@ -105,22 +100,35 @@ export class StepOne extends React.Component<
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
-            <InputField
-              id="mobile-number"
-              label={intl.formatMessage(messages.mobileNumberLabel)}
-              placeholder={intl.formatMessage(messages.mobileNumberPlaceholder)}
-              type="text"
-              disabled={false}
-              meta={tempMeta}
+            <Field
+              id={stepOneFields.mobile.id}
+              name={stepOneFields.mobile.name}
+              component={InputField}
+              validate={stepOneFields.mobile.validate}
+              props={
+                {
+                  type: 'number',
+                  label: intl.formatMessage(messages.mobileNumberLabel),
+                  placeholder: intl.formatMessage(
+                    messages.mobileNumberPlaceholder
+                  ),
+                  minLength: stepOneFields.mobile.minLength
+                } as any
+              }
             />
           </FieldWrapper>
           <FieldWrapper>
-            <InputField
-              id="password"
-              label={intl.formatMessage(messages.passwordLabel)}
-              type="password"
-              disabled={false}
-              meta={tempMeta}
+            <Field
+              id={stepOneFields.password.id}
+              name={stepOneFields.password.name}
+              component={InputField}
+              validate={stepOneFields.password.validate}
+              props={
+                {
+                  type: 'password',
+                  label: intl.formatMessage(messages.passwordLabel)
+                } as any
+              }
             />
           </FieldWrapper>
           <ActionWrapper>

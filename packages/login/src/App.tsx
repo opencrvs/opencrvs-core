@@ -10,6 +10,7 @@ import { config } from './config'
 import { StepTwo } from './login/StepTwo'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { pageWrapper } from './common/PageWrapper'
+import { StepOneContainer } from './login/StepOneContainer'
 
 const StyledPage = styled(Page)`
   background-color: ${({ theme }) => theme.colors.background};
@@ -62,7 +63,11 @@ export class App extends React.Component {
           <ThemeProvider theme={getTheme(config.LOCALE)}>
             <ConnectedRouter history={history}>
               <StyledPage>
-                <Route exact path="/" component={pageWrapper(StepTwo)} />
+                <Route
+                  exact
+                  path="/"
+                  component={pageWrapper(StepOneContainer)}
+                />
                 <Route exact path="/smscode" component={pageWrapper(StepTwo)} />
               </StyledPage>
             </ConnectedRouter>

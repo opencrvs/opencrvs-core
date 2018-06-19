@@ -1,13 +1,12 @@
 import { connect } from 'react-redux'
-import { Dispatch } from 'redux'
 import { STEP_ONE_FORM } from './Constants'
 import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
-import { IStepOne, StepOne } from './StepOne'
+import { IStepOneForm, StepOneForm } from './StepOneForm'
 import * as actions from './LoginActions'
 
-type StateProps = Partial<IStepOne>
-type DispatchProps = Partial<IStepOne>
+type StateProps = Partial<IStepOneForm>
+type DispatchProps = Partial<IStepOneForm>
 
 const mapStateToProps = (store: any): StateProps => {
   const formId = STEP_ONE_FORM
@@ -16,14 +15,14 @@ const mapStateToProps = (store: any): StateProps => {
   }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  submitAction: (values: any) => dispatch(actions.startStepOne(values))
-})
+const mapDispatchToProps = {
+  submitAction: actions.startStepOne
+}
 
-const stepOneForm = reduxForm<{}, IStepOne>({
+const stepOneForm = reduxForm({
   form: STEP_ONE_FORM,
   destroyOnUnmount: true
-})(injectIntl(StepOne))
+})(injectIntl(StepOneForm))
 
 export const StepOneContainer = connect<StateProps, DispatchProps>(
   mapStateToProps,

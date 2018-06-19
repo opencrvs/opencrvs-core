@@ -3,9 +3,8 @@ import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
 import { InjectedFormProps } from 'redux-form'
 import { Input } from '@opencrvs/components/lib/form/Input'
 import { Button } from '@opencrvs/components/lib/Button'
-import { StyledBox, Title, FormWrapper, ActionWrapper } from './StepOne'
+import { StyledBox, Title, FormWrapper, ActionWrapper } from './StepOneForm'
 import styled from 'styled-components'
-import { IStepTwoFields } from './type/Login'
 
 const messages = defineMessages({
   stepTwoTitle: {
@@ -35,14 +34,12 @@ const Separator = styled.div`
   border-right: 1px solid ${({ theme }) => theme.colors.secondary};
 `
 
-export interface IStepTwo {
+export interface IStepTwoForm {
   formId: string
-  meta: IStepTwoFields
-  initialValues: any
   submitAction: (values: any) => void
 }
 class StepTwoWrapper extends React.Component<
-  IStepTwo & InjectedIntlProps & InjectedFormProps<{}, IStepTwo>
+  IStepTwoForm & InjectedIntlProps & InjectedFormProps<{}, IStepTwoForm>
 > {
   render() {
     const { intl } = this.props
@@ -124,4 +121,4 @@ class StepTwoWrapper extends React.Component<
   }
 }
 
-export const StepTwo = injectIntl<IStepTwo>(StepTwoWrapper)
+export const StepTwo = injectIntl<IStepTwoForm>(StepTwoWrapper)

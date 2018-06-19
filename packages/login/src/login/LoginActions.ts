@@ -1,4 +1,4 @@
-import { IStepOne } from './type/Login'
+import { IStepOneData } from './type/Login'
 import { AxiosError } from 'axios'
 import { authApi } from '../utils/authApi'
 
@@ -7,16 +7,16 @@ export const STEP_ONE_SUCCESS = 'STEP_ONE/STEP_ONE_SUCCESS'
 export const STEP_ONE_FAILED = 'STEP_ONE/STEP_ONE_FAILED'
 
 export type Action =
-  | { type: typeof START_STEP_ONE; payload: IStepOne }
+  | { type: typeof START_STEP_ONE; payload: IStepOneData }
   | { type: typeof STEP_ONE_SUCCESS; payload: any }
   | { type: typeof STEP_ONE_FAILED; payload: Error }
 
-export const startStepOne = (values: IStepOne): Action => ({
+export const startStepOne = (values: IStepOneData): Action => ({
   type: START_STEP_ONE,
   payload: values
 })
 
-export const submitStepOne = (data: IStepOne): Promise<Action> => {
+export const submitStepOne = (data: IStepOneData): Promise<Action> => {
   return authApi.submitStepOne(data)
 }
 
