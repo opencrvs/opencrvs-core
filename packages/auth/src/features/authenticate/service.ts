@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from 'src/config'
+import { USER_MANAGEMENT_URL } from 'src/constants'
 import { resolve } from 'url'
 
 interface IAuthentication {
