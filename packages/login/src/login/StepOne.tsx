@@ -1,14 +1,46 @@
 import * as React from 'react'
-import { InjectedIntlProps } from 'react-intl'
+import { InjectedIntlProps, defineMessages } from 'react-intl'
 import { InjectedFormProps } from 'redux-form'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box } from '@opencrvs/components/lib/Box'
 import styled from 'styled-components'
-import { messages } from '../i18n/messages'
-import { IStepOneFields } from './type/StepOne'
+import { IStepOneFields } from './type/Login'
 
-const StyledBox = styled(Box)`
+const messages = defineMessages({
+  stepOneTitle: {
+    id: 'login.stepOneTitle',
+    defaultMessage: 'Login to OpenCRVS',
+    description: 'The title that appears in step one of the form'
+  },
+  stepOneInstruction: {
+    id: 'login.stepOneInstruction',
+    defaultMessage: 'Please enter your mobile number and password.',
+    description: 'The instruction that appears in step one of the form'
+  },
+  mobileNumberLabel: {
+    id: 'login.mobileNumberLabel',
+    defaultMessage: 'Mobile number',
+    description: 'The label that appears on the mobile number input'
+  },
+  mobileNumberPlaceholder: {
+    id: 'login.mobileNumberPlaceholder',
+    defaultMessage: 'e.g: +44-7XXX-XXXXXX',
+    description: 'The placeholder that appears on the mobile number input'
+  },
+  passwordLabel: {
+    id: 'login.passwordLabel',
+    defaultMessage: 'Password',
+    description: 'The label that appears on the password input'
+  },
+  submit: {
+    id: 'login.submit',
+    defaultMessage: 'Submit',
+    description: 'The label that appears on the submit button'
+  }
+})
+
+export const StyledBox = styled(Box)`
   position: absolute;
   height: auto;
   top: 50%;
@@ -18,7 +50,7 @@ const StyledBox = styled(Box)`
   transform: translate(50%, -50%);
 `
 
-const FormWrapper = styled.form`
+export const FormWrapper = styled.form`
   position: relative;
   margin: auto;
   width: 80%;
@@ -29,14 +61,14 @@ const FormWrapper = styled.form`
   padding-top: 20px;
 `
 
-const ActionWrapper = styled.div`
+export const ActionWrapper = styled.div`
   position: relative;
   float: right;
   margin-top: 10px;
   margin-bottom: 40px;
 `
 
-const Title = styled.div`
+export const Title = styled.div`
   margin: auto;
   margin-top: 30px;
   width: 80%;
@@ -55,6 +87,7 @@ export interface IStepOne {
   initialValues: any
   submitAction: (values: any) => void
 }
+
 export class StepOne extends React.Component<
   IStepOne & InjectedIntlProps & InjectedFormProps<{}, IStepOne>
 > {

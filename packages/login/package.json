@@ -8,6 +8,7 @@
     "@types/react-intl": "^2.3.8",
     "@types/react-redux": "^6.0.0",
     "@types/react-router-redux": "^5.0.14",
+    "axios": "^0.18.0",
     "history": "^4.7.2",
     "lint-staged": "^7.1.0",
     "react": "^16.3.2",
@@ -18,22 +19,24 @@
     "react-router-redux": "next",
     "react-scripts-ts": "2.16.0",
     "redux": "^4.0.0",
-    "redux-form": "^7.4.2"
+    "redux-form": "^7.4.2",
+    "redux-loop": "^4.3.3"
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "PORT=3030 REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+    "start":
+      "PORT=3030 REACT_APP_AUTH_API_URL=http://localhost:4040/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
+    "test":
+      "PORT=3030 REACT_APP_AUTH_API_URL=http://localhost:4040/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": [
-      "prettier --write",
-      "tslint",
-      "git add"
-    ]
+    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "git add"]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",

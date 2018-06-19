@@ -4,7 +4,7 @@ import { STEP_ONE_FORM } from './Constants'
 import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
 import { IStepOne, StepOne } from './StepOne'
-import { actions as loginActions } from './LoginActions'
+import * as actions from './LoginActions'
 
 type StateProps = Partial<IStepOne>
 type DispatchProps = Partial<IStepOne>
@@ -17,7 +17,7 @@ const mapStateToProps = (store: any): StateProps => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  submitAction: (values: any) => dispatch(loginActions.startStepOne(values))
+  submitAction: (values: any) => dispatch(actions.startStepOne(values))
 })
 
 const stepOneForm = reduxForm<{}, IStepOne>({

@@ -31,7 +31,7 @@ const localeFonts = {
   }
 }
 
-export const fonts = (locale: string) => ({
+export const fonts = (locale: string): IFonts => ({
   boldFont: localeFonts[locale].boldFontFamily,
   lightFont: localeFonts[locale].lightFontFamily,
   regularFont: localeFonts[locale].regularFontFamily,
