@@ -14,19 +14,12 @@ const reducers = combineReducers({
 })
 const enhancedCreateStore = createStore as StoreCreator
 
-let enhancer = compose(install())
-
-if (
-  typeof window === 'object' &&
-  (window as any).__REDUX_DEVTOOLS_EXTENSION__
-) {
-  enhancer = compose(
-    applyMiddleware(middleware),
-    install(),
-    typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
-      ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
-      : (f: any) => f
-  )
-}
+const enhancer = compose(
+  applyMiddleware(middleware),
+  install(),
+  typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
+    ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+    : (f: any) => f
+)
 
 export const store = enhancedCreateStore(reducers, {}, enhancer)

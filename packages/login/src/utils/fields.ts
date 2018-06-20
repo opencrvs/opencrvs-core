@@ -1,5 +1,6 @@
 import * as validations from './validate'
 import { InjectedIntl, Messages } from 'react-intl'
+import { IIntlDynamicProps } from '@opencrvs/components/lib/utils/intlUtils'
 
 type IReduxFormFieldProps = {
   id: string
@@ -10,7 +11,7 @@ type IReduxFormFieldProps = {
   maxLength?: number
   placeholder?: string
   label?: string
-  customProps?: any
+  dynamicErrors?: IIntlDynamicProps
 }
 
 type IFieldGroup = {
@@ -28,7 +29,8 @@ export const stepOneFields: IFieldGroup = {
       validations.isNumber
     ],
     disabled: false,
-    type: 'text'
+    type: 'text',
+    dynamicErrors: validations.dynamicValidationProps
   },
   password: {
     id: 'password',
@@ -42,8 +44,7 @@ export const stepOneFields: IFieldGroup = {
 export const getFieldProps = (
   intl: InjectedIntl,
   field: IReduxFormFieldProps,
-  messages: Messages,
-  customProps?: any
+  messages: Messages
 ): IReduxFormFieldProps => {
   const placeholder = messages[`${field.id}Placeholder`]
     ? intl.formatMessage(messages[`${field.id}Placeholder`])
@@ -54,7 +55,6 @@ export const getFieldProps = (
   return {
     ...field,
     placeholder,
-    label,
-    customProps
+    label
   }
 }

@@ -7,11 +7,11 @@ import { InputError } from './form/InputError'
 import { InputLabel } from './form/InputLabel'
 import { substituteDynamicIntlProps } from './utils/intlUtils'
 import { IIntlDynamicProps } from './utils/intlUtils'
-export interface IInputFieldProps {
+export interface IPhoneInputFieldProps {
   input?: any
   intl: InjectedIntl
   id: string
-  label?: string
+  label?: string | undefined
   placeholder?: string
   disabled: boolean
   type: string
@@ -20,14 +20,7 @@ export interface IInputFieldProps {
   dynamicErrors?: IIntlDynamicProps
 }
 
-const applyDefaultIfNotDisabled = (
-  disabled: boolean,
-  label?: string
-): string => {
-  return !disabled && label ? label : ''
-}
-
-export const InputField = ({
+export const PhoneInputField = ({
   input,
   intl,
   id,
@@ -38,14 +31,12 @@ export const InputField = ({
   meta,
   maxLength = 50,
   dynamicErrors
-}: IInputFieldProps) => (
+}: IPhoneInputFieldProps) => (
   <div>
     {label && <InputLabel disabled={disabled}>{label}</InputLabel>}
     <Input
       {...input}
-      placeholder={
-        placeholder ? placeholder : applyDefaultIfNotDisabled(disabled, label)
-      }
+      placeholder={placeholder ? placeholder : disabled ? '' : label}
       error={meta && meta.error}
       touched={meta && meta.touched}
     />

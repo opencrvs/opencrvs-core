@@ -7,7 +7,6 @@ import { Box } from '@opencrvs/components/lib/Box'
 import styled from 'styled-components'
 import { getFieldProps, stepOneFields } from '../utils/fields'
 import { Field } from 'redux-form'
-import { IIntlDynamicProps } from '../i18n/type/CustomIntlTypes'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -39,35 +38,8 @@ export const messages = defineMessages({
     id: 'login.submit',
     defaultMessage: 'Submit',
     description: 'The label that appears on the submit button'
-  },
-  required: {
-    id: 'login.required',
-    defaultMessage: 'Required',
-    description: 'The error message that appears on required fields'
-  },
-  minLength: {
-    id: 'login.minLength',
-    defaultMessage: 'Must be {min} characters or more',
-    description:
-      'The error message that appears on fields with a minimum length'
-  },
-  numberRequired: {
-    id: 'login.numberRequired',
-    defaultMessage: 'Must be a number',
-    description:
-      'The error message that appears on fields where the value must be a number'
   }
 })
-
-const intlDynamicProps: IIntlDynamicProps = {
-  minLength: {
-    min: 11
-  }
-}
-
-const customMobileFieldProps = {
-  intlDynamicError: intlDynamicProps
-}
 
 export const StyledBox = styled(Box)`
   position: absolute;
@@ -129,12 +101,7 @@ export class StepOneForm extends React.Component<
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
             <Field
-              {...getFieldProps(
-                intl,
-                stepOneFields.mobile,
-                messages,
-                customMobileFieldProps
-              )}
+              {...getFieldProps(intl, stepOneFields.mobile, messages)}
               component={InputField}
               intl={intl}
             />
