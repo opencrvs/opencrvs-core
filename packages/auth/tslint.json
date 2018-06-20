@@ -4,6 +4,7 @@
     "no-duplicate-variable": true,
     "no-unused-variable": [true],
     "object-literal-sort-keys": false,
+    "max-classes-per-file": false,
     "semicolon": [false, "never"],
     "ordered-imports": false
   },
