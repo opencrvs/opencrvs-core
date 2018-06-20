@@ -1,7 +1,7 @@
 {
-  "name": "@opencrvs/auth",
+  "name": "@opencrvs/user-mgnt",
   "version": "1.0.0",
-  "description": "OpenCRVS authentication service",
+  "description": "OpenCRVS user management service",
   "main": "src/index.js",
   "license": "NONE",
   "private": true,

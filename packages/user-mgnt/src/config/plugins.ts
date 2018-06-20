@@ -38,7 +38,7 @@ export default function getPlugins() {
       plugin: HapiSwagger,
       options: {
         info: {
-          title: 'OpenCRVS Auth Service Documentation',
+          title: 'OpenCRVS User Management Service Documentation',
           version: '1.0.0'
         }
       },

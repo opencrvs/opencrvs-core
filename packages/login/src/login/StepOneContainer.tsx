@@ -20,7 +20,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   submitAction: (values: any) => dispatch(loginActions.startStepOne(values))
 })
 
-const stepOneForm = reduxForm<{}, IStepOne>({
+const stepOneForm = reduxForm({
   form: STEP_ONE_FORM,
   destroyOnUnmount: true
 })(injectIntl(StepOne))
