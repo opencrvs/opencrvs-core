@@ -7,7 +7,7 @@ const unsafeConfig = {
 Object.entries(unsafeConfig).forEach(([key, value]) => {
   if (value === undefined) {
     throw new Error(
-      `Hey, there's a configuration value (REACT_APP_ ${key}) missing from the enviroment variables this app was build with`
+      `Hey, there's a configuration value (REACT_APP_${key}) missing from the enviroment variables this app was build with`
     )
   }
 })
