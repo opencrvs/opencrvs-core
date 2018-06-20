@@ -7,9 +7,7 @@ describe('authenticate handler receives a request', () => {
 
   beforeEach(async () => {
     server = await createServer()
-    await server.start()
   })
-  afterEach(() => server.stop())
 
   describe('user management service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {

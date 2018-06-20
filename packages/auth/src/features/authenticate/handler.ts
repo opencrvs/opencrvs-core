@@ -1,12 +1,15 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { authenticate, isUnauthorizedError } from './service'
+import {
+  authenticate,
+  isUnauthorizedError,
+  storeUserInformation
+} from './service'
 import {
   generateVerificationCode,
   sendVerificationCode
 } from 'src/features/verifyCode/service'
 import { unauthorized } from 'boom'
-import { RedisClient } from 'redis'
 
 interface IAuthPayload {
   mobile: string
@@ -19,17 +22,14 @@ interface IAuthResponse {
 }
 
 export default async function authenticateHandler(
-  request: Hapi.Request & { pre: { redis: RedisClient } },
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
-  let mobile
-  let nonce
+  let result
 
   try {
-    const result = await authenticate(payload.mobile, payload.password)
-    mobile = result.mobile
-    nonce = result.nonce
+    result = await authenticate(payload.mobile, payload.password)
   } catch (err) {
     if (isUnauthorizedError(err)) {
       throw unauthorized()
@@ -37,14 +37,16 @@ export default async function authenticateHandler(
     throw err
   }
 
-  const verificationCode = await generateVerificationCode(
-    nonce,
-    mobile,
-    request.pre.redis
-  )
-  await sendVerificationCode(mobile, verificationCode)
+  await storeUserInformation(result.nonce, result.userId, result.role)
 
-  return { nonce, mobile }
+  const verificationCode = await generateVerificationCode(
+    result.nonce,
+    result.mobile
+  )
+
+  await sendVerificationCode(result.mobile, verificationCode)
+
+  return { mobile: result.mobile, nonce: result.nonce }
 }
 
 export const requestSchema = Joi.object({
