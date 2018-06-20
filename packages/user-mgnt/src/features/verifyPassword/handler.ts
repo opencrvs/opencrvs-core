@@ -1,7 +1,7 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
-import User from '../../model/user'
+import User, { IUserModel } from '../../model/user'
 import { generatePasswordHash } from '../../utils/password'
 
 interface IVerifyPayload {
@@ -23,7 +23,7 @@ export default async function verifyPassHandler(
     return h.response().code(400)
   }
 
-  const user: any = await User.findOne({ mobile })
+  const user: IUserModel | null = await User.findOne({ mobile })
 
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists

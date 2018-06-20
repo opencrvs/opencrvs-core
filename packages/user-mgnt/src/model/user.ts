@@ -1,6 +1,15 @@
-import * as mongoose from 'mongoose'
+import { model, Schema, Document } from 'mongoose'
 
-const userSchema = new mongoose.Schema({
+interface IUser {
+  email: string
+  mobile: string
+  passwordHash: string
+  salt: string
+  role: string
+}
+export interface IUserModel extends IUser, Document {}
+
+const userSchema = new Schema({
   email: String,
   mobile: String,
   passwordHash: { type: String, required: true },
@@ -8,4 +17,4 @@ const userSchema = new mongoose.Schema({
   role: { type: String, required: true }
 })
 
-export default mongoose.model('User', userSchema)
+export default model<IUserModel>('User', userSchema)
