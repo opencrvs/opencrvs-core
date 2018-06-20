@@ -5,7 +5,8 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box } from '@opencrvs/components/lib/Box'
 import styled from 'styled-components'
-import { getFieldProps, stepOneFields } from '../utils/fields'
+import { stepOneFields } from './stepOneFields'
+import { getFieldProps } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
 
 export const messages = defineMessages({

@@ -1,4 +1,4 @@
-import { IStepOneData } from './type/Login'
+import { IStepOneData } from '../type/Login'
 import { AxiosError } from 'axios'
 import { authApi } from '../utils/authApi'
 

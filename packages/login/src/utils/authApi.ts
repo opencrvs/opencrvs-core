@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
-import { IAPIOptions } from './type/API'
+import { IAPIOptions } from '../type/API'
 import { config } from '../config'
-import { IStepOneData } from '../login/type/Login'
+import { IStepOneData } from '../type/Login'
 import { resolve } from 'url'
 
 const client = axios.create({
