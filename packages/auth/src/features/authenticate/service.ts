@@ -19,16 +19,16 @@ export async function authenticate(
 ): Promise<IAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/authenticate')
 
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ mobile, password })
-  })
-
-  const body = await res.json()
-
-  if (!body.valid) {
+  let res
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({ mobile, password })
+    })
+  } catch (err) {
     throw new UnauthorizedError('Unauthorized')
   }
+  const body = await res.json()
 
   return { nonce: body.nonce, mobile }
 }

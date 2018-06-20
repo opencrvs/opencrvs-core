@@ -13,7 +13,7 @@ describe('authenticate handler receives a request', () => {
 
   describe('user management service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {
-      fetch.mockResponse(JSON.stringify({ valid: false }))
+      fetch.mockReject(new Error())
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -28,7 +28,7 @@ describe('authenticate handler receives a request', () => {
   })
   describe('user management service says credentials are valid', () => {
     it('returns a nonce to the client', async () => {
-      fetch.mockResponse(JSON.stringify({ valid: true, nonce: '12345' }))
+      fetch.mockResponse(JSON.stringify({ nonce: '12345' }))
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -41,7 +41,7 @@ describe('authenticate handler receives a request', () => {
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
     it('generates a mobile verification code and sends it to sms gateway', async () => {
-      fetch.mockResponse(JSON.stringify({ valid: true, nonce: '12345' }))
+      fetch.mockResponse(JSON.stringify({ nonce: '12345' }))
       const spy = jest.spyOn(codeService, 'sendVerificationCode')
 
       await server.server.inject({
