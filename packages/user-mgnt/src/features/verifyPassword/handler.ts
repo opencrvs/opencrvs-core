@@ -1,8 +1,8 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
-import User, { IUserModel } from '../../model/user'
-import { generatePasswordHash } from '../../utils/password'
+import User, { IUserModel } from 'src/model/user'
+import { generatePasswordHash } from 'src/utils/password'
 
 interface IVerifyPayload {
   mobile: string

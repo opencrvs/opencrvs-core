@@ -1,4 +1,4 @@
-import User from '../../model/user'
+import User from 'src/model/user'
 import verifyPassHandler from './handler'
 
 test("verifyPassHandler should return 400 when mobile or password isn't supplied", async () => {

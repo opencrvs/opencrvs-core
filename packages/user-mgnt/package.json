@@ -19,6 +19,7 @@
     "@types/joi": "^13.3.0",
     "@types/mongoose": "^5.0.16",
     "@types/vision": "^5.3.4",
+    "app-module-path": "^2.2.0",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
@@ -49,6 +50,9 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "modulePaths": [
+      "<rootDir>"
+    ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
