@@ -4,6 +4,6 @@ import { grid } from '../grid'
 
 export const Page = styled.div`
   display: flex;
-  min-width: : ${({ theme }) => theme.grid.minWidth}px;
+  min-width: ${({ theme }) => theme.grid.minWidth}px;
   flex-direction: column;
 `

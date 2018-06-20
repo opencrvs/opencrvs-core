@@ -10,6 +10,7 @@ type IReduxFormFieldProps = {
   maxLength?: number
   placeholder?: string
   label?: string
+  customProps?: any
 }
 
 type IFieldGroup = {
@@ -41,7 +42,8 @@ export const stepOneFields: IFieldGroup = {
 export const getFieldProps = (
   intl: InjectedIntl,
   field: IReduxFormFieldProps,
-  messages: Messages
+  messages: Messages,
+  customProps?: any
 ): IReduxFormFieldProps => {
   const placeholder = messages[`${field.id}Placeholder`]
     ? intl.formatMessage(messages[`${field.id}Placeholder`])
@@ -52,6 +54,7 @@ export const getFieldProps = (
   return {
     ...field,
     placeholder,
-    label
+    label,
+    customProps
   }
 }

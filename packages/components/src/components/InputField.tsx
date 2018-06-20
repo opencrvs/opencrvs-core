@@ -4,6 +4,7 @@ import styled, { StyledFunction } from 'styled-components'
 import { Input } from './form/Input'
 import { InputError } from './form/InputError'
 import { InputLabel } from './form/InputLabel'
+import { substituteDynamicIntlProps } from './utils/intlUtils'
 
 export interface IInputFieldProps {
   input?: any
@@ -15,6 +16,7 @@ export interface IInputFieldProps {
   type: string
   meta?: { touched: boolean; error: any }
   maxLength?: number
+  props?: any
 }
 
 export const InputField = ({
@@ -26,7 +28,8 @@ export const InputField = ({
   placeholder,
   disabled,
   meta,
-  maxLength = 50
+  maxLength = 50,
+  props
 }: IInputFieldProps) => (
   <div>
     {label && <InputLabel disabled={disabled}>{label}</InputLabel>}
@@ -41,7 +44,10 @@ export const InputField = ({
       (meta && meta.touched) && (
         <InputError
           id={id + '_error'}
-          errorMessage={intl.formatMessage(meta.error)}
+          errorMessage={substituteDynamicIntlProps(
+            meta.error,
+            props.intlDynamicError
+          )}
         />
       )}
   </div>

@@ -7,6 +7,7 @@ import { Box } from '@opencrvs/components/lib/Box'
 import styled from 'styled-components'
 import { getFieldProps, stepOneFields } from '../utils/fields'
 import { Field } from 'redux-form'
+import { IIntlDynamicProps } from '../i18n/type/CustomIntlTypes'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -57,6 +58,16 @@ export const messages = defineMessages({
       'The error message that appears on fields where the value must be a number'
   }
 })
+
+const intlDynamicProps: IIntlDynamicProps = {
+  minLength: {
+    min: 11
+  }
+}
+
+const customMobileFieldProps = {
+  intlDynamicError: intlDynamicProps
+}
 
 export const StyledBox = styled(Box)`
   position: absolute;
@@ -118,7 +129,12 @@ export class StepOneForm extends React.Component<
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
             <Field
-              {...getFieldProps(intl, stepOneFields.mobile, messages)}
+              {...getFieldProps(
+                intl,
+                stepOneFields.mobile,
+                messages,
+                customMobileFieldProps
+              )}
               component={InputField}
               intl={intl}
             />
