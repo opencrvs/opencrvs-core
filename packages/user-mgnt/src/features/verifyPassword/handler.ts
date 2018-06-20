@@ -1,5 +1,6 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
+import { unauthorized } from 'boom'
 
 import User, { IUserModel } from 'src/model/user'
 import { generatePasswordHash } from 'src/utils/password'
@@ -19,19 +20,15 @@ export default async function verifyPassHandler(
 ) {
   const { mobile, password } = request.payload as IVerifyPayload
 
-  if (!mobile || !password) {
-    return h.response().code(400)
-  }
-
   const user: IUserModel | null = await User.findOne({ mobile })
 
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
-    return h.response().code(400)
+    throw unauthorized()
   }
 
   if (generatePasswordHash(password, user.salt) !== user.passwordHash) {
-    return h.response().code(400)
+    throw unauthorized()
   }
 
   const response: IVerifyResponse = { role: user.role }
@@ -39,8 +36,8 @@ export default async function verifyPassHandler(
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string(),
-  password: Joi.string()
+  mobile: Joi.string().required(),
+  password: Joi.string().required()
 })
 
 export const responseSchema = Joi.object({

@@ -1,30 +1,23 @@
+import { unauthorized } from 'boom'
+
 import User from 'src/model/user'
 import verifyPassHandler from './handler'
 
-test("verifyPassHandler should return 400 when mobile or password isn't supplied", async () => {
-  let actualCode = null
-  await verifyPassHandler(
-    // @ts-ignore
-    { payload: {} },
-    { response: () => ({ code: (code: number) => (actualCode = code) }) }
-  )
-  expect(actualCode).toBe(400)
-})
-
-test("verifyPassHandler should return 400 when user doesn't exist", async () => {
+test("verifyPassHandler should throw with 401 when user doesn't exist", async () => {
   const spy = jest.spyOn(User, 'findOne').mockResolvedValueOnce(null)
 
-  let actualCode = null
-  await verifyPassHandler(
-    // @ts-ignore
-    { payload: { mobile: '27555555555', password: 'test' } },
-    { response: () => ({ code: (code: number) => (actualCode = code) }) }
-  )
-  expect(actualCode).toBe(400)
+  await expect(
+    verifyPassHandler(
+      // @ts-ignore
+      { payload: { mobile: '27555555555', password: 'test' } },
+      // tslint:disable-next-line:no-empty
+      { response: () => ({ code: () => {} }) }
+    )
+  ).rejects.toThrowError(unauthorized().message)
   expect(spy).toBeCalled()
 })
 
-test("verifyPassHandler should return 400 when password hash doesn't match", async () => {
+test("verifyPassHandler should throw with 401 when password hash doesn't match", async () => {
   const spy = jest.spyOn(User, 'findOne').mockResolvedValueOnce({
     mobile: '27555555555',
     passwordHash: 'xyz',
@@ -32,13 +25,14 @@ test("verifyPassHandler should return 400 when password hash doesn't match", asy
     role: 'test'
   })
 
-  let actualCode = null
-  await verifyPassHandler(
-    // @ts-ignore
-    { payload: { mobile: '27555555555', password: 'test' } },
-    { response: () => ({ code: (code: number) => (actualCode = code) }) }
-  )
-  expect(actualCode).toBe(400)
+  await expect(
+    verifyPassHandler(
+      // @ts-ignore
+      { payload: { mobile: '27555555555', password: 'test' } },
+      // tslint:disable-next-line:no-empty
+      { response: () => ({ code: () => {} }) }
+    )
+  ).rejects.toThrowError(unauthorized().message)
   expect(spy).toBeCalled()
 })
 

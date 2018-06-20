@@ -26,7 +26,7 @@ export async function createServer() {
     await server.register(getPlugins())
   }
 
-  // curl -H 'Content-Type: application/json' -d '{"mobile": "27845829934", "password": "test"}' http://localhost:3030/verifyPassword
+  // curl -H 'Content-Type: application/json' -d '{"mobile": "27855555555", "password": "test"}' http://localhost:3030/verifyPassword
   server.route({
     method: 'POST',
     path: '/verifyPassword',
