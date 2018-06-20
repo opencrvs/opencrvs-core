@@ -4,3 +4,6 @@ services:
   mongo:
     ports:
       - "27017:27017"
+  redis:
+    ports:
+      - "6379:6379"
