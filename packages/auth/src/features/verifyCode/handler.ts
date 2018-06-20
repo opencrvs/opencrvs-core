@@ -1,8 +1,13 @@
 import * as Hapi from 'hapi'
+import * as Joi from 'joi'
 
 interface IVerifyPayload {
   nonce: string
   code: string
+}
+
+interface IVerifyResponse {
+  token: string
 }
 
 export default function authenticateHandler(
@@ -10,6 +15,17 @@ export default function authenticateHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IVerifyPayload
+  // @ts-ignore
+  const code = payload.code
   // TODO OCRVS-327
-  return payload.code // should return either a 200 (code valid) or 400 (code invalid)
+  const response: IVerifyResponse = { token: 'xyz.abc.sig' }
+  return response
 }
+
+export const requestSchema = Joi.object({
+  nonce: Joi.string(),
+  code: Joi.string()
+})
+export const responseSchma = Joi.object({
+  token: Joi.string()
+})
