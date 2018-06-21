@@ -115,7 +115,7 @@ export class StepOneForm extends React.Component<
             />
           </FieldWrapper>
           <ActionWrapper>
-            <Button id="login-mobile-submit">
+            <Button id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
             </Button>
           </ActionWrapper>

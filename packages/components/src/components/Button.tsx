@@ -6,6 +6,7 @@ export interface IButton {
   secondary?: boolean
   children?: any
   className?: string
+  type?: string
 }
 
 const styledButton = styled.button.attrs<IButton>({})
@@ -43,9 +44,14 @@ const StyledButton = styledButton`
 `
 export class Button extends React.Component<IButton> {
   render() {
-    const { children, secondary, id, className } = this.props
+    const { children, secondary, id, className, type } = this.props
     return (
-      <StyledButton id={id} secondary={secondary} className={className}>
+      <StyledButton
+        id={id}
+        secondary={secondary}
+        className={className}
+        type={type}
+      >
         {children}
       </StyledButton>
     )
