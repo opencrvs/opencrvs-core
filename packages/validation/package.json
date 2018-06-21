@@ -1,0 +1,44 @@
+{
+  "name": "@opencrvs/valiation",
+  "version": "1.0.0",
+  "description": "OpenCRVS validation utilities",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage"
+  },
+  "license": "NONE",
+  "private": true,
+  "dependencies": {
+    "@types/joi": "^13.3.0",
+    "country-data": "^0.0.31",
+    "joi": "^13.4.0",
+    "typescript": "^2.9.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.1.1",
+    "jest": "^23.1.0",
+    "ts-jest": "^22.4.6"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,graphql}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "testEnvironment": "node"
+  }
+}
