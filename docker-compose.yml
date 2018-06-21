@@ -5,7 +5,7 @@ services:
     image: jembi/ocrvs-register:latest
     build:
       context: .
-      dockerfile: packages/register/Dockerfile
+      dockerfile: ./Dockerfile-register
     restart: unless-stopped
     ports:
       - "5050:5000"
@@ -21,7 +21,7 @@ services:
     image: jembi/ocrvs-login:latest
     build:
       context: .
-      dockerfile: packages/login/Dockerfile
+      dockerfile: ./Dockerfile-login
     restart: unless-stopped
     ports:
       - "5040:5000"
