@@ -27,7 +27,7 @@ export const messages = defineMessages({
   },
   mobilePlaceholder: {
     id: 'login.mobilePlaceholder',
-    defaultMessage: 'e.g: +44-7XXX-XXXXXX',
+    defaultMessage: '07XXXXXXXXX',
     description: 'The placeholder that appears on the mobile number input'
   },
   passwordLabel: {

@@ -22,24 +22,25 @@
     "react-router": "^4.2.0",
     "react-router-redux": "next",
     "react-scripts-ts": "2.16.0",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "redux-loop": "^4.3.3"
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start":
-      "PORT=3000 BROWSER=none REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+    "start": "PORT=3000 BROWSER=none REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
     "build": "yarn verify-build-config && react-scripts-ts build",
-    "docker:build":
-      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
-    "docker:run":
-      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test":
-      "PORT=3000 REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "test": "PORT=3000 REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "git add"]
+    "src/**/*.{ts,tsx,json}": [
+      "prettier --write",
+      "tslint",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
