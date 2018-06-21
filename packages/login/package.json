@@ -21,19 +21,19 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
-    "start": "PORT=3030 REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
+    "verify-build-config":
+      "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "start":
+      "PORT=3020 REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en react-scripts-ts start",
     "build": "yarn verify-build-config && react-scripts-ts build",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": [
-      "prettier --write",
-      "tslint",
-      "git add"
-    ]
+    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "git add"]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
