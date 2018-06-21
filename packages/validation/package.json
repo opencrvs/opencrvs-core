@@ -1,5 +1,5 @@
 {
-  "name": "@opencrvs/valiation",
+  "name": "@opencrvs/validation",
   "version": "1.0.0",
   "description": "OpenCRVS validation utilities",
   "main": "src/index.js",
