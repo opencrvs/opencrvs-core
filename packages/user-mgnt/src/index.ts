@@ -1,11 +1,17 @@
-import * as Hapi from 'hapi'
+// tslint:disable-next-line no-var-requires
+require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
-import { AUTH_HOST, AUTH_PORT } from './constants'
+import * as Hapi from 'hapi'
+import * as mongoose from 'mongoose'
+
+import { AUTH_HOST, AUTH_PORT, MONGO_URL } from './constants'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from './features/verifyPassword/handler'
 import getPlugins from './config/plugins'
+
+mongoose.connect(MONGO_URL)
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -20,7 +26,7 @@ export async function createServer() {
     await server.register(getPlugins())
   }
 
-  // curl -H 'Content-Type: application/json' -d '{"mobile": "27845829934", "password": "test"}' http://localhost:3030/verifyPassword
+  // curl -H 'Content-Type: application/json' -d '{"mobile": "27855555555", "password": "test"}' http://localhost:3030/verifyPassword
   server.route({
     method: 'POST',
     path: '/verifyPassword',

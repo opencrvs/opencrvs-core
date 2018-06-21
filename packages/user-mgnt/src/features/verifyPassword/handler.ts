@@ -1,5 +1,9 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
+import { unauthorized } from 'boom'
+
+import User, { IUserModel } from 'src/model/user'
+import { generatePasswordHash } from 'src/utils/password'
 
 interface IVerifyPayload {
   mobile: string
@@ -10,20 +14,30 @@ interface IVerifyResponse {
   role: string
 }
 
-export default function verifyPassHandler(
+export default async function verifyPassHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  // @ts-ignore
-  const payload = request.payload as IVerifyPayload
-  // TODO OCRVS-328
-  const response: IVerifyResponse = { role: 'test' }
+  const { mobile, password } = request.payload as IVerifyPayload
+
+  const user: IUserModel | null = await User.findOne({ mobile })
+
+  if (!user) {
+    // Don't return a 404 as this gives away that this user account exists
+    throw unauthorized()
+  }
+
+  if (generatePasswordHash(password, user.salt) !== user.passwordHash) {
+    throw unauthorized()
+  }
+
+  const response: IVerifyResponse = { role: user.role }
   return response
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string(),
-  password: Joi.string()
+  mobile: Joi.string().required(),
+  password: Joi.string().required()
 })
 
 export const responseSchema = Joi.object({
