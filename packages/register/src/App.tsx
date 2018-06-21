@@ -5,32 +5,20 @@ import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import { Page } from '@opencrvs/components/lib/layout/Page'
-import { Content } from '@opencrvs/components/lib/layout/Content'
-import { Wrapper } from '@opencrvs/components/lib/layout/Wrapper'
+import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
 import { store, history } from './store'
 import { Route } from 'react-router'
 import styled, { ThemeProvider } from 'styled-components'
 import { RegistrationList } from './registrations/RegistrationList'
 import { config } from './config'
-
-import { Header } from '@opencrvs/components/lib/Header'
 import { Box } from '@opencrvs/components/lib/Box'
 import { getTheme } from '@opencrvs/components/lib/theme'
-
-/*const messages = defineMessages({
-  welcome: {
-    id: 'app.welcome',
-    defaultMessage: 'Welcome',
-    description: 'Test text'
-  }
-})*/
 
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h1FontStyle};
 `
 
-const StyledPage = styled(Page)`
+const StyledPage = styled(PageWrapper)`
   background-color: ${({ theme }) => theme.colors.background};
   ${({ theme }) => theme.fonts.defaultFontStyle}
 
@@ -73,14 +61,9 @@ const StyledPage = styled(Page)`
 `
 
 const Home = injectIntl(({ intl }) => (
-  <Wrapper>
-    <Header />
-    <Content>
-      <Box id="loginBox" columns={6}>
-        <RegistrationList />
-      </Box>
-    </Content>
-  </Wrapper>
+  <Box id="registerDashboard" columns={6}>
+    <RegistrationList />
+  </Box>
 ))
 
 const Other = () => (

@@ -5,7 +5,8 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box } from '@opencrvs/components/lib/Box'
 import styled from 'styled-components'
-import { getFieldProps, stepOneFields } from '../utils/fields'
+import { stepOneFields } from './stepOneFields'
+import { getFieldProps } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
 
 export const messages = defineMessages({
@@ -38,23 +39,6 @@ export const messages = defineMessages({
     id: 'login.submit',
     defaultMessage: 'Submit',
     description: 'The label that appears on the submit button'
-  },
-  required: {
-    id: 'login.required',
-    defaultMessage: 'Required',
-    description: 'The error message that appears on required fields'
-  },
-  minLength: {
-    id: 'login.minLength',
-    defaultMessage: 'Must be {min} characters or more',
-    description:
-      'The error message that appears on fields with a minimum length'
-  },
-  numberRequired: {
-    id: 'login.numberRequired',
-    defaultMessage: 'Must be a number',
-    description:
-      'The error message that appears on fields where the value must be a number'
   }
 })
 
@@ -131,7 +115,7 @@ export class StepOneForm extends React.Component<
             />
           </FieldWrapper>
           <ActionWrapper>
-            <Button id="login-mobile-submit">
+            <Button id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
             </Button>
           </ActionWrapper>

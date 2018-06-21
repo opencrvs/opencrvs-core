@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
-import { IAPIOptions } from './type/API'
+import { IAPIOptions } from '../type/API'
 import { config } from '../config'
-import { IStepOneData } from '../login/type/Login'
+import { IStepOneData } from '../type/Login'
 import { resolve } from 'url'
 
 const client = axios.create({
@@ -17,16 +17,13 @@ const request = (options: IAPIOptions) => {
     if (error.response) {
       // Request was made but server responded with something
       // other than 2xx
-      console.error('Status:', error.response.status)
-      console.error('Data:', error.response.data)
-      console.error('Headers:', error.response.headers)
     } else {
       // Something else happened while setting up the request
-      // triggered the error
+      // TODO: replace with call to Sentry
       console.error('Error Message:', error.message)
     }
 
-    return Promise.reject(error.response || error.message)
+    throw error
   }
 
   return client(options)
