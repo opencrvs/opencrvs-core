@@ -51,7 +51,6 @@ const StyledPage = styledPage`
 export class Page extends React.Component<IPage> {
   render() {
     const { language, children } = this.props
-    console.log(language)
     return <StyledPage language={language}>{children}</StyledPage>
   }
 }
