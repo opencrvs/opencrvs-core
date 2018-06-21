@@ -4,11 +4,12 @@ import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
 import { IStepOneForm, StepOneForm } from './StepOneForm'
 import * as actions from './LoginActions'
+import { IStoreState } from '../store'
 
 type StateProps = Partial<IStepOneForm>
 type DispatchProps = Partial<IStepOneForm>
 
-const mapStateToProps = (store: any): StateProps => {
+const mapStateToProps = (store: IStoreState): StateProps => {
   const formId = STEP_ONE_FORM
   return {
     formId
