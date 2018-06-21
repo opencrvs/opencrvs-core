@@ -12,8 +12,7 @@ export const stepOneFields: IFieldGroup = {
       validations.isNumber
     ],
     disabled: false,
-    type: 'number',
-    dynamicErrors: validations.dynamicValidationProps
+    type: 'number'
   },
   password: {
     id: 'password',

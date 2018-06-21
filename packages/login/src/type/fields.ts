@@ -1,9 +1,13 @@
-import { IIntlDynamicProps } from '@opencrvs/components/lib/utils/intlUtils'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, MessageValue } from 'react-intl'
 
 export type Validation = (
   value: any
-) => FormattedMessage.MessageDescriptor | undefined
+) =>
+  | {
+      message: FormattedMessage.MessageDescriptor
+      props?: { [key: string]: MessageValue }
+    }
+  | undefined
 
 export type IReduxFormFieldProps = {
   id: string
@@ -15,7 +19,6 @@ export type IReduxFormFieldProps = {
   maxLength?: number
   placeholder?: string
   label?: string
-  dynamicErrors?: IIntlDynamicProps
 }
 
 export type IFieldGroup = {

@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import { stepOneFields } from './stepOneFields'
 import { getFieldProps } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
+import { localizeInput } from '../i18n/localizeInput'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -88,6 +89,8 @@ export interface IStepOneForm {
   submitAction: (values: any) => void
 }
 
+const LocalizedInputField = localizeInput(InputField)
+
 export class StepOneForm extends React.Component<
   InjectedIntlProps & InjectedFormProps<{}, IStepOneForm> & IStepOneForm
 > {
@@ -103,15 +106,13 @@ export class StepOneForm extends React.Component<
           <FieldWrapper>
             <Field
               {...getFieldProps(intl, stepOneFields.mobile, messages)}
-              component={InputField}
-              intl={intl}
+              component={LocalizedInputField}
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
               {...getFieldProps(intl, stepOneFields.password, messages)}
-              component={InputField}
-              intl={intl}
+              component={LocalizedInputField}
             />
           </FieldWrapper>
           <ActionWrapper>
