@@ -1,13 +1,14 @@
 import { IntlState } from './IntlReducer'
+import { IStoreState } from '../store'
 
-const getPartialState = (store: any): IntlState => store.i18n
+const getPartialState = (store: IStoreState): IntlState => store.i18n
 
-function getKey<T, K extends keyof IntlState>(store: T, key: K) {
+function getKey<K extends keyof IntlState>(store: IStoreState, key: K) {
   return getPartialState(store)[key]
 }
 
-export const getLanguage = (store: any): IntlState['LANGUAGE'] =>
+export const getLanguage = (store: IStoreState): IntlState['LANGUAGE'] =>
   getKey(store, 'LANGUAGE')
 
-export const getMessages = (store: any): IntlState['messages'] =>
+export const getMessages = (store: IStoreState): IntlState['messages'] =>
   getKey(store, 'messages')
