@@ -44,10 +44,14 @@ const StyledInput = styledInput`
     -webkit-appearance: none;
   }
 
-  &[type='number'] {
+  &[maxlength='1'] {
     -moz-appearance: textfield;
+    display: block;
+    float: left;
     padding: 0;
-    text-indent: 20px;
+    width: 10%;
+    text-align: center;
+    margin-right: 2%;
   }
 `
 

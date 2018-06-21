@@ -4,34 +4,57 @@ import { IInputProps, Input } from './form/Input'
 import { InputError } from './form/InputError'
 import { InputLabel } from './form/InputLabel'
 
-export interface IInputFieldProps {
-  label: string
-  meta: {
-    touched: boolean
-    error?: string
-  }
+export interface IProps {
+  id: string
+  label?: string
+  placeholder?: string
+  disabled: boolean
+  type: string
+  meta?: { touched: boolean; error: string }
   maxLength?: number
+  min?: number
 }
 
-export class InputField extends React.Component<
-  IInputFieldProps & IInputProps
-> {
-  render() {
-    const { id, meta, disabled, label, placeholder, ...props } = this.props
+export type IInputFieldProps = IProps & IInputProps
 
-    const defaultLabel = disabled ? '' : label
+const applyDefaultIfNotDisabled = (
+  disabled: boolean,
+  label?: string
+): string => {
+  return !disabled && label ? label : ''
+}
+
+export class InputField extends React.Component<IInputFieldProps, {}> {
+  render() {
+    const {
+      id,
+      label,
+      type,
+      placeholder,
+      disabled,
+      meta,
+      min,
+      maxLength = 50,
+      ...props
+    } = this.props
 
     return (
       <div>
         {label && <InputLabel disabled={disabled}>{label}</InputLabel>}
+
         <Input
-          {...this.props}
-          placeholder={placeholder ? placeholder : defaultLabel}
-          error={Boolean(meta.error)}
-          touched={meta.touched}
+          {...props}
+          placeholder={
+            placeholder
+              ? placeholder
+              : applyDefaultIfNotDisabled(disabled, label)
+          }
+          error={Boolean(meta && meta.error)}
+          touched={meta && meta.touched}
         />
-        {meta.touched &&
-          meta.error && (
+        {meta &&
+          meta.error &&
+          meta.touched && (
             <InputError id={id + '_error'} errorMessage={meta.error} />
           )}
       </div>

@@ -1,21 +1,17 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { IntlProvider, injectIntl } from 'react-intl'
+import { IntlProvider } from 'react-intl'
 import { ConnectedRouter } from 'react-router-redux'
-import { Page } from '@opencrvs/components/lib/layout/Page'
-import { Content } from '@opencrvs/components/lib/layout/Content'
-import { Wrapper } from '@opencrvs/components/lib/layout/Wrapper'
 import { store, history } from './store'
 import { Route } from 'react-router'
 import styled, { ThemeProvider } from 'styled-components'
 import { config } from './config'
-import { StepOneContainer } from './login/StepOneContainer'
+import { StepTwo } from './login/StepTwo'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
+import { StepOneContainer } from './login/StepOneContainer'
 
-const StyledPage = styled(Page)`
-  background-color: ${({ theme }) => theme.colors.background};
-  min-height: 100vh;
-  ${({ theme }) => theme.fonts.defaultFontStyle}
+const StyledPage = styled(PageWrapper)`
 
   * {
     box-sizing: border-box;
@@ -55,14 +51,6 @@ const StyledPage = styled(Page)`
   }
 `
 
-const PageWrapper = injectIntl(({ intl }) => (
-  <Wrapper>
-    <Content>
-      <StepOneContainer />
-    </Content>
-  </Wrapper>
-))
-
 export class App extends React.Component {
   public render() {
     return (
@@ -71,7 +59,8 @@ export class App extends React.Component {
           <ThemeProvider theme={getTheme(config.LOCALE)}>
             <ConnectedRouter history={history}>
               <StyledPage>
-                <Route exact path="/" component={PageWrapper} />
+                <Route exact path="/" component={StepOneContainer} />
+                <Route exact path="/smscode" component={StepTwo} />
               </StyledPage>
             </ConnectedRouter>
           </ThemeProvider>
