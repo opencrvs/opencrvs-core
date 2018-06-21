@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom'
 import { injectGlobal } from 'styled-components'
 import { App } from './App'
 import registerServiceWorker from './registerServiceWorker'
-
+/* istanbul ignore file */
 // Injecting global styles for the body tag - used only once
 // tslint:disable-next-line
 injectGlobal`

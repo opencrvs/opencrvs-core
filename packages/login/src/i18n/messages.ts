@@ -1,4 +1,5 @@
 import { defineMessages } from 'react-intl'
+/* istanbul ignore file */
 
 export const messages = defineMessages({
   stepOneTitle: {
