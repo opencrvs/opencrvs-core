@@ -17,7 +17,8 @@
     "react-router": "^4.2.0",
     "react-router-redux": "next",
     "react-scripts-ts": "2.16.0",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "redux-form": "^7.4.2"
   },
   "scripts": {
     "precommit": "lint-staged",
@@ -33,7 +34,11 @@
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "git add"]
+    "src/**/*.{ts,tsx,json}": [
+      "prettier --write",
+      "tslint",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
@@ -42,6 +47,7 @@
     "@types/node": "^10.0.8",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
+    "@types/redux-form": "^7.2.6",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "prettier": "^1.12.1",

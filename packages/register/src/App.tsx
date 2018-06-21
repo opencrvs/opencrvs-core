@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { IntlProvider, injectIntl, defineMessages } from 'react-intl'
+import { IntlProvider, injectIntl } from 'react-intl'
 import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import { Page } from './common/Page'
-import { Wrapper } from './common/Wrapper'
-import { Main } from './common/Main'
+import { Page } from '@opencrvs/components/lib/layout/Page'
+import { Content } from '@opencrvs/components/lib/layout/Content'
+import { Wrapper } from '@opencrvs/components/lib/layout/Wrapper'
 import { store, history } from './store'
 import { Route } from 'react-router'
 import styled, { ThemeProvider } from 'styled-components'
@@ -15,17 +15,16 @@ import { RegistrationList } from './registrations/RegistrationList'
 import { config } from './config'
 
 import { Header } from '@opencrvs/components/lib/Header'
-import { Nav } from '@opencrvs/components/lib/Nav'
 import { Box } from '@opencrvs/components/lib/Box'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
-const messages = defineMessages({
+/*const messages = defineMessages({
   welcome: {
     id: 'app.welcome',
     defaultMessage: 'Welcome',
     description: 'Test text'
   }
-})
+})*/
 
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h1FontStyle};
@@ -74,20 +73,14 @@ const StyledPage = styled(Page)`
 `
 
 const Home = injectIntl(({ intl }) => (
-  <div>
-    <Header>
-      <Wrapper>
-        <Nav>
-          <Title>{intl.formatMessage(messages.welcome)}</Title>
-        </Nav>
-      </Wrapper>
-    </Header>
-    <Main>
+  <Wrapper>
+    <Header />
+    <Content>
       <Box id="loginBox" columns={6}>
         <RegistrationList />
       </Box>
-    </Main>
-  </div>
+    </Content>
+  </Wrapper>
 ))
 
 const Other = () => (
