@@ -1,5 +1,15 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
+import {
+  authenticate,
+  isUnauthorizedError,
+  storeUserInformation
+} from './service'
+import {
+  generateVerificationCode,
+  sendVerificationCode
+} from 'src/features/verifyCode/service'
+import { unauthorized } from 'boom'
 
 interface IAuthPayload {
   mobile: string
@@ -11,14 +21,32 @@ interface IAuthResponse {
   mobile: string
 }
 
-export default function authenticateHandler(
+export default async function authenticateHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
-) {
+): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
-  // TODO OCRVS-326
-  const response: IAuthResponse = { nonce: 'test1234', mobile: payload.mobile }
-  return response
+  let result
+
+  try {
+    result = await authenticate(payload.mobile, payload.password)
+  } catch (err) {
+    if (isUnauthorizedError(err)) {
+      throw unauthorized()
+    }
+    throw err
+  }
+
+  await storeUserInformation(result.nonce, result.userId, result.role)
+
+  const verificationCode = await generateVerificationCode(
+    result.nonce,
+    result.mobile
+  )
+
+  await sendVerificationCode(result.mobile, verificationCode)
+
+  return { mobile: result.mobile, nonce: result.nonce }
 }
 
 export const requestSchema = Joi.object({

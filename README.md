@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/jembi/OpenCRVS.svg?token=VAkt1HxiHGcBsXWJ7mWy&branch=master)](https://travis-ci.com/jembi/OpenCRVS) [![codecov](https://codecov.io/gh/jembi/OpenCRVS/branch/master/graph/badge.svg?token=ZDi55WmcbB)](https://codecov.io/gh/jembi/OpenCRVS)
+
 # OpenCRVS
 
 This repo contains the frontend components and frontend related middleware for the OpenCRVS app.

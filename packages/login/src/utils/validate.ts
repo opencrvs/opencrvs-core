@@ -1,6 +1,5 @@
 import { defineMessages } from 'react-intl'
 import { Validation } from '../type/fields'
-import { IIntlDynamicProps } from '@opencrvs/components/lib/utils/intlUtils'
 import { config } from '../config'
 
 export const messages = defineMessages({
@@ -30,7 +29,7 @@ export const messages = defineMessages({
   }
 })
 
-export const dynamicValidationProps: IIntlDynamicProps = {
+const dynamicValidationProps = {
   minLength: {
     min: 11
   },
@@ -42,22 +41,30 @@ export const dynamicValidationProps: IIntlDynamicProps = {
 }
 
 const isAValidPhoneNumberFormat = (value: string): boolean => {
-  console.log(value)
   const numberRexExp = new RegExp('0[0-9]{10}')
   return numberRexExp.test(value)
 }
 
 export const required: Validation = (value: any) =>
-  value || typeof value === 'number' ? undefined : messages.required
+  value || typeof value === 'number'
+    ? undefined
+    : { message: messages.required }
 
 export const minLength = (min: number) => (value: any) =>
-  value && value.length < min ? messages.minLength : undefined
+  value && value.length < min
+    ? { message: messages.minLength, values: dynamicValidationProps.minLength }
+    : undefined
 
 export const isNumber: Validation = (value: any) =>
-  value && isNaN(Number(value)) ? messages.numberRequired : undefined
+  value && isNaN(Number(value))
+    ? { message: messages.numberRequired }
+    : undefined
 
-export const phoneNumberFormat: Validation = (value: any) => {
+export const phoneNumberFormat: Validation = (value: any, ...rest: any[]) => {
   return value && isAValidPhoneNumberFormat(value)
     ? undefined
-    : messages.phoneNumberFormat
+    : {
+        message: messages.phoneNumberFormat,
+        values: dynamicValidationProps.phoneNumberFormat
+      }
 }
