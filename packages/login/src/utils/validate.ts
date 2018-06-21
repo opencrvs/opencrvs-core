@@ -4,24 +4,24 @@ import { config } from '../config'
 
 export const messages = defineMessages({
   required: {
-    id: 'required',
+    id: 'validations.required',
     defaultMessage: 'Required',
     description: 'The error message that appears on required fields'
   },
   minLength: {
-    id: 'minLength',
+    id: 'validations.minLength',
     defaultMessage: 'Must be {min} characters or more',
     description:
       'The error message that appears on fields with a minimum length'
   },
   numberRequired: {
-    id: 'numberRequired',
+    id: 'validations.numberRequired',
     defaultMessage: 'Must be a number',
     description:
       'The error message that appears on fields where the value must be a number'
   },
   phoneNumberFormat: {
-    id: 'phoneNumberFormat',
+    id: 'validations.phoneNumberFormat',
     defaultMessage:
       'Must be a valid {locale} mobile phone number. Starting with 0. {min} digits.  E.G. {format}',
     description:

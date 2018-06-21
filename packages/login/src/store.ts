@@ -4,13 +4,15 @@ import { combineReducers, install, StoreCreator } from 'redux-loop'
 import { routerReducer, routerMiddleware } from 'react-router-redux'
 import { reducer as formReducer } from 'redux-form'
 import { loginReducer } from './login/loginReducer'
+import { intlReducer } from './i18n/IntlReducer'
 
 export const history = createHistory()
 const middleware = routerMiddleware(history)
 const reducers = combineReducers({
   router: routerReducer,
   login: loginReducer,
-  form: formReducer
+  form: formReducer,
+  i18n: intlReducer
 })
 const enhancedCreateStore = createStore as StoreCreator
 
