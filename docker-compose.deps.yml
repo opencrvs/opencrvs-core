@@ -11,9 +11,11 @@ services:
       placement:
         constraints:
           - node.role == manager
+
   redis:
     image: redis
     restart: unless-stopped
+
   hearth:
     image: jembi/hearth:latest
     environment:
