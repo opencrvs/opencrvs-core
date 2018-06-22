@@ -5,14 +5,14 @@ export const stepOneFields: IFieldGroup = {
   mobile: {
     id: 'mobile',
     name: 'mobile',
-    min: 11,
+    maxLength: 11,
     validate: [
       validations.required,
       validations.phoneNumberFormat,
       validations.isNumber
     ],
     disabled: false,
-    type: 'number'
+    type: 'tel'
   },
   password: {
     id: 'password',

@@ -1,9 +1,9 @@
 import { connect } from 'react-redux'
-import { STEP_ONE_FORM } from './Constants'
+import { STEP_ONE_FORM } from './constants'
 import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
 import { IStepOneForm, StepOneForm } from './StepOneForm'
-import * as actions from './LoginActions'
+import * as actions from './loginActions'
 
 type StateProps = Partial<IStepOneForm>
 type DispatchProps = Partial<IStepOneForm>
