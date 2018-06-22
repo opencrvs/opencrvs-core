@@ -1,10 +1,10 @@
 import axios, { AxiosError } from 'axios'
 import { IAPIOptions } from '../type/API'
 import { config } from '../config'
-import { IStepOneData } from '../type/Login'
+import { IStepOneData } from '../type/login'
 import { resolve } from 'url'
 
-const client = axios.create({
+export const client = axios.create({
   baseURL: config.AUTH_API_URL
 })
 
@@ -40,5 +40,6 @@ const submitStepOne = (data: IStepOneData) => {
 }
 
 export const authApi = {
+  request,
   submitStepOne
 }

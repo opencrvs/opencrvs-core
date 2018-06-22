@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import * as actions from './IntlActions'
+import * as actions from './intlActions'
 import { IntlMessages } from '../type/i18n'
 import { ENGLISH_STATE } from './en'
 import { BENGALI_STATE } from './bn'
@@ -10,8 +10,8 @@ export type IntlState = {
 }
 
 export const initialState: IntlState = {
-  LANGUAGE: 'bn',
-  messages: BENGALI_STATE.messages
+  LANGUAGE: 'en',
+  messages: ENGLISH_STATE.messages
 }
 
 const getNextMessages = (language: string): IntlMessages => {

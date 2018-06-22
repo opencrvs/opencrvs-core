@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { getLanguage } from '../i18n/IntlSelectors'
+import { getLanguage } from '../i18n/intlSelectors'
 import { Page } from './Page'
 import { IStoreState } from '../store'
 

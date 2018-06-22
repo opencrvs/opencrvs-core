@@ -1,5 +1,5 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
-import * as actions from './LoginActions'
+import * as actions from './loginActions'
 
 export type LoginState = {
   stepOneSubmitting: boolean
