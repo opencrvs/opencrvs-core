@@ -30,7 +30,7 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{"mobile": "27845829934", "password": "test"}' http://localhost:4040/authenticate
+  // curl -H 'Content-Type: application/json' -d '{"mobile": "27855555555", "password": "test"}' http://localhost:4040/authenticate
   server.route({
     method: 'POST',
     path: '/authenticate',
