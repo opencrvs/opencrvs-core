@@ -106,6 +106,8 @@ export class StepOneForm extends React.Component<
           <FieldWrapper>
             <Field
               {...getFieldProps(intl, stepOneFields.mobile, messages)}
+              type="tel"
+              maxLength={12}
               component={LocalizedInputField}
             />
           </FieldWrapper>

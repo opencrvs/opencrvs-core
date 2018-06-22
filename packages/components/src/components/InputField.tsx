@@ -26,17 +26,7 @@ const applyDefaultIfNotDisabled = (
 
 export class InputField extends React.Component<IInputFieldProps, {}> {
   render() {
-    const {
-      id,
-      label,
-      type,
-      placeholder,
-      disabled,
-      meta,
-      min,
-      maxLength = 50,
-      ...props
-    } = this.props
+    const { id, label, placeholder, disabled, meta, min, ...props } = this.props
 
     return (
       <div>
