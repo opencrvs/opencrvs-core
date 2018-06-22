@@ -40,6 +40,15 @@ const StyledPage = styledPage`
   }
 
   @font-face {
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    src:
+      url('/fonts/notosans-regular-webfont-en.woff')
+      format('woff');
+    font-style: normal;
+    unicode-range: U+0025-00FF;
+  }
+
+  @font-face {
     font-family: ${({ theme }) => theme.fonts.boldFont};
     src:
       url('/fonts/notosans-bold-webfont-${({ language }) => language}.woff')
