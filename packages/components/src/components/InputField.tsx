@@ -26,7 +26,7 @@ const applyDefaultIfNotDisabled = (
 
 export class InputField extends React.Component<IInputFieldProps, {}> {
   render() {
-    const { id, label, placeholder, disabled, meta, min, ...props } = this.props
+    const { id, label, placeholder, disabled, meta, ...props } = this.props
 
     return (
       <div>
@@ -34,6 +34,8 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
 
         <Input
           {...props}
+          id={id}
+          disabled={disabled}
           placeholder={
             placeholder
               ? placeholder
