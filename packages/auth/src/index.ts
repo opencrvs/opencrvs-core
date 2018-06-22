@@ -1,8 +1,11 @@
-// tslint:disable-next-line no-var-requires
+// tslint:disable no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
+require('dotenv').config({
+  path: `${process.cwd()}/.env`
+})
+// tslint:enable no-var-requires
 
 import * as Hapi from 'hapi'
-import * as DotEnv from 'dotenv'
 
 import { AUTH_HOST, AUTH_PORT } from './constants'
 import authenticateHandler, {
@@ -16,10 +19,6 @@ import verifyCodeHandler, {
 import getPlugins from './config/plugins'
 
 import * as database from './database'
-
-DotEnv.config({
-  path: `${process.cwd()}/.env`
-})
 
 export async function createServer() {
   const server = new Hapi.Server({
