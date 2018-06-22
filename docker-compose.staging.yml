@@ -1,5 +1,26 @@
 version: "3.3"
 
+services:
+  auth:
+    secrets:
+      - jwt-public-key
+      - jwt-private-key
+  user-mgnt:
+    secrets:
+      - jwt-public-key
+  gateway:
+    secrets:
+     - jwt-public-key
+  hearth:
+    secrets:
+      - jwt-public-key
+
+secrets:
+  jwt-public-key:
+    external: true
+  jwt-private-key:
+    external: true
+
 configs:
   openhim-console-conf:
     file: ./infrastructure/openhim-console-config.staging.json
