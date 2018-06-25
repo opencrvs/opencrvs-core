@@ -8,7 +8,7 @@ describe('authApi', () => {
   afterEach(() => {
     moxios.uninstall(client)
   })
-  it('should authenticate with the server and return a nonce!  Love that word!', async () => {
+  it('authenticates with the server and return a nonce!  Love that word!', async () => {
     const data = {
       mobile: '27845829934',
       password: 'test'
