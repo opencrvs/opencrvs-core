@@ -35,8 +35,8 @@ To deploy to staging we use the same docker-compose files that are used in the d
 The deploy is easily executed by just running: `yarn deploy:staging` - you will need ssh access to the server for this to work.
 
 Some useful commands to manage the swarm:
-  * `ssh root@209.97.128.246 docker service ls` - see all services running in the swarm including how many replicas are running
-  * `ssh root@209.97.128.246 docker service logs -f <service-id>` - stream the logs for a particular service (which could include logs from multiple replicas)
-  * `ssh root@209.97.128.246 docker stack ps opencrvs` - view all tasks (containers) running in the opencrvs stack
+  * `ssh root@opencrvs-staging.jembi.org docker service ls` - see all services running in the swarm including how many replicas are running
+  * `ssh root@opencrvs-staging.jembi.org docker service logs -f <service-id>` - stream the logs for a particular service (which could include logs from multiple replicas)
+  * `ssh root@opencrvs-staging.jembi.org docker stack ps opencrvs` - view all tasks (containers) running in the opencrvs stack
 
 To scale a service change the deploy->replicas setting in the corresponding compose file and run the deploy again.

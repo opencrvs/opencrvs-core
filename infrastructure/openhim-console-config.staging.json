@@ -2,7 +2,7 @@
   "version": "1.10.0",
   "minimumCoreVersion": "3.4.0",
   "protocol": "https",
-  "host": "209.97.128.246",
+  "host": "opencrvs-staging.jembi.org",
   "port": 8080,
   "title": "OpenCRVS - Admin Console",
   "footerTitle": "OpenCRVS - OpenHIM Administration Console",
