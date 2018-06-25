@@ -1,6 +1,5 @@
 import { IStepOneData } from '../type/login'
 import { AxiosError } from 'axios'
-import { authApi } from '../utils/authApi'
 
 export const START_STEP_ONE = 'STEP_ONE/START_STEP_ONE'
 export const STEP_ONE_SUCCESS = 'STEP_ONE/STEP_ONE_SUCCESS'
@@ -15,10 +14,6 @@ export const startStepOne = (values: IStepOneData): Action => ({
   type: START_STEP_ONE,
   payload: values
 })
-
-export const submitStepOne = (data: IStepOneData): Promise<Action> => {
-  return authApi.submitStepOne(data)
-}
 
 export const submitStepOneSuccess = (response: any): Action => ({
   type: STEP_ONE_SUCCESS,

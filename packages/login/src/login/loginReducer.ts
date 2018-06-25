@@ -1,5 +1,6 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
 import * as actions from './loginActions'
+import { authApi } from '../utils/authApi'
 
 export type LoginState = {
   stepOneSubmitting: boolean
@@ -21,7 +22,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.START_STEP_ONE:
       return loop(
         { ...state, stepOneSubmitting: true },
-        Cmd.run(actions.submitStepOne, {
+        Cmd.run(authApi.submitStepOne, {
           successActionCreator: actions.submitStepOneSuccess,
           failActionCreator: actions.submitStepOneFailed,
           args: [action.payload]
