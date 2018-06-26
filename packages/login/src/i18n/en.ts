@@ -1,7 +1,7 @@
 export const ENGLISH_STATE = {
   lang: 'en',
   messages: {
-    'login.stepOneTitle': 'Login to OpenCRVS',
+    'login.stepOneTitle': 'Login',
     'login.stepOneInstruction': 'Please enter your mobile number and password.',
     'login.mobileLabel': 'Mobile number',
     'login.mobilePlaceholder': '07XXXXXXXXX',

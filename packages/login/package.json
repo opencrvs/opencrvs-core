@@ -25,13 +25,13 @@
   "scripts": {
     "precommit": "lint-staged",
     "start":
-      "PORT=3020 REACT_APP_AUTH_API_URL=http://localhost:4040/ REACT_APP_LOCALE=gb react-scripts-ts start",
+      "PORT=3020 REACT_APP_AUTH_API_URL=http://localhost:4040/ REACT_APP_LOCALE=bd react-scripts-ts start",
     "docker:build":
       "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run":
       "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
     "test":
-      "PORT=3020 REACT_APP_AUTH_API_URL=http://localhost:4040/ REACT_APP_LOCALE=gb react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+      "PORT=3020 REACT_APP_AUTH_API_URL=http://localhost:4040/ REACT_APP_LOCALE=bd react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "verify-build-config":
       "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
     "build": "yarn verify-build-config && react-scripts-ts build",

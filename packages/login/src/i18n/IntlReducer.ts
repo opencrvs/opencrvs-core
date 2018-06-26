@@ -10,8 +10,8 @@ export type IntlState = {
 }
 
 export const initialState: IntlState = {
-  LANGUAGE: 'en',
-  messages: ENGLISH_STATE.messages
+  LANGUAGE: 'bn',
+  messages: BENGALI_STATE.messages
 }
 
 const getNextMessages = (language: string): IntlMessages => {

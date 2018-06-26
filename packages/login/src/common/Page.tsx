@@ -46,6 +46,15 @@ const StyledPage = styledPage`
       format('woff');
     font-style: normal;
   }
+
+
+  @font-face {
+    font-family: noto_sansregular;
+    src:
+      url('/fonts/notosans-regular-webfont-en.woff')
+      format('woff');
+    font-style: normal;
+  }
 `
 
 export class Page extends React.Component<IPage> {
