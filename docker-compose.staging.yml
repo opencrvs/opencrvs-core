@@ -3,24 +3,28 @@ version: "3.3"
 services:
   auth:
     secrets:
-      - jwt-public-key
-      - jwt-private-key
+      - jwt-public-key.{{ts}}
+      - jwt-private-key.{{ts}}
   user-mgnt:
     secrets:
-      - jwt-public-key
+      - jwt-public-key.{{ts}}
   gateway:
     secrets:
-     - jwt-public-key
+     - jwt-public-key.{{ts}}
   hearth:
     secrets:
-      - jwt-public-key
+      - jwt-public-key.{{ts}}
+  openhim-console:
+    configs:
+      - source: openhim-console-conf.{{ts}}
+        target: /usr/share/nginx/html/config/default.json
 
 secrets:
-  jwt-public-key:
+  jwt-public-key.{{ts}}:
     external: true
-  jwt-private-key:
+  jwt-private-key.{{ts}}:
     external: true
 
 configs:
-  openhim-console-conf:
+  openhim-console-conf.{{ts}}:
     file: ./infrastructure/openhim-console-config.staging.json
