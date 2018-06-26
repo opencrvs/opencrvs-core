@@ -1,5 +1,8 @@
 import { IStepOneData } from '../type/login'
 import { AxiosError } from 'axios'
+import { authApi } from '../utils/authApi'
+import { convertToMSISDN } from '@opencrvs/validation/src'
+import { config } from '../config'
 
 export const START_STEP_ONE = 'STEP_ONE/START_STEP_ONE'
 export const STEP_ONE_SUCCESS = 'STEP_ONE/STEP_ONE_SUCCESS'
@@ -14,6 +17,15 @@ export const startStepOne = (values: IStepOneData): Action => ({
   type: START_STEP_ONE,
   payload: values
 })
+
+export const submitStepOne = (data: IStepOneData): Promise<Action> => {
+  const cleanedData = {
+    mobile: convertToMSISDN(data.mobile, config.LOCALE),
+    password: data.password
+  }
+  console.log(cleanedData.mobile)
+  return authApi.submitStepOne(data)
+}
 
 export const submitStepOneSuccess = (response: any): Action => ({
   type: STEP_ONE_SUCCESS,

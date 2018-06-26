@@ -4,6 +4,7 @@ import { InjectedFormProps } from 'redux-form'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box } from '@opencrvs/components/lib/Box'
+import { EnglishText } from '@opencrvs/components/lib/EnglishText'
 import styled from 'styled-components'
 import { stepOneFields } from './stepOneFields'
 import { getFieldProps } from '../utils/fieldUtils'
@@ -13,7 +14,7 @@ import { localizeInput } from '../i18n/localizeInput'
 export const messages = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
-    defaultMessage: 'Login to OpenCRVS',
+    defaultMessage: 'Login',
     description: 'The title that appears in step one of the form'
   },
   stepOneInstruction: {
@@ -28,7 +29,7 @@ export const messages = defineMessages({
   },
   mobilePlaceholder: {
     id: 'login.mobilePlaceholder',
-    defaultMessage: 'e.g: +44-7XXX-XXXXXX',
+    defaultMessage: '07XXXXXXXXX',
     description: 'The placeholder that appears on the mobile number input'
   },
   passwordLabel: {
@@ -99,7 +100,10 @@ export class StepOneForm extends React.Component<
     return (
       <StyledBox id="login-step-one-box" columns={4}>
         <Title>
-          <h2>{intl.formatMessage(messages.stepOneTitle)}</h2>
+          <h2>
+            <EnglishText>OpenCRVS </EnglishText>
+            {intl.formatMessage(messages.stepOneTitle)}
+          </h2>
           <p>{intl.formatMessage(messages.stepOneInstruction)}</p>
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>

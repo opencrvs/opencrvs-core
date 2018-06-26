@@ -1,5 +1,4 @@
 const unsafeConfig = {
-  LANGUAGE: process.env.REACT_APP_LANGUAGE,
   LOCALE: process.env.REACT_APP_LOCALE,
   AUTH_API_URL: process.env.REACT_APP_AUTH_API_URL
 }
