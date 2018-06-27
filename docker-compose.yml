@@ -67,3 +67,16 @@ services:
       - MONGO_URL=mongodb://mongo/user-mgnt
     deploy:
       replicas: 2
+
+  notification:
+    image: jembi/ocrvs-notification:latest
+    build: packages/notification
+    restart: unless-stopped
+    ports:
+      - "2020:2020"
+    environment:
+      - CLICKATELL_USER=jembihealth
+      - CLICKATELL_PASSWORD=BdFGAZMDTZSgKX
+      - CLICKATELL_API_ID=3414601
+    deploy:
+      replicas: 2
