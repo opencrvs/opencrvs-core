@@ -23,11 +23,9 @@ describe('foo', () => {
 
     app
       .find('input#mobile')
-      .simulate('change', { target: { value: '04477897788' } })
+      .simulate('change', { target: { value: '07111111111' } })
 
-    app
-      .find('input#password')
-      .simulate('change', { target: { value: 'hello' } })
+    app.find('input#password').simulate('change', { target: { value: 'test' } })
 
     app.find('form#STEP_ONE').simulate('submit')
 
