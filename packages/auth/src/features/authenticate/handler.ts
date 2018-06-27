@@ -1,10 +1,6 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import {
-  authenticate,
-  isUnauthorizedError,
-  storeUserInformation
-} from './service'
+import { authenticate, storeUserInformation } from './service'
 import {
   generateVerificationCode,
   sendVerificationCode
@@ -31,10 +27,7 @@ export default async function authenticateHandler(
   try {
     result = await authenticate(payload.mobile, payload.password)
   } catch (err) {
-    if (isUnauthorizedError(err)) {
-      throw unauthorized()
-    }
-    throw err
+    throw unauthorized()
   }
 
   await storeUserInformation(result.nonce, result.userId, result.role)
