@@ -20,13 +20,7 @@ export interface IAuthentication {
   userId: string
   role: string
 }
-
-export class UnauthorizedError extends Error {}
 export class UserInfoNotFoundError extends Error {}
-
-export function isUnauthorizedError(err: Error) {
-  return err instanceof UnauthorizedError
-}
 
 export function isUserInfoNotFoundError(err: Error) {
   return err instanceof UserInfoNotFoundError
@@ -36,7 +30,7 @@ export async function authenticate(
   mobile: string,
   password: string
 ): Promise<IAuthentication> {
-  const url = resolve(USER_MANAGEMENT_URL, '/authenticate')
+  const url = resolve(USER_MANAGEMENT_URL, '/verifyPassword')
 
   let res
   try {
@@ -44,12 +38,21 @@ export async function authenticate(
       method: 'POST',
       body: JSON.stringify({ mobile, password })
     })
+    switch (res.status) {
+      case 200:
+        const body = await res.json()
+        return {
+          nonce: body.nonce,
+          userId: body.userId,
+          role: body.role,
+          mobile
+        }
+      default:
+        throw Error(res.statusText)
+    }
   } catch (err) {
-    throw new UnauthorizedError('Unauthorized')
+    throw Error(err.statusText)
   }
-  const body = await res.json()
-
-  return { nonce: body.nonce, userId: body.userId, role: body.role, mobile }
 }
 
 export async function createToken(

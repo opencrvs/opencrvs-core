@@ -11,6 +11,7 @@ export interface IFonts {
   h1FontStyle: string
   h2FontStyle: string
   h3FontStyle: string
+  englishTextFont: string
 }
 
 const localeFonts = {
@@ -31,10 +32,11 @@ const localeFonts = {
   }
 }
 
-export const fonts = (locale: string) => ({
+export const fonts = (locale: string): IFonts => ({
   boldFont: localeFonts[locale].boldFontFamily,
   lightFont: localeFonts[locale].lightFontFamily,
   regularFont: localeFonts[locale].regularFontFamily,
+  englishTextFont: 'noto_sansregular',
   defaultFontStyle: `font-family: ${localeFonts[locale].regularFontFamily};
     font-weight: 300;
     font-size: 16px;
