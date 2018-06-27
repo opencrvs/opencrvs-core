@@ -88,7 +88,7 @@ export const Title = styled.div`
 `
 
 export const ErrorText = styled.p`
-  color: ${({ theme }) => theme.colors.error}
+  color: ${({ theme }) => theme.colors.error};
 `
 
 const FieldWrapper = styled.div`
@@ -123,7 +123,9 @@ export class StepOneForm extends React.Component<
           </h2>
           <p>{intl.formatMessage(messages.stepOneInstruction)}</p>
           {submissionError && (
-            <ErrorText>{intl.formatMessage(messages.submissionError)}</ErrorText>
+            <ErrorText>
+              {intl.formatMessage(messages.submissionError)}
+            </ErrorText>
           )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>

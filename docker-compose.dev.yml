@@ -1,5 +1,6 @@
 version: "3.3"
 
+# Expose ports locally for dev
 services:
   mongo:
     ports:
@@ -7,3 +8,13 @@ services:
   redis:
     ports:
       - "6379:6379"
+
+  # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
+  hearth:
+    volumes:
+      - ".secrets/public-key.pem:/secrets/public-key.pem"
+
+  # Expose config as a plain volume - these will use docker config in staging and prod
+  openhim-console:
+    volumes:
+      - "./infrastructure/openhim-console-config.staging.json:/usr/share/nginx/html/config/default.json"

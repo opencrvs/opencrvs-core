@@ -44,3 +44,26 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
     deploy:
       replicas: 2
+
+  auth:
+    image: jembi/ocrvs-auth:latest
+    build: packages/auth
+    restart: unless-stopped
+    environment:
+      - REDIS_HOST=redis
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+    ports:
+      - "4040:4040"
+    deploy:
+      replicas: 2
+
+  user-mgnt:
+    image: jembi/ocrvs-user-mgnt:latest
+    build: packages/user-mgnt
+    restart: unless-stopped
+    ports:
+      - "3030:3030"
+    environment:
+      - MONGO_URL=mongodb://mongo/user-mgnt
+    deploy:
+      replicas: 2
