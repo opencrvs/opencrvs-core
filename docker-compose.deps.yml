@@ -11,9 +11,11 @@ services:
       placement:
         constraints:
           - node.role == manager
+
   redis:
     image: redis
     restart: unless-stopped
+
   hearth:
     image: jembi/hearth:latest
     environment:
@@ -47,13 +49,6 @@ services:
     image: jembi/openhim-console
     ports:
       - "8888:80"
-    configs:
-      - source: openhim-console-conf
-        target: /usr/share/nginx/html/config/default.json
     restart: unless-stopped
     deploy:
       replicas: 2
-
-configs:
-  openhim-console-conf:
-    file: ./infrastructure/openhim-console-config.json

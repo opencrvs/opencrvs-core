@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "lerna run --parallel start",
-    "dev": "concurrently \"yarn run start\" \"yarn run compose\"",
+    "dev": "yarn dev:secrets:gen && concurrently \"yarn run start\" \"yarn run compose\"",
+    "dev:secrets:gen": "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
     "test": "lerna run --parallel test -- --watchAll=false",
     "compose": "yarn run compose:build && yarn run compose:up",
     "compose:up": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.dev.yml up",
@@ -18,7 +19,7 @@
     "compose:all:up": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml up",
     "compose:all:down": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml down",
     "compose:all:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.yml build",
-    "deploy:staging": "scp -r docker-compose* infrastructure/ root@209.97.128.246:/tmp/ && ssh root@209.97.128.246 'cd /tmp && docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.staging.yml --with-registry-auth opencrvs'"
+    "deploy:staging": "rsync -rP docker-compose* infrastructure root@opencrvs-staging.jembi.org:/tmp/compose/ && ssh root@opencrvs-staging.jembi.org '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.staging.yml | tee -a /var/log/rotate-secrets.log' && ssh root@opencrvs-staging.jembi.org 'cd /tmp/compose && docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.staging.yml --with-registry-auth opencrvs'"
   },
   "devDependencies": {
     "@types/dotenv": "^4.0.3",
