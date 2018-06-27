@@ -41,6 +41,12 @@ export const messages = defineMessages({
     id: 'login.submit',
     defaultMessage: 'Submit',
     description: 'The label that appears on the submit button'
+  },
+  submissionError: {
+    id: 'login.submissionError',
+    defaultMessage: 'Sorry that mobile number and password did not work.',
+    description:
+      'The error that appears when the user entered details are unauthorised'
   }
 })
 
@@ -81,12 +87,17 @@ export const Title = styled.div`
   }
 `
 
+export const ErrorText = styled.p`
+  color: ${({ theme }) => theme.colors.error}
+`
+
 const FieldWrapper = styled.div`
   margin-bottom: 30px;
 `
 
 export interface IStepOneForm {
   formId: string
+  submissionError: boolean
   submitAction: (values: any) => void
 }
 
@@ -96,7 +107,13 @@ export class StepOneForm extends React.Component<
   InjectedIntlProps & InjectedFormProps<{}, IStepOneForm> & IStepOneForm
 > {
   render() {
-    const { intl, handleSubmit, formId, submitAction } = this.props
+    const {
+      intl,
+      handleSubmit,
+      formId,
+      submitAction,
+      submissionError
+    } = this.props
     return (
       <StyledBox id="login-step-one-box" columns={4}>
         <Title>
@@ -105,6 +122,9 @@ export class StepOneForm extends React.Component<
             {intl.formatMessage(messages.stepOneTitle)}
           </h2>
           <p>{intl.formatMessage(messages.stepOneInstruction)}</p>
+          {submissionError && (
+            <ErrorText>{intl.formatMessage(messages.submissionError)}</ErrorText>
+          )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>

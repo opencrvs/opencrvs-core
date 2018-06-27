@@ -5,14 +5,15 @@ import { reduxForm } from 'redux-form'
 import { IStepOneForm, StepOneForm } from './StepOneForm'
 import { IStoreState } from '../store'
 import * as actions from './loginActions'
+import { getSubmissionError } from './loginSelectors'
 
 type StateProps = Partial<IStepOneForm>
 type DispatchProps = Partial<IStepOneForm>
 
 const mapStateToProps = (store: IStoreState): StateProps => {
-  const formId = STEP_ONE_FORM
   return {
-    formId
+    formId: STEP_ONE_FORM,
+    submissionError: getSubmissionError(store)
   }
 }
 

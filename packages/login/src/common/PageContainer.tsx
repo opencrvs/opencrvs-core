@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import { getLanguage } from '../i18n/intlSelectors'
+import { withRouter } from 'react-router'
 import { Page } from './Page'
 import { IStoreState } from '../store'
 
@@ -13,4 +14,6 @@ const mapStateToProps = (store: IStoreState): StateProps => {
   }
 }
 
-export const PageContainer = connect<StateProps, {}>(mapStateToProps)(Page)
+export const PageContainer = withRouter(connect<StateProps, {}>(
+  mapStateToProps
+)(Page) as any)

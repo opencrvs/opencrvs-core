@@ -1,16 +1,16 @@
 import { compose, createStore, applyMiddleware } from 'redux'
-import createHistory from 'history/createBrowserHistory'
+import { createBrowserHistory } from 'history'
 import { combineReducers, install, StoreCreator } from 'redux-loop'
 import {
-  routerReducer,
+  connectRouter,
   routerMiddleware,
   RouterState
-} from 'react-router-redux'
+} from 'connected-react-router'
 import { reducer as formReducer, FormState } from 'redux-form'
 import { loginReducer, LoginState } from './login/loginReducer'
 import { intlReducer, IntlState } from './i18n/intlReducer'
 
-export const history = createHistory()
+export const history = createBrowserHistory()
 const middleware = routerMiddleware(history)
 
 export interface IStoreState {
@@ -21,8 +21,8 @@ export interface IStoreState {
 }
 
 const reducers = combineReducers({
-  router: routerReducer,
   login: loginReducer,
+  router: connectRouter(history),
   form: formReducer,
   i18n: intlReducer
 })

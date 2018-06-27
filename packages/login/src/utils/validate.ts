@@ -23,25 +23,36 @@ export const messages = defineMessages({
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
     defaultMessage:
-      'Must be a valid {locale} mobile phone number. Starting with 0. {min} digits.  E.G. {format}',
+      'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
+  },
+  mobilePhoneRegex: {
+    id: 'validations.mobilePhoneRegex',
+    defaultMessage: '07[0-9]{9,10}',
+    description:
+      'The regular expression to use when validating a local mobile phone number'
+  },
+  mobileNumberFormat: {
+    id: 'validations.mobileNumberFormat',
+    defaultMessage: '07123456789',
+    description:
+      'The format of the mobile number that appears in an error message'
   }
 })
 
 const dynamicValidationProps = {
   minLength: {
-    min: 11
+    min: 10
   },
   phoneNumberFormat: {
     locale: config.LOCALE.toUpperCase(),
-    min: 11,
-    format: '07012345678'
+    format: messages.mobileNumberFormat.defaultMessage
   }
 }
 
 const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const numberRexExp = new RegExp('0[0-9]{10}')
+  const numberRexExp = new RegExp(messages.mobilePhoneRegex.defaultMessage)
   return numberRexExp.test(value)
 }
 
