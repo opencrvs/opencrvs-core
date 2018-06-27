@@ -19,7 +19,9 @@ export default function getPlugins() {
               args: [
                 {
                   log: '*',
-                  response: '*'
+                  response: '*',
+                  request: '*',
+                  error: '*'
                 }
               ]
             },

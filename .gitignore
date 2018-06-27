@@ -14,3 +14,5 @@ build
 .DS_Store
 .env
 *.log
+.vscode
+.vs
