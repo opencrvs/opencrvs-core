@@ -1,5 +1,6 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
+import { internal } from 'boom'
 import { sendSMS } from './service'
 
 export interface IAuthPayload {
@@ -12,8 +13,13 @@ export default async function smsHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IAuthPayload
-  await sendSMS(request, payload)
-  return 'OK'
+  try {
+    await sendSMS(payload.msisdn, payload.message)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
 }
 
 export const requestSchema = Joi.object({
