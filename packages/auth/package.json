@@ -21,6 +21,7 @@
     "@types/node-fetch": "^2.1.1",
     "@types/redis": "^2.8.6",
     "@types/vision": "^5.3.4",
+    "@types/winston": "^2.3.9",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "dotenv": "^6.0.0",
@@ -32,7 +33,8 @@
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.1.2",
     "redis": "^2.8.0",
-    "typescript": "^2.9.2"
+    "typescript": "^2.9.2",
+    "winston": "^3.0.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
