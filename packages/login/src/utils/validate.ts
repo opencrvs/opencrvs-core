@@ -38,6 +38,12 @@ export const messages = defineMessages({
     defaultMessage: '07123456789',
     description:
       'The format of the mobile number that appears in an error message'
+  },
+  requiredSymbol: {
+    id: 'validations.requiredSymbol',
+    defaultMessage: '',
+    description:
+      'A blank error message. Used for highlighting a required field without showing an error'
   }
 })
 
@@ -56,10 +62,11 @@ const isAValidPhoneNumberFormat = (value: string): boolean => {
   return numberRexExp.test(value)
 }
 
+export const requiredSymbol: Validation = (value: any) =>
+  value ? undefined : { message: messages.requiredSymbol }
+
 export const required: Validation = (value: any) =>
-  value || typeof value === 'number'
-    ? undefined
-    : { message: messages.required }
+  value ? undefined : { message: messages.required }
 
 export const minLength = (min: number) => (value: any) =>
   value && value.length < min

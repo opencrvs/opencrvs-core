@@ -6,7 +6,7 @@ import { store, history } from './store'
 import { Route, Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 import { config } from './config'
-import { StepTwo } from './login/StepTwo'
+import { StepTwoContainer } from './login/StepTwoContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { StepOneContainer } from './login/StepOneContainer'
 import { PageContainer } from './common/PageContainer'
@@ -26,7 +26,11 @@ export class App extends React.Component {
                     path={routes.STEP_ONE}
                     component={StepOneContainer}
                   />
-                  <Route exact path={routes.STEP_TWO} component={StepTwo} />
+                  <Route
+                    exact
+                    path={routes.STEP_TWO}
+                    component={StepTwoContainer}
+                  />
                 </Switch>
               </PageContainer>
             </ConnectedRouter>

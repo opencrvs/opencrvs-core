@@ -62,7 +62,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           }
         },
         Cmd.run(gotoStepTwo, {
-          successActionCreator: actions.stepTwoComplete,
+          successActionCreator: actions.stepOneComplete,
           args: [Cmd.dispatch]
         })
       )
