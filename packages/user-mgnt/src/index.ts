@@ -2,16 +2,14 @@
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
-import * as mongoose from 'mongoose'
 
-import { AUTH_HOST, AUTH_PORT, MONGO_URL } from './constants'
+import { AUTH_HOST, AUTH_PORT } from './constants'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from './features/verifyPassword/handler'
 import getPlugins from './config/plugins'
-
-mongoose.connect(MONGO_URL)
+import * as database from './database'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -55,11 +53,13 @@ export async function createServer() {
   async function start() {
     await init()
     await server.start()
+    await database.start()
     server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
   }
 
   async function stop() {
     await server.stop()
+    await database.stop()
     server.log('info', 'server stopped')
   }
 
