@@ -5,7 +5,9 @@ import {
   generateVerificationCode,
   sendVerificationCode
 } from 'src/features/verifyCode/service'
+import { logger } from 'src/logger'
 import { unauthorized } from 'boom'
+import { PRODUCTION } from 'src/constants'
 
 interface IAuthPayload {
   mobile: string
@@ -37,7 +39,14 @@ export default async function authenticateHandler(
     result.mobile
   )
 
-  await sendVerificationCode(result.mobile, verificationCode)
+  if (!PRODUCTION) {
+    logger.info('Sending a verification SMS', {
+      mobile: result.mobile,
+      verificationCode
+    })
+  } else {
+    await sendVerificationCode(result.mobile, verificationCode)
+  }
 
   return { mobile: result.mobile, nonce: result.nonce }
 }

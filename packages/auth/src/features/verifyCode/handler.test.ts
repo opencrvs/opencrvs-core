@@ -1,16 +1,16 @@
-import { createServer } from 'src/index'
 import * as fetch from 'jest-fetch-mock'
-import * as codeService from '../verifyCode/service'
+import { createServerWithEnvironment } from 'src/tests/util'
 
 describe('authenticate handler receives a request', () => {
   let server: any
 
   beforeEach(async () => {
-    server = await createServer()
+    server = await createServerWithEnvironment({ NODE_ENV: 'production' })
   })
 
   describe('user management service says credentials are valid', () => {
     it('generates a mobile verification code and sends it to sms gateway', async () => {
+      const codeService = require('./service')
       fetch.mockResponse(
         JSON.stringify({
           valid: true,
@@ -20,7 +20,6 @@ describe('authenticate handler receives a request', () => {
         })
       )
       const spy = jest.spyOn(codeService, 'sendVerificationCode')
-
       const authRes = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -31,7 +30,6 @@ describe('authenticate handler receives a request', () => {
       })
 
       const code = spy.mock.calls[0][1]
-
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
@@ -40,12 +38,9 @@ describe('authenticate handler receives a request', () => {
           code
         }
       })
-
       expect(res.result.token.split('.')).toHaveLength(3)
-
       const [, payload] = res.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-
       expect(body.role).toBe('admin')
       expect(body.sub).toBe('1')
     })
@@ -58,7 +53,6 @@ describe('authenticate handler receives a request', () => {
           code: '23122'
         }
       })
-
       expect(res.result.statusCode).toBe(401)
     })
   })
