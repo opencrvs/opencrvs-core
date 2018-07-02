@@ -1,12 +1,38 @@
-import smsHandler from './handler'
-
 import * as service from './service'
+import { createServer } from '../..'
 
 describe('smsHandler', () => {
-  it('should return OK if the sms gets sent', async () => {
-    jest.spyOn(service, 'sendSMS').mockResolvedValueOnce(null)
-    // @ts-ignore
-    const res = await smsHandler({}, {})
-    expect(res).toBe('OK')
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('returns OK if the sms gets sent', async () => {
+    const spy = jest.spyOn(service, 'sendSMS').mockResolvedValueOnce(null)
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/sms',
+      payload: { msisdn: '447789778823', message: 'foo' }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(200)
+  })
+  it("returns 500 if the sms isn't sent", async () => {
+    const spy = jest
+      .spyOn(service, 'sendSMS')
+      .mockImplementation(() => Promise.reject(new Error()))
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/sms',
+      payload: { msisdn: '447789778823', message: 'foo' }
+    })
+
+    expect(spy).toHaveBeenCalled()
+    expect(res.statusCode).toBe(500)
   })
 })

@@ -1,6 +1,5 @@
-import { Request } from 'hapi'
-import { internal } from 'boom'
 import fetch from 'node-fetch'
+import { stringify } from 'querystring'
 
 import {
   SMS_PROVIDER,
@@ -8,44 +7,42 @@ import {
   CLICKATELL_PASSWORD,
   CLICKATELL_USER
 } from 'src/constants'
-import { IAuthPayload } from 'src/features/sms/handler'
+import { logger } from 'src/logger'
 
-async function sendSMSClickatell(
-  request: Request,
-  { msisdn, message }: IAuthPayload
-) {
-  const escapeSpaces = (str: string) => str.replace(' ', '+')
+async function sendSMSClickatell(msisdn: string, message: string) {
+  const params = {
+    user: CLICKATELL_USER,
+    password: CLICKATELL_PASSWORD,
+    api_id: CLICKATELL_API_ID,
+    to: msisdn,
+    text: message
+  }
 
-  request.log(['info', 'sms'], `Sending SMS to '${msisdn}' using Clickatell`)
+  logger.info('Sending a verification token', params)
 
-  const url =
-    `http://api.clickatell.com/http/sendmsg?api_id=${CLICKATELL_API_ID}&` +
-    `user=${CLICKATELL_USER}&password=${CLICKATELL_PASSWORD}&` +
-    `to=${msisdn}&text=${escapeSpaces(message)}`
+  const url = `https://api.clickatell.com/http/sendmsg?${stringify(params)}`
 
   let res
   try {
     res = await fetch(url)
   } catch (err) {
-    request.log(['error', 'sms'], err)
-    throw internal('Could not connect to clickatell provider', err)
+    logger.error(err)
+    throw err
   }
 
   const body = await res.text()
   if (body.includes('ERR')) {
-    throw internal(body)
+    logger.error(body)
+    throw new Error(body)
   }
-  request.log(
-    ['info', 'sms'],
-    `Received success response from Clickatell: ${body}`
-  )
+  logger.info('Received success response from Clickatell: Success')
 }
 
-export async function sendSMS(request: Request, options: IAuthPayload) {
+export async function sendSMS(msisdn: string, message: string) {
   switch (SMS_PROVIDER) {
     case 'clickatell':
-      return sendSMSClickatell(request, options)
+      return sendSMSClickatell(msisdn, message)
     default:
-      throw internal(`Unknown sms provider ${SMS_PROVIDER}`)
+      throw new Error(`Unknown sms provider ${SMS_PROVIDER}`)
   }
 }
