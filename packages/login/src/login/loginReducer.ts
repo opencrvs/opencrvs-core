@@ -1,9 +1,7 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
 import { IStepOneData, IStepTwoData } from '../type/login'
 import * as actions from './loginActions'
-import * as routes from '../navigation/routes'
-import { store } from '../store'
-import { push } from 'connected-react-router'
+import { authApi } from '../utils/authApi'
 
 export type LoginState = {
   stepOneSubmitting: boolean
@@ -38,7 +36,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           submissionError: false,
           stepOneDetails: action.payload
         },
-        Cmd.run(actions.submitStepOne, {
+        Cmd.run(authApi.submitStepOne, {
           successActionCreator: actions.submitStepOneSuccess,
           failActionCreator: actions.submitStepOneFailed,
           args: [action.payload]
@@ -61,18 +59,15 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
             mobile: action.payload.mobile
           }
         },
-        Cmd.run(gotoStepTwo, {
+        Cmd.run(actions.gotoStepTwo, {
           successActionCreator: actions.stepOneComplete,
           args: [Cmd.dispatch]
         })
       )
+    case actions.STEP_ONE_COMPLETE:
+      return { ...state, stepOneSubmitting: false, submissionError: false }
 
     default:
       return state
   }
-}
-
-export function gotoStepTwo(dispatch: any) {
-  store.dispatch(push(routes.STEP_TWO))
-  return routes.STEP_TWO
 }

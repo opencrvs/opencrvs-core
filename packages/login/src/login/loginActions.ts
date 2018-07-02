@@ -1,6 +1,8 @@
 import { IStepOneData, IStepTwoData, IStepTwoSMSData } from '../type/login'
 import { AxiosError } from 'axios'
-import { authApi } from '../utils/authApi'
+import * as routes from '../navigation/routes'
+import { store } from '../store'
+import { push } from 'connected-react-router'
 import { convertToMSISDN } from '../utils/dataCleanse'
 import { config } from '../config'
 
@@ -36,10 +38,6 @@ export const startStepOne = (values: IStepOneData): Action => {
   }
 }
 
-export const submitStepOne = (data: IStepOneData): Promise<Action> => {
-  return authApi.submitStepOne(data)
-}
-
 export const submitStepOneSuccess = (response: any): Action => ({
   type: STEP_ONE_SUCCESS,
   payload: response
@@ -65,4 +63,9 @@ export const startStepTwo = (values: IStepTwoSMSData): Action => {
     type: START_STEP_TWO,
     payload
   }
+}
+
+export function gotoStepTwo(dispatch: any) {
+  store.dispatch(push(routes.STEP_TWO))
+  return routes.STEP_TWO
 }
