@@ -3,7 +3,8 @@ import * as Joi from 'joi'
 import { authenticate, storeUserInformation } from './service'
 import {
   generateVerificationCode,
-  sendVerificationCode
+  sendVerificationCode,
+  generateNonce
 } from 'src/features/verifyCode/service'
 import { unauthorized } from 'boom'
 
@@ -30,16 +31,14 @@ export default async function authenticateHandler(
     throw unauthorized()
   }
 
-  await storeUserInformation(result.nonce, result.userId, result.role)
+  const nonce = generateNonce()
+  await storeUserInformation(nonce, result.userId, result.role)
 
-  const verificationCode = await generateVerificationCode(
-    result.nonce,
-    result.mobile
-  )
+  const verificationCode = await generateVerificationCode(nonce, result.mobile)
 
   await sendVerificationCode(result.mobile, verificationCode)
 
-  return { mobile: result.mobile, nonce: result.nonce }
+  return { mobile: result.mobile, nonce }
 }
 
 export const requestSchema = Joi.object({

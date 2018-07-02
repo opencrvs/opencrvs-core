@@ -26,7 +26,8 @@ describe('authenticate handler receives a request', () => {
   })
   describe('user management service says credentials are valid', () => {
     it('returns a nonce to the client', async () => {
-      fetch.mockResponse(JSON.stringify({ nonce: '12345' }))
+      jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
+      fetch.mockResponse(JSON.stringify({}))
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -39,7 +40,8 @@ describe('authenticate handler receives a request', () => {
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
     it('generates a mobile verification code and sends it to sms gateway', async () => {
-      fetch.mockResponse(JSON.stringify({ nonce: '12345' }))
+      jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
+      fetch.mockResponse(JSON.stringify({}))
       const spy = jest.spyOn(codeService, 'sendVerificationCode')
 
       await server.server.inject({

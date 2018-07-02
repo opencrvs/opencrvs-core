@@ -14,6 +14,9 @@ export async function generateVerificationCode(nonce: string, mobile: string) {
   await set(`verification_${nonce}`, code)
   return code
 }
+export function generateNonce() {
+  return Math.round(1000 + Math.random() * 8999).toString()
+}
 
 export async function sendVerificationCode(
   mobile: string,
