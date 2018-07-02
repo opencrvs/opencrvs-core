@@ -9,7 +9,12 @@ export async function stop() {
 }
 
 export async function start() {
-  redisClient = redis.createClient({ host: REDIS_HOST })
+  redisClient = redis.createClient({
+    host: REDIS_HOST,
+    retry_strategy: options => {
+      return 1000
+    }
+  })
 }
 
 export const get = (...args: string[]) =>
