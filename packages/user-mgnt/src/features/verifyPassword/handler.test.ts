@@ -2,18 +2,24 @@ import { unauthorized } from 'boom'
 
 import User from 'src/model/user'
 import verifyPassHandler from './handler'
+import { createServer } from '../..'
+
+let server: any
+
+beforeEach(async () => {
+  server = await createServer()
+})
 
 test("verifyPassHandler should throw with 401 when user doesn't exist", async () => {
   const spy = jest.spyOn(User, 'findOne').mockResolvedValueOnce(null)
 
-  await expect(
-    verifyPassHandler(
-      // @ts-ignore
-      { payload: { mobile: '27555555555', password: 'test' } },
-      // tslint:disable-next-line:no-empty
-      { response: () => ({ code: () => {} }) }
-    )
-  ).rejects.toThrowError(unauthorized().message)
+  const res = await server.server.inject({
+    method: 'POST',
+    url: '/verifyPassword',
+    payload: { mobile: '27555555555', password: 'test' }
+  })
+
+  expect(res.result.statusCode).toBe(401)
   expect(spy).toBeCalled()
 })
 
@@ -25,14 +31,13 @@ test("verifyPassHandler should throw with 401 when password hash doesn't match",
     role: 'test'
   })
 
-  await expect(
-    verifyPassHandler(
-      // @ts-ignore
-      { payload: { mobile: '27555555555', password: 'test' } },
-      // tslint:disable-next-line:no-empty
-      { response: () => ({ code: () => {} }) }
-    )
-  ).rejects.toThrowError(unauthorized().message)
+  const res = await server.server.inject({
+    method: 'POST',
+    url: '/verifyPassword',
+    payload: { mobile: '27555555555', password: 'test' }
+  })
+
+  expect(res.result.statusCode).toBe(401)
   expect(spy).toBeCalled()
 })
 
@@ -45,12 +50,13 @@ test('verifyPassHandler should return 200 and the user role when the user exists
     role: 'test'
   })
 
-  const res = await verifyPassHandler(
-    // @ts-ignore
-    { payload: { mobile: '27555555555', password: 'test' } },
-    {}
-  )
-  expect(res).toMatchObject({ role: 'test' })
+  const res = await server.server.inject({
+    method: 'POST',
+    url: '/verifyPassword',
+    payload: { mobile: '27555555555', password: 'test' }
+  })
+
+  expect(res.result).toMatchObject({ role: 'test' })
   expect(spy).toBeCalled()
 })
 
@@ -58,12 +64,12 @@ test('verifyPassHandler should throw when User.findOne throws', async () => {
   const spy = jest.spyOn(User, 'findOne').mockImplementationOnce(() => {
     throw new Error('boom')
   })
-  await expect(
-    verifyPassHandler(
-      // @ts-ignore
-      { payload: { mobile: '27555555555', password: 'test' } },
-      {}
-    )
-  ).rejects.toThrow('boom')
+  const res = await server.server.inject({
+    method: 'POST',
+    url: '/verifyPassword',
+    payload: { mobile: '27555555555', password: 'test' }
+  })
+  expect(res.result.statusCode).toBe(500)
+
   expect(spy).toBeCalled()
 })
