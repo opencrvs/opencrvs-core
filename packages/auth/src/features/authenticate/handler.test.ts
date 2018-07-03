@@ -1,6 +1,6 @@
-import { createServer } from 'src/index'
 import * as fetch from 'jest-fetch-mock'
-import * as codeService from '../verifyCode/service'
+import { createServerWithEnvironment } from 'src/tests/util'
+import { createServer } from '../..'
 
 describe('authenticate handler receives a request', () => {
   let server: any
@@ -39,8 +39,13 @@ describe('authenticate handler receives a request', () => {
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
     it('generates a mobile verification code and sends it to sms gateway', async () => {
+      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+
       fetch.mockResponse(JSON.stringify({ nonce: '12345' }))
-      const spy = jest.spyOn(codeService, 'sendVerificationCode')
+      const spy = jest.spyOn(
+        require('../verifyCode/service'),
+        'sendVerificationCode'
+      )
 
       await server.server.inject({
         method: 'POST',

@@ -66,6 +66,6 @@ export async function createServer() {
   return { server, start, stop }
 }
 
-if (!module.parent) {
+if (require.main === module) {
   createServer().then(server => server.start())
 }
