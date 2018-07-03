@@ -13,6 +13,40 @@ describe('loginActions tests', () => {
       actions.startStepOne({ mobile: '07111111111', password: 'test' })
     ).toEqual(action)
   })
+  it('submitStepOneSuccess should dispatch', () => {
+    const action = {
+      type: actions.STEP_ONE_SUCCESS,
+      payload: {
+        mobile: '+447111111111',
+        nonce: '1234'
+      }
+    }
+    expect(
+      actions.submitStepOneSuccess({
+        mobile: '+447111111111',
+        nonce: '1234'
+      })
+    ).toEqual(action)
+  })
+  it('submitStepOneFailed should dispatch', () => {
+    const err = {
+      name: '',
+      config: {},
+      message: ''
+    }
+    const action = {
+      type: actions.STEP_ONE_FAILED,
+      payload: err
+    }
+    expect(actions.submitStepOneFailed(err)).toEqual(action)
+  })
+
+  it('stepOneComplete should dispatch', () => {
+    const action = {
+      type: actions.STEP_ONE_COMPLETE
+    }
+    expect(actions.stepOneComplete()).toEqual(action)
+  })
   it('startStepTwo should join 6 separate code numbers and dispatch a START_STEP_TWO action', () => {
     const action = {
       type: actions.START_STEP_TWO,
