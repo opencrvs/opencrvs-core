@@ -1,10 +1,28 @@
+import * as moxios from 'moxios'
 import * as actions from './loginActions'
-import { loginReducer, initialState } from './loginReducer'
-
-jest.mock('../utils/authApi')
+import { initialState } from './loginReducer'
+import { createStore } from '../store'
+import { resolve } from 'url'
+import { config } from '../config'
+import { client } from '../utils/authApi'
 
 describe('loginReducer tests', () => {
-  it('should update the state with data ready to send to authorise service', () => {
+  let store: any
+  beforeEach(() => {
+    store = createStore()
+
+    moxios.install(client)
+    moxios.stubRequest(resolve(config.AUTH_API_URL, 'authenticate'), {
+      status: 200,
+      responseText: "{ nonce: '12345' }"
+    })
+  })
+
+  afterEach(() => {
+    moxios.uninstall(client)
+  })
+
+  it('updates the state with data ready to send to authorise service', async () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: true,
@@ -14,6 +32,7 @@ describe('loginReducer tests', () => {
         password: 'test'
       }
     }
+
     const action = {
       type: actions.START_STEP_ONE,
       payload: {
@@ -21,10 +40,10 @@ describe('loginReducer tests', () => {
         password: 'test'
       }
     }
-    const returnedState = loginReducer(expectedState, action)[0]
-    expect(returnedState).toEqual(expectedState)
+    store.dispatch(action)
+    expect((store.getState() as any).login).toEqual(expectedState)
   })
-  it('should update the state when nonce and mobile is returned from the authorise service', () => {
+  it('updates the state when nonce and mobile is returned from the authorise service', () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: false,
@@ -35,7 +54,7 @@ describe('loginReducer tests', () => {
       },
       stepOneDetails: {
         mobile: '+447111111111',
-        password: 'test'
+        password: ''
       }
     }
     const action = {
@@ -45,10 +64,11 @@ describe('loginReducer tests', () => {
         mobile: '+447111111111'
       }
     }
-    const returnedState = loginReducer(expectedState, action)[0]
-    expect(returnedState).toEqual(expectedState)
+    store.dispatch(action)
+    expect((store.getState() as any).login).toEqual(expectedState)
   })
-  it('should update the state when step one is completed', () => {
+
+  it('updates the state when step one is completed', () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: false,
@@ -57,10 +77,11 @@ describe('loginReducer tests', () => {
     const action = {
       type: actions.STEP_ONE_COMPLETE
     }
-    const returnedState = loginReducer(expectedState, action)
-    expect(returnedState).toEqual(expectedState)
+    store.dispatch(action)
+    expect((store.getState() as any).login).toEqual(expectedState)
   })
-  it('should update the state when step two is completed', () => {
+
+  it('updates the state when step two is completed', () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: false,
@@ -69,7 +90,7 @@ describe('loginReducer tests', () => {
     const action = {
       type: actions.STEP_TWO_COMPLETE
     }
-    const returnedState = loginReducer(expectedState, action)
-    expect(returnedState).toEqual(expectedState)
+    store.dispatch(action)
+    expect((store.getState() as any).login).toEqual(expectedState)
   })
 })

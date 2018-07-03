@@ -1,7 +1,7 @@
 import { IStepOneData, IStepTwoData, IStepTwoSMSData } from '../type/login'
 import { AxiosError } from 'axios'
 import * as routes from '../navigation/routes'
-import { store } from '../store'
+
 import { push } from 'connected-react-router'
 import { convertToMSISDN } from '../utils/dataCleanse'
 import { config } from '../config'
@@ -66,6 +66,6 @@ export const startStepTwo = (values: IStepTwoSMSData): Action => {
 }
 
 export function gotoStepTwo(dispatch: any) {
-  store.dispatch(push(routes.STEP_TWO))
+  dispatch(push(routes.STEP_TWO))
   return routes.STEP_TWO
 }

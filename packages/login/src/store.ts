@@ -1,4 +1,8 @@
-import { compose, createStore, applyMiddleware } from 'redux'
+import {
+  compose,
+  createStore as createReduxStore,
+  applyMiddleware
+} from 'redux'
 import { createBrowserHistory } from 'history'
 import { combineReducers, install, StoreCreator } from 'redux-loop'
 import {
@@ -27,7 +31,7 @@ const reducers = combineReducers({
   i18n: intlReducer
 })
 
-const enhancedCreateStore = createStore as StoreCreator
+const enhancedCreateStore = createReduxStore as StoreCreator
 
 const enhancer = compose(
   applyMiddleware(middleware),
@@ -37,4 +41,5 @@ const enhancer = compose(
     : (f: any) => f
 )
 
-export const store = enhancedCreateStore(reducers, {}, enhancer)
+export const createStore = () =>
+  enhancedCreateStore<any, any>(reducers, {}, enhancer)
