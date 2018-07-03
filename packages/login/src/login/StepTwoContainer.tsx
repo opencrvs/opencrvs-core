@@ -21,10 +21,12 @@ const mapDispatchToProps = {
   submitAction: actions.startStepTwo
 }
 
+/* istanbul ignore next */
 const stepTwoForm = reduxForm({
   form: STEP_TWO_FORM
 })(injectIntl(StepTwoForm))
 
+/* istanbul ignore next */
 export const StepTwoContainer = connect<StateProps, DispatchProps>(
   mapStateToProps,
   mapDispatchToProps
