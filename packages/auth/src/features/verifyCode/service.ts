@@ -6,6 +6,7 @@ import {
   CLICKATELL_API_ID
 } from 'src/constants'
 import { set, get } from 'src/database'
+import * as crypto from 'crypto'
 
 export async function generateVerificationCode(nonce: string, mobile: string) {
   // TODO lets come back to how these are generated
@@ -15,7 +16,7 @@ export async function generateVerificationCode(nonce: string, mobile: string) {
   return code
 }
 export function generateNonce() {
-  return Math.round(1000 + Math.random() * 8999).toString()
+  return crypto.randomBytes(16).toString('base64').toString()
 }
 
 export async function sendVerificationCode(
