@@ -17,6 +17,7 @@ import {
 } from './StepOneForm'
 import styled from 'styled-components'
 
+/* istanbul ignore next */
 const messages = defineMessages({
   stepTwoTitle: {
     id: 'login.stepTwoTitle',
