@@ -11,7 +11,6 @@ import { getFieldProps } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
 import { localizeInput } from '../i18n/localizeInput'
 
-/* istanbul ignore next */
 export const messages = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
