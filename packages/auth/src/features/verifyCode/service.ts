@@ -1,7 +1,10 @@
 import fetch from 'node-fetch'
 
 import { set, get } from 'src/database'
+
 import { NOTIFICATION_SERVICE_URL } from 'src/constants'
+
+import * as crypto from 'crypto'
 import { resolve } from 'url'
 
 export async function generateVerificationCode(nonce: string, mobile: string) {
@@ -12,7 +15,10 @@ export async function generateVerificationCode(nonce: string, mobile: string) {
   return code
 }
 export function generateNonce() {
-  return Math.round(1000 + Math.random() * 8999).toString()
+  return crypto
+    .randomBytes(16)
+    .toString('base64')
+    .toString()
 }
 
 export async function sendVerificationCode(
