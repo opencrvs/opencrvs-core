@@ -4,12 +4,12 @@ import {
   applyMiddleware
 } from 'redux'
 import { createBrowserHistory } from 'history'
-import { combineReducers, install, StoreCreator } from 'redux-loop'
+import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
-  connectRouter,
+  routerReducer,
   routerMiddleware,
   RouterState
-} from 'connected-react-router'
+} from 'react-router-redux'
 import { reducer as formReducer, FormState } from 'redux-form'
 import { loginReducer, LoginState } from './login/loginReducer'
 import { intlReducer, IntlState } from './i18n/intlReducer'
@@ -26,7 +26,7 @@ export interface IStoreState {
 
 const reducers = combineReducers({
   login: loginReducer,
-  router: connectRouter(history),
+  router: routerReducer,
   form: formReducer,
   i18n: intlReducer
 })
@@ -34,12 +34,16 @@ const reducers = combineReducers({
 const enhancedCreateStore = createReduxStore as StoreCreator
 
 const enhancer = compose(
-  applyMiddleware(middleware),
   install(),
+  applyMiddleware(middleware),
   typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
     ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
     : (f: any) => f
 )
 
 export const createStore = () =>
-  enhancedCreateStore<any, any>(reducers, {}, enhancer)
+  enhancedCreateStore(
+    reducers,
+    getModel(reducers(undefined, { type: 'NOOP' })),
+    enhancer
+  )
