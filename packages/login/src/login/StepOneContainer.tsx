@@ -21,12 +21,10 @@ const mapDispatchToProps = {
   submitAction: actions.startStepOne
 }
 
-/* istanbul ignore next */
 const stepOneForm = reduxForm({
   form: STEP_ONE_FORM
 })(injectIntl(StepOneForm))
 
-/* istanbul ignore next */
 export const StepOneContainer = connect<StateProps, DispatchProps>(
   mapStateToProps,
   mapDispatchToProps

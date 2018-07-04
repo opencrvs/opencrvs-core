@@ -2,7 +2,6 @@ import { defineMessages } from 'react-intl'
 import { Validation } from '../type/fields'
 import { config } from '../config'
 
-/* istanbul ignore next */
 export const messages = defineMessages({
   required: {
     id: 'validations.required',
