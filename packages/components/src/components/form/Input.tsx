@@ -49,9 +49,7 @@ const StyledInput = styledInput`
     display: block;
     float: left;
     padding: 0;
-    width: 10%;
     text-align: center;
-    margin-right: 2%;
   }
 `
 

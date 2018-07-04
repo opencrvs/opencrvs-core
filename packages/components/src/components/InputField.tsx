@@ -26,7 +26,15 @@ const applyDefaultIfNotDisabled = (
 
 export class InputField extends React.Component<IInputFieldProps, {}> {
   render() {
-    const { id, label, placeholder, disabled, meta, ...props } = this.props
+    const {
+      id,
+      label,
+      placeholder,
+      disabled,
+      maxLength,
+      meta,
+      ...props
+    } = this.props
 
     return (
       <div>
@@ -36,6 +44,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
           {...props}
           id={id}
           disabled={disabled}
+          maxLength={maxLength}
           placeholder={
             placeholder
               ? placeholder
@@ -47,7 +56,11 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
         {meta &&
           meta.error &&
           meta.touched && (
-            <InputError id={id + '_error'} errorMessage={meta.error} />
+            <InputError
+              id={id + '_error'}
+              errorMessage={meta.error}
+              centred={!maxLength}
+            />
           )}
       </div>
     )

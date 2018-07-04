@@ -2,6 +2,7 @@ import { defineMessages } from 'react-intl'
 import { Validation } from '../type/fields'
 import { config } from '../config'
 
+/* istanbul ignore next */
 export const messages = defineMessages({
   required: {
     id: 'validations.required',
@@ -38,6 +39,12 @@ export const messages = defineMessages({
     defaultMessage: '07123456789',
     description:
       'The format of the mobile number that appears in an error message'
+  },
+  requiredSymbol: {
+    id: 'validations.requiredSymbol',
+    defaultMessage: '',
+    description:
+      'A blank error message. Used for highlighting a required field without showing an error'
   }
 })
 
@@ -51,20 +58,22 @@ const dynamicValidationProps = {
   }
 }
 
-const isAValidPhoneNumberFormat = (value: string): boolean => {
+export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const numberRexExp = new RegExp(messages.mobilePhoneRegex.defaultMessage)
   return numberRexExp.test(value)
 }
 
-export const required: Validation = (value: any) =>
-  value || typeof value === 'number'
-    ? undefined
-    : { message: messages.required }
+export const requiredSymbol: Validation = (value: any) =>
+  value ? undefined : { message: messages.requiredSymbol }
 
-export const minLength = (min: number) => (value: any) =>
-  value && value.length < min
+export const required: Validation = (value: any) =>
+  value ? undefined : { message: messages.required }
+
+export const minLength = (min: number) => (value: any) => {
+  return value && value.length < min
     ? { message: messages.minLength, values: dynamicValidationProps.minLength }
     : undefined
+}
 
 export const isNumber: Validation = (value: any) =>
   value && isNaN(Number(value))

@@ -2,15 +2,17 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { IntlContainer } from './i18n/IntlContainer'
 import { ConnectedRouter } from 'react-router-redux'
-import { store, history } from './store'
+import { createStore, history } from './store'
 import { Route, Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 import { config } from './config'
-import { StepTwo } from './login/StepTwo'
+import { StepTwoContainer } from './login/StepTwoContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { StepOneContainer } from './login/StepOneContainer'
 import { PageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
+
+const store = createStore()
 
 export class App extends React.Component {
   public render() {
@@ -26,7 +28,11 @@ export class App extends React.Component {
                     path={routes.STEP_ONE}
                     component={StepOneContainer}
                   />
-                  <Route exact path={routes.STEP_TWO} component={StepTwo} />
+                  <Route
+                    exact
+                    path={routes.STEP_TWO}
+                    component={StepTwoContainer}
+                  />
                 </Switch>
               </PageContainer>
             </ConnectedRouter>

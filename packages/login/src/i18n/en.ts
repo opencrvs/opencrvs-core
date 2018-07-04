@@ -9,13 +9,15 @@ export const ENGLISH_STATE = {
     'login.submit': 'Submit',
     'login.submissionError':
       'Sorry that mobile number and password did not work.',
+    'login.codeSubmissionError': 'Sorry that code did not work.',
     'validations.required': 'required',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
     'validations.phoneNumberFormat':
       'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
     'validations.mobilePhoneRegex': '0[0-9]{9,10}',
-    'validations.mobileNumberFormat': '07123456789'
+    'validations.mobileNumberFormat': '07123456789',
+    'validations.requiredSymbol': 'x'
     // 'context.messageId': 'Translation',
   }
 }
