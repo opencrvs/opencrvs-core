@@ -73,9 +73,8 @@ export const FormWrapper = styled.form`
 
 export const ActionWrapper = styled.div`
   position: relative;
-  float: right;
   margin-top: 10px;
-  margin-bottom: 40px;
+  display: flex;
 `
 
 export const Title = styled.div`

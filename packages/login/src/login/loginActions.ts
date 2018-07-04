@@ -14,6 +14,8 @@ export const STEP_TWO_SUCCESS = 'STEP_TWO/STEP_TWO_SUCCESS'
 export const STEP_TWO_FAILED = 'STEP_TWO/STEP_TWO_FAILED'
 export const STEP_TWO_COMPLETE = 'STEP_TWO/STEP_TWO_COMPLETE'
 
+export const RESEND_SMS = 'STEP_TWO/RESEND_SMS'
+
 export type Action =
   | { type: typeof START_STEP_ONE; payload: IStepOneData }
   | { type: typeof STEP_ONE_SUCCESS; payload: any }
@@ -23,6 +25,7 @@ export type Action =
   | { type: typeof STEP_TWO_SUCCESS; payload: any }
   | { type: typeof STEP_TWO_FAILED; payload: Error }
   | { type: typeof STEP_TWO_COMPLETE }
+  | { type: typeof RESEND_SMS }
   | RouterAction
 
 export const startStepOne = (values: IStepOneData): Action => {
@@ -45,6 +48,10 @@ export const submitStepOneSuccess = (response: any): Action => ({
 export const submitStepOneFailed = (error: AxiosError): Action => ({
   type: STEP_ONE_FAILED,
   payload: error
+})
+
+export const resendSMS = (): Action => ({
+  type: RESEND_SMS
 })
 
 export const startStepTwo = (values: IStepTwoSMSData): Action => {

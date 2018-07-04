@@ -23,6 +23,11 @@ const messages = defineMessages({
     defaultMessage: 'Login to OpenCRVS',
     description: 'The title that appears in step two of the form'
   },
+  resend: {
+    id: 'login.resendMobile',
+    defaultMessage: 'Resend SMS',
+    description: 'Text for button that resends SMS verification code'
+  },
   stepTwoInstruction: {
     id: 'login.stepTwoInstruction',
     defaultMessage: 'Please enter your mobile number and password.',
@@ -68,16 +73,28 @@ const Circle = styled.div`
   background-color: ${({ theme }) => theme.colors.disabled};
 `
 
+const SecondaryButton = styled(Button).attrs({ secondary: true })`
+  margin-right: 1em;
+`
+
 const LocalizedInputField = localizeInput(InputField)
 
-export interface IStepTwoForm {
+export interface IProps {
   formId: string
   submissionError: boolean
-  submitAction: (values: any) => void
 }
 
+export interface IDispatchProps {
+  submitAction: (values: any) => void
+  onResendSMS: () => void
+}
+
+type IStepTwoFormProps = IProps & IDispatchProps
+
 export class StepTwoForm extends React.Component<
-  InjectedIntlProps & InjectedFormProps<{}, IStepTwoForm> & IStepTwoForm
+  InjectedIntlProps &
+    InjectedFormProps<{}, IStepTwoFormProps> &
+    IStepTwoFormProps
 > {
   render() {
     const {
@@ -161,6 +178,12 @@ export class StepTwoForm extends React.Component<
             </FieldWrapper>
           </FlexGrid>
           <ActionWrapper>
+            <SecondaryButton
+              onClick={this.props.onResendSMS}
+              id="login-mobile-resend"
+            >
+              {intl.formatMessage(messages.resend)}
+            </SecondaryButton>
             <Button id="login-mobile-submit">
               {intl.formatMessage(messages.submit)}
             </Button>

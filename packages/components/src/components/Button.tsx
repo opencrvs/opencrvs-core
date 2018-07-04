@@ -1,17 +1,7 @@
 import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
 
-export interface IButton {
-  id: string
-  secondary?: boolean
-  children?: any
-  className?: string
-  type?: string
-}
-
-const styledButton = styled.button.attrs<IButton>({})
-
-const StyledButton = styledButton`
+export const Button = styled.button.attrs<{ secondary?: boolean }>({})`
   width: auto;
   min-height: 44px;
   color: ${({ secondary, theme }) =>
@@ -21,12 +11,13 @@ const StyledButton = styledButton`
   border: ${({ secondary, theme }) =>
     secondary ? `1px solid ${theme.colors.accent}` : '#FFFFFF'};
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.capsFontStyle}
-  cursor: pointer;
+  ${({ theme }) => theme.fonts.capsFontStyle} cursor: pointer;
   padding: 4px 35px 0px 35px;
   &:hover {
-    background: linear-gradient(${({ theme }) =>
-      theme.colors.hoverGradientDark}, ${({ theme }) => theme.colors.primary});
+    background: linear-gradient(
+      ${({ theme }) => theme.colors.hoverGradientDark},
+      ${({ theme }) => theme.colors.primary}
+    );
     color: ${({ secondary }) => (secondary ? '#FFFFFF' : '#FFFFFF')};
     border: ${({ secondary }) => (secondary ? '#FFFFFF' : '#FFFFFF')};
   }
@@ -42,18 +33,3 @@ const StyledButton = styledButton`
     color: ${({ theme }) => theme.colors.disabled};
   }
 `
-export class Button extends React.Component<IButton> {
-  render() {
-    const { children, secondary, id, className, type } = this.props
-    return (
-      <StyledButton
-        id={id}
-        secondary={secondary}
-        className={className}
-        type={type}
-      >
-        {children}
-      </StyledButton>
-    )
-  }
-}

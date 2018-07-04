@@ -38,8 +38,16 @@ const submitStepOne = (data: IStepOneData) => {
     data
   } as IAPIOptions)
 }
+const resendSMS = (nonce: string) => {
+  return request({
+    url: resolve(config.AUTH_API_URL, '/resend-sms'),
+    method: 'POST',
+    data: { nonce }
+  } as IAPIOptions)
+}
 
 export const authApi = {
   request,
-  submitStepOne
+  submitStepOne,
+  resendSMS
 }

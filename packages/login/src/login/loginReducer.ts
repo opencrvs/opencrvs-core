@@ -63,6 +63,16 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         },
         Cmd.action(push(routes.STEP_TWO))
       )
+    case actions.RESEND_SMS:
+      return loop(
+        state,
+        Cmd.run(authApi.resendSMS, {
+          // TODO
+          // successActionCreator: actions.submitStepOneSuccess,
+          // failActionCreator: actions.submitStepOneFailed,
+          args: [state.stepTwoDetails.nonce]
+        })
+      )
 
     default:
       return state

@@ -7,6 +7,7 @@ import { initialState as loginState } from '../login/loginReducer'
 import { initialState as intlState } from '../i18n/intlReducer'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
+import { createMemoryHistory } from 'history'
 
 configure({ adapter: new Adapter() })
 
@@ -34,7 +35,7 @@ export const mockState: IStoreState = {
 }
 
 export function createTestApp() {
-  return mount(<App />)
+  return mount(<App history={createMemoryHistory()} />)
 }
 
 export const createTestComponent = (element: JSX.Element, store: any) => {

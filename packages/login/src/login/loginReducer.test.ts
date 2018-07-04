@@ -1,4 +1,5 @@
 import * as moxios from 'moxios'
+import { createBrowserHistory } from 'history'
 import * as actions from './loginActions'
 import { initialState } from './loginReducer'
 import { createStore } from '../store'
@@ -9,7 +10,7 @@ import { client } from '../utils/authApi'
 describe('loginReducer tests', () => {
   let store: any
   beforeEach(() => {
-    store = createStore()
+    store = createStore(createBrowserHistory())
 
     moxios.install(client)
     moxios.stubRequest(resolve(config.AUTH_API_URL, 'authenticate'), {
