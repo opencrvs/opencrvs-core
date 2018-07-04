@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import * as React from 'react'
 import { mount, configure } from 'enzyme'
 import { App } from '../App'

@@ -13,7 +13,7 @@ it('renders a phone number and a password field on startup', async () => {
   expect(app.find('input')).toHaveLength(2)
 })
 
-const wait = () => new Promise(resolve => process.nextTick(resolve))
+const wait = () => new Promise(res => process.nextTick(res))
 describe('Login app', () => {
   beforeEach(() => {
     moxios.install(client)
