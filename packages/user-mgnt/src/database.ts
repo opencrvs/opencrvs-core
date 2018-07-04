@@ -5,31 +5,33 @@ import { logger } from 'src/logger'
 
 const db = mongoose.connection
 
-const connect = () =>
-  mongoose.connect(
-    MONGO_URL,
-    { server: { auto_reconnect: true } }
-  )
+db.on('disconnected', () => {
+  logger.info('MongoDB disconnected')
+})
 
-const onError = (error: Error) => {
-  logger.error(error)
-  mongoose.disconnect()
+db.on('connected', () => {
+  logger.info('Connected to MongoBD')
+})
+
+const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
+
+const connect = async (): Promise<void> => {
+  try {
+    await mongoose.connect(
+      MONGO_URL,
+      { autoReconnect: true }
+    )
+  } catch (err) {
+    logger.error(err)
+    await wait(1000)
+    return connect()
+  }
 }
 
 export async function stop() {
-  db.off('error', onError)
-  db.off('disconnected', connect)
-  db.once('disconnected', () => {
-    logger.info('MongoDB disconnected')
-  })
   mongoose.disconnect()
 }
 
 export async function start() {
-  db.on('error', onError)
-  db.on('disconnected', connect)
-  db.once('connected', () => {
-    logger.info('Connected to MongoBD')
-  })
-  connect()
+  return connect()
 }
