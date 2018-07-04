@@ -1,7 +1,6 @@
 import * as fetch from 'jest-fetch-mock'
 import { createServerWithEnvironment } from 'src/tests/util'
 import { createServer } from '../..'
-import * as codeService from 'src/features/verifyCode/service'
 
 describe('authenticate handler receives a request', () => {
   let server: any
@@ -27,6 +26,7 @@ describe('authenticate handler receives a request', () => {
   })
   describe('user management service says credentials are valid', () => {
     it('returns a nonce to the client', async () => {
+      const codeService = require('../verifyCode/service')
       jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
       fetch.mockResponse(JSON.stringify({}))
       const res = await server.server.inject({

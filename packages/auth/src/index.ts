@@ -16,6 +16,10 @@ import verifyCodeHandler, {
   requestSchema as reqVerifySchema,
   responseSchma as resVerifySchema
 } from './features/verifyCode/handler'
+import refreshTokenHandler, {
+  requestSchema as reqRefreshSchema,
+  responseSchma as resRefreshSchema
+} from './features/refresh/handler'
 import getPlugins from './config/plugins'
 
 import * as database from './database'
@@ -29,7 +33,7 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{"mobile": "27855555555", "password": "test"}' http://localhost:4040/authenticate
+  // curl -H 'Content-Type: application/json' -d '{"mobile": "+447111111111", "password": "test"}' http://localhost:4040/authenticate
   server.route({
     method: 'POST',
     path: '/authenticate',
@@ -79,6 +83,33 @@ export async function createServer() {
       },
       response: {
         schema: resVerifySchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{"nonce": "123456", "token": ""}' http://localhost:4040/refreshToken
+  server.route({
+    method: 'POST',
+    path: '/refreshToken',
+    handler: refreshTokenHandler,
+    options: {
+      tags: ['api'],
+      description: 'Refresh an expiring token',
+      notes:
+        'Verifies the expired client token as true and returns a refreshed JWT API token for future requests',
+      validate: {
+        payload: reqRefreshSchema
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            200: { description: 'Token is valid' },
+            400: { description: 'Token is invalid' }
+          }
+        }
+      },
+      response: {
+        schema: resRefreshSchema
       }
     }
   })

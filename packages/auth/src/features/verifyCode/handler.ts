@@ -1,7 +1,7 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import { checkVerificationCode } from './service'
+import { checkVerificationCode, setVerificationCodeAsUsed } from './service'
 import {
   getStoredUserInformation,
   createToken
@@ -24,10 +24,11 @@ export default async function authenticateHandler(
 
   if (await checkVerificationCode(nonce, code)) {
     const { userId, role } = await getStoredUserInformation(nonce)
-
     const token = await createToken(userId, role)
-    const response: IVerifyResponse = { token }
-    return response
+    if (await setVerificationCodeAsUsed(nonce)) {
+      const response: IVerifyResponse = { token }
+      return response
+    }
   }
 
   return unauthorized()

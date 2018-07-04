@@ -1,5 +1,10 @@
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL, CERT_PRIVATE_KEY_PATH } from 'src/constants'
+import {
+  USER_MANAGEMENT_URL,
+  CERT_PRIVATE_KEY_PATH,
+  CERT_PUBLIC_KEY_PATH,
+  CONFIG_TOKEN_EXPIRY
+} from 'src/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
@@ -7,6 +12,7 @@ import * as jwt from 'jsonwebtoken'
 import { get, set } from 'src/database'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 const sign = promisify(jwt.sign) as (
   payload: string | Buffer | object,
@@ -14,12 +20,18 @@ const sign = promisify(jwt.sign) as (
   options?: jwt.SignOptions
 ) => Promise<string>
 
+const verify = promisify(jwt.verify) as (
+  token: string,
+  secretOrPublicKey: jwt.Secret
+) => Promise<any>
+
 export interface IAuthentication {
   nonce: string
   mobile: string
   userId: string
   role: string
 }
+
 export class UserInfoNotFoundError extends Error {}
 
 export function isUserInfoNotFoundError(err: Error) {
@@ -43,7 +55,7 @@ export async function authenticate(
         const body = await res.json()
         return {
           nonce: body.nonce,
-          userId: body.userId,
+          userId: body.id,
           role: body.role,
           mobile
         }
@@ -59,7 +71,11 @@ export async function createToken(
   userId: string,
   role: string
 ): Promise<string> {
-  return sign({ role }, cert, { subject: userId, algorithm: 'RS256' })
+  return sign({ role }, cert, {
+    subject: userId,
+    algorithm: 'RS256',
+    expiresIn: Number(CONFIG_TOKEN_EXPIRY)
+  })
 }
 
 export async function storeUserInformation(
@@ -72,10 +88,22 @@ export async function storeUserInformation(
 
 export async function getStoredUserInformation(nonce: string) {
   const record = await get(`user_information_${nonce}`)
-
   if (record === null) {
     throw new UserInfoNotFoundError()
   }
 
   return JSON.parse(record)
+}
+
+export async function verifyToken(token: string): Promise<any> {
+  let decoded
+  try {
+    decoded = await verify(token, publicCert)
+    return decoded
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return err
+    }
+    throw Error(err.message)
+  }
 }

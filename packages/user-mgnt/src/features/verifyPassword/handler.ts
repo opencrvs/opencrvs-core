@@ -12,6 +12,7 @@ interface IVerifyPayload {
 
 interface IVerifyResponse {
   role: string
+  id: string
 }
 
 export default async function verifyPassHandler(
@@ -31,7 +32,8 @@ export default async function verifyPassHandler(
     throw unauthorized()
   }
 
-  const response: IVerifyResponse = { role: user.role }
+  const response: IVerifyResponse = { role: user.role, id: user.id }
+
   return response
 }
 
@@ -41,5 +43,6 @@ export const requestSchema = Joi.object({
 })
 
 export const responseSchema = Joi.object({
-  role: Joi.string()
+  role: Joi.string(),
+  id: Joi.string()
 })

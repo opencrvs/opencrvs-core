@@ -8,9 +8,9 @@ describe('authenticate handler receives a request', () => {
     server = await createServerWithEnvironment({ NODE_ENV: 'production' })
   })
 
-  describe('user management service says credentials are valid', () => {
-    it('verifies a code and generates a token', async () => {
-      const codeService = require('./service')
+  describe('refresh expiring token', () => {
+    it('verifies a token and generates a new token', async () => {
+      const codeService = require('../verifyCode/service')
       const authService = require('../authenticate/service')
 
       fetch.mockResponse(
@@ -47,8 +47,16 @@ describe('authenticate handler receives a request', () => {
         }
       })
 
-      expect(res.result.token.split('.')).toHaveLength(3)
-      const [, payload] = res.result.token.split('.')
+      const refreshResponse = await server.server.inject({
+        method: 'POST',
+        url: '/refreshToken',
+        payload: {
+          nonce: authRes.result.nonce,
+          token: res.result.token
+        }
+      })
+      expect(refreshResponse.result.token.split('.')).toHaveLength(3)
+      const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.role).toBe('admin')
       expect(body.sub).toBe('1')

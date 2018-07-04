@@ -15,3 +15,5 @@ export const CERT_PUBLIC_KEY_PATH =
   '../../.secrets/public-key.pem'
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
+
+export const CONFIG_TOKEN_EXPIRY = process.env.CONFIG_TOKEN_EXPIRY || '600'
