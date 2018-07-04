@@ -1,8 +1,6 @@
-import { IStepOneData, IStepTwoData, IStepTwoSMSData } from '../type/login'
 import { AxiosError } from 'axios'
-import * as routes from '../navigation/routes'
-
-import { push } from 'connected-react-router'
+import { RouterAction } from 'react-router-redux'
+import { IStepOneData, IStepTwoData, IStepTwoSMSData } from '../type/login'
 import { convertToMSISDN } from '../utils/dataCleanse'
 import { config } from '../config'
 
@@ -25,6 +23,7 @@ export type Action =
   | { type: typeof STEP_TWO_SUCCESS; payload: any }
   | { type: typeof STEP_TWO_FAILED; payload: Error }
   | { type: typeof STEP_TWO_COMPLETE }
+  | RouterAction
 
 export const startStepOne = (values: IStepOneData): Action => {
   const cleanedData = {
@@ -48,10 +47,6 @@ export const submitStepOneFailed = (error: AxiosError): Action => ({
   payload: error
 })
 
-export const stepOneComplete = (): Action => ({
-  type: STEP_ONE_COMPLETE
-})
-
 export const startStepTwo = (values: IStepTwoSMSData): Action => {
   const code = Object.values(values).join('')
   const payload: IStepTwoData = {
@@ -63,9 +58,4 @@ export const startStepTwo = (values: IStepTwoSMSData): Action => {
     type: START_STEP_TWO,
     payload
   }
-}
-
-export function gotoStepTwo(dispatch: any) {
-  dispatch(push(routes.STEP_TWO))
-  return routes.STEP_TWO
 }

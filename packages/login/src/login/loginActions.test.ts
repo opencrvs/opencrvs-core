@@ -41,12 +41,6 @@ describe('loginActions tests', () => {
     expect(actions.submitStepOneFailed(err)).toEqual(action)
   })
 
-  it('stepOneComplete should dispatch', () => {
-    const action = {
-      type: actions.STEP_ONE_COMPLETE
-    }
-    expect(actions.stepOneComplete()).toEqual(action)
-  })
   it('startStepTwo should join 6 separate code numbers and dispatch a START_STEP_TWO action', () => {
     const action = {
       type: actions.START_STEP_TWO,

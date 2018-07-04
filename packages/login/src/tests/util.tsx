@@ -19,9 +19,9 @@ export const mockState: IStoreState = {
       pathname: '',
       search: '',
       hash: '',
+      state: '',
       key: ''
-    },
-    action: 'PUSH'
+    }
   },
   form: {
     registeredFields: [
