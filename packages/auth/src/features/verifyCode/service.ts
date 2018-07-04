@@ -1,11 +1,8 @@
 import fetch from 'node-fetch'
-import { stringify } from 'querystring'
-import {
-  CLICKATELL_USER,
-  CLICKATELL_PASSWORD,
-  CLICKATELL_API_ID
-} from 'src/constants'
+
 import { set, get } from 'src/database'
+import { NOTIFICATION_SERVICE_URL } from 'src/constants'
+import { resolve } from 'url'
 
 export async function generateVerificationCode(nonce: string, mobile: string) {
   // TODO lets come back to how these are generated
@@ -22,17 +19,16 @@ export async function sendVerificationCode(
   mobile: string,
   verificationCode: string
 ): Promise<void> {
-  const params = stringify({
-    user: CLICKATELL_USER,
-    password: CLICKATELL_PASSWORD,
-    api_id: CLICKATELL_API_ID,
-    to: mobile,
-    text: verificationCode
+  const params = {
+    msisdn: mobile,
+    message: verificationCode
+  }
+
+  await fetch(resolve(NOTIFICATION_SERVICE_URL, 'sms'), {
+    method: 'POST',
+    body: JSON.stringify(params)
   })
 
-  await fetch(`https://api.clickatell.com/http/sendmsg?${params}`, {
-    method: 'GET'
-  })
   return undefined
 }
 

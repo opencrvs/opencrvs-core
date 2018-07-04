@@ -8,6 +8,11 @@ services:
   user-mgnt:
     secrets:
       - jwt-public-key.{{ts}}
+  notification:
+    secrets:
+      - clickatell-user
+      - clickatell-password
+      - clickatell-api-id
   gateway:
     secrets:
      - jwt-public-key.{{ts}}
@@ -23,6 +28,12 @@ secrets:
   jwt-public-key.{{ts}}:
     external: true
   jwt-private-key.{{ts}}:
+    external: true
+  clickatell-user:
+    external: true
+  clickatell-password:
+    external: true
+  clickatell-api-id:
     external: true
 
 configs:
