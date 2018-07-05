@@ -1,6 +1,15 @@
 import { defineMessages } from 'react-intl'
-import { Validation } from '../type/fields'
 import { config } from '../config'
+import { FormattedMessage, MessageValue } from 'react-intl'
+
+export type Validation = (
+  value: string
+) =>
+  | {
+      message: FormattedMessage.MessageDescriptor
+      props?: { [key: string]: MessageValue }
+    }
+  | undefined
 
 export const messages = defineMessages({
   required: {
@@ -62,24 +71,24 @@ export const isAValidPhoneNumberFormat = (value: string): boolean => {
   return numberRexExp.test(value)
 }
 
-export const requiredSymbol: Validation = (value: any) =>
+export const requiredSymbol: Validation = (value: string) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: any) =>
+export const required: Validation = (value: string) =>
   value ? undefined : { message: messages.required }
 
-export const minLength = (min: number) => (value: any) => {
+export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
     ? { message: messages.minLength, values: dynamicValidationProps.minLength }
     : undefined
 }
 
-export const isNumber: Validation = (value: any) =>
+export const isNumber: Validation = (value: string) =>
   value && isNaN(Number(value))
     ? { message: messages.numberRequired }
     : undefined
 
-export const phoneNumberFormat: Validation = (value: any, ...rest: any[]) => {
+export const phoneNumberFormat: Validation = (value: string) => {
   return value && isAValidPhoneNumberFormat(value)
     ? undefined
     : {
