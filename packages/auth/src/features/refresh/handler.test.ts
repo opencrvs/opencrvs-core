@@ -15,8 +15,6 @@ describe('authenticate handler receives a request', () => {
 
       fetch.mockResponse(
         JSON.stringify({
-          valid: true,
-          nonce: '12345',
           userId: '1',
           role: 'admin'
         })
@@ -36,13 +34,13 @@ describe('authenticate handler receives a request', () => {
           password: '2r23432'
         }
       })
-      const code = codeSpy.mock.calls[0][1]
+      const smsCode = codeSpy.mock.calls[0][1]
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code
+          code: smsCode
         }
       })
 
