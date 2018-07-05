@@ -2,7 +2,7 @@ import * as React from 'react'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { IInputFieldProps } from '@opencrvs/components/lib/InputField'
 import { WrappedFieldProps } from 'redux-form'
-import { Validation } from '../type/fields'
+import { Validation } from '../utils/validate'
 
 export const localizeInput = (
   Component: React.ComponentType<IInputFieldProps>
@@ -11,7 +11,7 @@ export const localizeInput = (
     { meta: { error: Validation } } & IInputFieldProps &
       InjectedIntlProps &
       WrappedFieldProps,
-    any
+    {}
   > {
     render() {
       const { meta, intl, input, ...props } = this.props

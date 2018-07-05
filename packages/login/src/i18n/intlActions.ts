@@ -1,4 +1,6 @@
-import { Ii18n } from '../type/i18n'
+interface Ii18n {
+  LANGUAGE: string
+}
 
 export const CHANGE_LANGUAGE = 'I18N/CHANGE_LANGUAGE'
 

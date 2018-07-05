@@ -70,14 +70,29 @@ const Circle = styled.div`
 
 const LocalizedInputField = localizeInput(InputField)
 
-export interface IStepTwoForm {
-  formId: string
-  submissionError: boolean
-  submitAction: (values: any) => void
+export interface IStepTwoSMSData {
+  code1: string
+  code2: string
+  code3: string
+  code4: string
+  code5: string
+  code6: string
 }
 
+export interface IProps {
+  formId: string
+  submissionError: boolean
+}
+export interface IDispatchProps {
+  submitAction: (values: IStepTwoSMSData) => void
+}
+
+type IStepTwoForm = IProps & IDispatchProps
+
 export class StepTwoForm extends React.Component<
-  InjectedIntlProps & InjectedFormProps<{}, IStepTwoForm> & IStepTwoForm
+  InjectedIntlProps &
+    InjectedFormProps<IStepTwoSMSData, IStepTwoForm> &
+    IStepTwoForm
 > {
   render() {
     const {

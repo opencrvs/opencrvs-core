@@ -95,16 +95,27 @@ const FieldWrapper = styled.div`
   margin-bottom: 30px;
 `
 
-export interface IStepOneForm {
+export interface IStepOneData {
+  mobile: string
+  password: string
+}
+
+export interface IProps {
   formId: string
   submissionError: boolean
-  submitAction: (values: any) => void
 }
+export interface IDispatchProps {
+  submitAction: (values: IStepOneData) => void
+}
+
+type IStepOneForm = IProps & IDispatchProps
 
 const LocalizedInputField = localizeInput(InputField)
 
 export class StepOneForm extends React.Component<
-  InjectedIntlProps & InjectedFormProps<{}, IStepOneForm> & IStepOneForm
+  InjectedIntlProps &
+    InjectedFormProps<IStepOneData, IStepOneForm> &
+    IStepOneForm
 > {
   render() {
     const {
