@@ -21,16 +21,28 @@ export default async function authenticateHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { code, nonce } = request.payload as IVerifyPayload
-  const valid = await checkVerificationCode(nonce, code)
-  if (valid) {
-    const { userId, role } = await getStoredUserInformation(nonce)
-    const token = await createToken(userId, role)
-    if (await deleteUsedVerificationCode(nonce)) {
-      const response: IVerifyResponse = { token }
-      return response
+  try {
+    await checkVerificationCode(nonce, code)
+    try {
+      const { userId, role } = await getStoredUserInformation(nonce)
+      try {
+        const token = await createToken(userId, role)
+        try {
+          await deleteUsedVerificationCode(nonce)
+          const response: IVerifyResponse = { token }
+          return response
+        } catch (err) {
+          throw Error(err.message)
+        }
+      } catch (err) {
+        throw Error(err.message)
+      }
+    } catch (err) {
+      return unauthorized()
     }
+  } catch (err) {
+    return unauthorized()
   }
-  return unauthorized()
 }
 
 export const requestSchema = Joi.object({

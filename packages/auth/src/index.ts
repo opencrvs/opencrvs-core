@@ -42,7 +42,7 @@ export async function createServer() {
       tags: ['api'],
       description: 'Authenticate with username and password',
       notes:
-        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication',
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.  Sends an SMS to the user mobile with verification code',
       validate: {
         payload: reqAuthSchema
       },

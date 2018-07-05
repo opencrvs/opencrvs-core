@@ -3,6 +3,7 @@ import { set, get, del } from 'src/database'
 import { NOTIFICATION_SERVICE_URL, CONFIG_TOKEN_EXPIRY } from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
+import { logger } from 'src/logger'
 
 interface ICodeDetails {
   code: string
@@ -20,11 +21,6 @@ export async function generateVerificationCode(nonce: string, mobile: string) {
 
   await set(`verification_${nonce}`, JSON.stringify(codeDetails))
   return code
-}
-
-export async function getVerificationCode(nonce: string): Promise<string> {
-  const verificationCode = await get(`verification_${nonce}`)
-  return verificationCode
 }
 
 export async function getVerificationCodeDetails(
@@ -62,15 +58,21 @@ export async function checkVerificationCode(
   nonce: string,
   code: string
 ): Promise<boolean> {
-  let codeDetails: ICodeDetails
   try {
-    codeDetails = await getVerificationCodeDetails(nonce)
+    const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
     if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_TOKEN_EXPIRY) {
       throw new Error('sms code expired')
     }
-    return code === codeDetails.code
+    if (code === codeDetails.code) {
+      return true
+    } else {
+      throw new Error('sms code invalid')
+    }
   } catch (err) {
-    throw Error(err.message)
+    logger.info('err', {
+      err
+    })
+    throw new Error('sms code invalid')
   }
 }
 

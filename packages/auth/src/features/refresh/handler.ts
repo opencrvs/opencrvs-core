@@ -9,10 +9,6 @@ interface IRefreshPayload {
   token: string
 }
 
-interface IRefreshResponse {
-  token: string
-}
-
 export default async function refreshHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -22,7 +18,7 @@ export default async function refreshHandler(
     const decoded = await verifyToken(token)
     try {
       const newToken = await refreshToken(decoded)
-      const response: IRefreshResponse = { token: newToken }
+      const response = { token: newToken }
       return response
     } catch (err) {
       throw Error(err.message)
