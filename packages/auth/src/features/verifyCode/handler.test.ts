@@ -53,5 +53,8 @@ describe('authenticate handler receives a request', () => {
       expect(body.role).toBe('admin')
       expect(body.sub).toBe('1')
     })
+    /*it('returns a 401 on an incorrect code', async () => {
+
+    }*/
   })
 })

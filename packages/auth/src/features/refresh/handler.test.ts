@@ -61,5 +61,7 @@ describe('authenticate handler receives a request', () => {
       expect(body.role).toBe('admin')
       expect(body.sub).toBe('1')
     })
+    /*it('refreshError returns a 401 to the client', async () => {
+    })*/
   })
 })

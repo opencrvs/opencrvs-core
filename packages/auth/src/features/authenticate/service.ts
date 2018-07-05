@@ -88,10 +88,9 @@ export async function storeUserInformation(
 
 export async function getStoredUserInformation(nonce: string) {
   const record = await get(`user_information_${nonce}`)
-  if (record === null) {
-    throw new UserInfoNotFoundError()
+  if (record === undefined) {
+    throw new UserInfoNotFoundError('user not found')
   }
-
   return JSON.parse(record)
 }
 
@@ -104,6 +103,7 @@ export async function verifyToken(token: string): Promise<any> {
     if (err.name === 'TokenExpiredError') {
       return err
     }
+
     throw Error(err.message)
   }
 }
