@@ -34,16 +34,6 @@ export async function getVerificationCodeDetails(
   return JSON.parse(codeDetails) as ICodeDetails
 }
 
-export async function updateVerificationCode(
-  codeDetails: ICodeDetails,
-  nonce: string
-): Promise<boolean> {
-  if (await set(`verification_${nonce}`, JSON.stringify(codeDetails))) {
-    return true
-  }
-  return false
-}
-
 export function generateNonce() {
   return crypto
     .randomBytes(16)
@@ -76,11 +66,11 @@ export async function checkVerificationCode(
   try {
     codeDetails = await getVerificationCodeDetails(nonce)
     if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_TOKEN_EXPIRY) {
-      return false
+      throw new Error('sms code expired')
     }
     return code === codeDetails.code
-  } catch {
-    return false
+  } catch (err) {
+    throw Error(err.message)
   }
 }
 
@@ -91,6 +81,6 @@ export async function deleteUsedVerificationCode(
     await del(`verification_${nonce}`)
     return true
   } catch (err) {
-    return false
+    throw Error(err.message)
   }
 }
