@@ -17,7 +17,7 @@ describe('authenticate service errors', () => {
     })
     it('returns an Error for a malformed token', async () => {
       expect.assertions(1)
-      const badToken = 'ytfhgfjhgf'
+      const badToken = 'ytfhgfjgf'
       return verifyToken(badToken).catch((e: Error) =>
         expect(e.message).toEqual('jwt malformed')
       )
