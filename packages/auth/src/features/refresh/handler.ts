@@ -18,14 +18,14 @@ export default async function refreshHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { token } = request.payload as IRefreshPayload
-
-  const decoded = await verifyToken(token)
-  if (decoded.name !== 'TokenExpiredError') {
+  try {
+    const decoded = await verifyToken(token)
     const newToken = await refreshToken(decoded)
     const response: IRefreshResponse = { token: newToken }
     return response
+  } catch (err) {
+    return unauthorized()
   }
-  return unauthorized()
 }
 
 export const requestSchema = Joi.object({

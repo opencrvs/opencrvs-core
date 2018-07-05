@@ -4,6 +4,8 @@ import { promisify } from 'util'
 
 let redisClient: redis.RedisClient
 
+// When adding new methods, also add them to test mocks here: ../test/setupJest.js
+
 export async function stop() {
   redisClient.quit()
 }
@@ -22,3 +24,6 @@ export const get = (...args: string[]) =>
 
 export const set = (...args: string[]) =>
   promisify(redisClient.set).bind(redisClient)(...args)
+
+export const del = (key: string) =>
+  promisify(redisClient.del).bind(redisClient)(key)

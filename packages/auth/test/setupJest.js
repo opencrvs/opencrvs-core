@@ -10,6 +10,7 @@ jest.setMock('src/database', {
     database[key] = value
   },
   get: key => database[key],
+  del: key => {},
   start: () => {},
   stop: () => {}
 })

@@ -20,11 +20,6 @@ const sign = promisify(jwt.sign) as (
   options?: jwt.SignOptions
 ) => Promise<string>
 
-const verify = promisify(jwt.verify) as (
-  token: string,
-  secretOrPublicKey: jwt.Secret
-) => Promise<any>
-
 export interface IAuthentication {
   nonce: string
   mobile: string
@@ -74,7 +69,7 @@ export async function createToken(
   return sign({ role }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: Number(CONFIG_TOKEN_EXPIRY)
+    expiresIn: CONFIG_TOKEN_EXPIRY
   })
 }
 
@@ -95,15 +90,5 @@ export async function getStoredUserInformation(nonce: string) {
 }
 
 export async function verifyToken(token: string): Promise<any> {
-  let decoded
-  try {
-    decoded = await verify(token, publicCert)
-    return decoded
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return err
-    }
-
-    throw Error(err.message)
-  }
+  return jwt.verify(token, publicCert)
 }

@@ -1,23 +1,24 @@
 import fetch from 'node-fetch'
-
-import { set, get } from 'src/database'
-
+import { set, get, del } from 'src/database'
 import { NOTIFICATION_SERVICE_URL, CONFIG_TOKEN_EXPIRY } from 'src/constants'
-
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 
 interface ICodeDetails {
   code: string
-  used: string
   createdAt: number
 }
 
 export async function generateVerificationCode(nonce: string, mobile: string) {
   // TODO lets come back to how these are generated
   const code = Math.floor(100000 + Math.random() * 900000).toString()
-  const codeEntry = `${code}_used_${false}_created_${Date.now()}`
-  await set(`verification_${nonce}`, codeEntry)
+
+  const codeDetails = {
+    code,
+    created: Date.now()
+  }
+
+  await set(`verification_${nonce}`, JSON.stringify(codeDetails))
   return code
 }
 
@@ -29,25 +30,15 @@ export async function getVerificationCode(nonce: string): Promise<string> {
 export async function getVerificationCodeDetails(
   nonce: string
 ): Promise<ICodeDetails> {
-  const codeEntry = await get(`verification_${nonce}`)
-  const firstSplit = codeEntry.split('_used_')
-  const secondSplit = firstSplit[1].split('_created_')
-
-  return {
-    code: firstSplit[0],
-    used: secondSplit[0],
-    createdAt: secondSplit[1]
-  } as ICodeDetails
+  const codeDetails = await get(`verification_${nonce}`)
+  return JSON.parse(codeDetails) as ICodeDetails
 }
 
 export async function updateVerificationCode(
   codeDetails: ICodeDetails,
   nonce: string
 ): Promise<boolean> {
-  const codeEntry = `${codeDetails.code}_used_${codeDetails.used}_created_${
-    codeDetails.createdAt
-  }`
-  if (await set(`verification_${nonce}`, codeEntry)) {
+  if (await set(`verification_${nonce}`, JSON.stringify(codeDetails))) {
     return true
   }
   return false
@@ -81,24 +72,25 @@ export async function checkVerificationCode(
   nonce: string,
   code: string
 ): Promise<boolean> {
-  const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
-  if (codeDetails.used === 'true') {
+  let codeDetails: ICodeDetails
+  try {
+    codeDetails = await getVerificationCodeDetails(nonce)
+    if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_TOKEN_EXPIRY) {
+      return false
+    }
+    return code === codeDetails.code
+  } catch {
     return false
   }
-  if (
-    (Date.now() - codeDetails.createdAt) / 1000 >=
-    Number(CONFIG_TOKEN_EXPIRY)
-  ) {
-    return false
-  }
-  return code === codeDetails.code
 }
 
-export async function setVerificationCodeAsUsed(
+export async function deleteUsedVerificationCode(
   nonce: string
 ): Promise<boolean> {
-  const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
-  codeDetails.used = 'true'
-  const updated = await updateVerificationCode(codeDetails, nonce)
-  return updated
+  try {
+    await del(`verification_${nonce}`)
+    return true
+  } catch (err) {
+    return false
+  }
 }

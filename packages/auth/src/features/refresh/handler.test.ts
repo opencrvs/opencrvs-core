@@ -27,7 +27,6 @@ describe('authenticate handler receives a request', () => {
         role: 'admin',
         mobile: '+345345343'
       })
-      jest.spyOn(codeService, 'setVerificationCodeAsUsed').mockReturnValue(true)
 
       const authRes = await server.server.inject({
         method: 'POST',

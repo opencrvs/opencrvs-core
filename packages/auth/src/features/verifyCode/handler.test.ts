@@ -27,7 +27,6 @@ describe('authenticate handler receives a request', () => {
         role: 'admin',
         mobile: '+345345343'
       })
-      jest.spyOn(codeService, 'setVerificationCodeAsUsed').mockReturnValue(true)
 
       const authRes = await server.server.inject({
         method: 'POST',
@@ -53,8 +52,42 @@ describe('authenticate handler receives a request', () => {
       expect(body.role).toBe('admin')
       expect(body.sub).toBe('1')
     })
-    /*it('returns a 401 on an incorrect code', async () => {
+  })
+  describe('user auth service says credentials are invalid', () => {
+    it('returns a 401 if the code is bad', async () => {
+      const authService = require('../authenticate/service')
 
-    }*/
+      fetch.mockResponse(
+        JSON.stringify({
+          valid: true,
+          nonce: '12345',
+          userId: '1',
+          role: 'admin'
+        })
+      )
+      jest.spyOn(authService, 'authenticate').mockReturnValue({
+        userId: '1',
+        role: 'admin',
+        mobile: '+345345343'
+      })
+      const authRes = await server.server.inject({
+        method: 'POST',
+        url: '/authenticate',
+        payload: {
+          mobile: '+345345343',
+          password: '2r23432'
+        }
+      })
+      const badCode = '1'
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/verifyCode',
+        payload: {
+          nonce: authRes.result.nonce,
+          code: badCode
+        }
+      })
+      expect(res.statusCode).toBe(401)
+    })
   })
 })
