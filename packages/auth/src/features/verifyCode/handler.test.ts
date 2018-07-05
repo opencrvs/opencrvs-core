@@ -1,4 +1,3 @@
-import * as fetch from 'jest-fetch-mock'
 import { createServerWithEnvironment } from 'src/tests/util'
 
 describe('authenticate handler receives a request', () => {
@@ -12,15 +11,6 @@ describe('authenticate handler receives a request', () => {
     it('verifies a code and generates a token', async () => {
       const codeService = require('./service')
       const authService = require('../authenticate/service')
-
-      fetch.mockResponse(
-        JSON.stringify({
-          valid: true,
-          nonce: '12345',
-          userId: '1',
-          role: 'admin'
-        })
-      )
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
@@ -56,15 +46,6 @@ describe('authenticate handler receives a request', () => {
   describe('user auth service says credentials are invalid', () => {
     it('returns a 401 if the code is bad', async () => {
       const authService = require('../authenticate/service')
-
-      fetch.mockResponse(
-        JSON.stringify({
-          valid: true,
-          nonce: '12345',
-          userId: '1',
-          role: 'admin'
-        })
-      )
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         role: 'admin',

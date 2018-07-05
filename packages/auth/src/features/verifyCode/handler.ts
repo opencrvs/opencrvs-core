@@ -21,9 +21,7 @@ export default async function authenticateHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { code, nonce } = request.payload as IVerifyPayload
-  console.log('code in payload:', code)
   const valid = await checkVerificationCode(nonce, code)
-  console.log(valid)
   if (valid) {
     const { userId, role } = await getStoredUserInformation(nonce)
     const token = await createToken(userId, role)

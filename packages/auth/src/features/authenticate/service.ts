@@ -83,7 +83,7 @@ export async function storeUserInformation(
 
 export async function getStoredUserInformation(nonce: string) {
   const record = await get(`user_information_${nonce}`)
-  if (record === undefined) {
+  if (record === null) {
     throw new UserInfoNotFoundError('user not found')
   }
   return JSON.parse(record)

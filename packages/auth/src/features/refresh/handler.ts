@@ -20,9 +20,13 @@ export default async function refreshHandler(
   const { token } = request.payload as IRefreshPayload
   try {
     const decoded = await verifyToken(token)
-    const newToken = await refreshToken(decoded)
-    const response: IRefreshResponse = { token: newToken }
-    return response
+    try {
+      const newToken = await refreshToken(decoded)
+      const response: IRefreshResponse = { token: newToken }
+      return response
+    } catch (err) {
+      throw Error(err.message)
+    }
   } catch (err) {
     return unauthorized()
   }
