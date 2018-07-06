@@ -87,7 +87,7 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{"nonce": "123456", "token": ""}' http://localhost:4040/refreshToken
+  // curl -H 'Content-Type: application/json' -d '{"nonce": "", "token": ""}' http://localhost:4040/refreshToken
   server.route({
     method: 'POST',
     path: '/refreshToken',

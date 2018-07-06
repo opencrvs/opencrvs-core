@@ -16,7 +16,7 @@ export async function generateVerificationCode(nonce: string, mobile: string) {
 
   const codeDetails = {
     code,
-    created: Date.now()
+    createdAt: Date.now()
   }
 
   await set(`verification_${nonce}`, JSON.stringify(codeDetails))
@@ -62,8 +62,7 @@ export async function checkVerificationCode(
     const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
     if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_TOKEN_EXPIRY) {
       throw new Error('sms code expired')
-    }
-    if (code === codeDetails.code) {
+    } else if (code === codeDetails.code) {
       return true
     } else {
       throw new Error('sms code invalid')
