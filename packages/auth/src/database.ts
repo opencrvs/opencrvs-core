@@ -12,11 +12,11 @@ export interface IDatabaseConnector {
   del: (key: string) => Promise<number>
 }
 
-async function stop() {
+export async function stop() {
   redisClient.quit()
 }
 
-async function start() {
+export async function start() {
   redisClient = redis.createClient({
     host: REDIS_HOST,
     retry_strategy: options => {
@@ -25,13 +25,15 @@ async function start() {
   })
 }
 
-const get = (key: string) => promisify(redisClient.get).bind(redisClient)(key)
+export const get = (key: string) =>
+  promisify(redisClient.get).bind(redisClient)(key)
 
-const set = (key: string, value: string) =>
+export const set = (key: string, value: string) =>
   promisify(redisClient.set).bind(redisClient)(key, value)
 
-const del = (key: string) => promisify(redisClient.del).bind(redisClient)(key)
+export const del = (key: string) =>
+  promisify(redisClient.del).bind(redisClient)(key)
 
-const connector: IDatabaseConnector = { set, get, del, stop, start }
+export const connector: IDatabaseConnector = { set, get, del, stop, start }
 
 export default connector
