@@ -9,7 +9,7 @@ export interface IDatabaseConnector {
   start: () => void
   set: (key: string, value: string) => Promise<void>
   get: (key: string) => Promise<string | null>
-  del: (key: string) => Promise<string | null>
+  del: (key: string) => Promise<number>
 }
 
 async function stop() {
