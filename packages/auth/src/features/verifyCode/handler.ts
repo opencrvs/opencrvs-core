@@ -23,26 +23,14 @@ export default async function authenticateHandler(
   const { code, nonce } = request.payload as IVerifyPayload
   try {
     await checkVerificationCode(nonce, code)
-    try {
-      const { userId, role } = await getStoredUserInformation(nonce)
-      try {
-        const token = await createToken(userId, role)
-        try {
-          await deleteUsedVerificationCode(nonce)
-          const response: IVerifyResponse = { token }
-          return response
-        } catch (err) {
-          throw Error(err.message)
-        }
-      } catch (err) {
-        throw Error(err.message)
-      }
-    } catch (err) {
-      return unauthorized()
-    }
   } catch (err) {
     return unauthorized()
   }
+  const { userId, role } = await getStoredUserInformation(nonce)
+  const token = await createToken(userId, role)
+  await deleteUsedVerificationCode(nonce)
+  const response: IVerifyResponse = { token }
+  return response
 }
 
 export const requestSchema = Joi.object({
