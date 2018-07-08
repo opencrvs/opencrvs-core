@@ -1,5 +1,21 @@
-import { IReduxFormFieldProps } from '../type/fields'
 import { InjectedIntl, Messages } from 'react-intl'
+import { Validation } from './validate'
+
+export type IReduxFormFieldProps = {
+  id: string
+  name: string
+  validate: Validation[]
+  disabled: boolean
+  type: string
+  min?: number
+  maxLength?: number
+  placeholder?: string
+  label?: string
+}
+
+export type IFieldGroup = {
+  [key: string]: IReduxFormFieldProps
+}
 
 export const getFieldProps = (
   intl: InjectedIntl,

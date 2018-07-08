@@ -1,13 +1,13 @@
 import * as moxios from 'moxios'
 import * as actions from './loginActions'
 import { initialState } from './loginReducer'
-import { createStore } from '../store'
+import { createStore, AppStore } from '../store'
 import { resolve } from 'url'
 import { config } from '../config'
 import { client } from '../utils/authApi'
 
 describe('loginReducer tests', () => {
-  let store: any
+  let store: AppStore
   beforeEach(() => {
     store = createStore()
 
@@ -26,11 +26,7 @@ describe('loginReducer tests', () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: true,
-      submissionError: false,
-      stepOneDetails: {
-        mobile: '+447111111111',
-        password: 'test'
-      }
+      submissionError: false
     }
 
     const action = {
@@ -41,9 +37,9 @@ describe('loginReducer tests', () => {
       }
     }
     store.dispatch(action)
-    expect((store.getState() as any).login).toEqual(expectedState)
+    expect(store.getState().login).toEqual(expectedState)
   })
-  it('updates the state when nonce and mobile is returned from the authorise service', () => {
+  it('updates the state when nonce is returned from the authorise service', () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: false,
@@ -51,21 +47,16 @@ describe('loginReducer tests', () => {
       stepTwoDetails: {
         code: '',
         nonce: '1234'
-      },
-      stepOneDetails: {
-        mobile: '+447111111111',
-        password: ''
       }
     }
     const action = {
       type: actions.STEP_ONE_SUCCESS,
       payload: {
-        nonce: '1234',
-        mobile: '+447111111111'
+        nonce: '1234'
       }
     }
     store.dispatch(action)
-    expect((store.getState() as any).login).toEqual(expectedState)
+    expect(store.getState().login).toEqual(expectedState)
   })
 
   it('updates the state when step one is completed', () => {
@@ -78,7 +69,7 @@ describe('loginReducer tests', () => {
       type: actions.STEP_ONE_COMPLETE
     }
     store.dispatch(action)
-    expect((store.getState() as any).login).toEqual(expectedState)
+    expect(store.getState().login).toEqual(expectedState)
   })
 
   it('updates the state when step two is completed', () => {
@@ -91,6 +82,6 @@ describe('loginReducer tests', () => {
       type: actions.STEP_TWO_COMPLETE
     }
     store.dispatch(action)
-    expect((store.getState() as any).login).toEqual(expectedState)
+    expect(store.getState().login).toEqual(expectedState)
   })
 })

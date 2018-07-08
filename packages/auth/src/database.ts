@@ -4,13 +4,19 @@ import { promisify } from 'util'
 
 let redisClient: redis.RedisClient
 
-// When adding new methods, also add them to test mocks here: ../test/setupJest.js
+export interface IDatabaseConnector {
+  stop: () => void
+  start: () => void
+  set: (key: string, value: string) => Promise<void>
+  get: (key: string) => Promise<string | null>
+  del: (key: string) => Promise<string | null>
+}
 
-export async function stop() {
+async function stop() {
   redisClient.quit()
 }
 
-export async function start() {
+async function start() {
   redisClient = redis.createClient({
     host: REDIS_HOST,
     retry_strategy: options => {
@@ -19,11 +25,13 @@ export async function start() {
   })
 }
 
-export const get = (...args: string[]) =>
-  promisify(redisClient.get).bind(redisClient)(...args)
+const get = (key: string) => promisify(redisClient.get).bind(redisClient)(key)
 
-export const set = (...args: string[]) =>
-  promisify(redisClient.set).bind(redisClient)(...args)
+const set = (key: string, value: string) =>
+  promisify(redisClient.set).bind(redisClient)(key, value)
 
-export const del = (key: string) =>
-  promisify(redisClient.del).bind(redisClient)(key)
+const del = (key: string) => promisify(redisClient.del).bind(redisClient)(key)
+
+const connector: IDatabaseConnector = { set, get, del, stop, start }
+
+export default connector

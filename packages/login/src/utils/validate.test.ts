@@ -94,7 +94,7 @@ describe('validate', () => {
       expect(isNumber(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value.', () => {
-      const goodValue = 7
+      const goodValue = '7'
       const response = undefined
       expect(isNumber(goodValue)).toEqual(response)
     })

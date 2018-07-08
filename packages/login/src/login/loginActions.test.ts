@@ -17,13 +17,11 @@ describe('loginActions tests', () => {
     const action = {
       type: actions.STEP_ONE_SUCCESS,
       payload: {
-        mobile: '+447111111111',
         nonce: '1234'
       }
     }
     expect(
       actions.submitStepOneSuccess({
-        mobile: '+447111111111',
         nonce: '1234'
       })
     ).toEqual(action)
@@ -45,7 +43,6 @@ describe('loginActions tests', () => {
     const action = {
       type: actions.START_STEP_TWO,
       payload: {
-        nonce: '',
         code: '123456'
       }
     }

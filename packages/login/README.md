@@ -1,3 +1,26 @@
+# OpenCRVS Login app
+
+Dependencies:
+  - [OpenCRVS Auth API](https://github.com/jembi/OpenCRVS/tree/master/packages/auth)
+
+### How do I log in?
+
+- Make sure you have both Auth API and this project running
+- Open http://localhost:3020
+- By default the user database has no entries. Go to `user-mgnt` project and run `yarn populate`
+- `packages/user-mgnt/resources/populate.ts` is a good place to find example credentials
+- Hit submit
+
+### Where do I get the SMS verification code in development?
+Check the terminal window where you're running Auth API.
+You should see something like this there after you've finished the first login step:
+
+```
+@opencrvs/auth: info: Sending a verification SMS {"mobile":"+447111111111","verificationCode":"4991"}
+```
+
+----
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

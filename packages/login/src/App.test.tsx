@@ -1,7 +1,8 @@
 import * as moxios from 'moxios'
+import { resolve } from 'url'
+import { ReactWrapper } from 'enzyme'
 import { createTestApp } from './tests/util'
 import { client } from './utils/authApi'
-import { resolve } from 'url'
 import { config } from './config'
 
 it('renders without crashing', async () => {
@@ -23,7 +24,7 @@ describe('Login app', () => {
   })
 
   describe('when credential form is filled', () => {
-    let app: any
+    let app: ReactWrapper<{}, {}>
     beforeEach(() => {
       app = createTestApp()
       app
@@ -54,6 +55,7 @@ describe('Login app', () => {
       await wait()
 
       app.update()
+
       expect(app.find('form#STEP_TWO')).toHaveLength(1)
     })
   })

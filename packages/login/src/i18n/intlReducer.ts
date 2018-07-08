@@ -1,8 +1,11 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from './intlActions'
-import { IntlMessages } from '../type/i18n'
 import { ENGLISH_STATE } from './en'
 import { BENGALI_STATE } from './bn'
+
+export interface IntlMessages {
+  [key: string]: string
+}
 
 export type IntlState = {
   LANGUAGE: string
