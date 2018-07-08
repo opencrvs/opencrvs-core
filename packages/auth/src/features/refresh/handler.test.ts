@@ -7,9 +7,9 @@ describe('authenticate handler receives a request', () => {
     server = await createServerWithEnvironment({ NODE_ENV: 'production' })
   })
 
-  describe('user management service says credentials are valid', () => {
-    it('verifies a code and generates a token', async () => {
-      const codeService = require('./service')
+  describe('refresh expiring token', () => {
+    it('verifies a token and generates a new token', async () => {
+      const codeService = require('../verifyCode/service')
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
@@ -36,21 +36,30 @@ describe('authenticate handler receives a request', () => {
         }
       })
 
-      expect(res.result.token.split('.')).toHaveLength(3)
-      const [, payload] = res.result.token.split('.')
+      const refreshResponse = await server.server.inject({
+        method: 'POST',
+        url: '/refreshToken',
+        payload: {
+          nonce: authRes.result.nonce,
+          token: res.result.token
+        }
+      })
+      expect(refreshResponse.result.token.split('.')).toHaveLength(3)
+      const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.role).toBe('admin')
       expect(body.sub).toBe('1')
     })
-  })
-  describe('user auth service says credentials are invalid', () => {
-    it('returns a 401 if the code is bad', async () => {
+    it('refreshError returns a 401 to the client if the token is bad', async () => {
+      const codeService = require('../verifyCode/service')
       const authService = require('../authenticate/service')
+      const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         role: 'admin',
         mobile: '+345345343'
       })
+
       const authRes = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -59,16 +68,27 @@ describe('authenticate handler receives a request', () => {
           password: '2r23432'
         }
       })
-      const badCode = '1'
-      const res = await server.server.inject({
+      const smsCode = codeSpy.mock.calls[0][1]
+      await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: badCode
+          code: smsCode
         }
       })
-      expect(res.statusCode).toBe(401)
+
+      const badToken = 'ilgiglig'
+
+      const refreshResponse = await server.server.inject({
+        method: 'POST',
+        url: '/refreshToken',
+        payload: {
+          nonce: authRes.result.nonce,
+          token: badToken
+        }
+      })
+      expect(refreshResponse.statusCode).toBe(401)
     })
   })
 })

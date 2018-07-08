@@ -1,19 +1,35 @@
 import fetch from 'node-fetch'
-
-import { set, get } from 'src/database'
-
-import { NOTIFICATION_SERVICE_URL } from 'src/constants'
-
+import { set, get, del } from 'src/database'
+import { NOTIFICATION_SERVICE_URL, CONFIG_TOKEN_EXPIRY } from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
+import { logger } from 'src/logger'
+
+interface ICodeDetails {
+  code: string
+  createdAt: number
+}
 
 export async function generateVerificationCode(nonce: string, mobile: string) {
   // TODO lets come back to how these are generated
-  const code = Math.round(1000 + Math.random() * 8999).toString()
+  const code = Math.floor(100000 + Math.random() * 900000).toString()
 
-  await set(`verification_${nonce}`, code)
+  const codeDetails = {
+    code,
+    createdAt: Date.now()
+  }
+
+  await set(`verification_${nonce}`, JSON.stringify(codeDetails))
   return code
 }
+
+export async function getVerificationCodeDetails(
+  nonce: string
+): Promise<ICodeDetails> {
+  const codeDetails = await get(`verification_${nonce}`)
+  return JSON.parse(codeDetails) as ICodeDetails
+}
+
 export function generateNonce() {
   return crypto
     .randomBytes(16)
@@ -42,6 +58,30 @@ export async function checkVerificationCode(
   nonce: string,
   code: string
 ): Promise<boolean> {
-  const storedCode = await get(`verification_${nonce}`)
-  return code === storedCode
+  try {
+    const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
+    if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_TOKEN_EXPIRY) {
+      throw new Error('sms code expired')
+    } else if (code === codeDetails.code) {
+      return true
+    } else {
+      throw new Error('sms code invalid')
+    }
+  } catch (err) {
+    logger.info('err', {
+      err
+    })
+    throw new Error('sms code invalid')
+  }
+}
+
+export async function deleteUsedVerificationCode(
+  nonce: string
+): Promise<boolean> {
+  try {
+    await del(`verification_${nonce}`)
+    return true
+  } catch (err) {
+    throw Error(err.message)
+  }
 }

@@ -13,6 +13,7 @@ const mock: IDatabaseConnector = {
     database[key] = value
   },
   get: async key => database[key] || null,
+  del: async key => database[key].length,
   // tslint:disable-next-line no-empty
   start: () => {},
   // tslint:disable-next-line no-empty

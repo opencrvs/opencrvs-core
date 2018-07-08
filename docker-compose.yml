@@ -52,6 +52,8 @@ services:
     environment:
       - REDIS_HOST=redis
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - CONFIG_TOKEN_EXPIRY=600
+      - NOTIFICATION_SERVICE_URL=http://localhost:2020/
     ports:
       - "4040:4040"
     deploy:
