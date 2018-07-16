@@ -6,6 +6,11 @@ WORKDIR /usr/src/app
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
+# Default build env
+ENV REACT_APP_API_GATEWAY_URL=http://localhost:7070/
+ENV REACT_APP_LOCALE=gb
+ENV REACT_APP_LANGUAGE=en
+
 # Install and configure `serve`.
 RUN yarn global add serve
 CMD cd packages/register; serve -s build
