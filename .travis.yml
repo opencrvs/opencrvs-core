@@ -6,6 +6,7 @@ after_success:
   - codecov
 jobs:
   include:
+    - stage: test
     - stage: push docker images
       if: branch IN (master, ocrvs-332-auto-deploy)
       script: yarn compose:push
