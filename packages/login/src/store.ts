@@ -35,7 +35,7 @@ export const createStore = (history: History) => {
     install(),
     applyMiddleware(middleware),
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
-      ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+      ? /* istanbul ignore next */ (window as any).__REDUX_DEVTOOLS_EXTENSION__()
       : (f: any) => f
   )
 
