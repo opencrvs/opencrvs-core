@@ -79,22 +79,30 @@ const SecondaryButton = styled(Button).attrs({ secondary: true })`
 
 const LocalizedInputField = localizeInput(InputField)
 
+export interface IStepTwoSMSData {
+  code1: string
+  code2: string
+  code3: string
+  code4: string
+  code5: string
+  code6: string
+}
+
 export interface IProps {
   formId: string
   submissionError: boolean
 }
-
 export interface IDispatchProps {
-  submitAction: (values: any) => void
+  submitAction: (values: IStepTwoSMSData) => void
   onResendSMS: () => void
 }
 
-type IStepTwoFormProps = IProps & IDispatchProps
+type IStepTwoForm = IProps & IDispatchProps
 
 export class StepTwoForm extends React.Component<
   InjectedIntlProps &
-    InjectedFormProps<{}, IStepTwoFormProps> &
-    IStepTwoFormProps
+    InjectedFormProps<IStepTwoSMSData, IStepTwoForm> &
+    IStepTwoForm
 > {
   render() {
     const {

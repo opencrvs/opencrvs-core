@@ -1,14 +1,13 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
+import { RouteComponentProps } from 'react-router'
 
 export interface IPage {
   language?: string
 }
 
-const styledPage = styled(PageWrapper).attrs<IPage>({})
-
-const StyledPage = styledPage`
+const StyledPage = styled(PageWrapper).attrs<IPage>({})`
 
   * {
     box-sizing: border-box;
@@ -57,7 +56,7 @@ const StyledPage = styledPage`
   }
 `
 
-export class Page extends React.Component<IPage> {
+export class Page extends React.Component<IPage & RouteComponentProps<{}>> {
   render() {
     const { language, children } = this.props
     return <StyledPage language={language}>{children}</StyledPage>

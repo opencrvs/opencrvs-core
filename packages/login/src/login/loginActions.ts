@@ -1,8 +1,10 @@
 import { AxiosError } from 'axios'
 import { RouterAction } from 'react-router-redux'
-import { IStepOneData, IStepTwoData, IStepTwoSMSData } from '../type/login'
 import { convertToMSISDN } from '../utils/dataCleanse'
 import { config } from '../config'
+import { IAuthenticateResponse } from '../utils/authApi'
+import { IStepOneData } from './StepOneForm'
+import { IStepTwoSMSData } from './StepTwoForm'
 
 export const START_STEP_ONE = 'STEP_ONE/START_STEP_ONE'
 export const STEP_ONE_SUCCESS = 'STEP_ONE/STEP_ONE_SUCCESS'
@@ -18,11 +20,11 @@ export const RESEND_SMS = 'STEP_TWO/RESEND_SMS'
 
 export type Action =
   | { type: typeof START_STEP_ONE; payload: IStepOneData }
-  | { type: typeof STEP_ONE_SUCCESS; payload: any }
+  | { type: typeof STEP_ONE_SUCCESS; payload: IAuthenticateResponse }
   | { type: typeof STEP_ONE_FAILED; payload: Error }
   | { type: typeof STEP_ONE_COMPLETE }
-  | { type: typeof START_STEP_TWO; payload: IStepTwoData }
-  | { type: typeof STEP_TWO_SUCCESS; payload: any }
+  | { type: typeof START_STEP_TWO; payload: { code: string } }
+  | { type: typeof STEP_TWO_SUCCESS }
   | { type: typeof STEP_TWO_FAILED; payload: Error }
   | { type: typeof STEP_TWO_COMPLETE }
   | { type: typeof RESEND_SMS }
@@ -40,7 +42,9 @@ export const startStepOne = (values: IStepOneData): Action => {
   }
 }
 
-export const submitStepOneSuccess = (response: any): Action => ({
+export const submitStepOneSuccess = (
+  response: IAuthenticateResponse
+): Action => ({
   type: STEP_ONE_SUCCESS,
   payload: response
 })
@@ -56,13 +60,9 @@ export const resendSMS = (): Action => ({
 
 export const startStepTwo = (values: IStepTwoSMSData): Action => {
   const code = Object.values(values).join('')
-  const payload: IStepTwoData = {
-    nonce: '',
-    code
-  }
 
   return {
     type: START_STEP_TWO,
-    payload
+    payload: { code }
   }
 }

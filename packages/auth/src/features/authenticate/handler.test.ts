@@ -43,11 +43,12 @@ describe('authenticate handler receives a request', () => {
     it('generates a mobile verification code and sends it to sms gateway', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
 
-      const codeService = require('../verifyCode/service')
-      jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
+      const reloadedCodeService = require('../verifyCode/service')
+
+      jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
       fetch.mockResponse(JSON.stringify({}))
-      const spy = jest.spyOn(codeService, 'sendVerificationCode')
+      const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
 
       await server.server.inject({
         method: 'POST',

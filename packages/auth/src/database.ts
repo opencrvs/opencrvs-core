@@ -4,6 +4,14 @@ import { promisify } from 'util'
 
 let redisClient: redis.RedisClient
 
+export interface IDatabaseConnector {
+  stop: () => void
+  start: () => void
+  set: (key: string, value: string) => Promise<void>
+  get: (key: string) => Promise<string | null>
+  del: (key: string) => Promise<number>
+}
+
 export async function stop() {
   redisClient.quit()
 }
@@ -17,8 +25,15 @@ export async function start() {
   })
 }
 
-export const get = (...args: string[]) =>
-  promisify(redisClient.get).bind(redisClient)(...args)
+export const get = (key: string) =>
+  promisify(redisClient.get).bind(redisClient)(key)
 
-export const set = (...args: string[]) =>
-  promisify(redisClient.set).bind(redisClient)(...args)
+export const set = (key: string, value: string) =>
+  promisify(redisClient.set).bind(redisClient)(key, value)
+
+export const del = (key: string) =>
+  promisify(redisClient.del).bind(redisClient)(key)
+
+export const connector: IDatabaseConnector = { set, get, del, stop, start }
+
+export default connector

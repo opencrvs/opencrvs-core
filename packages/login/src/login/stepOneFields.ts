@@ -1,5 +1,5 @@
 import * as validations from '../utils/validate'
-import { IFieldGroup } from '../type/fields'
+import { IFieldGroup } from '../utils/fieldUtils'
 
 export const stepOneFields: IFieldGroup = {
   mobile: {

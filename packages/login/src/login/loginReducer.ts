@@ -1,23 +1,18 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
 import { push } from 'react-router-redux'
-import { IStepOneData, IStepTwoData } from '../type/login'
+
 import * as actions from './loginActions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
 
 export type LoginState = {
   stepOneSubmitting: boolean
-  stepOneDetails: IStepOneData
-  stepTwoDetails: IStepTwoData
+  stepTwoDetails: { code: string; nonce: string }
   submissionError: boolean
 }
 
 export const initialState: LoginState = {
   stepOneSubmitting: false,
-  stepOneDetails: {
-    mobile: '',
-    password: ''
-  },
   stepTwoDetails: {
     nonce: '',
     code: ''
@@ -35,8 +30,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         {
           ...state,
           stepOneSubmitting: true,
-          submissionError: false,
-          stepOneDetails: action.payload
+          submissionError: false
         },
         Cmd.run(authApi.submitStepOne, {
           successActionCreator: actions.submitStepOneSuccess,
@@ -55,10 +49,6 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           stepTwoDetails: {
             ...state.stepTwoDetails,
             nonce: action.payload.nonce
-          },
-          stepOneDetails: {
-            ...state.stepOneDetails,
-            mobile: action.payload.mobile
           }
         },
         Cmd.action(push(routes.STEP_TWO))

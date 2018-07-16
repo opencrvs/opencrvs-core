@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { mount, configure } from 'enzyme'
-import { App } from '../App'
+import { mount, configure, ReactWrapper } from 'enzyme'
 import * as Adapter from 'enzyme-adapter-react-16'
-import { IStoreState } from '../store'
-import { initialState as loginState } from '../login/loginReducer'
-import { initialState as intlState } from '../i18n/intlReducer'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
-import { createMemoryHistory } from 'history'
+import { App } from '../App'
+import { IStoreState, AppStore } from '../store'
+import { initialState as loginState } from '../login/loginReducer'
+import { initialState as intlState } from '../i18n/intlReducer'
 
 configure({ adapter: new Adapter() })
 
@@ -24,20 +23,22 @@ export const mockState: IStoreState = {
     }
   },
   form: {
-    registeredFields: [
-      {
-        name: '',
-        type: 'Field'
-      }
-    ]
+    MOCK_FORM: {
+      registeredFields: [
+        {
+          name: '',
+          type: 'Field'
+        }
+      ]
+    }
   },
   i18n: intlState
 }
 
-export function createTestApp() {
-  return mount(<App history={createMemoryHistory()} />)
+export function createTestApp(): ReactWrapper<{}, {}> {
+  return mount<App>(<App />)
 }
 
-export const createTestComponent = (element: JSX.Element, store: any) => {
+export const createTestComponent = (element: JSX.Element, store: AppStore) => {
   return mount(<Provider store={store}>{element}</Provider>)
 }

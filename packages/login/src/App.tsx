@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Provider, Store } from 'react-redux'
+import { Provider } from 'react-redux'
 import { IntlContainer } from './i18n/IntlContainer'
 import { ConnectedRouter } from 'react-router-redux'
-import { createStore } from './store'
+import { createStore, history } from './store'
 import { Route, Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 import { config } from './config'
@@ -11,25 +11,16 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { StepOneContainer } from './login/StepOneContainer'
 import { PageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
-import { History } from '../../../node_modules/@types/history'
 
-interface IProps {
-  history: History
-}
+const store = createStore()
 
-export class App extends React.Component<IProps> {
-  store: Store<{}>
-
-  constructor(props: IProps) {
-    super(props)
-    this.store = createStore(props.history)
-  }
+export class App extends React.Component {
   public render() {
     return (
-      <Provider store={this.store}>
+      <Provider store={store}>
         <IntlContainer>
           <ThemeProvider theme={getTheme(config.LOCALE)}>
-            <ConnectedRouter history={this.props.history}>
+            <ConnectedRouter history={history}>
               <PageContainer>
                 <Switch>
                   <Route

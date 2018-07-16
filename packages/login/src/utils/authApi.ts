@@ -1,14 +1,18 @@
-import axios, { AxiosError } from 'axios'
-import { IAPIOptions } from '../type/API'
+import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { config } from '../config'
-import { IStepOneData } from '../type/login'
 import { resolve } from 'url'
+import { IStepOneData } from '../login/StepOneForm'
 
 export const client = axios.create({
   baseURL: config.AUTH_API_URL
 })
 
-const request = (options: IAPIOptions) => {
+export interface IAuthenticateResponse {
+  nonce: string
+}
+
+const request = (options: AxiosRequestConfig) => {
+  // tslint:disable-next-line no-any
   const onSuccess = (response: any) => {
     return response.data
   }
@@ -31,19 +35,19 @@ const request = (options: IAPIOptions) => {
     .catch(onError)
 }
 
-const submitStepOne = (data: IStepOneData) => {
+const submitStepOne = (data: IStepOneData): Promise<IAuthenticateResponse> => {
   return request({
     url: resolve(config.AUTH_API_URL, 'authenticate'),
     method: 'POST',
     data
-  } as IAPIOptions)
+  })
 }
 const resendSMS = (nonce: string) => {
   return request({
     url: resolve(config.AUTH_API_URL, '/resend-sms'),
     method: 'POST',
     data: { nonce }
-  } as IAPIOptions)
+  })
 }
 
 export const authApi = {
