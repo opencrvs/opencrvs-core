@@ -9,6 +9,7 @@ jobs:
         - codecov
     - stage: push docker images
       if: branch IN (master, ocrvs-332-auto-deploy) AND type = push
+      install: skip
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - yarn compose:push

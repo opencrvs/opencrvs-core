@@ -5,17 +5,27 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
       - jwt-private-key.{{ts}}
+    environment:
+      - CERT_PRIVATE_KEY_PATH=/run/secrets/jwt-private-key.{{ts}}
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
   user-mgnt:
     secrets:
       - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
   notification:
     secrets:
       - clickatell-user
       - clickatell-password
       - clickatell-api-id
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
   gateway:
     secrets:
      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
   hearth:
     secrets:
       - jwt-public-key.{{ts}}
