@@ -1,3 +1,4 @@
+/* istanbul ignore next */
 import {
   compose,
   createStore as createReduxStore,
