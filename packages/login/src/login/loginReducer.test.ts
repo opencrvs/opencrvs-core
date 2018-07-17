@@ -26,7 +26,11 @@ describe('loginReducer tests', () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: true,
-      submissionError: false
+      submissionError: false,
+      stepOneDetails: {
+        mobile: '+447111111111',
+        password: 'test'
+      }
     }
 
     const action = {
@@ -45,7 +49,6 @@ describe('loginReducer tests', () => {
       stepOneSubmitting: false,
       submissionError: false,
       stepTwoDetails: {
-        code: '',
         nonce: '1234'
       }
     }
@@ -59,27 +62,14 @@ describe('loginReducer tests', () => {
     expect(store.getState().login).toEqual(expectedState)
   })
 
-  it('updates the state when step one is completed', () => {
+  it('updates the state when resend SMS is requested', () => {
     const expectedState = {
       ...initialState,
       stepOneSubmitting: false,
       submissionError: false
     }
     const action = {
-      type: actions.STEP_ONE_COMPLETE
-    }
-    store.dispatch(action)
-    expect(store.getState().login).toEqual(expectedState)
-  })
-
-  it('updates the state when step two is completed', () => {
-    const expectedState = {
-      ...initialState,
-      stepOneSubmitting: false,
-      submissionError: false
-    }
-    const action = {
-      type: actions.STEP_TWO_COMPLETE
+      type: actions.RESEND_SMS
     }
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)

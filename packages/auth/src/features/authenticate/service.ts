@@ -76,9 +76,13 @@ export async function createToken(
 export async function storeUserInformation(
   nonce: string,
   userId: string,
-  role: string
+  role: string,
+  mobile: string
 ) {
-  return set(`user_information_${nonce}`, JSON.stringify({ userId, role }))
+  return set(
+    `user_information_${nonce}`,
+    JSON.stringify({ userId, role, mobile })
+  )
 }
 
 export async function getStoredUserInformation(nonce: string) {

@@ -1,21 +1,19 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
 import { push } from 'react-router-redux'
-
 import * as actions from './loginActions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
 
 export type LoginState = {
   stepOneSubmitting: boolean
-  stepTwoDetails: { code: string; nonce: string }
+  stepTwoDetails: { nonce: string }
   submissionError: boolean
 }
 
 export const initialState: LoginState = {
   stepOneSubmitting: false,
   stepTwoDetails: {
-    nonce: '',
-    code: ''
+    nonce: ''
   },
   submissionError: false
 }
@@ -30,7 +28,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         {
           ...state,
           stepOneSubmitting: true,
-          submissionError: false
+          submissionError: false,
+          stepOneDetails: action.payload
         },
         Cmd.run(authApi.submitStepOne, {
           successActionCreator: actions.submitStepOneSuccess,
@@ -55,11 +54,12 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
       )
     case actions.RESEND_SMS:
       return loop(
-        state,
+        {
+          ...state
+        },
         Cmd.run(authApi.resendSMS, {
-          // TODO
-          // successActionCreator: actions.submitStepOneSuccess,
-          // failActionCreator: actions.submitStepOneFailed,
+          successActionCreator: actions.resendSMSSuccess,
+          failActionCreator: actions.resendSMSFailed,
           args: [state.stepTwoDetails.nonce]
         })
       )

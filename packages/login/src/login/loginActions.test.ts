@@ -57,4 +57,35 @@ describe('loginActions tests', () => {
       })
     ).toEqual(action)
   })
+  it('resendSMS should dispatch', () => {
+    const action = {
+      type: actions.RESEND_SMS
+    }
+    expect(actions.resendSMS()).toEqual(action)
+  })
+  it('resendSMSSuccess should dispatch', () => {
+    const action = {
+      type: actions.RESEND_SMS_SUCCESS,
+      payload: {
+        nonce: '123456'
+      }
+    }
+    expect(
+      actions.resendSMSSuccess({
+        nonce: '123456'
+      })
+    ).toEqual(action)
+  })
+  it('resendSMSFailed should dispatch', () => {
+    const err = {
+      name: '',
+      config: {},
+      message: ''
+    }
+    const action = {
+      type: actions.RESEND_SMS_FAILED,
+      payload: err
+    }
+    expect(actions.resendSMSFailed(err)).toEqual(action)
+  })
 })
