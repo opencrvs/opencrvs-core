@@ -8,7 +8,7 @@ jobs:
         - npm install codecov -g
         - codecov
     - stage: push docker images
-      if: branch IN (master, ocrvs-332-auto-deploy)
+      if: branch = master
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - yarn compose:push
@@ -16,7 +16,7 @@ jobs:
       services:
         - docker
     - stage: deploy to staging
-      if: branch IN (master, ocrvs-332-auto-deploy)
+      if: branch = master
       install: skip
       script: yarn deploy:staging
       addons:
