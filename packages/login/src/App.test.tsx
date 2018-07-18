@@ -1,9 +1,11 @@
 import * as moxios from 'moxios'
-import { resolve } from 'url'
-import { ReactWrapper } from 'enzyme'
 import { createTestApp } from './tests/util'
 import { client } from './utils/authApi'
+import { resolve } from 'url'
+import { ReactWrapper } from 'enzyme'
 import { config } from './config'
+
+const wait = () => new Promise(res => process.nextTick(res))
 
 it('renders without crashing', async () => {
   createTestApp()
@@ -14,7 +16,6 @@ it('renders a phone number and a password field on startup', async () => {
   expect(app.find('input')).toHaveLength(2)
 })
 
-const wait = () => new Promise(res => process.nextTick(res))
 describe('Login app', () => {
   beforeEach(() => {
     moxios.install(client)
@@ -38,9 +39,7 @@ describe('Login app', () => {
 
     it('sends the phone number and the password to our api when user submits the form', async () => {
       app.find('form#STEP_ONE').simulate('submit')
-
       await wait()
-
       const request = moxios.requests.mostRecent()
       expect(request.url).toMatch(/authenticate/)
     })
@@ -51,11 +50,8 @@ describe('Login app', () => {
         responseText: "{ nonce: '12345' }"
       })
       app.find('form#STEP_ONE').simulate('submit')
-
       await wait()
-
       app.update()
-
       expect(app.find('form#STEP_TWO')).toHaveLength(1)
     })
   })

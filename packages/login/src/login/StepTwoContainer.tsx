@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { STEP_TWO_FORM } from './constants'
 import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
-import { StepTwoForm, IProps, IDispatchProps } from './StepTwoForm'
+import { IProps, IDispatchProps, StepTwoForm } from './StepTwoForm'
 import { IStoreState } from '../store'
 import * as actions from './loginActions'
 import { getSubmissionError } from './loginSelectors'
@@ -14,8 +14,9 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 
-const mapDispatchToProps: IDispatchProps = {
-  submitAction: actions.startStepTwo
+const mapDispatchToProps = {
+  submitAction: actions.startStepTwo,
+  onResendSMS: actions.resendSMS
 }
 
 const stepTwoForm = reduxForm({
