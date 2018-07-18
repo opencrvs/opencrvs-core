@@ -6,7 +6,6 @@ import {
 
 const nonce = '12345'
 const mobile = '+447111111111'
-
 describe('verifyCode service', () => {
   describe('generateVerificationCode', () => {
     it('generates a pseudo random 6 digit code', async () => {
