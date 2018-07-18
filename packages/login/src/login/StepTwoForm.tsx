@@ -20,7 +20,7 @@ import styled from 'styled-components'
 const messages = defineMessages({
   stepTwoTitle: {
     id: 'login.stepTwoTitle',
-    defaultMessage: 'Login to OpenCRVS',
+    defaultMessage: 'Verify your mobile',
     description: 'The title that appears in step two of the form'
   },
   resend: {
@@ -30,7 +30,8 @@ const messages = defineMessages({
   },
   stepTwoInstruction: {
     id: 'login.stepTwoInstruction',
-    defaultMessage: 'Please enter your mobile number and password.',
+    defaultMessage:
+      'Please enter the sms code we have sent to your mobile phone.',
     description: 'The instruction that appears in step two of the form'
   },
   submit: {

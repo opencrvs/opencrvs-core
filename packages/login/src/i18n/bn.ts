@@ -10,6 +10,10 @@ export const BENGALI_STATE = {
     'login.submit': 'জমা দিন',
     'login.submissionError': 'দুঃখিত যে মোবাইল নম্বর এবং পাসওয়ার্ড কাজ করে নি',
     'login.codeSubmissionError': 'দুঃখিত যে কোড কাজ না।',
+    'login.resendMobile': 'অন্য এসএমএস পাঠান',
+    'login.stepTwoTitle': 'আপনার মোবাইল যাচাই করুন',
+    'login.stepTwoInstruction':
+      'দয়া করে এসএমএস কোড লিখুন যা আমরা আপনার মোবাইল ফোনে পাঠিয়েছি।',
     'validations.required': 'প্রয়োজনীয়',
     'validations.minLength': '{Min} অক্ষর বা আরো হওয়া আবশ্যক',
     'validations.numberRequired': 'অবশ্যই একটি সংখ্যা হবেr',
