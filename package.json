@@ -27,6 +27,7 @@
       "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml down",
     "compose:all:build":
       "docker-compose -f docker-compose.deps.yml -f docker-compose.yml build",
+    "compose:push": "docker-compose build && docker-compose push",
     "deploy:staging":
       "rsync -rP docker-compose* infrastructure root@opencrvs-staging.jembi.org:/tmp/compose/ && ssh root@opencrvs-staging.jembi.org '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.staging.yml | tee -a /var/log/rotate-secrets.log' && ssh root@opencrvs-staging.jembi.org 'cd /tmp/compose && docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.staging.yml --with-registry-auth opencrvs'"
   },

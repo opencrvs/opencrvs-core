@@ -6,6 +6,11 @@ WORKDIR /usr/src/app
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
+# Default build env
+ENV REACT_APP_AUTH_API_URL=http://opencrvs-staging.jembi.org:4040/
+ENV REACT_APP_LOCALE=gb
+ENV REACT_APP_LANGUAGE=en
+
 # Install and configure `serve`.
 RUN yarn global add serve
 CMD cd packages/login; serve -s build
