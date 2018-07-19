@@ -14,6 +14,24 @@ enum BirthRegType {
   TEST
 }
 
+enum BirthType {
+  SINGLE
+  TWIN
+  TRIPLET
+  QUADRUPLET
+  HIGHER_MULTIPLE_DELIVERY
+}
+
+enum AttendantType {
+  PHYSICIAN
+  NURSE
+  NURSE_MIDWIFE
+  MIDWIFE
+  OTHER_PARAMEDICAL_PERSONNEL
+  LAYPERSON
+  NOT_STATED
+}
+
 enum RegistrationType {
   BIRTH
   DEATH
@@ -63,6 +81,8 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: PersonInput
   birthLocation: LocationInput
+  birthType: BirthType
+  attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
   createdAt: Date
   updatedAt: Date

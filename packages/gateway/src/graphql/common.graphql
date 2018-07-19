@@ -22,6 +22,13 @@ enum Relationship {
   PATERNAL_GRANDFATHER
 }
 
+enum LocationType {
+  HOSPITAL
+  OTHER_INSTITUTION
+  PRIVATE_HOME
+  OTHER
+}
+
 input PersonInput {
   identifier: [ID]
   name: [HumanNameInput]
@@ -86,6 +93,7 @@ input LocationInput {
   name: String
   alias: [String]
   description: String
+  type: LocationType
   telecom: [ContactPointInput]
   address: AddressInput
   longitude: Float
