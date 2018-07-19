@@ -38,6 +38,28 @@ enum IdentityType {
   DEATH_REGISTRATION_NUMBER
 }
 
+enum EducationType {
+  NO_SCHOOLING
+  PRIMARY_ISCED_1
+  LOWER_SECONDARY_ISCED_2
+  UPPER_SECONDARY_ISCED_3
+  POST_SECONDARY_ISCED_4
+  FIRST_STAGE_TERTIARY_ISCED_5
+  SECOND_STAGE_TERTIARY_ISCED_6
+  NOT_STATED
+}
+
+enum MigrantType {
+  FOREIGN_RESIDENT
+  STUDENT
+  ASYLUM_SEEKER
+  RESIDENT
+  VISITOR
+  TRANSIENT
+  REFUGEE
+  OTHER
+}
+
 input IdentityInput {
   id: ID
   type: IdentityType
@@ -53,12 +75,17 @@ input PersonInput {
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: String
+  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
   birthDate: String
+  maritalStatus: String # Use https://www.hl7.org/fhir/valueset-marital-status.html
+  dateOfMarriage: Date
   multipleBirth: Int # For order of birth 3 equals 3rd born
   address: [AddressInput]
   photo: AttachmentInput
   deceased: Boolean
   nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+  educationalAttainment: EducationType
+  migrantStatus: MigrantType
 }
 
 type Person {
@@ -67,12 +94,17 @@ type Person {
   name: [HumanName]
   telecom: [ContactPoint]
   gender: String
+  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
   birthDate: String
+  maritalStatus: String # Use https://www.hl7.org/fhir/valueset-marital-status.html
+  dateOfMarriage: Date
   multipleBirth: Int # For order of birth 3 equals 3rd born
   address: [Address]
   photo: Attachment
   deceased: Boolean
   nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+  educationalAttainment: EducationType
+  migrantStatus: MigrantType
 }
 
 input RelatedPersonInput {

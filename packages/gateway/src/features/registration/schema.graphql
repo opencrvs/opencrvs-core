@@ -54,10 +54,25 @@ enum CauseOfDeath {
   OTHER
 }
 
+input CommentInput {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
 input RegWorkflowInput {
   type: RegStatus
   user: UserInput
   timestamp: Date
+  comments: [CommentInput]
   location: LocationInput
 }
 
@@ -66,6 +81,7 @@ type RegWorkflow {
   type: RegStatus
   user: User
   timestamp: Date
+  comments: [Comment]
   location: Location
 }
 
@@ -96,6 +112,10 @@ input BirthRegistrationInput {
   birthType: BirthType
   attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  birthOrder: Int # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
   createdAt: Date
   updatedAt: Date
 }
@@ -111,13 +131,17 @@ type BirthRegistration {
   birthType: BirthType
   attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  birthOrder: Int # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
   createdAt: Date
   updatedAt: Date
 }
 
 input DeathRegistrationInput {
   registration: RegistrationInput
-  deceased: PersonInput
+  deceased: PersonInput # Remember to mark person as deceased
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
@@ -131,7 +155,7 @@ input DeathRegistrationInput {
 type DeathRegistration {
   id: ID! # long uuid
   registration: Registration
-  deceased: Person
+  deceased: Person # Remember to mark person as deceased
   mother: Person
   father: Person
   informant: Person
