@@ -1,11 +1,23 @@
-import { getSubmissionError } from './loginSelectors'
+import {
+  getSubmissionError,
+  getResentSMS,
+  getStepSubmitting
+} from './loginSelectors'
 import { mockState } from '../tests/util'
 
-describe('intlSelectors', () => {
-  describe('getSubmissionError', () => {
+describe('loginSelectors', () => {
+  describe('selectors', () => {
     it('should return submission error boolean', () => {
       const submissionError = false
       expect(getSubmissionError(mockState)).toEqual(submissionError)
+    })
+    it('should return resentSMS boolean', () => {
+      const resentSMS = false
+      expect(getResentSMS(mockState)).toEqual(resentSMS)
+    })
+    it('should return stepSubmitting boolean', () => {
+      const stepSubmitting = false
+      expect(getStepSubmitting(mockState)).toEqual(stepSubmitting)
     })
   })
 })

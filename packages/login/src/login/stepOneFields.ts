@@ -8,13 +8,15 @@ export const stepOneFields: IFieldGroup = {
     maxLength: 11,
     validate: [validations.required, validations.phoneNumberFormat],
     disabled: false,
-    type: 'tel'
+    type: 'tel',
+    focusInput: true
   },
   password: {
     id: 'password',
     name: 'password',
     validate: [validations.required],
     disabled: false,
-    type: 'password'
+    type: 'password',
+    focusInput: false
   }
 }

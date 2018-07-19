@@ -3,19 +3,22 @@ import { push } from 'react-router-redux'
 import * as actions from './loginActions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
+import { config } from '../config'
 
 export type LoginState = {
-  stepOneSubmitting: boolean
+  stepSubmitting: boolean
   stepTwoDetails: { nonce: string }
   submissionError: boolean
+  resentSMS: boolean
 }
 
 export const initialState: LoginState = {
-  stepOneSubmitting: false,
+  stepSubmitting: false,
   stepTwoDetails: {
     nonce: ''
   },
-  submissionError: false
+  submissionError: false,
+  resentSMS: false
 }
 
 export const loginReducer: LoopReducer<LoginState, actions.Action> = (
@@ -27,8 +30,9 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
       return loop(
         {
           ...state,
-          stepOneSubmitting: true,
+          stepSubmitting: true,
           submissionError: false,
+          resentSMS: false,
           stepOneDetails: action.payload
         },
         Cmd.run(authApi.submitStepOne, {
@@ -38,13 +42,14 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         })
       )
     case actions.STEP_ONE_FAILED:
-      return { ...state, stepOneSubmitting: false, submissionError: true }
+      return { ...state, stepSubmitting: false, submissionError: true }
     case actions.STEP_ONE_SUCCESS:
       return loop(
         {
           ...state,
-          stepOneSubmitting: false,
+          stepSubmitting: false,
           submissionError: false,
+          resentSMS: false,
           stepTwoDetails: {
             ...state.stepTwoDetails,
             nonce: action.payload.nonce
@@ -55,7 +60,9 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.RESEND_SMS:
       return loop(
         {
-          ...state
+          ...state,
+          submissionError: false,
+          resentSMS: false
         },
         Cmd.run(authApi.resendSMS, {
           successActionCreator: actions.resendSMSSuccess,
@@ -63,6 +70,44 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           args: [state.stepTwoDetails.nonce]
         })
       )
+    case actions.RESEND_SMS_FAILED:
+      return { ...state, resentSMS: false, submissionError: true }
+    case actions.RESEND_SMS_SUCCESS:
+      return {
+        ...state,
+        resentSMS: true,
+        submissionError: false,
+        stepTwoDetails: {
+          ...state.stepTwoDetails,
+          nonce: action.payload.nonce
+        }
+      }
+    case actions.START_STEP_TWO:
+      const code = action.payload.code
+      return loop(
+        {
+          ...state,
+          stepSubmitting: true,
+          submissionError: false,
+          resentSMS: false,
+          stepOneDetails: action.payload
+        },
+        Cmd.run(authApi.submitStepTwo, {
+          successActionCreator: actions.submitStepTwoSuccess,
+          failActionCreator: actions.submitStepTwoFailed,
+          args: [{ code, nonce: state.stepTwoDetails.nonce }]
+        })
+      )
+    case actions.STEP_TWO_FAILED:
+      return { ...state, stepSubmitting: false, submissionError: true }
+    case actions.STEP_TWO_SUCCESS:
+      window.location.href = config.REGISTER_APP_URL
+      return {
+        ...state,
+        stepSubmitting: false,
+        submissionError: false,
+        resentSMS: false
+      }
 
     default:
       return state

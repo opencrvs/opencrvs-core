@@ -1,5 +1,6 @@
 import * as validations from '../utils/validate'
-import { IFieldGroup } from '../utils/fieldUtils'
+import { IFieldGroup, IFieldRefGroup } from '../utils/fieldUtils'
+import * as React from 'react'
 
 export const stepTwoFields: IFieldGroup = {
   code1: {
@@ -8,6 +9,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
+    focusInput: true,
     type: 'number'
   },
   code2: {
@@ -16,6 +18,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
+    focusInput: false,
     type: 'number'
   },
   code3: {
@@ -24,6 +27,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
+    focusInput: false,
     type: 'number'
   },
   code4: {
@@ -32,6 +36,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
+    focusInput: false,
     type: 'number'
   },
   code5: {
@@ -40,6 +45,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
+    focusInput: false,
     type: 'number'
   },
   code6: {
@@ -48,6 +54,16 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
+    focusInput: false,
     type: 'number'
   }
+}
+
+export const fieldRefs: IFieldRefGroup = {
+  code1: React.createRef(),
+  code2: React.createRef(),
+  code3: React.createRef(),
+  code4: React.createRef(),
+  code5: React.createRef(),
+  code6: React.createRef()
 }

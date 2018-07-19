@@ -6,7 +6,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { FlexGrid } from '@opencrvs/components/lib/grid'
 import { getFieldProps } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
-import { stepTwoFields } from './stepTwoFields'
+import { stepTwoFields, fieldRefs } from './stepTwoFields'
 import { localizeInput } from '../i18n/localizeInput'
 import {
   StyledBox,
@@ -44,6 +44,11 @@ const messages = defineMessages({
     defaultMessage: 'Sorry that code did not work.',
     description:
       'The error that appears when the user entered sms code is unauthorised'
+  },
+  resentSMS: {
+    id: 'login.resentSMS',
+    defaultMessage: 'We have delivered a new SMS to your mobile phone',
+    description: 'The message that appears when the resend button is clicked.'
   }
 })
 
@@ -89,9 +94,17 @@ export interface IStepTwoSMSData {
   code6: string
 }
 
+export interface IStepTwoData {
+  nonce: string
+  code: string
+}
+
 export interface IProps {
   formId: string
   submissionError: boolean
+  resentSMS: boolean
+  stepSubmitting: boolean
+  fieldToFocus?: string
 }
 export interface IDispatchProps {
   submitAction: (values: IStepTwoSMSData) => void
@@ -111,9 +124,15 @@ export class StepTwoForm extends React.Component<
       handleSubmit,
       formId,
       submitAction,
-      submissionError
+      submissionError,
+      stepSubmitting,
+      resentSMS,
+      fieldToFocus
     } = this.props
-
+    if (fieldToFocus) {
+      console.log(fieldRefs[fieldToFocus].current!.getRenderedComponent())
+      // fieldRefs[fieldToFocus].current!.getRenderedComponent().focusInput()
+    }
     return (
       <StyledBox id="login-step-two-box" columns={4}>
         <Title>
@@ -124,6 +143,9 @@ export class StepTwoForm extends React.Component<
               {intl.formatMessage(messages.codeSubmissionError)}
             </ErrorText>
           )}
+          {resentSMS && (
+            <ErrorText>{intl.formatMessage(messages.resentSMS)}</ErrorText>
+          )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FlexGrid>
@@ -132,7 +154,8 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code1, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
-                autoFocus={true}
+                withRef={true}
+                ref={fieldRefs.code1}
               />
             </FieldWrapper>
             <Separator>
@@ -143,6 +166,8 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code2, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
+                withRef={true}
+                ref={fieldRefs.code2}
               />
             </FieldWrapper>
             <Separator>
@@ -153,6 +178,8 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code3, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
+                withRef={true}
+                ref={fieldRefs.code3}
               />
             </FieldWrapper>
             <Separator>
@@ -163,6 +190,8 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code4, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
+                withRef={true}
+                ref={fieldRefs.code4}
               />
             </FieldWrapper>
             <Separator>
@@ -173,6 +202,8 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code5, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
+                withRef={true}
+                ref={fieldRefs.code5}
               />
             </FieldWrapper>
             <Separator>
@@ -183,6 +214,8 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code6, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
+                withRef={true}
+                ref={fieldRefs.code6}
               />
             </FieldWrapper>
           </FlexGrid>
@@ -193,7 +226,7 @@ export class StepTwoForm extends React.Component<
             >
               {intl.formatMessage(messages.resend)}
             </SecondaryButton>
-            <Button id="login-mobile-submit">
+            <Button id="login-mobile-submit" disabled={stepSubmitting}>
               {intl.formatMessage(messages.submit)}
             </Button>
           </ActionWrapper>

@@ -57,6 +57,31 @@ describe('loginActions tests', () => {
       })
     ).toEqual(action)
   })
+  it('submitStepTwoSuccess should dispatch', () => {
+    const action = {
+      type: actions.STEP_TWO_SUCCESS,
+      payload: {
+        nonce: '1234'
+      }
+    }
+    expect(
+      actions.submitStepTwoSuccess({
+        nonce: '1234'
+      })
+    ).toEqual(action)
+  })
+  it('submitStepTwoFailed should dispatch', () => {
+    const err = {
+      name: '',
+      config: {},
+      message: ''
+    }
+    const action = {
+      type: actions.STEP_TWO_FAILED,
+      payload: err
+    }
+    expect(actions.submitStepTwoFailed(err)).toEqual(action)
+  })
   it('resendSMS should dispatch', () => {
     const action = {
       type: actions.RESEND_SMS

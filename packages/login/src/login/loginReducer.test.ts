@@ -25,8 +25,9 @@ describe('loginReducer tests', () => {
   it('updates the state with data ready to send to authorise service', async () => {
     const expectedState = {
       ...initialState,
-      stepOneSubmitting: true,
+      stepSubmitting: true,
       submissionError: false,
+      resentSMS: false,
       stepOneDetails: {
         mobile: '+447111111111',
         password: 'test'
@@ -46,8 +47,9 @@ describe('loginReducer tests', () => {
   it('updates the state when nonce is returned from the authorise service', () => {
     const expectedState = {
       ...initialState,
-      stepOneSubmitting: false,
+      stepSubmitting: false,
       submissionError: false,
+      resentSMS: false,
       stepTwoDetails: {
         nonce: '1234'
       }
@@ -65,11 +67,31 @@ describe('loginReducer tests', () => {
   it('updates the state when resend SMS is requested', () => {
     const expectedState = {
       ...initialState,
-      stepOneSubmitting: false,
-      submissionError: false
+      stepSubmitting: false,
+      submissionError: false,
+      resentSMS: false
     }
     const action = {
       type: actions.RESEND_SMS
+    }
+    store.dispatch(action)
+    expect(store.getState().login).toEqual(expectedState)
+  })
+  it('updates the state when nonce is returned from the resendSMS service', () => {
+    const expectedState = {
+      ...initialState,
+      stepSubmitting: false,
+      submissionError: false,
+      resentSMS: true,
+      stepTwoDetails: {
+        nonce: '1234'
+      }
+    }
+    const action = {
+      type: actions.RESEND_SMS_SUCCESS,
+      payload: {
+        nonce: '1234'
+      }
     }
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
