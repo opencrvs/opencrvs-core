@@ -3,7 +3,7 @@ import { IStoreState } from '../store'
 import { FormStateMap } from 'redux-form'
 import { stepTwoFields } from './stepTwoFields'
 import { IReduxFormFieldProps } from '../utils/fieldUtils'
-import { difference } from 'lodash-es'
+import { difference } from 'lodash'
 
 const getPartialState = (store: IStoreState): LoginState => store.login
 const getPartialFormState = (store: IStoreState): FormStateMap => store.form

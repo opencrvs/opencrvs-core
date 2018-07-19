@@ -130,7 +130,7 @@ export class StepTwoForm extends React.Component<
       fieldToFocus
     } = this.props
     if (fieldToFocus) {
-      console.log(fieldRefs[fieldToFocus].current!.getRenderedComponent())
+      // console.log(fieldRefs[fieldToFocus].current!.getRenderedComponent())
       // fieldRefs[fieldToFocus].current!.getRenderedComponent().focusInput()
     }
     return (

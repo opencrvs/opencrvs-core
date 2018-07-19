@@ -13,7 +13,6 @@ export type IReduxFormFieldProps = {
   maxLength?: number
   placeholder?: string
   label?: string
-  focusInput: boolean
 }
 
 export type IFieldGroup = {

@@ -13,7 +13,7 @@ export interface IProps {
   meta?: { touched: boolean; error: string }
   maxLength?: number
   min?: number
-  focusInput: boolean
+  focusInput?: () => void
 }
 
 export type IInputFieldProps = IProps & IInputProps

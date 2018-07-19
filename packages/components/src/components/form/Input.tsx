@@ -4,7 +4,7 @@ import styled, { StyledFunction } from 'styled-components'
 export interface ICustomProps {
   error?: boolean
   touched?: boolean
-  focusInput: boolean
+  focusInput?: () => void
 }
 
 export type IInputProps = ICustomProps &
@@ -54,23 +54,14 @@ const StyledInput = styledInput`
   }
 `
 
-interface IInputState {
-  focusInput: boolean
-}
-
-const initialState: IInputState = {
-  focusInput: false
-}
-export class Input extends React.Component<IInputProps, IInputState> {
+export class Input extends React.Component<IInputProps> {
   private textInput: React.RefObject<HTMLInputElement>
   constructor(props: IInputProps, {}) {
     super(props)
     this.textInput = React.createRef()
   }
-  componentDidUpdate(prevProps: IInputProps, prevState: IInputState): void {
-    if (this.props.focusInput) {
-      // this.textInput.current!.focus()
-    }
+  focusInput(): void {
+    this.textInput.current!.focus()
   }
   render() {
     const { ...props } = this.props

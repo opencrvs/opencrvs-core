@@ -9,7 +9,6 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
-    focusInput: true,
     type: 'number'
   },
   code2: {
@@ -18,7 +17,6 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
-    focusInput: false,
     type: 'number'
   },
   code3: {
@@ -27,7 +25,6 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
-    focusInput: false,
     type: 'number'
   },
   code4: {
@@ -36,7 +33,6 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
-    focusInput: false,
     type: 'number'
   },
   code5: {
@@ -45,7 +41,6 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
-    focusInput: false,
     type: 'number'
   },
   code6: {
@@ -54,7 +49,6 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol],
     disabled: false,
-    focusInput: false,
     type: 'number'
   }
 }
