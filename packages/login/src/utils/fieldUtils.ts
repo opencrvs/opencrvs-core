@@ -13,6 +13,7 @@ export type IReduxFormFieldProps = {
   maxLength?: number
   placeholder?: string
   label?: string
+  focusInput: boolean
 }
 
 export type IFieldGroup = {
@@ -39,4 +40,8 @@ export const getFieldProps = (
     placeholder,
     label
   }
+}
+
+export const getFocusState = (id: string, fieldToFocus?: string): boolean => {
+  return fieldToFocus === id ? true : false
 }
