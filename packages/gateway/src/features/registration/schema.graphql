@@ -12,6 +12,7 @@ enum BirthRegType {
   INFORMANT_ONLY
   SINGLE_PARENT
   TEST
+  OTHER
 }
 
 enum BirthType {
@@ -29,7 +30,17 @@ enum AttendantType {
   MIDWIFE
   OTHER_PARAMEDICAL_PERSONNEL
   LAYPERSON
-  NOT_STATED
+  NONE
+  OTHER
+}
+
+enum AttachmentType {
+  PASSPORT
+  NATIONAL_ID
+  IMMUNISATION_CERTIFICATE
+  PAPER_FORM
+  PASSPORT_PHOTO
+  OTHER
 }
 
 enum RegistrationType {
@@ -40,6 +51,7 @@ enum RegistrationType {
 enum CauseOfDeath {
   NATURAL
   ACCIDENT
+  OTHER
 }
 
 input RegWorkflowInput {
@@ -96,6 +108,8 @@ type BirthRegistration {
   father: Person
   informant: Person
   birthLocation: Location
+  birthType: BirthType
+  attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
   createdAt: Date
   updatedAt: Date
@@ -107,7 +121,7 @@ input DeathRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  spouse: PersonInput
+  spouse: [PersonInput] # need to track multiple spouses for muslim countries
   deathLocation: LocationInput
   causeOfDeath: CauseOfDeath
   createdAt: Date
@@ -121,7 +135,7 @@ type DeathRegistration {
   mother: Person
   father: Person
   informant: Person
-  spouse: Person
+  spouse: [Person]
   deathLocation: Location
   causeOfDeath: CauseOfDeath
   createdAt: Date
@@ -131,8 +145,9 @@ type DeathRegistration {
 input RegistrationInput {
   trackingID: String # short uuid easy to remember
   registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
-  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  bookId: ID
+  paperFormID: String
+  page: String
+  book: String
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
@@ -143,8 +158,9 @@ type Registration {
   id: ID! # long uuid
   trackingID: String # short uuid easy to remember
   registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
-  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  bookId: ID
+  paperFormID: String
+  page: String
+  book: String
   status: [RegWorkflow]
   type: RegistrationType
   attachments: [Attachment]
@@ -156,6 +172,7 @@ input AttachmentInput {
   status: String # approved/validated deleted
   originalFileName: String
   systemFileName: String
+  type: AttachmentType
   # rest of the stuff
   createdAt: Date
 }
@@ -166,6 +183,7 @@ type Attachment {
   status: String # approved/validated deleted
   originalFileName: String
   systemFileName: String
+  type: AttachmentType
   # rest of the stuff
   createdAt: Date
 }
