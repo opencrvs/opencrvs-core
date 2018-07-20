@@ -20,32 +20,95 @@ enum Relationship {
   MATERNAL_GRANDFATHER
   PATERNAL_GRANDMOTHER
   PATERNAL_GRANDFATHER
+  OTHER
+}
+
+enum LocationType {
+  HOSPITAL
+  OTHER_INSTITUTION
+  PRIVATE_HOME
+  OTHER
+}
+
+enum IdentityType {
+  PASSPORT
+  NATIONAL_ID
+  DRIVING_LICENCE
+  BIRTH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER
+}
+
+enum EducationType {
+  NO_SCHOOLING
+  PRIMARY_ISCED_1
+  LOWER_SECONDARY_ISCED_2
+  UPPER_SECONDARY_ISCED_3
+  POST_SECONDARY_ISCED_4
+  FIRST_STAGE_TERTIARY_ISCED_5
+  SECOND_STAGE_TERTIARY_ISCED_6
+  NOT_STATED
+}
+
+enum MigrantType {
+  FOREIGN_RESIDENT
+  STUDENT
+  ASYLUM_SEEKER
+  RESIDENT
+  VISITOR
+  TRANSIENT
+  REFUGEE
+  OTHER
+}
+
+input IdentityInput {
+  id: ID
+  type: IdentityType
+}
+
+type IdentityType {
+  id: ID
+  type: IdentityType
 }
 
 input PersonInput {
-  identifier: [ID]
+  identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: String
+  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
   birthDate: String
+  maritalStatus: String # Use https://www.hl7.org/fhir/valueset-marital-status.html
+  dateOfMarriage: Date
+  multipleBirth: Int # For order of birth 3 equals 3rd born
   address: [AddressInput]
   photo: AttachmentInput
+  deceased: Boolean
+  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+  educationalAttainment: EducationType
+  migrantStatus: MigrantType
 }
 
 type Person {
   id: ID
-  identifier: [ID] # Change ot ID object with type - so we can insert Nat. ID
+  identifier: [IdentityType]
   name: [HumanName]
   telecom: [ContactPoint]
   gender: String
+  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
   birthDate: String
+  maritalStatus: String # Use https://www.hl7.org/fhir/valueset-marital-status.html
+  dateOfMarriage: Date
+  multipleBirth: Int # For order of birth 3 equals 3rd born
   address: [Address]
   photo: Attachment
+  deceased: Boolean
   nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+  educationalAttainment: EducationType
+  migrantStatus: MigrantType
 }
 
 input RelatedPersonInput {
-  identifier: [ID]
+  identifier: [IdentityInput]
   name: [HumanNameInput]
   relationship: Relationship
   telecom: [ContactPointInput]
@@ -53,11 +116,12 @@ input RelatedPersonInput {
   birthDate: String
   address: [AddressInput]
   photo: AttachmentInput
+  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
 }
 
 type RelatedPerson {
   id: ID
-  identifier: [ID] # Change ot ID object with type - so we can insert Nat. ID
+  identifier: [IdentityType]
   name: [HumanName]
   relationship: Relationship
   telecom: [ContactPoint]
@@ -86,6 +150,7 @@ input LocationInput {
   name: String
   alias: [String]
   description: String
+  type: LocationType
   telecom: [ContactPointInput]
   address: AddressInput
   longitude: Float
@@ -100,6 +165,7 @@ type Location {
   name: String
   alias: [String]
   description: String
+  type: LocationType
   telecom: [ContactPoint]
   address: Address
   longitude: Float
@@ -144,6 +210,7 @@ input UserInput {
   lastName: String
   email: String
   telecom: [ContactPointInput]
+  identifier: [IdentityInput]
   role: [UserRoleInput]!
   address: AddressInput
   primaryOffice: LocationInput
@@ -160,6 +227,7 @@ type User {
   lastName: String
   email: String
   telecom: [ContactPoint]
+  identifier: [IdentityType]
   role: [UserRole]!
   address: Address
   primaryOffice: Location
