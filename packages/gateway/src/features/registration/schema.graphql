@@ -12,6 +12,35 @@ enum BirthRegType {
   INFORMANT_ONLY
   SINGLE_PARENT
   TEST
+  OTHER
+}
+
+enum BirthType {
+  SINGLE
+  TWIN
+  TRIPLET
+  QUADRUPLET
+  HIGHER_MULTIPLE_DELIVERY
+}
+
+enum AttendantType {
+  PHYSICIAN
+  NURSE
+  NURSE_MIDWIFE
+  MIDWIFE
+  OTHER_PARAMEDICAL_PERSONNEL
+  LAYPERSON
+  NONE
+  OTHER
+}
+
+enum AttachmentType {
+  PASSPORT
+  NATIONAL_ID
+  IMMUNISATION_CERTIFICATE
+  PAPER_FORM
+  PASSPORT_PHOTO
+  OTHER
 }
 
 enum RegistrationType {
@@ -22,12 +51,28 @@ enum RegistrationType {
 enum CauseOfDeath {
   NATURAL
   ACCIDENT
+  OTHER
+}
+
+input CommentInput {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
 }
 
 input RegWorkflowInput {
   type: RegStatus
   user: UserInput
   timestamp: Date
+  comments: [CommentInput]
   location: LocationInput
 }
 
@@ -36,6 +81,7 @@ type RegWorkflow {
   type: RegStatus
   user: User
   timestamp: Date
+  comments: [Comment]
   location: Location
 }
 
@@ -63,7 +109,13 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: PersonInput
   birthLocation: LocationInput
+  birthType: BirthType
+  attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  birthOrder: Int # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
   createdAt: Date
   updatedAt: Date
 }
@@ -76,18 +128,24 @@ type BirthRegistration {
   father: Person
   informant: Person
   birthLocation: Location
+  birthType: BirthType
+  attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  birthOrder: Int # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
   createdAt: Date
   updatedAt: Date
 }
 
 input DeathRegistrationInput {
   registration: RegistrationInput
-  deceased: PersonInput
+  deceased: PersonInput # Remember to mark person as deceased
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  spouse: PersonInput
+  spouse: [PersonInput] # need to track multiple spouses for muslim countries
   deathLocation: LocationInput
   causeOfDeath: CauseOfDeath
   createdAt: Date
@@ -97,11 +155,11 @@ input DeathRegistrationInput {
 type DeathRegistration {
   id: ID! # long uuid
   registration: Registration
-  deceased: Person
+  deceased: Person # Remember to mark person as deceased
   mother: Person
   father: Person
   informant: Person
-  spouse: Person
+  spouse: [Person]
   deathLocation: Location
   causeOfDeath: CauseOfDeath
   createdAt: Date
@@ -111,8 +169,9 @@ type DeathRegistration {
 input RegistrationInput {
   trackingID: String # short uuid easy to remember
   registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
-  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  bookId: ID
+  paperFormID: String
+  page: String
+  book: String
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
@@ -123,8 +182,9 @@ type Registration {
   id: ID! # long uuid
   trackingID: String # short uuid easy to remember
   registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
-  paperFormID: String # assumption based on "Number of the application (5 digit) ???"
-  bookId: ID
+  paperFormID: String
+  page: String
+  book: String
   status: [RegWorkflow]
   type: RegistrationType
   attachments: [Attachment]
@@ -136,6 +196,7 @@ input AttachmentInput {
   status: String # approved/validated deleted
   originalFileName: String
   systemFileName: String
+  type: AttachmentType
   # rest of the stuff
   createdAt: Date
 }
@@ -146,7 +207,7 @@ type Attachment {
   status: String # approved/validated deleted
   originalFileName: String
   systemFileName: String
-  # rest of the stuff
+  type: AttachmentType
   createdAt: Date
 }
 
