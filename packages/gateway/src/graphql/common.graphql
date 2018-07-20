@@ -30,7 +30,7 @@ enum LocationType {
   OTHER
 }
 
-enum IdentityType {
+enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
   DRIVING_LICENCE
@@ -62,12 +62,12 @@ enum MigrantType {
 
 input IdentityInput {
   id: ID
-  type: IdentityType
+  type: IdentityIDType
 }
 
 type IdentityType {
   id: ID
-  type: IdentityType
+  type: IdentityIDType
 }
 
 input PersonInput {

@@ -56,7 +56,7 @@ enum CauseOfDeath {
 
 input CommentInput {
   id: ID!
-  user: User
+  user: UserInput
   comment: String
   createdAt: Date
 }
