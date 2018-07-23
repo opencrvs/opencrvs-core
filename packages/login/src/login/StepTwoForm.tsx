@@ -223,7 +223,7 @@ export class StepTwoForm extends React.Component<
           </FlexGrid>
 
           {fieldToFocus && (
-            <ClearFormLink onClick={this.clearTheForm}>
+            <ClearFormLink id="login-clear-form" onClick={this.clearTheForm}>
               Clear form
             </ClearFormLink>
           )}

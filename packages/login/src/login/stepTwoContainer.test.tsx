@@ -1,14 +1,9 @@
 import { StepTwoContainer } from './StepTwoContainer'
 import * as React from 'react'
-import {
-  createTestComponent,
-  mockState,
-  createTestState,
-  wait
-} from '../tests/util'
+import { createTestComponent, wait } from '../tests/util'
 import * as moxios from 'moxios'
 import { client } from '../utils/authApi'
-import { store } from '../App'
+import { ReactWrapper } from 'enzyme'
 
 interface ITestProps {
   test: string
@@ -27,7 +22,7 @@ describe('Login app step two', () => {
       props = {
         test: ''
       }
-      component = createTestComponent(<StepTwoContainer {...props} />, store)
+      component = createTestComponent(<StepTwoContainer {...props} />)
     })
     it('Renders successfully', () => {
       expect(component.find('form#STEP_TWO')).toHaveLength(1)
@@ -55,6 +50,23 @@ describe('Login app step two', () => {
       await wait()
       const request = moxios.requests.mostRecent()
       expect(request.url).toMatch(/verifyCode/)
+    })
+    it('Requests another SMS code to be sent', async () => {
+      component
+        .find('#login-mobile-resend')
+        .hostNodes()
+        .simulate('click')
+      await wait()
+      const request = moxios.requests.mostRecent()
+      expect(request.url).toMatch(/resendSms/)
+    })
+    it('Clears the form', async () => {
+      component
+        .find('input#code1')
+        .simulate('change', { target: { value: '1' } })
+      component.find('form#STEP_TWO').simulate('submit')
+      await wait()
+      // console.log(component.find('form').debug())
     })
   })
 })
