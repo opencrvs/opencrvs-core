@@ -16,7 +16,7 @@ it('renders a phone number and a password field on startup', async () => {
   expect(app.find('input')).toHaveLength(2)
 })
 
-describe('Login app', () => {
+describe('Login app step one', () => {
   beforeEach(() => {
     moxios.install(client)
   })
