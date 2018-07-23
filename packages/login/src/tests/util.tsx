@@ -87,3 +87,5 @@ export function createTestComponent(
     }
   )
 }
+
+export const wait = () => new Promise(res => process.nextTick(res))
