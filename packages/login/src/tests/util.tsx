@@ -45,7 +45,10 @@ export const mockState: IStoreState = {
           name: '',
           type: 'Field'
         }
-      ]
+      ],
+      values: {
+        code1: '1'
+      }
     }
   },
   i18n: intlState

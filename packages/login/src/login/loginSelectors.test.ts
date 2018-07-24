@@ -1,7 +1,8 @@
 import {
   getSubmissionError,
   getResentSMS,
-  getStepSubmitting
+  getStepSubmitting,
+  getFieldToFocus
 } from './loginSelectors'
 import { mockState } from '../tests/util'
 
@@ -18,6 +19,10 @@ describe('loginSelectors', () => {
     it('should return stepSubmitting boolean', () => {
       const stepSubmitting = false
       expect(getStepSubmitting(mockState)).toEqual(stepSubmitting)
+    })
+    it('should return the field to focus', () => {
+      const nextField = 'code2'
+      expect(getFieldToFocus(mockState)).toEqual(nextField)
     })
   })
 })
