@@ -1,4 +1,4 @@
-import { IntlState } from './IntlReducer'
+import { IntlState } from './intlReducer'
 import { IStoreState } from '../store'
 
 const getPartialState = (store: IStoreState): IntlState => store.i18n

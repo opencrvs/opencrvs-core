@@ -12,6 +12,10 @@ export interface IAuthenticateResponse {
   nonce: string
 }
 
+export interface ITokenResponse {
+  token: string
+}
+
 const request = (options: AxiosRequestConfig) => {
   // tslint:disable-next-line no-any
   const onSuccess = (response: any) => {
@@ -52,7 +56,7 @@ const resendSMS = (nonce: string) => {
   })
 }
 
-const submitStepTwo = (data: IStepTwoData): Promise<IAuthenticateResponse> => {
+const submitStepTwo = (data: IStepTwoData): Promise<ITokenResponse> => {
   return request({
     url: resolve(config.AUTH_API_URL, 'verifyCode'),
     method: 'POST',

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import { set, get, del } from 'src/database'
-import { NOTIFICATION_SERVICE_URL, CONFIG_TOKEN_EXPIRY } from 'src/constants'
+import { NOTIFICATION_SERVICE_URL, CONFIG_SMS_CODE_EXPIRY } from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { logger } from 'src/logger'
@@ -60,7 +60,7 @@ export async function checkVerificationCode(
 ): Promise<boolean> {
   try {
     const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
-    if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_TOKEN_EXPIRY) {
+    if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_SMS_CODE_EXPIRY) {
       throw new Error('sms code expired')
     } else if (code === codeDetails.code) {
       return true
