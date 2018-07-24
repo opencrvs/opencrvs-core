@@ -100,8 +100,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.STEP_TWO_FAILED:
       return { ...state, stepSubmitting: false, submissionError: true }
     case actions.STEP_TWO_SUCCESS:
-      localStorage.setItem('opencrvs', action.payload.token)
-      window.location.href = config.REGISTER_APP_URL
+      const redirectURL = config.REGISTER_APP_URL + action.payload.token
+      window.location.href = redirectURL
       return {
         ...state,
         stepSubmitting: false,

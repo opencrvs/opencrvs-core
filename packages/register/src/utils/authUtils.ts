@@ -1,25 +1,24 @@
 import * as decode from 'jwt-decode'
-import { config } from '../config'
 
+export interface IURLParams {
+  [key: string]: string
+}
 export interface ITokenProfile {
   subject: string
-  expiresIn: string
+  exp: string
   algorithm: string
-  body: {
-    role: string
-  }
+  role: string
 }
 
-export const isTokenExpired = (token: string) => {
+export const isTokenStillValid = (token: string, localToken?: boolean) => {
   try {
     const decoded: ITokenProfile = getProfile(token)
-    if (
-      Number(decoded.expiresIn) <
-      Date.now() / Number(config.CONFIG_TOKEN_EXPIRY)
-    ) {
+    if (Number(decoded.exp) * 1000 > Date.now()) {
       return true
     } else {
-      localStorage.removeItem('opencrvs')
+      if (localToken) {
+        localStorage.removeItem('opencrvs')
+      }
       return false
     }
   } catch (err) {
@@ -29,9 +28,41 @@ export const isTokenExpired = (token: string) => {
 
 export const getProfile = (token: string): ITokenProfile => decode(token)
 
-export const loggedIn = (): boolean => {
-  const token = localStorage.getItem('opencrvs')
-  return !!token && !isTokenExpired(token)
+export const loggedIn = (urlParams: IURLParams): string => {
+  const localToken = checkLocalToken()
+  if (Boolean(localToken)) {
+    return localToken
+  }
+  const urlToken = checkURLToken(urlParams)
+  if (Boolean(urlToken)) {
+    return urlToken
+  }
+  return ''
 }
 
-export const getToken = () => localStorage.getItem('opencrvs')
+const checkLocalToken = (): string => {
+  const localToken = localStorage.getItem('opencrvs')
+  if (localToken) {
+    if (isTokenStillValid(localToken, true)) {
+      return localToken
+    } else {
+      return ''
+    }
+  } else {
+    return ''
+  }
+}
+
+const checkURLToken = (urlParams: IURLParams): string => {
+  const urlToken = urlParams.token
+  if (urlToken) {
+    if (isTokenStillValid(urlToken)) {
+      localStorage.setItem('opencrvs', urlToken)
+      return urlToken
+    } else {
+      return ''
+    }
+  } else {
+    return ''
+  }
+}

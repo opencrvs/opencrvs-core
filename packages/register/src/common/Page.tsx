@@ -2,13 +2,15 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
 import { RouteComponentProps } from 'react-router'
+import * as QueryString from 'query-string'
+import { IURLParams } from '../utils/authUtils'
 
 export interface IProps {
   language?: string
 }
 
 export interface IDispatchProps {
-  checkAuth: () => void
+  checkAuth: (urlValues: IURLParams) => void
 }
 
 type IPage = IProps & IDispatchProps
@@ -64,7 +66,8 @@ const StyledPage = styled(PageWrapper).attrs<IPage>({})`
 
 export class Page extends React.Component<RouteComponentProps<{}> & IPage> {
   componentWillMount() {
-    this.props.checkAuth()
+    const values = QueryString.parse(this.props.location.search)
+    this.props.checkAuth(values)
   }
   render() {
     const { children } = this.props

@@ -66,11 +66,14 @@ export class Input extends React.Component<IInputProps> {
   onBlur(e: any) {
     e.preventDefault()
   }
-  render() {
-    const { focusInput, ...props } = this.props
-    if (this.props.focusInput) {
+  componentWillReceiveProps(nextProps: IInputProps) {
+    if (nextProps.focusInput) {
       this.focusField()
     }
+  }
+  render() {
+    const { focusInput, ...props } = this.props
+
     return (
       <StyledInput
         innerRef={this.textInput}

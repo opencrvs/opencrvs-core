@@ -15,6 +15,7 @@
     "history": "^4.7.2",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
+    "query-string": "^6.1.0",
     "react": "^16.3.2",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.3.2",
@@ -29,7 +30,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "start":
-      "PORT=3000 BROWSER=none REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en REACT_APP_LOGIN_URL=http://localhost:3020 REACT_APP_CONFIG_TOKEN_EXPIRY=600 react-scripts-ts start",
+      "PORT=3000 BROWSER=none REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en REACT_APP_LOGIN_URL=http://localhost:3020 react-scripts-ts start",
     "verify-build-config":
       "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
     "build": "yarn verify-build-config && react-scripts-ts build",
@@ -38,7 +39,7 @@
     "docker:run":
       "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
     "test":
-      "PORT=3000 REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en REACT_APP_LOGIN_URL=http://localhost:3020 REACT_APP_CONFIG_TOKEN_EXPIRY=600 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+      "PORT=3000 REACT_APP_API_GATEWAY_URL=http://localhost:7070/ REACT_APP_LOCALE=gb REACT_APP_LANGUAGE=en REACT_APP_LOGIN_URL=http://localhost:3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
@@ -50,6 +51,7 @@
     "@types/jest": "^22.2.3",
     "@types/jwt-decode": "^2.2.1",
     "@types/node": "^10.0.8",
+    "@types/query-string": "^6.1.0",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "enzyme": "^3.3.0",

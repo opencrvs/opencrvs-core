@@ -11,7 +11,6 @@ ENV REACT_APP_API_GATEWAY_URL=http://opencrvs-staging.jembi.org:7070/
 ENV REACT_APP_LOGIN_URL=http://opencrvs-staging.jembi.org:5040/
 ENV REACT_APP_LOCALE=gb
 ENV REACT_APP_LANGUAGE=en
-ENV REACT_APP_CONFIG_TOKEN_EXPIRY=600
 
 # Install and configure `serve`.
 RUN yarn global add serve

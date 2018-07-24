@@ -46,7 +46,7 @@ export const getFieldToFocus = (store: IStoreState) => {
     if (incompleteFields.length > 0) {
       return incompleteFields[0].id
     } else {
-      return undefined
+      return 'code1'
     }
   }
   return undefined
