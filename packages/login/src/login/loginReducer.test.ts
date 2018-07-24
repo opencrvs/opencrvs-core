@@ -96,4 +96,21 @@ describe('loginReducer tests', () => {
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
   })
+  it('updates the state with data ready to send to verify sms code service', async () => {
+    const expectedState = {
+      ...initialState,
+      stepSubmitting: true,
+      submissionError: false,
+      resentSMS: false
+    }
+
+    const action = {
+      type: actions.START_STEP_TWO,
+      payload: {
+        code: '123456'
+      }
+    }
+    store.dispatch(action)
+    expect(store.getState().login).toEqual(expectedState)
+  })
 })

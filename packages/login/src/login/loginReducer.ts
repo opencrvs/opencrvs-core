@@ -89,8 +89,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state,
           stepSubmitting: true,
           submissionError: false,
-          resentSMS: false,
-          stepOneDetails: action.payload
+          resentSMS: false
         },
         Cmd.run(authApi.submitStepTwo, {
           successActionCreator: actions.submitStepTwoSuccess,
