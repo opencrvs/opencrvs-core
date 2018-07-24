@@ -6,6 +6,7 @@ enum RegStatus {
 }
 
 enum BirthRegType {
+  BOTH_PARENTS
   SELF
   STATELESS
   REFUGEE

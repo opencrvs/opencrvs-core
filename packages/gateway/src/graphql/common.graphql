@@ -60,6 +60,16 @@ enum MigrantType {
   OTHER
 }
 
+enum MaritalStatusType {
+  SINGLE
+  LAWFULLY_MARRIED
+  OTHER_UNIONS
+  WIDOWED
+  DIVORCED
+  SEPARATED
+  NOT_STATED
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -77,7 +87,7 @@ input PersonInput {
   gender: String
   weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
   birthDate: String
-  maritalStatus: String # Use https://www.hl7.org/fhir/valueset-marital-status.html
+  maritalStatus: MaritalStatusType
   dateOfMarriage: Date
   multipleBirth: Int # For order of birth 3 equals 3rd born
   address: [AddressInput]
@@ -96,7 +106,7 @@ type Person {
   gender: String
   weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
   birthDate: String
-  maritalStatus: String # Use https://www.hl7.org/fhir/valueset-marital-status.html
+  maritalStatus: MaritalStatusType
   dateOfMarriage: Date
   multipleBirth: Int # For order of birth 3 equals 3rd born
   address: [Address]
@@ -208,7 +218,6 @@ input UserInput {
   lastLoggedIn: Date
   firstName: String
   lastName: String
-  email: String
   telecom: [ContactPointInput]
   identifier: [IdentityInput]
   role: [UserRoleInput]!
@@ -225,7 +234,6 @@ type User {
   lastLoggedIn: Date
   firstName: String
   lastName: String
-  email: String
   telecom: [ContactPoint]
   identifier: [IdentityType]
   role: [UserRole]!
