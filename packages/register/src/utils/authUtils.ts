@@ -19,6 +19,7 @@ export const isTokenExpired = (token: string) => {
     ) {
       return true
     } else {
+      localStorage.removeItem('opencrvs')
       return false
     }
   } catch (err) {

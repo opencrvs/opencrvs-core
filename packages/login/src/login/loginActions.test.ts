@@ -61,12 +61,12 @@ describe('loginActions tests', () => {
     const action = {
       type: actions.STEP_TWO_SUCCESS,
       payload: {
-        nonce: '1234'
+        token: '1234'
       }
     }
     expect(
       actions.submitStepTwoSuccess({
-        nonce: '1234'
+        token: '1234'
       })
     ).toEqual(action)
   })
