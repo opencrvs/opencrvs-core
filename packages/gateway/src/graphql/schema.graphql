@@ -1,0 +1,518 @@
+# automatically map from FHIR
+
+scalar Date
+
+enum RegStatus {
+  DECLARED
+  VERIFIED
+  REGISTERED
+  CERTIFIED
+}
+
+enum BirthRegType {
+  BOTH_PARENTS
+  SELF
+  MIGRANT
+  REFUGEE
+  INFORMANT_ONLY
+  SINGLE_PARENT
+  TEST
+  OTHER
+}
+
+enum BirthType {
+  SINGLE
+  TWIN
+  TRIPLET
+  QUADRUPLET
+  HIGHER_MULTIPLE_DELIVERY
+}
+
+enum AttendantType {
+  PHYSICIAN
+  NURSE
+  NURSE_MIDWIFE
+  MIDWIFE
+  OTHER_PARAMEDICAL_PERSONNEL
+  LAYPERSON
+  NONE
+  OTHER
+}
+
+enum AttachmentType {
+  PASSPORT
+  NATIONAL_ID
+  IMMUNISATION_CERTIFICATE
+  PAPER_FORM
+  PASSPORT_PHOTO
+  OTHER
+}
+
+enum RegistrationType {
+  BIRTH
+  DEATH
+}
+
+enum CauseOfDeath {
+  NATURAL
+  ACCIDENT
+  OTHER
+}
+
+input CommentInput {
+  id: ID!
+  user: UserInput
+  comment: String
+  createdAt: Date
+}
+
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+input RegWorkflowInput {
+  type: RegStatus
+  user: UserInput
+  timestamp: Date
+  comments: [CommentInput]
+  location: LocationInput
+}
+
+type RegWorkflow {
+  id: ID!
+  type: RegStatus
+  user: User
+  timestamp: Date
+  comments: [Comment]
+  location: Location
+}
+
+input CertificateInput {
+  paperId: ID!
+  reciever: PersonInput
+  location: LocationInput
+  User: UserInput
+  createdAt: Date
+}
+
+type Certificate {
+  id: ID!
+  paperId: ID!
+  reciever: Person
+  location: Location
+  User: User
+  createdAt: Date
+}
+
+input BirthRegistrationInput {
+  registration: RegistrationInput
+  child: PersonInput
+  mother: PersonInput
+  father: PersonInput
+  informant: PersonInput
+  birthLocation: LocationInput
+  birthType: BirthType
+  attendantAtBirth: AttendantType
+  birthRegistrationType: BirthRegType
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  birthOrder: Int # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
+  createdAt: Date
+  updatedAt: Date
+}
+
+type BirthRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  child: Person
+  mother: Person
+  father: Person
+  informant: Person
+  birthLocation: Location
+  birthType: BirthType
+  attendantAtBirth: AttendantType
+  birthRegistrationType: BirthRegType
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  birthOrder: Int # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
+  createdAt: Date
+  updatedAt: Date
+}
+
+input DeathRegistrationInput {
+  registration: RegistrationInput
+  deceased: PersonInput # Remember to mark person as deceased
+  mother: PersonInput
+  father: PersonInput
+  informant: PersonInput
+  spouse: [PersonInput] # need to track multiple spouses for muslim countries
+  deathLocation: LocationInput
+  causeOfDeath: CauseOfDeath
+  createdAt: Date
+  updatedAt: Date
+}
+
+type DeathRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  deceased: Person # Remember to mark person as deceased
+  mother: Person
+  father: Person
+  informant: Person
+  spouse: [Person]
+  deathLocation: Location
+  causeOfDeath: CauseOfDeath
+  createdAt: Date
+  updatedAt: Date
+}
+
+input RegistrationInput {
+  trackingID: String # short uuid easy to remember
+  registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
+  paperFormID: String
+  page: String
+  book: String
+  status: [RegWorkflowInput]
+  type: RegistrationType
+  attachments: [AttachmentInput]
+  location: LocationInput
+}
+
+type Registration {
+  id: ID! # long uuid
+  trackingID: String # short uuid easy to remember
+  registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
+  paperFormID: String
+  page: String
+  book: String
+  status: [RegWorkflow]
+  type: RegistrationType
+  attachments: [Attachment]
+  location: Location
+}
+
+input AttachmentInput {
+  data: String # base64
+  status: String # approved/validated deleted
+  originalFileName: String
+  systemFileName: String
+  type: AttachmentType
+  # rest of the stuff
+  createdAt: Date
+}
+
+type Attachment {
+  id: ID! # uuid
+  data: String # base64
+  status: String # approved/validated deleted
+  originalFileName: String
+  systemFileName: String
+  type: AttachmentType
+  createdAt: Date
+}
+
+type Query {
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
+  listDeathRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
+  user(id: ID!): User
+}
+
+type Mutation {
+  # BIRTH
+  createBirthRegistration(details: BirthRegistrationInput!): ID!
+  updateBirthRegistration(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): BirthRegistration!
+  # process transitions
+  markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markBirthAsRegistered(id: ID!, location: LocationInput): BirthRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markBirthAsCertified(id: ID!, location: LocationInput): BirthRegistration # updates status to 'certified' - a printed certificate has been produced
+  markBirthAsVoided(
+    id: ID!
+    reason: String!
+    location: LocationInput
+  ): BirthRegistration # updated status to 'voided' - the registration was captured in error
+  # DEATH
+  createDeathRegistration(details: DeathRegistrationInput!): ID!
+  updateDeathRegistration(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): DeathRegistration!
+  # process transitions
+  markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsVoided(
+    id: ID!
+    reason: String!
+    location: LocationInput
+  ): DeathRegistration # updated status to 'voided' - the registration was captured in error
+}
+
+input HumanNameInput {
+  use: String # traditional (Bangla) or English
+  givenName: String
+  familyName: String
+}
+
+type HumanName {
+  use: String # traditional (Bangla) or English
+  givenName: String
+  familyName: String
+}
+
+enum Relationship {
+  GUARDIAN
+  MATERNAL_GRANDMOTHER
+  MATERNAL_GRANDFATHER
+  PATERNAL_GRANDMOTHER
+  PATERNAL_GRANDFATHER
+  OTHER
+}
+
+enum LocationType {
+  HOSPITAL
+  OTHER_INSTITUTION
+  PRIVATE_HOME
+  OTHER
+}
+
+enum IdentityIDType {
+  PASSPORT
+  NATIONAL_ID
+  DRIVING_LICENCE
+  BIRTH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER
+}
+
+enum EducationType {
+  NO_SCHOOLING
+  PRIMARY_ISCED_1
+  LOWER_SECONDARY_ISCED_2
+  UPPER_SECONDARY_ISCED_3
+  POST_SECONDARY_ISCED_4
+  FIRST_STAGE_TERTIARY_ISCED_5
+  SECOND_STAGE_TERTIARY_ISCED_6
+  NOT_STATED
+}
+
+enum MigrantType {
+  FOREIGN_RESIDENT
+  STUDENT
+  ASYLUM_SEEKER
+  RESIDENT
+  VISITOR
+  TRANSIENT
+  REFUGEE
+  OTHER
+}
+
+enum MaritalStatusType {
+  SINGLE
+  LAWFULLY_MARRIED
+  OTHER_UNIONS
+  WIDOWED
+  DIVORCED
+  SEPARATED
+  NOT_STATED
+}
+
+input IdentityInput {
+  id: ID
+  type: IdentityIDType
+}
+
+type IdentityType {
+  id: ID
+  type: IdentityIDType
+}
+
+input PersonInput {
+  identifier: [IdentityInput]
+  name: [HumanNameInput]
+  telecom: [ContactPointInput]
+  gender: String
+  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
+  birthDate: String
+  maritalStatus: MaritalStatusType
+  dateOfMarriage: Date
+  multipleBirth: Int # For order of birth 3 equals 3rd born
+  address: [AddressInput]
+  photo: AttachmentInput
+  deceased: Boolean
+  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+  educationalAttainment: EducationType
+  migrantStatus: MigrantType
+}
+
+type Person {
+  id: ID
+  identifier: [IdentityType]
+  name: [HumanName]
+  telecom: [ContactPoint]
+  gender: String
+  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
+  birthDate: String
+  maritalStatus: MaritalStatusType
+  dateOfMarriage: Date
+  multipleBirth: Int # For order of birth 3 equals 3rd born
+  address: [Address]
+  photo: Attachment
+  deceased: Boolean
+  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+  educationalAttainment: EducationType
+  migrantStatus: MigrantType
+}
+
+input RelatedPersonInput {
+  identifier: [IdentityInput]
+  name: [HumanNameInput]
+  relationship: Relationship
+  telecom: [ContactPointInput]
+  gender: String
+  birthDate: String
+  address: [AddressInput]
+  photo: AttachmentInput
+  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+}
+
+type RelatedPerson {
+  id: ID
+  identifier: [IdentityType]
+  name: [HumanName]
+  relationship: Relationship
+  telecom: [ContactPoint]
+  gender: String
+  birthDate: String
+  address: [Address]
+  photo: Attachment
+  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+}
+
+input ContactPointInput {
+  system: String # phone | fax | email | pager | url | sms | other
+  value: String # The actual contact point details
+  use: String # home | work | temp | old | mobile - purpose of this contact point
+}
+
+type ContactPoint {
+  system: String # phone | fax | email | pager | url | sms | other
+  value: String # The actual contact point details
+  use: String # home | work | temp | old | mobile - purpose of this contact point
+}
+
+input LocationInput {
+  identifier: [ID]
+  status: String
+  name: String
+  alias: [String]
+  description: String
+  type: LocationType
+  telecom: [ContactPointInput]
+  address: AddressInput
+  longitude: Float
+  latitude: Float
+  altitude: Float
+}
+
+type Location {
+  id: ID!
+  identifier: [ID]
+  status: String
+  name: String
+  alias: [String]
+  description: String
+  type: LocationType
+  telecom: [ContactPoint]
+  address: Address
+  longitude: Float
+  latitude: Float
+  altitude: Float
+}
+
+input AddressInput {
+  use: String
+  type: String
+  text: String
+  line: [String]
+  city: String
+  district: String
+  state: String
+  postalCode: String
+  country: String
+  from: Date
+  to: Date
+}
+
+type Address {
+  use: String
+  type: String
+  text: String
+  line: [String]
+  city: String
+  district: String
+  state: String
+  postalCode: String
+  country: String
+  from: Date
+  to: Date
+}
+
+# TODO: Move to user feature when built out - manage through a user management microservice
+input UserInput {
+  userName: String
+  created: Date
+  lastLoggedIn: Date
+  firstName: String
+  lastName: String
+  telecom: [ContactPointInput]
+  identifier: [IdentityInput]
+  role: [UserRoleInput]!
+  address: AddressInput
+  primaryOffice: LocationInput
+  currentLocation: LocationInput
+  catchmentArea: [LocationInput]
+}
+
+type User {
+  id: ID!
+  userName: String
+  created: Date
+  lastLoggedIn: Date
+  firstName: String
+  lastName: String
+  telecom: [ContactPoint]
+  identifier: [IdentityType]
+  role: [UserRole]!
+  address: Address
+  primaryOffice: Location
+  currentLocation: Location
+  catchmentArea: [Location]
+}
+
+input UserRoleInput {
+  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
+}
+
+type UserRole {
+  id: ID!
+  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
+}

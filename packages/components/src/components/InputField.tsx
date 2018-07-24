@@ -13,6 +13,7 @@ export interface IProps {
   meta?: { touched: boolean; error: string }
   maxLength?: number
   min?: number
+  focusInput: boolean
 }
 
 export type IInputFieldProps = IProps & IInputProps
@@ -33,6 +34,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       disabled,
       maxLength,
       meta,
+      focusInput,
       ...props
     } = this.props
 
@@ -52,6 +54,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
           }
           error={Boolean(meta && meta.error)}
           touched={meta && meta.touched}
+          focusInput={focusInput}
         />
         {meta &&
           meta.error &&

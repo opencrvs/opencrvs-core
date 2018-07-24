@@ -1,6 +1,7 @@
 const unsafeConfig = {
   LOCALE: process.env.REACT_APP_LOCALE,
-  AUTH_API_URL: process.env.REACT_APP_AUTH_API_URL
+  AUTH_API_URL: process.env.REACT_APP_AUTH_API_URL,
+  REGISTER_APP_URL: process.env.REACT_APP_REGISTER_APP_URL
 }
 
 Object.entries(unsafeConfig).forEach(([key, value]) => {

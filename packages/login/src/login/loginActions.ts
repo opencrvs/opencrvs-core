@@ -26,7 +26,7 @@ export type Action =
   | { type: typeof STEP_ONE_FAILED; payload: Error }
   | { type: typeof STEP_ONE_COMPLETE }
   | { type: typeof START_STEP_TWO; payload: { code: string } }
-  | { type: typeof STEP_TWO_SUCCESS }
+  | { type: typeof STEP_TWO_SUCCESS; payload: IAuthenticateResponse }
   | { type: typeof STEP_TWO_FAILED; payload: Error }
   | { type: typeof STEP_TWO_COMPLETE }
   | { type: typeof RESEND_SMS }
@@ -78,5 +78,17 @@ export const resendSMSSuccess = (response: IAuthenticateResponse): Action => ({
 
 export const resendSMSFailed = (error: AxiosError): Action => ({
   type: RESEND_SMS_FAILED,
+  payload: error
+})
+
+export const submitStepTwoSuccess = (
+  response: IAuthenticateResponse
+): Action => ({
+  type: STEP_TWO_SUCCESS,
+  payload: response
+})
+
+export const submitStepTwoFailed = (error: AxiosError): Action => ({
+  type: STEP_TWO_FAILED,
   payload: error
 })

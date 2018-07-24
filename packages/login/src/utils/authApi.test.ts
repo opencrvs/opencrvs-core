@@ -39,4 +39,21 @@ describe('authApi', () => {
 
     expect(result).toEqual(expectedResponse)
   })
+  it('submits the SMS code', async () => {
+    const data = {
+      nonce: '12345',
+      code: '123456'
+    }
+
+    const expectedResponse = { nonce: '12345' }
+
+    moxios.wait(() => {
+      const request = moxios.requests.mostRecent()
+      request.respondWith({ status: 200, response: expectedResponse })
+    })
+
+    const result = await authApi.submitStepTwo(data)
+
+    expect(result).toEqual(expectedResponse)
+  })
 })

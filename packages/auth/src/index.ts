@@ -20,6 +20,10 @@ import refreshTokenHandler, {
   requestSchema as reqRefreshSchema,
   responseSchma as resRefreshSchema
 } from './features/refresh/handler'
+import resendSmsHandler, {
+  requestSchema as reqResendSmsSchema,
+  responseSchma as resResendSmsSchema
+} from './features/resend/handler'
 import getPlugins from './config/plugins'
 
 import * as database from './database'
@@ -56,6 +60,33 @@ export async function createServer() {
       },
       response: {
         schema: resAuthSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{"nonce": ""}' http://localhost:4040/resendSms
+  server.route({
+    method: 'POST',
+    path: '/resendSms',
+    handler: resendSmsHandler,
+    options: {
+      tags: ['api'],
+      description: 'Resend another SMS code',
+      notes:
+        'Sends a new SMS code to the user based on the phone number associated with the nonce',
+      validate: {
+        payload: reqResendSmsSchema
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            200: { description: 'Nonce is valid' },
+            400: { description: 'Nonce is invalid' }
+          }
+        }
+      },
+      response: {
+        schema: resResendSmsSchema
       }
     }
   })

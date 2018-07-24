@@ -7,7 +7,7 @@
     "react-docgen-typescript": "^1.5.0",
     "react-dom": "^16.3.2",
     "react-styleguidist": "^7.0.13",
-    "styled-components": "^3.2.6"
+    "styled-components": "^3.3.3"
   },
   "scripts": {
     "precommit": "lint-staged",

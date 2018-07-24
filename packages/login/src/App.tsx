@@ -12,7 +12,7 @@ import { StepOneContainer } from './login/StepOneContainer'
 import { PageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
 
-const store = createStore()
+export const store = createStore()
 
 export class App extends React.Component {
   public render() {

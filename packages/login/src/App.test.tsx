@@ -1,11 +1,9 @@
 import * as moxios from 'moxios'
-import { createTestApp } from './tests/util'
+import { createTestApp, wait } from './tests/util'
 import { client } from './utils/authApi'
 import { resolve } from 'url'
 import { ReactWrapper } from 'enzyme'
 import { config } from './config'
-
-const wait = () => new Promise(res => process.nextTick(res))
 
 it('renders without crashing', async () => {
   createTestApp()
@@ -16,7 +14,7 @@ it('renders a phone number and a password field on startup', async () => {
   expect(app.find('input')).toHaveLength(2)
 })
 
-describe('Login app', () => {
+describe('Login app step one', () => {
   beforeEach(() => {
     moxios.install(client)
   })

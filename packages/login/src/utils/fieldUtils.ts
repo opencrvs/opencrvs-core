@@ -1,5 +1,7 @@
 import { InjectedIntl, Messages } from 'react-intl'
 import { Validation } from './validate'
+import { Field } from 'redux-form'
+import { IInputFieldProps } from '@opencrvs/components/lib/InputField'
 
 export type IReduxFormFieldProps = {
   id: string
@@ -11,10 +13,15 @@ export type IReduxFormFieldProps = {
   maxLength?: number
   placeholder?: string
   label?: string
+  focusInput: boolean
 }
 
 export type IFieldGroup = {
   [key: string]: IReduxFormFieldProps
+}
+
+export type IFieldRefGroup = {
+  [key: string]: React.RefObject<Field<IReduxFormFieldProps & IInputFieldProps>>
 }
 
 export const getFieldProps = (
@@ -33,4 +40,8 @@ export const getFieldProps = (
     placeholder,
     label
   }
+}
+
+export const getFocusState = (id: string, fieldToFocus?: string): boolean => {
+  return fieldToFocus === id ? true : false
 }

@@ -4,6 +4,7 @@ import styled, { StyledFunction } from 'styled-components'
 export interface ICustomProps {
   error?: boolean
   touched?: boolean
+  focusInput: boolean
 }
 
 export type IInputProps = ICustomProps &
@@ -54,7 +55,28 @@ const StyledInput = styledInput`
 `
 
 export class Input extends React.Component<IInputProps> {
+  private textInput: React.RefObject<HTMLInputElement>
+  constructor(props: IInputProps, {}) {
+    super(props)
+    this.textInput = React.createRef()
+  }
+  focusField(): void {
+    this.textInput.current!.focus()
+  }
+  onBlur(e: any) {
+    e.preventDefault()
+  }
   render() {
-    return <StyledInput {...this.props} />
+    const { focusInput, ...props } = this.props
+    if (this.props.focusInput) {
+      this.focusField()
+    }
+    return (
+      <StyledInput
+        innerRef={this.textInput}
+        {...this.props}
+        onBlur={this.onBlur}
+      />
+    )
   }
 }

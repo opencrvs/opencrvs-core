@@ -5,12 +5,20 @@ import { reduxForm } from 'redux-form'
 import { IProps, IDispatchProps, StepTwoForm } from './StepTwoForm'
 import { IStoreState } from '../store'
 import * as actions from './loginActions'
-import { getSubmissionError } from './loginSelectors'
+import {
+  getSubmissionError,
+  getResentSMS,
+  getStepSubmitting,
+  getFieldToFocus
+} from './loginSelectors'
 
 const mapStateToProps = (store: IStoreState): IProps => {
   return {
     formId: STEP_TWO_FORM,
-    submissionError: getSubmissionError(store)
+    submissionError: getSubmissionError(store),
+    resentSMS: getResentSMS(store),
+    stepSubmitting: getStepSubmitting(store),
+    fieldToFocus: getFieldToFocus(store)
   }
 }
 

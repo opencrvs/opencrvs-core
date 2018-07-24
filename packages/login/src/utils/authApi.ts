@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { config } from '../config'
 import { resolve } from 'url'
 import { IStepOneData } from '../login/StepOneForm'
+import { IStepTwoData } from '../login/StepTwoForm'
 
 export const client = axios.create({
   baseURL: config.AUTH_API_URL
@@ -42,16 +43,26 @@ const submitStepOne = (data: IStepOneData): Promise<IAuthenticateResponse> => {
     data
   })
 }
+
 const resendSMS = (nonce: string) => {
   return request({
-    url: resolve(config.AUTH_API_URL, '/resend-sms'),
+    url: resolve(config.AUTH_API_URL, '/resendSms'),
     method: 'POST',
     data: { nonce }
+  })
+}
+
+const submitStepTwo = (data: IStepTwoData): Promise<IAuthenticateResponse> => {
+  return request({
+    url: resolve(config.AUTH_API_URL, 'verifyCode'),
+    method: 'POST',
+    data
   })
 }
 
 export const authApi = {
   request,
   submitStepOne,
+  submitStepTwo,
   resendSMS
 }
