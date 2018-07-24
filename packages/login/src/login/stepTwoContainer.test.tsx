@@ -23,6 +23,24 @@ describe('Login app step two', () => {
         test: ''
       }
       component = createTestComponent(<StepTwoContainer {...props} />)
+      component
+        .find('input#code1')
+        .simulate('change', { target: { value: '' } })
+      component
+        .find('input#code2')
+        .simulate('change', { target: { value: '' } })
+      component
+        .find('input#code3')
+        .simulate('change', { target: { value: '' } })
+      component
+        .find('input#code4')
+        .simulate('change', { target: { value: '' } })
+      component
+        .find('input#code5')
+        .simulate('change', { target: { value: '' } })
+      component
+        .find('input#code6')
+        .simulate('change', { target: { value: '' } })
     })
     it('Renders successfully', () => {
       expect(component.find('form#STEP_TWO')).toHaveLength(1)
@@ -60,13 +78,13 @@ describe('Login app step two', () => {
       const request = moxios.requests.mostRecent()
       expect(request.url).toMatch(/resendSms/)
     })
-    it('Clears the form', async () => {
+    it('Displays the reset form link when a field is entered', async () => {
       component
         .find('input#code1')
         .simulate('change', { target: { value: '1' } })
-      component.find('form#STEP_TWO').simulate('submit')
       await wait()
-      // console.log(component.find('form').debug())
+      component.update()
+      expect(component.find('#login-clear-form').hostNodes()).toHaveLength(1)
     })
   })
 })
