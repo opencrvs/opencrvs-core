@@ -16,10 +16,12 @@ export const CERT_PUBLIC_KEY_PATH =
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 
-export const CONFIG_TOKEN_EXPIRY = process.env.CONFIG_TOKEN_EXPIRY
-  ? parseInt(process.env.CONFIG_TOKEN_EXPIRY, 10)
+export const CONFIG_TOKEN_EXPIRY_SECONDS = process.env
+  .CONFIG_TOKEN_EXPIRY_SECONDS
+  ? parseInt(process.env.CONFIG_TOKEN_EXPIRY_SECONDS, 10)
   : 600
 
-export const CONFIG_SMS_CODE_EXPIRY = process.env.CONFIG_SMS_CODE_EXPIRY
-  ? parseInt(process.env.CONFIG_SMS_CODE_EXPIRY, 10)
+export const CONFIG_SMS_CODE_EXPIRY_SECONDS = process.env
+  .CONFIG_SMS_CODE_EXPIRY_SECONDS
+  ? parseInt(process.env.CONFIG_SMS_CODE_EXPIRY_SECONDS, 10)
   : 600

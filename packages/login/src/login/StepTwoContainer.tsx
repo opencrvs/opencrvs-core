@@ -9,16 +9,18 @@ import {
   getSubmissionError,
   getResentSMS,
   getStepSubmitting,
-  getFieldToFocus
+  getStepTwoFormState
 } from './loginSelectors'
+import { getFieldToFocus } from './utils/stepTwoFormUtils'
 
 const mapStateToProps = (store: IStoreState): IProps => {
+  const formState = getStepTwoFormState(store)
   return {
     formId: STEP_TWO_FORM,
     submissionError: getSubmissionError(store),
     resentSMS: getResentSMS(store),
     stepSubmitting: getStepSubmitting(store),
-    fieldToFocus: getFieldToFocus(store)
+    fieldToFocus: getFieldToFocus(formState)
   }
 }
 
