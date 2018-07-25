@@ -8,10 +8,10 @@ input HumanNameInput {
   familyName: String
 }
 
-type HumanName {
+type HumanName { # -> HumanName
   use: String # traditional (Bangla) or English
-  givenName: String
-  familyName: String
+  givenName: String # -> .given
+  familyName: String # -> .family
 }
 
 enum Relationship {
@@ -70,14 +70,14 @@ enum MaritalStatusType {
   NOT_STATED
 }
 
-input IdentityInput {
-  id: ID
-  type: IdentityIDType
+input IdentityInput { # -> Identifier
+  id: ID # -> .value
+  type: IdentityIDType # -> .system
 }
 
-type IdentityType {
-  id: ID
-  type: IdentityIDType
+type IdentityType { # -> Identifier
+  id: ID # -> .value
+  type: IdentityIDType # -> .system
 }
 
 input PersonInput {
@@ -85,36 +85,38 @@ input PersonInput {
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: String
-  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
+  weightAtBirth: String
   birthDate: String
   maritalStatus: MaritalStatusType
   dateOfMarriage: Date
-  multipleBirth: Int # For order of birth 3 equals 3rd born
+  # For order of birth 3 equals 3rd born
+  multipleBirth: Int
   address: [AddressInput]
   photo: AttachmentInput
   deceased: Boolean
-  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+  nationality: String
   educationalAttainment: EducationType
   migrantStatus: MigrantType
 }
 
-type Person {
+type Person { # -> Patient
   id: ID
-  identifier: [IdentityType]
-  name: [HumanName]
-  telecom: [ContactPoint]
-  gender: String
-  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight?
-  birthDate: String
-  maritalStatus: MaritalStatusType
-  dateOfMarriage: Date
-  multipleBirth: Int # For order of birth 3 equals 3rd born
-  address: [Address]
-  photo: Attachment
-  deceased: Boolean
-  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
-  educationalAttainment: EducationType
-  migrantStatus: MigrantType
+  identifier: [IdentityType] # -> .identifier
+  name: [HumanName] # -> .name
+  telecom: [ContactPoint] # -> .telecom
+  gender: String # -> .gender
+  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight? # -> Observation.valueQuantity (code=kg)
+  birthDate: String # -> birthDate
+  maritalStatus: MaritalStatusType # -> .maritalStatus
+  dateOfMarriage: Date # -> .extension custom
+  # For order of birth 3 equals 3rd born
+  multipleBirth: Int # -> .multipleBirth[x]
+  address: [Address] # -> .address
+  photo: Attachment # -> .photo
+  deceased: Boolean # -> .deceased[x]
+  nationality: String # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
+  educationalAttainment: EducationType # -> .extension custom
+  migrantStatus: MigrantType # -> .extension custom
 }
 
 input RelatedPersonInput {
@@ -129,29 +131,29 @@ input RelatedPersonInput {
   nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
 }
 
-type RelatedPerson {
-  id: ID
-  identifier: [IdentityType]
-  name: [HumanName]
-  relationship: Relationship
-  telecom: [ContactPoint]
-  gender: String
-  birthDate: String
-  address: [Address]
-  photo: Attachment
-  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
+# Only used for storing relationship, Patient is used for details
+type RelatedPerson { # -> RelatedPerson
+  id: ID # -> .id
+  relationship: Relationship # -> .relationship.coding.code
+  patient: Person # -> .patient.reference
 }
 
 input ContactPointInput {
-  system: String # phone | fax | email | pager | url | sms | other
-  value: String # The actual contact point details
-  use: String # home | work | temp | old | mobile - purpose of this contact point
+  # phone | fax | email | pager | url | sms | other
+  system: String
+  # The actual contact point details
+  value: String
+  # home | work | temp | old | mobile - purpose of this contact point
+  use: String
 }
 
-type ContactPoint {
-  system: String # phone | fax | email | pager | url | sms | other
-  value: String # The actual contact point details
-  use: String # home | work | temp | old | mobile - purpose of this contact point
+type ContactPoint { # -> ContactPoint
+  # phone | fax | email | pager | url | sms | other
+  system: String # -> .system
+  # The actual contact point details
+  value: String # -> .value
+  # home | work | temp | old | mobile - purpose of this contact point
+  use: String # -> .use
 }
 
 input LocationInput {
@@ -168,7 +170,7 @@ input LocationInput {
   altitude: Float
 }
 
-type Location {
+type Location { # -> Location (mostly the same properties)
   id: ID!
   identifier: [ID]
   status: String
@@ -178,9 +180,9 @@ type Location {
   type: LocationType
   telecom: [ContactPoint]
   address: Address
-  longitude: Float
-  latitude: Float
-  altitude: Float
+  longitude: Float # -> position.longitude
+  latitude: Float # -> position.latitude
+  altitude: Float # -> position.altitude
 }
 
 input AddressInput {
@@ -197,7 +199,7 @@ input AddressInput {
   to: Date
 }
 
-type Address {
+type Address { # -> Address
   use: String
   type: String
   text: String
@@ -207,8 +209,8 @@ type Address {
   state: String
   postalCode: String
   country: String
-  from: Date
-  to: Date
+  from: Date # -> .period.start
+  to: Date # -> .period.end
 }
 
 # TODO: Move to user feature when built out - manage through a user management microservice
