@@ -7,9 +7,10 @@ import { Box } from '@opencrvs/components/lib/Box'
 import { EnglishText } from '@opencrvs/components/lib/EnglishText'
 import styled from 'styled-components'
 import { stepOneFields } from './stepOneFields'
-import { getFieldProps } from '../utils/fieldUtils'
+import { getFieldProps } from '../../utils/fieldUtils'
 import { Field } from 'redux-form'
-import { localizeInput } from '../i18n/components/localizeInput'
+import { localizeInput } from '../../i18n/components/localizeInput'
+import { IAuthenticationData } from '@opencrvs/login/src/utils/authApi'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -94,17 +95,12 @@ const FieldWrapper = styled.div`
   margin-bottom: 30px;
 `
 
-export interface IStepOneData {
-  mobile: string
-  password: string
-}
-
 export interface IProps {
   formId: string
   submissionError: boolean
 }
 export interface IDispatchProps {
-  submitAction: (values: IStepOneData) => void
+  submitAction: (values: IAuthenticationData) => void
 }
 
 type IStepOneForm = IProps & IDispatchProps
@@ -113,7 +109,7 @@ const LocalizedInputField = localizeInput(InputField)
 
 export class StepOneForm extends React.Component<
   InjectedIntlProps &
-    InjectedFormProps<IStepOneData, IStepOneForm> &
+    InjectedFormProps<IAuthenticationData, IStepOneForm> &
     IStepOneForm
 > {
   render() {

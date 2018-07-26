@@ -2,59 +2,53 @@ import { AxiosError } from 'axios'
 import { RouterAction } from 'react-router-redux'
 import { convertToMSISDN } from '../utils/dataCleanse'
 import { config } from '../config'
-import { IAuthenticateResponse } from '../utils/authApi'
-import { IStepOneData } from './StepOneForm'
-import { IStepTwoSMSData } from './StepTwoForm'
+import { IAuthenticateResponse, IAuthenticationData } from '../utils/authApi'
 
-export const START_STEP_ONE = 'STEP_ONE/START_STEP_ONE'
-export const STEP_ONE_SUCCESS = 'STEP_ONE/STEP_ONE_SUCCESS'
-export const STEP_ONE_FAILED = 'STEP_ONE/STEP_ONE_FAILED'
-export const STEP_ONE_COMPLETE = 'STEP_ONE/STEP_ONE_COMPLETE'
+export const AUTHENTICATE = 'login/AUTHENTICATE'
+export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
+export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
 
-export const START_STEP_TWO = 'STEP_TWO/START_STEP_TWO'
-export const STEP_TWO_SUCCESS = 'STEP_TWO/STEP_TWO_SUCCESS'
-export const STEP_TWO_FAILED = 'STEP_TWO/STEP_TWO_FAILED'
-export const STEP_TWO_COMPLETE = 'STEP_TWO/STEP_TWO_COMPLETE'
+export const VERIFY_CODE = 'login/VERIFY_CODE'
+export const VERIFY_CODE_COMPLETED = 'login/VERIFY_CODE_COMPLETED'
+export const VERIFY_CODE_FAILED = 'login/VERIFY_CODE_FAILED'
 
-export const RESEND_SMS = 'STEP_TWO/RESEND_SMS'
-export const RESEND_SMS_SUCCESS = 'STEP_TWO/RESEND_SMS_SUCCESS'
-export const RESEND_SMS_FAILED = 'STEP_TWO/RESEND_SMS_FAILED'
+export const RESEND_SMS = 'login/RESEND_SMS'
+export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
+export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
 
 export type Action =
-  | { type: typeof START_STEP_ONE; payload: IStepOneData }
-  | { type: typeof STEP_ONE_SUCCESS; payload: IAuthenticateResponse }
-  | { type: typeof STEP_ONE_FAILED; payload: Error }
-  | { type: typeof STEP_ONE_COMPLETE }
-  | { type: typeof START_STEP_TWO; payload: { code: string } }
-  | { type: typeof STEP_TWO_SUCCESS; payload: IAuthenticateResponse }
-  | { type: typeof STEP_TWO_FAILED; payload: Error }
-  | { type: typeof STEP_TWO_COMPLETE }
+  | { type: typeof AUTHENTICATE; payload: IAuthenticationData }
+  | { type: typeof AUTHENTICATION_COMPLETED; payload: IAuthenticateResponse }
+  | { type: typeof AUTHENTICATION_FAILED; payload: Error }
+  | { type: typeof VERIFY_CODE; payload: { code: string } }
+  | { type: typeof VERIFY_CODE_COMPLETED; payload: IAuthenticateResponse }
+  | { type: typeof VERIFY_CODE_FAILED; payload: Error }
   | { type: typeof RESEND_SMS }
-  | { type: typeof RESEND_SMS_SUCCESS; payload: IAuthenticateResponse }
+  | { type: typeof RESEND_SMS_COMPLETED; payload: IAuthenticateResponse }
   | { type: typeof RESEND_SMS_FAILED; payload: Error }
   | RouterAction
 
-export const startStepOne = (values: IStepOneData): Action => {
+export const authenticate = (values: IAuthenticationData): Action => {
   const cleanedData = {
     mobile: convertToMSISDN(values.mobile, config.LOCALE),
     password: values.password
   }
 
   return {
-    type: START_STEP_ONE,
+    type: AUTHENTICATE,
     payload: cleanedData
   }
 }
 
-export const submitStepOneSuccess = (
+export const completeAuthentication = (
   response: IAuthenticateResponse
 ): Action => ({
-  type: STEP_ONE_SUCCESS,
+  type: AUTHENTICATION_COMPLETED,
   payload: response
 })
 
-export const submitStepOneFailed = (error: AxiosError): Action => ({
-  type: STEP_ONE_FAILED,
+export const failAuthentication = (error: AxiosError): Action => ({
+  type: AUTHENTICATION_FAILED,
   payload: error
 })
 
@@ -62,33 +56,42 @@ export const resendSMS = (): Action => ({
   type: RESEND_SMS
 })
 
-export const startStepTwo = (values: IStepTwoSMSData): Action => {
-  const code = Object.values(values).join('')
-
-  return {
-    type: START_STEP_TWO,
-    payload: { code }
-  }
+export interface IVerifyCodeNumbers {
+  code1: string
+  code2: string
+  code3: string
+  code4: string
+  code5: string
+  code6: string
 }
 
-export const resendSMSSuccess = (response: IAuthenticateResponse): Action => ({
-  type: RESEND_SMS_SUCCESS,
+export const completeSMSResend = (response: IAuthenticateResponse): Action => ({
+  type: RESEND_SMS_COMPLETED,
   payload: response
 })
 
-export const resendSMSFailed = (error: AxiosError): Action => ({
+export const failSMSResend = (error: AxiosError): Action => ({
   type: RESEND_SMS_FAILED,
   payload: error
 })
 
-export const submitStepTwoSuccess = (
+export const verifyCode = (values: IVerifyCodeNumbers): Action => {
+  const code = Object.values(values).join('')
+
+  return {
+    type: VERIFY_CODE,
+    payload: { code }
+  }
+}
+
+export const completeVerifyCode = (
   response: IAuthenticateResponse
 ): Action => ({
-  type: STEP_TWO_SUCCESS,
+  type: VERIFY_CODE_COMPLETED,
   payload: response
 })
 
-export const submitStepTwoFailed = (error: AxiosError): Action => ({
-  type: STEP_TWO_FAILED,
+export const failVerifyCode = (error: AxiosError): Action => ({
+  type: VERIFY_CODE_FAILED,
   payload: error
 })

@@ -11,8 +11,8 @@ import { createStore, history } from './store'
 import { config } from './config'
 import { PageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
-import { StepTwoContainer } from './views/StepTwoContainer'
-import { StepOneContainer } from './views/StepOneContainer'
+import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
+import { StepOneContainer } from './views/StepOne/StepOneContainer'
 
 export const store = createStore()
 

@@ -6,125 +6,42 @@ import { resolve } from 'url'
 import { config } from '../config'
 import { client } from '../utils/authApi'
 
-import {
-  getSubmissionError,
-  getResentSMS,
-  getStepSubmitting
-} from './selectors'
+import { getSubmissionError, getResentSMS, getsubmitting } from './selectors'
 import { mockState } from '../tests/util'
 
 describe('actions', () => {
-  it('startStepOne should clean mobile number by locale and dispatch START_STEP_ONE action', () => {
-    const action = {
-      type: actions.START_STEP_ONE,
-      payload: {
-        mobile: '+447111111111',
-        password: 'test'
+  describe('authenticate', () => {
+    it('cleans mobile number by locale and dispatch START_STEP_ONE action', () => {
+      const action = {
+        type: actions.AUTHENTICATE,
+        payload: {
+          mobile: '+447111111111',
+          password: 'test'
+        }
       }
-    }
-    expect(
-      actions.startStepOne({ mobile: '07111111111', password: 'test' })
-    ).toEqual(action)
+      expect(
+        actions.authenticate({ mobile: '07111111111', password: 'test' })
+      ).toEqual(action)
+    })
   })
-  it('submitStepOneSuccess should dispatch', () => {
-    const action = {
-      type: actions.STEP_ONE_SUCCESS,
-      payload: {
-        nonce: '1234'
-      }
-    }
-    expect(
-      actions.submitStepOneSuccess({
-        nonce: '1234'
+  describe('verifyCode', () => {
+    it('creates a code string from received code object', () => {
+      expect(
+        actions.verifyCode({
+          code1: '1',
+          code2: '2',
+          code3: '3',
+          code4: '4',
+          code5: '5',
+          code6: '6'
+        })
+      ).toEqual({
+        type: actions.VERIFY_CODE,
+        payload: {
+          code: '123456'
+        }
       })
-    ).toEqual(action)
-  })
-  it('submitStepOneFailed should dispatch', () => {
-    const err = {
-      name: '',
-      config: {},
-      message: ''
-    }
-    const action = {
-      type: actions.STEP_ONE_FAILED,
-      payload: err
-    }
-    expect(actions.submitStepOneFailed(err)).toEqual(action)
-  })
-
-  it('startStepTwo should join 6 separate code numbers and dispatch a START_STEP_TWO action', () => {
-    const action = {
-      type: actions.START_STEP_TWO,
-      payload: {
-        code: '123456'
-      }
-    }
-    expect(
-      actions.startStepTwo({
-        code1: '1',
-        code2: '2',
-        code3: '3',
-        code4: '4',
-        code5: '5',
-        code6: '6'
-      })
-    ).toEqual(action)
-  })
-  it('submitStepTwoSuccess should dispatch', () => {
-    const action = {
-      type: actions.STEP_TWO_SUCCESS,
-      payload: {
-        nonce: '1234'
-      }
-    }
-    expect(
-      actions.submitStepTwoSuccess({
-        nonce: '1234'
-      })
-    ).toEqual(action)
-  })
-  it('submitStepTwoFailed should dispatch', () => {
-    const err = {
-      name: '',
-      config: {},
-      message: ''
-    }
-    const action = {
-      type: actions.STEP_TWO_FAILED,
-      payload: err
-    }
-    expect(actions.submitStepTwoFailed(err)).toEqual(action)
-  })
-  it('resendSMS should dispatch', () => {
-    const action = {
-      type: actions.RESEND_SMS
-    }
-    expect(actions.resendSMS()).toEqual(action)
-  })
-  it('resendSMSSuccess should dispatch', () => {
-    const action = {
-      type: actions.RESEND_SMS_SUCCESS,
-      payload: {
-        nonce: '123456'
-      }
-    }
-    expect(
-      actions.resendSMSSuccess({
-        nonce: '123456'
-      })
-    ).toEqual(action)
-  })
-  it('resendSMSFailed should dispatch', () => {
-    const err = {
-      name: '',
-      config: {},
-      message: ''
-    }
-    const action = {
-      type: actions.RESEND_SMS_FAILED,
-      payload: err
-    }
-    expect(actions.resendSMSFailed(err)).toEqual(action)
+    })
   })
 })
 
@@ -147,7 +64,7 @@ describe('reducer', () => {
   it('updates the state with data ready to send to authorise service', async () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: true,
+      submitting: true,
       submissionError: false,
       resentSMS: false,
       stepOneDetails: {
@@ -157,7 +74,7 @@ describe('reducer', () => {
     }
 
     const action = {
-      type: actions.START_STEP_ONE,
+      type: actions.AUTHENTICATE,
       payload: {
         mobile: '+447111111111',
         password: 'test'
@@ -169,15 +86,15 @@ describe('reducer', () => {
   it('updates the state when nonce is returned from the authorise service', () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: false,
+      submitting: false,
       submissionError: false,
       resentSMS: false,
-      stepTwoDetails: {
+      authenticationDetails: {
         nonce: '1234'
       }
     }
     const action = {
-      type: actions.STEP_ONE_SUCCESS,
+      type: actions.AUTHENTICATION_COMPLETED,
       payload: {
         nonce: '1234'
       }
@@ -189,7 +106,7 @@ describe('reducer', () => {
   it('updates the state when resend SMS is requested', () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: false,
+      submitting: false,
       submissionError: false,
       resentSMS: false
     }
@@ -202,15 +119,15 @@ describe('reducer', () => {
   it('updates the state when nonce is returned from the resendSMS service', () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: false,
+      submitting: false,
       submissionError: false,
       resentSMS: true,
-      stepTwoDetails: {
+      authenticationDetails: {
         nonce: '1234'
       }
     }
     const action = {
-      type: actions.RESEND_SMS_SUCCESS,
+      type: actions.RESEND_SMS_COMPLETED,
       payload: {
         nonce: '1234'
       }
@@ -221,13 +138,13 @@ describe('reducer', () => {
   it('updates the state with data ready to send to verify sms code service', async () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: true,
+      submitting: true,
       submissionError: false,
       resentSMS: false
     }
 
     const action = {
-      type: actions.START_STEP_TWO,
+      type: actions.VERIFY_CODE,
       payload: {
         code: '123456'
       }
@@ -246,8 +163,8 @@ describe('selectors', () => {
     const resentSMS = false
     expect(getResentSMS(mockState)).toEqual(resentSMS)
   })
-  it('returns stepSubmitting boolean', () => {
-    const stepSubmitting = false
-    expect(getStepSubmitting(mockState)).toEqual(stepSubmitting)
+  it('returns submitting boolean', () => {
+    const submitting = false
+    expect(getsubmitting(mockState)).toEqual(submitting)
   })
 })

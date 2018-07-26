@@ -21,7 +21,7 @@ describe('authApi', () => {
       request.respondWith({ status: 200, response: expectedResponse })
     })
 
-    const result = await authApi.submitStepOne(data)
+    const result = await authApi.authenticate(data)
 
     expect(result).toEqual(expectedResponse)
   })
@@ -52,7 +52,7 @@ describe('authApi', () => {
       request.respondWith({ status: 200, response: expectedResponse })
     })
 
-    const result = await authApi.submitStepTwo(data)
+    const result = await authApi.verifyCode(data)
 
     expect(result).toEqual(expectedResponse)
   })

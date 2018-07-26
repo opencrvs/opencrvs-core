@@ -1,5 +1,5 @@
-import * as validations from '../utils/validate'
-import { IFieldGroup, IFieldRefGroup } from '../utils/fieldUtils'
+import * as validations from '../../utils/validate'
+import { IFieldGroup, IFieldRefGroup } from '../../utils/fieldUtils'
 import * as React from 'react'
 
 export const stepTwoFields: IFieldGroup = {

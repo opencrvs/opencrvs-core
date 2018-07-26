@@ -1,19 +1,20 @@
+import { difference } from 'lodash'
 import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
 import { IProps, IDispatchProps, StepTwoForm } from './StepTwoForm'
-import { IStoreState } from '../store'
-import { STEP_TWO_FORM } from '../login/constants'
-import * as actions from '../login/actions'
+import { IStoreState } from '../../store'
+
+import * as actions from '../../login/actions'
 import {
   getSubmissionError,
   getResentSMS,
-  getStepSubmitting,
+  getsubmitting,
   getStepTwoFormState
-} from '../login/selectors'
-import { difference } from 'lodash'
-import { IReduxFormFieldProps } from '../utils/fieldUtils'
+} from '../../login/selectors'
+import { IReduxFormFieldProps } from '../../utils/fieldUtils'
 import { stepTwoFields } from './stepTwoFields'
+import { FORM_NAME } from '@opencrvs/login/src/views/StepTwo/contants'
 
 export const getFieldToFocus = (store: IStoreState) => {
   const formState = getStepTwoFormState(store)
@@ -38,21 +39,21 @@ export const getFieldToFocus = (store: IStoreState) => {
 
 const mapStateToProps = (store: IStoreState): IProps => {
   return {
-    formId: STEP_TWO_FORM,
+    formId: FORM_NAME,
     submissionError: getSubmissionError(store),
     resentSMS: getResentSMS(store),
-    stepSubmitting: getStepSubmitting(store),
+    submitting: getsubmitting(store),
     fieldToFocus: getFieldToFocus(store)
   }
 }
 
 const mapDispatchToProps = {
-  submitAction: actions.startStepTwo,
+  submitAction: actions.verifyCode,
   onResendSMS: actions.resendSMS
 }
 
 const stepTwoForm = reduxForm({
-  form: STEP_TWO_FORM
+  form: FORM_NAME
 })(injectIntl(StepTwoForm))
 
 export const StepTwoContainer = connect<IProps, IDispatchProps>(
