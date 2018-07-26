@@ -1,16 +1,18 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { IntlContainer } from './i18n/components/I18nContainer'
 import { ConnectedRouter } from 'react-router-redux'
-import { createStore, history } from './store'
 import { Route, Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
+
+import { getTheme } from '@opencrvs/components/lib/theme'
+
+import { IntlContainer } from './i18n/components/I18nContainer'
+import { createStore, history } from './store'
 import { config } from './config'
-import { StepTwoContainer } from './login/StepTwoContainer'
-import { getTheme } from '../../components/lib/theme'
-import { StepOneContainer } from './login/StepOneContainer'
 import { PageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
+import { StepTwoContainer } from './views/StepTwoContainer'
+import { StepOneContainer } from './views/StepOneContainer'
 
 export const store = createStore()
 

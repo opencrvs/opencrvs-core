@@ -1,9 +1,6 @@
-import { LoginState } from './loginReducer'
+import { LoginState } from './reducer'
 import { IStoreState } from '../store'
 import { FormStateMap } from 'redux-form'
-import { stepTwoFields } from './stepTwoFields'
-import { IReduxFormFieldProps } from '../utils/fieldUtils'
-import { difference } from 'lodash'
 
 const getPartialState = (store: IStoreState): LoginState => store.login
 const getPartialFormState = (store: IStoreState): FormStateMap => store.form
@@ -30,24 +27,3 @@ export const getStepSubmitting = (
 export const getStepTwoFormState = (
   store: IStoreState
 ): FormStateMap['STEP_TWO'] => getFormKey(store, 'STEP_TWO')
-
-export const getFieldToFocus = (store: IStoreState) => {
-  const formState = getStepTwoFormState(store)
-  const allFields: IReduxFormFieldProps[] = Object.values(stepTwoFields)
-  const completedFields: IReduxFormFieldProps[] = []
-  let incompleteFields: IReduxFormFieldProps[] = []
-  if (formState) {
-    if (formState.values) {
-      Object.keys(formState.values).forEach(key => {
-        completedFields.push(stepTwoFields[key])
-      })
-      incompleteFields = difference(allFields, completedFields)
-    }
-    if (incompleteFields.length > 0) {
-      return incompleteFields[0].id
-    } else {
-      return undefined
-    }
-  }
-  return undefined
-}

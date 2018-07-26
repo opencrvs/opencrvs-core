@@ -9,7 +9,7 @@ import { getFieldProps, getFocusState } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
 import { stepTwoFields } from './stepTwoFields'
 import { localizeInput } from '../i18n/components/localizeInput'
-import { STEP_TWO_FORM } from './constants'
+import { STEP_TWO_FORM } from '../login/constants'
 import { store } from '../App'
 import {
   StyledBox,
