@@ -9,7 +9,7 @@ import styled from 'styled-components'
 import { stepOneFields } from './stepOneFields'
 import { getFieldProps } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
-import { localizeInput } from '../i18n/localizeInput'
+import { localizeInput } from '../i18n/components/localizeInput'
 
 export const messages = defineMessages({
   stepOneTitle: {

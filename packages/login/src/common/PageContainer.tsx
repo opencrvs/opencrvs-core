@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { getLanguage } from '../i18n/intlSelectors'
+import { getLanguage } from '../i18n/selectors'
 import { Page, IPage } from './Page'
 import { IStoreState } from '../store'
 import { withRouter } from 'react-router'
