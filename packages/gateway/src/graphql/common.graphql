@@ -70,9 +70,9 @@ enum MaritalStatusType {
   NOT_STATED
 }
 
-input IdentityInput { # -> Identifier
-  id: ID # -> .value
-  type: IdentityIDType # -> .system
+input IdentityInput {
+  id: ID
+  type: IdentityIDType
 }
 
 type IdentityType { # -> Identifier
@@ -85,7 +85,6 @@ input PersonInput {
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: String
-  weightAtBirth: String
   birthDate: String
   maritalStatus: MaritalStatusType
   dateOfMarriage: Date
@@ -105,37 +104,17 @@ type Person { # -> Patient
   name: [HumanName] # -> .name
   telecom: [ContactPoint] # -> .telecom
   gender: String # -> .gender
-  weightAtBirth: String # Should this be Observation > Category > vital-signs > weight? # -> Observation.valueQuantity (code=kg)
   birthDate: String # -> birthDate
   maritalStatus: MaritalStatusType # -> .maritalStatus
-  dateOfMarriage: Date # -> .extension custom
+  dateOfMarriage: Date # -> .extension(url='http://opencrvs.org/specs/date-of-marriage').valueDateTime
   # For order of birth 3 equals 3rd born
-  multipleBirth: Int # -> .multipleBirth[x]
+  multipleBirth: Int # -> .multipleBirthInteger
   address: [Address] # -> .address
   photo: Attachment # -> .photo
-  deceased: Boolean # -> .deceased[x]
+  deceased: Boolean # -> .deceasedBoolean
   nationality: String # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
-  educationalAttainment: EducationType # -> .extension custom
-  migrantStatus: MigrantType # -> .extension custom
-}
-
-input RelatedPersonInput {
-  identifier: [IdentityInput]
-  name: [HumanNameInput]
-  relationship: Relationship
-  telecom: [ContactPointInput]
-  gender: String
-  birthDate: String
-  address: [AddressInput]
-  photo: AttachmentInput
-  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
-}
-
-# Only used for storing relationship, Patient is used for details
-type RelatedPerson { # -> RelatedPerson
-  id: ID # -> .id
-  relationship: Relationship # -> .relationship.coding.code
-  patient: Person # -> .patient.reference
+  educationalAttainment: EducationType # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
+  migrantStatus: MigrantType # -> .extension(url='http://opencrvs.org/specs/extension/migrant-status').valueString
 }
 
 input ContactPointInput {
@@ -170,7 +149,7 @@ input LocationInput {
   altitude: Float
 }
 
-type Location { # -> Location (mostly the same properties)
+type Location { # -> Location (mostly the same property name except:)
   id: ID!
   identifier: [ID]
   status: String
@@ -199,7 +178,7 @@ input AddressInput {
   to: Date
 }
 
-type Address { # -> Address
+type Address { # -> Address (mostly the same property name except:)
   use: String
   type: String
   text: String

@@ -80,10 +80,10 @@ input RegWorkflowInput {
 type RegWorkflow { # Task
   id: ID!
   type: RegStatus # -> .businessStatus
-  user: User
+  user: User # -> extension(url='http://opencrvs.org/specs/extension/regLastUser').valueString
   timestamp: Date # -> lastModified
   comments: [Comment] # -> .note
-  location: Location
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
 }
 
 input CertificateInput {
@@ -94,7 +94,7 @@ input CertificateInput {
   createdAt: Date
 }
 
-type Certificate { # ?? DocumentRef?
+type Certificate {
   id: ID!
   paperId: ID!
   reciever: Person
@@ -111,6 +111,7 @@ input BirthRegistrationInput {
   informant: PersonInput
   birthLocation: LocationInput
   birthType: BirthType
+  weightAtBirth: Float
   attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
   childrenBornAliveToMother: Int
@@ -130,12 +131,13 @@ type BirthRegistration { # -> Composition
   father: Person # -> .section(code='father-details').entry.reference
   informant: Person # -> .section(code='informant-details').entry.reference
   birthLocation: Location # -> .section(code='birth-encounter').entry.reference.location
-  birthType: BirthType # -> Observation ??
-  attendantAtBirth: AttendantType # -> Observation ??
-  birthRegistrationType: BirthRegType # -> Observation ??
-  childrenBornAliveToMother: Int # -> Observation ??
-  foetalDeathsToMother: Int # -> Observation ??
-  lastPreviousLiveBirth: Date # -> Observation ??
+  birthType: BirthType # -> Observation.valueInteger
+  weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
+  attendantAtBirth: AttendantType # -> Observation.valueString
+  birthRegistrationType: BirthRegType # -> Observation.valueString
+  childrenBornAliveToMother: Int # -> Observation.valueInteger
+  foetalDeathsToMother: Int # -> Observation.valueInteger
+  lastPreviousLiveBirth: Date # -> Observation.valueDateTime
   # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
   birthOrder: Int # -> Patient.multipleBirthInteger
   createdAt: Date # -> .date($first)
@@ -168,14 +170,16 @@ type DeathRegistration { # -> Composition
   # need to track multiple spouses for muslim countries
   spouse: [Person] # -> .section(code='spouse-details').entry.reference
   deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
-  causeOfDeath: CauseOfDeath # -> Observation ??
+  causeOfDeath: CauseOfDeath # -> Observation.valueCodeableConcept
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
 }
 
 input RegistrationInput {
-  trackingID: String # short uuid easy to remember
-  registrationNumber: String # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
+  # short uuid easy to remember
+  trackingID: String
+  # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
+  registrationNumber: String
   paperFormID: String
   page: String
   book: String
@@ -185,7 +189,7 @@ input RegistrationInput {
   location: LocationInput
 }
 
-type Registration { # -> Composition
+type Registration { # -> Task
   # short uuid easy to remember
   trackingID: String # -> .identifier
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -193,25 +197,27 @@ type Registration { # -> Composition
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
-  status: [RegWorkflow] # -> Task. ??
-  type: RegistrationType # -> .type
-  attachments: [Attachment] # -> .section(code='scanned-documents').entry.reference
+  status: [RegWorkflow] # -> Task.*
+  type: RegistrationType # -> .code
+  attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
 }
 
 input AttachmentInput {
-  data: String # base64
-  status: String # approved/validated deleted
+  # base64
+  data: String
+  # approved/validated/deleted
+  status: String
   originalFileName: String
   systemFileName: String
   type: AttachmentType
-  # rest of the stuff
   createdAt: Date
 }
 
 type Attachment { # -> DocumentReference
   id: ID! # uuid
+  # base64
   data: String # -> .content.attachment.data base64
-  # approved/validated deleted
+  # approved/validated/deleted
   status: String # -> .status
   originalFileName: String # -> .identifier
   systemFileName: String # -> .identifier
