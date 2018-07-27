@@ -3,13 +3,18 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
 
-import { AUTH_HOST, AUTH_PORT } from './constants'
+import { AUTH_HOST, AUTH_PORT, CERT_PUBLIC_KEY_PATH } from './constants'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from './features/verifyPassword/handler'
 import getPlugins from './config/plugins'
 import * as database from './database'
+import { readFileSync } from 'fs'
+import { verify } from 'jsonwebtoken'
+import { promisify } from 'util'
+
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -20,9 +25,26 @@ export async function createServer() {
     }
   })
 
-  async function init() {
-    await server.register(getPlugins())
-  }
+  await server.register(getPlugins())
+
+  server.auth.strategy('jwt', 'jwt', {
+    key: publicCert,
+    verifyOptions: { algorithms: ['RS256'] },
+    verify: async (payload: any, request: any) => {
+      try {
+        await promisify(verify)(
+          request.headers.authorization.replace('Bearer ', ''),
+          publicCert
+        )
+      } catch (err) {
+        return { isValid: false }
+      }
+
+      return { isValid: true, credentials: payload }
+    }
+  })
+
+  server.auth.default('jwt')
 
   // curl -H 'Content-Type: application/json' -d '{"mobile": "27855555555", "password": "test"}' http://localhost:3030/verifyPassword
   server.route({
@@ -30,6 +52,7 @@ export async function createServer() {
     path: '/verifyPassword',
     handler: verifyPassHandler,
     options: {
+      auth: false,
       tags: ['api'],
       description: 'Verify user password',
       notes: 'Verify account exist and password is correct',
@@ -50,8 +73,14 @@ export async function createServer() {
     }
   })
 
+  // Temporary route for testing authentication
+  server.route({
+    method: 'GET',
+    path: '/check-token',
+    handler: (request: Hapi.Request) => request.auth.credentials
+  })
+
   async function start() {
-    await init()
     await server.start()
     await database.start()
     server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)

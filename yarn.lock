@@ -88,6 +88,13 @@
   version "0.13.1"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.13.1.tgz#7d39750355c9ecb921816d6f76c080405b5f6bea"
 
+"@types/hapi-auth-jwt2@^8.0.1":
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/@types/hapi-auth-jwt2/-/hapi-auth-jwt2-8.0.1.tgz#923414680992b27486f8cfeee7bc71738f41e951"
+  dependencies:
+    "@types/hapi" "*"
+    "@types/jsonwebtoken" "*"
+
 "@types/hapi@*", "@types/hapi@^17.0.12":
   version "17.0.12"
   resolved "https://registry.yarnpkg.com/@types/hapi/-/hapi-17.0.12.tgz#5751f4d8db4decb4eae6671a4efbeae671278ceb"
@@ -140,6 +147,12 @@
 "@types/joi@^13.3.0":
   version "13.3.0"
   resolved "https://registry.yarnpkg.com/@types/joi/-/joi-13.3.0.tgz#bdfa2e49d8d258ba79f23304228d0c4d5cfc848c"
+
+"@types/jsonwebtoken@*":
+  version "7.2.8"
+  resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-7.2.8.tgz#8d199dab4ddb5bba3234f8311b804d2027af2b3a"
+  dependencies:
+    "@types/node" "*"
 
 "@types/jsonwebtoken@^7.2.7":
   version "7.2.7"
@@ -2710,7 +2723,7 @@ cookie-signature@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
 
-cookie@0.3.1:
+cookie@0.3.1, cookie@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
 
@@ -4805,6 +4818,14 @@ handlebars@4.x.x, handlebars@^4.0.11, handlebars@^4.0.2, handlebars@^4.0.3:
   optionalDependencies:
     uglify-js "^2.6"
 
+hapi-auth-jwt2@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/hapi-auth-jwt2/-/hapi-auth-jwt2-8.1.0.tgz#4e3497cdb3925a315861f60f4057ddd11466e68c"
+  dependencies:
+    boom "^7.1.1"
+    cookie "^0.3.1"
+    jsonwebtoken "^8.1.0"
+
 hapi-boom-decorators@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/hapi-boom-decorators/-/hapi-boom-decorators-3.0.1.tgz#264c3bb5d35278112688cf758d3e9e2eed11d988"
@@ -6679,7 +6700,7 @@ jsonparse@^1.2.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
 
-jsonwebtoken@^8.3.0:
+jsonwebtoken@^8.1.0, jsonwebtoken@^8.3.0:
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-8.3.0.tgz#056c90eee9a65ed6e6c72ddb0a1d325109aaf643"
   dependencies:
