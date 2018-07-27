@@ -382,31 +382,6 @@ type Person {
   migrantStatus: MigrantType
 }
 
-input RelatedPersonInput {
-  identifier: [IdentityInput]
-  name: [HumanNameInput]
-  relationship: Relationship
-  telecom: [ContactPointInput]
-  gender: String
-  birthDate: String
-  address: [AddressInput]
-  photo: AttachmentInput
-  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
-}
-
-type RelatedPerson {
-  id: ID
-  identifier: [IdentityType]
-  name: [HumanName]
-  relationship: Relationship
-  telecom: [ContactPoint]
-  gender: String
-  birthDate: String
-  address: [Address]
-  photo: Attachment
-  nationality: String # use https://www.hl7.org/fhir/extension-patient-nationality.html
-}
-
 input ContactPointInput {
   system: String # phone | fax | email | pager | url | sms | other
   value: String # The actual contact point details
