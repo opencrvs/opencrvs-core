@@ -11,8 +11,6 @@ import verifyPassHandler, {
 import getPlugins from './config/plugins'
 import * as database from './database'
 import { readFileSync } from 'fs'
-import { verify } from 'jsonwebtoken'
-import { promisify } from 'util'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -30,18 +28,10 @@ export async function createServer() {
   server.auth.strategy('jwt', 'jwt', {
     key: publicCert,
     verifyOptions: { algorithms: ['RS256'] },
-    verify: async (payload: any, request: any) => {
-      try {
-        await promisify(verify)(
-          request.headers.authorization.replace('Bearer ', ''),
-          publicCert
-        )
-      } catch (err) {
-        return { isValid: false }
-      }
-
-      return { isValid: true, credentials: payload }
-    }
+    validate: (payload: any, request: any) => ({
+      isValid: true,
+      credentials: payload
+    })
   })
 
   server.auth.default('jwt')
