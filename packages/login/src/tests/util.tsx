@@ -14,6 +14,7 @@ import { ENGLISH_STATE } from '../i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { config } from '../config'
 import { store } from '../App'
+import { IntlContainer } from '../i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
 addLocaleData([...en])
@@ -92,9 +93,11 @@ export function createConnectedTestComponent(
 ) {
   return mount(
     <Provider store={testStore}>
-      <ThemeProvider theme={getTheme(config.LOCALE)}>
-        {nodeWithIntlProp(node)}
-      </ThemeProvider>
+      <IntlContainer>
+        <ThemeProvider theme={getTheme(config.LOCALE)}>
+          {nodeWithIntlProp(node)}
+        </ThemeProvider>
+      </IntlContainer>
     </Provider>,
     {
       context: { intl },
