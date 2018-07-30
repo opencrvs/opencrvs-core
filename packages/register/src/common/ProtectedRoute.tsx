@@ -1,12 +1,17 @@
 import * as React from 'react'
 import { Route, RouteProps } from 'react-router'
-import { store } from '../App'
-import { getAuthenticated } from '../profile/profileSelectors'
 import { LoginRedirect } from './LoginRedirect'
+import { connect } from 'react-redux'
+import { getAuthenticated } from '../profile/profileSelectors'
+import { IStoreState } from '../store'
 
-export class ProtectedRoute extends Route<RouteProps> {
+export interface IProps {
+  isAuthenticated: boolean
+}
+
+class ProtectedRouteWrapper extends Route<IProps & RouteProps> {
   public render() {
-    const isAuthenticated = getAuthenticated(store.getState())
+    const { isAuthenticated } = this.props
     if (!isAuthenticated) {
       const renderComponent = () => <LoginRedirect />
       return (
@@ -17,3 +22,12 @@ export class ProtectedRoute extends Route<RouteProps> {
     }
   }
 }
+
+const mapStateToProps = (store: IStoreState): IProps => {
+  return {
+    isAuthenticated: getAuthenticated(store)
+  }
+}
+export const ProtectedRoute = connect<IProps, {}>(mapStateToProps)(
+  ProtectedRouteWrapper
+)

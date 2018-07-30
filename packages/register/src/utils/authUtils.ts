@@ -11,17 +11,13 @@ export interface ITokenProfile {
 }
 
 export const isTokenStillValid = (token: string, localToken?: boolean) => {
-  try {
-    const decoded: ITokenProfile = getProfile(token)
-    if (Number(decoded.exp) * 1000 > Date.now()) {
-      return true
-    } else {
-      if (localToken) {
-        localStorage.removeItem('opencrvs')
-      }
-      return false
+  const decoded: ITokenProfile = getProfile(token)
+  if (Number(decoded.exp) * 1000 > Date.now()) {
+    return true
+  } else {
+    if (localToken) {
+      localStorage.removeItem('opencrvs')
     }
-  } catch (err) {
     return false
   }
 }
