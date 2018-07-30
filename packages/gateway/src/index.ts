@@ -5,37 +5,55 @@ import * as DotEnv from 'dotenv'
 import { getPlugins } from 'src/config/plugins'
 import { getServer } from 'src/config/server'
 import { getLogger } from 'src/utils/logger'
+import { getRoutes } from 'src/config/routes'
+import { CERT_PUBLIC_KEY_PATH } from 'src/constants'
+import { readFileSync } from 'fs'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
 })
+
 const graphQLSchemaPath = `${process.cwd()}/src/graphql/index.graphql`
+
 const logger = getLogger(Number(process.env.LOG_LEVEL), process.env.APP_NAME)
-const server = getServer(process.env.NODE_ENV, process.env.PORT, logger)
-const plugins = getPlugins(process.env.NODE_ENV, graphQLSchemaPath)
 
-async function startServer() {
-  try {
-    // add things here before the app starts, like database connection check etc
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
+
+export async function createServer() {
+  const server = getServer(process.env.NODE_ENV, process.env.PORT, logger)
+  const plugins = getPlugins(process.env.NODE_ENV, graphQLSchemaPath)
+
+  await server.register(plugins)
+
+  server.auth.strategy('jwt', 'jwt', {
+    key: publicCert,
+    verifyOptions: { algorithms: ['RS256'] },
+    validate: (payload: any, request: any) => ({
+      isValid: true,
+      credentials: payload
+    })
+  })
+
+  server.auth.default('jwt')
+
+  const routes = getRoutes()
+  server.route(routes)
+
+  async function start() {
     await server.start()
-    logger.info(
-      `server started at port: ${process.env.PORT} with env: ${
-        process.env.NODE_ENV
-      }`
-    )
-  } catch (error) {
-    logger.error(error)
-    process.exit(1)
+
+    server.log('info', `server started on port ${process.env.PORT}`)
   }
+
+  async function stop() {
+    await server.stop()
+
+    server.log('info', 'server stopped')
+  }
+
+  return { server, start, stop }
 }
 
-const registerPlugins = async () => {
-  try {
-    await server.register(plugins)
-    startServer()
-  } catch (error) {
-    logger.error(error, 'Failed to register hapi plugins')
-    throw error
-  }
+if (require.main === module) {
+  createServer().then(server => server.start())
 }
-registerPlugins()
