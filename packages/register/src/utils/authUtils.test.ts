@@ -16,11 +16,11 @@ describe('authUtils tests', () => {
       role: 'chw'
     }
   })
-  it('isTokenStillValid confirms a token that has not expired', () => {
+  it('should confirm a token has not expired', () => {
     jest.spyOn(authUtils, 'getProfile').mockReturnValue(mockValidToken)
     expect(authUtils.isTokenStillValid('12345')).toEqual(true)
   })
-  it('isTokenStillValid confirms a token that has expired', () => {
+  it('should confirm a token has expired', () => {
     jest.spyOn(authUtils, 'getProfile').mockReturnValue(mockInvalidToken)
     expect(authUtils.isTokenStillValid('12345')).toEqual(false)
   })
