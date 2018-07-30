@@ -1,25 +1,27 @@
 import { connect } from 'react-redux'
-import { STEP_ONE_FORM } from './constants'
 import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
 import { StepOneForm, IProps, IDispatchProps } from './StepOneForm'
-import { IStoreState } from '../store'
-import * as actions from './loginActions'
-import { getSubmissionError } from './loginSelectors'
+import { IStoreState } from '../../store'
+
+import * as actions from '../../login/actions'
+import { getSubmissionError } from '../../login/selectors'
+
+const FORM_NAME = 'STEP_ONE'
 
 const mapStateToProps = (store: IStoreState): IProps => {
   return {
-    formId: STEP_ONE_FORM,
+    formId: FORM_NAME,
     submissionError: getSubmissionError(store)
   }
 }
 
 const mapDispatchToProps = {
-  submitAction: actions.startStepOne
+  submitAction: actions.authenticate
 }
 
 const stepOneForm = reduxForm({
-  form: STEP_ONE_FORM
+  form: FORM_NAME
 })(injectIntl(StepOneForm))
 
 export const StepOneContainer = connect<IProps, IDispatchProps>(

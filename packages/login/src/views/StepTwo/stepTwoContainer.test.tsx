@@ -1,9 +1,9 @@
-import { StepTwoContainer } from './StepTwoContainer'
 import * as React from 'react'
-import { createTestComponent, wait } from '../tests/util'
 import * as moxios from 'moxios'
-import { client } from '../utils/authApi'
 import { ReactWrapper } from 'enzyme'
+import { getFieldToFocus, StepTwoContainer } from './StepTwoContainer'
+import { createTestComponent, wait, mockState } from '../../tests/util'
+import { client } from '../../utils/authApi'
 
 interface ITestProps {
   test: string
@@ -85,6 +85,10 @@ describe('Login app step two', () => {
       await wait()
       component.update()
       expect(component.find('#login-clear-form').hostNodes()).toHaveLength(1)
+    })
+    it('should return the field to focus', () => {
+      const nextField = 'code2'
+      expect(getFieldToFocus(mockState)).toEqual(nextField)
     })
   })
 })

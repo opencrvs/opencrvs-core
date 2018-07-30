@@ -1,12 +1,51 @@
 import * as moxios from 'moxios'
-import * as actions from './loginActions'
-import { initialState } from './loginReducer'
+import * as actions from './actions'
+import { initialState } from './reducer'
 import { createStore, AppStore } from '../store'
 import { resolve } from 'url'
 import { config } from '../config'
 import { client } from '../utils/authApi'
 
-describe('loginReducer tests', () => {
+import { getSubmissionError, getResentSMS, getsubmitting } from './selectors'
+import { mockState } from '../tests/util'
+
+describe('actions', () => {
+  describe('authenticate', () => {
+    it('cleans mobile number by locale and dispatch START_STEP_ONE action', () => {
+      const action = {
+        type: actions.AUTHENTICATE,
+        payload: {
+          mobile: '+447111111111',
+          password: 'test'
+        }
+      }
+      expect(
+        actions.authenticate({ mobile: '07111111111', password: 'test' })
+      ).toEqual(action)
+    })
+  })
+  describe('verifyCode', () => {
+    it('creates a code string from received code object', () => {
+      expect(
+        actions.verifyCode({
+          code1: '1',
+          code2: '2',
+          code3: '3',
+          code4: '4',
+          code5: '5',
+          code6: '6'
+        })
+      ).toEqual({
+        type: actions.VERIFY_CODE,
+        payload: {
+          code: '123456'
+        }
+      })
+    })
+  })
+})
+
+describe('reducer', () => {
   let store: AppStore
   beforeEach(() => {
     store = createStore()
@@ -25,7 +64,7 @@ describe('loginReducer tests', () => {
   it('updates the state with data ready to send to authorise service', async () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: true,
+      submitting: true,
       submissionError: false,
       resentSMS: false,
       stepOneDetails: {
@@ -35,7 +74,7 @@ describe('loginReducer tests', () => {
     }
 
     const action = {
-      type: actions.START_STEP_ONE,
+      type: actions.AUTHENTICATE,
       payload: {
         mobile: '+447111111111',
         password: 'test'
@@ -47,15 +86,15 @@ describe('loginReducer tests', () => {
   it('updates the state when nonce is returned from the authorise service', () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: false,
+      submitting: false,
       submissionError: false,
       resentSMS: false,
-      stepTwoDetails: {
+      authenticationDetails: {
         nonce: '1234'
       }
     }
     const action = {
-      type: actions.STEP_ONE_SUCCESS,
+      type: actions.AUTHENTICATION_COMPLETED,
       payload: {
         nonce: '1234'
       }
@@ -67,7 +106,7 @@ describe('loginReducer tests', () => {
   it('updates the state when resend SMS is requested', () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: false,
+      submitting: false,
       submissionError: false,
       resentSMS: false
     }
@@ -80,15 +119,15 @@ describe('loginReducer tests', () => {
   it('updates the state when nonce is returned from the resendSMS service', () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: false,
+      submitting: false,
       submissionError: false,
       resentSMS: true,
-      stepTwoDetails: {
+      authenticationDetails: {
         nonce: '1234'
       }
     }
     const action = {
-      type: actions.RESEND_SMS_SUCCESS,
+      type: actions.RESEND_SMS_COMPLETED,
       payload: {
         nonce: '1234'
       }
@@ -99,18 +138,33 @@ describe('loginReducer tests', () => {
   it('updates the state with data ready to send to verify sms code service', async () => {
     const expectedState = {
       ...initialState,
-      stepSubmitting: true,
+      submitting: true,
       submissionError: false,
       resentSMS: false
     }
 
     const action = {
-      type: actions.START_STEP_TWO,
+      type: actions.VERIFY_CODE,
       payload: {
         code: '123456'
       }
     }
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
+  })
+})
+
+describe('selectors', () => {
+  it('returns submission error boolean', () => {
+    const submissionError = false
+    expect(getSubmissionError(mockState)).toEqual(submissionError)
+  })
+  it('returns resentSMS boolean', () => {
+    const resentSMS = false
+    expect(getResentSMS(mockState)).toEqual(resentSMS)
+  })
+  it('returns submitting boolean', () => {
+    const submitting = false
+    expect(getsubmitting(mockState)).toEqual(submitting)
   })
 })

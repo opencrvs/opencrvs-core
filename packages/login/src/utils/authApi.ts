@@ -1,8 +1,16 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { config } from '../config'
 import { resolve } from 'url'
-import { IStepOneData } from '../login/StepOneForm'
-import { IStepTwoData } from '../login/StepTwoForm'
+
+export interface ICodeVerifyData {
+  nonce: string
+  code: string
+}
+
+export interface IAuthenticationData {
+  mobile: string
+  password: string
+}
 
 export const client = axios.create({
   baseURL: config.AUTH_API_URL
@@ -40,7 +48,9 @@ const request = (options: AxiosRequestConfig) => {
     .catch(onError)
 }
 
-const submitStepOne = (data: IStepOneData): Promise<IAuthenticateResponse> => {
+const authenticate = (
+  data: IAuthenticationData
+): Promise<IAuthenticateResponse> => {
   return request({
     url: resolve(config.AUTH_API_URL, 'authenticate'),
     method: 'POST',
@@ -56,7 +66,7 @@ const resendSMS = (nonce: string) => {
   })
 }
 
-const submitStepTwo = (data: IStepTwoData): Promise<ITokenResponse> => {
+const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
     url: resolve(config.AUTH_API_URL, 'verifyCode'),
     method: 'POST',
@@ -66,7 +76,7 @@ const submitStepTwo = (data: IStepTwoData): Promise<ITokenResponse> => {
 
 export const authApi = {
   request,
-  submitStepOne,
-  submitStepTwo,
+  authenticate,
+  verifyCode,
   resendSMS
 }

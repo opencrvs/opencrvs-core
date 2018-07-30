@@ -1,4 +1,4 @@
-import { LoginState } from './loginReducer'
+import { LoginState } from './reducer'
 import { IStoreState } from '../store'
 import { FormStateMap } from 'redux-form'
 
@@ -20,9 +20,8 @@ export const getSubmissionError = (
 export const getResentSMS = (store: IStoreState): LoginState['resentSMS'] =>
   getKey(store, 'resentSMS')
 
-export const getStepSubmitting = (
-  store: IStoreState
-): LoginState['stepSubmitting'] => getKey(store, 'stepSubmitting')
+export const getsubmitting = (store: IStoreState): LoginState['submitting'] =>
+  getKey(store, 'submitting')
 
 export const getStepTwoFormState = (
   store: IStoreState
