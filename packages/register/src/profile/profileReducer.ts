@@ -19,7 +19,7 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
   switch (action.type) {
     case actions.CHECK_AUTH:
       const validToken = loggedIn(action.payload)
-      if (Boolean(validToken)) {
+      if (validToken) {
         const tokenProfile = getProfile(validToken)
         return {
           ...state,

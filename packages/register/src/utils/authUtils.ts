@@ -24,7 +24,7 @@ export const isTokenStillValid = (token: string, localToken?: boolean) => {
 
 export const getProfile = (token: string): ITokenProfile => decode(token)
 
-export const loggedIn = (urlParams: IURLParams): string => {
+export const loggedIn = (urlParams: IURLParams) => {
   const localToken = checkLocalToken()
   if (Boolean(localToken)) {
     return localToken
@@ -33,32 +33,32 @@ export const loggedIn = (urlParams: IURLParams): string => {
   if (Boolean(urlToken)) {
     return urlToken
   }
-  return ''
+  return null
 }
 
-const checkLocalToken = (): string => {
+const checkLocalToken = () => {
   const localToken = localStorage.getItem('opencrvs')
   if (localToken) {
     if (isTokenStillValid(localToken, true)) {
       return localToken
     } else {
-      return ''
+      return null
     }
   } else {
-    return ''
+    return null
   }
 }
 
-const checkURLToken = (urlParams: IURLParams): string => {
+const checkURLToken = (urlParams: IURLParams) => {
   const urlToken = urlParams.token
   if (urlToken) {
     if (isTokenStillValid(urlToken)) {
       localStorage.setItem('opencrvs', urlToken)
       return urlToken
     } else {
-      return ''
+      return null
     }
   } else {
-    return ''
+    return null
   }
 }

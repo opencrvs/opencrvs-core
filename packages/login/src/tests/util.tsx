@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import * as Adapter from 'enzyme-adapter-react-16'
 import configureStore from 'redux-mock-store'
 import { App } from '../App'
-import { IStoreState } from '../store'
+import { IStoreState, AppStore } from '../store'
 import { initialState as loginState } from '../login/loginReducer'
 import { initialState as intlState } from '../i18n/intlReducer'
 import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
@@ -75,6 +75,23 @@ function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
 export function createTestComponent(node: React.ReactElement<ITestView>) {
   return mount(
     <Provider store={store}>
+      <ThemeProvider theme={getTheme(config.LOCALE)}>
+        {nodeWithIntlProp(node)}
+      </ThemeProvider>
+    </Provider>,
+    {
+      context: { intl },
+      childContextTypes: { intl: intlShape }
+    }
+  )
+}
+
+export function createConnectedTestComponent(
+  node: React.ReactElement<ITestView>,
+  testStore: AppStore
+) {
+  return mount(
+    <Provider store={testStore}>
       <ThemeProvider theme={getTheme(config.LOCALE)}>
         {nodeWithIntlProp(node)}
       </ThemeProvider>
