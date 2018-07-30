@@ -1,20 +1,20 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
 import { push } from 'react-router-redux'
-import * as actions from './loginActions'
+import * as actions from './actions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
 import { config } from '../config'
 
 export type LoginState = {
-  stepSubmitting: boolean
-  stepTwoDetails: { nonce: string }
+  submitting: boolean
+  authenticationDetails: { nonce: string }
   submissionError: boolean
   resentSMS: boolean
 }
 
 export const initialState: LoginState = {
-  stepSubmitting: false,
-  stepTwoDetails: {
+  submitting: false,
+  authenticationDetails: {
     nonce: ''
   },
   submissionError: false,
@@ -26,32 +26,32 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
   action: actions.Action
 ): LoginState | Loop<LoginState, actions.Action> => {
   switch (action.type) {
-    case actions.START_STEP_ONE:
+    case actions.AUTHENTICATE:
       return loop(
         {
           ...state,
-          stepSubmitting: true,
+          submitting: true,
           submissionError: false,
           resentSMS: false,
           stepOneDetails: action.payload
         },
-        Cmd.run(authApi.submitStepOne, {
-          successActionCreator: actions.submitStepOneSuccess,
-          failActionCreator: actions.submitStepOneFailed,
+        Cmd.run(authApi.authenticate, {
+          successActionCreator: actions.completeAuthentication,
+          failActionCreator: actions.failAuthentication,
           args: [action.payload]
         })
       )
-    case actions.STEP_ONE_FAILED:
-      return { ...state, stepSubmitting: false, submissionError: true }
-    case actions.STEP_ONE_SUCCESS:
+    case actions.AUTHENTICATION_FAILED:
+      return { ...state, submitting: false, submissionError: true }
+    case actions.AUTHENTICATION_COMPLETED:
       return loop(
         {
           ...state,
-          stepSubmitting: false,
+          submitting: false,
           submissionError: false,
           resentSMS: false,
-          stepTwoDetails: {
-            ...state.stepTwoDetails,
+          authenticationDetails: {
+            ...state.authenticationDetails,
             nonce: action.payload.nonce
           }
         },
@@ -65,45 +65,45 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           resentSMS: false
         },
         Cmd.run(authApi.resendSMS, {
-          successActionCreator: actions.resendSMSSuccess,
-          failActionCreator: actions.resendSMSFailed,
-          args: [state.stepTwoDetails.nonce]
+          successActionCreator: actions.completeSMSResend,
+          failActionCreator: actions.failSMSResend,
+          args: [state.authenticationDetails.nonce]
         })
       )
     case actions.RESEND_SMS_FAILED:
       return { ...state, resentSMS: false, submissionError: true }
-    case actions.RESEND_SMS_SUCCESS:
+    case actions.RESEND_SMS_COMPLETED:
       return {
         ...state,
         resentSMS: true,
         submissionError: false,
-        stepTwoDetails: {
-          ...state.stepTwoDetails,
+        authenticationDetails: {
+          ...state.authenticationDetails,
           nonce: action.payload.nonce
         }
       }
-    case actions.START_STEP_TWO:
+    case actions.VERIFY_CODE:
       const code = action.payload.code
       return loop(
         {
           ...state,
-          stepSubmitting: true,
+          submitting: true,
           submissionError: false,
           resentSMS: false
         },
-        Cmd.run(authApi.submitStepTwo, {
-          successActionCreator: actions.submitStepTwoSuccess,
-          failActionCreator: actions.submitStepTwoFailed,
-          args: [{ code, nonce: state.stepTwoDetails.nonce }]
+        Cmd.run(authApi.verifyCode, {
+          successActionCreator: actions.completeVerifyCode,
+          failActionCreator: actions.failVerifyCode,
+          args: [{ code, nonce: state.authenticationDetails.nonce }]
         })
       )
-    case actions.STEP_TWO_FAILED:
-      return { ...state, stepSubmitting: false, submissionError: true }
-    case actions.STEP_TWO_SUCCESS:
+    case actions.VERIFY_CODE_FAILED:
+      return { ...state, submitting: false, submissionError: true }
+    case actions.VERIFY_CODE_COMPLETED:
       window.location.href = config.REGISTER_APP_URL
       return {
         ...state,
-        stepSubmitting: false,
+        submitting: false,
         submissionError: false,
         resentSMS: false
       }

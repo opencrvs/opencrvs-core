@@ -5,20 +5,22 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
 import { FlexGrid } from '@opencrvs/components/lib/grid'
 import { Link } from '@opencrvs/components/lib/Link'
-import { getFieldProps, getFocusState } from '../utils/fieldUtils'
+import { getFieldProps, getFocusState } from '../../utils/fieldUtils'
 import { Field } from 'redux-form'
 import { stepTwoFields } from './stepTwoFields'
-import { localizeInput } from '../i18n/localizeInput'
-import { STEP_TWO_FORM } from './constants'
-import { store } from '../App'
+import { localizeInput } from '../../i18n/components/localizeInput'
+
+import { store } from '../../App'
 import {
   StyledBox,
   ErrorText,
   Title,
   FormWrapper,
   ActionWrapper
-} from './StepOneForm'
+} from '../StepOne/StepOneForm'
 import styled from 'styled-components'
+import { IVerifyCodeNumbers } from '@opencrvs/login/src/login/actions'
+import { FORM_NAME } from '@opencrvs/login/src/views/StepTwo/contants'
 
 const messages = defineMessages({
   stepTwoTitle: {
@@ -94,29 +96,15 @@ const ClearFormLink = styled(Link)`
   top: -20px;
 `
 
-export interface IStepTwoSMSData {
-  code1: string
-  code2: string
-  code3: string
-  code4: string
-  code5: string
-  code6: string
-}
-
-export interface IStepTwoData {
-  nonce: string
-  code: string
-}
-
 export interface IProps {
   formId: string
   submissionError: boolean
   resentSMS: boolean
-  stepSubmitting: boolean
+  submitting: boolean
   fieldToFocus?: string
 }
 export interface IDispatchProps {
-  submitAction: (values: IStepTwoSMSData) => void
+  submitAction: (values: IVerifyCodeNumbers) => void
   onResendSMS: () => void
 }
 
@@ -124,11 +112,11 @@ type IStepTwoForm = IProps & IDispatchProps
 
 export class StepTwoForm extends React.Component<
   InjectedIntlProps &
-    InjectedFormProps<IStepTwoSMSData, IStepTwoForm> &
+    InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
     IStepTwoForm
 > {
   clearTheForm(e: React.MouseEvent<HTMLElement>) {
-    store.dispatch(reset(STEP_TWO_FORM))
+    store.dispatch(reset(FORM_NAME))
   }
   render() {
     const {
@@ -137,7 +125,7 @@ export class StepTwoForm extends React.Component<
       formId,
       submitAction,
       submissionError,
-      stepSubmitting,
+      submitting,
       resentSMS,
       fieldToFocus
     } = this.props
@@ -234,7 +222,7 @@ export class StepTwoForm extends React.Component<
             >
               {intl.formatMessage(messages.resend)}
             </SecondaryButton>
-            <Button id="login-mobile-submit" disabled={stepSubmitting}>
+            <Button id="login-mobile-submit" disabled={submitting}>
               {intl.formatMessage(messages.submit)}
             </Button>
           </ActionWrapper>

@@ -1,9 +1,9 @@
-import { StepTwoContainer } from './StepTwoContainer'
 import * as React from 'react'
-import { createTestComponent, wait } from '../tests/util'
 import * as moxios from 'moxios'
-import { client } from '../utils/authApi'
 import { ReactWrapper } from 'enzyme'
+import { StepTwoContainer } from './StepTwoContainer'
+import { createTestComponent, wait } from '../../tests/util'
+import { client } from '../../utils/authApi'
 
 interface ITestProps {
   test: string
