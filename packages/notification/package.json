@@ -57,7 +57,7 @@
     ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "setupFiles": [
-      "./test/setupJest.js"
+      "./test/setupJest.ts"
     ],
     "moduleFileExtensions": [
       "ts",

@@ -2,9 +2,11 @@ import * as Good from 'good'
 import * as HapiSwagger from 'hapi-swagger'
 import * as Inert from 'inert'
 import * as Vision from 'vision'
+import * as JWT from 'hapi-auth-jwt2'
 
 export default function getPlugins() {
   const plugins: any[] = [
+    JWT,
     {
       plugin: Good,
       options: {
