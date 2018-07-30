@@ -4,6 +4,7 @@ import { NOTIFICATION_SERVICE_URL, CONFIG_TOKEN_EXPIRY } from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { logger } from 'src/logger'
+import { createToken } from 'src/features/authenticate/service'
 
 interface ICodeDetails {
   code: string
@@ -48,7 +49,10 @@ export async function sendVerificationCode(
 
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'sms'), {
     method: 'POST',
-    body: JSON.stringify(params)
+    body: JSON.stringify(params),
+    headers: {
+      Authorization: `Bearer ${createToken('auth', 'service')}`
+    }
   })
 
   return undefined
