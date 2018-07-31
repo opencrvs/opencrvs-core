@@ -102,11 +102,12 @@ describe('Route authorization', () => {
       headers: {
         Authorization:
           // Header: { "alg": "HS512", "typ": "JWT" }
-          // Payload: { "sub": "1", "exp": 2479647849169, "role": "admin", "iat": 1516239022 }
+          // Payload: { "sub": "1", "exp": 1532937683, "role": "admin", "iat": 1532937083 }
           // Secret: test/cert.key.pub
-          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI5Mzc2ODMsImV4cCI6MTUzMjkzNzA4Mywic3ViIjoiMSJ9.Ua4FPpLjI_U3DsGHGbC56BfugHDH5xohv9eLB8IZfDukJ-XoMyLryHltYG7tp3a4aLA1gFuMT5naYfvHKr04Mt8M5opLjGeTKWU6qVONw0Y-CMGxeQn8nLD3fNHfZRkvSX8hRfHeTZKKnfzDJ6Gy-g8sIAI3jO4X98oZcSc9tLptczwOkHsm8ZRzFLIpDVSwAVfTnsLC-SEPDg4qqSrw1iUujJvlQYhpPH8lCCj9d7omGssVkXdafB9aMAkvgB27YUhKrsDg7W_ptuPRrWAx1y9DmhlabX1Xl3p-HcIxaRbleYNdeH30Qv80zEFFAJF3lmYegKA3QR-XdRhyKf47jY6YSv9lXsYEEB663F3pkZ7THcn2MuGwlCucQJel16bO83XpVx4AWDMiaLFgJ_r4xl4YYcrt8q0HW1xiFHQmGO-9MkTnrObp0csUamA_zoJuIc061OTK1FDZs1sqImFDcgEYq5DS23g_oscINVKV6O91F3XEVvwkVeXmwIAwzfMWDPNWe3Jmbo9vjbDwM1Pn1uP7zhQASJGPihRc0o2ISYj5YBXqJalCS0bPsOxooyxbplj5SSk6hbECkc-HGk2hQ25onohohzkuJQ3L1jww_e2kNP-6oiezOiYeCufo10mviCyskRyhFcLJhEAnU6CL0LDfOVjNUGrgqWTXDdyiRXY'
+          'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI5Mzc2ODMsImV4cCI6MTUzMjkzNzA4Mywic3ViIjoiMSJ9.0R2nI_vqlClSW_bDbT9pJgGIqvuviTnOU1DHvKYoSyC4CbHrTTm4-ScHhrXwhbJaaA-CD9zM7r0T-9543mdjeA'
       }
     })
+
     expect(res.statusCode).toBe(401)
   })
 })
