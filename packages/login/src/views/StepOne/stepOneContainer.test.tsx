@@ -1,6 +1,6 @@
 import { StepOneContainer } from './StepOneContainer'
 import * as React from 'react'
-import { createConnectedTestComponent, wait } from '../../tests/util'
+import { createConnectedTestComponent } from '../../tests/util'
 import * as moxios from 'moxios'
 import { client } from '../../utils/authApi'
 import { ReactWrapper } from 'enzyme'
@@ -35,19 +35,15 @@ describe('Login app step one', () => {
       expect(component.find('form#STEP_ONE')).toHaveLength(1)
     })
     it('changes the language from english to bengali', async () => {
-      console.log('BEFORE', component.find('p').debug())
       const action = {
         type: actions.CHANGE_LANGUAGE,
         payload: { LANGUAGE: 'bn' }
       }
       store.dispatch(action)
-      await wait()
-      component.update()
-      console.log(store.getState())
-      console.log('AFTER', component.find('p').debug())
-      /* expect(component.find('p')).toEqual(
+
+      expect(component.find('p').text()).toEqual(
         'দয়া করে আপনার মোবাইল নম্বর এবং পাসওয়ার্ড লিখুন'
-      )*/
+      )
     })
   })
 })
