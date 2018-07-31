@@ -10,7 +10,8 @@
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "generate-test-token": "sh -c 'NODE_PATH=. CONFIG_TOKEN_EXPIRY=$2 ts-node resources/generate-test-token $0 $1 $2'"
   },
   "dependencies": {
     "@types/dotenv": "^4.0.3",
