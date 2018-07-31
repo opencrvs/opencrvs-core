@@ -12,7 +12,7 @@
       "yarn dev:secrets:gen && concurrently \"yarn run start\" \"yarn run compose\"",
     "dev:secrets:gen":
       "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
-    "test": "lerna run test --stream --concurrency 1 -- --watchAll=false",
+    "test": "lerna run test --stream --concurrency=1 --watchAll=false",
     "compose": "yarn run compose:build && yarn run compose:up",
     "compose:up":
       "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.dev.yml up",
