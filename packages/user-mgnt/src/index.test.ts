@@ -60,12 +60,11 @@ describe('Route authorization', () => {
       method: 'GET',
       url: '/check-token',
       headers: {
-        // Generated with "auth" project's test cert
+        // Generated with "auth" project's generator command
         Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI2OTM1MjEsImV4cCI6MjQ3OTQwMTkwMSwic3ViIjoiMSJ9.G4WYYnPZSnhMcnwsvODxlqSvYwBgVxvSRef94iVN8SDsHEfmJ0px3Gs-ezgZrgpNESMvLsdsWXGSFsAjqBielGRy7Cay-k7NTq-sFgDakrQq_6fTqAxEVnduaOjJr8BGciWh6raciw-IHLgB7evB314aiL-fr_P_Z76HhRRGLX11QSLYp2NHNO2uk-Quhq5OvMltZl35YUrmqyC_NCxds25YqM-zm2taRvohzvZ6ivTLPhBVxcNb00X93P3Sy3jyCqz2OmexsoGb9J-yFF6W5k5HGydYVGsiYSiGjwVMgi6upSwS3c_EHQtxN7P80axhUBttcqO0MF6q3D24Y3chbB0eyHbX4vJ0tbo37U80FRAi2FKgx3_RRmjhTkLa4h_RWovAaInNvyhDlG9yIJ6TaVXs08j2gUtlLmaAvWjf1-Fa5dGJ5jE272BXADg_EGfdYoF07eZsy_vxDw0KJKcyxVrJCKm8co0To1Nbf-mvIA00PzFgFJfTW0PamlsPMO6Lt1IE6UXnla-pz4k-Sg9vgcXyECqwN4PQPCjGIxknZ8_1UhcEyzM16gQz3G2HH6ybKzzAVBdGX0t3tttaBwegDBmx-LKBIlsVtDXm6CeOrB9TL20bUpod_M2Mk0KGOkf2479YF-kqx7TBz97QNsE38_7YS3JUBnUQKkl583vDO0Q'
+          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMwNDA1MzIsImV4cCI6MTU0MzA0MDUzMSwiYXVkIjpbInVzZXItbWFuYWdlbWVudCJdLCJzdWIiOiIxIn0.cXtDg_Y3St9dFds9m0ydId59aVIr5WS9ZzSuw9iB8xxRXsFpSoTVBj14umjmHDa8JA92WY6LqlVb9xwR4Nxef3SEW0Lo4MTCccDNy6ev3WI9JVNLiG2O-BE5HdU9dR1iArQutnN4kHAtf1VjGQKnS6sL73KAycQxlLRUXduq40CelmcUlPoo6C3CgcQZQxgvA420vyP2a8Ci0sMZfqmZeTtDIov_hkjmlkqfhgtuyfpKFO7uriNpubajYHPuk2JkqTEOBvtLV01YzfJ_fe8jMNW1WJUpO1rZhiBVPREsPaVtmm8Jv4cp7VPyo3uxcSNRhCsLlvglWGVqr-6q5L3K5k8LON_nYZC2pntv0_Fd-VsSyfbLfZAbOdpaExG9T149pW7rMylseVLmFDpsmDHKCc7ysOU-Kvt_gkLgAK_Qfp7UtcsiivLe-wpxcKvMFdZe5uICqIQHESMw7rxzVl60z7_SCAv1gd-4ZqWyqO-piYKGipU70mFuHgwQIGv4im1MiuMe158NNB-KZavEMg1kFDluzW9VhVS3Zex6OKRWCXz0vrCySseOqty6omz0LkiF52umhWZk61sL2TNjUF6-sgRoGo7vpFph5khGWAhSNls3F_a2vxM-HqbAkJAVNKTWkjkGaKrnHN7XGTQG72QWNNxQFM8tLdS4-DwL6CgP6ik'
       }
     })
-
     expect(res.statusCode).toBe(200)
   })
 
@@ -76,7 +75,7 @@ describe('Route authorization', () => {
       url: '/check-token',
       headers: {
         Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI2OTM1MjEsImV4cCI6MjQ3OTQwMTkwMSwic3ViIjoiMSJ9.G4WYYnPZSnhMcnwsvODxlqSvYwBgVxvSRef94iVN8SDsHEfmJ0px3Gs-ezgZrgpNESMvLsdsWXGSFsAjqBielGRy7Cay-k7NTq-sFgDakrQq_6fTqAxEVnduaOjJr8BGciWh6raciw-IHLgB7evB314aiL-fr_P_Z76HhRRGLX11QSLYp2NHNO2uk-Quhq5OvMltZl35YUrmqyC_NCxds25YqM-zm2taRvohzvZ6ivTLPhBVxcNb00X93P3Sy3jyCqz2OmexsoGb9J-yFF6W5k5HGydYVGsiYSiGjwVMgi6upSwS3c_EHQtxN7P80axhUBttcqO0MF6q3D24Y3chbB0eyHbX4vJ0tbo37U80FRAi2FKgx3_RRmjhTkLa4h_RWovAaInNvyhDlG9yIJ6TaVXs08j2gUtlLmaAvWjf1-Fa5dGJ5jE272BXADg_EGfdYoF07eZsy_vxDw0KJKcyxVrJCKm8co0To1Nbf-mvIA00PzFgFJfTW0PamlsPMO6Lt1IE6UXnla-pz4k-Sg9vgcXyECqwN4PQPCjGIxknZ8_1UhcEyzM16gQz3G2HH6ybKzzAVBdGX0t3tttaBwegDBmx-LKBIlsVtDXm6CeOrB9TL20bUpod_M2Mk0KGOkf2479YF-kqx7TBz97QNsE38_7YS3JUBnUQKkl583vDO0s'
+          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMwNDA1MzIsImV4cCI6MTU0MzA0MDUzMSwiYXVkIjpbInVzZXItbWFuYWdlbWVudCJdLCJzdWIiOiIxIn0.cXtDg_Y3St9dFds9m0ydId59aVIr5WS9ZzSuw9iB8xxRXsFpSoTVBj14umjmHDa8JA92WY6LqlVb9xwR4Nxef3SEW0Lo4MTCccDNy6ev3WI9JVNLiG2O-BE5HdU9dR1iArQutnN4kHAtf1VjGQKnS6sL73KAycQxlLRUXduq40CelmcUlPoo6C3CgcQZQxgvA420vyP2a8Ci0sMZfqmZeTtDIov_hkjmlkqfhgtuyfpKFO7uriNpubajYHPuk2JkqTEOBvtLV01YzfJ_fe8jMNW1WJUpO1rZhiBVPREsPaVtmm8Jv4cp7VPyo3uxcSNRhCsLlvglWGVqr-6q5L3K5k8LON_nYZC2pntv0_Fd-VsSyfbLfZAbOdpaExG9T149pW7rMylseVLmFDpsmDHKCc7ysOU-Kvt_gkLgAK_Qfp7UtcsiivLe-wpxcKvMFdZe5uICqIQHESMw7rxzVl60z7_SCAv1gd-4ZqWyqO-piYKGipU70mFuHgwQIGv4im1MiuMe158NNB-KZavEMg1kFDluzW9VhVS3Zex6OKRWCXz0vrCySseOqty6omz0LkiF52umhWZk61sL2TNjUF6-sgRoGo7vpFph5khGWAhSNls3F_a2vxM-HqbAkJAVNKTWkjkGaKrnHN7XGTQG72QWNNxQFM8tLdS4-DwL6CgP6id'
       }
     })
     expect(res.statusCode).toBe(401)
@@ -89,7 +88,7 @@ describe('Route authorization', () => {
       url: '/check-token',
       headers: {
         Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI5Mzc2ODMsImV4cCI6MTUzMjkzNzA4Mywic3ViIjoiMSJ9.Ua4FPpLjI_U3DsGHGbC56BfugHDH5xohv9eLB8IZfDukJ-XoMyLryHltYG7tp3a4aLA1gFuMT5naYfvHKr04Mt8M5opLjGeTKWU6qVONw0Y-CMGxeQn8nLD3fNHfZRkvSX8hRfHeTZKKnfzDJ6Gy-g8sIAI3jO4X98oZcSc9tLptczwOkHsm8ZRzFLIpDVSwAVfTnsLC-SEPDg4qqSrw1iUujJvlQYhpPH8lCCj9d7omGssVkXdafB9aMAkvgB27YUhKrsDg7W_ptuPRrWAx1y9DmhlabX1Xl3p-HcIxaRbleYNdeH30Qv80zEFFAJF3lmYegKA3QR-XdRhyKf47jY6YSv9lXsYEEB663F3pkZ7THcn2MuGwlCucQJel16bO83XpVx4AWDMiaLFgJ_r4xl4YYcrt8q0HW1xiFHQmGO-9MkTnrObp0csUamA_zoJuIc061OTK1FDZs1sqImFDcgEYq5DS23g_oscINVKV6O91F3XEVvwkVeXmwIAwzfMWDPNWe3Jmbo9vjbDwM1Pn1uP7zhQASJGPihRc0o2ISYj5YBXqJalCS0bPsOxooyxbplj5SSk6hbECkc-HGk2hQ25onohohzkuJQ3L1jww_e2kNP-6oiezOiYeCufo10mviCyskRyhFcLJhEAnU6CL0LDfOVjNUGrgqWTXDdyiRXY'
+          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMwNDA2MzIsImV4cCI6MTUzMzAzOTYzMiwiYXVkIjpbInVzZXItbWFuYWdlbWVudCJdLCJzdWIiOiIxIn0.Xfhbx7QKcWGuj1VgEwacpAtomRpY-FfPj3pI3vlK4htFWhL4Kh8XoZE2qpsaM2CNPuK1_h3oyJYp8DNz2026KMwFjVrOTf4ii3heUSGmeL8K9LFp7Il28a3slozxit_2Z1rhZGm__LNpryV4pCMVMz2J2nAt42XlBrxMSi4THVsjxkAQNyL0LlGKcC4yEV--KvAM81Bd9S4jmedFDhkPjSsmKvoy6AJu9nLt-2GaLoUgMmYiAdGTBBP6hSLEZWlLovtJMDj1BmeglRlgzdK4_nI-orwBZsbXyTMDvyYqOE6WrWHxCfsG3C00RbLdCTL7CIE5VWaWYIv-MhEiu1j1ALeoETbErD9IrqMhuXbsQsaV6O69HKXZ23WjIYZMwty5tEpKcUlWhUF40z3HbdjCRxbzuQU4SeGJLxZZMS85P_SNZZrD6fqB8sbN8OdWk0V873d5T9MKbyiGgEwmoqrXnPGmak5fjC-BwiH03qKw7Wl8mC26fGPC--SS3-1-FA7sLeVa-vFXZw1r8XU2hQH6k9lxDuOvyyzmem1ip2u3_CFy1yZbz3KBDxSEm9NLrqNilPpN1mYX8KpwWkWrIEJ2A7gYtWqS76ZqLfEluFhx4QcsG3Tbt0a0BWtC-1zhZ77ywXQVgCS3den4OIxU3KFPNIroiI2WyWhYBeUnJNVWC9c'
       }
     })
     expect(res.statusCode).toBe(401)
@@ -104,7 +103,34 @@ describe('Route authorization', () => {
           // Header: { "alg": "HS512", "typ": "JWT" }
           // Payload: { "sub": "1", "exp": 1532937683, "role": "admin", "iat": 1532937083 }
           // Secret: test/cert.key.pub
-          'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI5Mzc2ODMsImV4cCI6MTUzMjkzNzA4Mywic3ViIjoiMSJ9.0R2nI_vqlClSW_bDbT9pJgGIqvuviTnOU1DHvKYoSyC4CbHrTTm4-ScHhrXwhbJaaA-CD9zM7r0T-9543mdjeA'
+          'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMwNDA2ODcsImV4cCI6MTU0MzA0MDY4NiwiYXVkIjpbInVzZXItbWFuYWdlbWVudCJdLCJzdWIiOiIxIn0.YeK0Uv7ePjSvwsJHkQOqiee5iQYV9Gmb-w3o5NXtDkfamy6vROcjr-symJfODkDI_OJanzWXzXUkqvdEPmzMZw'
+      }
+    })
+
+    expect(res.statusCode).toBe(401)
+  })
+  it('blocks requests signed with wrong audience', async () => {
+    const server = await createServer()
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/check-token',
+      headers: {
+        Authorization:
+          /*
+          Header: { "alg": "RS256", "typ": "JWT" }
+          Payload:
+          {
+            "role": "admin",
+            "iat": 1533040746,
+            "exp": 1543040745,
+            "aud": [
+              "hello"
+            ],
+            "sub": "1"
+          }
+           Secret: test/cert.key.pub
+           */
+          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMwNDA3NDYsImV4cCI6MTU0MzA0MDc0NSwiYXVkIjpbImhlbGxvIl0sInN1YiI6IjEifQ.sfpuJyaj9b_i078Cp5zHXvxpT_R9Yn_Iq32zQ22JVTTacbX_DfDfbq7Y8j4XUphaKs7FnubV14SVKEUOG4A7y5jSPoCsGRk1HTfUY7rko45MN1ZRdJVkvUGUMpV3w0WmNflzBeXTGb8B9OTuPeOWpYpFxFtBEFmhnxMaCmxdwtLrVDBVYzrSngXWGhvmLFmFVB-Ac0oM8cP15gNojnMojQhk00emqutHpvYrzXdQo_8jZlNLPcLmSXpTqzghbK5qOACXMKdfHV8wOPMBOdJCccAAOs-3SqxwIJC_uhxnwWHcp1xZ45SdWEssRF-f75HA3NqqBtCMsSA08GaCDj5lW4B0SuE51nklGZcHZiWLoPIkhn-CLFIqmQIOI7hSTJMjmWnIJ4QTTofsupfZ3foF7F9IBCx9nN-JlqW9u5eKR3Cre9Unx4Rhlsj-fbL-u8wZ4NOA5vNSooghcX45JE70ctTEFHv_C6KztzlOIyI74RNVAXHobUM610j2AnJif_5jgGKz9T5ad4NyePf8QP4ZyxKWIi1pDt-3yDYBHA9Ip20SX2tfuFGvu8cgbcuR6WInKu8sK5jVb4J4RRbHoW_Q-dzRTpCE5Wx-5Gt7Iu3BJSJ1JBELxM_Wli4kkKIc1NZ_BS9D1CEn89WTE8HZYZPcbQBEcIvfRNrmn-CY8truAIY'
       }
     })
 

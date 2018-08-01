@@ -14,18 +14,17 @@ export default async function refreshHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { token } = request.payload as IRefreshPayload
+
+  let decoded
+
   try {
-    const decoded = await verifyToken(token)
-    try {
-      const newToken = await refreshToken(decoded)
-      const response = { token: newToken }
-      return response
-    } catch (err) {
-      throw Error(err.message)
-    }
+    decoded = verifyToken(token)
   } catch (err) {
     return unauthorized()
   }
+
+  const newToken = await refreshToken(decoded)
+  return { token: newToken }
 }
 
 export const requestSchema = Joi.object({

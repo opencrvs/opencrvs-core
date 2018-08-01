@@ -1,22 +1,49 @@
-import { createToken } from 'src/features/authenticate/service'
+import * as commandLineArgs from 'command-line-args'
+import * as commandLineUsage from 'command-line-usage'
+import { join } from 'path'
 
-const args = process.argv.slice(2)
+const optionList = [
+  { name: 'userId', type: String, defaultValue: '1' },
+  { name: 'role', type: String, defaultValue: 'admin' },
+  {
+    name: 'expiresIn',
+    type: Number,
+    defaultValue: 9999999,
+    description: 'Delta value from {bold now} in seconds'
+  },
+  {
+    name: 'audience',
+    type: String,
+    multiple: true,
+    defaultValue: ['user-management']
+  },
+  { name: 'help', type: Boolean, description: 'Show this menu' }
+]
 
-if (
-  args.length < 3 ||
-  args.indexOf('help') > -1 ||
-  args.indexOf('--help') > -1
-) {
+const options = commandLineArgs(optionList)
+
+if (options.help) {
+  const usage = commandLineUsage([
+    {
+      header: 'OpenCRVS JWT Token Generator',
+      content: 'Generate JWT tokens for tests'
+    },
+    { header: 'Options', optionList }
+  ])
   // tslint:disable-next-line no-console
-  console.log(`
-    Usage:
-    yarn generate-test-token <user id> <role> <expiry delta from now in seconds>
-  `)
-
+  console.log(usage)
   process.exit(0)
 }
 
-const [userId, role] = args
+process.env.CONFIG_TOKEN_EXPIRY = options.expiresIn
+process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, '../test/cert.key')
+process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, '../test/cert.key.pub')
 
-// tslint:disable-next-line no-console
-createToken(userId, role).then(token => console.log(token))
+// tslint:disable-next-line no-var-requires
+const { createToken } = require('src/features/authenticate/service')
+
+createToken(options.userId, options.role, options.audience).then(
+  (token: string) =>
+    // tslint:disable-next-line no-console
+    console.log(token)
+)

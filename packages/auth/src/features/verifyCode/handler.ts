@@ -4,7 +4,8 @@ import { unauthorized } from 'boom'
 import { checkVerificationCode, deleteUsedVerificationCode } from './service'
 import {
   getStoredUserInformation,
-  createToken
+  createToken,
+  getTokenAudience
 } from 'src/features/authenticate/service'
 
 interface IVerifyPayload {
@@ -27,7 +28,7 @@ export default async function authenticateHandler(
     return unauthorized()
   }
   const { userId, role } = await getStoredUserInformation(nonce)
-  const token = await createToken(userId, role)
+  const token = await createToken(userId, role, getTokenAudience(role))
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
   return response
