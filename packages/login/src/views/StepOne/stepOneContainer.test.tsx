@@ -7,9 +7,6 @@ import { ReactWrapper } from 'enzyme'
 import { createStore, AppStore } from '../../store'
 import * as actions from '../../i18n/actions'
 
-interface ITestProps {
-  test: string
-}
 describe('Login app step one', () => {
   let store: AppStore
   beforeEach(() => {
@@ -18,12 +15,12 @@ describe('Login app step one', () => {
   afterEach(() => {
     moxios.uninstall(client)
   })
-  describe('Step One Container test', () => {
+  describe('Step One Container', () => {
     let component: ReactWrapper
-    let props: ITestProps
+
     beforeEach(() => {
       store = createStore()
-      props = {
+      const props = {
         test: ''
       }
       component = createConnectedTestComponent(
@@ -31,9 +28,10 @@ describe('Login app step one', () => {
         store
       )
     })
-    it('Renders successfully', () => {
+    it('renders successfully', () => {
       expect(component.find('form#STEP_ONE')).toHaveLength(1)
     })
+
     it('changes the language from english to bengali', async () => {
       const action = {
         type: actions.CHANGE_LANGUAGE,
