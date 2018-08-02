@@ -6,6 +6,7 @@ import {
   getStoredUserInformation,
   createToken
 } from 'src/features/authenticate/service'
+import { logger } from 'src/logger'
 
 interface IVerifyPayload {
   nonce: string
@@ -24,6 +25,7 @@ export default async function authenticateHandler(
   try {
     await checkVerificationCode(nonce, code)
   } catch (err) {
+    logger.error(err)
     return unauthorized()
   }
   const { userId, role } = await getStoredUserInformation(nonce)

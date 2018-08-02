@@ -6,7 +6,6 @@ import {
 } from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
-import { logger } from 'src/logger'
 
 interface ICodeDetails {
   code: string
@@ -60,24 +59,19 @@ export async function sendVerificationCode(
 export async function checkVerificationCode(
   nonce: string,
   code: string
-): Promise<boolean> {
-  try {
-    const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
-    if (
-      (Date.now() - codeDetails.createdAt) / 1000 >=
-      CONFIG_SMS_CODE_EXPIRY_SECONDS
-    ) {
-      throw new Error('sms code expired')
-    } else if (code === codeDetails.code) {
-      return true
-    } else {
-      throw new Error('sms code invalid')
-    }
-  } catch (err) {
-    logger.info('err', {
-      err
-    })
+): Promise<void> {
+  const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
+
+  const codeExpired =
+    (Date.now() - codeDetails.createdAt) / 1000 >=
+    CONFIG_SMS_CODE_EXPIRY_SECONDS
+
+  if (code !== codeDetails.code) {
     throw new Error('sms code invalid')
+  }
+
+  if (codeExpired) {
+    throw new Error('sms code expired')
   }
 }
 
