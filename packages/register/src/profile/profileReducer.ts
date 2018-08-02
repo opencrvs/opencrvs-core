@@ -1,15 +1,15 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from './profileActions'
-import { loggedIn, getProfile, ITokenProfile } from '../utils/authUtils'
+import { getTokenPayload, ITokenPayload } from '../utils/authUtils'
 
 export type ProfileState = {
   authenticated: boolean
-  tokenProfile: ITokenProfile | null
+  tokenPayload: ITokenPayload | null
 }
 
 export const initialState: ProfileState = {
   authenticated: false,
-  tokenProfile: null
+  tokenPayload: null
 }
 
 export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
@@ -18,13 +18,12 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
 ): ProfileState | Loop<ProfileState, actions.Action> => {
   switch (action.type) {
     case actions.CHECK_AUTH:
-      const validToken = loggedIn(action.payload)
-      if (validToken) {
-        const tokenProfile = getProfile(validToken)
+      const tokenPayload = getTokenPayload()
+      if (tokenPayload) {
         return {
           ...state,
           authenticated: true,
-          tokenProfile
+          tokenPayload
         }
       } else {
         return {

@@ -1,64 +1,46 @@
+import * as queryString from 'query-string'
 import * as decode from 'jwt-decode'
 
 export interface IURLParams {
   [key: string]: string
 }
-export interface ITokenProfile {
+export interface ITokenPayload {
   subject: string
   exp: string
   algorithm: string
   role: string
 }
 
-export const isTokenStillValid = (token: string, localToken?: boolean) => {
-  const decoded: ITokenProfile = getProfile(token)
-  if (Number(decoded.exp) * 1000 > Date.now()) {
-    return true
-  } else {
-    if (localToken) {
-      localStorage.removeItem('opencrvs')
-    }
-    return false
-  }
+const isTokenStillValid = (decoded: ITokenPayload) => {
+  return Number(decoded.exp) * 1000 > Date.now()
 }
 
-export const getProfile = (token: string): ITokenProfile => decode(token)
-
-export const loggedIn = (urlParams: IURLParams) => {
-  const localToken = checkLocalToken()
-  if (Boolean(localToken)) {
-    return localToken
-  }
-  const urlToken = checkURLToken(urlParams)
-  if (Boolean(urlToken)) {
-    return urlToken
-  }
-  return null
+function getToken() {
+  return (
+    localStorage.getItem('opencrvs') ||
+    queryString.parse(window.location.search).token
+  )
 }
 
-const checkLocalToken = () => {
-  const localToken = localStorage.getItem('opencrvs')
-  if (localToken) {
-    if (isTokenStillValid(localToken, true)) {
-      return localToken
-    } else {
-      return null
-    }
-  } else {
+export const getTokenPayload = () => {
+  const token = getToken()
+
+  if (!token) {
     return null
   }
-}
-
-const checkURLToken = (urlParams: IURLParams) => {
-  const urlToken = urlParams.token
-  if (urlToken) {
-    if (isTokenStillValid(urlToken)) {
-      localStorage.setItem('opencrvs', urlToken)
-      return urlToken
-    } else {
-      return null
-    }
-  } else {
+  let decoded: ITokenPayload
+  try {
+    decoded = decode(token)
+  } catch (err) {
     return null
   }
+
+  if (isTokenStillValid(decoded)) {
+    localStorage.setItem('opencrvs', token)
+  } else {
+    localStorage.removeItem('opencrvs')
+    return null
+  }
+
+  return decoded
 }

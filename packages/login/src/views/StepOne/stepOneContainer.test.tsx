@@ -1,9 +1,9 @@
-import { StepOneContainer } from './StepOneContainer'
 import * as React from 'react'
-import { createConnectedTestComponent } from '../../tests/util'
 import * as moxios from 'moxios'
-import { client } from '../../utils/authApi'
 import { ReactWrapper } from 'enzyme'
+import { StepOneContainer } from './StepOneContainer'
+import { createConnectedTestComponent } from '../../tests/util'
+import { client } from '../../utils/authApi'
 import { createStore, AppStore } from '../../store'
 import * as actions from '../../i18n/actions'
 
