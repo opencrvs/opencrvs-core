@@ -27,7 +27,7 @@ export async function createServer() {
 
   server.auth.strategy('jwt', 'jwt', {
     key: publicCert,
-    verifyOptions: { algorithms: ['RS256'] },
+    verifyOptions: { algorithms: ['RS256'], audience: 'gateway' },
     validate: (payload: any, request: any) => ({
       isValid: true,
       credentials: payload

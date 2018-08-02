@@ -15,7 +15,7 @@ const optionList = [
     name: 'audience',
     type: String,
     multiple: true,
-    defaultValue: ['user-management']
+    defaultValue: ['user-management', 'gateway']
   },
   { name: 'help', type: Boolean, description: 'Show this menu' }
 ]

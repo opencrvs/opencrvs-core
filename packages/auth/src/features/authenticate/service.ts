@@ -78,7 +78,7 @@ export async function createToken(
 }
 
 export function getTokenAudience(role: string) {
-  return ['user-management']
+  return ['user-management', 'gateway']
 }
 
 export async function storeUserInformation(

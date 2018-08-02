@@ -28,9 +28,9 @@ describe('Route authorization', () => {
       method: 'GET',
       url: '/ping',
       headers: {
-        // Generated with "auth" project's test cert
+        // Generated with "auth" project's generate-test-token command
         Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI2OTM1MjEsImV4cCI6MjQ3OTQwMTkwMSwic3ViIjoiMSJ9.G4WYYnPZSnhMcnwsvODxlqSvYwBgVxvSRef94iVN8SDsHEfmJ0px3Gs-ezgZrgpNESMvLsdsWXGSFsAjqBielGRy7Cay-k7NTq-sFgDakrQq_6fTqAxEVnduaOjJr8BGciWh6raciw-IHLgB7evB314aiL-fr_P_Z76HhRRGLX11QSLYp2NHNO2uk-Quhq5OvMltZl35YUrmqyC_NCxds25YqM-zm2taRvohzvZ6ivTLPhBVxcNb00X93P3Sy3jyCqz2OmexsoGb9J-yFF6W5k5HGydYVGsiYSiGjwVMgi6upSwS3c_EHQtxN7P80axhUBttcqO0MF6q3D24Y3chbB0eyHbX4vJ0tbo37U80FRAi2FKgx3_RRmjhTkLa4h_RWovAaInNvyhDlG9yIJ6TaVXs08j2gUtlLmaAvWjf1-Fa5dGJ5jE272BXADg_EGfdYoF07eZsy_vxDw0KJKcyxVrJCKm8co0To1Nbf-mvIA00PzFgFJfTW0PamlsPMO6Lt1IE6UXnla-pz4k-Sg9vgcXyECqwN4PQPCjGIxknZ8_1UhcEyzM16gQz3G2HH6ybKzzAVBdGX0t3tttaBwegDBmx-LKBIlsVtDXm6CeOrB9TL20bUpod_M2Mk0KGOkf2479YF-kqx7TBz97QNsE38_7YS3JUBnUQKkl583vDO0Q'
+          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
       }
     })
 
@@ -44,7 +44,7 @@ describe('Route authorization', () => {
       url: '/ping',
       headers: {
         Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI2OTM1MjEsImV4cCI6MjQ3OTQwMTkwMSwic3ViIjoiMSJ9.G4WYYnPZSnhMcnwsvODxlqSvYwBgVxvSRef94iVN8SDsHEfmJ0px3Gs-ezgZrgpNESMvLsdsWXGSFsAjqBielGRy7Cay-k7NTq-sFgDakrQq_6fTqAxEVnduaOjJr8BGciWh6raciw-IHLgB7evB314aiL-fr_P_Z76HhRRGLX11QSLYp2NHNO2uk-Quhq5OvMltZl35YUrmqyC_NCxds25YqM-zm2taRvohzvZ6ivTLPhBVxcNb00X93P3Sy3jyCqz2OmexsoGb9J-yFF6W5k5HGydYVGsiYSiGjwVMgi6upSwS3c_EHQtxN7P80axhUBttcqO0MF6q3D24Y3chbB0eyHbX4vJ0tbo37U80FRAi2FKgx3_RRmjhTkLa4h_RWovAaInNvyhDlG9yIJ6TaVXs08j2gUtlLmaAvWjf1-Fa5dGJ5jE272BXADg_EGfdYoF07eZsy_vxDw0KJKcyxVrJCKm8co0To1Nbf-mvIA00PzFgFJfTW0PamlsPMO6Lt1IE6UXnla-pz4k-Sg9vgcXyECqwN4PQPCjGIxknZ8_1UhcEyzM16gQz3G2HH6ybKzzAVBdGX0t3tttaBwegDBmx-LKBIlsVtDXm6CeOrB9TL20bUpod_M2Mk0KGOkf2479YF-kqx7TBz97QNsE38_7YS3JUBnUQKkl583vDO0s'
+          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjd'
       }
     })
     expect(res.statusCode).toBe(401)
@@ -57,7 +57,7 @@ describe('Route authorization', () => {
       url: '/ping',
       headers: {
         Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI5Mzc2ODMsImV4cCI6MTUzMjkzNzA4Mywic3ViIjoiMSJ9.Ua4FPpLjI_U3DsGHGbC56BfugHDH5xohv9eLB8IZfDukJ-XoMyLryHltYG7tp3a4aLA1gFuMT5naYfvHKr04Mt8M5opLjGeTKWU6qVONw0Y-CMGxeQn8nLD3fNHfZRkvSX8hRfHeTZKKnfzDJ6Gy-g8sIAI3jO4X98oZcSc9tLptczwOkHsm8ZRzFLIpDVSwAVfTnsLC-SEPDg4qqSrw1iUujJvlQYhpPH8lCCj9d7omGssVkXdafB9aMAkvgB27YUhKrsDg7W_ptuPRrWAx1y9DmhlabX1Xl3p-HcIxaRbleYNdeH30Qv80zEFFAJF3lmYegKA3QR-XdRhyKf47jY6YSv9lXsYEEB663F3pkZ7THcn2MuGwlCucQJel16bO83XpVx4AWDMiaLFgJ_r4xl4YYcrt8q0HW1xiFHQmGO-9MkTnrObp0csUamA_zoJuIc061OTK1FDZs1sqImFDcgEYq5DS23g_oscINVKV6O91F3XEVvwkVeXmwIAwzfMWDPNWe3Jmbo9vjbDwM1Pn1uP7zhQASJGPihRc0o2ISYj5YBXqJalCS0bPsOxooyxbplj5SSk6hbECkc-HGk2hQ25onohohzkuJQ3L1jww_e2kNP-6oiezOiYeCufo10mviCyskRyhFcLJhEAnU6CL0LDfOVjNUGrgqWTXDdyiRXY'
+          'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUzMTYsImV4cCI6MTUzMzE5NTIxNiwiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.sibbska3KxUIR4Tm6X3wBcRj8YwvJM_hxNe7BwC0Wqn--0jiIuS8Eehsvpfani1jNbyjkO9lJhXmYpysfqje_XvE-XsAaED9EhuNMmjrsCxjy-H4aviufnH5Ek0pWjApG9Ku5IywyMugnNYFMm0rcZYLhbupoYA7iuHvSUsZvkG82FzMVTT-PBZUYAd5pmxBLFEDGfjr0XCL_CzX_jmAGLypyiIdMkvS5XxmN7V_PG0shVu2BLIBc2YcinGQHDltpPbJwsTTe3BUG1XEpK9TfBtuVJDabK-YjhIfOloI6rWBNpdbcAxoQ3IC04Jwhh09wbbD731y0xw7tRh-hXaCzChBCCqk2LJFiCnlxu0an_2oturbAmKOGxShplr_zvZrGkqw4r7QoPX3OEvtYLa4RJhozc1mhnmZ_PmW14FZv-v-pDhML7XQ3nffng0REE8GjWNSAMOAn4Ig5DKA0fJKxXv5BqmOLILGmRsdv28WLv1b3jXFtkNp3gNT4EYPQrqGncC93tdpAtjaohcBfKr_ZO-U8BlpF7XkWXbFWZyMwni0AIR4sjs5eOX1K7AGK3ig5y3xWdBnzHCYUvtrDqg0GMEAjhYCKoU6vc21I1ihJwYrLSRUDuUe_iTzaowrsEYknNIhrIWqMDPC3tI-2PVkXZqk7driKyB74jmQIvceTRg'
       }
     })
     expect(res.statusCode).toBe(401)
@@ -70,9 +70,9 @@ describe('Route authorization', () => {
       headers: {
         Authorization:
           // Header: { "alg": "HS512", "typ": "JWT" }
-          // Payload: { "sub": "1", "exp": 1532937683, "role": "admin", "iat": 1532937083 }
+          // Payload: {"role":"admin","iat":1533195372,"exp":1543195371,"aud":["gateway"],"sub":"1"}
           // Secret: test/cert.key.pub
-          'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzI5Mzc2ODMsImV4cCI6MTUzMjkzNzA4Mywic3ViIjoiMSJ9.0R2nI_vqlClSW_bDbT9pJgGIqvuviTnOU1DHvKYoSyC4CbHrTTm4-ScHhrXwhbJaaA-CD9zM7r0T-9543mdjeA'
+          'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUzNzIsImV4cCI6MTU0MzE5NTM3MSwiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.ep--vUK-cCkB6jt5-22ZHO9pk8gWUv3RagYE2jfzV1WFH3s2RN4JUrHrkAmWIzjPwHWZ_De1makYJ5TyNUCcyQ'
       }
     })
     expect(res.statusCode).toBe(401)
