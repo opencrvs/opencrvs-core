@@ -111,7 +111,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           resentSMS: false
         },
         Cmd.run(() => {
-          window.location.href = redirectURL
+          window.location.assign(redirectURL)
         })
       )
 
