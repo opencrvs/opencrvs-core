@@ -43,5 +43,5 @@ export const getFieldProps = (
 }
 
 export const getFocusState = (id: string, fieldToFocus?: string): boolean => {
-  return fieldToFocus === id ? true : false
+  return fieldToFocus === id
 }

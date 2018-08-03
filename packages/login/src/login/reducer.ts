@@ -100,13 +100,20 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.VERIFY_CODE_FAILED:
       return { ...state, submitting: false, submissionError: true }
     case actions.VERIFY_CODE_COMPLETED:
-      window.location.href = config.REGISTER_APP_URL
-      return {
-        ...state,
-        submitting: false,
-        submissionError: false,
-        resentSMS: false
-      }
+      const redirectURL = `${config.REGISTER_APP_URL}?token=${
+        action.payload.token
+      }`
+      return loop(
+        {
+          ...state,
+          stepSubmitting: false,
+          submissionError: false,
+          resentSMS: false
+        },
+        Cmd.run(() => {
+          window.location.assign(redirectURL)
+        })
+      )
 
     default:
       return state

@@ -3,7 +3,7 @@ import {
   USER_MANAGEMENT_URL,
   CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
-  CONFIG_TOKEN_EXPIRY
+  CONFIG_TOKEN_EXPIRY_SECONDS
 } from 'src/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -69,7 +69,7 @@ export async function createToken(
   return sign({ role }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: CONFIG_TOKEN_EXPIRY
+    expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS
   })
 }
 

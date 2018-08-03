@@ -20,6 +20,10 @@ export interface IAuthenticateResponse {
   nonce: string
 }
 
+export interface ITokenResponse {
+  token: string
+}
+
 const request = (options: AxiosRequestConfig) => {
   // tslint:disable-next-line no-any
   const onSuccess = (response: any) => {

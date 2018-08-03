@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { injectIntl } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { reduxForm } from 'redux-form'
 import { StepOneForm, IProps, IDispatchProps } from './StepOneForm'
 import { IStoreState } from '../../store'
@@ -22,9 +22,11 @@ const mapDispatchToProps = {
 
 const stepOneForm = reduxForm({
   form: FORM_NAME
-})(injectIntl(StepOneForm))
+})(StepOneForm)
 
-export const StepOneContainer = connect<IProps, IDispatchProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(stepOneForm)
+export const StepOneContainer = injectIntl(
+  connect<IProps, IDispatchProps, InjectedIntlProps>(
+    mapStateToProps,
+    mapDispatchToProps
+  )(stepOneForm)
+)

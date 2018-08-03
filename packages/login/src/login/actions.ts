@@ -2,7 +2,11 @@ import { AxiosError } from 'axios'
 import { RouterAction } from 'react-router-redux'
 import { convertToMSISDN } from '../utils/dataCleanse'
 import { config } from '../config'
-import { IAuthenticateResponse, IAuthenticationData } from '../utils/authApi'
+import {
+  IAuthenticateResponse,
+  IAuthenticationData,
+  ITokenResponse
+} from '../utils/authApi'
 
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
@@ -21,7 +25,7 @@ export type Action =
   | { type: typeof AUTHENTICATION_COMPLETED; payload: IAuthenticateResponse }
   | { type: typeof AUTHENTICATION_FAILED; payload: Error }
   | { type: typeof VERIFY_CODE; payload: { code: string } }
-  | { type: typeof VERIFY_CODE_COMPLETED; payload: IAuthenticateResponse }
+  | { type: typeof VERIFY_CODE_COMPLETED; payload: ITokenResponse }
   | { type: typeof VERIFY_CODE_FAILED; payload: Error }
   | { type: typeof RESEND_SMS }
   | { type: typeof RESEND_SMS_COMPLETED; payload: IAuthenticateResponse }
@@ -84,9 +88,7 @@ export const verifyCode = (values: IVerifyCodeNumbers): Action => {
   }
 }
 
-export const completeVerifyCode = (
-  response: IAuthenticateResponse
-): Action => ({
+export const completeVerifyCode = (response: ITokenResponse): Action => ({
   type: VERIFY_CODE_COMPLETED,
   payload: response
 })
