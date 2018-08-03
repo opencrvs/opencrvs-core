@@ -2,13 +2,13 @@ import * as React from 'react'
 import * as moxios from 'moxios'
 import { ReactWrapper } from 'enzyme'
 import { StepOneContainer } from './StepOneContainer'
-import { createConnectedTestComponent } from '../../tests/util'
+import { createTestComponent } from '../../tests/util'
 import { client } from '../../utils/authApi'
-import { createStore, AppStore } from '../../store'
+
 import * as actions from '../../i18n/actions'
+import { store } from '../../App'
 
 describe('Login app step one', () => {
-  let store: AppStore
   beforeEach(() => {
     moxios.install(client)
   })
@@ -19,14 +19,10 @@ describe('Login app step one', () => {
     let component: ReactWrapper
 
     beforeEach(() => {
-      store = createStore()
       const props = {
         test: ''
       }
-      component = createConnectedTestComponent(
-        <StepOneContainer {...props} />,
-        store
-      )
+      component = createTestComponent(<StepOneContainer {...props} />)
     })
     it('renders successfully', () => {
       expect(component.find('form#STEP_ONE')).toHaveLength(1)

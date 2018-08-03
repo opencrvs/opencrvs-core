@@ -88,7 +88,24 @@ describe('Login app step two', () => {
     })
     it('should return the field to focus', () => {
       const nextField = 'code2'
-      expect(getFieldToFocus(mockState)).toEqual(nextField)
+      expect(
+        getFieldToFocus({
+          ...mockState,
+          form: {
+            STEP_TWO: {
+              registeredFields: [
+                {
+                  name: '',
+                  type: 'Field'
+                }
+              ],
+              values: {
+                code1: '1'
+              }
+            }
+          }
+        })
+      ).toEqual(nextField)
     })
   })
 })
