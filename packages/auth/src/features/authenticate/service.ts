@@ -24,7 +24,7 @@ export interface IAuthentication {
   nonce: string
   mobile: string
   userId: string
-  role: string
+  roles: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -51,7 +51,7 @@ export async function authenticate(
         return {
           nonce: body.nonce,
           userId: body.id,
-          role: body.role,
+          roles: body.roles,
           mobile
         }
       default:
@@ -64,9 +64,9 @@ export async function authenticate(
 
 export async function createToken(
   userId: string,
-  role: string
+  roles: string[]
 ): Promise<string> {
-  return sign({ role }, cert, {
+  return sign({ roles }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS
@@ -76,12 +76,12 @@ export async function createToken(
 export async function storeUserInformation(
   nonce: string,
   userId: string,
-  role: string,
+  roles: string[],
   mobile: string
 ) {
   return set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, role, mobile })
+    JSON.stringify({ userId, roles, mobile })
   )
 }
 

@@ -28,8 +28,8 @@ export default async function authenticateHandler(
     logger.error(err)
     return unauthorized()
   }
-  const { userId, role } = await getStoredUserInformation(nonce)
-  const token = await createToken(userId, role)
+  const { userId, roles } = await getStoredUserInformation(nonce)
+  const token = await createToken(userId, roles)
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
   return response

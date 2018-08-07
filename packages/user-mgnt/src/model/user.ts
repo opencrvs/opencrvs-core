@@ -5,7 +5,7 @@ interface IUser {
   mobile: string
   passwordHash: string
   salt: string
-  role: string
+  roles: string[]
 }
 export interface IUserModel extends IUser, Document {}
 
@@ -14,7 +14,7 @@ const userSchema = new Schema({
   mobile: String,
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
-  role: { type: String, required: true }
+  roles: { type: [String], required: true }
 })
 
 export default model<IUserModel>('User', userSchema)

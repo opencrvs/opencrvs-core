@@ -12,7 +12,7 @@ const zaUserChw = new User({
   mobile: '+27811111111', // 10 digits long, starts with 08 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'chw'
+  roles: ['chw']
 })
 
 const gbUserChw = new User({
@@ -20,7 +20,7 @@ const gbUserChw = new User({
   mobile: '+447111111111', // 11 digits long, starts with 07 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'chw'
+  roles: ['chw']
 })
 
 const bdUserChw = new User({
@@ -28,7 +28,7 @@ const bdUserChw = new User({
   mobile: '+8801711111111', // 11 digits long, starts with 017 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'chw'
+  roles: ['chw']
 })
 
 const fiUserChw = new User({
@@ -36,7 +36,7 @@ const fiUserChw = new User({
   mobile: '+358411111111', // 10 or 11 digits long, starts with 04x, 0457 or 050 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'chw'
+  roles: ['chw']
 })
 
 const zaUserRegistrar = new User({
@@ -44,7 +44,7 @@ const zaUserRegistrar = new User({
   mobile: '+27822222222', // 10 digits long, starts with 08 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'registrar'
+  roles: ['registrar']
 })
 
 const gbUserRegistrar = new User({
@@ -52,7 +52,7 @@ const gbUserRegistrar = new User({
   mobile: '+447222222222', // 11 digits long, starts with 07 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'registrar'
+  roles: ['registrar']
 })
 
 const bdUserRegistrar = new User({
@@ -60,7 +60,7 @@ const bdUserRegistrar = new User({
   mobile: '+8801722222222', // 11 digits long, starts with 017 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'registrar'
+  roles: ['registrar']
 })
 
 const fiUserRegistrar = new User({
@@ -68,7 +68,7 @@ const fiUserRegistrar = new User({
   mobile: '+358422222222', // 10 or 11 digits long, starts with 04x, 0457 or 050 locally
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'registrar'
+  roles: ['registrar']
 })
 const testUsers = [
   zaUserChw,

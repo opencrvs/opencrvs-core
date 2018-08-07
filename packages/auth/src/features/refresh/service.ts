@@ -1,12 +1,12 @@
 import { createToken } from '../authenticate/service'
 
 export interface IDecodedToken {
-  role: string
+  roles: string[]
   iat: string
   exp: string
   sub: string
 }
 
 export async function refreshToken(payload: IDecodedToken): Promise<string> {
-  return createToken(payload.sub, payload.role)
+  return createToken(payload.sub, payload.roles)
 }
