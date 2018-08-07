@@ -13,7 +13,7 @@
     "@types/joi": "^13.3.0",
     "country-data": "^0.0.31",
     "joi": "^13.4.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.0.1"
   },
   "devDependencies": {
     "@types/jest": "^23.1.1",
