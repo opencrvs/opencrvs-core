@@ -8,15 +8,15 @@ input NotificationInput {
   updatedAt: Date
 }
 
-type Notification {
+type Notification { # -> Composition(type='birth-notification')
   id: ID!
-  child: Person
-  mother: Person
-  father: Person
-  informant: Person
-  location: Location
-  createdAt: Date
-  updatedAt: Date
+  child: Person # -> .section(code='child-details').entry.reference
+  mother: Person # -> .section(code='mother-details').entry.reference
+  father: Person # -> .section(code='father-details').entry.reference
+  informant: Person # -> .section(code='informant-details').entry.reference
+  location: Location # -> .section(code='notification-location').entry.reference
+  createdAt: Date # -> .date($first)
+  updatedAt: Date # -> .date
 }
 
 type Query {
