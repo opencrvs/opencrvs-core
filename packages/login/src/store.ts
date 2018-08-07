@@ -21,8 +21,8 @@ import {
   RouterState
 } from 'react-router-redux'
 import { reducer as formReducer, FormStateMap, FormAction } from 'redux-form'
-import { loginReducer, LoginState } from './login/loginReducer'
-import { intlReducer, IntlState } from './i18n/intlReducer'
+import { loginReducer, LoginState } from './login/reducer'
+import { intlReducer, IntlState } from './i18n/reducer'
 
 export const history = createBrowserHistory()
 const middleware = routerMiddleware(history)

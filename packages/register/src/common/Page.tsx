@@ -1,14 +1,21 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
+import { RouteComponentProps } from 'react-router'
+import * as QueryString from 'query-string'
+import { IURLParams } from '../utils/authUtils'
 
-export interface IPage {
+export interface IProps {
   language?: string
 }
 
-const styledPage = styled(PageWrapper).attrs<IPage>({})
+export interface IDispatchProps {
+  checkAuth: (urlValues: IURLParams) => void
+}
 
-const StyledPage = styledPage`
+type IPage = IProps & IDispatchProps
+
+const StyledPage = styled(PageWrapper).attrs<IPage>({})`
 
   * {
     box-sizing: border-box;
@@ -46,11 +53,24 @@ const StyledPage = styledPage`
       format('woff');
     font-style: normal;
   }
+
+
+  @font-face {
+    font-family: noto_sansregular;
+    src:
+      url('/fonts/notosans-regular-webfont-en.woff')
+      format('woff');
+    font-style: normal;
+  }
 `
 
-export class Page extends React.Component<IPage> {
+export class Page extends React.Component<RouteComponentProps<{}> & IPage> {
+  componentWillMount() {
+    const values = QueryString.parse(this.props.location.search)
+    this.props.checkAuth(values)
+  }
   render() {
-    const { language, children } = this.props
-    return <StyledPage language={language}>{children}</StyledPage>
+    const { children } = this.props
+    return <StyledPage {...this.props}>{children}</StyledPage>
   }
 }

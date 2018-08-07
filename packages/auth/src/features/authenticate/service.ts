@@ -3,13 +3,15 @@ import {
   USER_MANAGEMENT_URL,
   CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
-  CONFIG_TOKEN_EXPIRY
+  CONFIG_TOKEN_EXPIRY_SECONDS
 } from 'src/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { get, set } from 'src/database'
+import * as t from 'io-ts'
+import { identity } from 'fp-ts/lib/function'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -64,13 +66,19 @@ export async function authenticate(
 
 export async function createToken(
   userId: string,
-  role: string
+  role: string,
+  audience: string[]
 ): Promise<string> {
   return sign({ role }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: CONFIG_TOKEN_EXPIRY
+    expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS,
+    audience
   })
+}
+
+export function getTokenAudience(role: string) {
+  return ['user-management']
 }
 
 export async function storeUserInformation(
@@ -93,6 +101,20 @@ export async function getStoredUserInformation(nonce: string) {
   return JSON.parse(record)
 }
 
-export async function verifyToken(token: string): Promise<any> {
-  return jwt.verify(token, publicCert)
+const TokenPayload = t.type({
+  sub: t.string,
+  role: t.string,
+  iat: t.number,
+  exp: t.number,
+  aud: t.array(t.string)
+})
+
+export type ITokenPayload = t.TypeOf<typeof TokenPayload>
+
+export function verifyToken(token: string): ITokenPayload {
+  const decoded = jwt.verify(token, publicCert)
+
+  return TokenPayload.decode(decoded).fold(err => {
+    throw err
+  }, identity)
 }

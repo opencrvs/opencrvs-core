@@ -1,35 +1,19 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { injectIntl } from 'react-intl'
+import { IntlContainer } from './i18n/IntlContainer'
 import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import { store, history } from './store'
-import { Route } from 'react-router'
-import styled, { ThemeProvider } from 'styled-components'
-import { RegistrationList } from './registrations/RegistrationList'
+import { createStore, history } from './store'
+import { Switch } from 'react-router'
+import { ThemeProvider } from 'styled-components'
 import { config } from './config'
-import { Box } from '@opencrvs/components/lib/Box'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { PageContainer } from './common/PageContainer'
-import { IntlContainer } from './i18n/IntlContainer'
-
-const Title = styled.h1`
-  ${({ theme }) => theme.fonts.h1FontStyle};
-`
-
-const Home = injectIntl(({ intl }) => (
-  <Box id="registerDashboard" columns={6}>
-    <RegistrationList />
-  </Box>
-))
-
-const Other = () => (
-  <div className="App">
-    <Title>page 2</Title>
-  </div>
-)
+import { RegistrationFormContainer } from './registrations/RegistrationFormContainer'
+import { ProtectedRoute } from './common/ProtectedRoute'
+import * as routes from './navigation/routes'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -38,6 +22,8 @@ const client = new ApolloClient({
 interface IAppProps {
   client?: ApolloClient<{}>
 }
+
+export const store = createStore()
 
 export class App extends React.Component<IAppProps, {}> {
   public render() {
@@ -48,8 +34,13 @@ export class App extends React.Component<IAppProps, {}> {
             <ThemeProvider theme={getTheme(config.LOCALE)}>
               <ConnectedRouter history={history}>
                 <PageContainer>
-                  <Route exact path="/" component={Home} />
-                  <Route exact path="/other" component={Other} />
+                  <Switch>
+                    <ProtectedRoute
+                      exact
+                      path={routes.HOME}
+                      component={RegistrationFormContainer}
+                    />
+                  </Switch>
                 </PageContainer>
               </ConnectedRouter>
             </ThemeProvider>
