@@ -2,8 +2,8 @@ import * as mongoose from 'mongoose'
 
 import User from '../src/model/user'
 import { generateSaltedHash } from '../src/utils/password'
-
-mongoose.connect('mongodb://localhost/test')
+import { MONGO_URL } from '../src/constants'
+mongoose.connect(MONGO_URL)
 
 const pass = generateSaltedHash('test')
 
