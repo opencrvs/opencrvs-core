@@ -12,16 +12,25 @@ interface ICodeDetails {
   createdAt: number
 }
 
-export async function generateVerificationCode(nonce: string, mobile: string) {
-  // TODO lets come back to how these are generated
-  const code = Math.floor(100000 + Math.random() * 900000).toString()
+type SixDigitVerificationCode = string
 
+export async function storeVerificationCode(nonce: string, code: string) {
   const codeDetails = {
     code,
     createdAt: Date.now()
   }
 
   await set(`verification_${nonce}`, JSON.stringify(codeDetails))
+}
+
+export async function generateVerificationCode(
+  nonce: string,
+  mobile: string
+): Promise<SixDigitVerificationCode> {
+  // TODO lets come back to how these are generated
+  const code = Math.floor(100000 + Math.random() * 900000).toString()
+
+  await storeVerificationCode(nonce, code)
   return code
 }
 
