@@ -34,7 +34,7 @@ export default async function authenticateHandler(
   }
 
   const nonce = generateNonce()
-  await storeUserInformation(nonce, result.userId, result.role, result.mobile)
+  await storeUserInformation(nonce, result.userId, result.roles, result.mobile)
 
   const verificationCode = await generateVerificationCode(nonce, result.mobile)
 

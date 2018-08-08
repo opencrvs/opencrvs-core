@@ -2,107 +2,33 @@ import * as React from 'react'
 import { mount, configure, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import * as Adapter from 'enzyme-adapter-react-16'
-import configureStore from 'redux-mock-store'
-import { App } from '../App'
-import { IStoreState, AppStore } from '../store'
-import { initialState as loginState } from '../login/reducer'
-import { initialState as intlState } from '../i18n/reducer'
-import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import * as en from 'react-intl/locale-data/en'
 import { ThemeProvider } from 'styled-components'
-import { ENGLISH_STATE } from '../i18n/locales/en'
+import { addLocaleData } from 'react-intl'
+
 import { getTheme } from '@opencrvs/components/lib/theme'
+
+import { App, store } from '../App'
+import { IStoreState, createStore } from '../store'
 import { config } from '../config'
-import { store } from '../App'
 import { IntlContainer } from '../i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
 addLocaleData([...en])
 
-export const mockStore = configureStore()
-export const mockState: IStoreState = {
-  login: loginState,
-  router: {
-    location: {
-      pathname: '',
-      search: '',
-      hash: '',
-      state: '',
-      key: ''
-    }
-  },
-  form: {
-    STEP_ONE: {
-      registeredFields: [
-        {
-          name: '',
-          type: 'Field'
-        }
-      ]
-    },
-    STEP_TWO: {
-      registeredFields: [
-        {
-          name: '',
-          type: 'Field'
-        }
-      ],
-      values: {
-        code1: '1'
-      }
-    }
-  },
-  i18n: intlState
-}
+export const mockState: IStoreState = createStore().getState()
 
 export function createTestApp(): ReactWrapper<{}, {}> {
   return mount<App>(<App />)
 }
 
-interface ITestView {
-  intl: ReactIntl.InjectedIntl
-}
-
-const intlProvider = new IntlProvider(
-  { locale: 'en', messages: ENGLISH_STATE.messages },
-  {}
-)
-const { intl } = intlProvider.getChildContext()
-
-function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
-  return React.cloneElement(node, { intl })
-}
-
-export function createTestComponent(node: React.ReactElement<ITestView>) {
+export function createTestComponent(node: React.ReactElement<object>) {
   return mount(
     <Provider store={store}>
-      <ThemeProvider theme={getTheme(config.LOCALE)}>
-        {nodeWithIntlProp(node)}
-      </ThemeProvider>
-    </Provider>,
-    {
-      context: { intl },
-      childContextTypes: { intl: intlShape }
-    }
-  )
-}
-
-export function createConnectedTestComponent(
-  node: React.ReactElement<ITestView>,
-  testStore: AppStore
-) {
-  return mount(
-    <Provider store={testStore}>
       <IntlContainer>
-        <ThemeProvider theme={getTheme(config.LOCALE)}>
-          {nodeWithIntlProp(node)}
-        </ThemeProvider>
+        <ThemeProvider theme={getTheme(config.LOCALE)}>{node}</ThemeProvider>
       </IntlContainer>
-    </Provider>,
-    {
-      context: { intl },
-      childContextTypes: { intl: intlShape }
-    }
+    </Provider>
   )
 }
 

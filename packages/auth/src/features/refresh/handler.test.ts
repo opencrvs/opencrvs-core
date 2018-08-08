@@ -14,7 +14,7 @@ describe('authenticate handler receives a request', () => {
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        role: 'admin',
+        roles: ['admin'],
         mobile: '+345345343'
       })
 
@@ -47,7 +47,7 @@ describe('authenticate handler receives a request', () => {
       expect(refreshResponse.result.token.split('.')).toHaveLength(3)
       const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.role).toBe('admin')
+      expect(body.roles).toEqual(['admin'])
       expect(body.sub).toBe('1')
     })
     it('refreshError returns a 401 to the client if the token is bad', async () => {
@@ -56,7 +56,7 @@ describe('authenticate handler receives a request', () => {
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        role: 'admin',
+        roles: ['admin'],
         mobile: '+345345343'
       })
 
