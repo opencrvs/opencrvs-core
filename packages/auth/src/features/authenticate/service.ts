@@ -21,7 +21,6 @@ const sign = promisify(jwt.sign) as (
 ) => Promise<string>
 
 export interface IAuthentication {
-  nonce: string
   mobile: string
   userId: string
   roles: string[]
@@ -39,26 +38,20 @@ export async function authenticate(
 ): Promise<IAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyPassword')
 
-  let res
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ mobile, password })
-    })
-    switch (res.status) {
-      case 200:
-        const body = await res.json()
-        return {
-          nonce: body.nonce,
-          userId: body.id,
-          roles: body.roles,
-          mobile
-        }
-      default:
-        throw Error(res.statusText)
-    }
-  } catch (err) {
-    throw Error(err.statusText)
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ mobile, password })
+  })
+
+  if (res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const body = await res.json()
+  return {
+    userId: body.id,
+    roles: body.roles,
+    mobile
   }
 }
 
