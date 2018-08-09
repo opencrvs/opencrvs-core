@@ -23,3 +23,10 @@ jobs:
       script: yarn deploy:staging
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
+
+    - stage: run integration tests
+      # if: branch = master AND type = push
+      install: skip
+      script: cd packages/e2e && yarn start
+      env:
+        CYPRESS_REGISTER_URL=http://opencrvs-staging.jembi.org:5040/
