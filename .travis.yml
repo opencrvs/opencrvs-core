@@ -27,6 +27,6 @@ jobs:
     - stage: run integration tests
       # if: branch = master AND type = push
       install: skip
-      script: cd packages/e2e && yarn start
+      script: cd packages/e2e && yarn && yarn start
       env:
         CYPRESS_REGISTER_URL=http://opencrvs-staging.jembi.org:5040/
