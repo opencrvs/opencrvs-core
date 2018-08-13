@@ -15,8 +15,8 @@ export const ArrowWithGradientIcon = (
         y2="49.4679251%"
         id="linearGradient-1"
       >
-        <stop stop-color="#4C68C1" offset="0%" />
-        <stop stop-color="#B0C8F1" offset="100%" />
+        <stop stopColor="#4C68C1" offset="0%" />
+        <stop stopColor="#B0C8F1" offset="100%" />
       </linearGradient>
       <linearGradient
         x1="-20.0881137%"
@@ -25,23 +25,23 @@ export const ArrowWithGradientIcon = (
         y2="-28.9360891%"
         id="linearGradient-2"
       >
-        <stop stop-color="#4C68C1" offset="0%" />
-        <stop stop-color="#B0C8F1" offset="100%" />
+        <stop stopColor="#4C68C1" offset="0%" />
+        <stop stopColor="#B0C8F1" offset="100%" />
       </linearGradient>
     </defs>
     <g
       id="Symbols"
       stroke="none"
-      stroke-width="1"
+      strokeWidth="1"
       fill="none"
-      fill-rule="evenodd"
-      stroke-linecap="round"
+      fillRule="evenodd"
+      strokeLinecap="round"
     >
       <g
         id="Box/One-line"
         transform="translate(-475.000000, -38.000000)"
-        fill-rule="nonzero"
-        stroke-width="4"
+        fillRule="nonzero"
+        strokeWidth="4"
       >
         <g id="Group-2">
           <g id="Group-4" transform="translate(477.000000, 40.000000)">
@@ -55,7 +55,7 @@ export const ArrowWithGradientIcon = (
                 <polyline
                   id="Line-6"
                   stroke="url(#linearGradient-2)"
-                  stroke-linejoin="round"
+                  strokeLinejoin="round"
                   transform="translate(26.000000, 8.000000) rotate(-315.000000) translate(-26.000000, -8.000000) "
                   points="21 3 31 3 31 13"
                 />
