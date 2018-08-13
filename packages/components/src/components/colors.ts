@@ -26,7 +26,7 @@ export const colors: IColors = {
   headerGradientDark: '#42506B',
   headerGradientLight: '#485F88',
   placeholder: '#969696',
-  primary: '#608FCC',
+  primary: '#4C68C1',
   secondary: '#35495D',
   success: '#49B78D',
   warning: '#EEB268',

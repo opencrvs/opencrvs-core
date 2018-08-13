@@ -8,6 +8,11 @@ import { Header } from '@opencrvs/components/lib/Header'
 import { HamburgerIcon } from '@opencrvs/components/lib/icons/Hamburger'
 import { ArrowBackIcon } from '@opencrvs/components/lib/icons/ArrowBack'
 import { ArrowWithGradientIcon } from '@opencrvs/components/lib/icons/ArrowWithGradient'
+import {
+  Button,
+  ButtonIcon,
+  IButtonProps
+} from '@opencrvs/components/lib/buttons/Button'
 export const messages = defineMessages({})
 
 const TopMenu = styled.div`
@@ -16,40 +21,6 @@ const TopMenu = styled.div`
   justify-content: space-between;
   align-items: center;
 `
-
-const ButtonBase = styled.button`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  align-items: center;
-  display: inline-flex;
-  border: 0;
-  justify-content: space-between;
-  cursor: pointer;
-`
-
-const ButtonIcon = styled.div`
-  /* TODO these feel weird..*/
-  display: flex;
-  justify-content: center;
-  /* TODO 1. only apply margin if not only child */
-  margin-left: 2em;
-`
-interface IButtonProps {
-  icon?: () => React.ReactNode
-}
-
-function Button({
-  icon,
-  children,
-  ...otherProps
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & IButtonProps) {
-  return (
-    <ButtonBase {...otherProps}>
-      {children}
-
-      {icon && <ButtonIcon>{icon()}</ButtonIcon>}
-    </ButtonBase>
-  )
-}
 
 const MenuButton = styled(Button)`
   height: 100%;
@@ -65,7 +36,7 @@ const BackButton = styled(Button).attrs<IButtonProps>({})`
   width: 69px;
   height: 42px;
   margin-left: 25px;
-  background: #4c68c1;
+  background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
   /* TODO 1. */
