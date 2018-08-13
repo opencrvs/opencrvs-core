@@ -4,7 +4,8 @@ import styled, { StyledComponentClass } from 'styled-components'
 export const Header = styled.section`
   min-width: 100%;
   color: white;
-  height: 80px;
+  min-height: 80px;
+  overflow: auto;
   background: linear-gradient(
     270deg,
     ${({ theme }) => theme.colors.headerGradientLight} 0%,

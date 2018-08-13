@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { InjectedIntlProps, defineMessages } from 'react-intl'
+import styled from 'styled-components'
 import { InjectedFormProps } from 'redux-form'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Box } from '@opencrvs/components/lib/Box'
-import styled from 'styled-components'
+
 import { registrationFields } from './registrationFields'
 import { getFieldProps } from '../utils/fieldUtils'
 import { Field } from 'redux-form'
@@ -43,16 +43,6 @@ export const messages = defineMessages({
       'The error that appears when the user entered details are invalid'
   }
 })
-
-export const StyledBox = styled(Box)`
-  position: absolute;
-  height: auto;
-  top: 50%;
-  right: 50%;
-  padding: 0px;
-  margin: 0px;
-  transform: translate(50%, -50%);
-`
 
 export const FormWrapper = styled.form`
   position: relative;
@@ -117,8 +107,9 @@ export class RegistrationForm extends React.Component<
       submitAction,
       submissionError
     } = this.props
+
     return (
-      <StyledBox id="registration-form-box" columns={4}>
+      <div>
         <Title>
           <h2>{intl.formatMessage(messages.registrationTitle)}</h2>
           <p>{intl.formatMessage(messages.registrationInstruction)}</p>
@@ -141,7 +132,7 @@ export class RegistrationForm extends React.Component<
             </Button>
           </ActionWrapper>
         </FormWrapper>
-      </StyledBox>
+      </div>
     )
   }
 }
