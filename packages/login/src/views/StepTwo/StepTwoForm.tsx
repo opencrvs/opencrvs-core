@@ -2,7 +2,8 @@ import * as React from 'react'
 import { InjectedIntlProps, defineMessages } from 'react-intl'
 import { InjectedFormProps, reset } from 'redux-form'
 import { InputField } from '@opencrvs/components/lib/InputField'
-import { Button } from '@opencrvs/components/lib/Button'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
+import { SecondaryButton } from '@opencrvs/components/lib/buttons/SecondaryButton'
 import { FlexGrid } from '@opencrvs/components/lib/grid'
 import { Link } from '@opencrvs/components/lib/Link'
 import { getFieldProps, getFocusState } from '../../utils/fieldUtils'
@@ -84,7 +85,7 @@ const Circle = styled.div`
   background-color: ${({ theme }) => theme.colors.disabled};
 `
 
-const SecondaryButton = styled(Button).attrs({ secondary: true })`
+const SecondaryButtonStyled = styled(SecondaryButton)`
   margin-right: 1em;
 `
 
@@ -216,15 +217,15 @@ export class StepTwoForm extends React.Component<
             </ClearFormLink>
           )}
           <ActionWrapper>
-            <SecondaryButton
+            <SecondaryButtonStyled
               onClick={this.props.onResendSMS}
               id="login-mobile-resend"
             >
               {intl.formatMessage(messages.resend)}
-            </SecondaryButton>
-            <Button id="login-mobile-submit" disabled={submitting}>
+            </SecondaryButtonStyled>
+            <PrimaryButton id="login-mobile-submit" disabled={submitting}>
               {intl.formatMessage(messages.submit)}
-            </Button>
+            </PrimaryButton>
           </ActionWrapper>
         </FormWrapper>
       </StyledBox>

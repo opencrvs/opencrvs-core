@@ -25,7 +25,7 @@ const ActionTitle = styled.h3`
 export const ActionList = styled.div`
   z-index: 1;
   position: relative;
-  padding: 0 ${({ theme }: { theme: ITheme }) => theme.grid.margin}px;
+  padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
 
 export interface IActionProps extends IButtonProps {

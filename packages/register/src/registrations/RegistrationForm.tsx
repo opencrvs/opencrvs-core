@@ -3,7 +3,7 @@ import { InjectedIntlProps, defineMessages } from 'react-intl'
 import styled from 'styled-components'
 import { InjectedFormProps } from 'redux-form'
 import { InputField } from '@opencrvs/components/lib/InputField'
-import { Button } from '@opencrvs/components/lib/Button'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 
 import { registrationFields } from './registrationFields'
 import { getFieldProps } from '../utils/fieldUtils'
@@ -127,9 +127,9 @@ export class RegistrationForm extends React.Component<
             />
           </FieldWrapper>
           <ActionWrapper>
-            <Button id="registration-submit" type="submit">
+            <PrimaryButton id="registration-submit" type="submit">
               {intl.formatMessage(messages.submit)}
-            </Button>
+            </PrimaryButton>
           </ActionWrapper>
         </FormWrapper>
       </div>

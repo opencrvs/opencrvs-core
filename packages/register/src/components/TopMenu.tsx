@@ -1,13 +1,11 @@
 import * as React from 'react'
 
 import { defineMessages } from 'react-intl'
-// import { InjectedIntlProps, defineMessages } from 'react-intl'
-// import { InjectedFormProps } from 'redux-form'
 
 import { HamburgerIcon } from '@opencrvs/components/lib/icons/Hamburger'
 import { ArrowBackIcon } from '@opencrvs/components/lib/icons/ArrowBack'
-
-import { Button, ButtonIcon } from '@opencrvs/components/lib/buttons/Button'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
+import { ButtonIcon } from '@opencrvs/components/lib/buttons/Button'
 
 import styled from '../styled-components'
 
@@ -20,7 +18,7 @@ const TopMenuContainer = styled.div`
   align-items: center;
 `
 
-const MenuButton = styled(Button)`
+const MenuButton = styled(PrimaryButton)`
   height: 100%;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   background: #4c68c1;
@@ -35,7 +33,7 @@ const BackButtonContainer = styled.div`
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
 
-const BackButton = styled(Button)`
+const BackButton = styled(PrimaryButton)`
   width: 69px;
   height: 42px;
   background: ${({ theme }) => theme.colors.primary};
