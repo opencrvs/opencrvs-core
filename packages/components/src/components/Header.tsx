@@ -2,9 +2,11 @@ import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
 
 export const Header = styled.section`
-  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+
   color: white;
-  min-height: 80px;
+
   overflow: auto;
   background: linear-gradient(
     270deg,
