@@ -2,7 +2,7 @@ import * as React from 'react'
 import { InjectedIntlProps, defineMessages } from 'react-intl'
 import { InjectedFormProps } from 'redux-form'
 import { InputField } from '@opencrvs/components/lib/InputField'
-import { Button } from '@opencrvs/components/lib/buttons/Button'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 import { Box } from '@opencrvs/components/lib/Box'
 import { EnglishText } from '@opencrvs/components/lib/EnglishText'
 import styled from 'styled-components'
@@ -148,9 +148,9 @@ export class StepOneForm extends React.Component<
             />
           </FieldWrapper>
           <ActionWrapper>
-            <Button id="login-mobile-submit" type="submit">
+            <PrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
-            </Button>
+            </PrimaryButton>
           </ActionWrapper>
         </FormWrapper>
       </StyledBox>
