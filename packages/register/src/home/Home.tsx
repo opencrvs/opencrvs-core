@@ -2,9 +2,9 @@ import * as React from 'react'
 
 import { defineMessages } from 'react-intl'
 
-import { Header } from '@opencrvs/components/lib/Header'
-import { ArrowWithGradientIcon } from '@opencrvs/components/lib/icons/ArrowWithGradient'
-import { Action, ActionList } from '@opencrvs/components/lib/buttons/ActionList'
+import { Header } from '@opencrvs/components/lib/interface'
+import { ArrowWithGradient } from '@opencrvs/components/lib/icons'
+import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 
 import styled from '../styled-components'
 import { TopMenu } from '../components/TopMenu'
@@ -32,8 +32,8 @@ export class Home extends React.Component {
           />
         </StretchedHeader>
         <ActionListStyled>
-          <Action title="Birth" icon={() => <ArrowWithGradientIcon />} />
-          <Action title="Death" icon={() => <ArrowWithGradientIcon />} />
+          <Action title="Birth" icon={() => <ArrowWithGradient />} />
+          <Action title="Death" icon={() => <ArrowWithGradient />} />
         </ActionListStyled>
       </>
     )

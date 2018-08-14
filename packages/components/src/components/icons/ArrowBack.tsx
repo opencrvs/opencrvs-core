@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const ArrowBackIcon = (props: React.HTMLAttributes<SVGElement>) => (
+export const ArrowBack = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={29} height={14} {...props}>
     <title>Group</title>
     <g

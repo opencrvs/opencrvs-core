@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const HamburgerIcon = (props: React.HTMLAttributes<SVGElement>) => (
+export const Hamburger = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={30} height={25} {...props}>
     <title>Menu/Hamburger</title>
     <g fill="#FFF" fillRule="nonzero">

@@ -1,16 +1,20 @@
+import { Field } from 'redux-form'
 import * as React from 'react'
+import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages } from 'react-intl'
 import { InjectedFormProps, reset } from 'redux-form'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
-import { SecondaryButton } from '@opencrvs/components/lib/buttons/SecondaryButton'
-import { FlexGrid } from '@opencrvs/components/lib/grid'
-import { Link } from '@opencrvs/components/lib/Link'
-import { getFieldProps, getFocusState } from '../../utils/fieldUtils'
-import { Field } from 'redux-form'
-import { stepTwoFields } from './stepTwoFields'
-import { localizeInput } from '../../i18n/components/localizeInput'
 
+import { InputField } from '@opencrvs/components/lib/forms'
+import {
+  SecondaryButton,
+  PrimaryButton
+} from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/typography'
+import { FlexGrid } from '@opencrvs/components/lib/grid'
+
+import { stepTwoFields } from './stepTwoFields'
+import { getFieldProps, getFocusState } from '../../utils/fieldUtils'
+import { localizeInput } from '../../i18n/components/localizeInput'
 import { store } from '../../App'
 import {
   StyledBox,
@@ -19,7 +23,6 @@ import {
   FormWrapper,
   ActionWrapper
 } from '../StepOne/StepOneForm'
-import styled from 'styled-components'
 import { IVerifyCodeNumbers } from '@opencrvs/login/src/login/actions'
 import { FORM_NAME } from '@opencrvs/login/src/views/StepTwo/contants'
 

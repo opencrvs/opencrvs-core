@@ -1,9 +1,7 @@
 import * as React from 'react'
 
 /* TODO one line is missing */
-export const ArrowWithGradientIcon = (
-  props: React.HTMLAttributes<SVGElement>
-) => (
+export const ArrowWithGradient = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={38} height={20} {...props}>
     <title>Arrow Gradient</title>
     <defs>

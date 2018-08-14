@@ -3,7 +3,6 @@ import styled, { StyledFunction } from 'styled-components'
 
 export interface IInputError {
   id: string
-  errorMessage?: string
   centred: boolean
 }
 
@@ -20,10 +19,10 @@ const InputErrorWrapper = styledErrorWrapper`
 
 export class InputError extends React.Component<IInputError> {
   render() {
-    const { id, errorMessage, centred } = this.props
+    const { children, centred, ...props } = this.props
     return (
-      <InputErrorWrapper id={id} centred={centred}>
-        {errorMessage}
+      <InputErrorWrapper centred={centred} {...props}>
+        {children}
       </InputErrorWrapper>
     )
   }

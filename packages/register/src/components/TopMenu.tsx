@@ -1,11 +1,8 @@
 import * as React from 'react'
-
 import { defineMessages } from 'react-intl'
 
-import { HamburgerIcon } from '@opencrvs/components/lib/icons/Hamburger'
-import { ArrowBackIcon } from '@opencrvs/components/lib/icons/ArrowBack'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
-import { ButtonIcon } from '@opencrvs/components/lib/buttons/Button'
+import { Hamburger, ArrowBack } from '@opencrvs/components/lib/icons'
+import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 import styled from '../styled-components'
 
@@ -58,10 +55,10 @@ export class TopMenu extends React.Component {
     return (
       <TopMenuContainer>
         <BackButtonContainer>
-          <BackButton icon={() => <ArrowBackIcon />} />
+          <BackButton icon={() => <ArrowBack />} />
           <BackButtonText>Back</BackButtonText>
         </BackButtonContainer>
-        <MenuButton icon={() => <HamburgerIcon />}>Menu</MenuButton>
+        <MenuButton icon={() => <Hamburger />}>Menu</MenuButton>
       </TopMenuContainer>
     )
   }
