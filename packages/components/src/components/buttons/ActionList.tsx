@@ -13,6 +13,9 @@ const ActionContainer = styled(Button)`
   text-align: left;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 10px;
+  &:last-child {
+    margin-bottom: 0;
+  }
 `
 
 const ActionTitle = styled.h3`
