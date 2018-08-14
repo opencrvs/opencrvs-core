@@ -1,69 +1,45 @@
 import * as React from 'react'
 
-/* TODO run through https://svgr.now.sh/ */
+/* TODO one line is missing */
 export const ArrowWithGradientIcon = (
   props: React.HTMLAttributes<SVGElement>
 ) => (
   <svg width={38} height={20} {...props}>
     <title>Arrow Gradient</title>
-
     <defs>
       <linearGradient
-        x1="96.4677685%"
-        y1="49.4679251%"
-        x2="3.53223148%"
-        y2="49.4679251%"
-        id="linearGradient-1"
+        x1="96.468%"
+        y1="49.468%"
+        x2="3.532%"
+        y2="49.468%"
+        id="arrowWithGradientA"
       >
         <stop stopColor="#4C68C1" offset="0%" />
         <stop stopColor="#B0C8F1" offset="100%" />
       </linearGradient>
       <linearGradient
-        x1="-20.0881137%"
-        y1="117.078227%"
-        x2="126.273753%"
-        y2="-28.9360891%"
-        id="linearGradient-2"
+        x1="-20.088%"
+        y1="117.078%"
+        x2="126.274%"
+        y2="-28.936%"
+        id="arrowWithGradientB"
       >
         <stop stopColor="#4C68C1" offset="0%" />
         <stop stopColor="#B0C8F1" offset="100%" />
       </linearGradient>
     </defs>
-    <g
-      id="Symbols"
-      stroke="none"
-      strokeWidth="1"
-      fill="none"
-      fillRule="evenodd"
-      strokeLinecap="round"
-    >
-      <g
-        id="Box/One-line"
-        transform="translate(-475.000000, -38.000000)"
-        fillRule="nonzero"
-        strokeWidth="4"
-      >
-        <g id="Group-2">
-          <g id="Group-4" transform="translate(477.000000, 40.000000)">
-            <g id="Group-5-Copy">
-              <g id="Arrow-Gradient">
-                <path
-                  d="M0,8 L30,8"
-                  id="Line-3"
-                  stroke="url(#linearGradient-1)"
-                />
-                <polyline
-                  id="Line-6"
-                  stroke="url(#linearGradient-2)"
-                  strokeLinejoin="round"
-                  transform="translate(26.000000, 8.000000) rotate(-315.000000) translate(-26.000000, -8.000000) "
-                  points="21 3 31 3 31 13"
-                />
-              </g>
-            </g>
-          </g>
-        </g>
-      </g>
+    <g fillRule="nonzero" strokeWidth={4} fill="none" strokeLinecap="round">
+      <path
+        d="M0 8h30"
+        stroke="url(#arrowWithGradientA)"
+        transform="translate(2 2)"
+      />
+      <path
+        stroke="url(#arrowWithGradientB)"
+        strokeLinejoin="round"
+        transform="rotate(45 24.586 11.414)"
+        d="M21 3h10v10"
+      />
     </g>
   </svg>
 )
