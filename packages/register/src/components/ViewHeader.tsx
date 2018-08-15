@@ -17,10 +17,13 @@ const StretchedHeader = styled(Header)`
 
 export class ViewHeader extends React.Component<IViewHeadingProps> {
   render() {
+    const { title, description, breadcrump, ...otherProps } = this.props
+
     return (
-      <StretchedHeader>
+      <StretchedHeader {...otherProps}>
         <TopMenu />
-        <ViewHeading {...this.props} />
+        <ViewHeading {...{ title, description, breadcrump }} />
+        {this.props.children}
       </StretchedHeader>
     )
   }

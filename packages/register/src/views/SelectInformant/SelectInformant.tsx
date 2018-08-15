@@ -6,10 +6,14 @@ import { ArrowWithGradient } from '@opencrvs/components/lib/icons'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 
 import { ViewHeader } from '../../components/ViewHeader'
+import { goToBirthRegistrationAsParent } from '../../navigation/navigationActions'
+import { connect } from 'react-redux'
 
 export const messages = defineMessages({})
 
-export class SelectInformant extends React.Component {
+export class SelectInformantView extends React.Component<{
+  goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+}> {
   render() {
     return (
       <>
@@ -24,6 +28,7 @@ export class SelectInformant extends React.Component {
             title="Parent"
             description="Required: Details of the child, mother and informant. Optional: Details of the father."
             icon={() => <ArrowWithGradient />}
+            onClick={this.props.goToBirthRegistrationAsParent}
           />
           <Action
             id="select_someone_else_informant"
@@ -42,3 +47,7 @@ export class SelectInformant extends React.Component {
     )
   }
 }
+
+export const SelectInformant = connect(null, { goToBirthRegistrationAsParent })(
+  SelectInformantView
+)

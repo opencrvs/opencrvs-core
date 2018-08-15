@@ -19,6 +19,7 @@ import { Page } from './components/Page'
 
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
+import { BirthParentForm } from './views/BirthParentForm/BirthParentForm'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -49,6 +50,11 @@ export class App extends React.Component<IAppProps, {}> {
                       exact
                       path={routes.SELECT_INFORMANT}
                       component={SelectInformant}
+                    />
+                    <ProtectedRoute
+                      exact
+                      path={routes.BIRTH_PARENT_FORM}
+                      component={BirthParentForm}
                     />
                   </Switch>
                 </Page>

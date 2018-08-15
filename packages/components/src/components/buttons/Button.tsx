@@ -10,6 +10,7 @@ const ButtonBase = styled.button`
   border: 0;
   justify-content: space-between;
   cursor: pointer;
+  background: transparent;
 `
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
