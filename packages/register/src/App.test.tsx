@@ -1,6 +1,9 @@
 import { createTestApp } from './tests/util'
 import { config } from '../src/config'
-import { SELECT_VITAL_EVENT } from '@opencrvs/register/src/navigation/routes'
+import {
+  SELECT_VITAL_EVENT,
+  SELECT_INFORMANT
+} from '@opencrvs/register/src/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 
 const assign = window.location.assign as jest.Mock
@@ -48,6 +51,27 @@ describe('when user has a valid token', () => {
       })
       it('takes user to the informant selection view', () => {
         expect(app.find('#select_parent_informant').hostNodes()).toHaveLength(1)
+      })
+    })
+  })
+  describe('when user is in informant selection view', () => {
+    beforeEach(() => {
+      history.replaceState({}, '', SELECT_INFORMANT)
+    })
+    describe('when selects "Parent"', () => {
+      beforeEach(() => {
+        app
+          .find('#select_parent_informant')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('takes user to the informant selection view', () => {
+        expect(
+          app
+            .find('#view_title')
+            .hostNodes()
+            .text()
+        ).toMatch(/new birth registration/i)
       })
     })
   })

@@ -3,7 +3,7 @@ import styled from '../styled-components'
 
 export interface IViewHeadingProps {
   title: string
-  description: string
+  description?: string
   breadcrump?: string
 }
 
@@ -20,8 +20,10 @@ const Breadcrumb = styled.div`
 `
 
 const ViewTitle = styled.h2`
+  font-size: 32px;
   font-family: ${({ theme }) => theme.fonts.lightFont};
   margin: 0;
+  font-weight: 100;
 `
 
 const ViewDescription = styled.p`
@@ -38,8 +40,8 @@ export function ViewHeading({
   return (
     <ViewHeadingContainer>
       {breadcrump && <Breadcrumb>{breadcrump}</Breadcrumb>}
-      <ViewTitle>{title}</ViewTitle>
-      <ViewDescription>{description}</ViewDescription>
+      <ViewTitle id="view_title">{title}</ViewTitle>
+      {description && <ViewDescription>{description}</ViewDescription>}
     </ViewHeadingContainer>
   )
 }
