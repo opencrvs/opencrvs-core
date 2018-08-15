@@ -42,7 +42,7 @@ export class App extends React.Component<IAppProps, {}> {
                   <Switch>
                     <ProtectedRoute
                       exact
-                      path={routes.HOME}
+                      path={routes.SELECT_VITAL_EVENT}
                       component={SelectVitalEvent}
                     />
                     <ProtectedRoute

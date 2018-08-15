@@ -95,7 +95,8 @@ const mapDispatchToProps = {
   checkAuth: actions.checkAuth
 }
 
-export const Page = connect<IPageProps, IDispatchProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(Component))
+export const Page = withRouter(
+  connect<IPageProps, IDispatchProps>(mapStateToProps, mapDispatchToProps)(
+    Component
+  )
+)
