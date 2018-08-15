@@ -11,7 +11,7 @@ import { ThemeProvider } from 'styled-components'
 import { config } from './config'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { PageContainer } from './common/PageContainer'
-import { RegistrationFormContainer } from './registrations/RegistrationFormContainer'
+import { Home } from './home/Home'
 import { ProtectedRoute } from './common/ProtectedRoute'
 import * as routes from './navigation/routes'
 
@@ -35,11 +35,7 @@ export class App extends React.Component<IAppProps, {}> {
               <ConnectedRouter history={history}>
                 <PageContainer>
                   <Switch>
-                    <ProtectedRoute
-                      exact
-                      path={routes.HOME}
-                      component={RegistrationFormContainer}
-                    />
+                    <ProtectedRoute exact path={routes.HOME} component={Home} />
                   </Switch>
                 </PageContainer>
               </ConnectedRouter>

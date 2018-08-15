@@ -1,15 +1,20 @@
+import { Field } from 'redux-form'
 import * as React from 'react'
+import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages } from 'react-intl'
 import { InjectedFormProps, reset } from 'redux-form'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { Button } from '@opencrvs/components/lib/Button'
-import { FlexGrid } from '@opencrvs/components/lib/grid'
-import { Link } from '@opencrvs/components/lib/Link'
-import { getFieldProps, getFocusState } from '../../utils/fieldUtils'
-import { Field } from 'redux-form'
-import { stepTwoFields } from './stepTwoFields'
-import { localizeInput } from '../../i18n/components/localizeInput'
 
+import { InputField } from '@opencrvs/components/lib/forms'
+import {
+  SecondaryButton,
+  PrimaryButton
+} from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/typography'
+import { FlexGrid } from '@opencrvs/components/lib/grid'
+
+import { stepTwoFields } from './stepTwoFields'
+import { getFieldProps, getFocusState } from '../../utils/fieldUtils'
+import { localizeInput } from '../../i18n/components/localizeInput'
 import { store } from '../../App'
 import {
   StyledBox,
@@ -18,7 +23,6 @@ import {
   FormWrapper,
   ActionWrapper
 } from '../StepOne/StepOneForm'
-import styled from 'styled-components'
 import { IVerifyCodeNumbers } from '@opencrvs/login/src/login/actions'
 import { FORM_NAME } from '@opencrvs/login/src/views/StepTwo/contants'
 
@@ -84,7 +88,7 @@ const Circle = styled.div`
   background-color: ${({ theme }) => theme.colors.disabled};
 `
 
-const SecondaryButton = styled(Button).attrs({ secondary: true })`
+const SecondaryButtonStyled = styled(SecondaryButton)`
   margin-right: 1em;
 `
 
@@ -216,15 +220,15 @@ export class StepTwoForm extends React.Component<
             </ClearFormLink>
           )}
           <ActionWrapper>
-            <SecondaryButton
+            <SecondaryButtonStyled
               onClick={this.props.onResendSMS}
               id="login-mobile-resend"
             >
               {intl.formatMessage(messages.resend)}
-            </SecondaryButton>
-            <Button id="login-mobile-submit" disabled={submitting}>
+            </SecondaryButtonStyled>
+            <PrimaryButton id="login-mobile-submit" disabled={submitting}>
               {intl.formatMessage(messages.submit)}
-            </Button>
+            </PrimaryButton>
           </ActionWrapper>
         </FormWrapper>
       </StyledBox>
