@@ -36,8 +36,6 @@ describe('authenticate handler receives a request', () => {
         }
       })
 
-      console.log(res.result.token)
-
       const refreshResponse = await server.server.inject({
         method: 'POST',
         url: '/refreshToken',
@@ -47,8 +45,7 @@ describe('authenticate handler receives a request', () => {
         }
       })
 
-      console.log(refreshResponse.result)
-
+      expect(refreshResponse.result.token).toBeDefined()
       expect(refreshResponse.result.token.split('.')).toHaveLength(3)
 
       const [, payload] = refreshResponse.result.token.split('.')
