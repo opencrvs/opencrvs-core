@@ -11,9 +11,11 @@ import { ThemeProvider } from 'styled-components'
 import { config } from './config'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { PageContainer } from './common/PageContainer'
-import { Home } from './home/Home'
 import { ProtectedRoute } from './common/ProtectedRoute'
 import * as routes from './navigation/routes'
+
+import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
+import { SelectInformant } from './views/SelectInformant/SelectInformant'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -35,7 +37,16 @@ export class App extends React.Component<IAppProps, {}> {
               <ConnectedRouter history={history}>
                 <PageContainer>
                   <Switch>
-                    <ProtectedRoute exact path={routes.HOME} component={Home} />
+                    <ProtectedRoute
+                      exact
+                      path={routes.HOME}
+                      component={SelectVitalEvent}
+                    />
+                    <ProtectedRoute
+                      exact
+                      path={routes.SELECT_INFORMANT}
+                      component={SelectInformant}
+                    />
                   </Switch>
                 </PageContainer>
               </ConnectedRouter>
