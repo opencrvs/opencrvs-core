@@ -20,16 +20,19 @@ export class SelectInformant extends React.Component {
         />
         <ActionList>
           <Action
+            id="select_parent_informant"
             title="Parent"
             description="Required: Details of the child, mother and informant. Optional: Details of the father."
             icon={() => <ArrowWithGradient />}
           />
           <Action
+            id="select_someone_else_informant"
             title="Someone else"
             description="Required: Details of the child and informant. Optional: Details of the mother/father."
             icon={() => <ArrowWithGradient />}
           />
           <Action
+            id="select_self_informant"
             title="Self (18+)"
             description="Required: Details of the individual and informant. Optional: Details of the mother/father."
             icon={() => <ArrowWithGradient />}
