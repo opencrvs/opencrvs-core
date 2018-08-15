@@ -23,10 +23,9 @@ const sign = promisify(jwt.sign) as (
 ) => Promise<string>
 
 export interface IAuthentication {
-  nonce: string
   mobile: string
   userId: string
-  role: string
+  roles: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -41,35 +40,29 @@ export async function authenticate(
 ): Promise<IAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyPassword')
 
-  let res
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ mobile, password })
-    })
-    switch (res.status) {
-      case 200:
-        const body = await res.json()
-        return {
-          nonce: body.nonce,
-          userId: body.id,
-          role: body.role,
-          mobile
-        }
-      default:
-        throw Error(res.statusText)
-    }
-  } catch (err) {
-    throw Error(err.statusText)
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ mobile, password })
+  })
+
+  if (res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const body = await res.json()
+  return {
+    userId: body.id,
+    roles: body.roles,
+    mobile
   }
 }
 
 export async function createToken(
   userId: string,
-  role: string,
+  roles: string[],
   audience: string[]
 ): Promise<string> {
-  return sign({ role }, cert, {
+  return sign({ roles }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS,
@@ -77,19 +70,19 @@ export async function createToken(
   })
 }
 
-export function getTokenAudience(role: string) {
+export function getTokenAudience(roles: string[]) {
   return ['user-management']
 }
 
 export async function storeUserInformation(
   nonce: string,
   userId: string,
-  role: string,
+  roles: string[],
   mobile: string
 ) {
   return set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, role, mobile })
+    JSON.stringify({ userId, roles, mobile })
   )
 }
 
@@ -112,7 +105,9 @@ const TokenPayload = t.type({
 export type ITokenPayload = t.TypeOf<typeof TokenPayload>
 
 export function verifyToken(token: string): ITokenPayload {
-  const decoded = jwt.verify(token, publicCert)
+  const decoded = jwt.verify(token, publicCert, {
+    issuer: ''
+  })
 
   return TokenPayload.decode(decoded).fold(err => {
     throw err

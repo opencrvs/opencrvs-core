@@ -1,9 +1,16 @@
-import {
-  createToken,
-  ITokenPayload,
-  getTokenAudience
-} from '../authenticate/service'
+import { createToken, getTokenAudience } from '../authenticate/service'
 
-export async function refreshToken(payload: ITokenPayload): Promise<string> {
-  return createToken(payload.sub, payload.role, getTokenAudience(payload.role))
+export interface IDecodedToken {
+  roles: string[]
+  iat: string
+  exp: string
+  sub: string
+}
+
+export async function refreshToken(payload: IDecodedToken): Promise<string> {
+  return createToken(
+    payload.sub,
+    payload.roles,
+    getTokenAudience(payload.roles)
+  )
 }

@@ -30,7 +30,7 @@ describe('resend handler receives a request', () => {
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
         userId: '1',
-        role: 'admin',
+        roles: ['admin'],
         mobile: '+345345343'
       })
       fetch.mockResponse(JSON.stringify({}))
