@@ -16,6 +16,18 @@ Optional: full backend setup
 5. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
 6. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
 
+### tmuxed development setup
+
+Sometimes it's nice to have the option to restart all running build processes (webpack etc). To get the dependencies and the build processes running in separate sessions you can use
+
+`yarn dev:tmux` - to start build processes and dependencies in different sessions
+`yarn dev:tmux:kill` - to kill the tmux session
+
+You can use **ctrl + b** and arrow keys to navigate between tmux windows.
+
+This will require installation of [tmux](https://github.com/tmux/tmux/wiki) which is `brew install tmux` on OSX and [tmuxinator](https://github.com/tmuxinator/tmuxinator) which is usually `gem install tmuxinator`.
+
+
 ## Docker scripts
 
 There are a number of docker scripts available via `yarn`. `yarn dev` is the easiest command to run to get started (see above) but if you need to manage the docker containers some of these scripts may be useful.
