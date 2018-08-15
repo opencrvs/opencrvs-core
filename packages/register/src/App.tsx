@@ -5,14 +5,17 @@ import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
-import { createStore, history } from './store'
 import { Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
-import { config } from './config'
+
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { PageContainer } from './common/PageContainer'
-import { ProtectedRoute } from './common/ProtectedRoute'
+
+import { createStore, history } from './store'
+import { config } from './config'
+import { ProtectedRoute } from '@opencrvs/register/src/components/ProtectedRoute'
 import * as routes from './navigation/routes'
+
+import { Page } from './components/Page'
 
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
@@ -35,7 +38,7 @@ export class App extends React.Component<IAppProps, {}> {
           <IntlContainer>
             <ThemeProvider theme={getTheme(config.LOCALE)}>
               <ConnectedRouter history={history}>
-                <PageContainer>
+                <Page>
                   <Switch>
                     <ProtectedRoute
                       exact
@@ -48,7 +51,7 @@ export class App extends React.Component<IAppProps, {}> {
                       component={SelectInformant}
                     />
                   </Switch>
-                </PageContainer>
+                </Page>
               </ConnectedRouter>
             </ThemeProvider>
           </IntlContainer>
