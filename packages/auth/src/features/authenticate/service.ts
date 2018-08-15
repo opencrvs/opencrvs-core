@@ -109,7 +109,6 @@ export function verifyToken(token: string): ITokenPayload {
   })
   const result = TokenPayload.decode(decoded)
   ThrowReporter.report(result)
-  // @ts-ignore
   const decodedToken: ITokenPayload = result.value
   return decodedToken
 }
