@@ -20,6 +20,8 @@ export interface IDispatchProps {
 
 type IPage = IPageProps & IDispatchProps
 
+const languageFromProps = ({ language }: IPageProps) => language
+
 const StyledPage = styled.div.attrs<IPage>({})`
   background: #f4f4f4;
   min-height: 100vh;
@@ -38,8 +40,8 @@ const StyledPage = styled.div.attrs<IPage>({})`
   @font-face {
     font-family: ${({ theme }) => theme.fonts.lightFont};
     src:
-      url('/fonts/notosans-light-webfont-${({ language }) => language}.woff')
-      format('woff');
+      url('/fonts/notosans-extra-light-webfont-${languageFromProps}.ttf')
+      format('truetype');
     font-weight: 300;
     font-style: normal;
   }
@@ -47,25 +49,16 @@ const StyledPage = styled.div.attrs<IPage>({})`
   @font-face {
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
-      url('/fonts/notosans-regular-webfont-${({ language }) => language}.woff')
-      format('woff');
+      url('/fonts/notosans-light-webfont-${languageFromProps}.ttf')
+      format('truetype');
     font-style: normal;
   }
 
   @font-face {
     font-family: ${({ theme }) => theme.fonts.boldFont};
     src:
-      url('/fonts/notosans-bold-webfont-${({ language }) => language}.woff')
-      format('woff');
-    font-style: normal;
-  }
-
-
-  @font-face {
-    font-family: noto_sansregular;
-    src:
-      url('/fonts/notosans-regular-webfont-en.woff')
-      format('woff');
+      url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
+      format('truetype');
     font-style: normal;
   }
 `
