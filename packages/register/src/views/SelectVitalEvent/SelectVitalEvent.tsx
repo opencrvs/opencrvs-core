@@ -2,7 +2,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import { ArrowWithGradient } from '@opencrvs/components/lib/icons'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 
 import { ViewHeader } from '../../components/ViewHeader'
@@ -24,14 +23,9 @@ class SelectVitalEventView extends React.Component<{
           <Action
             id="select_birth_event"
             title="Birth"
-            icon={() => <ArrowWithGradient />}
             onClick={this.props.goToBirthRegistration}
           />
-          <Action
-            id="select_death_event"
-            title="Death"
-            icon={() => <ArrowWithGradient />}
-          />
+          <Action id="select_death_event" title="Death" disabled />
         </ActionList>
       </>
     )

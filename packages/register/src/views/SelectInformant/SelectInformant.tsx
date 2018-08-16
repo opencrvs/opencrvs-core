@@ -2,7 +2,6 @@ import * as React from 'react'
 
 import { defineMessages } from 'react-intl'
 
-import { ArrowWithGradient } from '@opencrvs/components/lib/icons'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 
 import { ViewHeader } from '../../components/ViewHeader'
@@ -27,20 +26,19 @@ export class SelectInformantView extends React.Component<{
             id="select_parent_informant"
             title="Parent"
             description="Required: Details of the child, mother and informant. Optional: Details of the father."
-            icon={() => <ArrowWithGradient />}
             onClick={this.props.goToBirthRegistrationAsParent}
           />
           <Action
             id="select_someone_else_informant"
             title="Someone else"
             description="Required: Details of the child and informant. Optional: Details of the mother/father."
-            icon={() => <ArrowWithGradient />}
+            disabled
           />
           <Action
             id="select_self_informant"
             title="Self (18+)"
             description="Required: Details of the individual and informant. Optional: Details of the mother/father."
-            icon={() => <ArrowWithGradient />}
+            disabled
           />
         </ActionList>
       </>
