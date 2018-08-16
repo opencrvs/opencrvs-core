@@ -27,7 +27,11 @@ export async function createServer() {
 
   server.auth.strategy('jwt', 'jwt', {
     key: publicCert,
-    verifyOptions: { algorithms: ['RS256'], audience: 'user-management' },
+    verifyOptions: {
+      algorithms: ['RS256'],
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:user-mgnt-user'
+    },
     validate: (payload: any, request: any) => ({
       isValid: true,
       credentials: payload

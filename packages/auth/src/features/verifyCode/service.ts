@@ -1,25 +1,36 @@
 import fetch from 'node-fetch'
 import { set, get, del } from 'src/database'
-import { NOTIFICATION_SERVICE_URL, CONFIG_TOKEN_EXPIRY } from 'src/constants'
+import {
+  NOTIFICATION_SERVICE_URL,
+  CONFIG_SMS_CODE_EXPIRY_SECONDS
+} from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
-import { logger } from 'src/logger'
 
 interface ICodeDetails {
   code: string
   createdAt: number
 }
 
-export async function generateVerificationCode(nonce: string, mobile: string) {
-  // TODO lets come back to how these are generated
-  const code = Math.floor(100000 + Math.random() * 900000).toString()
+type SixDigitVerificationCode = string
 
+export async function storeVerificationCode(nonce: string, code: string) {
   const codeDetails = {
     code,
     createdAt: Date.now()
   }
 
   await set(`verification_${nonce}`, JSON.stringify(codeDetails))
+}
+
+export async function generateVerificationCode(
+  nonce: string,
+  mobile: string
+): Promise<SixDigitVerificationCode> {
+  // TODO lets come back to how these are generated
+  const code = Math.floor(100000 + Math.random() * 900000).toString()
+
+  await storeVerificationCode(nonce, code)
   return code
 }
 
@@ -57,21 +68,19 @@ export async function sendVerificationCode(
 export async function checkVerificationCode(
   nonce: string,
   code: string
-): Promise<boolean> {
-  try {
-    const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
-    if ((Date.now() - codeDetails.createdAt) / 1000 >= CONFIG_TOKEN_EXPIRY) {
-      throw new Error('sms code expired')
-    } else if (code === codeDetails.code) {
-      return true
-    } else {
-      throw new Error('sms code invalid')
-    }
-  } catch (err) {
-    logger.info('err', {
-      err
-    })
+): Promise<void> {
+  const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
+
+  const codeExpired =
+    (Date.now() - codeDetails.createdAt) / 1000 >=
+    CONFIG_SMS_CODE_EXPIRY_SECONDS
+
+  if (code !== codeDetails.code) {
     throw new Error('sms code invalid')
+  }
+
+  if (codeExpired) {
+    throw new Error('sms code expired')
   }
 }
 

@@ -58,7 +58,7 @@
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
-    "jest": "^22.4.4",
+    "jest": "^23.4.2",
     "lab": "^15.1.2",
     "lab-transform-typescript": "^3.0.1",
     "nodemon": "^1.11.0",

@@ -12,10 +12,15 @@ const optionList = [
     description: 'Delta value from {bold now} in seconds'
   },
   {
+    name: 'issuer',
+    type: String,
+    defaultValue: 'opencrvs:auth-service'
+  },
+  {
     name: 'audience',
     type: String,
     multiple: true,
-    defaultValue: ['user-management', 'gateway']
+    defaultValue: ['opencrvs:auth-user', 'opencrvs:user-mgnt-user', 'opencrvs:hearth-user', 'opencrvs:gateway-user']
   },
   { name: 'help', type: Boolean, description: 'Show this menu' }
 ]
@@ -42,7 +47,7 @@ process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, '../test/cert.key.pub')
 // tslint:disable-next-line no-var-requires
 const { createToken } = require('src/features/authenticate/service')
 
-createToken(options.userId, options.role, options.audience).then(
+createToken(options.userId, options.role, options.audience, options.issuer).then(
   (token: string) =>
     // tslint:disable-next-line no-console
     console.log(token)

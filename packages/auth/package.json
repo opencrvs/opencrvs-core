@@ -37,7 +37,7 @@
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.1.2",
     "redis": "^2.8.0",
-    "typescript": "^2.9.2",
+    "typescript": "^3.0.1",
     "winston": "^3.0.0"
   },
   "devDependencies": {
@@ -48,7 +48,7 @@
     "cross-env": "^5.2.0",
     "hapi-swagger": "^9.1.1",
     "inert": "^5.1.0",
-    "jest": "^23.1.0",
+    "jest": "^23.4.2",
     "jest-fetch-mock": "^1.6.5",
     "nodemon": "^1.17.5",
     "prettier": "^1.13.5",

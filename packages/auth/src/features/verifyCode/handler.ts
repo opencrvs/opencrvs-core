@@ -4,9 +4,10 @@ import { unauthorized } from 'boom'
 import { checkVerificationCode, deleteUsedVerificationCode } from './service'
 import {
   getStoredUserInformation,
-  createToken,
-  getTokenAudience
+  createToken
 } from 'src/features/authenticate/service'
+import { logger } from 'src/logger'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from 'src/constants'
 
 interface IVerifyPayload {
   nonce: string
@@ -25,10 +26,16 @@ export default async function authenticateHandler(
   try {
     await checkVerificationCode(nonce, code)
   } catch (err) {
+    logger.error(err)
     return unauthorized()
   }
-  const { userId, role } = await getStoredUserInformation(nonce)
-  const token = await createToken(userId, role, getTokenAudience(role))
+  const { userId, roles } = await getStoredUserInformation(nonce)
+  const token = await createToken(
+    userId,
+    roles,
+    WEB_USER_JWT_AUDIENCES,
+    JWT_ISSUER
+  )
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
   return response
