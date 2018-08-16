@@ -29,6 +29,7 @@ export const CONFIG_SMS_CODE_EXPIRY_SECONDS = process.env
 export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:auth-user',
   'opencrvs:user-mgnt-user',
-  'opencrvs:hearth-user'
+  'opencrvs:hearth-user',
+  'opencrvs:gateway-user'
 ]
 export const JWT_ISSUER = 'opencrvs:auth-service'

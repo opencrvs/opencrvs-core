@@ -20,7 +20,7 @@ const optionList = [
     name: 'audience',
     type: String,
     multiple: true,
-    defaultValue: ['opencrvs:auth-user', 'opencrvs:user-mgnt-user', 'opencrvs:hearth-user']
+    defaultValue: ['opencrvs:auth-user', 'opencrvs:user-mgnt-user', 'opencrvs:hearth-user', 'opencrvs:gateway-user']
   },
   { name: 'help', type: Boolean, description: 'Show this menu' }
 ]
