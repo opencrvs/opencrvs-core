@@ -29,7 +29,7 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "PORT=3000 BROWSER=none react-scripts-ts start",
+    "start": "BROWSER=none PORT=3000 react-scripts-ts start",
     "verify-build-config":
       "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
     "build": "yarn verify-build-config && react-scripts-ts build",

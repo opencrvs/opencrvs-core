@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\" \"opener http://localhost:7070/graphiql\"",
+    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\"",
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
