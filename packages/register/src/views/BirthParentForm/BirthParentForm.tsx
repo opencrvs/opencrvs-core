@@ -4,7 +4,7 @@ import { defineMessages } from 'react-intl'
 
 import { Tab, Tabs } from '@opencrvs/components/lib/interface'
 
-import { ViewHeader } from '@opencrvs/register/src/components/ViewHeader'
+import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistration } from '../../navigation/navigationActions'
 import styled from '../../styled-components'
 
