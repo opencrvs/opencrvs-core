@@ -3,7 +3,8 @@
   "workspaces": ["packages/*"],
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --parallel precommit"
+      "pre-commit": "lerna run --parallel precommit",
+      "pre-push": "yarn test"
     }
   },
   "scripts": {
