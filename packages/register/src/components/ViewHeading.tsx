@@ -8,12 +8,12 @@ export interface IViewHeadingProps {
 }
 
 const ViewHeadingContainer = styled.div`
-  padding: ${({ theme }) => theme.grid.margin}px;
+  padding: ${({ theme }) => theme.grid.margin}px 50px;
 `
 
 const Breadcrumb = styled.div`
   font-family: ${({ theme }) => theme.fonts.lightFont};
-  letter-spacing: 2.14;
+  letter-spacing: 2.14px;
   font-size: 15px;
   text-transform: uppercase;
   margin-bottom: 20px;
