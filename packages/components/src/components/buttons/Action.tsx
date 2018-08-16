@@ -3,6 +3,8 @@ import styled, { StyledComponentClass } from 'styled-components'
 
 import { ITheme } from '../theme'
 import { Button, IButtonProps } from './Button'
+import { ArrowWithGradient } from '../icons'
+import { DisabledArrow } from '../icons'
 
 const ActionContainer = styled(Button)`
   width: 100%;
@@ -18,15 +20,15 @@ const ActionContainer = styled(Button)`
   }
 `
 
-const ActionTitle = styled.h3`
-  color: #526dc3;
+const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
+  color: ${({ disabled }) => (disabled ? '#D2D2D2' : '#526dc3')};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 24px;
   margin: 0;
 `
 
-const ActionDescription = styled.p`
-  color: #30495f;
+const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
+  color: ${({ disabled }) => (disabled ? '#D2D2D2' : '#30495f')};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 14px;
   margin: 0;
@@ -35,14 +37,27 @@ const ActionDescription = styled.p`
 export interface IActionProps extends IButtonProps {
   title: string
   description?: string
+  disabled?: boolean
 }
 
-export function Action({ title, description, ...props }: IActionProps) {
+export function Action({
+  title,
+  description,
+  disabled,
+  ...props
+}: IActionProps) {
   return (
-    <ActionContainer {...props}>
+    <ActionContainer
+      icon={() => (disabled ? <DisabledArrow /> : <ArrowWithGradient />)}
+      {...props}
+    >
       <div>
-        <ActionTitle>{title}</ActionTitle>
-        {description && <ActionDescription>{description}</ActionDescription>}
+        <ActionTitle disabled={disabled}>{title}</ActionTitle>
+        {description && (
+          <ActionDescription disabled={disabled}>
+            {description}
+          </ActionDescription>
+        )}
       </div>
     </ActionContainer>
   )
