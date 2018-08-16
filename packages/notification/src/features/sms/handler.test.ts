@@ -25,7 +25,6 @@ describe('smsHandler', () => {
       url: '/sms',
       payload: { msisdn: '447789778823', message: 'foo' },
       headers: {
-        // Generated with "auth" project's test cert
         Authorization: `Bearer ${token}`
       }
     })
@@ -50,7 +49,6 @@ describe('smsHandler', () => {
       url: '/sms',
       payload: { msisdn: '447789778823', message: 'foo' },
       headers: {
-        // Generated with "auth" project's test cert
         Authorization: `Bearer ${token}`
       }
     })
