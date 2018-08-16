@@ -11,7 +11,7 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { get, set } from 'src/database'
 import * as t from 'io-ts'
-import { identity } from 'fp-ts/lib/function'
+import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -23,10 +23,9 @@ const sign = promisify(jwt.sign) as (
 ) => Promise<string>
 
 export interface IAuthentication {
-  nonce: string
   mobile: string
   userId: string
-  role: string
+  roles: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -41,55 +40,47 @@ export async function authenticate(
 ): Promise<IAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyPassword')
 
-  let res
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({ mobile, password })
-    })
-    switch (res.status) {
-      case 200:
-        const body = await res.json()
-        return {
-          nonce: body.nonce,
-          userId: body.id,
-          role: body.role,
-          mobile
-        }
-      default:
-        throw Error(res.statusText)
-    }
-  } catch (err) {
-    throw Error(err.statusText)
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ mobile, password })
+  })
+
+  if (res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const body = await res.json()
+  return {
+    userId: body.id,
+    roles: body.roles,
+    mobile
   }
 }
 
 export async function createToken(
   userId: string,
-  role: string,
-  audience: string[]
+  roles: string[],
+  audience: string[],
+  issuer: string
 ): Promise<string> {
-  return sign({ role }, cert, {
+  return sign({ roles }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS,
-    audience
+    audience,
+    issuer
   })
-}
-
-export function getTokenAudience(role: string) {
-  return ['user-management']
 }
 
 export async function storeUserInformation(
   nonce: string,
   userId: string,
-  role: string,
+  roles: string[],
   mobile: string
 ) {
   return set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, role, mobile })
+    JSON.stringify({ userId, roles, mobile })
   )
 }
 
@@ -103,7 +94,7 @@ export async function getStoredUserInformation(nonce: string) {
 
 const TokenPayload = t.type({
   sub: t.string,
-  role: t.string,
+  roles: t.array(t.string),
   iat: t.number,
   exp: t.number,
   aud: t.array(t.string)
@@ -112,9 +103,12 @@ const TokenPayload = t.type({
 export type ITokenPayload = t.TypeOf<typeof TokenPayload>
 
 export function verifyToken(token: string): ITokenPayload {
-  const decoded = jwt.verify(token, publicCert)
-
-  return TokenPayload.decode(decoded).fold(err => {
-    throw err
-  }, identity)
+  const decoded = jwt.verify(token, publicCert, {
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:auth-user'
+  })
+  const result = TokenPayload.decode(decoded)
+  ThrowReporter.report(result)
+  const decodedToken: ITokenPayload = result.value
+  return decodedToken
 }

@@ -8,7 +8,7 @@ export interface ITokenPayload {
   subject: string
   exp: string
   algorithm: string
-  role: string
+  roles: string[]
 }
 
 const isTokenStillValid = (decoded: ITokenPayload) => {

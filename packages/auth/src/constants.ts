@@ -25,3 +25,10 @@ export const CONFIG_SMS_CODE_EXPIRY_SECONDS = process.env
   .CONFIG_SMS_CODE_EXPIRY_SECONDS
   ? parseInt(process.env.CONFIG_SMS_CODE_EXPIRY_SECONDS, 10)
   : 600
+
+export const WEB_USER_JWT_AUDIENCES = [
+  'opencrvs:auth-user',
+  'opencrvs:user-mgnt-user',
+  'opencrvs:hearth-user'
+]
+export const JWT_ISSUER = 'opencrvs:auth-service'
