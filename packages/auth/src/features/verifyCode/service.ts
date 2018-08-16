@@ -2,7 +2,8 @@ import fetch from 'node-fetch'
 import { set, get, del } from 'src/database'
 import {
   NOTIFICATION_SERVICE_URL,
-  CONFIG_SMS_CODE_EXPIRY_SECONDS
+  CONFIG_SMS_CODE_EXPIRY_SECONDS,
+  JWT_ISSUER
 } from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
@@ -62,7 +63,12 @@ export async function sendVerificationCode(
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
-      Authorization: `Bearer ${createToken('auth', 'service')}`
+      Authorization: `Bearer ${createToken(
+        'auth',
+        ['service'],
+        ['opencrvs:notification-user'],
+        JWT_ISSUER
+      )}`
     }
   })
 
