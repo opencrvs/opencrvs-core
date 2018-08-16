@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { IntlContainer } from './i18n/IntlContainer'
 import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
 import { Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
+import { IntlContainer } from './i18n/IntlContainer'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
