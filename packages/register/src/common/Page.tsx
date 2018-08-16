@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
 import { RouteComponentProps } from 'react-router'
 import * as QueryString from 'query-string'
 import { IURLParams } from '../utils/authUtils'
@@ -15,8 +14,9 @@ export interface IDispatchProps {
 
 type IPage = IProps & IDispatchProps
 
-const StyledPage = styled(PageWrapper).attrs<IPage>({})`
-
+const StyledPage = styled.div.attrs<IPage>({})`
+  background: #f4f4f4;
+  min-height: 100vh;
   * {
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
@@ -71,6 +71,10 @@ export class Page extends React.Component<RouteComponentProps<{}> & IPage> {
   }
   render() {
     const { children } = this.props
-    return <StyledPage {...this.props}>{children}</StyledPage>
+    return (
+      <div>
+        <StyledPage {...this.props}>{children}</StyledPage>
+      </div>
+    )
   }
 }

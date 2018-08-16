@@ -6,6 +6,7 @@
   "rules": {
     "ordered-imports": false,
     "no-console": false,
+    "jsx-no-lambda": false,
     "object-literal-sort-keys": false,
     "jsx-boolean-value": false,
     "member-access": false,

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
+import { PageWrapper } from '@opencrvs/components/lib/layout'
 import { RouteComponentProps } from 'react-router'
 
 export interface IPage {
