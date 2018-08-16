@@ -2,10 +2,12 @@ import fetch from 'node-fetch'
 import { set, get, del } from 'src/database'
 import {
   NOTIFICATION_SERVICE_URL,
-  CONFIG_SMS_CODE_EXPIRY_SECONDS
+  CONFIG_SMS_CODE_EXPIRY_SECONDS,
+  JWT_ISSUER
 } from 'src/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
+import { createToken } from 'src/features/authenticate/service'
 
 interface ICodeDetails {
   code: string
@@ -59,7 +61,15 @@ export async function sendVerificationCode(
 
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'sms'), {
     method: 'POST',
-    body: JSON.stringify(params)
+    body: JSON.stringify(params),
+    headers: {
+      Authorization: `Bearer ${createToken(
+        'auth',
+        ['service'],
+        ['opencrvs:notification-user'],
+        JWT_ISSUER
+      )}`
+    }
   })
 
   return undefined
