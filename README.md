@@ -10,6 +10,15 @@ This repo contains the frontend components and frontend related middleware for t
 2. Run `yarn` to install deps
 3. Run `yarn dev` to up the dev environment (frontend will autoreload and backend services are started via docker-compose)
 
+Apps can be found running in following URLs:
+
+Styleguide: http://localhost:6060/
+Login: http://localhost:3020/
+Register: http://localhost:3000/
+Gateway Graphiql: http://localhost:7070/graphiql
+
+You can open all of them by running `yarn open`
+
 Optional: full backend setup
 
 4. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
