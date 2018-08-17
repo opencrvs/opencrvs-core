@@ -1,7 +1,7 @@
 import { InjectedIntl, Messages } from 'react-intl'
 import { Validation } from './validate'
 import { Field } from 'redux-form'
-import { IInputFieldProps } from '@opencrvs/components/lib/InputField'
+import { IInputFieldProps } from '@opencrvs/components/lib/forms'
 
 export type IReduxFormFieldProps = {
   id: string

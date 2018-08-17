@@ -1,8 +1,4 @@
-const {
-  styles,
-  theme
-} = require('./styleguide.styles')
-
+const { styles, theme } = require('./styleguide.styles')
 
 const path = require('path')
 
@@ -13,8 +9,36 @@ module.exports = {
   skipComponentsWithoutExample: true,
   webpackConfig: require('react-scripts-ts/config/webpack.config.dev.js'),
   styleguideComponents: {
-    Wrapper: path.join(__dirname, 'src/components/ThemeWrapper')
+    Wrapper: path.join(__dirname, 'src/components/styleguide/ThemeWrapper')
   },
+  sections: [
+    {
+      name: 'Buttons',
+      components: './src/components/buttons/**/*.tsx'
+    },
+    {
+      name: 'Forms',
+      components: './src/components/forms/**/*.tsx'
+    },
+    {
+      name: 'Typography',
+      components: './src/components/typography/**/*.tsx'
+    },
+    {
+      name: 'Interface',
+      components: './src/components/interface/**/*.tsx',
+      sections: [
+        {
+          name: 'Icons',
+          components: './src/components/icons/**/*.tsx'
+        }
+      ]
+    },
+    {
+      name: 'Other',
+      components: './src/components/*.tsx'
+    }
+  ],
   styles,
   theme
-};
+}
