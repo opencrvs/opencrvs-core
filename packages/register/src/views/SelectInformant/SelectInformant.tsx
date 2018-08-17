@@ -25,7 +25,8 @@ export class SelectInformantView extends React.Component<{
           <Action
             id="select_parent_informant"
             title="Parent"
-            description="Required: Details of the child, mother and informant. Optional: Details of the father."
+            description="<strong>Required</strong>: Details of the <strong>child, mother</strong> and <strong>informant</strong>.<br />
+            <strong>Optional</strong>: Details of the <strong>father.</strong>"
             onClick={this.props.goToBirthRegistrationAsParent}
           />
           <Action
@@ -37,7 +38,8 @@ export class SelectInformantView extends React.Component<{
           <Action
             id="select_self_informant"
             title="Self (18+)"
-            description="Required: Details of the individual and informant. Optional: Details of the mother/father."
+            description="<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.
+            <br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>."
             disabled
           />
         </ActionList>

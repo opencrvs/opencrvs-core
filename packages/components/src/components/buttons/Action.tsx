@@ -29,9 +29,13 @@ const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
 
 const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
   color: ${({ disabled }) => (disabled ? '#D2D2D2' : '#30495f')};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 14px;
   margin: 0;
+  margin-top: 3px;
+  strong {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+  }
 `
 
 export interface IActionProps extends IButtonProps {
@@ -54,9 +58,10 @@ export function Action({
       <div>
         <ActionTitle disabled={disabled}>{title}</ActionTitle>
         {description && (
-          <ActionDescription disabled={disabled}>
-            {description}
-          </ActionDescription>
+          <ActionDescription
+            disabled={disabled}
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
         )}
       </div>
     </ActionContainer>
