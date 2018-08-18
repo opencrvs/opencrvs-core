@@ -52,7 +52,6 @@ export class App extends React.Component<IAppProps, {}> {
                       component={SelectInformant}
                     />
                     <ProtectedRoute
-                      exact
                       path={routes.BIRTH_PARENT_FORM}
                       component={BirthParentForm}
                     />

@@ -1,14 +1,20 @@
 import * as React from 'react'
+import { withRouter, RouteComponentProps, Route } from 'react-router'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import { Tab, Tabs } from '@opencrvs/components/lib/interface'
+import { Tab, Tabs, Box } from '@opencrvs/components/lib/interface'
 
 import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistration } from '../../navigation/navigationActions'
 import styled from '../../styled-components'
+import { InputField } from '@opencrvs/components/lib/forms'
 
 export const messages = defineMessages({})
+
+const FormContainer = styled.div`
+  padding: 35px 25px;
+`
 
 const ViewHeaderWithTabs = styled(ViewHeader)`
   padding-bottom: 0;
@@ -18,9 +24,34 @@ const ViewHeaderWithTabs = styled(ViewHeader)`
   }
 `
 
-class BirthParentFormView extends React.Component<{
-  goToBirthRegistration: typeof goToBirthRegistration
-}> {
+const FormItem = styled.div`
+  margin-bottom: 2em;
+`
+
+const FormSectionWrapper = styled.section``
+
+const FormSectionTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+`
+
+interface IFormSectionProps extends React.HTMLAttributes<HTMLDivElement> {
+  title: string
+}
+
+const FormSection = ({ title, children }: IFormSectionProps) => {
+  return (
+    <FormSectionWrapper>
+      <FormSectionTitle>{title}</FormSectionTitle>
+      {children}
+    </FormSectionWrapper>
+  )
+}
+
+class BirthParentFormView extends React.Component<
+  {
+    goToBirthRegistration: typeof goToBirthRegistration
+  } & RouteComponentProps<{}>
+> {
   render() {
     return (
       <>
@@ -36,11 +67,57 @@ class BirthParentFormView extends React.Component<{
             <Tab>Registration</Tab>
           </Tabs>
         </ViewHeaderWithTabs>
+        <FormContainer>
+          <Route
+            exact
+            path={`${this.props.match.url}`}
+            component={() => {
+              return (
+                <Box>
+                  <FormSection title="Child's details">
+                    <FormItem>
+                      <InputField
+                        id="dummy-input"
+                        type="text"
+                        label="Label goes here"
+                      />
+                    </FormItem>
+                    <FormItem>
+                      <InputField
+                        id="dummy-input"
+                        type="text"
+                        label="Label goes here"
+                      />
+                    </FormItem>
+                    <FormItem>
+                      <InputField
+                        id="dummy-input"
+                        type="text"
+                        label="Label goes here"
+                      />
+                    </FormItem>
+                  </FormSection>
+                </Box>
+              )
+            }}
+          />
+          <Route
+            path={`${this.props.match.url}/mother`}
+            component={() => {
+              return (
+                <Box>
+                  <h1>moro</h1>
+                  <InputField id="test" />
+                </Box>
+              )
+            }}
+          />
+        </FormContainer>
       </>
     )
   }
 }
 
-export const BirthParentForm = connect(null, { goToBirthRegistration })(
-  BirthParentFormView
+export const BirthParentForm = withRouter(
+  connect(null, { goToBirthRegistration })(BirthParentFormView)
 )
