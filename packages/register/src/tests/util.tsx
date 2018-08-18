@@ -1,13 +1,11 @@
 import * as React from 'react'
-import { initialState as intlState } from '../i18n/intlReducer'
-import { initialState as profileState } from '../profile/profileReducer'
-import { initialState as registrationState } from '../registrations/registrationReducer'
+
 import { Provider } from 'react-redux'
 import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
-import configureStore from 'redux-mock-store'
+
 import { ApolloLink, Observable } from 'apollo-link'
-import { IStoreState } from '../store'
+import { IStoreState, createStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as en from 'react-intl/locale-data/en'
 import { mount, configure, ReactWrapper } from 'enzyme'
@@ -45,21 +43,12 @@ function createGraphQLClient() {
 
 addLocaleData([...en])
 
-export const mockStore = configureStore()
-export const mockState: IStoreState = {
-  profile: profileState,
-  registration: registrationState,
-  router: {
-    location: {
-      pathname: '',
-      search: '',
-      hash: '',
-      state: '',
-      key: ''
-    }
-  },
-  form: {},
-  i18n: intlState
+export function getInitialState(): IStoreState {
+  const mockStore = createStore()
+
+  mockStore.dispatch({ type: 'NOOP' })
+
+  return mockStore.getState()
 }
 
 export function createTestApp(): ReactWrapper {

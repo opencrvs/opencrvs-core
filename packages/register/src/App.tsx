@@ -6,7 +6,7 @@ import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
 import { Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
-import { IntlContainer } from './i18n/IntlContainer'
+import { I18nContainer } from './i18n/I18nContainer'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
@@ -36,7 +36,7 @@ export class App extends React.Component<IAppProps, {}> {
     return (
       <ApolloProvider client={this.props.client || client}>
         <Provider store={store}>
-          <IntlContainer>
+          <I18nContainer>
             <ThemeProvider theme={getTheme(config.LOCALE)}>
               <ConnectedRouter history={history}>
                 <Page>
@@ -59,7 +59,7 @@ export class App extends React.Component<IAppProps, {}> {
                 </Page>
               </ConnectedRouter>
             </ThemeProvider>
-          </IntlContainer>
+          </I18nContainer>
         </Provider>
       </ApolloProvider>
     )

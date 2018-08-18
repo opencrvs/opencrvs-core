@@ -1,5 +1,5 @@
-import * as actions from './intlActions'
-import { intlReducer, initialState } from './intlReducer'
+import * as actions from './i18nActions'
+import { i18nReducer, initialState } from './i18nReducer'
 import { BENGALI_STATE } from './bn'
 
 describe('intlReducer tests', () => {
@@ -13,7 +13,7 @@ describe('intlReducer tests', () => {
       type: actions.CHANGE_LANGUAGE,
       payload: { LANGUAGE: 'bn' }
     }
-    const returnedState = intlReducer(expectedState, action)
+    const returnedState = i18nReducer(expectedState, action)
     expect(returnedState).toEqual(expectedState)
   })
 })
