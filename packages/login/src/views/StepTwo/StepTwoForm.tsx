@@ -134,7 +134,7 @@ export class StepTwoForm extends React.Component<
       fieldToFocus
     } = this.props
     return (
-      <StyledBox id="login-step-two-box" columns={4}>
+      <StyledBox id="login-step-two-box">
         <Title>
           <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
           <p>{intl.formatMessage(messages.stepTwoInstruction)}</p>

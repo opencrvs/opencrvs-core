@@ -4,7 +4,7 @@ import styled, { StyledFunction } from 'styled-components'
 export interface ICustomProps {
   error?: boolean
   touched?: boolean
-  focusInput: boolean
+  focusInput?: boolean
 }
 
 export type IInputProps = ICustomProps &
@@ -14,16 +14,20 @@ const styledInput = styled.input.attrs<IInputProps>({})
 
 const StyledInput = styledInput`
   width: 100%;
+  padding: 10px 2px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
   border: 0px solid;
   border-bottom: solid 1px
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.error : theme.colors.disabled};
-  padding: 0 2px;
   outline: none;
   ${({ theme }) => theme.fonts.defaultFontStyle};
   color: ${({ theme }) => theme.colors.secondary};
+  &[type="text"] {
+    background: #F9F9F9;
+  }
+
   &:focus {
     border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
   }

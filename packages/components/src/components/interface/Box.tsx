@@ -2,50 +2,20 @@ import * as React from 'react'
 import styled, { StyledFunction, withTheme } from 'styled-components'
 
 import { IGrid } from '../grid'
-import { getPercentageWidthFromColumns } from '../utils/grid'
 
-export interface IBox {
-  id: string
-  columns?: number
-  title?: string
-  children?: any
-  className?: string
-  width?: string
-}
+export interface IBox extends React.HTMLAttributes<HTMLDivElement> {}
 
-const styledWrapper = styled.div.attrs<IBox>({})
-
-const Wrapper = styledWrapper`
-  margin: auto;
-  ${({ theme }) => theme.fonts.defaultFontStyle}
-  width: ${({ width }) => (width ? width : `100%`)};
-  padding: 0px ${({ theme }) => theme.grid.gutter}px 0px ${({ theme }) =>
-  theme.grid.gutter}px;
-  margin: ${({ theme }) => theme.grid.margin}px auto;
+const Wrapper = styled.div.attrs<IBox>({})`
+  padding: 25px;
   background: white;
-  max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
-  box-shadow: 0 0 12px 0 rgba(0,0,0,0.11);
-  padding-top: 5px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 98%;
-    margin-left: 1%;
-  }
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
 `
 
 class Component extends React.Component<IBox & { theme: { grid: IGrid } }> {
   render() {
-    const { id, title, children, className, columns, theme } = this.props
-    const requiredGridColumns: number = columns ? columns : theme.grid.columns
+    const { id, title, children, className, theme } = this.props
     return (
-      <Wrapper
-        id={id}
-        className={className}
-        width={getPercentageWidthFromColumns(
-          requiredGridColumns,
-          theme.grid.columns
-        )}
-      >
-        <h1>{title}</h1>
+      <Wrapper id={id} className={className}>
         {children}
       </Wrapper>
     )
