@@ -1,4 +1,3 @@
-/* istanbul ignore next */
 import {
   compose,
   createStore as createReduxStore,
@@ -8,49 +7,32 @@ import {
   StoreEnhancer
 } from 'redux'
 import { createBrowserHistory } from 'history'
-import {
-  combineReducers,
-  install,
-  StoreCreator,
-  getModel,
-  LoopReducer
-} from 'redux-loop'
+import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
   routerReducer,
   routerMiddleware,
   RouterState
 } from 'react-router-redux'
-import { reducer as formReducer, FormStateMap, FormAction } from 'redux-form'
+
 import { profileReducer, ProfileState } from './profile/profileReducer'
-import {
-  registrationReducer,
-  RegistrationState
-} from './registrations/registrationReducer'
-import { intlReducer, IntlState } from './i18n/intlReducer'
+
+import { i18nReducer, I18nState } from './i18n/i18nReducer'
 
 export const history = createBrowserHistory()
 const middleware = routerMiddleware(history)
 
 export interface IStoreState {
   profile: ProfileState
-  registration: RegistrationState
   router: RouterState
-  form: FormStateMap
-  i18n: IntlState
+  i18n: I18nState
 }
-
-const formRed: LoopReducer<FormStateMap, FormAction> = (
-  state: FormStateMap,
-  action: FormAction
-) => formReducer(state, action)
 
 const reducers = combineReducers<IStoreState>({
   profile: profileReducer,
-  registration: registrationReducer,
   router: routerReducer,
-  form: formRed,
-  i18n: intlReducer
+  i18n: i18nReducer
 })
+
 const enhancedCreateStore = createReduxStore as StoreCreator
 
 const enhancer = compose(

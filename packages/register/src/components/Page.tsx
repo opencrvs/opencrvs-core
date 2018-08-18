@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 
 import { IURLParams } from '@opencrvs/register/src/utils/authUtils'
-import { getLanguage } from '@opencrvs/register/src/i18n/intlSelectors'
+import { getLanguage } from '@opencrvs/register/src/i18n/i18nSelectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import * as actions from '@opencrvs/register/src/profile/profileActions'
 

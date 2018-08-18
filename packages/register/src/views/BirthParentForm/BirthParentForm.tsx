@@ -9,6 +9,7 @@ import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistration } from '../../navigation/navigationActions'
 import styled from '../../styled-components'
 import { InputField } from '@opencrvs/components/lib/forms'
+import { birthParentFields } from '@opencrvs/register/src/forms/birth-parent'
 
 export const messages = defineMessages({})
 
@@ -75,27 +76,17 @@ class BirthParentFormView extends React.Component<
               return (
                 <Box>
                   <FormSection title="Child's details">
-                    <FormItem>
-                      <InputField
-                        id="dummy-input"
-                        type="text"
-                        label="Label goes here"
-                      />
-                    </FormItem>
-                    <FormItem>
-                      <InputField
-                        id="dummy-input"
-                        type="text"
-                        label="Label goes here"
-                      />
-                    </FormItem>
-                    <FormItem>
-                      <InputField
-                        id="dummy-input"
-                        type="text"
-                        label="Label goes here"
-                      />
-                    </FormItem>
+                    {birthParentFields.map(field => {
+                      return (
+                        <FormItem key={name}>
+                          <InputField
+                            id={field.name}
+                            type={field.type}
+                            label={field.label}
+                          />
+                        </FormItem>
+                      )
+                    })}
                   </FormSection>
                 </Box>
               )
