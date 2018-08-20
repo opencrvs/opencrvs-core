@@ -11,7 +11,7 @@ jobs:
 
     - stage: integration tests
       script:
-        - yarn dev
+        - yarn dev > /dev/null &
         - sleep 30
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start
