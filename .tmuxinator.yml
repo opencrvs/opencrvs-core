@@ -1,0 +1,13 @@
+# ~/.tmuxinator/opencrvs.yml
+
+name: opencrvs
+root: ./
+
+windows:
+  - editor:
+      layout: tiled
+      panes:
+        - apps:
+          - yarn run start
+        - deps:
+          - yarn run compose

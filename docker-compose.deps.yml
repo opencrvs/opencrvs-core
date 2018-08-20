@@ -6,6 +6,8 @@ services:
     restart: unless-stopped
     logging:
       driver: none
+    volumes:
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:
