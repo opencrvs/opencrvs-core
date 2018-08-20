@@ -8239,7 +8239,7 @@ ono@^4.0.3, ono@^4.0.5:
   dependencies:
     format-util "^1.0.3"
 
-opener@^1.5.0:
+opener@^1.4.3, opener@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.0.tgz#24222fb4ad423ba21f5bf38855cebe44220f6531"
 
