@@ -22,3 +22,6 @@ docker swarm join --token <TOKEN> opencrvs-staging.jembi.org:2377
 docker node ls
 # login to private registry on manager
 docker login
+
+# on manger, make mongo directory
+mkdir -p /data/mongo
