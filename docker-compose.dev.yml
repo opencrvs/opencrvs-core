@@ -17,4 +17,4 @@ services:
   # Expose config as a plain volume - these will use docker config in staging and prod
   openhim-console:
     volumes:
-      - "./infrastructure/openhim-console-config.staging.json:/usr/share/nginx/html/config/default.json"
+      - "./infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json"

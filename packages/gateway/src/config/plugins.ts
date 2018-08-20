@@ -1,4 +1,4 @@
-import { graphiqlHapi, graphqlHapi } from 'apollo-server-hapi'
+import { graphqlHapi } from 'apollo-server-hapi'
 import * as Good from 'good'
 import * as HapiSwagger from 'hapi-swagger'
 import * as Inert from 'inert'
@@ -11,32 +11,17 @@ export const getPlugins = (env: string | undefined, schemaPath: string) => {
   const executableSchema = getExecutableSchema(schemaPath)
 
   if (env === 'DEVELOPMENT') {
-    plugins.push(
-      Inert,
-      Vision,
-      {
-        plugin: HapiSwagger,
-        options: {
-          info: {
-            title: 'OpenCRVS Auth Gateway Documentation',
-            version: '1.0.0'
-          }
-        },
-        name: 'hapi-swagger',
-        version: '9.1.1'
+    plugins.push(Inert, Vision, {
+      plugin: HapiSwagger,
+      options: {
+        info: {
+          title: 'OpenCRVS Auth Gateway Documentation',
+          version: '1.0.0'
+        }
       },
-      {
-        plugin: graphiqlHapi,
-        options: {
-          path: '/graphiql',
-          graphiqlOptions: {
-            endpointURL: '/graphql'
-          }
-        },
-        name: 'graphiql',
-        version: '1.3.6'
-      }
-    )
+      name: 'hapi-swagger',
+      version: '9.1.1'
+    })
   }
 
   plugins.push(
