@@ -13,6 +13,7 @@ jobs:
       script:
         - yarn dev
         - sleep 30
+        - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start
       env:
         CYPRESS_REGISTER_URL=http://localhost:5040/
