@@ -10,7 +10,8 @@
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token"
   },
   "dependencies": {
     "@types/dotenv": "^4.0.3",
@@ -26,18 +27,24 @@
     "boom": "^7.2.0",
     "crypto": "^1.0.1",
     "dotenv": "^6.0.0",
+    "fp-ts": "^1.7.1",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
+    "io-ts": "^1.2.1",
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.1.2",
     "redis": "^2.8.0",
-    "typescript": "^2.9.2",
+    "typescript": "^3.0.1",
     "winston": "^3.0.0"
   },
   "devDependencies": {
+    "@types/command-line-args": "^5.0.0",
+    "@types/command-line-usage": "^5.0.1",
+    "command-line-args": "^5.0.2",
+    "command-line-usage": "^5.0.5",
     "cross-env": "^5.2.0",
     "hapi-swagger": "^9.1.1",
     "inert": "^5.1.0",

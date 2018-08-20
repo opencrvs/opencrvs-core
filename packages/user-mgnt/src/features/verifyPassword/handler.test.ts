@@ -1,7 +1,4 @@
-import { unauthorized } from 'boom'
-
 import User from 'src/model/user'
-import verifyPassHandler from './handler'
 import { createServer } from '../..'
 
 let server: any

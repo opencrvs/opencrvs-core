@@ -44,7 +44,10 @@ describe('authenticate handler receives a request', () => {
           token: res.result.token
         }
       })
+
+      expect(refreshResponse.result.token).toBeDefined()
       expect(refreshResponse.result.token.split('.')).toHaveLength(3)
+
       const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.roles).toEqual(['admin'])

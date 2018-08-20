@@ -1,8 +1,8 @@
 import * as React from 'react'
 import styled, { StyledFunction, withTheme } from 'styled-components'
 
-import { IGrid } from './grid'
-import { getPercentageWidthFromColumns } from './utils/grid'
+import { IGrid } from '../grid'
+import { getPercentageWidthFromColumns } from '../utils/grid'
 
 export interface IBox {
   id: string

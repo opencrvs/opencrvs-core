@@ -10,6 +10,8 @@ import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { get, set } from 'src/database'
+import * as t from 'io-ts'
+import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -57,12 +59,16 @@ export async function authenticate(
 
 export async function createToken(
   userId: string,
-  roles: string[]
+  roles: string[],
+  audience: string[],
+  issuer: string
 ): Promise<string> {
   return sign({ roles }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS
+    expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS,
+    audience,
+    issuer
   })
 }
 
@@ -86,6 +92,22 @@ export async function getStoredUserInformation(nonce: string) {
   return JSON.parse(record)
 }
 
-export async function verifyToken(token: string): Promise<any> {
-  return jwt.verify(token, publicCert)
+const TokenPayload = t.type({
+  sub: t.string,
+  roles: t.array(t.string),
+  iat: t.number,
+  exp: t.number,
+  aud: t.array(t.string)
+})
+
+export type ITokenPayload = t.TypeOf<typeof TokenPayload>
+
+export function verifyToken(token: string): ITokenPayload {
+  const decoded = jwt.verify(token, publicCert, {
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:auth-user'
+  })
+  const result = TokenPayload.decode(decoded)
+  ThrowReporter.report(result)
+  return result.value as ITokenPayload
 }

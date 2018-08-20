@@ -23,7 +23,7 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "PORT=3020 react-scripts-ts start",
+    "start": "BROWSER=none PORT=3020 react-scripts-ts start",
     "docker:build":
       "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run":

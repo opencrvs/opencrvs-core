@@ -10,11 +10,31 @@ This repo contains the frontend components and frontend related middleware for t
 2. Run `yarn` to install deps
 3. Run `yarn dev` to up the dev environment (frontend will autoreload and backend services are started via docker-compose)
 
+Apps can be found running in following URLs:
+
+Styleguide: http://localhost:6060/
+Login: http://localhost:3020/
+Register: http://localhost:3000/
+
+You can open all of them by running `yarn open`
+
 Optional: full backend setup
 
 4. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
 5. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
 6. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
+
+### tmuxed development setup
+
+Sometimes it's nice to have the option to restart all running build processes (webpack etc). To get the dependencies and the build processes running in separate sessions you can use
+
+`yarn dev:tmux` - to start build processes and dependencies in different sessions
+`yarn dev:tmux:kill` - to kill the tmux session
+
+You can use **ctrl + b** and arrow keys to navigate between tmux windows.
+
+This will require installation of [tmux](https://github.com/tmux/tmux/wiki) which is `brew install tmux` on OSX and [tmuxinator](https://github.com/tmuxinator/tmuxinator) which is usually `gem install tmuxinator`.
+
 
 ## Docker scripts
 

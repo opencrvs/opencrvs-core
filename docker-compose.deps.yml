@@ -2,10 +2,12 @@ version: "3.3"
 
 services:
   mongo:
-    image: mongo
+    image: mongo:3.4
     restart: unless-stopped
     logging:
       driver: none
+    volumes:
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:

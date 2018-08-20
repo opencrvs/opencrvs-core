@@ -7,9 +7,12 @@ require('dotenv').config({
 
 import * as Hapi from 'hapi'
 
-import { HOST, PORT } from './constants'
+import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from './constants'
 import smsHandler, { requestSchema } from './features/sms/handler'
 import getPlugins from './config/plugins'
+import { readFileSync } from 'fs'
+
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -19,6 +22,23 @@ export async function createServer() {
       cors: { origin: ['*'] }
     }
   })
+
+  await server.register(getPlugins())
+
+  server.auth.strategy('jwt', 'jwt', {
+    key: publicCert,
+    verifyOptions: {
+      algorithms: ['RS256'],
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:notification-user'
+    },
+    validate: (payload: any, request: any) => ({
+      isValid: true,
+      credentials: payload
+    })
+  })
+
+  server.auth.default('jwt')
 
   // curl -H 'Content-Type: application/json' -d '{"msisdn": "+27855555555", "message": "Test"}' http://localhost:2020/sms
   server.route({
@@ -41,8 +61,6 @@ export async function createServer() {
       }
     }
   })
-
-  await server.register(getPlugins())
 
   async function stop() {
     await server.stop()

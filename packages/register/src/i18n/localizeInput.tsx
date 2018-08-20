@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
-import { IInputFieldProps } from '@opencrvs/components/lib/InputField'
+import { IInputFieldProps } from '@opencrvs/components/lib/forms'
 import { WrappedFieldProps } from 'redux-form'
 import { Validation } from '../utils/validate'
 

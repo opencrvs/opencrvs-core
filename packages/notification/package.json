@@ -28,7 +28,7 @@
     "hapi": "^17.5.1",
     "joi": "^13.4.0",
     "node-fetch": "^2.1.2",
-    "typescript": "^2.9.2",
+    "typescript": "^3.0.1",
     "winston": "^3.0.0"
   },
   "devDependencies": {
@@ -58,7 +58,7 @@
     ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "setupFiles": [
-      "./test/setupJest.js"
+      "./test/setupJest.ts"
     ],
     "moduleFileExtensions": [
       "ts",
