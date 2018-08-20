@@ -1,34 +1,26 @@
-import {
-  verifyToken,
-  getStoredUserInformation,
-  UserInfoNotFoundError
-} from './service'
+import { verifyToken, getStoredUserInformation } from './service'
 
 describe('authenticate service errors', () => {
   describe('verifyToken - token expired', () => {
     it('returns a JWT Error for an expired token', () => {
       const expiredToken =
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2h3IiwiaWF0IjoxNTMwNzc2OTYxLCJleHAiOjE1MzA3Nzc1NjEsInN1YiI6IjViMzI1YTYyMGVmNDgxM2UzMDhhNDMxMyJ9.leJuSng-PmQvFCS-FrIl9-Z2iYitwuX274QHkDoVQGmHtfi9SsKIRmZ1OlNRS6g7eT4LvvUDjwBZvCO7Rvhf_vnrHmHE4JR_e9MWVoK_0vjxCkDmo-cZ6iM7aBzrB4-F1eaaZJwxrwPFY5o_rsxCAeHj-draVYQTEr388y-rffdaC7IHoHhTrGoj8n40d8RyvX7UVVG5w1zsxFhYlN44zvMDNy56zGpbJ7mNn3M6hJWGUjDaOhtsEpfyDeoeiuEkU4Rn_WxtbognqLt12P6TQWsQOy_eHqR2UfBdmPw_uSW28FFQh9ebOEjMSI0JnIFXagrWkkFVO2DcBh8YlGE5M_fZWrrkz9pTiVb1KQWTz_TPUf8VVlTRNBKCnumiQJRIkWNxIecYwKap_HpKd5SaD8sLgB3htmomfJE4h4nu-7Tjy_QYw_2Sm4upDCEcB-mjx_EeIVTQXk5Re3QMhY1hEh9tD0kDhJudPQWBG7g8GQy2ZBmy6CtP7FQ-tRdyOE_0TNazZSB4Ogz8im5c2ZSVRWalPZWp0TupiSWI5sY-k_Qab6hpbxAFxqsH-8eRelos4y9Ohh60mpNNIqZkizSLfoWKgR5tMBkyDbMPbfbDUEKYKSa5b29uCeAHeJXvW-A0Nk5YwiPNZIe2ycuVaWUaDnL3vvbb5yrTG1eDuhFm_xw'
-      return verifyToken(expiredToken).catch((e: Error) => {
-        expect(e.message).toEqual('jwt expired')
-      })
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxMTY2NDMsImV4cCI6MTUzMzExNTY0MywiYXVkIjpbInVzZXItbWFuYWdlbWVudCJdLCJzdWIiOiIxIn0.H_Mi4fIZCCr4PGNrB9KCFZPlByK4GlB74ikU9f92u0TbqJFDSYB-rIgbAYfRGquhS0RrrfYmK88Lik3t9bbpDY1DV4_gJP95oTNZntMKGmlB9GqlTbSWaYWUKyT6uTty6ZI4Rq2C5XWQiGL_MRnNy92SiXDUqBtBgk4Wp5Elu8P6NCemq1DiA9busl3JxzFgpyGUz4Fdrq40k-hasaAFUl1tnfC4otMqVVGMGDOisfe-yDkdAAXo5EvT9N3MgTuMbwBozwnq03vRcWRGL_05ndLHFyA-29LAJTcUNCkgpVVz0yruMuN_akyCsui-eC8_10eJYYy8wwKoAFqAxxOLiSACBQg6iUbepvj4BKimfPnbU0PATGulJi78RvW_ufn2see_7GLvh64pEosbYJtaRxsHDie5VW2ftWWSTyuswi7r1-DrQtCqn6bV4fa0x0FzmHn4sC3zQbT9o5cy0EYkZgj9ymCMPvdNWD5uLevjxNzlethAqABAhMD4fSF7OFtnVfxaFhWeZ3JLSgvfYhP_VuAx9wZ7MqfW7J_P9PBhMsb68MClBfi9wN21Gzx3K1rKH09Xmp6eh2f7whDXEduUHmY2T4j3BG4biLRJhsFh-0kZt9tbt8zERHm7wybh0CFGHQc_fE3-vvbo69p2bnLNQoZWEJUS6W24dOgNj5SBuCk'
+
+      expect(() => verifyToken(expiredToken)).toThrowErrorMatchingSnapshot()
     })
     it('returns an Error for a malformed token', () => {
       const badToken = 'ytfhgfgf'
-      return verifyToken(badToken).catch((e: Error) =>
-        expect(e.message).toEqual('jwt malformed')
-      )
+      expect(() => verifyToken(badToken)).toThrowErrorMatchingSnapshot()
     })
   })
 
   describe('getStoredUserInformation - cannot find a user', () => {
     it('returns an Error if a user cannot be found', () => {
       const badNonce = 'ytfhgfjhgf'
-      return getStoredUserInformation(badNonce).catch(
-        (e: UserInfoNotFoundError) => {
-          expect(e.message).toEqual('user not found')
-        }
-      )
+
+      expect(
+        getStoredUserInformation(badNonce)
+      ).rejects.toThrowErrorMatchingSnapshot()
     })
   })
 })

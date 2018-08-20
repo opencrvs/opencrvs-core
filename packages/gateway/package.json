@@ -28,6 +28,7 @@
     "graphql-import": "^0.5.2",
     "graphql-tools": "^3.0.1",
     "hapi": "^17.4.0",
+    "hapi-auth-jwt2": "^8.1.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-swagger": "^9.1.1",
     "hapijs-status-monitor": "^0.6.0",
@@ -91,7 +92,13 @@
       "json",
       "node"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFiles": [
+      "./test/setupJest.ts"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ]
   },
   "keywords": [
     "api",

@@ -15,7 +15,6 @@ Apps can be found running in following URLs:
 Styleguide: http://localhost:6060/
 Login: http://localhost:3020/
 Register: http://localhost:3000/
-Gateway Graphiql: http://localhost:7070/graphiql
 
 You can open all of them by running `yarn open`
 

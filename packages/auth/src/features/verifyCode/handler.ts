@@ -7,6 +7,7 @@ import {
   createToken
 } from 'src/features/authenticate/service'
 import { logger } from 'src/logger'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from 'src/constants'
 
 interface IVerifyPayload {
   nonce: string
@@ -29,7 +30,12 @@ export default async function authenticateHandler(
     return unauthorized()
   }
   const { userId, roles } = await getStoredUserInformation(nonce)
-  const token = await createToken(userId, roles)
+  const token = await createToken(
+    userId,
+    roles,
+    WEB_USER_JWT_AUDIENCES,
+    JWT_ISSUER
+  )
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
   return response
