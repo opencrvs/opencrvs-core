@@ -12,11 +12,11 @@ jobs:
     - stage: integration tests
       script:
         - yarn dev &
-        - sleep 60
+        - sleep 120
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start
       env:
-        CYPRESS_REGISTER_URL=http://localhost:5040/
+        CYPRESS_REGISTER_URL=http://localhost:3020/
       services:
         - docker
 
