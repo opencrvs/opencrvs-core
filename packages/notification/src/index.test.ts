@@ -2,12 +2,6 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from './index'
 
-test('should start and stop server without error', async () => {
-  const { start, stop } = await createServer()
-  await start()
-  await stop()
-})
-
 describe('Route authorization', () => {
   it('blocks requests without a token', async () => {
     const server = await createServer()
