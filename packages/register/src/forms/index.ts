@@ -7,11 +7,13 @@ export interface IFormField {
   validate: Validation[]
 }
 
+export interface IFormTab {
+  id: string
+  name: string
+  title: string
+  fields: IFormField[]
+}
+
 export interface IForm {
-  tabs: Array<{
-    id: string
-    name: string
-    title: string
-    fields: IFormField[]
-  }>
+  tabs: IFormTab[]
 }
