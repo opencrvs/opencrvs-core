@@ -8,10 +8,10 @@ import { Tab, Tabs, Box } from '@opencrvs/components/lib/interface'
 import { InputField } from '@opencrvs/components/lib/forms'
 
 import { ViewHeader } from '../../components/ViewHeader'
-import { goToTab } from '../../navigation/navigationActions'
+import { goToTab as goToTabAction } from '../../navigation/navigationActions'
 import styled from '../../styled-components'
 import { birthParentForm } from '../../forms/birth-parent'
-import { IFormField } from '@opencrvs/register/src/forms'
+import { IFormField, IForm } from '@opencrvs/register/src/forms'
 
 export const messages = defineMessages({})
 
@@ -76,16 +76,38 @@ function getActiveTabId(form: any, viewParams: { tab?: string }) {
   return viewParams.tab || form.tabs[0].id
 }
 
+interface IFormTabProps {
+  form: IForm
+  activeTabId: string
+  onTabClick: (tabId: string) => void
+}
+
+function FormTabs({ form, activeTabId, onTabClick }: IFormTabProps) {
+  return (
+    <Tabs>
+      {form.tabs.map(({ name, id }) => (
+        <Tab
+          id={`tab_${id}`}
+          onClick={() => onTabClick(id)}
+          key={id}
+          active={activeTabId === id}
+        >
+          {name}
+        </Tab>
+      ))}
+    </Tabs>
+  )
+}
+
 class BirthParentFormView extends React.Component<
   {
-    goToTab: typeof goToTab
+    goToTab: typeof goToTabAction
   } & RouteComponentProps<{ tab: string }>
 > {
   render() {
-    const { match } = this.props
+    const { match, goToTab } = this.props
 
     const activeTabId = getActiveTabId(birthParentForm, this.props.match.params)
-
     const activeTab = birthParentForm.tabs.find(({ id }) => id === activeTabId)
 
     if (!activeTab) {
@@ -98,18 +120,11 @@ class BirthParentFormView extends React.Component<
           breadcrump="Informant: Parent"
           title="New Birth Registration"
         >
-          <Tabs>
-            {birthParentForm.tabs.map(({ name, id }) => (
-              <Tab
-                id={`tab_${id}`}
-                onClick={() => this.props.goToTab(id)}
-                key={id}
-                active={activeTabId === id}
-              >
-                {name}
-              </Tab>
-            ))}
-          </Tabs>
+          <FormTabs
+            form={birthParentForm}
+            activeTabId={activeTabId}
+            onTabClick={goToTab}
+          />
         </ViewHeaderWithTabs>
         <FormContainer>
           <Form title={activeTab.title} fields={activeTab.fields} />
@@ -119,4 +134,6 @@ class BirthParentFormView extends React.Component<
   }
 }
 
-export const BirthParentForm = connect(null, { goToTab })(BirthParentFormView)
+export const BirthParentForm = connect(null, { goToTab: goToTabAction })(
+  BirthParentFormView
+)
