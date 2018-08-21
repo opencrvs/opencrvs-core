@@ -11,7 +11,7 @@ import { ViewHeader } from '../../components/ViewHeader'
 import { goToTab } from '../../navigation/navigationActions'
 import styled from '../../styled-components'
 import { birthParentForm } from '../../forms/birth-parent'
-import { IFormField, IFormTab } from '@opencrvs/register/src/forms'
+import { IFormField } from '@opencrvs/register/src/forms'
 
 export const messages = defineMessages({})
 
@@ -31,8 +31,6 @@ const FormItem = styled.div`
   margin-bottom: 2em;
 `
 
-const FormSectionWrapper = styled.section``
-
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
 `
@@ -43,10 +41,10 @@ interface IFormSectionProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const FormSection = ({ title, children }: IFormSectionProps) => {
   return (
-    <FormSectionWrapper>
+    <section>
       <FormSectionTitle id="form_section_title">{title}</FormSectionTitle>
       {children}
-    </FormSectionWrapper>
+    </section>
   )
 }
 
@@ -90,10 +88,6 @@ function getActiveTabId(form: any, viewParams: { tab?: string }) {
   return viewParams.tab || form.tabs[0].id
 }
 
-function FormTab({ tab }: { tab: IFormTab }) {
-  return <Form title={tab.title} fields={tab.fields} />
-}
-
 class BirthParentFormView extends React.Component<
   {
     goToTab: typeof goToTab
@@ -130,7 +124,7 @@ class BirthParentFormView extends React.Component<
           </Tabs>
         </ViewHeaderWithTabs>
         <FormContainer>
-          <FormTab tab={activeTab} />
+          <Form title={activeTab.title} fields={activeTab.fields} />
         </FormContainer>
       </>
     )
