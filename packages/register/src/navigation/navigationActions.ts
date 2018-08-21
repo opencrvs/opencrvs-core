@@ -11,3 +11,7 @@ export function goToBirthRegistration() {
 export function goToBirthRegistrationAsParent() {
   return push(BIRTH_PARENT_FORM)
 }
+
+export function goToTab(id: string) {
+  return push(BIRTH_PARENT_FORM + '/' + id)
+}

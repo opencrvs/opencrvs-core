@@ -24,23 +24,23 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "PORT=3020 react-scripts-ts start",
-    "docker:build":
-      "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
-    "docker:run":
-      "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
-    "test":
-      "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
-    "verify-build-config":
-      "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
+    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
+    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
     "build": "yarn verify-build-config && react-scripts-ts build",
     "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "git add"]
+    "src/**/*.{ts,tsx,json}": [
+      "prettier --write",
+      "tslint",
+      "git add"
+    ]
   },
   "devDependencies": {
-    "@types/enzyme": "^3.1.10",
-    "@types/enzyme-adapter-react-16": "^1.0.2",
+    "@types/enzyme": "^3.1.13",
+    "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/jest": "^22.2.3",
     "@types/lodash-es": "^4.17.0",
     "@types/node": "^10.0.8",
@@ -48,8 +48,8 @@
     "@types/react-dom": "^16.0.5",
     "@types/redux-form": "^7.2.6",
     "@types/redux-mock-store": "^1.0.0",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme": "^3.4.4",
+    "enzyme-adapter-react-16": "^1.2.0",
     "moxios": "^0.4.0",
     "prettier": "^1.12.1",
     "redux-mock-store": "^1.5.3",
