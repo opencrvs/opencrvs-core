@@ -11,7 +11,7 @@ import { ViewHeader } from '../../components/ViewHeader'
 import { goToTab } from '../../navigation/navigationActions'
 import styled from '../../styled-components'
 import { birthParentForm } from '../../forms/birth-parent'
-import { IFormField } from '@opencrvs/register/src/forms'
+import { IFormField, IFormTab } from '@opencrvs/register/src/forms'
 
 export const messages = defineMessages({})
 
@@ -86,18 +86,11 @@ const Form = withFormik<{ fields: any[]; title: string }, any>({
   }
 })(ChildsDetails)
 
-function getActiveTab(form: any, viewParams: { tab?: string }) {
+function getActiveTabId(form: any, viewParams: { tab?: string }) {
   return viewParams.tab || form.tabs[0].id
 }
 
-function FormTab({ match }: RouteComponentProps<{ tab: string }>) {
-  const tab = birthParentForm.tabs.find(
-    ({ id }) => id === getActiveTab(birthParentForm, match.params)
-  )
-  if (!tab) {
-    throw new Error(`Configuration for tab "${match.params.tab}" missing!`)
-  }
-
+function FormTab({ tab }: { tab: IFormTab }) {
   return <Form title={tab.title} fields={tab.fields} />
 }
 
@@ -107,7 +100,15 @@ class BirthParentFormView extends React.Component<
   } & RouteComponentProps<{ tab: string }>
 > {
   render() {
-    const activeTab = getActiveTab(birthParentForm, this.props.match.params)
+    const { match } = this.props
+
+    const activeTabId = getActiveTabId(birthParentForm, this.props.match.params)
+
+    const activeTab = birthParentForm.tabs.find(({ id }) => id === activeTabId)
+
+    if (!activeTab) {
+      throw new Error(`Configuration for tab "${match.params.tab}" missing!`)
+    }
 
     return (
       <>
@@ -121,7 +122,7 @@ class BirthParentFormView extends React.Component<
                 id={`tab_${id}`}
                 onClick={() => this.props.goToTab(id)}
                 key={id}
-                active={activeTab === id}
+                active={activeTabId === id}
               >
                 {name}
               </Tab>
@@ -129,7 +130,7 @@ class BirthParentFormView extends React.Component<
           </Tabs>
         </ViewHeaderWithTabs>
         <FormContainer>
-          <FormTab {...this.props} />
+          <FormTab tab={activeTab} />
         </FormContainer>
       </>
     )
