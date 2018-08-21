@@ -12,10 +12,10 @@ jobs:
     - stage: integration tests
       script:
         - yarn dev:secrets:gen
-        - yarn run compose -d
+        - yarn compose -d
         - sleep 60
-        - yarn run start &
-        - sleep 120
+        - yarn start &
+        - sleep 60
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start
       env:

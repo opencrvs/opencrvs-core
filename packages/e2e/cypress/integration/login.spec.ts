@@ -17,6 +17,6 @@ context('Login', () => {
     cy.get('#code6').type('0')
 
     cy.get('#login-mobile-submit').click()
-    cy.get('#registration-form-box').should('be.visible')
+    cy.location('search').should('match', /\?token=.*/)
   })
 })
