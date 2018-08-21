@@ -66,14 +66,14 @@ const FormSection = ({
   )
 }
 
-const Form = withFormik<{ fields: any[]; title: string }, any>({
+const Form = withFormik<{ fields: IFormField[]; title: string }, any>({
   handleSubmit: values => {
     console.log(values)
   }
 })(FormSection)
 
-function getActiveTabId(form: any, viewParams: { tab?: string }) {
-  return viewParams.tab || form.tabs[0].id
+function getActiveTabId(form: IForm, viewParams: { tab?: string }) {
+  return viewParams.tab || form.sections[0].id
 }
 
 interface IFormTabProps {
@@ -85,7 +85,7 @@ interface IFormTabProps {
 function FormTabs({ form, activeTabId, onTabClick }: IFormTabProps) {
   return (
     <Tabs>
-      {form.tabs.map(({ name, id }) => (
+      {form.sections.map(({ name, id }) => (
         <Tab
           id={`tab_${id}`}
           onClick={() => onTabClick(id)}
@@ -108,7 +108,9 @@ class BirthParentFormView extends React.Component<
     const { match, goToTab } = this.props
 
     const activeTabId = getActiveTabId(birthParentForm, this.props.match.params)
-    const activeTab = birthParentForm.tabs.find(({ id }) => id === activeTabId)
+    const activeTab = birthParentForm.sections.find(
+      ({ id }) => id === activeTabId
+    )
 
     if (!activeTab) {
       throw new Error(`Configuration for tab "${match.params.tab}" missing!`)

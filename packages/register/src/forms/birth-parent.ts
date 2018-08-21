@@ -2,7 +2,7 @@ import * as validations from '../utils/validate'
 import { IForm } from './'
 
 export const birthParentForm: IForm = {
-  tabs: [
+  sections: [
     {
       id: 'child',
       name: 'Child',
