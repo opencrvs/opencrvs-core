@@ -25,6 +25,8 @@ const languageFromProps = ({ language }: IPageProps) => language
 const StyledPage = styled.div.attrs<IPage>({})`
   background: #f4f4f4;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   * {
     box-sizing: border-box;
     text-rendering: optimizeLegibility;

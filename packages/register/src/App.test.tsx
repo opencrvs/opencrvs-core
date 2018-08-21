@@ -101,11 +101,28 @@ describe('when user has a valid token in local storage', () => {
   describe('when user is in birth registration by parent informant view', () => {
     beforeEach(() => {
       history.replace(BIRTH_PARENT_FORM)
+      app.update()
     })
     describe('when user clicks the "mother" tab', () => {
       beforeEach(() => {
         app
           .find('#tab_mother')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('changes to the mother details section', () => {
+        expect(
+          app
+            .find('#form_section_title')
+            .hostNodes()
+            .text()
+        ).toMatch(/mother\'s details/i)
+      })
+    })
+    describe('when user clicks "next" button', () => {
+      beforeEach(() => {
+        app
+          .find('#next_tab')
           .hostNodes()
           .simulate('click')
       })

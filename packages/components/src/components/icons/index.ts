@@ -1,4 +1,5 @@
 export * from './ArrowBack'
+export * from './ArrowForward'
 export * from './Hamburger'
 export * from './ArrowWithGradient'
 export * from './DisabledArrow'

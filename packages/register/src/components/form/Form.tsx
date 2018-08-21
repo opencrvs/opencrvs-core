@@ -2,7 +2,6 @@ import * as React from 'react'
 import { withFormik } from 'formik'
 
 import { InputField } from '@opencrvs/components/lib/forms'
-import { Box } from '@opencrvs/components/lib/interface'
 
 import styled from '../../styled-components'
 import { IFormField } from '../../forms'
@@ -25,24 +24,22 @@ const FormSection = ({
   title: string
 }) => {
   return (
-    <Box>
-      <section>
-        <FormSectionTitle id="form_section_title">{title}</FormSectionTitle>
-        <form onSubmit={handleSubmit}>
-          {fields.map(field => {
-            return (
-              <FormItem key={`${field.name}`}>
-                <InputField
-                  id={field.name}
-                  type={field.type}
-                  label={field.label}
-                />
-              </FormItem>
-            )
-          })}
-        </form>
-      </section>
-    </Box>
+    <section>
+      <FormSectionTitle id="form_section_title">{title}</FormSectionTitle>
+      <form onSubmit={handleSubmit}>
+        {fields.map(field => {
+          return (
+            <FormItem key={`${field.name}`}>
+              <InputField
+                id={field.name}
+                type={field.type}
+                label={field.label}
+              />
+            </FormItem>
+          )
+        })}
+      </form>
+    </section>
   )
 }
 
