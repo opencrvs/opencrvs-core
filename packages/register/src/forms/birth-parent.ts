@@ -1,6 +1,7 @@
 import * as validations from '../utils/validate'
+import { IForm } from './'
 
-export const birthParentForm = {
+export const birthParentForm: IForm = {
   tabs: [
     {
       id: 'child',
@@ -24,8 +25,7 @@ export const birthParentForm = {
           name: 'firstName',
           type: 'text',
           label: "Mother's first name",
-          validate: [validations.required],
-          tab: 'mother'
+          validate: [validations.required]
         }
       ]
     }

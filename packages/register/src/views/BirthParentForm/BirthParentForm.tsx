@@ -11,6 +11,7 @@ import { ViewHeader } from '../../components/ViewHeader'
 import { goToTab } from '../../navigation/navigationActions'
 import styled from '../../styled-components'
 import { birthParentForm } from '../../forms/birth-parent'
+import { IFormField } from '@opencrvs/register/src/forms'
 
 export const messages = defineMessages({})
 
@@ -55,7 +56,7 @@ const ChildsDetails = ({
   title
 }: {
   handleSubmit: () => void
-  fields: any[]
+  fields: IFormField[]
   title: string
 }) => {
   return (
@@ -64,7 +65,7 @@ const ChildsDetails = ({
         <form onSubmit={handleSubmit}>
           {fields.map(field => {
             return (
-              <FormItem key={`${field.tab} ${field.name}`}>
+              <FormItem key={`${field.name}`}>
                 <InputField
                   id={field.name}
                   type={field.type}
