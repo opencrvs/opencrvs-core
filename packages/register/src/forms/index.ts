@@ -7,7 +7,7 @@ export interface IFormField {
   validate: Validation[]
 }
 
-export interface IFormTab {
+export interface IFormSection {
   id: string
   name: string
   title: string
@@ -15,5 +15,5 @@ export interface IFormTab {
 }
 
 export interface IForm {
-  tabs: IFormTab[]
+  sections: IFormSection[]
 }
