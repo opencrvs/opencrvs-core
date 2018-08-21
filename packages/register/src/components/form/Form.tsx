@@ -12,6 +12,7 @@ const FormItem = styled.div`
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.copy};
 `
 
 const FormSection = ({
@@ -31,6 +32,7 @@ const FormSection = ({
           return (
             <FormItem key={`${field.name}`}>
               <InputField
+                required={field.required}
                 id={field.name}
                 type={field.type}
                 label={field.label}

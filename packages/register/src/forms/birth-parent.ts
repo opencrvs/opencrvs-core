@@ -1,4 +1,3 @@
-import * as validations from '../utils/validate'
 import { IForm } from './'
 
 export const birthParentForm: IForm = {
@@ -12,7 +11,22 @@ export const birthParentForm: IForm = {
           name: 'firstName',
           type: 'text',
           label: 'First name',
-          validate: [validations.required]
+          required: true,
+          validate: []
+        },
+        {
+          name: 'foo',
+          type: 'text',
+          label: 'Label goes here',
+          required: false,
+          validate: []
+        },
+        {
+          name: 'bar',
+          type: 'text',
+          label: 'Label goes here',
+          required: false,
+          validate: []
         }
       ]
     },
@@ -25,7 +39,8 @@ export const birthParentForm: IForm = {
           name: 'firstName',
           type: 'text',
           label: "Mother's first name",
-          validate: [validations.required]
+          required: false,
+          validate: []
         }
       ]
     },

@@ -14,13 +14,14 @@ const styledInput = styled.input.attrs<IInputProps>({})
 
 const StyledInput = styledInput`
   width: 100%;
-  padding: 10px 2px;
+  padding: 10px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
   border: 0px solid;
   border-bottom: solid 1px
-    ${({ error, touched, theme }) =>
-      error && touched ? theme.colors.error : theme.colors.disabled};
+  ${({ error, touched, theme }) =>
+    error && touched ? theme.colors.error : theme.colors.disabled};
+  box-sizing: border-box;
   outline: none;
   ${({ theme }) => theme.fonts.defaultFontStyle};
   color: ${({ theme }) => theme.colors.secondary};

@@ -12,6 +12,7 @@ An Input Field with the custom and default HTML attributes:
 />
 ```
 
+**With an error**
 ```js
 <InputField
   id="erro-on-input"
@@ -27,12 +28,27 @@ An Input Field with the custom and default HTML attributes:
 />
 ```
 
+**Disabled field**
 ```js
 <InputField
   id="disabled-input"
   label="A disabled field"
   type="text"
   disabled
+  meta={{
+    touched: false
+  }}
+/>
+```
+
+**Optional field**
+
+```js
+<InputField
+  id="optional-input"
+  label="An optional field"
+  type="text"
+  required={false}
   meta={{
     touched: false
   }}

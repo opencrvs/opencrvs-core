@@ -7,6 +7,7 @@ import { InputLabel } from './InputLabel'
 export interface IProps extends IInputProps {
   id: string
   label?: string
+  required?: boolean
   meta?: { touched: boolean; error: string }
 }
 
@@ -19,20 +20,47 @@ const applyDefaultIfNotDisabled = (
   return !disabled && label ? label : ''
 }
 
+const InputHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const Optional = styled.div.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 14px;
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.accent};
+  flex-grow: 0;
+`
+
 export class InputField extends React.Component<IInputFieldProps, {}> {
   render() {
-    const { label, placeholder, meta, focusInput, ...props } = this.props
+    const {
+      label,
+      required = true,
+      placeholder,
+      meta,
+      focusInput,
+      ...props
+    } = this.props
 
     return (
       <div>
-        {label && <InputLabel disabled={props.disabled}>{label}</InputLabel>}
+        <InputHeader>
+          {label && <InputLabel disabled={props.disabled}>{label}</InputLabel>}
+          {!required && (
+            <Optional disabled={props.disabled}>•&nbsp;Optional</Optional>
+          )}
+        </InputHeader>
 
         <Input
           {...props}
           placeholder={
             placeholder
               ? placeholder
-              : applyDefaultIfNotDisabled(props.disabled, label)
+              : applyDefaultIfNotDisabled(props.disabled, placeholder)
           }
           error={Boolean(meta && meta.error)}
           touched={meta && meta.touched}

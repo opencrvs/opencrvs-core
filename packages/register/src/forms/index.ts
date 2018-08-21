@@ -5,6 +5,7 @@ export interface IFormField {
   type: string
   label: string
   validate: Validation[]
+  required?: boolean
 }
 
 export interface IFormSection {
