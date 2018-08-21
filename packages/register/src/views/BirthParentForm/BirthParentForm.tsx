@@ -35,20 +35,7 @@ const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
 `
 
-interface IFormSectionProps extends React.HTMLAttributes<HTMLDivElement> {
-  title: string
-}
-
-const FormSection = ({ title, children }: IFormSectionProps) => {
-  return (
-    <section>
-      <FormSectionTitle id="form_section_title">{title}</FormSectionTitle>
-      {children}
-    </section>
-  )
-}
-
-const ChildsDetails = ({
+const FormSection = ({
   handleSubmit,
   fields,
   title
@@ -59,7 +46,8 @@ const ChildsDetails = ({
 }) => {
   return (
     <Box>
-      <FormSection title={title}>
+      <section>
+        <FormSectionTitle id="form_section_title">{title}</FormSectionTitle>
         <form onSubmit={handleSubmit}>
           {fields.map(field => {
             return (
@@ -73,7 +61,7 @@ const ChildsDetails = ({
             )
           })}
         </form>
-      </FormSection>
+      </section>
     </Box>
   )
 }
@@ -82,7 +70,7 @@ const Form = withFormik<{ fields: any[]; title: string }, any>({
   handleSubmit: values => {
     console.log(values)
   }
-})(ChildsDetails)
+})(FormSection)
 
 function getActiveTabId(form: any, viewParams: { tab?: string }) {
   return viewParams.tab || form.tabs[0].id
