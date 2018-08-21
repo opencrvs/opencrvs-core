@@ -6,7 +6,7 @@ import {
   Store,
   StoreEnhancer
 } from 'redux'
-import { createBrowserHistory } from 'history'
+import { createBrowserHistory, History } from 'history'
 import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
   routerReducer,
@@ -17,9 +17,6 @@ import {
 import { profileReducer, ProfileState } from './profile/profileReducer'
 
 import { i18nReducer, I18nState } from './i18n/i18nReducer'
-
-export const history = createBrowserHistory()
-const middleware = routerMiddleware(history)
 
 export interface IStoreState {
   profile: ProfileState
@@ -35,21 +32,27 @@ const reducers = combineReducers<IStoreState>({
 
 const enhancedCreateStore = createReduxStore as StoreCreator
 
-const enhancer = compose(
-  install(),
-  applyMiddleware(middleware),
-  // tslint:disable no-any
-  typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
-    ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
-    : (f: any) => f
-  // tslint:enable no-any
-) as StoreEnhancer<IStoreState>
-
 export type AppStore = Store<IStoreState, AnyAction>
 
-export const createStore = (): AppStore =>
-  enhancedCreateStore<IStoreState, AnyAction>(
+export const createStore = (): { store: AppStore; history: History } => {
+  const history = createBrowserHistory()
+  const middleware = routerMiddleware(history)
+
+  const enhancer = compose(
+    install(),
+    applyMiddleware(middleware),
+    // tslint:disable no-any
+    typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
+      ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+      : (f: any) => f
+    // tslint:enable no-any
+  ) as StoreEnhancer<IStoreState>
+
+  const store = enhancedCreateStore<IStoreState, AnyAction>(
     reducers,
     getModel(reducers(undefined, { type: 'NOOP' })),
     enhancer
   )
+
+  return { store, history }
+}

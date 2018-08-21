@@ -8,7 +8,7 @@ import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as en from 'react-intl/locale-data/en'
-import { mount, configure, ReactWrapper } from 'enzyme'
+import { mount, configure } from 'enzyme'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '../App'
@@ -17,7 +17,6 @@ import { ThemeProvider } from 'styled-components'
 import { ENGLISH_STATE } from '../i18n/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { config } from '../config'
-import { store } from '../App'
 
 configure({ adapter: new Adapter() })
 
@@ -44,15 +43,20 @@ function createGraphQLClient() {
 addLocaleData([...en])
 
 export function getInitialState(): IStoreState {
-  const mockStore = createStore()
+  const { store: mockStore } = createStore()
 
   mockStore.dispatch({ type: 'NOOP' })
 
   return mockStore.getState()
 }
 
-export function createTestApp(): ReactWrapper {
-  return mount(<App client={createGraphQLClient()} />)
+export function createTestApp() {
+  const { store, history } = createStore()
+  const app = mount(
+    <App store={store} history={history} client={createGraphQLClient()} />
+  )
+
+  return { history, app }
 }
 
 interface ITestView {
@@ -70,6 +74,8 @@ function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
 }
 
 export function createTestComponent(node: React.ReactElement<ITestView>) {
+  const { store } = createStore()
+
   return mount(
     <Provider store={store}>
       <ThemeProvider theme={getTheme(config.LOCALE)}>

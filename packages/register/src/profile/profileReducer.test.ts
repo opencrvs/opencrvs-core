@@ -5,7 +5,7 @@ import { createStore, AppStore } from '../store'
 describe('profileReducer tests', () => {
   let store: AppStore
   beforeEach(() => {
-    store = createStore()
+    store = createStore().store
   })
 
   it('sets user as logged out on bad token', async () => {
