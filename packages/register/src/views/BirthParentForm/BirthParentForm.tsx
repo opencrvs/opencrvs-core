@@ -43,7 +43,7 @@ interface IFormSectionProps extends React.HTMLAttributes<HTMLDivElement> {
 const FormSection = ({ title, children }: IFormSectionProps) => {
   return (
     <FormSectionWrapper>
-      <FormSectionTitle>{title}</FormSectionTitle>
+      <FormSectionTitle id="form_section_title">{title}</FormSectionTitle>
       {children}
     </FormSectionWrapper>
   )
@@ -117,8 +117,8 @@ class BirthParentFormView extends React.Component<
           <Tabs>
             {birthParentForm.tabs.map(({ name, id }) => (
               <Tab
-                id={id}
-                onClick={this.props.goToTab}
+                id={`tab_${id}`}
+                onClick={() => this.props.goToTab(id)}
                 key={id}
                 active={activeTab === id}
               >

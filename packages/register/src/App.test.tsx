@@ -1,6 +1,10 @@
 import { createTestApp } from './tests/util'
 import { config } from '../src/config'
-import { SELECT_VITAL_EVENT, SELECT_INFORMANT } from './navigation/routes'
+import {
+  SELECT_VITAL_EVENT,
+  SELECT_INFORMANT,
+  BIRTH_PARENT_FORM
+} from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 
@@ -71,6 +75,7 @@ describe('when user has a valid token in local storage', () => {
       })
     })
   })
+
   describe('when user is in informant selection view', () => {
     beforeEach(() => {
       history.replace(SELECT_INFORMANT)
@@ -82,13 +87,35 @@ describe('when user has a valid token in local storage', () => {
           .hostNodes()
           .simulate('click')
       })
-      it('takes user to the informant selection view', () => {
+      it('takes user to the birth registration by parent informant view', () => {
         expect(
           app
             .find('#view_title')
             .hostNodes()
             .text()
         ).toMatch(/new birth registration/i)
+      })
+    })
+  })
+
+  describe('when user is in birth registration by parent informant view', () => {
+    beforeEach(() => {
+      history.replace(BIRTH_PARENT_FORM)
+    })
+    describe('when user clicks the "mother" tab', () => {
+      beforeEach(() => {
+        app
+          .find('#tab_mother')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('changes to the mother details section', () => {
+        expect(
+          app
+            .find('#form_section_title')
+            .hostNodes()
+            .text()
+        ).toMatch(/mother\'s details/i)
       })
     })
   })
