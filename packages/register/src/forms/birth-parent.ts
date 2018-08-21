@@ -28,6 +28,24 @@ export const birthParentForm: IForm = {
           validate: [validations.required]
         }
       ]
+    },
+    {
+      id: 'father',
+      name: 'Father',
+      title: "Father's details",
+      fields: []
+    },
+    {
+      id: 'registration',
+      name: 'Registration',
+      title: 'Registration',
+      fields: []
+    },
+    {
+      id: 'documents',
+      name: 'Documents',
+      title: 'Documents',
+      fields: []
     }
   ]
 }

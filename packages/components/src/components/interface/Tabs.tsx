@@ -15,6 +15,8 @@ export interface IProps extends IButtonProps {
 
 export const Tab = styled(Button).attrs<IProps>({})`
   color: #fff;
+  padding-left: 20px;
+  padding-right: 20px;
   font-family: ${({ theme, active }) =>
     active ? theme.fonts.regularFont : theme.fonts.lightFont};
   font-size: 18px;
