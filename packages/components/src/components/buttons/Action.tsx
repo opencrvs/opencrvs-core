@@ -6,8 +6,8 @@ import { Button, IButtonProps } from './Button'
 
 const ActionContainer = styled(Button)`
   width: 100%;
-  height: 96px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+
+  padding: 30px ${({ theme }) => theme.grid.margin}px;
   background: #fff;
   color: #fff;
   text-align: left;
@@ -25,14 +25,25 @@ const ActionTitle = styled.h3`
   margin: 0;
 `
 
+const ActionDescription = styled.p`
+  color: #30495f;
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-size: 14px;
+  margin: 0;
+`
+
 export interface IActionProps extends IButtonProps {
   title: string
+  description?: string
 }
 
-export function Action({ title, ...props }: IActionProps) {
+export function Action({ title, description, ...props }: IActionProps) {
   return (
     <ActionContainer {...props}>
-      <ActionTitle>{title}</ActionTitle>
+      <div>
+        <ActionTitle>{title}</ActionTitle>
+        {description && <ActionDescription>{description}</ActionDescription>}
+      </div>
     </ActionContainer>
   )
 }
