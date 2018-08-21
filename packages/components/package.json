@@ -14,7 +14,7 @@
     "clean": "rm -rf lib",
     "start": "concurrently 'styleguidist server' 'tsc -w'",
     "postinstall": "yarn build",
-    "build": "yarn clean && styleguidist build && tsc",
+    "build": "yarn clean && tsc",
     "docker-build": "docker build -t components .",
     "docker-run": "docker run -it --rm -p 5000:5000 --name components components"
   },
