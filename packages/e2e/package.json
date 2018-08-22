@@ -8,6 +8,6 @@
   },
   "scripts": {
     "start": "cypress run",
-    "open": "cypress open"
+    "open": "CYPRESS_REGISTER_URL=http://localhost:3020/ cypress open"
   }
 }
