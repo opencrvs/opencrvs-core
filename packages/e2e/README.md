@@ -8,6 +8,8 @@ yarn open
 
 These test will automatically be run on travis-ci when you create a PR and will be run against our staging environment once once the code hits master and the staging environment has be auto-deployed.
 
+These automatic tests run can be reviewed on the [Cypress OpenCRVS Dashboard](https://dashboard.cypress.io/#/projects/ayoz3q/runs).
+
 These tests are meant for:
 - Making sure integrations work as intended
 - Verifying an environment works flawlessly, regardless if it's your local one, staging or production environment. Most valuable time to run these tests is probably right after deployment.
