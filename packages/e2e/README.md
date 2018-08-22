@@ -2,8 +2,8 @@
 
 These tests are meant for:
 - Making sure integrations work as intended
-- Verifying an environment works flawlessly, regardless if it's your local one, staging or production environment. Most valuable time to run these tests is probably right after deployment. A future goal is to run these tests for all pull requests after each push.
-
+- Verifying an environment works flawlessly, regardless if it's your local one, staging or production environment. Most valuable time to run these tests is probably right after deployment.
+- Ensuring new PRs don't break existing functionality
 
 These tests are not meant for:
 - Verifying all possible scenario works
