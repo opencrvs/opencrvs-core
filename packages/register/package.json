@@ -31,8 +31,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3000 react-scripts-ts start",
-    "verify-build-config":
-      "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
     "build": "yarn verify-build-config && react-scripts-ts build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
@@ -59,7 +58,7 @@
     "enzyme-adapter-react-16": "^1.2.0",
     "prettier": "^1.12.1",
     "ts-node": "^6.1.1",
-    "typescript": "^2.8.3"
+    "typescript": "^3.0.1"
   },
   "jest": {
     "collectCoverageFrom": [

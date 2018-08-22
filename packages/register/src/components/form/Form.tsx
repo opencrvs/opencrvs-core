@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { withFormik } from 'formik'
 
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
 
 import styled from '../../styled-components'
 import { IFormField } from '../../forms'
@@ -14,6 +14,28 @@ const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
 `
+
+function getInputField(field: IFormField) {
+  if (field.type === 'select') {
+    return (
+      <InputField
+        component={Select}
+        options={field.options}
+        required={field.required}
+        id={field.name}
+        label={field.label}
+      />
+    )
+  }
+  return (
+    <InputField
+      component={TextInput}
+      required={field.required}
+      id={field.name}
+      label={field.label}
+    />
+  )
+}
 
 const FormSection = ({
   handleSubmit,
@@ -30,14 +52,7 @@ const FormSection = ({
       <form onSubmit={handleSubmit}>
         {fields.map(field => {
           return (
-            <FormItem key={`${field.name}`}>
-              <InputField
-                required={field.required}
-                id={field.name}
-                type={field.type}
-                label={field.label}
-              />
-            </FormItem>
+            <FormItem key={`${field.name}`}>{getInputField(field)}</FormItem>
           )
         })}
       </form>

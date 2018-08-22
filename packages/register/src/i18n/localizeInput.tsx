@@ -1,34 +1,37 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { IInputFieldProps } from '@opencrvs/components/lib/forms'
-import { WrappedFieldProps } from 'redux-form'
-import { Validation } from '../utils/validate'
+import { IValidationResult } from '../utils/validate'
 
-export const localizeInput = (
-  Component: React.ComponentType<IInputFieldProps>
-): React.ComponentType<IInputFieldProps & WrappedFieldProps> => {
-  class LocalizedInput extends React.Component<
-    { meta: { error: Validation } } & IInputFieldProps &
-      InjectedIntlProps &
-      WrappedFieldProps,
-    {}
-  > {
+// Wrapped component takes a validation object to be translated instead of an error string
+type MetaPropsWithMessageDescriptors = {
+  meta: { error: IValidationResult }
+}
+
+export function localizeInput<InputComponentProps>(
+  Component: React.ComponentClass<IInputFieldProps & InputComponentProps>
+): React.ComponentClass<IInputFieldProps & InputComponentProps> {
+  type PropsForFinalComponent = InputComponentProps &
+    MetaPropsWithMessageDescriptors &
+    IInputFieldProps &
+    InjectedIntlProps
+
+  class LocalizedInput extends React.Component<PropsForFinalComponent, {}> {
     render() {
-      const { meta, intl, input, ...props } = this.props
+      const { meta, intl } = this.props
 
       return (
         <Component
-          {...input}
-          {...props}
+          {...this.props}
           meta={{
             touched: meta.touched,
             error:
               meta.error &&
-              intl.formatMessage(meta.error.message, meta.error.values)
+              intl.formatMessage(meta.error.message, meta.error.props)
           }}
         />
       )
     }
   }
-  return injectIntl(LocalizedInput)
+  return injectIntl<PropsForFinalComponent>(LocalizedInput)
 }

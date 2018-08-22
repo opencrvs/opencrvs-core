@@ -1,17 +1,20 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
-import { IInputProps, Input } from './Input'
+import { ITextInputProps, TextInput } from '../TextInput'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
+import { ISelectProps } from '../Select'
 
-export interface IProps extends IInputProps {
+export interface IInputFieldProps {
   id: string
   label?: string
+  placeholder?: string
   required?: boolean
+  disabled?: boolean
+  maxLength?: number
   meta?: { touched: boolean; error: string }
+  component?: React.ComponentClass<any>
 }
-
-export type IInputFieldProps = IProps & IInputProps
 
 const applyDefaultIfNotDisabled = (
   disabled?: boolean,
@@ -35,41 +38,48 @@ const Optional = styled.div.attrs<
   flex-grow: 0;
 `
 
-export class InputField extends React.Component<IInputFieldProps, {}> {
+export class InputField<
+  P = ITextInputProps | ISelectProps
+> extends React.Component<IInputFieldProps & P, {}> {
   render() {
     const {
       label,
       required = true,
       placeholder,
-      meta,
-      focusInput,
-      ...props
+      component = TextInput,
+      meta
     } = this.props
+
+    const Component = component
 
     return (
       <div>
         <InputHeader>
-          {label && <InputLabel disabled={props.disabled}>{label}</InputLabel>}
+          {label && (
+            <InputLabel disabled={this.props.disabled}>{label}</InputLabel>
+          )}
           {!required && (
-            <Optional disabled={props.disabled}>•&nbsp;Optional</Optional>
+            <Optional disabled={this.props.disabled}>•&nbsp;Optional</Optional>
           )}
         </InputHeader>
 
-        <Input
-          {...props}
+        <Component
+          {...this.props}
           placeholder={
             placeholder
               ? placeholder
-              : applyDefaultIfNotDisabled(props.disabled, placeholder)
+              : applyDefaultIfNotDisabled(this.props.disabled, placeholder)
           }
           error={Boolean(meta && meta.error)}
           touched={meta && meta.touched}
-          focusInput={focusInput}
         />
         {meta &&
           meta.error &&
           meta.touched && (
-            <InputError id={props.id + '_error'} centred={!props.maxLength}>
+            <InputError
+              id={this.props.id + '_error'}
+              centred={!this.props.maxLength}
+            >
               {meta.error}
             </InputError>
           )}

@@ -27,6 +27,18 @@ export const birthParentForm: IForm = {
           label: 'Label goes here',
           required: false,
           validate: []
+        },
+        {
+          name: 'baz',
+          type: 'select',
+          label: 'Label goes here',
+          required: true,
+          validate: [],
+          options: [
+            { value: 'chocolate', label: 'Chocolate' },
+            { value: 'strawberry', label: 'Strawberry' },
+            { value: 'vanilla', label: 'Vanilla' }
+          ]
         }
       ]
     },
