@@ -93,7 +93,7 @@ describe('when user has a valid token in local storage', () => {
             .find('#view_title')
             .hostNodes()
             .text()
-        ).toMatch(/new birth registration/i)
+        ).toMatch(/new birth declaration/i)
       })
     })
   })

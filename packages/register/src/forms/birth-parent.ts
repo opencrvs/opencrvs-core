@@ -1,10 +1,39 @@
 import { IForm } from './'
+import { defineMessages } from 'react-intl'
+
+const messages = defineMessages({
+  child: {
+    id: 'menu.child',
+    defaultMessage: 'Child',
+    description: 'Child'
+  },
+  mother: {
+    id: 'menu.mother',
+    defaultMessage: 'Mother',
+    description: 'Mother'
+  },
+  father: {
+    id: 'menu.father',
+    defaultMessage: 'Father',
+    description: 'Father'
+  },
+  documents: {
+    id: 'menu.informant',
+    defaultMessage: 'Documents',
+    description: 'Documents'
+  },
+  registration: {
+    id: 'menu.registration',
+    defaultMessage: 'Registration',
+    description: 'Registration'
+  }
+})
 
 export const birthParentForm: IForm = {
   sections: [
     {
       id: 'child',
-      name: 'Child',
+      name: messages.child,
       title: "Child's details",
       fields: [
         {
@@ -44,7 +73,7 @@ export const birthParentForm: IForm = {
     },
     {
       id: 'mother',
-      name: 'Mother',
+      name: messages.mother,
       title: "Mother's details",
       fields: [
         {
@@ -58,19 +87,19 @@ export const birthParentForm: IForm = {
     },
     {
       id: 'father',
-      name: 'Father',
+      name: messages.father,
       title: "Father's details",
       fields: []
     },
     {
       id: 'registration',
-      name: 'Registration',
+      name: messages.registration,
       title: 'Registration',
       fields: []
     },
     {
       id: 'documents',
-      name: 'Documents',
+      name: messages.documents,
       title: 'Documents',
       fields: []
     }

@@ -14,7 +14,7 @@ import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '../App'
 import { getSchema } from './graphql-schema-mock'
 import { ThemeProvider } from 'styled-components'
-import { ENGLISH_STATE } from '../i18n/en'
+import { ENGLISH_STATE } from '../i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { config } from '../config'
 

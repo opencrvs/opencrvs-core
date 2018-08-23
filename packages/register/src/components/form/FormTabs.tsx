@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { defineMessages } from 'react-intl'
 import { Tab, Tabs } from '@opencrvs/components/lib/interface'
 import { IFormSection } from '../../forms'
-
-export const messages = defineMessages({})
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 
 interface IFormTabProps {
   sections: IFormSection[]
@@ -11,7 +9,12 @@ interface IFormTabProps {
   onTabClick: (tabId: string) => void
 }
 
-export function FormTabs({ sections, activeTabId, onTabClick }: IFormTabProps) {
+function FormTabsComponent({
+  sections,
+  activeTabId,
+  onTabClick,
+  intl
+}: IFormTabProps & InjectedIntlProps) {
   return (
     <Tabs>
       {sections.map(({ name, id }) => (
@@ -21,9 +24,11 @@ export function FormTabs({ sections, activeTabId, onTabClick }: IFormTabProps) {
           key={id}
           active={activeTabId === id}
         >
-          {name}
+          {intl.formatMessage(name)}
         </Tab>
       ))}
     </Tabs>
   )
 }
+
+export const FormTabs = injectIntl(FormTabsComponent)

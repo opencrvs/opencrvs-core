@@ -4,7 +4,7 @@ import styled from '../styled-components'
 export interface IViewHeadingProps {
   title: string
   description?: string
-  breadcrump?: string
+  breadcrumb?: string
 }
 
 const ViewHeadingContainer = styled.div`
@@ -35,11 +35,11 @@ const ViewDescription = styled.p`
 export function ViewHeading({
   title,
   description,
-  breadcrump
+  breadcrumb
 }: IViewHeadingProps) {
   return (
     <ViewHeadingContainer>
-      {breadcrump && <Breadcrumb>{breadcrump}</Breadcrumb>}
+      {breadcrumb && <Breadcrumb>{breadcrumb}</Breadcrumb>}
       <ViewTitle id="view_title">{title}</ViewTitle>
       {description && <ViewDescription>{description}</ViewDescription>}
     </ViewHeadingContainer>
