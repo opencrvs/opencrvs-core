@@ -17,7 +17,7 @@ jobs:
         - yarn start &
         - sleep 60
         - cd packages/user-mgnt && yarn populate && cd ../..
-        - cd packages/e2e && yarn start
+        - cd packages/e2e && yarn start --record
       env:
         CYPRESS_REGISTER_URL=http://localhost:3020/
       services:
@@ -43,6 +43,6 @@ jobs:
     - stage: integration tests on staging
       if: branch = master AND type = push
       install: skip
-      script: cd packages/e2e && yarn && yarn start
+      script: cd packages/e2e && yarn && yarn start --record
       env:
         CYPRESS_REGISTER_URL=http://opencrvs-staging.jembi.org:5040/
