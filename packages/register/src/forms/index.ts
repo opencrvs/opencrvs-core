@@ -8,7 +8,7 @@ export interface ISelectOption {
 export interface IFormField {
   name: string
   type: string
-  label: string
+  label: FormattedMessage.MessageDescriptor
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
@@ -17,7 +17,7 @@ export interface IFormField {
 export interface IFormSection {
   id: string
   name: FormattedMessage.MessageDescriptor
-  title: string
+  title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
 }
 
