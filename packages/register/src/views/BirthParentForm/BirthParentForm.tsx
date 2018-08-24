@@ -24,6 +24,29 @@ const FormPrimaryButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
+export const messages = defineMessages({
+  newBirthRegistration: {
+    id: 'register.form.newBirthRegistration',
+    defaultMessage: 'New birth declaration',
+    description: 'The message that appears for new birth registrations'
+  },
+  saveDraft: {
+    id: 'register.form.saveDraft',
+    defaultMessage: 'Save draft',
+    description: 'Save draft button'
+  },
+  preview: {
+    id: 'register.form.preview',
+    defaultMessage: 'Preview',
+    description: 'Preview button'
+  },
+  next: {
+    id: 'register.form.next',
+    defaultMessage: 'Next',
+    description: 'Next button'
+  }
+})
+
 const FormContainer = styled.div`
   padding: 35px 25px;
   padding-bottom: 0;
@@ -63,14 +86,6 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
 
   return sections[currentIndex + 1]
 }
-
-export const messages = defineMessages({
-  newBirthRegistration: {
-    id: 'register.form.newBirthRegistration',
-    defaultMessage: 'New birth declaration',
-    description: 'The message that appears for new birth registrations'
-  }
-})
 
 class BirthParentFormView extends React.Component<
   {
@@ -118,7 +133,7 @@ class BirthParentFormView extends React.Component<
                   id="next_tab"
                   icon={() => <ArrowForward />}
                 >
-                  Next
+                  {intl.formatMessage(messages.next)}
                 </FormPrimaryButton>
               )}
             </FormAction>
@@ -126,10 +141,14 @@ class BirthParentFormView extends React.Component<
         </FormContainer>
         <ViewFooter>
           <FormAction>
-            <FormPrimaryButton id="save_draft">Save draft</FormPrimaryButton>
+            <FormPrimaryButton id="save_draft">
+              {intl.formatMessage(messages.saveDraft)}
+            </FormPrimaryButton>
           </FormAction>
           <FormAction>
-            <FormPrimaryButton id="preview">Preview</FormPrimaryButton>
+            <FormPrimaryButton id="preview">
+              {intl.formatMessage(messages.preview)}
+            </FormPrimaryButton>
           </FormAction>
         </ViewFooter>
       </FormViewContainer>

@@ -1,11 +1,12 @@
 export const ENGLISH_STATE = {
   lang: 'en',
   messages: {
-    'register.registerNewEventTitle': 'Declare a new vital event',
-    'register.registerNewEventDesc':
+    'register.selectVitalEvent.registerNewEventTitle':
+      'Declare a new vital event',
+    'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
-    'register.birthActionTitle': 'Birth',
-    'register.deathActionTitle': 'Death',
+    'register.selectVitalEvent.birthActionTitle': 'Birth',
+    'register.selectVitalEvent.deathActionTitle': 'Death',
     'form.mobileLabel': 'Mobile number',
     'form.mobilePlaceholder': '07XXXXXXXXX',
     'form.submit': 'Submit',
