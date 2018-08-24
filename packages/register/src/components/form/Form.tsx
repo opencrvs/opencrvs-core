@@ -65,10 +65,10 @@ function FormSectionComponent({
   )
 }
 
-const FormSection = injectIntl(FormSectionComponent)
-
-export const Form = withFormik<{ fields: IFormField[]; title: string }, any>({
-  handleSubmit: values => {
-    console.log(values)
-  }
-})(FormSection)
+export const Form = injectIntl(
+  withFormik<{ fields: IFormField[]; title: string } & InjectedIntlProps, any>({
+    handleSubmit: values => {
+      console.log(values)
+    }
+  })(FormSectionComponent)
+)
