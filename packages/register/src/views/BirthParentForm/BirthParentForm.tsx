@@ -125,7 +125,10 @@ class BirthParentFormView extends React.Component<
         </ViewHeaderWithTabs>
         <FormContainer>
           <Box>
-            <Form title={activeSection.title} fields={activeSection.fields} />
+            <Form
+              title={intl.formatMessage(activeSection.title)}
+              fields={activeSection.fields}
+            />
             <FormAction>
               {nextTab && (
                 <FormPrimaryButton
