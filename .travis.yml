@@ -24,7 +24,7 @@ jobs:
         - docker
 
     - stage: build and push docker images
-      # if: branch = master AND type = push
+      if: branch = master AND type = push
       install: skip
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
