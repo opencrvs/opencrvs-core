@@ -15,6 +15,7 @@ export const messages = defineMessages({})
 const StretchedHeader = styled(Header)`
   justify-content: flex-end;
   padding-bottom: 50px;
+  color: ${({ theme }) => theme.colors.background};
 `
 const ActionListStyled = styled(ActionList)`
   margin-top: -50px;
