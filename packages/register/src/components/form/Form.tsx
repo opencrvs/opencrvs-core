@@ -40,6 +40,7 @@ function getInputField(field: IFormField, label: string) {
 interface IFormSectionProps {
   fields: IFormField[]
   title: string
+  id: string
   handleSubmit: () => void
 }
 
@@ -47,11 +48,14 @@ function FormSectionComponent({
   handleSubmit,
   fields,
   title,
+  id,
   intl
 }: IFormSectionProps & InjectedIntlProps) {
   return (
     <section>
-      <FormSectionTitle id="form_section_title">{title}</FormSectionTitle>
+      <FormSectionTitle id={`form_section_title_${id}`}>
+        {title}
+      </FormSectionTitle>
       <form onSubmit={handleSubmit}>
         {fields.map(field => {
           return (
@@ -66,7 +70,10 @@ function FormSectionComponent({
 }
 
 export const Form = injectIntl(
-  withFormik<{ fields: IFormField[]; title: string } & InjectedIntlProps, any>({
+  withFormik<
+    { fields: IFormField[]; title: string; id: string } & InjectedIntlProps,
+    any
+  >({
     handleSubmit: values => {
       console.log(values)
     }

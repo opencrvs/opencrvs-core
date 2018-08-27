@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from '../styled-components'
 
 export interface IViewHeadingProps {
+  id: string
   title: string
   description?: string
   breadcrumb?: string
@@ -35,10 +36,11 @@ const ViewDescription = styled.p`
 export function ViewHeading({
   title,
   description,
-  breadcrumb
+  breadcrumb,
+  id
 }: IViewHeadingProps) {
   return (
-    <ViewHeadingContainer>
+    <ViewHeadingContainer id={id}>
       {breadcrumb && <Breadcrumb>{breadcrumb}</Breadcrumb>}
       <ViewTitle id="view_title">{title}</ViewTitle>
       {description && <ViewDescription>{description}</ViewDescription>}

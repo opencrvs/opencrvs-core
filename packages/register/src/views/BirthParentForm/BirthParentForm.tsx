@@ -115,6 +115,7 @@ class BirthParentFormView extends React.Component<
       <FormViewContainer>
         <ViewHeaderWithTabs
           breadcrumb="Informant: Parent"
+          id="informant_parent_view"
           title={intl.formatMessage(messages.newBirthRegistration)}
         >
           <FormTabs
@@ -128,6 +129,7 @@ class BirthParentFormView extends React.Component<
             <Form
               title={intl.formatMessage(activeSection.title)}
               fields={activeSection.fields}
+              id={activeSection.id}
             />
             <FormAction>
               {nextTab && (

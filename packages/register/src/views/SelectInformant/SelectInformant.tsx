@@ -77,6 +77,7 @@ export class SelectInformantView extends React.Component<
           breadcrumb={intl.formatMessage(messages.newBirthRegistration)}
           title={intl.formatMessage(messages.informantTitle)}
           description={intl.formatMessage(messages.informantDescription)}
+          id="select_informant_view"
         />
         <ActionList>
           <Action

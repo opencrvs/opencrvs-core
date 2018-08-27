@@ -40,6 +40,7 @@ class SelectVitalEventView extends React.Component<
         <ViewHeader
           title={intl.formatMessage(messages.registerNewEventTitle)}
           description={intl.formatMessage(messages.registerNewEventDesc)}
+          id="select_vital_event_view"
         />
         <ActionList>
           <Action
