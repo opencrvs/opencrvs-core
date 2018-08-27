@@ -1,17 +1,16 @@
 import * as React from 'react'
 
 export const DisabledArrow = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={38} height={20} {...props}>
+  <svg viewBox="0 0 42.7 25.9" width={42.7} height={25.9} {...props}>
     <title>Disabled arrow</title>
-    <g
-      fillRule="nonzero"
-      stroke="#F4F4F4"
-      strokeWidth={4}
-      fill="none"
-      strokeLinecap="round"
-    >
-      <path d="M2 10h30" />
-      <path strokeLinejoin="round" d="M28 2.929L35.071 10 28 17.071" />
+    <g id="Arrow-Gradient" stroke="#F4F4F4" strokeWidth={4} fill="none">
+      <path fill="none" strokeLinecap="round" d="M4.6,14h30" />
+      <polyline
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points="30.6,6.9 37.7,14 30.6,21 	"
+      />
     </g>
   </svg>
 )
