@@ -45,4 +45,4 @@ jobs:
       install: skip
       script: cd packages/e2e && yarn && yarn start --record
       env:
-        CYPRESS_REGISTER_URL=http://opencrvs-staging.jembi.org:5040/
+        CYPRESS_REGISTER_URL=https://login.opencrvs-staging.jembi.org/

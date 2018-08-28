@@ -25,8 +25,6 @@ services:
       - logger__level=error
       - authentication__type=disabled
       - idGenerator=uuidv4
-    ports:
-      - "3447:3447"
     restart: unless-stopped
     deploy:
       replicas: 2

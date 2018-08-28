@@ -54,6 +54,13 @@ To deploy to staging we use the same docker-compose files that are used in the d
 
 The deploy is easily executed by just running: `yarn deploy:staging` - you will need ssh access to the server for this to work.
 
+The applications will be available here:
+
+* [Register app](https://register.opencrvs-staging.jembi.org/)
+* [Login app](https://login.opencrvs-staging.jembi.org/)
+* [GraphQl gateway](https://gateway.opencrvs-staging.jembi.org/)
+* [Auth service](https://auth.opencrvs-staging.jembi.org/)
+
 Some useful commands to manage the swarm:
   * `ssh root@opencrvs-staging.jembi.org docker service ls` - see all services running in the swarm including how many replicas are running
   * `ssh root@opencrvs-staging.jembi.org docker service logs -f <service-id>` - stream the logs for a particular service (which could include logs from multiple replicas)
