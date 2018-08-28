@@ -71,7 +71,7 @@ describe('when user has a valid token in local storage', () => {
           .simulate('click')
       })
       it('takes user to the informant selection view', () => {
-        expect(app.find('#select_parent_informant').hostNodes()).toHaveLength(1)
+        expect(app.find('#select_informant_view').hostNodes()).toHaveLength(1)
       })
     })
   })
@@ -88,12 +88,7 @@ describe('when user has a valid token in local storage', () => {
           .simulate('click')
       })
       it('takes user to the birth registration by parent informant view', () => {
-        expect(
-          app
-            .find('#view_title')
-            .hostNodes()
-            .text()
-        ).toMatch(/new birth registration/i)
+        expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
       })
     })
   })
@@ -111,12 +106,9 @@ describe('when user has a valid token in local storage', () => {
           .simulate('click')
       })
       it('changes to the mother details section', () => {
-        expect(
-          app
-            .find('#form_section_title')
-            .hostNodes()
-            .text()
-        ).toMatch(/mother\'s details/i)
+        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
+          1
+        )
       })
     })
     describe('when user clicks "next" button', () => {
@@ -127,12 +119,9 @@ describe('when user has a valid token in local storage', () => {
           .simulate('click')
       })
       it('changes to the mother details section', () => {
-        expect(
-          app
-            .find('#form_section_title')
-            .hostNodes()
-            .text()
-        ).toMatch(/mother\'s details/i)
+        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
+          1
+        )
       })
     })
   })
