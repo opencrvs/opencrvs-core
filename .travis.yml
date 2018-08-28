@@ -4,11 +4,26 @@ node_js:
 cache: yarn
 jobs:
   include:
-    - stage: travis_retry test
+    - stage: unit tests
       after_success:
         - npm install codecov -g
         - codecov
-    - stage: push docker images
+
+    - stage: integration tests
+      script:
+        - yarn dev:secrets:gen
+        - yarn compose -d
+        - sleep 10
+        - yarn start &
+        - sleep 60
+        - cd packages/user-mgnt && yarn populate && cd ../..
+        - cd packages/e2e && yarn start --record
+      env:
+        CYPRESS_REGISTER_URL=http://localhost:3020/
+      services:
+        - docker
+
+    - stage: build and push docker images
       if: branch = master AND type = push
       install: skip
       script:
@@ -17,9 +32,17 @@ jobs:
       sudo: required
       services:
         - docker
+
     - stage: deploy to staging
       if: branch = master AND type = push
       install: skip
       script: yarn deploy:staging
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
+
+    - stage: integration tests on staging
+      if: branch = master AND type = push
+      install: skip
+      script: cd packages/e2e && yarn && yarn start --record
+      env:
+        CYPRESS_REGISTER_URL=https://login.opencrvs-staging.jembi.org/

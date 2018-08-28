@@ -8,7 +8,7 @@
     }
   },
   "scripts": {
-    "start": "lerna run build --scope @opencrvs/components && lerna run --parallel start",
+    "start": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e start",
     "dev":
       "yarn dev:secrets:gen && concurrently \"yarn run start\" \"yarn run compose\"",
     "dev:secrets:gen":

@@ -63,6 +63,7 @@ const ViewFooter = styled(Header)`
   flex-grow: 1;
   margin-top: -50px;
   padding-top: 100px;
+  padding-bottom: 40px;
 
   ${FormPrimaryButton} {
     width: 270px;
@@ -148,11 +149,6 @@ class BirthParentFormView extends React.Component<
           <FormAction>
             <FormPrimaryButton id="save_draft">
               {intl.formatMessage(messages.saveDraft)}
-            </FormPrimaryButton>
-          </FormAction>
-          <FormAction>
-            <FormPrimaryButton id="preview">
-              {intl.formatMessage(messages.preview)}
             </FormPrimaryButton>
           </FormAction>
         </ViewFooter>

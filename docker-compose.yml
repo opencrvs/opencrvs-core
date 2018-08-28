@@ -7,8 +7,6 @@ services:
       context: .
       dockerfile: ./Dockerfile-register
     restart: unless-stopped
-    ports:
-      - "5050:5000"
     deploy:
       replicas: 2
 
@@ -18,8 +16,6 @@ services:
       context: .
       dockerfile: ./Dockerfile-login
     restart: unless-stopped
-    ports:
-      - "5040:5000"
     deploy:
       replicas: 2
 
@@ -27,8 +23,6 @@ services:
     image: jembi/ocrvs-gateway:latest
     build: packages/gateway
     restart: unless-stopped
-    ports:
-      - "7070:7070"
     environment:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://openhim-core:5001/fhir
@@ -45,8 +39,6 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=600
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
-    ports:
-      - "4040:4040"
     deploy:
       replicas: 2
 
@@ -54,8 +46,6 @@ services:
     image: jembi/ocrvs-user-mgnt:latest
     build: packages/user-mgnt
     restart: unless-stopped
-    ports:
-      - "3030:3030"
     environment:
       - MONGO_URL=mongodb://mongo/user-mgnt
     deploy:
@@ -65,7 +55,5 @@ services:
     image: jembi/ocrvs-notification:latest
     build: packages/notification
     restart: unless-stopped
-    ports:
-      - "2020:2020"
     deploy:
       replicas: 2
