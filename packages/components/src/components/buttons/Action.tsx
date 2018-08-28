@@ -21,14 +21,16 @@ const ActionContainer = styled(Button)`
 `
 
 const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
-  color: ${({ disabled }) => (disabled ? '#D2D2D2' : '#526dc3')};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.primary};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 24px;
   margin: 0;
 `
 
 const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
-  color: ${({ disabled }) => (disabled ? '#D2D2D2' : '#30495f')};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.secondary};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 14px;
   margin: 0;

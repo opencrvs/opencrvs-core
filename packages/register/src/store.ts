@@ -16,18 +16,18 @@ import {
 
 import { profileReducer, ProfileState } from './profile/profileReducer'
 
-import { i18nReducer, I18nState } from './i18n/i18nReducer'
+import { intlReducer, IntlState } from './i18n/reducer'
 
 export interface IStoreState {
   profile: ProfileState
   router: RouterState
-  i18n: I18nState
+  i18n: IntlState
 }
 
 const reducers = combineReducers<IStoreState>({
   profile: profileReducer,
   router: routerReducer,
-  i18n: i18nReducer
+  i18n: intlReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

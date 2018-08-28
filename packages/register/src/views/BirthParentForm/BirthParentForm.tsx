@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-import { defineMessages } from 'react-intl'
 
 import { Box, Header } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
+
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 import styled from '../../styled-components'
 
@@ -23,7 +24,28 @@ const FormPrimaryButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
-export const messages = defineMessages({})
+export const messages = defineMessages({
+  newBirthRegistration: {
+    id: 'register.form.newBirthRegistration',
+    defaultMessage: 'New birth declaration',
+    description: 'The message that appears for new birth registrations'
+  },
+  saveDraft: {
+    id: 'register.form.saveDraft',
+    defaultMessage: 'Save draft',
+    description: 'Save draft button'
+  },
+  preview: {
+    id: 'register.form.preview',
+    defaultMessage: 'Preview',
+    description: 'Preview button'
+  },
+  next: {
+    id: 'register.form.next',
+    defaultMessage: 'Next',
+    description: 'Next button'
+  }
+})
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -69,10 +91,11 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
 class BirthParentFormView extends React.Component<
   {
     goToTab: typeof goToTabAction
-  } & RouteComponentProps<{ tab: string }>
+  } & InjectedIntlProps &
+    RouteComponentProps<{ tab: string }>
 > {
   render() {
-    const { match, goToTab } = this.props
+    const { match, goToTab, intl } = this.props
 
     const activeTabId = getActiveSectionId(
       birthParentForm,
@@ -92,8 +115,9 @@ class BirthParentFormView extends React.Component<
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
-          breadcrump="Informant: Parent"
-          title="New Birth Registration"
+          breadcrumb="Informant: Parent"
+          id="informant_parent_view"
+          title={intl.formatMessage(messages.newBirthRegistration)}
         >
           <FormTabs
             sections={birthParentForm.sections}
@@ -103,7 +127,11 @@ class BirthParentFormView extends React.Component<
         </ViewHeaderWithTabs>
         <FormContainer>
           <Box>
-            <Form title={activeSection.title} fields={activeSection.fields} />
+            <Form
+              title={intl.formatMessage(activeSection.title)}
+              fields={activeSection.fields}
+              id={activeSection.id}
+            />
             <FormAction>
               {nextTab && (
                 <FormPrimaryButton
@@ -111,7 +139,7 @@ class BirthParentFormView extends React.Component<
                   id="next_tab"
                   icon={() => <ArrowForward />}
                 >
-                  Next
+                  {intl.formatMessage(messages.next)}
                 </FormPrimaryButton>
               )}
             </FormAction>
@@ -119,7 +147,9 @@ class BirthParentFormView extends React.Component<
         </FormContainer>
         <ViewFooter>
           <FormAction>
-            <FormPrimaryButton id="save_draft">Save draft</FormPrimaryButton>
+            <FormPrimaryButton id="save_draft">
+              {intl.formatMessage(messages.saveDraft)}
+            </FormPrimaryButton>
           </FormAction>
         </ViewFooter>
       </FormViewContainer>
@@ -127,6 +157,6 @@ class BirthParentFormView extends React.Component<
   }
 }
 
-export const BirthParentForm = connect(null, { goToTab: goToTabAction })(
-  BirthParentFormView
+export const BirthParentForm = injectIntl(
+  connect(null, { goToTab: goToTabAction })(BirthParentFormView)
 )

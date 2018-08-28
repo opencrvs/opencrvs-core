@@ -1,4 +1,5 @@
 import { Validation } from '../utils/validate'
+import { FormattedMessage } from 'react-intl'
 
 export interface ISelectOption {
   value: string
@@ -7,7 +8,7 @@ export interface ISelectOption {
 export interface IFormField {
   name: string
   type: string
-  label: string
+  label: FormattedMessage.MessageDescriptor
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
@@ -15,8 +16,8 @@ export interface IFormField {
 
 export interface IFormSection {
   id: string
-  name: string
-  title: string
+  name: FormattedMessage.MessageDescriptor
+  title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
 }
 

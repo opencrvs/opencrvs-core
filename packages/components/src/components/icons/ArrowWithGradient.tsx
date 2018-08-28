@@ -2,41 +2,48 @@ import * as React from 'react'
 
 /* TODO one line is missing */
 export const ArrowWithGradient = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={38} height={20} {...props}>
-    <title>Arrow Gradient</title>
-    <defs>
+  <svg viewBox="0 0 42.7 25.9" width={42.7} height={25.9} {...props}>
+    <g id="Arrow-Gradient">
       <linearGradient
-        x1="96.468%"
-        y1="49.468%"
-        x2="3.532%"
-        y2="49.468%"
-        id="arrowWithGradientA"
+        id="ArrowGradient"
+        gradientUnits="userSpaceOnUse"
+        x1="-272.8998"
+        y1="25.9785"
+        x2="-273.8292"
+        y2="25.9785"
+        gradientTransform="matrix(30 0 0 -1 8220.5381 39.957)"
       >
-        <stop stopColor="#4C68C1" offset="0%" />
-        <stop stopColor="#B0C8F1" offset="100%" />
+        <stop offset={0} style={{ stopColor: '#4C68C1' }} />
+        <stop offset={1} style={{ stopColor: '#B0C8F1' }} />
       </linearGradient>
-      <linearGradient
-        x1="-20.088%"
-        y1="117.078%"
-        x2="126.274%"
-        y2="-28.936%"
-        id="arrowWithGradientB"
-      >
-        <stop stopColor="#4C68C1" offset="0%" />
-        <stop stopColor="#B0C8F1" offset="100%" />
-      </linearGradient>
-    </defs>
-    <g fillRule="nonzero" strokeWidth={4} fill="none" strokeLinecap="round">
       <path
-        d="M0 8h30"
-        stroke="url(#arrowWithGradientA)"
-        transform="translate(2 2)"
+        id="Line-3"
+        fill="none"
+        stroke="url(#ArrowGradient)"
+        strokeWidth={4}
+        strokeLinecap="round"
+        d="M4.6,14h30"
       />
-      <path
-        stroke="url(#arrowWithGradientB)"
+      <linearGradient
+        id="HorizontalGradient"
+        gradientUnits="userSpaceOnUse"
+        x1="-236.1376"
+        y1="402.7931"
+        x2="-234.674"
+        y2="404.2532"
+        gradientTransform="matrix(7.0711 7.0711 7.0711 -7.0711 -1157.5292 4531.8896)"
+      >
+        <stop offset={0} style={{ stopColor: '#4C68C1' }} />
+        <stop offset={1} style={{ stopColor: '#B0C8F1' }} />
+      </linearGradient>
+      <polyline
+        id="Line-6"
+        fill="none"
+        stroke="url(#HorizontalGradient)"
+        strokeWidth={4}
+        strokeLinecap="round"
         strokeLinejoin="round"
-        transform="rotate(45 24.586 11.414)"
-        d="M21 3h10v10"
+        points="30.6,6.9 37.7,14 30.6,21 	"
       />
     </g>
   </svg>
