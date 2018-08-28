@@ -22,7 +22,7 @@ const MenuButton = styled(PrimaryButton)`
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;
-  color: $white;
+  color: ${({ theme }) => theme.colors.white};
 `
 
 const BackButtonContainer = styled.div`

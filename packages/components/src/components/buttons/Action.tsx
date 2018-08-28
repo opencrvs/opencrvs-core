@@ -8,8 +8,8 @@ const ActionContainer = styled(Button)`
   width: 100%;
   height: 96px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  background: #fff;
-  color: #fff;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.white};
   text-align: left;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 10px;
@@ -19,7 +19,7 @@ const ActionContainer = styled(Button)`
 `
 
 const ActionTitle = styled.h3`
-  color: #526dc3;
+  color: ${({ theme }) => theme.colors.primary};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 24px;
   margin: 0;
