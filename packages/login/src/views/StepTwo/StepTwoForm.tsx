@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages } from 'react-intl'
 import { InjectedFormProps, reset } from 'redux-form'
 
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField, ITextInputProps } from '@opencrvs/components/lib/forms'
 import {
   SecondaryButton,
   PrimaryButton
@@ -92,7 +92,7 @@ const SecondaryButtonStyled = styled(SecondaryButton)`
   margin-right: 1em;
 `
 
-const LocalizedInputField = localizeInput(InputField)
+const LocalizedInputField = localizeInput<ITextInputProps>(InputField)
 
 const ClearFormLink = styled(Link)`
   position: relative;
@@ -134,7 +134,7 @@ export class StepTwoForm extends React.Component<
       fieldToFocus
     } = this.props
     return (
-      <StyledBox id="login-step-two-box" columns={4}>
+      <StyledBox id="login-step-two-box">
         <Title>
           <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
           <p>{intl.formatMessage(messages.stepTwoInstruction)}</p>

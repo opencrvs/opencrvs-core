@@ -17,7 +17,7 @@ const TopMenuContainer = styled.div`
 
 const MenuButton = styled(PrimaryButton)`
   height: 100%;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  padding: 0 30px;
   background: #4c68c1;
   text-transform: uppercase;
   font-size: 14px;

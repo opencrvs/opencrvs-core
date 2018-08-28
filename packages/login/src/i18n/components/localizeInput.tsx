@@ -4,22 +4,24 @@ import { IInputFieldProps } from '@opencrvs/components/lib/forms'
 import { WrappedFieldProps } from 'redux-form'
 import { Validation } from '../../utils/validate'
 
-export const localizeInput = (
-  Component: React.ComponentType<IInputFieldProps>
-): React.ComponentType<IInputFieldProps & WrappedFieldProps> => {
-  class LocalizedInput extends React.Component<
-    { meta: { error: Validation } } & IInputFieldProps &
-      InjectedIntlProps &
-      WrappedFieldProps,
-    {}
-  > {
+export function localizeInput<WrappedComponentProps>(
+  Component: React.ComponentClass<IInputFieldProps & WrappedComponentProps>
+): React.ComponentClass<
+  IInputFieldProps & WrappedFieldProps & WrappedComponentProps
+> {
+  type AllProps = WrappedComponentProps & {
+    meta: { error: Validation }
+  } & IInputFieldProps &
+    InjectedIntlProps &
+    WrappedFieldProps
+  class LocalizedInput extends React.Component<AllProps, {}> {
     render() {
-      const { meta, intl, input, ...props } = this.props
+      const { meta, intl, input } = this.props
 
       return (
         <Component
+          {...this.props}
           {...input}
-          {...props}
           meta={{
             touched: meta.touched,
             error:
@@ -30,5 +32,5 @@ export const localizeInput = (
       )
     }
   }
-  return injectIntl(LocalizedInput)
+  return injectIntl<AllProps>(LocalizedInput)
 }

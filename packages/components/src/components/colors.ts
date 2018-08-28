@@ -17,7 +17,7 @@ export interface IColors {
 }
 
 export const colors: IColors = {
-  accent: '#4CA1F2', // for links
+  accent: '#4C68C1',
   accentGradientDark: '#629FCC',
   accentGradientLight: '#7DC1EA',
   background: '#F4F4F4',

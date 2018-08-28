@@ -8,6 +8,8 @@
   },
   "rules": {
     "member-access": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "jsx-no-lambda": false,
+    "ordered-imports": false
   }
 }
