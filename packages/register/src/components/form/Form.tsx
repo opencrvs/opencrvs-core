@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { withFormik } from 'formik'
+import { withFormik, FormikProps } from 'formik'
+import { isEqual } from 'lodash'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 
 import {
   InputField,
@@ -8,7 +10,6 @@ import {
   DateField,
   TextArea
 } from '@opencrvs/components/lib/forms'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
 import { IFormField, Ii18nFormField, Ii18nSelectOption } from '../../forms'
 
@@ -21,7 +22,9 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-function getInputField(field: Ii18nFormField) {
+function GeneratedInputField(
+  { field, ...props }: { field: IFormField } & any /* TODO */
+) {
   if (field.type === 'select') {
     return (
       <InputField
@@ -29,9 +32,10 @@ function getInputField(field: Ii18nFormField) {
         options={field.options}
         required={field.required}
         id={field.name}
-        label={field.label}
-        prefix={field.prefix}
+        pref
+        ix={field.prefix}
         postfix={field.postfix}
+        label={props.label}
       />
     )
   }
@@ -44,60 +48,79 @@ function getInputField(field: Ii18nFormField) {
   return <InputField component={TextInput} id={field.name} {...field} />
 }
 
-interface IFormSectionProps {
+const toObject = (fields: IFormField[]) =>
+  fields.reduce(
+    (memo, field) => ({ ...memo, [field.name]: field.initialValue }),
+    {}
+  )
+
+interface IFormProps {
   fields: IFormField[]
   title: string
   id: string
-  handleSubmit: () => void
+  onChange: (values: any) => void
 }
 
-function FormSectionComponent({
-  handleSubmit,
-  fields,
-  title,
-  id,
-  intl
-}: IFormSectionProps & InjectedIntlProps) {
-  function internationaliseFieldObject(field: IFormField): Ii18nFormField {
-    return {
-      ...field,
-      label: intl.formatMessage(field.label),
-      options: field.options
-        ? field.options.map(opt => {
-            return {
-              ...opt,
-              label: intl.formatMessage(opt.label)
-            } as Ii18nSelectOption
-          })
-        : undefined
-    } as Ii18nFormField
-  }
-
-  return (
-    <section>
-      <FormSectionTitle id={`form_section_title_${id}`}>
-        {title}
-      </FormSectionTitle>
-      <form onSubmit={handleSubmit}>
-        {fields.map(field => {
-          return (
-            <FormItem key={`${field.name}`}>
-              {getInputField(internationaliseFieldObject(field))}
-            </FormItem>
-          )
-        })}
-      </form>
-    </section>
-  )
-}
-
-export const Form = injectIntl(
-  withFormik<
-    { fields: IFormField[]; title: string; id: string } & InjectedIntlProps,
-    any
-  >({
-    handleSubmit: values => {
-      console.log(values)
+class FormSection extends React.Component<
+  IFormProps & FormikProps<any> & InjectedIntlProps
+> {
+  componentWillReceiveProps(nextProps: any) {
+    if (!isEqual(nextProps.values, this.props.values)) {
+      this.props.onChange(nextProps.values)
     }
-  })(FormSectionComponent)
-)
+  }
+  render() {
+    const {
+      handleSubmit,
+      handleChange,
+      handleBlur,
+      values,
+      fields,
+      id,
+      intl,
+      title
+    } = this.props
+    function internationaliseFieldObject(field: IFormField): Ii18nFormField {
+      return {
+        ...field,
+        label: intl.formatMessage(field.label),
+        options: field.options
+          ? field.options.map(opt => {
+              return {
+                ...opt,
+                label: intl.formatMessage(opt.label)
+              } as Ii18nSelectOption
+            })
+          : undefined
+      } as Ii18nFormField
+    }
+    return (
+      <section>
+        <FormSectionTitle id={`form_section_title_${id}`}>
+          {title}
+        </FormSectionTitle>
+        <form onSubmit={handleSubmit}>
+          {fields.map(field => {
+            return (
+              <FormItem key={`${field.name}`}>
+                <GeneratedInputField
+                  field={internationaliseFieldObject(field)}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values[field.name]}
+                />
+              </FormItem>
+            )
+          })}
+        </form>
+      </section>
+    )
+  }
+}
+
+export const Form = withFormik<IFormProps, any>({
+  mapPropsToValues: props => toObject(props.fields),
+  handleSubmit: values => {
+    console.log(values)
+  }
+})(injectIntl(FormSection))

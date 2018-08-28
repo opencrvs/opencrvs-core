@@ -131,9 +131,10 @@ class BirthParentFormView extends React.Component<
         <FormContainer>
           <Box>
             <Form
-              title={intl.formatMessage(activeSection.title)}
-              fields={activeSection.fields}
               id={activeSection.id}
+              title={intl.formatMessage(activeSection.title)}
+              onChange={console.log.bind(console, 'onChange')}
+              fields={activeSection.fields}
             />
             <FormAction>
               {nextTab && (
