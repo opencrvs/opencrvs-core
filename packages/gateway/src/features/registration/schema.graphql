@@ -8,11 +8,16 @@ enum RegStatus {
 enum BirthRegType {
   BOTH_PARENTS
   SELF
-  STATELESS
-  REFUGEE
   INFORMANT_ONLY
-  SINGLE_PARENT
-  TEST
+  MOTHER_ONLY
+  FATHER_ONLY
+}
+
+enum BirthRegPresence {
+  BOTH_PARENTS
+  INFORMANT_ONLY
+  MOTHER_ONLY
+  FATHER_ONLY
   OTHER
 }
 
@@ -114,6 +119,7 @@ input BirthRegistrationInput {
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   birthRegistrationType: BirthRegType
+  presentAtBirthRegistration: BirthRegPresence
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
@@ -135,6 +141,7 @@ type BirthRegistration { # -> Composition
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
   birthRegistrationType: BirthRegType # -> Observation.valueString
+  presentAtBirthRegistration: BirthRegPresence
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime

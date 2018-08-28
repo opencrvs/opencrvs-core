@@ -16,11 +16,11 @@ type HumanName { # -> HumanName
 
 enum Relationship {
   GUARDIAN
+  NON_LEGAL_GUARDIAN
   MATERNAL_GRANDMOTHER
   MATERNAL_GRANDFATHER
   PATERNAL_GRANDMOTHER
   PATERNAL_GRANDFATHER
-  OTHER
 }
 
 enum LocationType {
@@ -36,6 +36,8 @@ enum IdentityIDType {
   DRIVING_LICENCE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
+  REFUGEE_NUMBER
+  ALIEN_NUMBER
 }
 
 enum EducationType {
@@ -49,25 +51,20 @@ enum EducationType {
   NOT_STATED
 }
 
-enum MigrantType {
-  FOREIGN_RESIDENT
-  STUDENT
-  ASYLUM_SEEKER
-  RESIDENT
-  VISITOR
-  TRANSIENT
-  REFUGEE
-  OTHER
-}
-
 enum MaritalStatusType {
   SINGLE
-  LAWFULLY_MARRIED
-  OTHER_UNIONS
+  MARRIED
   WIDOWED
   DIVORCED
-  SEPARATED
   NOT_STATED
+}
+
+enum AddressType {
+  CURRENT
+  PERMANENT
+  MILITARY_BASE_OR_CANTONMENT
+  IDP_CAMP # -> Disaster Camp
+  UNHCR_CAMP # -> UNHCR Camp
 }
 
 input IdentityInput {
@@ -93,9 +90,8 @@ input PersonInput {
   address: [AddressInput]
   photo: AttachmentInput
   deceased: Boolean
-  nationality: String
+  nationality: [String]
   educationalAttainment: EducationType
-  migrantStatus: MigrantType
 }
 
 type Person { # -> Patient
@@ -112,9 +108,8 @@ type Person { # -> Patient
   address: [Address] # -> .address
   photo: Attachment # -> .photo
   deceased: Boolean # -> .deceasedBoolean
-  nationality: String # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
+  nationality: [String] # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
   educationalAttainment: EducationType # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
-  migrantStatus: MigrantType # -> .extension(url='http://opencrvs.org/specs/extension/migrant-status').valueString
 }
 
 input ContactPointInput {
@@ -166,8 +161,8 @@ type Location { # -> Location (mostly the same property name except:)
 
 input AddressInput {
   use: String
-  type: String
-  text: String
+  type: AddressType
+  text: String # -> Reserve for geo-code
   line: [String]
   city: String
   district: String
@@ -180,8 +175,8 @@ input AddressInput {
 
 type Address { # -> Address (mostly the same property name except:)
   use: String
-  type: String
-  text: String
+  type: AddressType
+  text: String # -> Reserve for geo-code
   line: [String]
   city: String
   district: String

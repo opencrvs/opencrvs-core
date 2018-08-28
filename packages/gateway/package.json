@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/glob": "^5.0.35",
     "@types/hapi": "^17.0.12",
+    "@types/hapi-auth-jwt2": "^8.0.1",
     "@types/inert": "^5.1.0",
     "@types/lodash": "^4.14.108",
     "@types/node-fetch": "^1.6.9",
