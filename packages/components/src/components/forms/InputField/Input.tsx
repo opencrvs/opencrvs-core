@@ -14,7 +14,7 @@ const styledInput = styled.input.attrs<IInputProps>({})
 
 const StyledInput = styledInput`
   width: 100%;
-  min-height: 30px;
+  min-height: 48px;
   transition: border-color 500ms ease-out;
   border: 0px solid;
   border-bottom: solid 1px
