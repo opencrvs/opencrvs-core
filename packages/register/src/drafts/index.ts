@@ -1,14 +1,21 @@
-const CREATE_DRAFT = 'DRAFTS/CREATE_DRAFT'
+const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
 
-interface IDraft {
+export interface IDraft {
   id: number
 }
 
-type CreateDraftAction = { type: typeof CREATE_DRAFT }
-type ModifyDraftAction = { type: typeof MODIFY_DRAFT; payload: IDraft }
+type StoreDraftAction = {
+  type: typeof STORE_DRAFT
+  payload: { draft: IDraft }
+}
 
-type Action = CreateDraftAction | ModifyDraftAction
+type ModifyDraftAction = {
+  type: typeof MODIFY_DRAFT
+  payload: { draft: IDraft }
+}
+
+type Action = StoreDraftAction | ModifyDraftAction
 
 export interface IDraftsState {
   drafts: IDraft[]
@@ -19,11 +26,15 @@ const initialState = {
 }
 
 export function createDraft() {
-  return { type: CREATE_DRAFT }
+  return { id: Date.now() }
 }
 
-export function modifyDraft(draft: IDraft) {
-  return { type: MODIFY_DRAFT, payload: draft }
+export function storeDraft(draft: IDraft): StoreDraftAction {
+  return { type: STORE_DRAFT, payload: { draft } }
+}
+
+export function modifyDraft(draft: IDraft): ModifyDraftAction {
+  return { type: MODIFY_DRAFT, payload: { draft } }
 }
 
 export function draftsReducer(
@@ -31,11 +42,12 @@ export function draftsReducer(
   action: Action
 ) {
   switch (action.type) {
-    case CREATE_DRAFT:
+    case STORE_DRAFT:
       return {
         ...state,
-        drafts: state.drafts.concat({ id: Date.now() })
+        drafts: state.drafts.concat(action.payload.draft)
       }
+
     default:
       return state
   }

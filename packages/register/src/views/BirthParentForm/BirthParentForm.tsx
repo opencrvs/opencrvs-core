@@ -14,6 +14,8 @@ import { goToTab as goToTabAction } from '../../navigation/navigationActions'
 import { birthParentForm } from '../../forms/birth-parent'
 import { IForm, IFormSection } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
+import { IStoreState } from '@opencrvs/register/src/store'
+import { IDraft } from '@opencrvs/register/src/drafts'
 
 const FormAction = styled.div`
   display: flex;
@@ -77,8 +79,8 @@ const ViewFooter = styled(Header)`
   }
 `
 
-function getActiveSectionId(form: IForm, viewParams: { tab?: string }) {
-  return viewParams.tab || form.sections[0].id
+function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
+  return viewParams.tabId || form.sections[0].id
 }
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
@@ -91,28 +93,15 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
-class BirthParentFormView extends React.Component<
-  {
-    goToTab: typeof goToTabAction
-  } & InjectedIntlProps &
-    RouteComponentProps<{ tab: string }>
-> {
+type Props = {
+  goToTab: typeof goToTabAction
+  draft: IDraft
+  activeSection: IFormSection
+} & InjectedIntlProps
+
+class BirthParentFormView extends React.Component<Props> {
   render() {
-    const { match, goToTab, intl } = this.props
-
-    const activeTabId = getActiveSectionId(
-      birthParentForm,
-      this.props.match.params
-    )
-
-    const activeSection = birthParentForm.sections.find(
-      ({ id }) => id === activeTabId
-    )
-
-    if (!activeSection) {
-      throw new Error(`Configuration for tab "${match.params.tab}" missing!`)
-    }
-
+    const { goToTab, intl, activeSection, draft } = this.props
     const nextTab = getNextSection(birthParentForm.sections, activeSection)
 
     return (
@@ -124,8 +113,8 @@ class BirthParentFormView extends React.Component<
         >
           <FormTabs
             sections={birthParentForm.sections}
-            activeTabId={activeTabId}
-            onTabClick={goToTab}
+            activeTabId={activeSection.id}
+            onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
           />
         </ViewHeaderWithTabs>
         <FormContainer>
@@ -139,7 +128,7 @@ class BirthParentFormView extends React.Component<
             <FormAction>
               {nextTab && (
                 <FormPrimaryButton
-                  onClick={() => goToTab(nextTab.id)}
+                  onClick={() => goToTab(draft.id, nextTab.id)}
                   id="next_tab"
                   icon={() => <ArrowForward />}
                 >
@@ -161,6 +150,36 @@ class BirthParentFormView extends React.Component<
   }
 }
 
-export const BirthParentForm = injectIntl(
-  connect(null, { goToTab: goToTabAction })(BirthParentFormView)
-)
+function mapStateToProps(
+  state: IStoreState,
+  props: Props & RouteComponentProps<{ tabId: string; draftId: string }>
+) {
+  const { match } = props
+
+  const activeTabId = getActiveSectionId(birthParentForm, match.params)
+
+  const activeSection = birthParentForm.sections.find(
+    ({ id }) => id === activeTabId
+  )
+
+  const draft = state.drafts.drafts.find(
+    ({ id }) => id === parseInt(match.params.draftId, 10)
+  )
+
+  if (!draft) {
+    throw new Error(`Draft "${match.params.draftId}" missing!`)
+  }
+
+  if (!activeSection) {
+    throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
+  }
+
+  return {
+    activeSection,
+    draft
+  }
+}
+
+export const BirthParentForm = connect(mapStateToProps, {
+  goToTab: goToTabAction
+})(injectIntl(BirthParentFormView))

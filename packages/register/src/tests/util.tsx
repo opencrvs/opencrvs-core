@@ -56,7 +56,7 @@ export function createTestApp() {
     <App store={store} history={history} client={createGraphQLClient()} />
   )
 
-  return { history, app }
+  return { history, app, store }
 }
 
 interface ITestView {
