@@ -60,7 +60,16 @@ export const birthParentForm: IForm = {
       id: 'father',
       name: 'Father',
       title: "Father's details",
-      fields: []
+      fields: [
+        {
+          name: 'fathersDetailsExist',
+          type: 'radioGroup',
+          label: "Do you have the father's details?",
+          required: true,
+          validate: [],
+          options: [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }]
+        }
+      ]
     },
     {
       id: 'registration',

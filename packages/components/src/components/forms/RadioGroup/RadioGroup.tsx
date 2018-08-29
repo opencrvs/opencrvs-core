@@ -2,7 +2,10 @@ import * as React from 'react'
 import { Radio } from './Radio'
 import styled from 'styled-components'
 
-const Wrapper = styled.div``
+const Wrapper = styled.div`
+  margin-top: 8px;
+  margin-bottom: 10px;
+`
 
 const List = styled.ul`
   list-style: none;

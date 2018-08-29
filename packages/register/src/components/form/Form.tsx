@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { withFormik } from 'formik'
 
-import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
+import {
+  InputField,
+  TextInput,
+  Select,
+  RadioGroup
+} from '@opencrvs/components/lib/forms'
 
 import styled from '../../styled-components'
 import { IFormField } from '../../forms'
@@ -20,6 +25,17 @@ function getInputField(field: IFormField) {
     return (
       <InputField
         component={Select}
+        options={field.options}
+        required={field.required}
+        id={field.name}
+        label={field.label}
+      />
+    )
+  }
+  if (field.type === 'radioGroup') {
+    return (
+      <InputField
+        component={RadioGroup}
         options={field.options}
         required={field.required}
         id={field.name}

@@ -18,11 +18,9 @@ const Label = styled.label`
 const Check = styled.span`
   display: inline-block;
   border: 2px solid ${({ theme }) => theme.colors.primary};
-  border-radius: 12px;
-  height: 12px;
-  width: 12px;
-  top: 30px;
-  left: 20px;
+  border-radius: 17px;
+  height: 17px;
+  width: 17px;
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   z-index: 1;
@@ -31,11 +29,12 @@ const Check = styled.span`
     display: block;
     position: relative;
     content: '';
-    border-radius: 100%;
-    height: 9px;
-    width: 9px;
-    top: 11%;
-    margin: auto;
+    background: ${({ theme }) => theme.colors.white};
+    border-radius: 50%;
+    height: 10px;
+    width: 10px;
+    top: 10%;
+    left: 10%;
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
   }
@@ -43,8 +42,8 @@ const Check = styled.span`
 
 const Input = styled.input`
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   opacity: 0;
   z-index: 2;
   cursor: pointer;
