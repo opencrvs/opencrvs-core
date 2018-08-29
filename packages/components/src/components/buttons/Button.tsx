@@ -10,16 +10,17 @@ const ButtonBase = styled.button`
   border: 0;
   justify-content: space-between;
   cursor: pointer;
+  background: transparent;
 `
+export interface IButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: () => React.ReactNode
+}
 
 /* TODO this should be the last component of this file,
  * figure out how to define priority for styleguidist
  */
-export function Button({
-  icon,
-  children,
-  ...otherProps
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & IButtonProps) {
+export function Button({ icon, children, ...otherProps }: IButtonProps) {
   return (
     <ButtonBase {...otherProps}>
       {children}
@@ -37,6 +38,3 @@ export const ButtonIcon = styled.div`
   /* TODO 1. only apply margin if not only child */
   margin-left: 2em;
 `
-export interface IButtonProps {
-  icon?: () => React.ReactNode
-}

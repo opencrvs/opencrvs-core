@@ -1,8 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { IInputProps, Input } from '../InputField/Input'
-import { InputError } from '../InputField/InputError'
-import { InputLabel } from '../InputField/InputLabel'
+import { ITextInputProps, TextInput } from '../TextInput'
 
 export interface IProps {
   id: string
@@ -21,9 +19,9 @@ export interface IState {
   yyyy: string
 }
 
-export type IInputFieldProps = IProps & IInputProps
+export type IInputFieldProps = IProps & ITextInputProps
 
-const DateSegment = styled(Input)`
+const DateSegment = styled(TextInput)`
   width: 4em;
   margin: 0 9px;
   text-align: center;
@@ -75,7 +73,6 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
 
     return (
       <div>
-        <InputLabel>{label}</InputLabel>
         <DateSegment
           {...props}
           id="dd"
@@ -116,13 +113,6 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
           value={this.state.yyyy}
           onChange={this.change}
         />
-        {meta &&
-          meta.error &&
-          meta.touched && (
-            <InputError id={props.id + '_error'} centred={!props.maxLength}>
-              {meta.error}
-            </InputError>
-          )}
       </div>
     )
   }

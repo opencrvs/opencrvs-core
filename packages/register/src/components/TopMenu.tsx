@@ -1,12 +1,23 @@
 import * as React from 'react'
-import { defineMessages } from 'react-intl'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 import { Hamburger, ArrowBack } from '@opencrvs/components/lib/icons'
 import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 import styled from '../styled-components'
 
-export const messages = defineMessages({})
+const messages = defineMessages({
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
+  },
+  menu: {
+    id: 'menu.menu',
+    defaultMessage: 'Menu',
+    description: 'Menu'
+  }
+})
 
 const TopMenuContainer = styled.div`
   height: 90px;
@@ -17,7 +28,7 @@ const TopMenuContainer = styled.div`
 
 const MenuButton = styled(PrimaryButton)`
   height: 100%;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  padding: 0 30px;
   background: #4c68c1;
   text-transform: uppercase;
   font-size: 14px;
@@ -50,16 +61,21 @@ const BackButtonText = styled.span`
   margin-left: 14px;
 `
 
-export class TopMenu extends React.Component {
+class TopMenuComponent extends React.Component<InjectedIntlProps> {
   render() {
+    const { intl } = this.props
     return (
       <TopMenuContainer>
         <BackButtonContainer>
           <BackButton icon={() => <ArrowBack />} />
-          <BackButtonText>Back</BackButtonText>
+          <BackButtonText>{intl.formatMessage(messages.back)}</BackButtonText>
         </BackButtonContainer>
-        <MenuButton icon={() => <Hamburger />}>Menu</MenuButton>
+        <MenuButton icon={() => <Hamburger />}>
+          {intl.formatMessage(messages.menu)}
+        </MenuButton>
       </TopMenuContainer>
     )
   }
 }
+
+export const TopMenu = injectIntl<{}>(TopMenuComponent)

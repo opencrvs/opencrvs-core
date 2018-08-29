@@ -1,23 +1,43 @@
-An Input Field with the custom and default HTML attributes:
+A wrapper for input elements that adds a label, an error message and an indicator if the input field is optional
+
+**With TextInput (default)**
 
 ```js
 <InputField
   id="default-input"
   label="Mobile number"
   placeholder="e.g: +44-XXXX-XXXXXX"
-  type="text"
   meta={{
     touched: false
   }}
 />
 ```
 
+**With Select**
+
+```js
+const Select = require('../Select').Select;
+
+<InputField
+  component={Select}
+  required={false}
+  id="select-input"
+  label="Mobile number"
+  placeholder="e.g: +44-XXXX-XXXXXX"
+  options={[
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' }
+  ]}
+/>
+```
+
+**With an error**
 ```js
 <InputField
   id="erro-on-input"
   label="Mobile number"
   placeholder="e.g: +44-XXXX-XXXXXX"
-  type="text"
   value="An input error"
   onChange={() => {}}
   meta={{
@@ -27,12 +47,25 @@ An Input Field with the custom and default HTML attributes:
 />
 ```
 
+**Disabled field**
 ```js
 <InputField
   id="disabled-input"
   label="A disabled field"
-  type="text"
   disabled
+  meta={{
+    touched: false
+  }}
+/>
+```
+
+**Optional field**
+
+```js
+<InputField
+  id="optional-input"
+  label="An optional field"
+  required={false}
   meta={{
     touched: false
   }}

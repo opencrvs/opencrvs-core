@@ -121,7 +121,7 @@ export class StepOneForm extends React.Component<
       submissionError
     } = this.props
     return (
-      <StyledBox id="login-step-one-box" columns={4}>
+      <StyledBox id="login-step-one-box">
         <Title>
           <h2>
             <EnglishText>OpenCRVS </EnglishText>
