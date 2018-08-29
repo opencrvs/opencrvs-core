@@ -16,7 +16,7 @@ export interface IState {
   yyyy: string
 }
 
-export type IInputFieldProps = IProps & ITextInputProps
+export type IDateFieldProps = IProps & ITextInputProps
 
 const DateSegment = styled(TextInput)`
   width: 4em;
@@ -31,12 +31,12 @@ const DateSegment = styled(TextInput)`
   }
 `
 
-export class DateField extends React.Component<IInputFieldProps, IState> {
+export class DateField extends React.Component<IDateFieldProps, IState> {
   private dd: React.RefObject<TextInput>
   private mm: React.RefObject<TextInput>
   private yyyy: React.RefObject<TextInput>
 
-  constructor(props: IInputFieldProps) {
+  constructor(props: IDateFieldProps) {
     super(props)
     this.dd = React.createRef()
     this.mm = React.createRef()
