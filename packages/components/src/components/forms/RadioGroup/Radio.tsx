@@ -4,6 +4,7 @@ import styled from 'styled-components'
 const Wrapper = styled.li`
   padding-top: 5px;
   padding-bottom: 5px;
+  list-style-type: none;
 `
 
 const Label = styled.label`
