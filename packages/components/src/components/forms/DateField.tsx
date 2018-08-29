@@ -45,15 +45,15 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
     if (props.value && typeof props.value === 'string') {
       const dateSegmentVals = props.value.split('-')
       this.state = {
-        dd: dateSegmentVals[0],
+        yyyy: dateSegmentVals[0],
         mm: dateSegmentVals[1],
-        yyyy: dateSegmentVals[2]
+        dd: dateSegmentVals[2]
       }
     } else {
       this.state = {
-        dd: '',
+        yyyy: '',
         mm: '',
-        yyyy: ''
+        dd: ''
       }
     }
   }
@@ -84,16 +84,19 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
           if (val.length > 4) {
             return
           }
+          break
       }
 
-      // @ts-ignore
-      this.setState({ [segmentType]: val }, () => {
-        if (this.props.onChange) {
-          this.props.onChange(
-            `${this.state.dd}-${this.state.mm}-${this.state.yyyy}`
-          )
+      this.setState(
+        { [segmentType]: val } as Pick<IState, 'dd' | 'mm' | 'yyyy'>,
+        () => {
+          if (this.props.onChange) {
+            this.props.onChange(
+              `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
+            )
+          }
         }
-      })
+      )
     }
   }
 
