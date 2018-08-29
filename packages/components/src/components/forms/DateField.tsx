@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, TextInput } from '../TextInput'
+import { ITextInputProps, TextInput } from './TextInput'
 
 export interface IProps {
   id: string
@@ -35,8 +35,15 @@ const DateSegment = styled(TextInput)`
 `
 
 export class DateField extends React.Component<IInputFieldProps, IState> {
+  private dd: React.RefObject<any>
+  private mm: React.RefObject<any>
+  private yyyy: React.RefObject<any>
+
   constructor(props: IInputFieldProps) {
     super(props)
+    this.dd = React.createRef()
+    this.mm = React.createRef()
+    this.yyyy = React.createRef()
 
     if (props.value && typeof props.value === 'string') {
       const dateSegmentVals = props.value.split('-')
@@ -57,25 +64,43 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
   }
 
   change(event: React.ChangeEvent<HTMLInputElement>) {
-    const update = {}
-    update[event.target.id] = event.target.value
-    this.setState(update, () => {
-      if (this.props.onChange) {
-        this.props.onChange(
-          `${this.state.dd}-${this.state.mm}-${this.state.yyyy}`
-        )
+    const segmentType = String(event.target.id.split('-').pop())
+    const val = event.target.value
+
+    if (['dd', 'mm', 'yyyy'].includes(segmentType)) {
+      switch (segmentType) {
+        case 'dd':
+          if (val.length > 1) {
+            this.mm.current.$element.current.focus()
+          }
+          break
+        case 'mm':
+          if (val.length > 1) {
+            this.yyyy.current.$element.current.focus()
+          }
+          break
       }
-    })
+
+      // @ts-ignore
+      this.setState({ [segmentType]: val }, () => {
+        if (this.props.onChange) {
+          this.props.onChange(
+            `${this.state.dd}-${this.state.mm}-${this.state.yyyy}`
+          )
+        }
+      })
+    }
   }
 
   render() {
-    const { label, meta, focusInput, ...props } = this.props
+    const { id, label, meta, focusInput, ...props } = this.props
 
     return (
-      <div>
+      <div id={id}>
         <DateSegment
           {...props}
-          id="dd"
+          id={`${id}-dd`}
+          innerRef={this.dd}
           error={Boolean(meta && meta.error)}
           touched={meta && meta.touched}
           focusInput={focusInput}
@@ -88,7 +113,8 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
         />
         <DateSegment
           {...props}
-          id="mm"
+          id={`${id}-mm`}
+          innerRef={this.mm}
           error={Boolean(meta && meta.error)}
           touched={meta && meta.touched}
           focusInput={false}
@@ -102,7 +128,8 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
         />
         <DateSegment
           {...props}
-          id="yyyy"
+          id={`${id}-yyyy`}
+          innerRef={this.yyyy}
           error={Boolean(meta && meta.error)}
           touched={meta && meta.touched}
           focusInput={false}
