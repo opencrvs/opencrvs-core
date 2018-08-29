@@ -6,6 +6,8 @@
   ],
   "rules": {
     "color-no-hex": true,
-    "color-named": "never"
+    "color-named": "never",
+    "no-descending-specificity": null,
+    "property-no-vendor-prefix": null
   }
 }

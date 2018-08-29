@@ -11,6 +11,15 @@ module.exports = {
   styleguideComponents: {
     Wrapper: path.join(__dirname, 'src/components/styleguide/ThemeWrapper')
   },
+  getComponentPathLine(componentPath) {
+    const name = path.basename(componentPath, '.tsx')
+    const dir = path.dirname(componentPath)
+    const exportDirectory = dir
+      .split('src/components/')
+      .slice(1)[0]
+      .split('/')[0]
+    return `import {${name}} from '@opencrvs/components/lib/${exportDirectory}';`
+  },
   sections: [
     {
       name: 'Buttons',

@@ -1,0 +1,36 @@
+logLevel = "INFO"
+defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+  [entryPoints.https.tls]
+
+[api]
+
+[ping]
+
+[docker]
+domain = "opencrvs-staging.jembi.org"
+swarmMode = true
+exposedByDefault = false
+watch = true
+
+[acme]
+email = "ryan@jembi.org"
+storage = "acme.json"
+entryPoint = "https"
+onHostRule = true
+
+[acme.httpChallenge]
+entryPoint = "http"
+
+[[acme.domains]]
+  main = "opencrvs-staging.jembi.org"
+  sans = ["register.opencrvs-staging.jembi.org", "login.opencrvs-staging.jembi.org", "auth.opencrvs-staging.jembi.org", "gateway.opencrvs-staging.jembi.org"]
+
+[retry]

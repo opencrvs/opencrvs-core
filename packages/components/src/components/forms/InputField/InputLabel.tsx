@@ -8,12 +8,14 @@ export type IInputLabel = { disabled?: boolean } & React.LabelHTMLAttributes<
 const styledInputLabel = styled.label.attrs<IInputLabel>({})
 
 const StyledInputLabel = styledInputLabel`
-  min-height: 18px;
-  width: 100%;
-  display: inline-block;
-  ${({ theme }) => theme.fonts.defaultFontStyle}
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 16px;
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.accent};
+
+  width: 100%;
+  margin-bottom: 5px;
+  display: inline-block;
 `
 
 export class InputLabel extends React.Component<IInputLabel> {

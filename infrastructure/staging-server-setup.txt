@@ -23,5 +23,8 @@ docker node ls
 # login to private registry on manager
 docker login
 
-# on manger, make mongo directory
+# on manger, create required directories
 mkdir -p /data/mongo
+mkdir -p /data/traefik
+touch /data/traefik/acme.json
+chmod 600 /data/traefik/acme.json
