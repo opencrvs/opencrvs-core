@@ -4,11 +4,8 @@ import { ITextInputProps, TextInput } from './TextInput'
 
 export interface IProps {
   id: string
-  label?: string
   disabled: boolean
-  type: string
   meta?: { touched: boolean; error: string }
-  min?: number
   focusInput: boolean
   onChange: (dateString: string) => {}
 }
@@ -35,9 +32,9 @@ const DateSegment = styled(TextInput)`
 `
 
 export class DateField extends React.Component<IInputFieldProps, IState> {
-  private dd: React.RefObject<any>
-  private mm: React.RefObject<any>
-  private yyyy: React.RefObject<any>
+  private dd: React.RefObject<TextInput>
+  private mm: React.RefObject<TextInput>
+  private yyyy: React.RefObject<TextInput>
 
   constructor(props: IInputFieldProps) {
     super(props)
@@ -59,26 +56,34 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
         yyyy: ''
       }
     }
-
-    this.change = this.change.bind(this)
   }
 
-  change(event: React.ChangeEvent<HTMLInputElement>) {
+  change = (event: React.ChangeEvent<HTMLInputElement>) => {
     const segmentType = String(event.target.id.split('-').pop())
     const val = event.target.value
 
     if (['dd', 'mm', 'yyyy'].includes(segmentType)) {
       switch (segmentType) {
         case 'dd':
-          if (val.length > 1) {
-            this.mm.current.$element.current.focus()
+          if (val.length > 2) {
+            return
+          }
+          if (val.length > 1 && this.mm.current) {
+            this.mm.current.focusField()
           }
           break
         case 'mm':
-          if (val.length > 1) {
-            this.yyyy.current.$element.current.focus()
+          if (val.length > 2) {
+            return
+          }
+          if (val.length > 1 && this.yyyy.current) {
+            this.yyyy.current.focusField()
           }
           break
+        case 'yyyy':
+          if (val.length > 4) {
+            return
+          }
       }
 
       // @ts-ignore
@@ -93,7 +98,7 @@ export class DateField extends React.Component<IInputFieldProps, IState> {
   }
 
   render() {
-    const { id, label, meta, focusInput, ...props } = this.props
+    const { id, meta, focusInput, ...props } = this.props
 
     return (
       <div id={id}>
