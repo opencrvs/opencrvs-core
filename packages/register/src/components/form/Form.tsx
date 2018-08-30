@@ -9,7 +9,7 @@ import {
 } from '@opencrvs/components/lib/forms'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
-import { IFormField } from '../../forms'
+import { IFormField, Ii18nFormField, Ii18nSelectOption } from '../../forms'
 
 const FormItem = styled.div`
   margin-bottom: 2em;
@@ -20,7 +20,7 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-function getInputField(field: IFormField, label: string) {
+function getInputField(field: Ii18nFormField) {
   if (field.type === 'select') {
     return (
       <InputField
@@ -28,7 +28,7 @@ function getInputField(field: IFormField, label: string) {
         options={field.options}
         required={field.required}
         id={field.name}
-        label={label}
+        label={field.label}
       />
     )
   }
@@ -39,7 +39,7 @@ function getInputField(field: IFormField, label: string) {
         options={field.options}
         required={field.required}
         id={field.name}
-        label={label}
+        label={field.label}
       />
     )
   }
@@ -48,7 +48,7 @@ function getInputField(field: IFormField, label: string) {
       component={TextInput}
       required={field.required}
       id={field.name}
-      label={label}
+      label={field.label}
     />
   )
 }
@@ -67,6 +67,21 @@ function FormSectionComponent({
   id,
   intl
 }: IFormSectionProps & InjectedIntlProps) {
+  function internationaliseFieldObject(field: IFormField): Ii18nFormField {
+    return {
+      ...field,
+      label: intl.formatMessage(field.label),
+      options: field.options
+        ? field.options.map(opt => {
+            return {
+              ...opt,
+              label: intl.formatMessage(opt.label)
+            } as Ii18nSelectOption
+          })
+        : undefined
+    } as Ii18nFormField
+  }
+
   return (
     <section>
       <FormSectionTitle id={`form_section_title_${id}`}>
@@ -76,7 +91,7 @@ function FormSectionComponent({
         {fields.map(field => {
           return (
             <FormItem key={`${field.name}`}>
-              {getInputField(field, intl.formatMessage(field.label))}
+              {getInputField(internationaliseFieldObject(field))}
             </FormItem>
           )
         })}
