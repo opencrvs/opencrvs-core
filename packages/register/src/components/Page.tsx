@@ -23,7 +23,7 @@ type IPage = IPageProps & IDispatchProps
 const languageFromProps = ({ language }: IPageProps) => language
 
 const StyledPage = styled.div.attrs<IPage>({})`
-  background: #f4f4f4;
+  background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;
   flex-direction: column;

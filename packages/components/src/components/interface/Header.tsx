@@ -5,7 +5,7 @@ export const Header = styled.section`
   display: flex;
   flex-direction: column;
 
-  color: white;
+  color: ${({ theme }) => theme.colors.white};
 
   overflow: auto;
   background: linear-gradient(

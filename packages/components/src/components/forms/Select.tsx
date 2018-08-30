@@ -11,7 +11,7 @@ export interface ISelectProps {
 const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
   ${({ theme }) => theme.fonts.defaultFontStyle};
   .react-select__control {
-    background: #f9f9f9;
+    background: ${({ theme }) => theme.colors.select};
     border-radius: 0;
     border: 0;
     box-shadow: none;
