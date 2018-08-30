@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { withFormik } from 'formik'
 
-import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
+import {
+  InputField,
+  TextInput,
+  Select,
+  DateField
+} from '@opencrvs/components/lib/forms'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
 import { IFormField } from '../../forms'
@@ -20,6 +25,17 @@ function getInputField(field: IFormField, label: string) {
     return (
       <InputField
         component={Select}
+        options={field.options}
+        required={field.required}
+        id={field.name}
+        label={label}
+      />
+    )
+  }
+  if (field.type === 'date') {
+    return (
+      <InputField
+        component={DateField}
         options={field.options}
         required={field.required}
         id={field.name}

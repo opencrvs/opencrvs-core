@@ -62,10 +62,80 @@ export const messages = defineMessages({
     defaultMessage: 'Documents',
     description: 'Form section title for Documents'
   },
-  firstName: {
-    id: 'formFields.firstName',
-    defaultMessage: 'First name',
-    description: 'Label for form field: First name'
+  childGivenName: {
+    id: 'formFields.childGivenName',
+    defaultMessage: 'Given name',
+    description: 'Label for form field: Given name'
+  },
+  childMiddleNames: {
+    id: 'formFields.childMiddleNames',
+    defaultMessage: 'Middle name(s)',
+    description: 'Label for form field: Middle names'
+  },
+  childFamilyName: {
+    id: 'formFields.childFamilyName',
+    defaultMessage: 'Family name',
+    description: 'Label for form field: Family name'
+  },
+  childGivenNameEng: {
+    id: 'formFields.childGivenName',
+    defaultMessage: 'Given name (in english)',
+    description: 'Label for form field: Given name in english'
+  },
+  childMiddleNamesEng: {
+    id: 'formFields.childMiddleNames',
+    defaultMessage: 'Middle name(s) (in english)',
+    description: 'Label for form field: Middle names in english'
+  },
+  childFamilyNameEng: {
+    id: 'formFields.childFamilyName',
+    defaultMessage: 'Family name (in english)',
+    description: 'Label for form field: Family name in english'
+  },
+  childSex: {
+    id: 'formFields.childSex',
+    defaultMessage: 'Sex',
+    description: 'Label for form field: Sex name'
+  },
+  childDateOfBirth: {
+    id: 'formFields.childDateOfBirth',
+    defaultMessage: 'Date of birth',
+    description: 'Label for form field: Date of birth'
+  },
+  attendantAtBirth: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Attendant at birth',
+    description: 'Label for form field: Attendant at birth'
+  },
+  typeOfBirth: {
+    id: 'formFields.typeOfBirth',
+    defaultMessage: 'Type of birth',
+    description: 'Label for form field: Type of birth'
+  },
+  orderOfBirth: {
+    id: 'formFields.orderOfBirth',
+    defaultMessage: 'Order of birth',
+    description: 'Label for form field: Order of birth'
+  },
+  weightAtBirth: {
+    id: 'formFields.weightAtBirth',
+    defaultMessage: 'Weight at birth',
+    description: 'Label for form field: Weight at birth'
+  },
+  placeOfDelivery: {
+    id: 'formFields.placeOfDelivery',
+    defaultMessage: 'Place of delivery',
+    description: 'Label for form field: Place of delivery'
+  },
+  deliveryInstitution: {
+    id: 'formFields.deliveryInstitution',
+    defaultMessage: 'Type or select institution',
+    description: 'Label for form field: Type or select institution'
+  },
+  deliveryAddress: {
+    id: 'formFields.deliveryAddress',
+    defaultMessage: 'Address of place of delivery',
+    description: 'Label for form field: Address of place of delivery'
   },
   mothersFirstName: {
     id: 'formFields.mothersFirstName',
@@ -87,37 +157,117 @@ export const birthParentForm: IForm = {
       title: messages.childTitle,
       fields: [
         {
-          name: 'firstName',
+          name: 'childGivenName',
           type: 'text',
-          label: messages.firstName,
+          label: messages.childGivenName,
           required: true,
           validate: []
         },
         {
-          name: 'foo',
+          name: 'childMiddleNames',
           type: 'text',
-          label: messages.defaultLabel,
+          label: messages.childMiddleNames,
           required: false,
           validate: []
         },
         {
-          name: 'bar',
+          name: 'childFamilyName',
           type: 'text',
-          label: messages.defaultLabel,
+          label: messages.childFamilyName,
+          validate: []
+        },
+        {
+          name: 'childGivenNameEng',
+          type: 'text',
+          label: messages.childGivenNameEng,
+          required: true,
+          validate: []
+        },
+        {
+          name: 'childMiddleNamesEng',
+          type: 'text',
+          label: messages.childMiddleNamesEng,
           required: false,
           validate: []
         },
         {
-          name: 'baz',
+          name: 'childFamilyNameEng',
+          type: 'text',
+          label: messages.childFamilyNameEng,
+          validate: []
+        },
+        {
+          name: 'childSex',
           type: 'select',
-          label: messages.defaultLabel,
+          label: messages.childSex,
           required: true,
           validate: [],
           options: [
-            { value: 'chocolate', label: 'Chocolate' },
-            { value: 'strawberry', label: 'Strawberry' },
-            { value: 'vanilla', label: 'Vanilla' }
+            { value: 'm', label: 'Male' },
+            { value: 'f', label: 'Female' },
+            { value: 'u', label: 'Unknown' }
           ]
+        },
+        {
+          name: 'dateOfBirth',
+          type: 'date',
+          label: messages.childDateOfBirth,
+          required: true,
+          validate: []
+        },
+        {
+          name: 'attendantAtBirth',
+          type: 'select',
+          label: messages.attendantAtBirth,
+          required: true,
+          validate: [],
+          options: [{ value: '?', label: '?' }]
+        },
+        {
+          name: 'typeOfBirth',
+          type: 'select',
+          label: messages.typeOfBirth,
+          required: true,
+          validate: [],
+          options: [{ value: '?', label: '?' }]
+        },
+        {
+          name: 'orderOfBirth',
+          type: 'select',
+          label: messages.orderOfBirth,
+          required: true,
+          validate: [],
+          options: [{ value: '?', label: '?' }]
+        },
+        {
+          name: 'weightAtBirth', // needs Kg unit
+          type: 'text',
+          label: messages.weightAtBirth,
+          required: true,
+          validate: []
+        },
+        {
+          name: 'placeOfDelivery',
+          type: 'select',
+          label: messages.placeOfDelivery,
+          required: true,
+          validate: [],
+          options: [{ value: '?', label: '?' }]
+        },
+        {
+          name: 'deliveryInstitution',
+          type: 'select',
+          label: messages.deliveryInstitution,
+          required: true,
+          validate: [],
+          options: [{ value: '?', label: '?' }]
+        },
+        {
+          name: 'deliveryAddress', // needs text area display
+          type: 'text',
+          label: messages.deliveryAddress,
+          required: true,
+          validate: []
         }
       ]
     },
