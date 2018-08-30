@@ -186,13 +186,6 @@ function mapStateToProps(
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
   }
 
-  // console.log(
-  //   'sent',
-  //   activeSectionId,
-  //   draft,
-  //   replaceInitialValues(activeSection.fields, draft[activeSectionId] || {})
-  // )
-
   return {
     activeSection: {
       ...activeSection,
