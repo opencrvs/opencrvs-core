@@ -94,13 +94,30 @@ class FormSection extends React.Component<
           : undefined
       } as Ii18nFormField
     }
+
+    /*
+     * HACK
+     *
+     * No idea why, but when "fields" prop is changed from outside,
+     * "values" still reflect the old version for one render.
+     *
+     * This causes React to throw an error. You can see this happening by doing:
+     *
+     * if (fields.length > Object.keys(values).length) {
+     *   console.log({ fields, values })
+     * }
+     */
+    const fieldsWithValuesDefined = fields.filter(
+      field => values[field.name] !== undefined
+    )
+
     return (
       <section>
         <FormSectionTitle id={`form_section_title_${id}`}>
           {title}
         </FormSectionTitle>
         <form onSubmit={handleSubmit}>
-          {fields.map(field => {
+          {fieldsWithValuesDefined.map(field => {
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
@@ -119,6 +136,7 @@ class FormSection extends React.Component<
 }
 
 export const Form = withFormik<IFormProps, any>({
+  enableReinitialize: true,
   mapPropsToValues: props => toObject(props.fields),
   handleSubmit: values => {
     console.log(values)
