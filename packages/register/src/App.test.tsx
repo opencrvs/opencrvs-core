@@ -125,7 +125,7 @@ describe('when user has a valid token in local storage', () => {
     describe('when user clicks "next" button', () => {
       beforeEach(() => {
         app
-          .find('#next_tab')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
       })
