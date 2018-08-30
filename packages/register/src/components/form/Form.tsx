@@ -33,22 +33,15 @@ const FormSectionTitle = styled.h2`
 
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
-function GeneratedInputField({
-  field,
-  ...props
-}: { field: Ii18nFormField } & Omit<IInputFieldProps, 'id'> & InputProps) {
+type GeneratedInputFieldProps = { field: Ii18nFormField } & Omit<
+  IInputFieldProps,
+  'id'
+> &
+  InputProps
+
+function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
-    return (
-      <InputField
-        component={Select}
-        options={field.options}
-        required={field.required}
-        id={field.name}
-        prefix={field.prefix}
-        postfix={field.postfix}
-        label={props.label}
-      />
-    )
+    return <InputField component={Select} id={field.name} {...field} />
   }
   if (field.type === 'date') {
     return <InputField component={DateField} id={field.name} {...field} />
