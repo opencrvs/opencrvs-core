@@ -353,7 +353,8 @@ export const birthParentForm: IForm = {
           type: 'text',
           label: messages.weightAtBirth,
           required: true,
-          validate: []
+          validate: [],
+          postfix: 'Kg'
         },
         {
           name: 'placeOfDelivery',

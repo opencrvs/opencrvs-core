@@ -29,6 +29,8 @@ function getInputField(field: Ii18nFormField) {
         required={field.required}
         id={field.name}
         label={field.label}
+        prefix={field.prefix}
+        postfix={field.postfix}
       />
     )
   }
@@ -40,6 +42,8 @@ function getInputField(field: Ii18nFormField) {
         required={field.required}
         id={field.name}
         label={field.label}
+        prefix={field.prefix}
+        postfix={field.postfix}
       />
     )
   }
@@ -49,6 +53,8 @@ function getInputField(field: Ii18nFormField) {
       required={field.required}
       id={field.name}
       label={field.label}
+      prefix={field.prefix}
+      postfix={field.postfix}
     />
   )
 }

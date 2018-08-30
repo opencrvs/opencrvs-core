@@ -48,6 +48,9 @@ const Padding = styled.span`
   padding: 0 4px;
   display: inline-flex;
   align-items: center;
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.accent};
 `
 
 const renderComponentOrString = (
