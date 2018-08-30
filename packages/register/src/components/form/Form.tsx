@@ -58,16 +58,18 @@ const toObject = (fields: IFormField[]) =>
     {}
   )
 
-interface IFormProps {
+interface IFormSectionProps {
   fields: IFormField[]
   title: string
   id: string
   onChange: (values: IFormSectionData) => void
 }
 
-type Props = IFormProps & FormikProps<IFormSectionData> & InjectedIntlProps
+type Props = IFormSectionProps &
+  FormikProps<IFormSectionData> &
+  InjectedIntlProps
 
-class FormSection extends React.Component<Props> {
+class FormSectionComponent extends React.Component<Props> {
   componentWillReceiveProps(nextProps: Props) {
     if (!isEqual(nextProps.values, this.props.values)) {
       this.props.onChange(nextProps.values)
@@ -139,10 +141,10 @@ class FormSection extends React.Component<Props> {
   }
 }
 
-export const Form = withFormik<IFormProps, IFormSectionData>({
+export const Form = withFormik<IFormSectionProps, IFormSectionData>({
   enableReinitialize: true,
   mapPropsToValues: props => toObject(props.fields),
   handleSubmit: values => {
     console.log(values)
   }
-})(injectIntl(FormSection))
+})(injectIntl(FormSectionComponent))
