@@ -349,7 +349,7 @@ export const birthParentForm: IForm = {
           validate: []
         },
         {
-          name: 'weightAtBirth', // needs Kg unit
+          name: 'weightAtBirth',
           type: 'text',
           label: messages.weightAtBirth,
           required: true,
