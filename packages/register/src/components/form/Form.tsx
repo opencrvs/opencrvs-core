@@ -8,11 +8,20 @@ import {
   TextInput,
   Select,
   DateField,
-  TextArea
+  TextArea,
+  ISelectProps,
+  IDateFieldProps,
+  ITextInputProps,
+  IInputFieldProps
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
-import { IFormField, Ii18nFormField, Ii18nSelectOption } from '../../forms'
-
+import {
+  IFormField,
+  Ii18nFormField,
+  Ii18nSelectOption,
+  IFormSectionData
+} from '../../forms'
+import { Omit } from '../../utils'
 const FormItem = styled.div`
   margin-bottom: 2em;
 `
@@ -22,9 +31,12 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-function GeneratedInputField(
-  { field, ...props }: { field: IFormField } & any /* TODO */
-) {
+type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
+
+function GeneratedInputField({
+  field,
+  ...props
+}: { field: Ii18nFormField } & Omit<IInputFieldProps, 'id'> & InputProps) {
   if (field.type === 'select') {
     return (
       <InputField
@@ -32,8 +44,7 @@ function GeneratedInputField(
         options={field.options}
         required={field.required}
         id={field.name}
-        pref
-        ix={field.prefix}
+        prefix={field.prefix}
         postfix={field.postfix}
         label={props.label}
       />
@@ -58,13 +69,13 @@ interface IFormProps {
   fields: IFormField[]
   title: string
   id: string
-  onChange: (values: any) => void
+  onChange: (values: IFormSectionData) => void
 }
 
-class FormSection extends React.Component<
-  IFormProps & FormikProps<any> & InjectedIntlProps
-> {
-  componentWillReceiveProps(nextProps: any) {
+type Props = IFormProps & FormikProps<IFormSectionData> & InjectedIntlProps
+
+class FormSection extends React.Component<Props> {
+  componentWillReceiveProps(nextProps: Props) {
     if (!isEqual(nextProps.values, this.props.values)) {
       this.props.onChange(nextProps.values)
     }
@@ -135,7 +146,7 @@ class FormSection extends React.Component<
   }
 }
 
-export const Form = withFormik<IFormProps, any>({
+export const Form = withFormik<IFormProps, IFormSectionData>({
   enableReinitialize: true,
   mapPropsToValues: props => toObject(props.fields),
   handleSubmit: values => {

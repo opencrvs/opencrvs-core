@@ -12,7 +12,7 @@ import styled from '../../styled-components'
 
 import { goToTab as goToTabAction } from '../../navigation/navigationActions'
 import { birthParentForm } from '../../forms/birth-parent'
-import { IForm, IFormSection, IFormField } from '../../forms'
+import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
@@ -97,13 +97,22 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
 
 type Props = {
   goToTab: typeof goToTabAction
-  modifyDraft: (sectionData: any) => void
-  initialValues: any
+  modifyDraft: typeof modifyDraft
   draft: IDraft
   activeSection: IFormSection
-} & InjectedIntlProps
+}
 
-class BirthParentFormView extends React.Component<Props> {
+class BirthParentFormView extends React.Component<Props & InjectedIntlProps> {
+  modifyDraft = (sectionData: IFormSectionData) => {
+    const { activeSection, draft } = this.props
+    this.props.modifyDraft({
+      ...draft,
+      data: {
+        ...draft.data,
+        [activeSection.id]: sectionData
+      }
+    })
+  }
   render() {
     const { goToTab, intl, activeSection, draft } = this.props
 
@@ -126,7 +135,7 @@ class BirthParentFormView extends React.Component<Props> {
           <Box>
             <Form
               id={activeSection.id}
-              onChange={this.props.modifyDraft}
+              onChange={this.modifyDraft}
               title={intl.formatMessage(activeSection.title)}
               fields={activeSection.fields}
             />
@@ -191,31 +200,14 @@ function mapStateToProps(
       ...activeSection,
       fields: replaceInitialValues(
         activeSection.fields,
-        draft[activeSectionId] || {}
+        draft.data[activeSectionId] || {}
       )
     },
     draft
   }
 }
 
-export const BirthParentForm = connect(
-  mapStateToProps,
-  (
-    dispatch,
-    ownProps: RouteComponentProps<{ tabId: string; draftId: string }>
-  ) => {
-    return {
-      modifyDraft: (sectionData: any) => {
-        const { match } = ownProps
-        const activeSectionId = getActiveSectionId(
-          birthParentForm,
-          match.params
-        )
-        const draftId = parseInt(match.params.draftId, 10)
-        dispatch(modifyDraft(draftId, activeSectionId, sectionData))
-      },
-      goToTab: (draftId: number, tabId: string) =>
-        dispatch(goToTabAction(draftId, tabId))
-    }
-  }
-)(injectIntl(BirthParentFormView))
+export const BirthParentForm = connect(mapStateToProps, {
+  modifyDraft,
+  goToTab: goToTabAction
+})(injectIntl<Props>(BirthParentFormView))

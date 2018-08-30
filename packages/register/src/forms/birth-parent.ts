@@ -234,6 +234,18 @@ export const messages = defineMessages({
   }
 })
 
+export interface IBirthParentFormData {
+  child: {
+    firstName: string
+    foo: string
+    bar: string
+    baz: string
+  }
+  mother: {
+    firstName: string
+  }
+}
+
 export const birthParentForm: IForm = {
   sections: [
     {

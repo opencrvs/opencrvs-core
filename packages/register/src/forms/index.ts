@@ -15,7 +15,7 @@ export interface IFormField {
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
-  initialValue: string
+  initialValue?: string
 }
 
 export interface IFormSection {
@@ -43,4 +43,12 @@ export interface Ii18nFormField {
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
+}
+
+export interface IFormSectionData {
+  [key: string]: string
+}
+
+export interface IFormData {
+  [key: string]: IFormSectionData
 }

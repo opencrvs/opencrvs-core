@@ -1,8 +1,11 @@
+import { IFormData } from '../forms'
+
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
 
 export interface IDraft {
   id: number
+  data: IFormData
 }
 
 type StoreDraftAction = {
@@ -12,7 +15,9 @@ type StoreDraftAction = {
 
 type ModifyDraftAction = {
   type: typeof MODIFY_DRAFT
-  payload: { draftId: number; sectionId: string; modifiedData: any }
+  payload: {
+    draft: IDraft
+  }
 }
 
 type Action = StoreDraftAction | ModifyDraftAction
@@ -26,19 +31,15 @@ const initialState = {
 }
 
 export function createDraft() {
-  return { id: Date.now() }
+  return { id: Date.now(), data: {} }
 }
 
 export function storeDraft(draft: IDraft): StoreDraftAction {
   return { type: STORE_DRAFT, payload: { draft } }
 }
 
-export function modifyDraft(
-  draftId: number,
-  sectionId: string,
-  modifiedData: any
-): ModifyDraftAction {
-  return { type: MODIFY_DRAFT, payload: { draftId, sectionId, modifiedData } }
+export function modifyDraft(draft: IDraft) {
+  return { type: MODIFY_DRAFT, payload: { draft } }
 }
 
 export function draftsReducerTMP(
@@ -55,11 +56,8 @@ export function draftsReducerTMP(
       return {
         ...state,
         drafts: state.drafts.map(draft => {
-          if (draft.id === action.payload.draftId) {
-            return {
-              ...draft,
-              [action.payload.sectionId]: action.payload.modifiedData
-            }
+          if (draft.id === action.payload.draft.id) {
+            return action.payload.draft
           }
           return draft
         })
