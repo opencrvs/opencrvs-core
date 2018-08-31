@@ -97,6 +97,26 @@ export const messages = defineMessages({
     defaultMessage: 'Sex',
     description: 'Label for form field: Sex name'
   },
+  childSexMale: {
+    id: 'formFields.childSexMale',
+    defaultMessage: 'Male',
+    description: 'Option for form field: Sex name'
+  },
+  childSexFemale: {
+    id: 'formFields.childSexFemale',
+    defaultMessage: 'Female',
+    description: 'Option for form field: Sex name'
+  },
+  childSexOther: {
+    id: 'formFields.childSexOther',
+    defaultMessage: 'Other',
+    description: 'Option for form field: Sex name'
+  },
+  childSexUnknown: {
+    id: 'formFields.childSexUnknown',
+    defaultMessage: 'Unknown',
+    description: 'Option for form field: Sex name'
+  },
   childDateOfBirth: {
     id: 'formFields.childDateOfBirth',
     defaultMessage: 'Date of birth',
@@ -107,14 +127,79 @@ export const messages = defineMessages({
     defaultMessage: 'Attendant at birth',
     description: 'Label for form field: Attendant at birth'
   },
+  attendantAtBirthPhysician: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Physician',
+    description: 'Label for form field: Attendant at birth'
+  },
+  attendantAtBirthNurse: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Nurse',
+    description: 'Label for form field: Attendant at birth'
+  },
+  attendantAtBirthNurseMidwife: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Nurse midwife',
+    description: 'Label for form field: Attendant at birth'
+  },
+  attendantAtBirthMidwife: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Midwife',
+    description: 'Label for form field: Attendant at birth'
+  },
+  attendantAtBirthOtherParamedicalPersonnel: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Other paramedical personnel',
+    description: 'Label for form field: Attendant at birth'
+  },
+  attendantAtBirthLayperson: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Layperson',
+    description: 'Label for form field: Attendant at birth'
+  },
+  attendantAtBirthNone: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'None',
+    description: 'Label for form field: Attendant at birth'
+  },
+  attendantAtBirthOther: {
+    id: 'formFields.attendantAtBirth',
+    defaultMessage: 'Other',
+    description: 'Label for form field: Attendant at birth'
+  },
   typeOfBirth: {
     id: 'formFields.typeOfBirth',
     defaultMessage: 'Type of birth',
     description: 'Label for form field: Type of birth'
   },
+  typeOfBirthSingle: {
+    id: 'formFields.typeOfBirth',
+    defaultMessage: 'Single',
+    description: 'Label for form field: Type of birth'
+  },
+  typeOfBirthTwin: {
+    id: 'formFields.typeOfBirth',
+    defaultMessage: 'Twin',
+    description: 'Label for form field: Type of birth'
+  },
+  typeOfBirthTriplet: {
+    id: 'formFields.typeOfBirth',
+    defaultMessage: 'Triplet',
+    description: 'Label for form field: Type of birth'
+  },
+  typeOfBirthQuadruplet: {
+    id: 'formFields.typeOfBirth',
+    defaultMessage: 'Quadruplet',
+    description: 'Label for form field: Type of birth'
+  },
+  typeOfBirthHigherMultipleDelivery: {
+    id: 'formFields.typeOfBirth',
+    defaultMessage: 'Higher multiple delivery',
+    description: 'Label for form field: Type of birth'
+  },
   orderOfBirth: {
     id: 'formFields.orderOfBirth',
-    defaultMessage: 'Order of birth',
+    defaultMessage: 'Order of birth (number)',
     description: 'Label for form field: Order of birth'
   },
   weightAtBirth: {
@@ -203,9 +288,10 @@ export const birthParentForm: IForm = {
           required: true,
           validate: [],
           options: [
-            { value: 'm', label: 'Male' },
-            { value: 'f', label: 'Female' },
-            { value: 'u', label: 'Unknown' }
+            { value: 'male', label: messages.childSexMale },
+            { value: 'female', label: messages.childSexFemale },
+            { value: 'other', label: messages.childSexOther },
+            { value: 'unknown', label: messages.childSexUnknown }
           ]
         },
         {
@@ -221,7 +307,22 @@ export const birthParentForm: IForm = {
           label: messages.attendantAtBirth,
           required: true,
           validate: [],
-          options: [{ value: '?', label: '?' }]
+          options: [
+            { value: 'PHYSICIAN', label: messages.attendantAtBirthPhysician },
+            { value: 'NURSE', label: messages.attendantAtBirthNurse },
+            {
+              value: 'NURSE_MIDWIFE',
+              label: messages.attendantAtBirthNurseMidwife
+            },
+            { value: 'MIDWIFE', label: messages.attendantAtBirthMidwife },
+            {
+              value: 'OTHER_PARAMEDICAL_PERSONNEL',
+              label: messages.attendantAtBirthOtherParamedicalPersonnel
+            },
+            { value: 'LAYPERSON', label: messages.attendantAtBirthLayperson },
+            { value: 'NONE', label: messages.attendantAtBirthNone },
+            { value: 'OTHER', label: messages.attendantAtBirthOther }
+          ]
         },
         {
           name: 'typeOfBirth',
@@ -229,22 +330,31 @@ export const birthParentForm: IForm = {
           label: messages.typeOfBirth,
           required: true,
           validate: [],
-          options: [{ value: '?', label: '?' }]
+          options: [
+            { value: 'SINGLE', label: messages.typeOfBirthSingle },
+            { value: 'TWIN', label: messages.typeOfBirthTwin },
+            { value: 'TRIPLET', label: messages.typeOfBirthTriplet },
+            { value: 'QUADRUPLET', label: messages.typeOfBirthQuadruplet },
+            {
+              value: 'HIGHER_MULTIPLE_DELIVERY',
+              label: messages.typeOfBirthHigherMultipleDelivery
+            }
+          ]
         },
         {
           name: 'orderOfBirth',
-          type: 'select',
+          type: 'text',
           label: messages.orderOfBirth,
           required: true,
-          validate: [],
-          options: [{ value: '?', label: '?' }]
+          validate: []
         },
         {
-          name: 'weightAtBirth', // needs Kg unit
+          name: 'weightAtBirth',
           type: 'text',
           label: messages.weightAtBirth,
           required: true,
-          validate: []
+          validate: [],
+          postfix: 'Kg'
         },
         {
           name: 'placeOfDelivery',
@@ -252,7 +362,7 @@ export const birthParentForm: IForm = {
           label: messages.placeOfDelivery,
           required: true,
           validate: [],
-          options: [{ value: '?', label: '?' }]
+          options: [{ value: '?', label: messages.defaultLabel }]
         },
         {
           name: 'deliveryInstitution',
@@ -260,14 +370,15 @@ export const birthParentForm: IForm = {
           label: messages.deliveryInstitution,
           required: true,
           validate: [],
-          options: [{ value: '?', label: '?' }]
+          options: [{ value: '?', label: messages.defaultLabel }]
         },
         {
-          name: 'deliveryAddress', // needs text area display
-          type: 'text',
+          name: 'deliveryAddress',
+          type: 'textarea',
           label: messages.deliveryAddress,
           required: true,
-          validate: []
+          validate: [],
+          disabled: true
         }
       ]
     },

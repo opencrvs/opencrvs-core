@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl'
 
 export interface ISelectOption {
   value: string
-  label: string
+  label: FormattedMessage.MessageDescriptor
 }
 export interface IFormField {
   name: string
@@ -12,6 +12,9 @@ export interface IFormField {
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
+  prefix?: React.ComponentClass<any> | string
+  postfix?: React.ComponentClass<any> | string
+  disabled?: boolean
 }
 
 export interface IFormSection {
@@ -23,4 +26,20 @@ export interface IFormSection {
 
 export interface IForm {
   sections: IFormSection[]
+}
+
+export interface Ii18nSelectOption {
+  value: string
+  label: string
+}
+export interface Ii18nFormField {
+  name: string
+  type: string
+  label: string
+  validate: Validation[]
+  required?: boolean
+  options?: ISelectOption[]
+  prefix?: React.ComponentClass<any> | string
+  postfix?: React.ComponentClass<any> | string
+  disabled?: boolean
 }

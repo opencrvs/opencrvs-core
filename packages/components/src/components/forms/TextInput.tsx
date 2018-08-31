@@ -24,7 +24,7 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   ${({ theme }) => theme.fonts.defaultFontStyle};
   color: ${({ theme }) => theme.colors.secondary};
   &[type='text'] {
-    background: ${({ theme }) => theme.colors.select};
+    background: ${({ theme }) => theme.colors.inputBackground};
   }
 
   &:focus {

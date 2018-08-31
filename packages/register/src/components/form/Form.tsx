@@ -5,11 +5,12 @@ import {
   InputField,
   TextInput,
   Select,
-  DateField
+  DateField,
+  TextArea
 } from '@opencrvs/components/lib/forms'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
-import { IFormField } from '../../forms'
+import { IFormField, Ii18nFormField, Ii18nSelectOption } from '../../forms'
 
 const FormItem = styled.div`
   margin-bottom: 2em;
@@ -20,7 +21,7 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-function getInputField(field: IFormField, label: string) {
+function getInputField(field: Ii18nFormField) {
   if (field.type === 'select') {
     return (
       <InputField
@@ -28,29 +29,19 @@ function getInputField(field: IFormField, label: string) {
         options={field.options}
         required={field.required}
         id={field.name}
-        label={label}
+        label={field.label}
+        prefix={field.prefix}
+        postfix={field.postfix}
       />
     )
   }
   if (field.type === 'date') {
-    return (
-      <InputField
-        component={DateField}
-        options={field.options}
-        required={field.required}
-        id={field.name}
-        label={label}
-      />
-    )
+    return <InputField component={DateField} id={field.name} {...field} />
   }
-  return (
-    <InputField
-      component={TextInput}
-      required={field.required}
-      id={field.name}
-      label={label}
-    />
-  )
+  if (field.type === 'textarea') {
+    return <InputField component={TextArea} id={field.name} {...field} />
+  }
+  return <InputField component={TextInput} id={field.name} {...field} />
 }
 
 interface IFormSectionProps {
@@ -67,6 +58,21 @@ function FormSectionComponent({
   id,
   intl
 }: IFormSectionProps & InjectedIntlProps) {
+  function internationaliseFieldObject(field: IFormField): Ii18nFormField {
+    return {
+      ...field,
+      label: intl.formatMessage(field.label),
+      options: field.options
+        ? field.options.map(opt => {
+            return {
+              ...opt,
+              label: intl.formatMessage(opt.label)
+            } as Ii18nSelectOption
+          })
+        : undefined
+    } as Ii18nFormField
+  }
+
   return (
     <section>
       <FormSectionTitle id={`form_section_title_${id}`}>
@@ -76,7 +82,7 @@ function FormSectionComponent({
         {fields.map(field => {
           return (
             <FormItem key={`${field.name}`}>
-              {getInputField(field, intl.formatMessage(field.label))}
+              {getInputField(internationaliseFieldObject(field))}
             </FormItem>
           )
         })}
