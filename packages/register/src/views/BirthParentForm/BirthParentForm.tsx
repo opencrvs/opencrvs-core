@@ -95,14 +95,19 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
-type Props = {
+type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
+}
+
+type Props = {
   draft: IDraft
   activeSection: IFormSection
 }
 
-class BirthParentFormView extends React.Component<Props & InjectedIntlProps> {
+class BirthParentFormView extends React.Component<
+  Props & DispatchProps & InjectedIntlProps
+> {
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     this.props.modifyDraft({
@@ -207,7 +212,7 @@ function mapStateToProps(
   }
 }
 
-export const BirthParentForm = connect(mapStateToProps, {
+export const BirthParentForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
   goToTab: goToTabAction
 })(injectIntl<Props>(BirthParentFormView))
