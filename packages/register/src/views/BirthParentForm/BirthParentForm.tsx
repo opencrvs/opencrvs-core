@@ -64,12 +64,15 @@ const ViewFooter = styled(Header)`
   margin-top: -50px;
   padding-top: 100px;
   padding-bottom: 40px;
-
+  /* stylelint-disable */
   ${FormPrimaryButton} {
+    /* stylelint-enable */
     width: 270px;
     justify-content: center;
   }
+  /* stylelint-disable */
   ${FormAction} {
+    /* stylelint-enable */
     margin-bottom: 1em;
   }
 `

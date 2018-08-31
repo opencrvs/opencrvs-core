@@ -28,12 +28,12 @@ const TopMenuContainer = styled.div`
 
 const MenuButton = styled(PrimaryButton)`
   height: 100%;
+  background: ${({ theme }) => theme.colors.primary};
   padding: 0 30px;
-  background: #4c68c1;
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;
-  color: #fff;
+  color: ${({ theme }) => theme.colors.white};
 `
 
 const BackButtonContainer = styled.div`
@@ -47,8 +47,9 @@ const BackButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
-
+  /* stylelint-disable */
   ${ButtonIcon} {
+    /* stylelint-enable */
     margin-left: 0em;
   }
 `

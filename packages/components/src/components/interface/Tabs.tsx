@@ -14,7 +14,7 @@ export interface IProps extends IButtonProps {
 }
 
 export const Tab = styled(Button).attrs<IProps>({})`
-  color: #fff;
+  color: ${({ theme }) => theme.colors.white};
   padding-left: 20px;
   padding-right: 20px;
   font-family: ${({ theme, active }) =>

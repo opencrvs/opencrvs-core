@@ -15,6 +15,7 @@ export interface IColors {
   copy: string
   hoverGradientDark: string
   inputBackground: string
+  white: string
 }
 
 export const colors: IColors = {
@@ -33,5 +34,6 @@ export const colors: IColors = {
   warning: '#EEB268',
   copy: '#35495D',
   hoverGradientDark: '#376fb7',
-  inputBackground: '#F9F9F9'
+  inputBackground: '#F9F9F9',
+  white: '#FFFFFF'
 }

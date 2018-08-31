@@ -4,7 +4,7 @@ import { Button, IButtonProps } from './Button'
 
 export const SecondaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.accent};
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `1px solid ${theme.colors.accent}`};
   border-radius: 2px;
   ${({ theme }) => theme.fonts.capsFontStyle};
@@ -14,8 +14,8 @@ export const SecondaryButton = styled(Button)`
       ${({ theme }) => theme.colors.hoverGradientDark},
       ${({ theme }) => theme.colors.primary}
     );
-    color: #ffffff;
-    border: #ffffff;
+    color: ${({ theme }) => theme.colors.white};
+    border: ${({ theme }) => theme.colors.white};
   }
 
   &:active {
@@ -24,7 +24,7 @@ export const SecondaryButton = styled(Button)`
   }
 
   &:disabled {
-    background-color: #ffffff;
+    background-color: ${({ theme }) => theme.colors.white};
     cursor: not-allowed;
     color: ${({ theme }) => theme.colors.disabled};
   }
