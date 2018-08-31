@@ -62,6 +62,16 @@ export const messages = defineMessages({
     defaultMessage: 'Documents',
     description: 'Form section title for Documents'
   },
+  previewTab: {
+    id: 'register.form.tabs.previewTab',
+    defaultMessage: 'Preview',
+    description: 'Tab title for Preview'
+  },
+  previewTitle: {
+    id: 'register.form.section.previewTitle',
+    defaultMessage: 'Preview',
+    description: 'Form section title for Preview'
+  },
   childGivenName: {
     id: 'formFields.childGivenName',
     defaultMessage: 'Given name',
@@ -429,6 +439,13 @@ export const birthParentForm: IForm = {
       id: 'documents',
       name: messages.documentsTab,
       title: messages.documentsTitle,
+      fields: []
+    },
+    {
+      id: 'preview',
+      type: 'preview',
+      name: messages.previewTab,
+      title: messages.previewTitle,
       fields: []
     }
   ]

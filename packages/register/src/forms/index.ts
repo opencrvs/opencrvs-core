@@ -20,6 +20,7 @@ export interface IFormField {
 
 export interface IFormSection {
   id: string
+  type?: string
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
