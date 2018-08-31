@@ -1,11 +1,13 @@
 import * as React from 'react'
 
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistrationAsParent } from '../../navigation/navigationActions'
-import { connect } from 'react-redux'
+import { createDraft, storeDraft } from '../../drafts'
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -65,9 +67,9 @@ export const messages = defineMessages({
 })
 
 export class SelectInformantView extends React.Component<
-  InjectedIntlProps & {
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-  }
+  {
+    goToBirthRegistrationAsParent: () => void
+  } & InjectedIntlProps
 > {
   render() {
     const { intl } = this.props
@@ -106,6 +108,14 @@ export class SelectInformantView extends React.Component<
   }
 }
 
-export const SelectInformant = injectIntl(
-  connect(null, { goToBirthRegistrationAsParent })(SelectInformantView)
-)
+export const SelectInformant = connect(null, function mapDispatchToProps(
+  dispatch: Dispatch
+) {
+  return {
+    goToBirthRegistrationAsParent: () => {
+      const draft = createDraft()
+      dispatch(storeDraft(draft))
+      dispatch(goToBirthRegistrationAsParent(draft.id))
+    }
+  }
+})(injectIntl(SelectInformantView))

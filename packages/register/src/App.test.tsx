@@ -3,15 +3,18 @@ import { config } from '../src/config'
 import {
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
-  BIRTH_PARENT_FORM
+  DRAFT_BIRTH_PARENT_FORM
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import { Store } from 'redux'
+import { storeDraft, createDraft } from './drafts'
 
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 
 beforeEach(() => {
+  history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -45,11 +48,14 @@ describe('when user has a valid token in url but an expired one in localStorage'
 describe('when user has a valid token in local storage', () => {
   let app: ReactWrapper
   let history: History
+  let store: Store
+
   beforeEach(() => {
     getItem.mockReturnValue(validToken)
     const testApp = createTestApp()
     app = testApp.app
     history = testApp.history
+    store = testApp.store
   })
 
   it("doesn't redirect user to SSO", async () => {
@@ -79,6 +85,7 @@ describe('when user has a valid token in local storage', () => {
   describe('when user is in informant selection view', () => {
     beforeEach(() => {
       history.replace(SELECT_INFORMANT)
+      app.update()
     })
     describe('when selects "Parent"', () => {
       beforeEach(() => {
@@ -95,7 +102,11 @@ describe('when user has a valid token in local storage', () => {
 
   describe('when user is in birth registration by parent informant view', () => {
     beforeEach(() => {
-      history.replace(BIRTH_PARENT_FORM)
+      const draft = createDraft()
+      store.dispatch(storeDraft(draft))
+      history.replace(
+        DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
+      )
       app.update()
     })
     describe('when user clicks the "mother" tab', () => {
@@ -114,12 +125,25 @@ describe('when user has a valid token in local storage', () => {
     describe('when user clicks "next" button', () => {
       beforeEach(() => {
         app
-          .find('#next_tab')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
       })
       it('changes to the mother details section', () => {
         expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
+          1
+        )
+      })
+    })
+    describe('when user clicks the "father" tab', () => {
+      beforeEach(() => {
+        app
+          .find('#tab_father')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('changes to the father details section', () => {
+        expect(app.find('#form_section_title_father').hostNodes()).toHaveLength(
           1
         )
       })
