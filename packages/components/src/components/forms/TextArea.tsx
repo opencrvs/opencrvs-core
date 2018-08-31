@@ -7,7 +7,6 @@ const StyledTextArea = styled.textarea`
   min-height: 80px;
   border: 0px solid;
   background-color: ${({ theme }) => theme.colors.inputBackground};
-  font-family: 'Noto Sans Display';
   font-size: 16px;
   color: ${({ theme }) => theme.colors.secondary};
 

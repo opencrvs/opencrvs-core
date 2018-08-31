@@ -231,6 +231,21 @@ export const messages = defineMessages({
     id: 'formFields.defaultLabel',
     defaultMessage: 'Label goes here',
     description: 'default label'
+  },
+  fathersDetailsExist: {
+    id: 'formFields.fathersDetailsExist',
+    defaultMessage: "Do you have the father's details?",
+    description: "Question to ask the user if they have the father's details"
+  },
+  confirm: {
+    id: 'formFields.confirm',
+    defaultMessage: 'Yes',
+    description: 'confirmation label for yes / no radio button'
+  },
+  deny: {
+    id: 'formFields.deny',
+    defaultMessage: 'No',
+    description: 'deny label for yes / no radio button'
   }
 })
 
@@ -417,7 +432,19 @@ export const birthParentForm: IForm = {
       id: 'father',
       name: messages.fatherTab,
       title: messages.fatherTitle,
-      fields: []
+      fields: [
+        {
+          name: 'fathersDetailsExist',
+          type: 'radioGroup',
+          label: messages.fathersDetailsExist,
+          required: true,
+          validate: [],
+          options: [
+            { value: '1', label: messages.confirm },
+            { value: '0', label: messages.deny }
+          ]
+        }
+      ]
     },
     {
       id: 'registration',

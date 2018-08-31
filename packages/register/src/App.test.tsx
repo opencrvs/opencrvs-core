@@ -135,6 +135,19 @@ describe('when user has a valid token in local storage', () => {
         )
       })
     })
+    describe('when user clicks the "father" tab', () => {
+      beforeEach(() => {
+        app
+          .find('#tab_father')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('changes to the father details section', () => {
+        expect(app.find('#form_section_title_father').hostNodes()).toHaveLength(
+          1
+        )
+      })
+    })
   })
 })
 it("doesn't redirect user to SSO if user has a token in their URL", async () => {

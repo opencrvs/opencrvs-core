@@ -12,7 +12,8 @@ import {
   ISelectProps,
   IDateFieldProps,
   ITextInputProps,
-  IInputFieldProps
+  IInputFieldProps,
+  RadioGroup
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
 import {
@@ -43,6 +44,10 @@ function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
     return <InputField component={Select} id={field.name} {...field} />
   }
+  if (field.type === 'radioGroup') {
+    return <InputField component={RadioGroup} id={field.name} {...field} />
+  }
+
   if (field.type === 'date') {
     return <InputField component={DateField} id={field.name} {...field} />
   }
