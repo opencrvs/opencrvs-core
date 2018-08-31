@@ -5,7 +5,8 @@ import {
   InputField,
   TextInput,
   Select,
-  DateField
+  DateField,
+  TextArea
 } from '@opencrvs/components/lib/forms'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
@@ -35,28 +36,12 @@ function getInputField(field: Ii18nFormField) {
     )
   }
   if (field.type === 'date') {
-    return (
-      <InputField
-        component={DateField}
-        options={field.options}
-        required={field.required}
-        id={field.name}
-        label={field.label}
-        prefix={field.prefix}
-        postfix={field.postfix}
-      />
-    )
+    return <InputField component={DateField} id={field.name} {...field} />
   }
-  return (
-    <InputField
-      component={TextInput}
-      required={field.required}
-      id={field.name}
-      label={field.label}
-      prefix={field.prefix}
-      postfix={field.postfix}
-    />
-  )
+  if (field.type === 'textarea') {
+    return <InputField component={TextArea} id={field.name} {...field} />
+  }
+  return <InputField component={TextInput} id={field.name} {...field} />
 }
 
 interface IFormSectionProps {

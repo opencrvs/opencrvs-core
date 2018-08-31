@@ -373,11 +373,12 @@ export const birthParentForm: IForm = {
           options: [{ value: '?', label: messages.defaultLabel }]
         },
         {
-          name: 'deliveryAddress', // needs text area display
-          type: 'text',
+          name: 'deliveryAddress',
+          type: 'textarea',
           label: messages.deliveryAddress,
           required: true,
-          validate: []
+          validate: [],
+          disabled: true
         }
       ]
     },

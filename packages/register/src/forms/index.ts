@@ -14,6 +14,7 @@ export interface IFormField {
   options?: ISelectOption[]
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
+  disabled?: boolean
 }
 
 export interface IFormSection {
@@ -40,4 +41,5 @@ export interface Ii18nFormField {
   options?: ISelectOption[]
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
+  disabled?: boolean
 }
