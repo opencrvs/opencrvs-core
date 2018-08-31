@@ -138,8 +138,10 @@ class BirthParentFormView extends React.Component<
         </ViewHeaderWithTabs>
         <FormContainer>
           <Box>
-            {activeSection.type === 'preview' && <h1>preview stuff here</h1>}
-            {!activeSection.type && (
+            {activeSection.viewType === 'preview' && (
+              <h1>preview stuff here</h1>
+            )}
+            {activeSection.viewType === 'form' && (
               <>
                 <Form
                   id={activeSection.id}
