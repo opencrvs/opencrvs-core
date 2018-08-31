@@ -17,23 +17,23 @@ const messages = defineMessages({
   },
   motherIDType: {
     id: 'formFields.mother.motherIDType',
-    defaultMessage: "Type of ID",
-    description: "Label for form field: Type of ID"
+    defaultMessage: 'Type of ID',
+    description: 'Label for form field: Type of ID'
   },
   motherID: {
     id: 'formFields.mother.motherID',
-    defaultMessage: "NID number",
-    description: "Label for form field: NID number"
+    defaultMessage: 'NID number',
+    description: 'Label for form field: NID number'
   },
   nationality: {
     id: 'formFields.mother.nationality',
-    defaultMessage: "Nationality",
-    description: "Label for form field: Nationality"
+    defaultMessage: 'Nationality',
+    description: 'Label for form field: Nationality'
   },
   nationalityBangladesh: {
     id: 'formFields.mother.nationalityBangladesh',
-    defaultMessage: "Bangladesh",
-    description: "Option for form field: Nationality"
+    defaultMessage: 'Bangladesh',
+    description: 'Option for form field: Nationality'
   },
   motherGivenName: {
     id: 'formFields.motherGivenName',
@@ -69,6 +69,91 @@ const messages = defineMessages({
     id: 'formFields.defaultLabel',
     defaultMessage: 'Label goes here',
     description: 'default label'
+  },
+  motherDateOfBirth: {
+    id: 'formFields.motherDateOfBirth',
+    defaultMessage: 'Date of birth',
+    description: 'Label for form field: Date of birth'
+  },
+  motherMaritalStatus: {
+    id: 'formFields.motherMaritalStatus',
+    defaultMessage: 'Marital status',
+    description: 'Label for form field: Marital status'
+  },
+  motherMaritalStatusSingle: {
+    id: 'formFields.motherMaritalStatusSingle',
+    defaultMessage: 'Single',
+    description: 'Option for form field: Marital status'
+  },
+  motherMaritalStatusMarried: {
+    id: 'formFields.motherMaritalStatusMarried',
+    defaultMessage: 'Married',
+    description: 'Option for form field: Marital status'
+  },
+  motherMaritalStatusWidowed: {
+    id: 'formFields.motherMaritalStatusWidowed',
+    defaultMessage: 'Widowed',
+    description: 'Option for form field: Marital status'
+  },
+  motherMaritalStatusDivorced: {
+    id: 'formFields.motherMaritalStatusDivorced',
+    defaultMessage: 'Divorced',
+    description: 'Option for form field: Marital status'
+  },
+  motherMaritalStatusNotStated: {
+    id: 'formFields.motherMaritalStatusNotStated',
+    defaultMessage: 'Not stated',
+    description: 'Option for form field: Marital status'
+  },
+  motherDateOfMarriage: {
+    id: 'formFields.motherDateOfMarriage',
+    defaultMessage: 'Date of marriage',
+    description: 'Option for form field: Date of marriage'
+  },
+  motherEducationAttainment: {
+    id: 'formFields.motherEducationAttainment',
+    defaultMessage: "Mother's level of formal education attained",
+    description: 'Label for form field: Mother education'
+  },
+  motherEducationAttainmentNone: {
+    id: 'formFields.motherEducationAttainmentNone',
+    defaultMessage: 'No schooling',
+    description: 'Option for form field: Mother education'
+  },
+  motherEducationAttainmentISCED1: {
+    id: 'formFields.motherEducationAttainmentISCED1',
+    defaultMessage: 'Primary',
+    description: 'Option for form field: Mother education'
+  },
+  motherEducationAttainmentISCED2: {
+    id: 'formFields.motherEducationAttainmentISCED2',
+    defaultMessage: 'Lower secondary',
+    description: 'Option for form field: Mother education'
+  },
+  motherEducationAttainmentISCED3: {
+    id: 'formFields.motherEducationAttainmentISCED3',
+    defaultMessage: 'Upper secondary',
+    description: 'Option for form field: Mother education'
+  },
+  motherEducationAttainmentISCED4: {
+    id: 'formFields.motherEducationAttainmentISCED4',
+    defaultMessage: 'Post secondary',
+    description: 'Option for form field: Mother education'
+  },
+  motherEducationAttainmentISCED5: {
+    id: 'formFields.motherEducationAttainmentISCED5',
+    defaultMessage: 'First stage tertiary',
+    description: 'Option for form field: Mother education'
+  },
+  motherEducationAttainmentISCED6: {
+    id: 'formFields.motherEducationAttainmentISCED6',
+    defaultMessage: 'Second stage tertiary',
+    description: 'Option for form field: Mother education'
+  },
+  motherEducationAttainmentNotStated: {
+    id: 'formFields.motherEducationAttainmentNotStated',
+    defaultMessage: 'Not stated',
+    description: 'Option for form field: Mother education'
   }
 })
 
@@ -86,7 +171,7 @@ export const motherSection = {
       validate: []
     },
     {
-      name: 'motherID',
+      name: 'motherID', // needs verification check mark
       type: 'text',
       label: messages.motherID,
       required: true,
@@ -98,11 +183,9 @@ export const motherSection = {
       type: 'select',
       label: messages.nationality,
       required: true,
-      initialValue: 'bg',
+      initialValue: '',
       validate: [],
-      options: [
-        { value: 'bg', label: messages.nationalityBangladesh }
-      ]
+      options: [{ value: 'bg', label: messages.nationalityBangladesh }]
     },
     {
       name: 'motherGivenName',
@@ -150,5 +233,55 @@ export const motherSection = {
       initialValue: '',
       validate: []
     },
+    {
+      name: 'motherDateOfBirth',
+      type: 'date',
+      label: messages.motherDateOfBirth,
+      required: true,
+      initialValue: '',
+      validate: []
+    },
+    {
+      name: 'maritalStatus',
+      type: 'select',
+      label: messages.motherMaritalStatus,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: 'SINGLE', label: messages.motherMaritalStatusSingle },
+        { value: 'MARRIED', label: messages.motherMaritalStatusMarried },
+        { value: 'WIDOWED', label: messages.motherMaritalStatusWidowed },
+        { value: 'DIVORCED', label: messages.motherMaritalStatusDivorced },
+        { value: 'NOT_STATED', label: messages.motherMaritalStatusNotStated }
+      ]
+    },
+    {
+      name: 'motherDateOfMarriage',
+      type: 'date',
+      label: messages.motherDateOfMarriage,
+      required: true,
+      initialValue: '',
+      validate: []
+    },
+    {
+      name: 'motherEducationAttainment',
+      type: 'select',
+      label: messages.motherEducationAttainment,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: 'NO_SCHOOLING', label: messages.motherEducationAttainmentNone },
+        { value: 'PRIMARY_ISCED_1', label: messages.motherEducationAttainmentISCED1 },
+        { value: 'LOWER_SECONDARY_ISCED_2', label: messages.motherEducationAttainmentISCED2 },
+        { value: 'UPPER_SECONDARY_ISCED_3', label: messages.motherEducationAttainmentISCED3 },
+        { value: 'POST_SECONDARY_ISCED_4', label: messages.motherEducationAttainmentISCED4 },
+        { value: 'FIRST_STAGE_TERTIARY_ISCED_5', label: messages.motherEducationAttainmentISCED5 },
+        { value: 'SECOND_STAGE_TERTIARY_ISCED_6', label: messages.motherEducationAttainmentISCED6 },
+        { value: 'NOT_STATED', label: messages.motherEducationAttainmentNotStated },
+      ]
+    },
+    // TODO: add address when component is ready
   ]
 }
