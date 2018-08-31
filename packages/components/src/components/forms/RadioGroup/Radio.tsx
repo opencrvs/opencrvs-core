@@ -18,13 +18,27 @@ const Label = styled.label`
 
 const Check = styled.span`
   display: inline-block;
-  border: 2px solid ${({ theme }) => theme.colors.primary};
-  border-radius: 17px;
-  height: 17px;
-  width: 17px;
+  background: ${({ theme }) => theme.colors.primary};
+  border-radius: 50%;
+  height: 22px;
+  width: 22px;
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   z-index: 1;
+
+  &::after {
+    display: block;
+    position: relative;
+    content: '';
+    background: ${({ theme }) => theme.colors.white};
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+    top: -7px;
+    left: 7px;
+    transition: background 0.25s linear;
+    -webkit-transition: background 0.25s linear;
+  }
 
   &::before {
     display: block;
@@ -32,10 +46,10 @@ const Check = styled.span`
     content: '';
     background: ${({ theme }) => theme.colors.white};
     border-radius: 50%;
-    height: 10px;
-    width: 10px;
-    top: 10%;
-    left: 10%;
+    height: 14px;
+    width: 14px;
+    top: 4px;
+    left: 4px;
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
   }
@@ -48,7 +62,9 @@ const Input = styled.input`
   opacity: 0;
   z-index: 2;
   cursor: pointer;
-  &:checked ~ ${Check}::before {
+  /* stylelint-disable */
+  &:checked ~ ${Check}::after {
+    /* stylelint-enable */
     background: ${({ theme }) => theme.colors.primary};
   }
 `

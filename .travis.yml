@@ -10,6 +10,7 @@ jobs:
         - codecov
 
     - stage: integration tests
+      before_install: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       script:
         - yarn dev:secrets:gen
         - yarn compose -d

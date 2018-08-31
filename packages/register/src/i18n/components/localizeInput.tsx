@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { IInputFieldProps } from '@opencrvs/components/lib/forms'
-import { IValidationResult } from '../utils/validate'
+import { IValidationResult } from '../../utils/validate'
 
 // Wrapped component takes a validation object to be translated instead of an error string
 type MetaPropsWithMessageDescriptors = {

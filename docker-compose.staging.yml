@@ -25,8 +25,8 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.frontend.rule=Host: register.opencrvs-staging.jembi.org,opencrvs-staging.jembi.org"
-        - "traefik.frontend.redirect.regex=^https?://opencrvs-staging.jembi.org/(.*)""
-        - "traefik.frontend.redirect.replacement=https://register.opencrvs-staging.jembi.org/$${1}""
+        - "traefik.frontend.redirect.regex=^https?://opencrvs-staging.jembi.org/(.*)"
+        - "traefik.frontend.redirect.replacement=https://register.opencrvs-staging.jembi.org/$${1}"
         - "traefik.port=5000"
         - "traefik.docker.network=opencrvs_default"
 

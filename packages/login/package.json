@@ -24,19 +24,20 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3020 react-scripts-ts start",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
-    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
-    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
+    "test":
+      "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "verify-build-config":
+      "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
     "build": "yarn verify-build-config && react-scripts-ts build",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "lint:css": "stylelint 'src/**/*.{ts,tsx}'"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": [
-      "prettier --write",
-      "tslint",
-      "git add"
-    ]
+    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "stylelint"]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
@@ -53,6 +54,10 @@
     "moxios": "^0.4.0",
     "prettier": "^1.12.1",
     "redux-mock-store": "^1.5.3",
+    "stylelint": "^9.5.0",
+    "stylelint-config-recommended": "^2.1.0",
+    "stylelint-config-styled-components": "^0.1.1",
+    "stylelint-processor-styled-components": "^1.3.2",
     "ts-node": "^6.1.1",
     "typescript": "^3.0.1"
   },

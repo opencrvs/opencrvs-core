@@ -7,7 +7,7 @@ import { resolve } from 'url'
 import { History } from 'history'
 import { Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
-import { I18nContainer } from './i18n/I18nContainer'
+import { I18nContainer } from './i18n/components/I18nContainer'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 

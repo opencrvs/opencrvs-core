@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 
 import { IURLParams } from '@opencrvs/register/src/utils/authUtils'
-import { getLanguage } from '@opencrvs/register/src/i18n/i18nSelectors'
+import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import * as actions from '@opencrvs/register/src/profile/profileActions'
 
@@ -23,7 +23,7 @@ type IPage = IPageProps & IDispatchProps
 const languageFromProps = ({ language }: IPageProps) => language
 
 const StyledPage = styled.div.attrs<IPage>({})`
-  background: #f4f4f4;
+  background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
