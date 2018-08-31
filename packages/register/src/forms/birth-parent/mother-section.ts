@@ -272,16 +272,40 @@ export const motherSection = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'NO_SCHOOLING', label: messages.motherEducationAttainmentNone },
-        { value: 'PRIMARY_ISCED_1', label: messages.motherEducationAttainmentISCED1 },
-        { value: 'LOWER_SECONDARY_ISCED_2', label: messages.motherEducationAttainmentISCED2 },
-        { value: 'UPPER_SECONDARY_ISCED_3', label: messages.motherEducationAttainmentISCED3 },
-        { value: 'POST_SECONDARY_ISCED_4', label: messages.motherEducationAttainmentISCED4 },
-        { value: 'FIRST_STAGE_TERTIARY_ISCED_5', label: messages.motherEducationAttainmentISCED5 },
-        { value: 'SECOND_STAGE_TERTIARY_ISCED_6', label: messages.motherEducationAttainmentISCED6 },
-        { value: 'NOT_STATED', label: messages.motherEducationAttainmentNotStated },
+        {
+          value: 'NO_SCHOOLING',
+          label: messages.motherEducationAttainmentNone
+        },
+        {
+          value: 'PRIMARY_ISCED_1',
+          label: messages.motherEducationAttainmentISCED1
+        },
+        {
+          value: 'LOWER_SECONDARY_ISCED_2',
+          label: messages.motherEducationAttainmentISCED2
+        },
+        {
+          value: 'UPPER_SECONDARY_ISCED_3',
+          label: messages.motherEducationAttainmentISCED3
+        },
+        {
+          value: 'POST_SECONDARY_ISCED_4',
+          label: messages.motherEducationAttainmentISCED4
+        },
+        {
+          value: 'FIRST_STAGE_TERTIARY_ISCED_5',
+          label: messages.motherEducationAttainmentISCED5
+        },
+        {
+          value: 'SECOND_STAGE_TERTIARY_ISCED_6',
+          label: messages.motherEducationAttainmentISCED6
+        },
+        {
+          value: 'NOT_STATED',
+          label: messages.motherEducationAttainmentNotStated
+        }
       ]
-    },
+    }
     // TODO: add address when component is ready
   ]
 }
