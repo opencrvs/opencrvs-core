@@ -12,8 +12,10 @@ import styled from '../../styled-components'
 
 import { goToTab as goToTabAction } from '../../navigation/navigationActions'
 import { birthParentForm } from '../../forms/birth-parent'
-import { IForm, IFormSection } from '../../forms'
+import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
+import { IStoreState } from '../../store'
+import { IDraft, modifyDraft } from '../../drafts'
 
 const FormAction = styled.div`
   display: flex;
@@ -77,12 +79,14 @@ const ViewFooter = styled(Header)`
   }
 `
 
-function getActiveSectionId(form: IForm, viewParams: { tab?: string }) {
-  return viewParams.tab || form.sections[0].id
+function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
+  return viewParams.tabId || form.sections[0].id
 }
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
-  const currentIndex = sections.indexOf(fromSection)
+  const currentIndex = sections.findIndex(
+    (section: IFormSection) => section.id === fromSection.id
+  )
 
   if (currentIndex === sections.length - 1) {
     return null
@@ -91,29 +95,28 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
-class BirthParentFormView extends React.Component<
-  {
-    goToTab: typeof goToTabAction
-  } & InjectedIntlProps &
-    RouteComponentProps<{ tab: string }>
-> {
+type Props = {
+  goToTab: typeof goToTabAction
+  modifyDraft: typeof modifyDraft
+  draft: IDraft
+  activeSection: IFormSection
+}
+
+class BirthParentFormView extends React.Component<Props & InjectedIntlProps> {
+  modifyDraft = (sectionData: IFormSectionData) => {
+    const { activeSection, draft } = this.props
+    this.props.modifyDraft({
+      ...draft,
+      data: {
+        ...draft.data,
+        [activeSection.id]: sectionData
+      }
+    })
+  }
   render() {
-    const { match, goToTab, intl } = this.props
+    const { goToTab, intl, activeSection, draft } = this.props
 
-    const activeTabId = getActiveSectionId(
-      birthParentForm,
-      this.props.match.params
-    )
-
-    const activeSection = birthParentForm.sections.find(
-      ({ id }) => id === activeTabId
-    )
-
-    if (!activeSection) {
-      throw new Error(`Configuration for tab "${match.params.tab}" missing!`)
-    }
-
-    const nextTab = getNextSection(birthParentForm.sections, activeSection)
+    const nextSection = getNextSection(birthParentForm.sections, activeSection)
 
     return (
       <FormViewContainer>
@@ -124,22 +127,23 @@ class BirthParentFormView extends React.Component<
         >
           <FormTabs
             sections={birthParentForm.sections}
-            activeTabId={activeTabId}
-            onTabClick={goToTab}
+            activeTabId={activeSection.id}
+            onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
           />
         </ViewHeaderWithTabs>
         <FormContainer>
           <Box>
             <Form
+              id={activeSection.id}
+              onChange={this.modifyDraft}
               title={intl.formatMessage(activeSection.title)}
               fields={activeSection.fields}
-              id={activeSection.id}
             />
             <FormAction>
-              {nextTab && (
+              {nextSection && (
                 <FormPrimaryButton
-                  onClick={() => goToTab(nextTab.id)}
-                  id="next_tab"
+                  onClick={() => goToTab(draft.id, nextSection.id)}
+                  id="next_section"
                   icon={() => <ArrowForward />}
                 >
                   {intl.formatMessage(messages.next)}
@@ -160,6 +164,50 @@ class BirthParentFormView extends React.Component<
   }
 }
 
-export const BirthParentForm = injectIntl(
-  connect(null, { goToTab: goToTabAction })(BirthParentFormView)
-)
+function replaceInitialValues(fields: IFormField[], sectionValues: object) {
+  return fields.map(field => ({
+    ...field,
+    initialValue: sectionValues[field.name] || field.initialValue
+  }))
+}
+
+function mapStateToProps(
+  state: IStoreState,
+  props: Props & RouteComponentProps<{ tabId: string; draftId: string }>
+) {
+  const { match } = props
+
+  const activeSectionId = getActiveSectionId(birthParentForm, match.params)
+
+  const activeSection = birthParentForm.sections.find(
+    ({ id }) => id === activeSectionId
+  )
+
+  const draft = state.drafts.drafts.find(
+    ({ id }) => id === parseInt(match.params.draftId, 10)
+  )
+
+  if (!draft) {
+    throw new Error(`Draft "${match.params.draftId}" missing!`)
+  }
+
+  if (!activeSection) {
+    throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
+  }
+
+  return {
+    activeSection: {
+      ...activeSection,
+      fields: replaceInitialValues(
+        activeSection.fields,
+        draft.data[activeSectionId] || {}
+      )
+    },
+    draft
+  }
+}
+
+export const BirthParentForm = connect(mapStateToProps, {
+  modifyDraft,
+  goToTab: goToTabAction
+})(injectIntl<Props>(BirthParentFormView))

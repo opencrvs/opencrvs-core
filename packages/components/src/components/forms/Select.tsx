@@ -3,7 +3,7 @@ import { default as ReactSelect } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 
-export interface ISelectProps {
+export interface ISelectProps extends Props<any> {
   error?: boolean
   touched?: boolean
 }
@@ -34,7 +34,7 @@ const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
   }
 `
 
-export class Select extends React.Component<Props<any>> {
+export class Select extends React.Component<ISelectProps> {
   render() {
     return <StyledSelect classNamePrefix="react-select" {...this.props} />
   }

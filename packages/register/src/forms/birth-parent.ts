@@ -234,6 +234,18 @@ export const messages = defineMessages({
   }
 })
 
+export interface IBirthParentFormData {
+  child: {
+    firstName: string
+    foo: string
+    bar: string
+    baz: string
+  }
+  mother: {
+    firstName: string
+  }
+}
+
 export const birthParentForm: IForm = {
   sections: [
     {
@@ -246,6 +258,7 @@ export const birthParentForm: IForm = {
           type: 'text',
           label: messages.childGivenName,
           required: true,
+          initialValue: '',
           validate: []
         },
         {
@@ -253,6 +266,7 @@ export const birthParentForm: IForm = {
           type: 'text',
           label: messages.childMiddleNames,
           required: false,
+          initialValue: '',
           validate: []
         },
         {
@@ -273,6 +287,7 @@ export const birthParentForm: IForm = {
           type: 'text',
           label: messages.childMiddleNamesEng,
           required: false,
+          initialValue: '',
           validate: []
         },
         {
@@ -286,6 +301,7 @@ export const birthParentForm: IForm = {
           type: 'select',
           label: messages.childSex,
           required: true,
+          initialValue: '',
           validate: [],
           options: [
             { value: 'male', label: messages.childSexMale },
@@ -392,6 +408,7 @@ export const birthParentForm: IForm = {
           type: 'text',
           label: messages.mothersFirstName,
           required: false,
+          initialValue: '',
           validate: []
         }
       ]

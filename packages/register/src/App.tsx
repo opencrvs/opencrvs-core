@@ -56,11 +56,11 @@ export class App extends React.Component<IAppProps, {}> {
                     />
                     <ProtectedRoute
                       exact
-                      path={routes.BIRTH_PARENT_FORM}
+                      path={routes.DRAFT_BIRTH_PARENT_FORM}
                       component={BirthParentForm}
                     />
                     <ProtectedRoute
-                      path={routes.BIRTH_PARENT_FORM_TAB}
+                      path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
                       component={BirthParentForm}
                     />
                   </Switch>
