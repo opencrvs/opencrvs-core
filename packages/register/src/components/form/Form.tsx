@@ -34,16 +34,28 @@ const FormSectionTitle = styled.h2`
 
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
-type GeneratedInputFieldProps = { field: Ii18nFormField } & Omit<
-  IInputFieldProps,
-  'id'
-> &
+type GeneratedInputFieldProps = {
+  field: Ii18nFormField
+  handleChange: (e: React.ChangeEvent<any>) => void
+  setFieldValue: (name: string, value: string) => void
+} & Omit<IInputFieldProps, 'id'> &
   InputProps
 
-function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
+function GeneratedInputField({
+  field,
+  handleChange,
+  setFieldValue,
+  ...props
+}: GeneratedInputFieldProps) {
   if (field.type === 'select') {
     return (
-      <InputField component={Select} id={field.name} {...field} {...props} />
+      <InputField
+        component={Select}
+        id={field.name}
+        onChangeValue={setFieldValue}
+        {...field}
+        {...props}
+      />
     )
   }
   if (field.type === 'radioGroup') {
@@ -51,6 +63,7 @@ function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
       <InputField
         component={RadioGroup}
         id={field.name}
+        onChangeValue={setFieldValue}
         {...field}
         {...props}
       />
@@ -59,16 +72,34 @@ function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
 
   if (field.type === 'date') {
     return (
-      <InputField component={DateField} id={field.name} {...field} {...props} />
+      <InputField
+        component={DateField}
+        id={field.name}
+        onChangeValue={setFieldValue}
+        {...field}
+        {...props}
+      />
     )
   }
   if (field.type === 'textarea') {
     return (
-      <InputField component={TextArea} id={field.name} {...field} {...props} />
+      <InputField
+        component={TextArea}
+        id={field.name}
+        onChange={handleChange}
+        {...field}
+        {...props}
+      />
     )
   }
   return (
-    <InputField component={TextInput} id={field.name} {...field} {...props} />
+    <InputField
+      component={TextInput}
+      id={field.name}
+      onChange={handleChange}
+      {...field}
+      {...props}
+    />
   )
 }
 
@@ -102,6 +133,7 @@ class FormSectionComponent extends React.Component<Props> {
       handleBlur,
       values,
       fields,
+      setFieldValue,
       id,
       intl,
       title
@@ -148,8 +180,9 @@ class FormSectionComponent extends React.Component<Props> {
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
                   field={internationaliseFieldObject(field)}
-                  onChange={handleChange}
                   onBlur={handleBlur}
+                  handleChange={handleChange}
+                  setFieldValue={setFieldValue}
                   value={values[field.name]}
                 />
               </FormItem>
