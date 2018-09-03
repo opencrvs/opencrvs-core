@@ -1,4 +1,5 @@
 import { defineMessages } from 'react-intl'
+import { ValidIndicator } from '@opencrvs/components/lib/forms'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -218,13 +219,13 @@ export const motherSection = {
       ]
     },
     {
-      name: 'motherID', // needs verification check mark
+      name: 'motherID',
       type: 'text',
       label: messages.motherID,
       required: true,
       initialValue: '',
       validate: [],
-      postfix: '✓'
+      postfix: ValidIndicator
     },
     {
       name: 'nationality',
