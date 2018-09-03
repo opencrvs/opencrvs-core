@@ -1,6 +1,7 @@
 export * from './InputField/InputField'
 export * from './TextInput'
 export * from './Select'
+export * from './RadioGroup/RadioGroup'
 export * from './DateField'
 export * from './TextArea'
 export * from './VerifyingIndicator'

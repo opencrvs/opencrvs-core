@@ -48,6 +48,31 @@ const messages = defineMessages({
     id: 'register.form.section.documentsTitle',
     defaultMessage: 'Documents',
     description: 'Form section title for Documents'
+  },
+  previewTab: {
+    id: 'register.form.tabs.previewTab',
+    defaultMessage: 'Preview',
+    description: 'Tab title for Preview'
+  },
+  previewTitle: {
+    id: 'register.form.section.previewTitle',
+    defaultMessage: 'Preview',
+    description: 'Form section title for Preview'
+  },
+  fathersDetailsExist: {
+    id: 'formFields.fathersDetailsExist',
+    defaultMessage: "Do you have the father's details?",
+    description: "Question to ask the user if they have the father's details"
+  },
+  confirm: {
+    id: 'formFields.confirm',
+    defaultMessage: 'Yes',
+    description: 'confirmation label for yes / no radio button'
+  },
+  deny: {
+    id: 'formFields.deny',
+    defaultMessage: 'No',
+    description: 'deny label for yes / no radio button'
   }
 })
 
@@ -57,20 +82,42 @@ export const birthParentForm: IForm = {
     motherSection,
     {
       id: 'father',
+      viewType: 'form',
       name: messages.fatherTab,
       title: messages.fatherTitle,
-      fields: []
+      fields: [
+        {
+          name: 'fathersDetailsExist',
+          type: 'radioGroup',
+          label: messages.fathersDetailsExist,
+          required: true,
+          validate: [],
+          options: [
+            { value: '1', label: messages.confirm },
+            { value: '0', label: messages.deny }
+          ]
+        }
+      ]
     },
     {
       id: 'registration',
+      viewType: 'form',
       name: messages.registrationTab,
       title: messages.registrationTitle,
       fields: []
     },
     {
       id: 'documents',
+      viewType: 'form',
       name: messages.documentsTab,
       title: messages.documentsTitle,
+      fields: []
+    },
+    {
+      id: 'preview',
+      viewType: 'preview',
+      name: messages.previewTab,
+      title: messages.previewTitle,
       fields: []
     }
   ]

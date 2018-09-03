@@ -195,6 +195,7 @@ const messages = defineMessages({
 
 export const motherSection = {
   id: 'mother',
+  viewType: 'form',
   name: messages.motherTab,
   title: messages.motherTitle,
   fields: [

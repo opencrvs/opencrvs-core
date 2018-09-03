@@ -75,14 +75,8 @@ export class InputField<
       component = TextInput,
       meta
     } = this.props
-    const prefix = this.props.prefix as
-      | React.ComponentClass<any>
-
-      | string
-    const postfix = this.props.postfix as
-      | React.ComponentClass<any>
-
-      | string
+    const prefix = this.props.prefix as React.ComponentClass<any> | string
+    const postfix = this.props.postfix as React.ComponentClass<any> | string
 
     const Component = component
 

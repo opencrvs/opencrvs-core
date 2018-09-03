@@ -12,7 +12,8 @@ import {
   ISelectProps,
   IDateFieldProps,
   ITextInputProps,
-  IInputFieldProps
+  IInputFieldProps,
+  RadioGroup
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
 import {
@@ -41,15 +42,34 @@ type GeneratedInputFieldProps = { field: Ii18nFormField } & Omit<
 
 function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
-    return <InputField component={Select} id={field.name} {...field} />
+    return (
+      <InputField component={Select} id={field.name} {...field} {...props} />
+    )
   }
+  if (field.type === 'radioGroup') {
+    return (
+      <InputField
+        component={RadioGroup}
+        id={field.name}
+        {...field}
+        {...props}
+      />
+    )
+  }
+
   if (field.type === 'date') {
-    return <InputField component={DateField} id={field.name} {...field} />
+    return (
+      <InputField component={DateField} id={field.name} {...field} {...props} />
+    )
   }
   if (field.type === 'textarea') {
-    return <InputField component={TextArea} id={field.name} {...field} />
+    return (
+      <InputField component={TextArea} id={field.name} {...field} {...props} />
+    )
   }
-  return <InputField component={TextInput} id={field.name} {...field} />
+  return (
+    <InputField component={TextInput} id={field.name} {...field} {...props} />
+  )
 }
 
 const toObject = (fields: IFormField[]) =>
