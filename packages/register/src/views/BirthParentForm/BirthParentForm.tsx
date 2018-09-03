@@ -139,23 +139,30 @@ class BirthParentFormView extends React.Component<
         </ViewHeaderWithTabs>
         <FormContainer>
           <Box>
-            <Form
-              id={activeSection.id}
-              onChange={this.modifyDraft}
-              title={intl.formatMessage(activeSection.title)}
-              fields={activeSection.fields}
-            />
-            <FormAction>
-              {nextSection && (
-                <FormPrimaryButton
-                  onClick={() => goToTab(draft.id, nextSection.id)}
-                  id="next_section"
-                  icon={() => <ArrowForward />}
-                >
-                  {intl.formatMessage(messages.next)}
-                </FormPrimaryButton>
-              )}
-            </FormAction>
+            {activeSection.viewType === 'preview' && (
+              <h1>preview stuff here</h1>
+            )}
+            {activeSection.viewType === 'form' && (
+              <>
+                <Form
+                  id={activeSection.id}
+                  onChange={this.modifyDraft}
+                  title={intl.formatMessage(activeSection.title)}
+                  fields={activeSection.fields}
+                />
+                <FormAction>
+                  {nextSection && (
+                    <FormPrimaryButton
+                      onClick={() => goToTab(draft.id, nextSection.id)}
+                      id="next_section"
+                      icon={() => <ArrowForward />}
+                    >
+                      {intl.formatMessage(messages.next)}
+                    </FormPrimaryButton>
+                  )}
+                </FormAction>
+              </>
+            )}
           </Box>
         </FormContainer>
         <ViewFooter>

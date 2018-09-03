@@ -21,6 +21,7 @@ export interface IFormField {
 
 export interface IFormSection {
   id: string
+  viewType: string
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
