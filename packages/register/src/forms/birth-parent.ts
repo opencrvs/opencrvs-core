@@ -258,14 +258,14 @@ export const messages = defineMessages({
     defaultMessage: 'No',
     description: 'deny label for yes / no radio button'
   },
-  fathersAddress: {
-    id: 'formFields.fathersAddress',
-    defaultMessage: 'Please enter the address of the father',
+  currentAddress: {
+    id: 'formFields.currentAddress',
+    defaultMessage: 'Current Address',
     description: "Title for the father's address fields"
   },
   addressSameAsMother: {
     id: 'formFields.addressSameAsMother',
-    defaultMessage: "Is the father's address the same as the mother's address",
+    defaultMessage: "Is the father's address the same as the mother's address?",
     description:
       "Title for the radio button to select that the father's address is the same as the mother's address"
   },
@@ -513,7 +513,7 @@ export const birthParentForm: IForm = {
         {
           name: 'fathersAddress',
           type: 'address',
-          label: messages.fathersAddress,
+          label: messages.currentAddress,
           required: true,
           initialValue: '',
           validate: [],

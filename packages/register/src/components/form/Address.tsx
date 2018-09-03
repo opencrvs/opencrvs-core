@@ -3,12 +3,16 @@ import styled from 'styled-components'
 import { FormikProps } from 'formik'
 import { InjectedIntlProps, injectIntl, FormattedMessage } from 'react-intl'
 import { IFormField, IFormSectionData } from '../../forms'
-import { FormItem, GeneratedInputField } from './Form'
+import { FormItem, GeneratedInputField, FormSectionTitle } from './Form'
 import { internationaliseFieldObject } from '../../forms/utils'
 
 const AddressWrapper = styled.div`
   margin-top: 8px;
   margin-bottom: 10px;
+  border-top: solid 1px ${({ theme }) => theme.colors.background};
+  width: calc(100% + 50px);
+  margin-left: -25px;
+  padding: 35px 25px;
 `
 
 export interface IAddress {
@@ -77,7 +81,8 @@ class AddressComponent extends React.Component<Props, IState> {
     } = this.props
     return (
       <AddressWrapper id={id}>
-        {intl.formatMessage(label)}
+        <FormSectionTitle>{intl.formatMessage(label)}</FormSectionTitle>
+
         {fields.map(field => {
           return (
             <FormItem key={`${field.name}`}>

@@ -24,7 +24,7 @@ export const FormItem = styled.div`
   margin-bottom: 2em;
 `
 
-const FormSectionTitle = styled.h2`
+export const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
 `
