@@ -20,6 +20,41 @@ const messages = defineMessages({
     defaultMessage: 'Type of ID',
     description: 'Label for form field: Type of ID'
   },
+  motherIDTypePassport: {
+    id: 'formFields.mother.motherIDTypePassport',
+    defaultMessage: 'Passport',
+    description: 'Option for form field: Type of ID'
+  },
+  motherIDTypeNationalID: {
+    id: 'formFields.mother.motherIDTypeNationalID',
+    defaultMessage: 'National ID',
+    description: 'Option for form field: Type of ID'
+  },
+  motherIDTypeDrivingLicence: {
+    id: 'formFields.mother.motherIDTypeDrivingLicence',
+    defaultMessage: 'Drivers Licence',
+    description: 'Option for form field: Type of ID'
+  },
+  motherIDTypeBRN: {
+    id: 'formFields.mother.motherIDTypeBRN',
+    defaultMessage: 'Birth Registration Number',
+    description: 'Option for form field: Type of ID'
+  },
+  motherIDTypeDRN: {
+    id: 'formFields.mother.motherIDTypeDRN',
+    defaultMessage: 'Death Registration Number',
+    description: 'Option for form field: Type of ID'
+  },
+  motherIDTypeRefugeeNumber: {
+    id: 'formFields.mother.motherIDTypeRefugeeNumber',
+    defaultMessage: 'Refugee Number',
+    description: 'Option for form field: Type of ID'
+  },
+  motherIDTypeAlienNumber: {
+    id: 'formFields.mother.motherIDTypeAlienNumber',
+    defaultMessage: 'Alien Number',
+    description: 'Option for form field: Type of ID'
+  },
   motherID: {
     id: 'formFields.mother.motherID',
     defaultMessage: 'NID number',
@@ -168,7 +203,19 @@ export const motherSection = {
       label: messages.motherIDType,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      options: [
+        { value: 'PASSPORT', label: messages.motherIDTypePassport },
+        { value: 'NATIONAL_ID', label: messages.motherIDTypeNationalID },
+        {
+          value: 'DRIVING_LICENCE',
+          label: messages.motherIDTypeDrivingLicence
+        },
+        { value: 'BIRTH_REGISTRATION_NUMBER', label: messages.motherIDTypeBRN },
+        { value: 'DEATH_REGISTRATION_NUMBER', label: messages.motherIDTypeDRN },
+        { value: 'REFUGEE_NUMBER', label: messages.motherIDTypeRefugeeNumber },
+        { value: 'ALIEN_NUMBER', label: messages.motherIDTypeAlienNumber }
+      ]
     },
     {
       name: 'motherID', // needs verification check mark
@@ -176,7 +223,8 @@ export const motherSection = {
       label: messages.motherID,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      postfix: '✓'
     },
     {
       name: 'nationality',
