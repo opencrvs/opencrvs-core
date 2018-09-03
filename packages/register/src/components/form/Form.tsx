@@ -23,6 +23,11 @@ import {
   IFormSectionData
 } from '../../forms'
 import { Omit } from '../../utils'
+import { IValidationResult, required } from '../../utils/validate'
+import {
+  localizeInput,
+  MetaPropsWithMessageDescriptors
+} from '../../i18n/components/localizeInput'
 const FormItem = styled.div`
   margin-bottom: 2em;
 `
@@ -36,10 +41,13 @@ type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
-  onChange: (e: React.ChangeEvent<any>) => void
   setFieldValue: (name: string, value: string) => void
-} & Omit<IInputFieldProps, 'id'> &
+  onChange: (e: React.ChangeEvent<any>) => void
+  meta: MetaPropsWithMessageDescriptors
+} & Omit<Omit<IInputFieldProps, 'id'>, 'meta'> &
   InputProps
+
+const LocalizedInputField = localizeInput(InputField)
 
 function GeneratedInputField({
   field,
@@ -49,7 +57,7 @@ function GeneratedInputField({
 }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
     return (
-      <InputField
+      <LocalizedInputField
         component={Select}
         id={field.name}
         onChange={(value: string) => setFieldValue(field.name, value)}
@@ -60,7 +68,7 @@ function GeneratedInputField({
   }
   if (field.type === 'radioGroup') {
     return (
-      <InputField
+      <LocalizedInputField
         component={RadioGroup}
         id={field.name}
         onChange={(value: string) => setFieldValue(field.name, value)}
@@ -72,9 +80,9 @@ function GeneratedInputField({
 
   if (field.type === 'date') {
     return (
-      <InputField
-        component={DateField}
+      <LocalizedInputField
         onChange={(value: string) => setFieldValue(field.name, value)}
+        component={DateField}
         id={field.name}
         {...field}
         {...props}
@@ -83,17 +91,17 @@ function GeneratedInputField({
   }
   if (field.type === 'textarea') {
     return (
-      <InputField
+      <LocalizedInputField
         component={TextArea}
-        id={field.name}
         onChange={onChange}
+        id={field.name}
         {...field}
         {...props}
       />
     )
   }
   return (
-    <InputField
+    <LocalizedInputField
       component={TextInput}
       id={field.name}
       onChange={onChange}
@@ -134,10 +142,16 @@ class FormSectionComponent extends React.Component<Props> {
       values,
       fields,
       setFieldValue,
+      touched,
       id,
       intl,
       title
     } = this.props
+
+    const errors = this.props.errors as {
+      [key: string]: IValidationResult[]
+    }
+
     function internationaliseFieldObject(field: IFormField): Ii18nFormField {
       return {
         ...field,
@@ -176,6 +190,16 @@ class FormSectionComponent extends React.Component<Props> {
         </FormSectionTitle>
         <form onSubmit={handleSubmit}>
           {fieldsWithValuesDefined.map(field => {
+            const meta = {
+              touched: touched[field.name]
+            } as MetaPropsWithMessageDescriptors
+
+            const fieldErrors = errors[field.name]
+            if (fieldErrors && fieldErrors.length > 0) {
+              const [firstError] = fieldErrors
+              meta.error = firstError
+            }
+
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
@@ -184,6 +208,7 @@ class FormSectionComponent extends React.Component<Props> {
                   onChange={handleChange}
                   setFieldValue={setFieldValue}
                   value={values[field.name]}
+                  meta={meta}
                 />
               </FormItem>
             )
@@ -194,10 +219,31 @@ class FormSectionComponent extends React.Component<Props> {
   }
 }
 
+type Errors = { [key: string]: string }
+
 export const Form = withFormik<IFormSectionProps, IFormSectionData>({
   enableReinitialize: true,
   mapPropsToValues: props => fieldsToValues(props.fields),
   handleSubmit: values => {
     console.log(values)
+  },
+  validate: (values, props: IFormSectionProps) => {
+    return props.fields.reduce((errorsForAllFields: Errors, field) => {
+      const validators = field.validate.slice(0)
+      const value = values[field.name]
+
+      if (field.required) {
+        validators.push(required)
+      }
+
+      const validationErrors = validators
+        .map(validator => validator(value))
+        .filter(error => error !== undefined) as IValidationResult[]
+
+      return {
+        ...errorsForAllFields,
+        [field.name]: validationErrors
+      }
+    }, {})
   }
 })(injectIntl(FormSectionComponent))
