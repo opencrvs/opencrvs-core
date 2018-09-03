@@ -12,8 +12,8 @@ export interface IFormField {
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
-  prefix?: React.ComponentClass<any> | React.SFC | string
-  postfix?: React.ComponentClass<any> | React.SFC | string
+  prefix?: React.ComponentClass<any> | string
+  postfix?: React.ComponentClass<any> | string
   disabled?: boolean
   initialValue?: string
 }
@@ -40,8 +40,8 @@ export interface Ii18nFormField {
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
-  prefix?: React.ComponentClass<any> | React.SFC | string
-  postfix?: React.ComponentClass<any> | React.SFC | string
+  prefix?: React.ComponentClass<any> | string
+  postfix?: React.ComponentClass<any> | string
   disabled?: boolean
 }
 

@@ -14,8 +14,8 @@ export interface IInputFieldProps {
   maxLength?: number
   meta?: { touched: boolean; error: string }
   component?: React.ComponentClass<any>
-  prefix?: React.ComponentClass<any> | React.SFC | string
-  postfix?: React.ComponentClass<any> | React.SFC | string
+  prefix?: React.ComponentClass<any> | string
+  postfix?: React.ComponentClass<any> | string
 }
 
 const applyDefaultIfNotDisabled = (
@@ -54,7 +54,7 @@ const Padding = styled.span`
 `
 
 const renderComponentOrString = (
-  componentOrString: React.ComponentClass<any> | React.SFC | string
+  componentOrString: React.ComponentClass<any> | string
 ) => {
   if (typeof componentOrString === 'string') {
     return componentOrString
@@ -77,11 +77,11 @@ export class InputField<
     } = this.props
     const prefix = this.props.prefix as
       | React.ComponentClass<any>
-      | React.SFC
+
       | string
     const postfix = this.props.postfix as
       | React.ComponentClass<any>
-      | React.SFC
+
       | string
 
     const Component = component
