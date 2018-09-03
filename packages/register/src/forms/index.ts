@@ -16,6 +16,7 @@ export interface IFormField {
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
   initialValue?: string
+  fields?: IFormField[]
 }
 
 export interface IFormSection {

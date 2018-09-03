@@ -109,6 +109,7 @@ class BirthParentFormView extends React.Component<
   Props & DispatchProps & InjectedIntlProps
 > {
   modifyDraft = (sectionData: IFormSectionData) => {
+    console.log('hi')
     const { activeSection, draft } = this.props
     this.props.modifyDraft({
       ...draft,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { withFormik, FormikProps } from 'formik'
 import { isEqual } from 'lodash'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-
+import { internationaliseFieldObject } from '../../forms/utils'
 import {
   InputField,
   TextInput,
@@ -16,14 +16,11 @@ import {
   RadioGroup
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
-import {
-  IFormField,
-  Ii18nFormField,
-  Ii18nSelectOption,
-  IFormSectionData
-} from '../../forms'
+import { IFormField, Ii18nFormField, IFormSectionData } from '../../forms'
 import { Omit } from '../../utils'
-const FormItem = styled.div`
+import { Address } from './Address'
+
+export const FormItem = styled.div`
   margin-bottom: 2em;
 `
 
@@ -40,7 +37,10 @@ type GeneratedInputFieldProps = { field: Ii18nFormField } & Omit<
 > &
   InputProps
 
-function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
+export function GeneratedInputField({
+  field,
+  ...props
+}: GeneratedInputFieldProps) {
   if (field.type === 'select') {
     return <InputField component={Select} id={field.name} {...field} />
   }
@@ -57,13 +57,26 @@ function GeneratedInputField({ field, ...props }: GeneratedInputFieldProps) {
   return <InputField component={TextInput} id={field.name} {...field} />
 }
 
-const toObject = (fields: IFormField[]) =>
+const checkNestedFields = (field: IFormField) => {
+  if (field.type === 'address' && field.fields) {
+    return field.fields.reduce(
+      (memo, nestedField) => ({
+        ...memo,
+        [nestedField.name]: nestedField.initialValue
+      }),
+      {}
+    )
+  }
+  return field.initialValue
+}
+
+const getValuesFromFields = (fields: IFormField[]) =>
   fields.reduce(
-    (memo, field) => ({ ...memo, [field.name]: field.initialValue }),
+    (memo, field) => ({ ...memo, [field.name]: checkNestedFields(field) }),
     {}
   )
 
-interface IFormSectionProps {
+export interface IFormSectionProps {
   fields: IFormField[]
   title: string
   id: string
@@ -87,24 +100,11 @@ class FormSectionComponent extends React.Component<Props> {
       handleBlur,
       values,
       fields,
-      id,
       intl,
-      title
+      id,
+      title,
+      ...props
     } = this.props
-    function internationaliseFieldObject(field: IFormField): Ii18nFormField {
-      return {
-        ...field,
-        label: intl.formatMessage(field.label),
-        options: field.options
-          ? field.options.map(opt => {
-              return {
-                ...opt,
-                label: intl.formatMessage(opt.label)
-              } as Ii18nSelectOption
-            })
-          : undefined
-      } as Ii18nFormField
-    }
 
     /*
      * HACK
@@ -121,7 +121,7 @@ class FormSectionComponent extends React.Component<Props> {
     const fieldsWithValuesDefined = fields.filter(
       field => values[field.name] !== undefined
     )
-
+    console.log('values: ', values)
     return (
       <section>
         <FormSectionTitle id={`form_section_title_${id}`}>
@@ -129,10 +129,23 @@ class FormSectionComponent extends React.Component<Props> {
         </FormSectionTitle>
         <form onSubmit={handleSubmit}>
           {fieldsWithValuesDefined.map(field => {
+            if (field.type === 'address' && field.fields) {
+              return (
+                <Address
+                  id={field.name}
+                  label={field.label}
+                  fields={field.fields}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  values={Object(values[field.name])}
+                  {...props}
+                />
+              )
+            }
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
-                  field={internationaliseFieldObject(field)}
+                  field={internationaliseFieldObject(field, intl)}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values[field.name]}
@@ -148,7 +161,7 @@ class FormSectionComponent extends React.Component<Props> {
 
 export const Form = withFormik<IFormSectionProps, IFormSectionData>({
   enableReinitialize: true,
-  mapPropsToValues: props => toObject(props.fields),
+  mapPropsToValues: props => getValuesFromFields(props.fields),
   handleSubmit: values => {
     console.log(values)
   }
