@@ -22,6 +22,7 @@ export interface IRadioGroup {
   options: IRadioOption[]
   defaultValue?: string
   name: string
+  onChange: (value: string) => {}
 }
 
 interface IState {
@@ -54,6 +55,7 @@ export class RadioGroup extends React.Component<IRadioGroup, IState> {
           {options.map(option => {
             return (
               <Radio
+                {...props}
                 key={option.label}
                 name={name}
                 label={option.label}

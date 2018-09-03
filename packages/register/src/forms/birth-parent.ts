@@ -1,6 +1,5 @@
 import { IForm } from './'
 import { defineMessages } from 'react-intl'
-import { countries, states, districts } from './addressData'
 
 export const messages = defineMessages({
   childTab: {
@@ -261,53 +260,7 @@ export const messages = defineMessages({
   currentAddress: {
     id: 'formFields.currentAddress',
     defaultMessage: 'Current Address',
-    description: "Title for the father's address fields"
-  },
-  addressSameAsMother: {
-    id: 'formFields.addressSameAsMother',
-    defaultMessage: "Is the father's address the same as the mother's address?",
-    description:
-      "Title for the radio button to select that the father's address is the same as the mother's address"
-  },
-  country: {
-    id: 'formFields.country',
-    defaultMessage: 'Country',
-    description: 'Title for the country select'
-  },
-  state: {
-    id: 'formFields.state',
-    defaultMessage: 'State',
-    description: 'Title for the state select'
-  },
-  district: {
-    id: 'formFields.district',
-    defaultMessage: 'District',
-    description: 'Title for the district select'
-  },
-  addressLine1: {
-    id: 'formFields.addressLine1',
-    defaultMessage: 'Address Line 1',
-    description: 'Title for the address line 1'
-  },
-  addressLine2: {
-    id: 'formFields.addressLine2',
-    defaultMessage: 'Address Line 2',
-    description: 'Title for the address line 2'
-  },
-  addressLine3: {
-    id: 'formFields.addressLine3',
-    defaultMessage: 'Address Line 3',
-    description: 'Title for the address line 3'
-  },
-  addressLine4: {
-    id: 'formFields.addressLine4',
-    defaultMessage: 'Address Line 4',
-    description: 'Title for the address line 4'
-  },
-  postCode: {
-    id: 'formFields.postCode',
-    defaultMessage: 'Postcode',
-    description: 'Title for the postcode field'
+    description: 'Title for the current address fields'
   }
 })
 
@@ -503,7 +456,7 @@ export const birthParentForm: IForm = {
           type: 'radioGroup',
           label: messages.fathersDetailsExist,
           required: true,
-          initialValue: '',
+          initialValue: '0',
           validate: [],
           options: [
             { value: '1', label: messages.confirm },
@@ -511,93 +464,12 @@ export const birthParentForm: IForm = {
           ]
         },
         {
-          name: 'fathersAddress',
+          name: 'fathersCurrentAddress',
           type: 'address',
           label: messages.currentAddress,
-          required: true,
+          required: false,
           initialValue: '',
-          validate: [],
-          fields: [
-            {
-              name: 'addressSameAsMother',
-              type: 'radioGroup',
-              label: messages.addressSameAsMother,
-              required: true,
-              initialValue: '',
-              validate: [],
-              options: [
-                { value: '1', label: messages.confirm },
-                { value: '0', label: messages.deny }
-              ]
-            },
-            {
-              name: 'country',
-              type: 'select',
-              label: messages.country,
-              required: true,
-              initialValue: '',
-              validate: [],
-              options: countries
-            },
-            {
-              name: 'state',
-              type: 'select',
-              label: messages.state,
-              required: true,
-              initialValue: '',
-              validate: [],
-              options: states
-            },
-            {
-              name: 'district',
-              type: 'select',
-              label: messages.district,
-              required: true,
-              initialValue: '',
-              validate: [],
-              options: districts
-            },
-            {
-              name: 'addressLine1',
-              type: 'text',
-              label: messages.addressLine1,
-              required: true,
-              initialValue: '',
-              validate: []
-            },
-            {
-              name: 'addressLine2',
-              type: 'text',
-              label: messages.addressLine2,
-              required: false,
-              initialValue: '',
-              validate: []
-            },
-            {
-              name: 'addressLine3',
-              type: 'text',
-              label: messages.addressLine3,
-              required: false,
-              initialValue: '',
-              validate: []
-            },
-            {
-              name: 'addressLine4',
-              type: 'text',
-              label: messages.addressLine4,
-              required: false,
-              initialValue: '',
-              validate: []
-            },
-            {
-              name: 'postCode',
-              type: 'text',
-              label: messages.postCode,
-              required: true,
-              initialValue: '',
-              validate: []
-            }
-          ]
+          validate: []
         }
       ]
     },

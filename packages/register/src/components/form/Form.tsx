@@ -13,37 +13,49 @@ import {
   IDateFieldProps,
   ITextInputProps,
   IInputFieldProps,
-  RadioGroup
+  RadioGroup,
+  IAddressProps,
+  Address
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
 import { IFormField, Ii18nFormField, IFormSectionData } from '../../forms'
 import { Omit } from '../../utils'
-import { Address } from './Address'
 
 export const FormItem = styled.div`
   margin-bottom: 2em;
 `
 
-export const FormSectionTitle = styled.h2`
+const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
 `
 
-type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
+type InputProps =
+  | ISelectProps
+  | ITextInputProps
+  | IDateFieldProps
+  | IAddressProps
 
-type GeneratedInputFieldProps = { field: Ii18nFormField } & Omit<
-  IInputFieldProps,
-  'id'
-> &
+type GeneratedInputFieldProps = {
+  field: Ii18nFormField
+  values: IFormSectionData
+} & Omit<IInputFieldProps, 'id'> &
   InputProps
 
-export function GeneratedInputField({
+function GeneratedInputField({
   field,
+  values,
   ...props
 }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
     return (
-      <InputField component={Select} id={field.name} {...field} {...props} />
+      <InputField
+        component={Select}
+        id={field.name}
+        value={values[field.name]}
+        {...field}
+        {...props}
+      />
     )
   }
   if (field.type === 'radioGroup') {
@@ -51,6 +63,7 @@ export function GeneratedInputField({
       <InputField
         component={RadioGroup}
         id={field.name}
+        value={values[field.name]}
         {...field}
         {...props}
       />
@@ -59,35 +72,37 @@ export function GeneratedInputField({
 
   if (field.type === 'date') {
     return (
-      <InputField component={DateField} id={field.name} {...field} {...props} />
+      <InputField
+        component={DateField}
+        id={field.name}
+        value={values[field.name]}
+        {...field}
+        {...props}
+      />
     )
   }
   if (field.type === 'textarea') {
     return (
-      <InputField component={TextArea} id={field.name} {...field} {...props} />
+      <InputField
+        component={TextArea}
+        id={field.name}
+        value={values[field.name]}
+        {...field}
+        {...props}
+      />
     )
+  }
+  if (field.type === 'address') {
+    return <Address id={field.name} values={values} {...field} {...props} />
   }
   return (
     <InputField component={TextInput} id={field.name} {...field} {...props} />
   )
 }
 
-const checkNestedFields = (field: IFormField) => {
-  if (field.type === 'address' && field.fields) {
-    return field.fields.reduce(
-      (memo, nestedField) => ({
-        ...memo,
-        [nestedField.name]: nestedField.initialValue
-      }),
-      {}
-    )
-  }
-  return field.initialValue
-}
-
 const getValuesFromFields = (fields: IFormField[]) =>
   fields.reduce(
-    (memo, field) => ({ ...memo, [field.name]: checkNestedFields(field) }),
+    (memo, field) => ({ ...memo, [field.name]: field.initialValue }),
     {}
   )
 
@@ -104,7 +119,9 @@ type Props = IFormSectionProps &
 
 class FormSectionComponent extends React.Component<Props> {
   componentWillReceiveProps(nextProps: Props) {
+    console.log('hi')
     if (!isEqual(nextProps.values, this.props.values)) {
+      console.log('changing')
       this.props.onChange(nextProps.values)
     }
   }
@@ -117,8 +134,7 @@ class FormSectionComponent extends React.Component<Props> {
       fields,
       intl,
       id,
-      title,
-      ...props
+      title
     } = this.props
 
     /*
@@ -136,7 +152,6 @@ class FormSectionComponent extends React.Component<Props> {
     const fieldsWithValuesDefined = fields.filter(
       field => values[field.name] !== undefined
     )
-    console.log('values: ', values)
     return (
       <section>
         <FormSectionTitle id={`form_section_title_${id}`}>
@@ -144,26 +159,13 @@ class FormSectionComponent extends React.Component<Props> {
         </FormSectionTitle>
         <form onSubmit={handleSubmit}>
           {fieldsWithValuesDefined.map(field => {
-            if (field.type === 'address' && field.fields) {
-              return (
-                <Address
-                  id={field.name}
-                  label={field.label}
-                  fields={field.fields}
-                  handleChange={handleChange}
-                  handleBlur={handleBlur}
-                  values={Object(values[field.name])}
-                  {...props}
-                />
-              )
-            }
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
                   field={internationaliseFieldObject(field, intl)}
+                  values={values}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  value={values[field.name]}
                 />
               </FormItem>
             )
