@@ -63,6 +63,10 @@ type RemoveFathersDetailsAction = {
   type: typeof REMOVE_FATHERS_DETAILS
 }
 
+export function removeFathersDetails() {
+  return { type: REMOVE_FATHERS_DETAILS }
+}
+
 type Action = AddFathersDetailsAction | RemoveFathersDetailsAction
 
 export type IRegisterFormState = {
@@ -128,6 +132,14 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         const newFields = fathersSection.fields.concat(fathersSectionDetails)
         fathersSection.fields = newFields
         newState.registerForm.sections.splice(sectionIndex, 1, fathersSection)
+        return newState
+      } else {
+        return { ...state }
+      }
+    case REMOVE_FATHERS_DETAILS:
+      if (state.fathersDetailsAdded) {
+        const newState = { ...state, fathersDetailsAdded: false }
+        newState.registerForm.sections[2].fields.length = 1
         return newState
       } else {
         return { ...state }
