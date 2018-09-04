@@ -39,12 +39,16 @@ type InputProps =
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
   values: IFormSectionData
+  onChange: (e: React.ChangeEvent<any>) => void
+  setFieldValue: (name: string, value: string) => void
 } & Omit<IInputFieldProps, 'id'> &
   InputProps
 
 function GeneratedInputField({
   field,
   values,
+  onChange,
+  setFieldValue,
   ...props
 }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
@@ -53,6 +57,7 @@ function GeneratedInputField({
         component={Select}
         id={field.name}
         value={values[field.name]}
+        onChange={(value: string) => setFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -64,6 +69,7 @@ function GeneratedInputField({
         component={RadioGroup}
         id={field.name}
         value={values[field.name]}
+        onChange={(value: string) => setFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -74,8 +80,9 @@ function GeneratedInputField({
     return (
       <InputField
         component={DateField}
-        id={field.name}
         value={values[field.name]}
+        onChange={(value: string) => setFieldValue(field.name, value)}
+        id={field.name}
         {...field}
         {...props}
       />
@@ -87,6 +94,7 @@ function GeneratedInputField({
         component={TextArea}
         id={field.name}
         value={values[field.name]}
+        onChange={onChange}
         {...field}
         {...props}
       />
@@ -96,11 +104,17 @@ function GeneratedInputField({
     return <Address id={field.name} values={values} {...field} {...props} />
   }
   return (
-    <InputField component={TextInput} id={field.name} {...field} {...props} />
+    <InputField
+      component={TextInput}
+      id={field.name}
+      onChange={onChange}
+      {...field}
+      {...props}
+    />
   )
 }
 
-const getValuesFromFields = (fields: IFormField[]) =>
+const fieldsToValues = (fields: IFormField[]) =>
   fields.reduce(
     (memo, field) => ({ ...memo, [field.name]: field.initialValue }),
     {}
@@ -132,8 +146,9 @@ class FormSectionComponent extends React.Component<Props> {
       handleBlur,
       values,
       fields,
-      intl,
+      setFieldValue,
       id,
+      intl,
       title
     } = this.props
 
@@ -163,9 +178,11 @@ class FormSectionComponent extends React.Component<Props> {
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
                   field={internationaliseFieldObject(field, intl)}
+                  onBlur={handleBlur}
                   values={values}
                   onChange={handleChange}
-                  onBlur={handleBlur}
+                  setFieldValue={setFieldValue}
+                  value={values[field.name]}
                 />
               </FormItem>
             )
@@ -178,7 +195,7 @@ class FormSectionComponent extends React.Component<Props> {
 
 export const Form = withFormik<IFormSectionProps, IFormSectionData>({
   enableReinitialize: true,
-  mapPropsToValues: props => getValuesFromFields(props.fields),
+  mapPropsToValues: props => fieldsToValues(props.fields),
   handleSubmit: values => {
     console.log(values)
   }
