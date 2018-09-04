@@ -52,7 +52,7 @@ function GeneratedInputField({
       <InputField
         component={Select}
         id={field.name}
-        onChangeValue={setFieldValue}
+        onChange={(value: string) => setFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -63,7 +63,6 @@ function GeneratedInputField({
       <InputField
         component={RadioGroup}
         id={field.name}
-        onChangeValue={setFieldValue}
         {...field}
         {...props}
       />
@@ -72,13 +71,7 @@ function GeneratedInputField({
 
   if (field.type === 'date') {
     return (
-      <InputField
-        component={DateField}
-        id={field.name}
-        onChangeValue={setFieldValue}
-        {...field}
-        {...props}
-      />
+      <InputField component={DateField} id={field.name} {...field} {...props} />
     )
   }
   if (field.type === 'textarea') {
@@ -103,7 +96,7 @@ function GeneratedInputField({
   )
 }
 
-const toObject = (fields: IFormField[]) =>
+const fieldsToValues = (fields: IFormField[]) =>
   fields.reduce(
     (memo, field) => ({ ...memo, [field.name]: field.initialValue }),
     {}
@@ -196,7 +189,7 @@ class FormSectionComponent extends React.Component<Props> {
 
 export const Form = withFormik<IFormSectionProps, IFormSectionData>({
   enableReinitialize: true,
-  mapPropsToValues: props => toObject(props.fields),
+  mapPropsToValues: props => fieldsToValues(props.fields),
   handleSubmit: values => {
     console.log(values)
   }

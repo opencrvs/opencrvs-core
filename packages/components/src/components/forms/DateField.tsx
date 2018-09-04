@@ -8,7 +8,6 @@ export interface IProps {
   meta?: { touched: boolean; error: string }
   focusInput: boolean
   onChange: (dateString: string) => {}
-  onChangeValue: (name: string, value: string) => void
 }
 
 export interface IState {
@@ -92,8 +91,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
         { [segmentType]: val } as Pick<IState, 'dd' | 'mm' | 'yyyy'>,
         () => {
           if (this.props.onChange) {
-            this.props.onChangeValue(
-              this.props.id,
+            this.props.onChange(
               `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
             )
           }
