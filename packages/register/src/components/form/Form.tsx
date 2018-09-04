@@ -36,14 +36,14 @@ type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
-  handleChange: (e: React.ChangeEvent<any>) => void
+  onChange: (e: React.ChangeEvent<any>) => void
   setFieldValue: (name: string, value: string) => void
 } & Omit<IInputFieldProps, 'id'> &
   InputProps
 
 function GeneratedInputField({
   field,
-  handleChange,
+  onChange,
   setFieldValue,
   ...props
 }: GeneratedInputFieldProps) {
@@ -63,6 +63,7 @@ function GeneratedInputField({
       <InputField
         component={RadioGroup}
         id={field.name}
+        onChange={(value: string) => setFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -71,7 +72,13 @@ function GeneratedInputField({
 
   if (field.type === 'date') {
     return (
-      <InputField component={DateField} id={field.name} {...field} {...props} />
+      <InputField
+        component={DateField}
+        onChange={(value: string) => setFieldValue(field.name, value)}
+        id={field.name}
+        {...field}
+        {...props}
+      />
     )
   }
   if (field.type === 'textarea') {
@@ -79,7 +86,7 @@ function GeneratedInputField({
       <InputField
         component={TextArea}
         id={field.name}
-        onChange={handleChange}
+        onChange={onChange}
         {...field}
         {...props}
       />
@@ -89,7 +96,7 @@ function GeneratedInputField({
     <InputField
       component={TextInput}
       id={field.name}
-      onChange={handleChange}
+      onChange={onChange}
       {...field}
       {...props}
     />
@@ -174,7 +181,7 @@ class FormSectionComponent extends React.Component<Props> {
                 <GeneratedInputField
                   field={internationaliseFieldObject(field)}
                   onBlur={handleBlur}
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   setFieldValue={setFieldValue}
                   value={values[field.name]}
                 />
