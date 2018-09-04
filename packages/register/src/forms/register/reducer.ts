@@ -56,7 +56,6 @@ type AddFathersDetailsAction = {
 }
 
 export function addFathersDetails() {
-  console.log('hi')
   return { type: ADD_FATHERS_DETAILS }
 }
 
@@ -68,6 +67,7 @@ type Action = AddFathersDetailsAction | RemoveFathersDetailsAction
 
 export type IRegisterFormState = {
   registerForm: IForm
+  fathersDetailsAdded: boolean
 }
 
 export const initialState: IRegisterFormState = {
@@ -98,7 +98,8 @@ export const initialState: IRegisterFormState = {
         fields: []
       }
     ]
-  }
+  },
+  fathersDetailsAdded: false
 }
 
 const getRegisterFormSection = (state: IRegisterFormState, key: string) => {
@@ -120,13 +121,17 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
   switch (action.type) {
     case ADD_FATHERS_DETAILS:
-      const newState = { ...state }
-      const fathersSection = getRegisterFormSection(state, 'father')
-      const sectionIndex = getRegisterFormSectionIndex(state, fathersSection)
-      const newFields = fathersSection.fields.concat(fathersSectionDetails)
-      fathersSection.fields = newFields
-      newState.registerForm.sections.splice(sectionIndex, 1, fathersSection)
-      return newState
+      if (!state.fathersDetailsAdded) {
+        const newState = { ...state, fathersDetailsAdded: true }
+        const fathersSection = getRegisterFormSection(state, 'father')
+        const sectionIndex = getRegisterFormSectionIndex(state, fathersSection)
+        const newFields = fathersSection.fields.concat(fathersSectionDetails)
+        fathersSection.fields = newFields
+        newState.registerForm.sections.splice(sectionIndex, 1, fathersSection)
+        return newState
+      } else {
+        return { ...state }
+      }
     default:
       return state
   }
