@@ -8,10 +8,11 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { storeDraft, createDraft } from './drafts'
+import { storeDraft, createDraft, IDraft } from './drafts'
 
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
+const setItem = window.localStorage.setItem as jest.Mock
 
 beforeEach(() => {
   history.replaceState({}, '', '/')
@@ -52,6 +53,7 @@ describe('when user has a valid token in local storage', () => {
 
   beforeEach(() => {
     getItem.mockReturnValue(validToken)
+    setItem.mockClear()
     const testApp = createTestApp()
     app = testApp.app
     history = testApp.history
@@ -101,14 +103,16 @@ describe('when user has a valid token in local storage', () => {
   })
 
   describe('when user is in birth registration by parent informant view', () => {
+    let draft: IDraft
     beforeEach(() => {
-      const draft = createDraft()
+      draft = createDraft()
       store.dispatch(storeDraft(draft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
       )
       app.update()
     })
+
     describe('when user clicks the "mother" tab', () => {
       beforeEach(() => {
         app
@@ -122,6 +126,23 @@ describe('when user has a valid token in local storage', () => {
         )
       })
     })
+
+    describe('when user types in something', () => {
+      beforeEach(() => {
+        app
+          .find('#childGivenName')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childGivenName', value: 'hello' }
+          })
+      })
+      it('stores the value to a new draft', () => {
+        const [, data] = setItem.mock.calls[setItem.mock.calls.length - 1]
+        const storedDrafts = JSON.parse(data)
+        expect(storedDrafts[0].data.child.childGivenName).toEqual('hello')
+      })
+    })
+
     describe('when user clicks "next" button', () => {
       beforeEach(() => {
         app

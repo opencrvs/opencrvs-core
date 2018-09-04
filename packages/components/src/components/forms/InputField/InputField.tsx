@@ -16,7 +16,6 @@ export interface IInputFieldProps {
   component?: React.ComponentClass<any>
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
-  onChangeValue?: (name: string, value: string) => void
 }
 
 const applyDefaultIfNotDisabled = (

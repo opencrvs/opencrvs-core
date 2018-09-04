@@ -8,12 +8,15 @@ export interface ISelectProps extends Props<any> {
   error?: boolean
   touched?: boolean
   options: ISelectOption[]
-  onChangeValue: (name: string, value: string) => void
 }
 
 interface ISelectOption {
   value: string
   label: string
+}
+
+interface IReactSelectOverrides {
+  onChange: (value: string) => void
 }
 
 const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
@@ -44,41 +47,31 @@ const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
 interface IState {
   selectedOption: ISelectOption
 }
-export class Select extends React.Component<ISelectProps, IState> {
-  constructor(props: ISelectProps) {
-    super(props)
+
+function getSelectedOption(
+  value: string,
+  options: ISelectOption[]
+): ISelectOption | null {
+  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  if (selectedOption) {
+    return selectedOption
   }
+  return null
+}
+export class Select extends React.Component<
+  ISelectProps & IReactSelectOverrides,
+  IState
+> {
   change = (selectedOption: ISelectOption) => {
-    this.setState(
-      {
-        selectedOption
-      },
-      () => {
-        this.props.onChangeValue(this.props.id, selectedOption.value)
-      }
-    )
-  }
-  getSelectedOption = (
-    value: string,
-    options: ISelectOption[]
-  ): ISelectOption | null => {
-    const selectedOption = options.find((x: ISelectOption) => x.value === value)
-    if (selectedOption) {
-      return selectedOption
-    }
-    return null
+    this.props.onChange(selectedOption.value)
   }
   render() {
-    const { name, options, id, onChangeValue, value } = this.props
     return (
       <StyledSelect
         classNamePrefix="react-select"
+        {...this.props}
         onChange={this.change}
-        name={name}
-        value={this.getSelectedOption(value, options)}
-        options={options}
-        id={id}
-        onChangeValue={onChangeValue}
+        value={getSelectedOption(this.props.value, this.props.options)}
       />
     )
   }
