@@ -15,7 +15,9 @@ import {
   addFathersDetails,
   removeFathersDetails,
   addFatherCurrentAddress,
-  removeFatherCurrentAddress
+  removeFatherCurrentAddress,
+  addFatherPermanentAddress,
+  removeFatherPermanentAddress
 } from '../../forms/register/reducer'
 import { getRegisterForm } from '../../forms/register/selectors'
 
@@ -104,6 +106,8 @@ type DispatchProps = {
   removeFathersDetails: typeof removeFathersDetails
   addFatherCurrentAddress: typeof addFatherCurrentAddress
   removeFatherCurrentAddress: typeof addFatherCurrentAddress
+  addFatherPermanentAddress: typeof addFatherPermanentAddress
+  removeFatherPermanentAddress: typeof removeFatherPermanentAddress
 }
 
 type Props = {
@@ -122,6 +126,11 @@ class RegisterFormView extends React.Component<
         this.props.addFatherCurrentAddress()
       } else if (sectionData.addressSameAsMother === '1') {
         this.props.removeFatherCurrentAddress()
+      }
+      if (sectionData.permanentAddressSameAsMother === '0') {
+        this.props.addFatherPermanentAddress()
+      } else if (sectionData.permanentAddressSameAsMother === '1') {
+        this.props.removeFatherPermanentAddress()
       }
     } else {
       this.props.removeFathersDetails()
@@ -245,5 +254,7 @@ export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   removeFathersDetails,
   addFatherCurrentAddress,
   removeFatherCurrentAddress,
+  addFatherPermanentAddress,
+  removeFatherPermanentAddress,
   goToTab: goToTabAction
 })(injectIntl<Props>(RegisterFormView))

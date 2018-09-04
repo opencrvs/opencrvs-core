@@ -7,7 +7,8 @@ import {
   fatherSection,
   fathersSectionDetails,
   IFatherSectionFormData,
-  fathersCurrentAddress
+  fathersCurrentAddress,
+  fathersPermanentAddress
 } from './father-section'
 import { getFormFieldIndex } from '../utils'
 import { pullAll } from 'lodash'
@@ -90,16 +91,40 @@ export function removeFatherCurrentAddress() {
   return { type: REMOVE_FATHER_CURRENT_ADDRESS }
 }
 
+const ADD_FATHER_PERMANENT_ADDRESS =
+  'REGISTER_FORM/ADD_FATHER_PERMANENT_ADDRESS'
+const REMOVE_FATHER_PERMANENT_ADDRESS =
+  'REGISTER_FORM/REMOVE_FATHER_PERMANENT_ADDRESS'
+
+type AddFatherPermanentAddress = {
+  type: typeof ADD_FATHER_PERMANENT_ADDRESS
+}
+
+export function addFatherPermanentAddress() {
+  return { type: ADD_FATHER_PERMANENT_ADDRESS }
+}
+
+type RemoveFatherPermanentAddress = {
+  type: typeof REMOVE_FATHER_PERMANENT_ADDRESS
+}
+
+export function removeFatherPermanentAddress() {
+  return { type: REMOVE_FATHER_PERMANENT_ADDRESS }
+}
+
 type Action =
   | AddFathersDetailsAction
   | RemoveFathersDetailsAction
   | AddFatherCurrentAddress
   | RemoveFatherCurrentAddress
+  | AddFatherPermanentAddress
+  | RemoveFatherPermanentAddress
 
 export type IRegisterFormState = {
   registerForm: IForm
   fathersDetailsAdded: boolean
   fathersCurrentAddressAdded: boolean
+  fathersPermanentAddressAdded: boolean
 }
 
 export const initialState: IRegisterFormState = {
@@ -132,7 +157,8 @@ export const initialState: IRegisterFormState = {
     ]
   },
   fathersDetailsAdded: false,
-  fathersCurrentAddressAdded: false
+  fathersCurrentAddressAdded: false,
+  fathersPermanentAddressAdded: false
 }
 
 const getRegisterFormSection = (state: IRegisterFormState, key: string) => {
@@ -197,6 +223,29 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
       if (state.fathersCurrentAddressAdded) {
         const newState = { ...state, fathersCurrentAddressAdded: false }
         pullAll(fathersSection.fields, [fathersCurrentAddress])
+        newState.registerForm.sections = updateSection(newState, fathersSection)
+        return newState
+      } else {
+        return { ...state }
+      }
+    case ADD_FATHER_PERMANENT_ADDRESS:
+      if (!state.fathersPermanentAddressAdded) {
+        const newState = { ...state, fathersPermanentAddressAdded: true }
+        const insertPoint =
+          getFormFieldIndex(
+            fathersSection.fields,
+            'permanentAddressSameAsMother'
+          ) + 1
+        fathersSection.fields.splice(insertPoint, 0, fathersPermanentAddress)
+        newState.registerForm.sections = updateSection(newState, fathersSection)
+        return newState
+      } else {
+        return { ...state }
+      }
+    case REMOVE_FATHER_PERMANENT_ADDRESS:
+      if (state.fathersPermanentAddressAdded) {
+        const newState = { ...state, fathersPermanentAddressAdded: false }
+        pullAll(fathersSection.fields, [fathersPermanentAddress])
         newState.registerForm.sections = updateSection(newState, fathersSection)
         return newState
       } else {

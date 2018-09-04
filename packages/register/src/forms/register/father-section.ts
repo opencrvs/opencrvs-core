@@ -97,6 +97,11 @@ export const messages = defineMessages({
     id: 'formFields.currentAddress',
     defaultMessage: 'Current Address',
     description: 'Title for the current address fields'
+  },
+  permanentAddress: {
+    id: 'formFields.permanentAddress',
+    defaultMessage: 'Permanent Address',
+    description: 'Title for the permanent address fields'
   }
 })
 
@@ -302,6 +307,15 @@ export const fathersCurrentAddress = {
   name: 'fathersCurrentAddress',
   type: 'address',
   label: messages.currentAddress,
+  required: false,
+  initialValue: '',
+  validate: []
+}
+
+export const fathersPermanentAddress = {
+  name: 'fathersPermanentAddress',
+  type: 'address',
+  label: messages.permanentAddress,
   required: false,
   initialValue: '',
   validate: []
