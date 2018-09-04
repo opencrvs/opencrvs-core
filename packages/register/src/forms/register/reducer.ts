@@ -1,12 +1,13 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, IFormSection } from 'src/forms'
+import { IForm, IFormSection, IFormField } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { childSection, IChildSectionFormData } from './child-section'
 import { motherSection, IMotherSectionFormData } from './mother-section'
 import {
   fatherSection,
   fathersSectionDetails,
-  IFatherSectionFormData
+  IFatherSectionFormData,
+  fathersCurrentAddress
 } from './father-section'
 
 export interface IRegisterFormData {
@@ -67,11 +68,36 @@ export function removeFathersDetails() {
   return { type: REMOVE_FATHERS_DETAILS }
 }
 
-type Action = AddFathersDetailsAction | RemoveFathersDetailsAction
+const ADD_FATHER_CURRENT_ADDRESS = 'REGISTER_FORM/ADD_FATHER_CURRENT_ADDRESS'
+const REMOVE_FATHER_CURRENT_ADDRESS =
+  'REGISTER_FORM/REMOVE_FATHER_CURRENT_ADDRESS'
+
+type AddFatherCurrentAddress = {
+  type: typeof ADD_FATHER_CURRENT_ADDRESS
+}
+
+export function addFatherCurrentAddress() {
+  return { type: ADD_FATHER_CURRENT_ADDRESS }
+}
+
+type RemoveFatherCurrentAddress = {
+  type: typeof REMOVE_FATHER_CURRENT_ADDRESS
+}
+
+export function removeFatherCurrentAddress() {
+  return { type: REMOVE_FATHER_CURRENT_ADDRESS }
+}
+
+type Action =
+  | AddFathersDetailsAction
+  | RemoveFathersDetailsAction
+  | AddFatherCurrentAddress
+  | RemoveFatherCurrentAddress
 
 export type IRegisterFormState = {
   registerForm: IForm
   fathersDetailsAdded: boolean
+  fathersCurrentAddressAdded: boolean
 }
 
 export const initialState: IRegisterFormState = {
@@ -103,7 +129,8 @@ export const initialState: IRegisterFormState = {
       }
     ]
   },
-  fathersDetailsAdded: false
+  fathersDetailsAdded: false,
+  fathersCurrentAddressAdded: false
 }
 
 const getRegisterFormSection = (state: IRegisterFormState, key: string) => {
@@ -119,19 +146,39 @@ const getRegisterFormSectionIndex = (
   return state.registerForm.sections.indexOf(section)
 }
 
+const getFormField = (fields: IFormField[], key: string) => {
+  return fields.find((field: IFormField) => field.name === key) as IFormField
+}
+
+const getFormFieldIndex = (fields: IFormField[], field: IFormField) => {
+  return fields.indexOf(field)
+}
+
+const getSectionLengthAtField = (section: IFormSection, fieldName: string) => {
+  return (
+    getFormFieldIndex(section.fields, getFormField(section.fields, fieldName)) +
+    1
+  )
+}
+
 export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
   state: IRegisterFormState = initialState,
   action: Action
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
+  const fathersSection = getRegisterFormSection(state, 'father')
+  const fatherSectionIndex = getRegisterFormSectionIndex(state, fathersSection)
   switch (action.type) {
     case ADD_FATHERS_DETAILS:
       if (!state.fathersDetailsAdded) {
         const newState = { ...state, fathersDetailsAdded: true }
-        const fathersSection = getRegisterFormSection(state, 'father')
-        const sectionIndex = getRegisterFormSectionIndex(state, fathersSection)
-        const newFields = fathersSection.fields.concat(fathersSectionDetails)
-        fathersSection.fields = newFields
-        newState.registerForm.sections.splice(sectionIndex, 1, fathersSection)
+        fathersSection.fields = fathersSection.fields.concat(
+          fathersSectionDetails
+        )
+        newState.registerForm.sections.splice(
+          fatherSectionIndex,
+          1,
+          fathersSection
+        )
         return newState
       } else {
         return { ...state }
@@ -139,7 +186,37 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
     case REMOVE_FATHERS_DETAILS:
       if (state.fathersDetailsAdded) {
         const newState = { ...state, fathersDetailsAdded: false }
-        newState.registerForm.sections[2].fields.length = 1
+        getRegisterFormSection(newState, 'father').fields.length = 1
+        return newState
+      } else {
+        return { ...state }
+      }
+    case ADD_FATHER_CURRENT_ADDRESS:
+      if (!state.fathersCurrentAddressAdded) {
+        const newState = { ...state, fathersCurrentAddressAdded: true }
+        fathersSection.fields = fathersSection.fields.concat(
+          fathersCurrentAddress
+        )
+        newState.registerForm.sections.splice(
+          fatherSectionIndex,
+          1,
+          fathersSection
+        )
+        return newState
+      } else {
+        return { ...state }
+      }
+    case REMOVE_FATHER_CURRENT_ADDRESS:
+      if (state.fathersCurrentAddressAdded) {
+        const newState = { ...state, fathersCurrentAddressAdded: false }
+        const newSectionLength = getSectionLengthAtField(
+          fathersSection,
+          'addressSameAsMother'
+        )
+        getRegisterFormSection(
+          newState,
+          'father'
+        ).fields.length = newSectionLength
         return newState
       } else {
         return { ...state }

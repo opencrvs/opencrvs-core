@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 import { ValidIndicator } from '@opencrvs/components/lib/forms'
-import { addressSameAsMother, permanentAddressSameAsMother } from '../address'
+import { addressSameAsMother } from '../address'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
@@ -294,8 +294,7 @@ export const fathersSectionDetails = [
       }
     ]
   },
-  addressSameAsMother,
-  permanentAddressSameAsMother
+  addressSameAsMother
 ]
 
 export const fathersCurrentAddress = [

@@ -1,15 +1,11 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-
 import { Box, Header } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
-
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
 import styled from '../../styled-components'
-
 import { goToTab as goToTabAction } from '../../navigation/navigationActions'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
@@ -17,7 +13,9 @@ import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
 import {
   addFathersDetails,
-  removeFathersDetails
+  removeFathersDetails,
+  addFatherCurrentAddress,
+  removeFatherCurrentAddress
 } from '../../forms/register/reducer'
 import { getRegisterForm } from '../../forms/register/selectors'
 
@@ -104,6 +102,8 @@ type DispatchProps = {
   modifyDraft: typeof modifyDraft
   addFathersDetails: typeof addFathersDetails
   removeFathersDetails: typeof removeFathersDetails
+  addFatherCurrentAddress: typeof addFatherCurrentAddress
+  removeFatherCurrentAddress: typeof addFatherCurrentAddress
 }
 
 type Props = {
@@ -115,6 +115,24 @@ type Props = {
 class RegisterFormView extends React.Component<
   Props & DispatchProps & InjectedIntlProps
 > {
+  modifyFathersDynamicFields = (sectionData: IFormSectionData) => {
+    if (sectionData.fathersDetailsExist === '1') {
+      this.props.addFathersDetails()
+      if (sectionData.addressSameAsMother === '0') {
+        this.props.addFatherCurrentAddress()
+      } else if (sectionData.addressSameAsMother === '1') {
+        this.props.removeFatherCurrentAddress()
+      }
+    } else {
+      this.props.removeFathersDetails()
+    }
+  }
+  modifyDynamicFields = (id: string, sectionData: IFormSectionData) => {
+    if (id === 'father') {
+      this.modifyFathersDynamicFields(sectionData)
+    }
+  }
+
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     this.props.modifyDraft({
@@ -124,11 +142,7 @@ class RegisterFormView extends React.Component<
         [activeSection.id]: sectionData
       }
     })
-    if (sectionData.fathersDetailsExist === '1') {
-      this.props.addFathersDetails()
-    } else {
-      this.props.removeFathersDetails()
-    }
+    this.modifyDynamicFields(activeSection.id, sectionData)
   }
   render() {
     const { goToTab, intl, activeSection, draft, registerForm } = this.props
@@ -229,5 +243,7 @@ export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
   addFathersDetails,
   removeFathersDetails,
+  addFatherCurrentAddress,
+  removeFatherCurrentAddress,
   goToTab: goToTabAction
 })(injectIntl<Props>(RegisterFormView))
