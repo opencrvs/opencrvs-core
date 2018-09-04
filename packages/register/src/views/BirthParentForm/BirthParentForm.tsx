@@ -103,6 +103,7 @@ type DispatchProps = {
 type Props = {
   draft: IDraft
   activeSection: IFormSection
+  showValidationErrors: boolean
 }
 
 class BirthParentFormView extends React.Component<
@@ -119,7 +120,13 @@ class BirthParentFormView extends React.Component<
     })
   }
   render() {
-    const { goToTab, intl, activeSection, draft } = this.props
+    const {
+      goToTab,
+      intl,
+      activeSection,
+      showValidationErrors,
+      draft
+    } = this.props
 
     const nextSection = getNextSection(birthParentForm.sections, activeSection)
 
@@ -146,6 +153,7 @@ class BirthParentFormView extends React.Component<
                 <Form
                   id={activeSection.id}
                   onChange={this.modifyDraft}
+                  showValidationErrors={showValidationErrors}
                   title={intl.formatMessage(activeSection.title)}
                   fields={activeSection.fields}
                 />
@@ -207,13 +215,23 @@ function mapStateToProps(
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
   }
 
+  const nextSection = getNextSection(birthParentForm.sections, activeSection)
+
+  const hasBeenInTheNextSection = Boolean(
+    nextSection && draft.data[nextSection.id]
+  )
+  const showValidationErrors = hasBeenInTheNextSection
+
+  const fields = replaceInitialValues(
+    activeSection.fields,
+    draft.data[activeSectionId] || {}
+  )
+
   return {
+    showValidationErrors,
     activeSection: {
       ...activeSection,
-      fields: replaceInitialValues(
-        activeSection.fields,
-        draft.data[activeSectionId] || {}
-      )
+      fields
     },
     draft
   }
