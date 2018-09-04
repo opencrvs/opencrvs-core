@@ -44,7 +44,11 @@ export class RadioGroup extends React.Component<IRadioGroup, IState> {
   }
 
   change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ selected: event.target.value })
+    this.setState({ selected: event.target.value }, () => {
+      if (this.props.onChange) {
+        this.props.onChange(event.target.value)
+      }
+    })
   }
 
   render() {

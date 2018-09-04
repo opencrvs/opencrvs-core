@@ -68,7 +68,6 @@ export class Address extends React.Component<IAddressProps, IState> {
 
   render() {
     const { id, label, values } = this.props
-
     return (
       <AddressWrapper id={id}>
         <Title>{label}</Title>
