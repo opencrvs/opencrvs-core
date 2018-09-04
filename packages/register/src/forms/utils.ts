@@ -1,4 +1,4 @@
-import { IFormField, Ii18nFormField, Ii18nSelectOption } from './'
+import { IFormField, Ii18nFormField, Ii18nSelectOption, IFormSection } from './'
 import { InjectedIntl } from 'react-intl'
 
 export const internationaliseFieldObject = (
@@ -17,4 +17,21 @@ export const internationaliseFieldObject = (
         })
       : undefined
   } as Ii18nFormField
+}
+
+const getFormField = (fields: IFormField[], key: string) => {
+  return fields.find((field: IFormField) => field.name === key) as IFormField
+}
+
+export const getFormFieldIndex = (fields: IFormField[], key: string) => {
+  return fields.indexOf(fields.find(
+    (field: IFormField) => field.name === key
+  ) as IFormField)
+}
+
+export const getSectionLengthAtField = (
+  section: IFormSection,
+  fieldName: string
+) => {
+  return section.fields.indexOf(getFormField(section.fields, fieldName)) + 1
 }
