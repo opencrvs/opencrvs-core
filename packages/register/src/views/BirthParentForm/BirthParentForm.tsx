@@ -106,6 +106,14 @@ type Props = {
   showValidationErrors: boolean
 }
 
+const PreviewSectionTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.copy};
+`
+const PreviewBox = styled(Box)`
+  margin-bottom: 30px;
+`
+
 class BirthParentFormView extends React.Component<
   Props & DispatchProps & InjectedIntlProps
 > {
@@ -144,33 +152,48 @@ class BirthParentFormView extends React.Component<
           />
         </ViewHeaderWithTabs>
         <FormContainer>
-          <Box>
-            {activeSection.viewType === 'preview' && (
-              <h1>preview stuff here</h1>
-            )}
-            {activeSection.viewType === 'form' && (
-              <>
-                <Form
-                  id={activeSection.id}
-                  onChange={this.modifyDraft}
-                  showValidationErrors={showValidationErrors}
-                  title={intl.formatMessage(activeSection.title)}
-                  fields={activeSection.fields}
-                />
-                <FormAction>
-                  {nextSection && (
-                    <FormPrimaryButton
-                      onClick={() => goToTab(draft.id, nextSection.id)}
-                      id="next_section"
-                      icon={() => <ArrowForward />}
-                    >
-                      {intl.formatMessage(messages.next)}
-                    </FormPrimaryButton>
-                  )}
-                </FormAction>
-              </>
-            )}
-          </Box>
+          {activeSection.viewType === 'preview' && (
+            <>
+              {birthParentForm.sections.map((section: IFormSection) => (
+                <PreviewBox key={section.id}>
+                  <PreviewSectionTitle>
+                    {intl.formatMessage(section.title)}
+                  </PreviewSectionTitle>
+                  <ul>
+                    {section.fields.map((field: IFormField) => (
+                      <li key={field.name}>
+                        {intl.formatMessage(field.label)}
+                        {draft.data[section.id] &&
+                          draft.data[section.id][field.name]}
+                      </li>
+                    ))}
+                  </ul>
+                </PreviewBox>
+              ))}
+            </>
+          )}
+          {activeSection.viewType === 'form' && (
+            <Box>
+              <Form
+                id={activeSection.id}
+                onChange={this.modifyDraft}
+                showValidationErrors={showValidationErrors}
+                title={intl.formatMessage(activeSection.title)}
+                fields={activeSection.fields}
+              />
+              <FormAction>
+                {nextSection && (
+                  <FormPrimaryButton
+                    onClick={() => goToTab(draft.id, nextSection.id)}
+                    id="next_section"
+                    icon={() => <ArrowForward />}
+                  >
+                    {intl.formatMessage(messages.next)}
+                  </FormPrimaryButton>
+                )}
+              </FormAction>
+            </Box>
+          )}
         </FormContainer>
         <ViewFooter>
           <FormAction>
