@@ -20,7 +20,7 @@ import { Page } from './components/Page'
 
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
-import { BirthParentForm } from './views/BirthParentForm/BirthParentForm'
+import { RegisterForm } from './views/RegisterForm/RegisterForm'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -57,11 +57,11 @@ export class App extends React.Component<IAppProps, {}> {
                     <ProtectedRoute
                       exact
                       path={routes.DRAFT_BIRTH_PARENT_FORM}
-                      component={BirthParentForm}
+                      component={RegisterForm}
                     />
                     <ProtectedRoute
                       path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
-                      component={BirthParentForm}
+                      component={RegisterForm}
                     />
                   </Switch>
                 </Page>
