@@ -55,6 +55,11 @@ type AddFathersDetailsAction = {
   type: typeof ADD_FATHERS_DETAILS
 }
 
+export function addFathersDetails() {
+  console.log('hi')
+  return { type: ADD_FATHERS_DETAILS }
+}
+
 type RemoveFathersDetailsAction = {
   type: typeof REMOVE_FATHERS_DETAILS
 }

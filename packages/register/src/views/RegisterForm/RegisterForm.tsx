@@ -15,6 +15,7 @@ import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
+import { addFathersDetails } from '../../forms/register/reducer'
 import { getRegisterForm } from '../../forms/register/selectors'
 
 const FormAction = styled.div`
@@ -98,6 +99,7 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
 type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
+  addFathersDetails: typeof addFathersDetails
 }
 
 type Props = {
@@ -118,6 +120,9 @@ class RegisterFormView extends React.Component<
         [activeSection.id]: sectionData
       }
     })
+    if (sectionData.fathersDetailsExist === '1') {
+      this.props.addFathersDetails()
+    }
   }
   render() {
     const { goToTab, intl, activeSection, draft, registerForm } = this.props
@@ -216,5 +221,6 @@ function mapStateToProps(
 
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
+  addFathersDetails,
   goToTab: goToTabAction
 })(injectIntl<Props>(RegisterFormView))
