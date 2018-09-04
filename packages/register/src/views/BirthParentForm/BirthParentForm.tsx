@@ -109,6 +109,7 @@ class BirthParentFormView extends React.Component<
   Props & DispatchProps & InjectedIntlProps
 > {
   modifyDraft = (sectionData: IFormSectionData) => {
+    console.log('sectionDate: ', sectionData)
     const { activeSection, draft } = this.props
     this.props.modifyDraft({
       ...draft,
@@ -117,9 +118,6 @@ class BirthParentFormView extends React.Component<
         [activeSection.id]: sectionData
       }
     })
-  }
-  handleChange = (value: string) => {
-    console.log('Formik change: ', value)
   }
   render() {
     const { goToTab, intl, activeSection, draft } = this.props

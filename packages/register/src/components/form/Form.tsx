@@ -133,9 +133,7 @@ type Props = IFormSectionProps &
 
 class FormSectionComponent extends React.Component<Props> {
   componentWillReceiveProps(nextProps: Props) {
-    console.log('hi')
     if (!isEqual(nextProps.values, this.props.values)) {
-      console.log('changing')
       this.props.onChange(nextProps.values)
     }
   }
