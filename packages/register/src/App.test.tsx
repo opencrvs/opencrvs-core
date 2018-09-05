@@ -14,6 +14,10 @@ const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
 
+function flushPromises() {
+  return new Promise(resolve => setImmediate(resolve))
+}
+
 beforeEach(() => {
   history.replaceState({}, '', '/')
   assign.mockClear()
@@ -25,6 +29,8 @@ it('renders without crashing', async () => {
 
 it("redirects user to SSO if user doesn't have a token", async () => {
   createTestApp()
+  await flushPromises()
+
   expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
 })
 
