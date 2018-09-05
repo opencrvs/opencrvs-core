@@ -1,40 +1,46 @@
 import * as React from 'react'
-import { Route, RouteProps } from 'react-router'
+import {
+  Route,
+  RouteProps,
+  RouteComponentProps,
+  withRouter
+} from 'react-router'
 import { connect } from 'react-redux'
-import { IStoreState } from '@opencrvs/register/src/store'
-import { getAuthenticated } from '@opencrvs/register/src/profile/profileSelectors'
-import { redirectToAuthentication } from '@opencrvs/register/src/profile/profileActions'
+import { IStoreState } from '../store'
+import { getAuthenticated } from '../profile/profileSelectors'
+import { checkAuth } from '../profile/profileActions'
+import { IURLParams } from '../utils/authUtils'
+import { parse } from 'querystring'
 
 export interface IProps {
-  isAuthenticated: boolean
+  authenticated: boolean
 }
 interface IDispatchProps {
-  redirectToAuthentication: () => void
+  checkAuth: (urlValues: IURLParams) => void
 }
 
 class ProtectedRouteWrapper extends Route<
-  IProps & IDispatchProps & RouteProps
+  IProps & IDispatchProps & RouteProps & RouteComponentProps<{}>
 > {
   public componentDidMount() {
-    if (!this.props.isAuthenticated) {
-      this.props.redirectToAuthentication()
-    }
-  }
-  public componentWillReceiveProps(nextProps: IProps) {
-    if (!nextProps.isAuthenticated) {
-      this.props.redirectToAuthentication()
-    }
+    const values = parse(this.props.location.search)
+    this.props.checkAuth(values)
   }
   public render() {
+    if (!this.props.authenticated) {
+      return <div />
+    }
     return <Route {...this.props} />
   }
 }
 
 const mapStateToProps = (store: IStoreState): IProps => {
   return {
-    isAuthenticated: getAuthenticated(store)
+    authenticated: getAuthenticated(store)
   }
 }
-export const ProtectedRoute = connect<IProps, IDispatchProps>(mapStateToProps, {
-  redirectToAuthentication
-})(ProtectedRouteWrapper)
+export const ProtectedRoute = withRouter(
+  connect<IProps, IDispatchProps>(mapStateToProps, {
+    checkAuth
+  })(ProtectedRouteWrapper)
+)
