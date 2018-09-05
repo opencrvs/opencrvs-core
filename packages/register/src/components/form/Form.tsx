@@ -46,17 +46,19 @@ const getConditional = (
 
 const getConditionalValue = (
   conditional: IConditional,
-  fieldName: string
+  fieldName: string,
+  values: IFormSectionData
 ): boolean => {
-  conditional.expressions.forEach((expression: IExpression) => {
-    console.log(expression.code)
-    /* tslint:disable-next-line: no-eval */
-    if (expression.affects.includes(fieldName) && eval(expression.code)) {
-      return true
-    } else {
-      return false
-    }
-  })
+  if (conditional && conditional.expressions) {
+    conditional.expressions.forEach((expression: IExpression) => {
+      /* tslint:disable-next-line: no-eval */
+      if (expression.affects.includes(fieldName) && eval(expression.code)) {
+        return true
+      } else {
+        return false
+      }
+    })
+  }
   return false
 }
 
@@ -87,7 +89,8 @@ function GeneratedInputField({
         onChange={(value: string) => onSetFieldValue(field.name, value)}
         hide={getConditionalValue(
           getConditional(conditionals, 'hide'),
-          field.name
+          field.name,
+          values
         )}
         {...field}
         {...props}
@@ -102,7 +105,8 @@ function GeneratedInputField({
         onChange={(value: string) => onSetFieldValue(field.name, value)}
         hide={getConditionalValue(
           getConditional(conditionals, 'hide'),
-          field.name
+          field.name,
+          values
         )}
         {...field}
         {...props}
@@ -117,7 +121,8 @@ function GeneratedInputField({
         onChange={(value: string) => onSetFieldValue(field.name, value)}
         hide={getConditionalValue(
           getConditional(conditionals, 'hide'),
-          field.name
+          field.name,
+          values
         )}
         id={field.name}
         {...field}
@@ -133,7 +138,8 @@ function GeneratedInputField({
         onChange={onChange}
         hide={getConditionalValue(
           getConditional(conditionals, 'hide'),
-          field.name
+          field.name,
+          values
         )}
         {...field}
         {...props}
@@ -147,7 +153,8 @@ function GeneratedInputField({
       onChange={onChange}
       hide={getConditionalValue(
         getConditional(conditionals, 'hide'),
-        field.name
+        field.name,
+        values
       )}
       {...field}
       {...props}
@@ -222,7 +229,8 @@ class FormSectionComponent extends React.Component<Props> {
                   label={intl.formatMessage(field.label)}
                   hide={getConditionalValue(
                     getConditional(conditionals, 'hide'),
-                    field.name
+                    field.name,
+                    values
                   )}
                 />
               )
