@@ -1,9 +1,15 @@
 import { defineMessages } from 'react-intl'
 import { ValidIndicator } from '@opencrvs/components/lib/forms'
-import { addressSameAsMother, permanentAddressSameAsMother } from '../address'
+import {
+  addressSameAsMother,
+  permanentAddressSameAsMother,
+  currentAddressFields,
+  permanentAddressFields
+} from '../address'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
+import { IFormField } from '@opencrvs/register/src/forms'
 
 export interface IFatherSectionFormData {
   firstName: string
@@ -126,7 +132,7 @@ export const fatherSection = {
   ]
 }
 
-export const fathersSectionDetails = [
+export const fathersSectionDetails: IFormField[] = [
   {
     name: 'fatherIDType',
     type: 'select',
@@ -303,20 +309,24 @@ export const fathersSectionDetails = [
   permanentAddressSameAsMother
 ]
 
-export const fathersCurrentAddress = {
-  name: 'fathersCurrentAddress',
-  type: 'address',
-  label: messages.currentAddress,
-  required: false,
-  initialValue: '',
-  validate: []
-}
+export const fathersCurrentAddress: IFormField[] = [
+  {
+    name: 'fathersCurrentAddress',
+    type: 'subSection',
+    label: messages.currentAddress,
+    initialValue: '',
+    required: false,
+    validate: []
+  }
+].concat(currentAddressFields)
 
-export const fathersPermanentAddress = {
-  name: 'fathersPermanentAddress',
-  type: 'address',
-  label: messages.permanentAddress,
-  required: false,
-  initialValue: '',
-  validate: []
-}
+export const fathersPermanentAddress: IFormField[] = [
+  {
+    name: 'fathersPermanentAddress',
+    type: 'subSection',
+    label: messages.permanentAddress,
+    initialValue: '',
+    required: false,
+    validate: []
+  }
+].concat(permanentAddressFields)

@@ -10,7 +10,7 @@ import {
   fathersCurrentAddress,
   fathersPermanentAddress
 } from './father-section'
-import { getFormFieldIndex } from '../utils'
+import { getFormFieldIndex, insertFields } from '../utils'
 import { pullAll } from 'lodash'
 
 export interface IRegisterFormData {
@@ -213,7 +213,11 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         const newState = { ...state, fathersCurrentAddressAdded: true }
         const insertPoint =
           getFormFieldIndex(fathersSection.fields, 'addressSameAsMother') + 1
-        fathersSection.fields.splice(insertPoint, 0, fathersCurrentAddress)
+        fathersSection.fields = insertFields(
+          fathersSection.fields,
+          insertPoint,
+          fathersCurrentAddress
+        )
         newState.registerForm.sections = updateSection(newState, fathersSection)
         return newState
       } else {
@@ -222,7 +226,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
     case REMOVE_FATHER_CURRENT_ADDRESS:
       if (state.fathersCurrentAddressAdded) {
         const newState = { ...state, fathersCurrentAddressAdded: false }
-        pullAll(fathersSection.fields, [fathersCurrentAddress])
+        pullAll(fathersSection.fields, fathersCurrentAddress)
         newState.registerForm.sections = updateSection(newState, fathersSection)
         return newState
       } else {
@@ -236,7 +240,11 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
             fathersSection.fields,
             'permanentAddressSameAsMother'
           ) + 1
-        fathersSection.fields.splice(insertPoint, 0, fathersPermanentAddress)
+        fathersSection.fields = insertFields(
+          fathersSection.fields,
+          insertPoint,
+          fathersPermanentAddress
+        )
         newState.registerForm.sections = updateSection(newState, fathersSection)
         return newState
       } else {
@@ -245,7 +253,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
     case REMOVE_FATHER_PERMANENT_ADDRESS:
       if (state.fathersPermanentAddressAdded) {
         const newState = { ...state, fathersPermanentAddressAdded: false }
-        pullAll(fathersSection.fields, [fathersPermanentAddress])
+        pullAll(fathersSection.fields, fathersPermanentAddress)
         newState.registerForm.sections = updateSection(newState, fathersSection)
         return newState
       } else {

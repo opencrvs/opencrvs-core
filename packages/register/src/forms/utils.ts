@@ -33,3 +33,16 @@ export const getSectionLengthAtField = (
 ) => {
   return getFormFieldIndex(section.fields, fieldName) + 1
 }
+
+export const insertFields = (
+  fields: IFormField[],
+  index: number,
+  newFields: IFormField[]
+) => {
+  let insertedFields: IFormField[] = []
+  return (insertedFields = insertedFields.concat(
+    fields.slice(0, index),
+    newFields,
+    fields.slice(index)
+  ))
+}

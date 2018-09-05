@@ -14,8 +14,7 @@ import {
   ITextInputProps,
   IInputFieldProps,
   RadioGroup,
-  IAddressProps,
-  Address
+  SubSectionDivider
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
 import { IFormField, Ii18nFormField, IFormSectionData } from '../../forms'
@@ -30,11 +29,7 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-type InputProps =
-  | ISelectProps
-  | ITextInputProps
-  | IDateFieldProps
-  | IAddressProps
+type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
@@ -95,9 +90,6 @@ function GeneratedInputField({
         {...props}
       />
     )
-  }
-  if (field.type === 'address') {
-    return <Address id={field.name} values={values} {...field} {...props} />
   }
   return (
     <InputField
@@ -168,18 +160,27 @@ class FormSectionComponent extends React.Component<Props> {
         </FormSectionTitle>
         <form onSubmit={handleSubmit}>
           {fieldsWithValuesDefined.map(field => {
-            return (
-              <FormItem key={`${field.name}`}>
-                <GeneratedInputField
-                  field={internationaliseFieldObject(intl, field)}
-                  onBlur={handleBlur}
-                  values={values}
-                  onChange={handleChange}
-                  onSetFieldValue={setFieldValue}
-                  value={values[field.name]}
+            if (field.type === 'subSection') {
+              return (
+                <SubSectionDivider
+                  key={`${field.name}`}
+                  label={intl.formatMessage(field.label)}
                 />
-              </FormItem>
-            )
+              )
+            } else {
+              return (
+                <FormItem key={`${field.name}`}>
+                  <GeneratedInputField
+                    field={internationaliseFieldObject(intl, field)}
+                    onBlur={handleBlur}
+                    values={values}
+                    onChange={handleChange}
+                    onSetFieldValue={setFieldValue}
+                    value={values[field.name]}
+                  />
+                </FormItem>
+              )
+            }
           })}
         </form>
       </section>
