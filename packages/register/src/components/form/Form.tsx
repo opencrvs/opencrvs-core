@@ -56,7 +56,6 @@ function GeneratedInputField({
       <InputField
         component={Select}
         id={field.name}
-        value={values[field.name]}
         onChange={(value: string) => setFieldValue(field.name, value)}
         {...field}
         {...props}
@@ -68,7 +67,6 @@ function GeneratedInputField({
       <InputField
         component={RadioGroup}
         id={field.name}
-        value={values[field.name]}
         onChange={(value: string) => setFieldValue(field.name, value)}
         {...field}
         {...props}
@@ -80,7 +78,6 @@ function GeneratedInputField({
     return (
       <InputField
         component={DateField}
-        value={values[field.name]}
         onChange={(value: string) => setFieldValue(field.name, value)}
         id={field.name}
         {...field}
@@ -93,7 +90,6 @@ function GeneratedInputField({
       <InputField
         component={TextArea}
         id={field.name}
-        value={values[field.name]}
         onChange={onChange}
         {...field}
         {...props}
