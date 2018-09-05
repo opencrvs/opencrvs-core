@@ -40,7 +40,7 @@ type GeneratedInputFieldProps = {
   field: Ii18nFormField
   values: IFormSectionData
   onChange: (e: React.ChangeEvent<any>) => void
-  setFieldValue: (name: string, value: string) => void
+  onSetFieldValue: (name: string, value: string) => void
 } & Omit<IInputFieldProps, 'id'> &
   InputProps
 
@@ -48,7 +48,7 @@ function GeneratedInputField({
   field,
   values,
   onChange,
-  setFieldValue,
+  onSetFieldValue,
   ...props
 }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
@@ -56,7 +56,7 @@ function GeneratedInputField({
       <InputField
         component={Select}
         id={field.name}
-        onChange={(value: string) => setFieldValue(field.name, value)}
+        onChange={(value: string) => onSetFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -67,7 +67,7 @@ function GeneratedInputField({
       <InputField
         component={RadioGroup}
         id={field.name}
-        onChange={(value: string) => setFieldValue(field.name, value)}
+        onChange={(value: string) => onSetFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -78,7 +78,7 @@ function GeneratedInputField({
     return (
       <InputField
         component={DateField}
-        onChange={(value: string) => setFieldValue(field.name, value)}
+        onChange={(value: string) => onSetFieldValue(field.name, value)}
         id={field.name}
         {...field}
         {...props}
@@ -116,7 +116,7 @@ const fieldsToValues = (fields: IFormField[]) =>
     {}
   )
 
-export interface IFormSectionProps {
+interface IFormSectionProps {
   fields: IFormField[]
   title: string
   id: string
@@ -175,7 +175,7 @@ class FormSectionComponent extends React.Component<Props> {
                   onBlur={handleBlur}
                   values={values}
                   onChange={handleChange}
-                  setFieldValue={setFieldValue}
+                  onSetFieldValue={setFieldValue}
                   value={values[field.name]}
                 />
               </FormItem>
