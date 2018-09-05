@@ -116,7 +116,7 @@ export const fatherSection = {
       type: 'radioGroup',
       label: messages.fathersDetailsExist,
       required: true,
-      initialValue: '0',
+      initialValue: '',
       validate: [],
       options: [
         { value: '1', label: messages.confirm },
