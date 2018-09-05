@@ -1,11 +1,5 @@
 import { defineMessages } from 'react-intl'
-
-export interface IChildSectionFormData {
-  firstName: string
-  foo: string
-  bar: string
-  baz: string
-}
+import { IFormSection } from '../index'
 
 const messages = defineMessages({
   childTab: {
@@ -185,7 +179,7 @@ const messages = defineMessages({
   }
 })
 
-export const childSection = {
+export const childSection: IFormSection = {
   id: 'child',
   viewType: 'form',
   name: messages.childTab,
@@ -343,6 +337,12 @@ export const childSection = {
       initialValue: '',
       validate: [],
       disabled: true
+    }
+  ],
+  conditionals: [
+    {
+      action: '',
+      expressions: []
     }
   ]
 }

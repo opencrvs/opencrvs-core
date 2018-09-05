@@ -17,7 +17,13 @@ import {
   SubSectionDivider
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
-import { IFormField, Ii18nFormField, IFormSectionData } from '../../forms'
+import {
+  IFormField,
+  Ii18nFormField,
+  IFormSectionData,
+  IConditional,
+  IExpression
+} from '../../forms'
 import { Omit } from '../../utils'
 
 export const FormItem = styled.div`
@@ -29,11 +35,37 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
+const getConditional = (
+  conditionals: IConditional[],
+  key: string
+): IConditional => {
+  return conditionals.find(
+    (conditional: IConditional) => conditional.action === key
+  ) as IConditional
+}
+
+const getConditionalValue = (
+  conditional: IConditional,
+  fieldName: string
+): boolean => {
+  conditional.expressions.forEach((expression: IExpression) => {
+    console.log(expression.code)
+    /* tslint:disable-next-line: no-eval */
+    if (expression.affects.includes(fieldName) && eval(expression.code)) {
+      return true
+    } else {
+      return false
+    }
+  })
+  return false
+}
+
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
   values: IFormSectionData
+  conditionals: IConditional[]
   onChange: (e: React.ChangeEvent<any>) => void
   onSetFieldValue: (name: string, value: string) => void
 } & Omit<IInputFieldProps, 'id'> &
@@ -44,6 +76,7 @@ function GeneratedInputField({
   values,
   onChange,
   onSetFieldValue,
+  conditionals,
   ...props
 }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
@@ -52,6 +85,10 @@ function GeneratedInputField({
         component={Select}
         id={field.name}
         onChange={(value: string) => onSetFieldValue(field.name, value)}
+        hide={getConditionalValue(
+          getConditional(conditionals, 'hide'),
+          field.name
+        )}
         {...field}
         {...props}
       />
@@ -63,6 +100,10 @@ function GeneratedInputField({
         component={RadioGroup}
         id={field.name}
         onChange={(value: string) => onSetFieldValue(field.name, value)}
+        hide={getConditionalValue(
+          getConditional(conditionals, 'hide'),
+          field.name
+        )}
         {...field}
         {...props}
       />
@@ -74,6 +115,10 @@ function GeneratedInputField({
       <InputField
         component={DateField}
         onChange={(value: string) => onSetFieldValue(field.name, value)}
+        hide={getConditionalValue(
+          getConditional(conditionals, 'hide'),
+          field.name
+        )}
         id={field.name}
         {...field}
         {...props}
@@ -86,6 +131,10 @@ function GeneratedInputField({
         component={TextArea}
         id={field.name}
         onChange={onChange}
+        hide={getConditionalValue(
+          getConditional(conditionals, 'hide'),
+          field.name
+        )}
         {...field}
         {...props}
       />
@@ -96,6 +145,10 @@ function GeneratedInputField({
       component={TextInput}
       id={field.name}
       onChange={onChange}
+      hide={getConditionalValue(
+        getConditional(conditionals, 'hide'),
+        field.name
+      )}
       {...field}
       {...props}
     />
@@ -112,6 +165,7 @@ interface IFormSectionProps {
   fields: IFormField[]
   title: string
   id: string
+  conditionals: IConditional[]
   onChange: (values: IFormSectionData) => void
 }
 
@@ -135,7 +189,8 @@ class FormSectionComponent extends React.Component<Props> {
       setFieldValue,
       id,
       intl,
-      title
+      title,
+      conditionals
     } = this.props
 
     /*
@@ -165,6 +220,10 @@ class FormSectionComponent extends React.Component<Props> {
                 <SubSectionDivider
                   key={`${field.name}`}
                   label={intl.formatMessage(field.label)}
+                  hide={getConditionalValue(
+                    getConditional(conditionals, 'hide'),
+                    field.name
+                  )}
                 />
               )
             } else {
@@ -177,6 +236,7 @@ class FormSectionComponent extends React.Component<Props> {
                     onChange={handleChange}
                     onSetFieldValue={setFieldValue}
                     value={values[field.name]}
+                    conditionals={conditionals}
                   />
                 </FormItem>
               )

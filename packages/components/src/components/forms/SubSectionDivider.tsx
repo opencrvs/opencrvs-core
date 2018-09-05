@@ -16,15 +16,20 @@ const Title = styled.h2`
 
 export interface ISubSectionProps {
   label: string
+  hide: boolean
 }
 
 export class SubSectionDivider extends React.Component<ISubSectionProps> {
   render() {
-    const { label } = this.props
+    const { label, hide } = this.props
     return (
-      <SubSectionWrapper>
-        <Title>{label}</Title>
-      </SubSectionWrapper>
+      <>
+        {!hide && (
+          <SubSectionWrapper>
+            <Title>{label}</Title>
+          </SubSectionWrapper>
+        )}
+      </>
     )
   }
 }

@@ -3,10 +3,7 @@ import { ValidIndicator } from '@opencrvs/components/lib/forms'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
-
-export interface IMotherSectionFormData {
-  firstName: string
-}
+import { IFormSection } from '../index'
 
 const messages = defineMessages({
   motherTab: {
@@ -76,7 +73,7 @@ const messages = defineMessages({
   }
 })
 
-export const motherSection = {
+export const motherSection: IFormSection = {
   id: 'mother',
   viewType: 'form',
   name: messages.motherTab,
@@ -255,5 +252,11 @@ export const motherSection = {
       ]
     }
     // TODO: add address when component is ready
+  ],
+  conditionals: [
+    {
+      action: '',
+      expressions: []
+    }
   ]
 }

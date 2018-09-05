@@ -39,6 +39,45 @@ export const districtMessages = defineMessages({
   }
 })
 
+export const wards = defineMessages({
+  ward1: {
+    id: 'wards.ward1',
+    defaultMessage: 'ward1',
+    description: 'Test ward1'
+  },
+  ward2: {
+    id: 'wards.ward2',
+    defaultMessage: 'ward2',
+    description: 'Test ward2'
+  }
+})
+
+export const unions = defineMessages({
+  union1: {
+    id: 'unions.union1',
+    defaultMessage: 'union1',
+    description: 'Test union1'
+  },
+  union2: {
+    id: 'unions.union2',
+    defaultMessage: 'union2',
+    description: 'Test union2'
+  }
+})
+
+export const upazilas = defineMessages({
+  upazila1: {
+    id: 'upazilas.upazila1',
+    defaultMessage: 'upazila1',
+    description: 'Test upazila1'
+  },
+  upazila2: {
+    id: 'upazilas.upazila2',
+    defaultMessage: 'upazila2',
+    description: 'Test upazila2'
+  }
+})
+
 export const countries = [
   { value: 'BD', label: countryMessages.bd },
   { value: 'GB', label: countryMessages.gb }
@@ -54,6 +93,21 @@ export const districts = [
   { value: 'Lambeth', label: districtMessages.lambeth }
 ]
 
+export const addressLine3Options1 = [
+  { value: 'ward1', label: wards.ward1 },
+  { value: 'ward2', label: wards.ward2 }
+]
+
+export const addressLine3Options2 = [
+  { value: 'union1', label: unions.union1 },
+  { value: 'union2', label: unions.union2 }
+]
+
+export const addressLine4Options = [
+  { value: 'upazila1', label: upazilas.upazila1 },
+  { value: 'upazila2', label: upazilas.upazila2 }
+]
+
 export const messages = defineMessages({
   country: {
     id: 'formFields.country',
@@ -62,7 +116,7 @@ export const messages = defineMessages({
   },
   state: {
     id: 'formFields.state',
-    defaultMessage: 'State',
+    defaultMessage: 'Division',
     description: 'Title for the state select'
   },
   district: {
@@ -72,22 +126,27 @@ export const messages = defineMessages({
   },
   addressLine1: {
     id: 'formFields.addressLine1',
-    defaultMessage: 'Address Line 1',
+    defaultMessage: 'Street and house number',
     description: 'Title for the address line 1'
   },
   addressLine2: {
     id: 'formFields.addressLine2',
-    defaultMessage: 'Address Line 2',
+    defaultMessage: 'Area / Mouja / Village',
     description: 'Title for the address line 2'
   },
-  addressLine3: {
-    id: 'formFields.addressLine3',
-    defaultMessage: 'Address Line 3',
-    description: 'Title for the address line 3'
+  addressLine3Options1: {
+    id: 'formFields.addressLine3Options1',
+    defaultMessage: 'Ward / Cantonement',
+    description: 'Title for the address line 3 option 1'
+  },
+  addressLine3Options2: {
+    id: 'formFields.addressLine3Options2',
+    defaultMessage: 'Union / Cantonement',
+    description: 'Title for the address line 3 option 2'
   },
   addressLine4: {
     id: 'formFields.addressLine4',
-    defaultMessage: 'Address Line 4',
+    defaultMessage: 'Upazila (Thana) / City',
     description: 'Title for the address line 4'
   },
   postCode: {
@@ -124,182 +183,3 @@ export const messages = defineMessages({
       "Title for the radio button to select that the father's permanent address is the same as the mother's address"
   }
 })
-
-export const permanentAddressOption = {
-  name: 'permanentAddress',
-  type: 'radioGroup',
-  label: messages.permanentAddress,
-  required: true,
-  initialValue: '',
-  validate: [],
-  options: [
-    { value: '1', label: messages.confirm },
-    { value: '0', label: messages.deny }
-  ]
-}
-
-export const addressSameAsMother = {
-  name: 'addressSameAsMother',
-  type: 'radioGroup',
-  label: messages.addressSameAsMother,
-  required: true,
-  initialValue: '',
-  validate: [],
-  options: [
-    { value: '1', label: messages.confirm },
-    { value: '0', label: messages.deny }
-  ]
-}
-
-export const permanentAddressSameAsMother = {
-  name: 'permanentAddressSameAsMother',
-  type: 'radioGroup',
-  label: messages.permanentAddressSameAsMother,
-  required: true,
-  initialValue: '',
-  validate: [],
-  options: [
-    { value: '1', label: messages.confirm },
-    { value: '0', label: messages.deny }
-  ]
-}
-
-export const currentAddressFields = [
-  {
-    name: 'country',
-    type: 'select',
-    label: messages.country,
-    required: true,
-    initialValue: '',
-    validate: [],
-    options: countries
-  },
-  {
-    name: 'state',
-    type: 'select',
-    label: messages.state,
-    required: true,
-    initialValue: '',
-    validate: [],
-    options: states
-  },
-  {
-    name: 'district',
-    type: 'select',
-    label: messages.district,
-    required: true,
-    initialValue: '',
-    validate: [],
-    options: districts
-  },
-  {
-    name: 'addressLine1',
-    type: 'text',
-    label: messages.addressLine1,
-    required: true,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'addressLine2',
-    type: 'text',
-    label: messages.addressLine2,
-    required: false,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'addressLine3',
-    type: 'text',
-    label: messages.addressLine3,
-    required: false,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'addressLine4',
-    type: 'text',
-    label: messages.addressLine4,
-    required: false,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'postCode',
-    type: 'text',
-    label: messages.postCode,
-    required: true,
-    initialValue: '',
-    validate: []
-  }
-]
-
-export const permanentAddressFields = [
-  {
-    name: 'countryPermanent',
-    type: 'select',
-    label: messages.country,
-    required: true,
-    initialValue: '',
-    validate: [],
-    options: countries
-  },
-  {
-    name: 'statePermanent',
-    type: 'select',
-    label: messages.state,
-    required: true,
-    initialValue: '',
-    validate: [],
-    options: states
-  },
-  {
-    name: 'districtPermanent',
-    type: 'select',
-    label: messages.district,
-    required: true,
-    initialValue: '',
-    validate: [],
-    options: districts
-  },
-  {
-    name: 'addressLine1Permanent',
-    type: 'text',
-    label: messages.addressLine1,
-    required: true,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'addressLine2Permanent',
-    type: 'text',
-    label: messages.addressLine2,
-    required: false,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'addressLine3Permanent',
-    type: 'text',
-    label: messages.addressLine3,
-    required: false,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'addressLine4Permanent',
-    type: 'text',
-    label: messages.addressLine4,
-    required: false,
-    initialValue: '',
-    validate: []
-  },
-  {
-    name: 'postCodePermanent',
-    type: 'text',
-    label: messages.postCode,
-    required: true,
-    initialValue: '',
-    validate: []
-  }
-]

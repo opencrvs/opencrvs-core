@@ -19,12 +19,22 @@ export interface IFormField {
   fields?: IFormField[]
 }
 
+export interface IExpression {
+  code: string
+  affects: string[]
+}
+export interface IConditional {
+  action: string
+  expressions: IExpression[]
+}
+
 export interface IFormSection {
   id: string
   viewType: string
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
+  conditionals: IConditional[]
 }
 
 export interface IForm {
