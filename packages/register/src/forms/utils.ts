@@ -24,14 +24,12 @@ const getFormField = (fields: IFormField[], key: string) => {
 }
 
 export const getFormFieldIndex = (fields: IFormField[], key: string) => {
-  return fields.indexOf(fields.find(
-    (field: IFormField) => field.name === key
-  ) as IFormField)
+  return fields.indexOf(getFormField(fields, key))
 }
 
 export const getSectionLengthAtField = (
   section: IFormSection,
   fieldName: string
 ) => {
-  return section.fields.indexOf(getFormField(section.fields, fieldName)) + 1
+  return getFormFieldIndex(section.fields, fieldName) + 1
 }
