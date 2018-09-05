@@ -215,12 +215,16 @@ function mapStateToProps(
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
   }
 
-  const nextSection = getNextSection(birthParentForm.sections, activeSection)
-
-  const hasBeenInTheNextSection = Boolean(
-    nextSection && draft.data[nextSection.id]
+  const visitedSections = birthParentForm.sections.filter(({ id }) =>
+    Boolean(draft.data[id])
   )
-  const showValidationErrors = hasBeenInTheNextSection
+
+  const rightMostVisited = visitedSections[visitedSections.length - 1]
+
+  const showValidationErrors =
+    rightMostVisited &&
+    birthParentForm.sections.indexOf(activeSection) <
+      birthParentForm.sections.indexOf(rightMostVisited)
 
   const fields = replaceInitialValues(
     activeSection.fields,
