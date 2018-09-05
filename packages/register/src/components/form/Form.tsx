@@ -175,7 +175,7 @@ class FormSectionComponent extends React.Component<Props> {
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
-                  field={internationaliseFieldObject(field, intl)}
+                  field={internationaliseFieldObject(intl, field)}
                   onBlur={handleBlur}
                   values={values}
                   onChange={handleChange}

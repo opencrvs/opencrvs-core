@@ -2,8 +2,8 @@ import { IFormField, Ii18nFormField, Ii18nSelectOption, IFormSection } from './'
 import { InjectedIntl } from 'react-intl'
 
 export const internationaliseFieldObject = (
-  field: IFormField,
-  intl: InjectedIntl
+  intl: InjectedIntl,
+  field: IFormField
 ): Ii18nFormField => {
   return {
     ...field,
