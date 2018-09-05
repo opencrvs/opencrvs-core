@@ -100,3 +100,28 @@ The prefix postfix props can take either a `string` or a `Component` to render.
   postfix={ArrowWithGradient}
 />
 ```
+
+**Text field with postfix for async validity**
+
+This is used for async validation.
+
+```js
+<InputField
+  id="optional-input"
+  label="Is Valid?"
+  postfix={VerifyingIndicator}
+/>
+```
+
+
+**Text field with postfix for async validity**
+
+This is used for async validation.
+
+```js
+<InputField
+  id="optional-input"
+  label="Is Valid?"
+  postfix={ValidIndicator}
+/>
+```
