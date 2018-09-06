@@ -41,12 +41,12 @@ export const messages = defineMessages({
     description: 'deny label for yes / no radio button'
   },
   nationality: {
-    id: 'formFields.mother.nationality',
+    id: 'formFields.father.nationality',
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality'
   },
   nationalityBangladesh: {
-    id: 'formFields.mother.nationalityBangladesh',
+    id: 'formFields.father.nationalityBangladesh',
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality'
   },
@@ -91,7 +91,7 @@ export const messages = defineMessages({
     description: 'Label for form field: Date of birth'
   },
   fatherEducationAttainment: {
-    id: 'formFields.motherEducationAttainment',
+    id: 'formFields.fatherEducationAttainment',
     defaultMessage: "Father's level of formal education attained",
     description: 'Label for form field: Father education'
   },
@@ -172,7 +172,7 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [{ value: 'bg', label: messages.nationalityBangladesh }],
+      options: countries,
       conditionals: ['fathersDetailsExist']
     },
     {
