@@ -114,6 +114,29 @@ const PreviewBox = styled(Box)`
   margin-bottom: 30px;
 `
 
+const List = styled.ul`
+  padding: 0;
+`
+
+const ListItem = styled.li`
+  display: flex;
+  padding-top: 10px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.background};
+`
+
+const ListItemLabel = styled.div`
+  flex-basis: 50%;
+  font-size: 16px;
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.placeholder};
+`
+const ListItemValue = styled.div`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.copy};
+  font-size: 18px;
+`
+
 class BirthParentFormView extends React.Component<
   Props & DispatchProps & InjectedIntlProps
 > {
@@ -154,22 +177,28 @@ class BirthParentFormView extends React.Component<
         <FormContainer>
           {activeSection.viewType === 'preview' && (
             <>
-              {birthParentForm.sections.map((section: IFormSection) => (
-                <PreviewBox key={section.id}>
-                  <PreviewSectionTitle>
-                    {intl.formatMessage(section.title)}
-                  </PreviewSectionTitle>
-                  <ul>
-                    {section.fields.map((field: IFormField) => (
-                      <li key={field.name}>
-                        {intl.formatMessage(field.label)}
-                        {draft.data[section.id] &&
-                          draft.data[section.id][field.name]}
-                      </li>
-                    ))}
-                  </ul>
-                </PreviewBox>
-              ))}
+              {birthParentForm.sections
+                .filter(({ viewType }) => viewType === 'form')
+                .map((section: IFormSection) => (
+                  <PreviewBox key={section.id}>
+                    <PreviewSectionTitle>
+                      {intl.formatMessage(section.title)}
+                    </PreviewSectionTitle>
+                    <List>
+                      {section.fields.map((field: IFormField) => (
+                        <ListItem key={field.name}>
+                          <ListItemLabel>
+                            {intl.formatMessage(field.label)}
+                          </ListItemLabel>
+                          <ListItemValue>
+                            {draft.data[section.id] &&
+                              draft.data[section.id][field.name]}
+                          </ListItemValue>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </PreviewBox>
+                ))}
             </>
           )}
           {activeSection.viewType === 'form' && (

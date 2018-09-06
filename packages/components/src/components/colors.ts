@@ -27,7 +27,7 @@ export const colors: IColors = {
   error: '#D77160',
   headerGradientDark: '#42506B',
   headerGradientLight: '#485F88',
-  placeholder: '#969696',
+  placeholder: '#58727E',
   primary: '#4C68C1',
   secondary: '#35495D',
   success: '#49B78D',
@@ -37,3 +37,4 @@ export const colors: IColors = {
   inputBackground: '#F9F9F9',
   white: '#FFFFFF'
 }
+
