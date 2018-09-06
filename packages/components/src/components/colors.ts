@@ -1,24 +1,4 @@
-export interface IColors {
-  accent: string
-  accentGradientDark: string
-  accentGradientLight: string
-  background: string
-  disabled: string
-  error: string
-  headerGradientDark: string
-  headerGradientLight: string
-  placeholder: string
-  primary: string
-  secondary: string
-  success: string
-  warning: string
-  copy: string
-  hoverGradientDark: string
-  inputBackground: string
-  white: string
-}
-
-export const colors: IColors = {
+export const colors = {
   accent: '#4C68C1',
   accentGradientDark: '#629FCC',
   accentGradientLight: '#7DC1EA',
