@@ -103,7 +103,7 @@ type DispatchProps = {
 type Props = {
   draft: IDraft
   activeSection: IFormSection
-  showValidationErrors: boolean
+  setAllFieldsDirty: boolean
 }
 
 class BirthParentFormView extends React.Component<
@@ -124,7 +124,7 @@ class BirthParentFormView extends React.Component<
       goToTab,
       intl,
       activeSection,
-      showValidationErrors,
+      setAllFieldsDirty,
       draft
     } = this.props
 
@@ -153,7 +153,7 @@ class BirthParentFormView extends React.Component<
                 <Form
                   id={activeSection.id}
                   onChange={this.modifyDraft}
-                  showValidationErrors={showValidationErrors}
+                  setAllFieldsDirty={setAllFieldsDirty}
                   title={intl.formatMessage(activeSection.title)}
                   fields={activeSection.fields}
                 />
@@ -221,7 +221,7 @@ function mapStateToProps(
 
   const rightMostVisited = visitedSections[visitedSections.length - 1]
 
-  const showValidationErrors =
+  const setAllFieldsDirty =
     rightMostVisited &&
     birthParentForm.sections.indexOf(activeSection) <
       birthParentForm.sections.indexOf(rightMostVisited)
@@ -232,7 +232,7 @@ function mapStateToProps(
   )
 
   return {
-    showValidationErrors,
+    setAllFieldsDirty,
     activeSection: {
       ...activeSection,
       fields
