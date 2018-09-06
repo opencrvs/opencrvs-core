@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="65px" height="65px" viewBox="0 0 65 65" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 51.1 (57501) - http://www.bohemiancoding.com/sketch -->
+    <title>CE9FEE83-9396-405D-85E0-C3ADB81E9442</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="95.9356936%" x2="50%" y2="3.0001566%" id="linearGradient-1">
+            <stop stop-color="#4C68C1" offset="0%"></stop>
+            <stop stop-color="#B0C8F1" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="New-Birth-Declaration/Submit" transform="translate(-49.000000, -336.000000)" fill-rule="nonzero">
+            <g id="Icons/Tick/CompleteTick" transform="translate(51.000000, 338.000000)">
+                <polyline id="Line" stroke="#5E93ED" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="20.3333333 30.9337653 28.2711615 39.9655172 41.3678161 23.137931"></polyline>
+                <circle id="Oval" stroke="url(#linearGradient-1)" stroke-width="2.8" cx="30.5" cy="30.5" r="30.5"></circle>
+            </g>
+        </g>
+    </g>
+</svg>
