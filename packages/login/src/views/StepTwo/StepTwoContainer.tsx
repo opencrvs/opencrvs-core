@@ -19,22 +19,22 @@ import { FORM_NAME } from '@opencrvs/login/src/views/StepTwo/contants'
 export const getFieldToFocus = (store: IStoreState) => {
   const formState = getStepTwoFormState(store)
   const allFields: IReduxFormFieldProps[] = Object.values(stepTwoFields)
-  const completedFields: IReduxFormFieldProps[] = []
-  let incompleteFields: IReduxFormFieldProps[] = []
-  if (formState) {
-    if (formState.values) {
-      Object.keys(formState.values).forEach(key => {
-        completedFields.push(stepTwoFields[key])
-      })
-      incompleteFields = difference(allFields, completedFields)
-    }
-    if (incompleteFields.length > 0) {
-      return incompleteFields[0].id
-    } else {
-      return undefined
-    }
+
+  if (!formState || !formState.values) {
+    return null
   }
-  return undefined
+
+  const completedFields: IReduxFormFieldProps[] = Object.keys(
+    formState.values
+  ).map(key => stepTwoFields[key])
+
+  const incompleteFields = difference(allFields, completedFields)
+
+  if (incompleteFields.length > 0) {
+    return incompleteFields[0].id
+  }
+
+  return null
 }
 
 const mapStateToProps = (store: IStoreState): IProps => {

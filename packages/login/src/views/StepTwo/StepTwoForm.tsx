@@ -13,7 +13,7 @@ import { Link } from '@opencrvs/components/lib/typography'
 import { FlexGrid } from '@opencrvs/components/lib/grid'
 
 import { stepTwoFields } from './stepTwoFields'
-import { getFieldProps, getFocusState } from '../../utils/fieldUtils'
+import { getFieldProps } from '../../utils/fieldUtils'
 import { localizeInput } from '../../i18n/components/localizeInput'
 import { store } from '../../App'
 import {
@@ -105,7 +105,7 @@ export interface IProps {
   submissionError: boolean
   resentSMS: boolean
   submitting: boolean
-  fieldToFocus?: string
+  fieldToFocus: string | null
 }
 export interface IDispatchProps {
   submitAction: (values: IVerifyCodeNumbers) => void
@@ -133,6 +133,7 @@ export class StepTwoForm extends React.Component<
       resentSMS,
       fieldToFocus
     } = this.props
+
     return (
       <StyledBox id="login-step-two-box">
         <Title>
@@ -154,7 +155,7 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code1, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
-                focusInput={getFocusState(stepTwoFields.code1.id, fieldToFocus)}
+                focusInput={stepTwoFields.code1.id === fieldToFocus}
               />
             </FieldWrapper>
             <Separator>
@@ -165,7 +166,7 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code2, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
-                focusInput={getFocusState(stepTwoFields.code2.id, fieldToFocus)}
+                focusInput={stepTwoFields.code2.id === fieldToFocus}
               />
             </FieldWrapper>
             <Separator>
@@ -176,7 +177,7 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code3, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
-                focusInput={getFocusState(stepTwoFields.code3.id, fieldToFocus)}
+                focusInput={stepTwoFields.code3.id === fieldToFocus}
               />
             </FieldWrapper>
             <Separator>
@@ -187,7 +188,7 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code4, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
-                focusInput={getFocusState(stepTwoFields.code4.id, fieldToFocus)}
+                focusInput={stepTwoFields.code4.id === fieldToFocus}
               />
             </FieldWrapper>
             <Separator>
@@ -198,7 +199,7 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code5, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
-                focusInput={getFocusState(stepTwoFields.code5.id, fieldToFocus)}
+                focusInput={stepTwoFields.code5.id === fieldToFocus}
               />
             </FieldWrapper>
             <Separator>
@@ -209,7 +210,7 @@ export class StepTwoForm extends React.Component<
                 {...getFieldProps(intl, stepTwoFields.code6, messages)}
                 component={LocalizedInputField}
                 placeholder="0"
-                focusInput={getFocusState(stepTwoFields.code6.id, fieldToFocus)}
+                focusInput={stepTwoFields.code6.id === fieldToFocus}
               />
             </FieldWrapper>
           </FlexGrid>

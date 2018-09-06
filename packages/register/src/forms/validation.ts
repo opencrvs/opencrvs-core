@@ -2,7 +2,7 @@ import { required, IValidationResult } from '../utils/validate'
 import { IFormField, IFormSectionData } from './'
 
 export function getValidationErrorsForField(field: IFormField, value: string) {
-  const validators = field.validate.slice(0)
+  const validators = Array.from(field.validate)
 
   if (field.required) {
     validators.push(required)

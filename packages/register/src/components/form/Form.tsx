@@ -123,7 +123,7 @@ interface IFormSectionProps {
   fields: IFormField[]
   title: string
   id: string
-  showValidationErrors: boolean
+  setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
 }
 
@@ -142,11 +142,15 @@ class FormSectionComponent extends React.Component<Props> {
 
     if (sectionChanged) {
       this.props.resetForm()
-      this.showValidationErrors(nextProps.fields)
+      if (nextProps.setAllFieldsDirty) {
+        this.showValidationErrors(nextProps.fields)
+      }
     }
   }
   componentDidMount() {
-    this.showValidationErrors(this.props.fields)
+    if (this.props.setAllFieldsDirty) {
+      this.showValidationErrors(this.props.fields)
+    }
   }
   showValidationErrors(fields: IFormField[]) {
     const touched = fields.reduce(
@@ -156,11 +160,13 @@ class FormSectionComponent extends React.Component<Props> {
 
     this.props.setTouched(touched)
   }
+  handleBlur = (e: React.FocusEvent<any>) => {
+    this.props.setFieldTouched(e.target.name)
+  }
   render() {
     const {
       handleSubmit,
       handleChange,
-      handleBlur,
       values,
       fields,
       setFieldValue,
@@ -226,7 +232,7 @@ class FormSectionComponent extends React.Component<Props> {
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
                   field={internationaliseFieldObject(field)}
-                  onBlur={handleBlur}
+                  onBlur={this.handleBlur}
                   onChange={handleChange}
                   setFieldValue={setFieldValue}
                   value={values[field.name]}
@@ -246,11 +252,6 @@ export const Form = withFormik<IFormSectionProps, IFormSectionData>({
   handleSubmit: values => {
     console.log(values)
   },
-  validate: (values, props: IFormSectionProps) => {
-    if (!props.showValidationErrors) {
-      return {}
-    }
-
-    return getValidationErrorsForForm(props.fields, values)
-  }
+  validate: (values, props: IFormSectionProps) =>
+    getValidationErrorsForForm(props.fields, values)
 })(injectIntl(FormSectionComponent))
