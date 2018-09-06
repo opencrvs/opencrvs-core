@@ -73,6 +73,9 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^src(.*)$": "<rootDir>/src$1"
+    }
   }
 }
