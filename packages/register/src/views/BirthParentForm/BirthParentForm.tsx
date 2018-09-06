@@ -46,6 +46,11 @@ export const messages = defineMessages({
     id: 'register.form.next',
     defaultMessage: 'Next',
     description: 'Next button'
+  },
+  submit: {
+    id: 'register.form.submit',
+    defaultMessage: 'Submit',
+    description: 'Submit button'
   }
 })
 
@@ -150,6 +155,10 @@ class BirthParentFormView extends React.Component<
       }
     })
   }
+
+  submitForm() {
+    console.log('Submit')
+  }
   render() {
     const {
       goToTab,
@@ -160,6 +169,9 @@ class BirthParentFormView extends React.Component<
     } = this.props
 
     const nextSection = getNextSection(birthParentForm.sections, activeSection)
+    const formSections = birthParentForm.sections.filter(
+      ({ viewType }) => viewType === 'form'
+    )
 
     return (
       <FormViewContainer>
@@ -177,28 +189,37 @@ class BirthParentFormView extends React.Component<
         <FormContainer>
           {activeSection.viewType === 'preview' && (
             <>
-              {birthParentForm.sections
-                .filter(({ viewType }) => viewType === 'form')
-                .map((section: IFormSection) => (
-                  <PreviewBox key={section.id}>
-                    <PreviewSectionTitle>
-                      {intl.formatMessage(section.title)}
-                    </PreviewSectionTitle>
-                    <List>
-                      {section.fields.map((field: IFormField) => (
-                        <ListItem key={field.name}>
-                          <ListItemLabel>
-                            {intl.formatMessage(field.label)}
-                          </ListItemLabel>
-                          <ListItemValue>
-                            {draft.data[section.id] &&
-                              draft.data[section.id][field.name]}
-                          </ListItemValue>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </PreviewBox>
-                ))}
+              {formSections.map((section: IFormSection, i) => (
+                <PreviewBox key={section.id}>
+                  <PreviewSectionTitle>
+                    {intl.formatMessage(section.title)}
+                  </PreviewSectionTitle>
+                  <List>
+                    {section.fields.map((field: IFormField) => (
+                      <ListItem key={field.name}>
+                        <ListItemLabel>
+                          {intl.formatMessage(field.label)}
+                        </ListItemLabel>
+                        <ListItemValue>
+                          {draft.data[section.id] &&
+                            draft.data[section.id][field.name]}
+                        </ListItemValue>
+                      </ListItem>
+                    ))}
+                  </List>
+
+                  {i === formSections.length - 1 && (
+                    <FormAction>
+                      <FormPrimaryButton
+                        onClick={this.submitForm}
+                        id="submit_form"
+                      >
+                        {intl.formatMessage(messages.submit)}
+                      </FormPrimaryButton>
+                    </FormAction>
+                  )}
+                </PreviewBox>
+              ))}
             </>
           )}
           {activeSection.viewType === 'form' && (
