@@ -54,12 +54,7 @@ export const initialState: IRegisterFormState = {
         name: messages.registrationTab,
         title: messages.registrationTitle,
         fields: [],
-        conditionals: [
-          {
-            action: '',
-            expressions: []
-          }
-        ]
+        conditionals: []
       },
       {
         id: 'documents',
@@ -67,12 +62,7 @@ export const initialState: IRegisterFormState = {
         name: messages.documentsTab,
         title: messages.documentsTitle,
         fields: [],
-        conditionals: [
-          {
-            action: '',
-            expressions: []
-          }
-        ]
+        conditionals: []
       },
       {
         id: 'preview',
@@ -80,12 +70,7 @@ export const initialState: IRegisterFormState = {
         name: messages.previewTab,
         title: messages.previewTitle,
         fields: [],
-        conditionals: [
-          {
-            action: '',
-            expressions: []
-          }
-        ]
+        conditionals: []
       }
     ]
   }

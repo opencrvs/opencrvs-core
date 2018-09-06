@@ -21,8 +21,7 @@ import {
   IFormField,
   Ii18nFormField,
   IFormSectionData,
-  IConditional,
-  IExpression
+  IConditional
 } from '../../forms'
 import { Omit } from '../../utils'
 
@@ -35,31 +34,27 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-const getConditional = (
-  conditionals: IConditional[],
-  key: string
-): IConditional => {
-  return conditionals.find(
-    (conditional: IConditional) => conditional.action === key
-  ) as IConditional
-}
-
-const getConditionalValue = (
-  conditional: IConditional,
-  fieldName: string,
-  values: IFormSectionData
-): boolean => {
-  if (conditional && conditional.expressions) {
-    conditional.expressions.forEach((expression: IExpression) => {
-      /* tslint:disable-next-line: no-eval */
-      if (expression.affects.includes(fieldName) && eval(expression.code)) {
-        return true
-      } else {
-        return false
+const getConditionalsToRun = (
+  field: Ii18nFormField,
+  values: IFormSectionData,
+  conditionals: IConditional[]
+): string[] => {
+  const conditionalsToRun = []
+  if (field.conditionals) {
+    for (const conditionalID of field.conditionals) {
+      const conditionalObject = conditionals.find(
+        conditional => conditional.id === conditionalID
+      )
+      if (conditionalObject) {
+        /* tslint:disable-next-line: no-eval */
+        if (eval(conditionalObject.expression)) {
+          conditionalsToRun.push(conditionalObject.action)
+          break
+        }
       }
-    })
+    }
   }
-  return false
+  return conditionalsToRun
 }
 
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
@@ -81,85 +76,87 @@ function GeneratedInputField({
   conditionals,
   ...props
 }: GeneratedInputFieldProps) {
-  if (field.type === 'select') {
-    return (
-      <InputField
-        component={Select}
-        id={field.name}
-        onChange={(value: string) => onSetFieldValue(field.name, value)}
-        hide={getConditionalValue(
-          getConditional(conditionals, 'hide'),
-          field.name,
-          values
-        )}
-        {...field}
-        {...props}
-      />
-    )
-  }
-  if (field.type === 'radioGroup') {
-    return (
-      <InputField
-        component={RadioGroup}
-        id={field.name}
-        onChange={(value: string) => onSetFieldValue(field.name, value)}
-        hide={getConditionalValue(
-          getConditional(conditionals, 'hide'),
-          field.name,
-          values
-        )}
-        {...field}
-        {...props}
-      />
-    )
-  }
+  const conditionalsToRun = getConditionalsToRun(field, values, conditionals)
+  if (!conditionalsToRun.includes('hide')) {
+    if (field.type === 'select') {
+      return (
+        <InputField
+          component={Select}
+          id={field.name}
+          onChange={(value: string) => onSetFieldValue(field.name, value)}
+          {...field}
+          {...props}
+        />
+      )
+    }
+    if (field.type === 'radioGroup') {
+      return (
+        <InputField
+          component={RadioGroup}
+          id={field.name}
+          onChange={(value: string) => onSetFieldValue(field.name, value)}
+          {...field}
+          {...props}
+        />
+      )
+    }
 
-  if (field.type === 'date') {
+    if (field.type === 'date') {
+      return (
+        <InputField
+          component={DateField}
+          onChange={(value: string) => onSetFieldValue(field.name, value)}
+          id={field.name}
+          {...field}
+          {...props}
+        />
+      )
+    }
+    if (field.type === 'textarea') {
+      return (
+        <InputField
+          component={TextArea}
+          id={field.name}
+          onChange={onChange}
+          {...field}
+          {...props}
+        />
+      )
+    }
+    if (field.type === 'textarea') {
+      return (
+        <InputField
+          component={TextArea}
+          id={field.name}
+          onChange={onChange}
+          {...field}
+          {...props}
+        />
+      )
+    }
+    if (field.type === 'subSection') {
+      return (
+        <SubSectionDivider
+          key={`${field.name}`}
+          label={field.label}
+          {...field}
+          {...props}
+        />
+      )
+    }
+
     return (
       <InputField
-        component={DateField}
-        onChange={(value: string) => onSetFieldValue(field.name, value)}
-        hide={getConditionalValue(
-          getConditional(conditionals, 'hide'),
-          field.name,
-          values
-        )}
-        id={field.name}
-        {...field}
-        {...props}
-      />
-    )
-  }
-  if (field.type === 'textarea') {
-    return (
-      <InputField
-        component={TextArea}
+        component={TextInput}
         id={field.name}
         onChange={onChange}
-        hide={getConditionalValue(
-          getConditional(conditionals, 'hide'),
-          field.name,
-          values
-        )}
         {...field}
         {...props}
       />
     )
+  } else {
+    return null
   }
-  return (
-    <InputField
-      component={TextInput}
-      id={field.name}
-      onChange={onChange}
-      hide={getConditionalValue(
-        getConditional(conditionals, 'hide'),
-        field.name,
-        values
-      )}
-      {...field}
-      {...props}
-    />
-  )
 }
 
 const fieldsToValues = (fields: IFormField[]) =>
@@ -222,33 +219,19 @@ class FormSectionComponent extends React.Component<Props> {
         </FormSectionTitle>
         <form onSubmit={handleSubmit}>
           {fieldsWithValuesDefined.map(field => {
-            if (field.type === 'subSection') {
-              return (
-                <SubSectionDivider
-                  key={`${field.name}`}
-                  label={intl.formatMessage(field.label)}
-                  hide={getConditionalValue(
-                    getConditional(conditionals, 'hide'),
-                    field.name,
-                    values
-                  )}
+            return (
+              <FormItem key={`${field.name}`}>
+                <GeneratedInputField
+                  field={internationaliseFieldObject(intl, field)}
+                  onBlur={handleBlur}
+                  values={values}
+                  onChange={handleChange}
+                  onSetFieldValue={setFieldValue}
+                  value={values[field.name]}
+                  conditionals={conditionals}
                 />
-              )
-            } else {
-              return (
-                <FormItem key={`${field.name}`}>
-                  <GeneratedInputField
-                    field={internationaliseFieldObject(intl, field)}
-                    onBlur={handleBlur}
-                    values={values}
-                    onChange={handleChange}
-                    onSetFieldValue={setFieldValue}
-                    value={values[field.name]}
-                    conditionals={conditionals}
-                  />
-                </FormItem>
-              )
-            }
+              </FormItem>
+            )
           })}
         </form>
       </section>

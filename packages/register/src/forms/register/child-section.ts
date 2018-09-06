@@ -339,10 +339,5 @@ export const childSection: IFormSection = {
       disabled: true
     }
   ],
-  conditionals: [
-    {
-      action: '',
-      expressions: []
-    }
-  ]
+  conditionals: []
 }

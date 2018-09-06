@@ -5,6 +5,7 @@ export interface ISelectOption {
   value: string
   label: FormattedMessage.MessageDescriptor
 }
+
 export interface IFormField {
   name: string
   type: string
@@ -16,16 +17,13 @@ export interface IFormField {
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
   initialValue?: string
-  fields?: IFormField[]
+  conditionals?: string[]
 }
 
-export interface IExpression {
-  code: string
-  affects: string[]
-}
 export interface IConditional {
+  id: string
   action: string
-  expressions: IExpression[]
+  expression: string
 }
 
 export interface IFormSection {
@@ -55,6 +53,7 @@ export interface Ii18nFormField {
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
+  conditionals?: string[]
 }
 
 export interface IFormSectionData {

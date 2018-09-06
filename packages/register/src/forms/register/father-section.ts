@@ -152,7 +152,8 @@ export const fatherSection: IFormSection = {
           label: identityMessages.iDTypeRefugeeNumber
         },
         { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
-      ]
+      ],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherID',
@@ -161,7 +162,8 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      postfix: ValidIndicator
+      postfix: ValidIndicator,
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'nationality',
@@ -170,7 +172,8 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [{ value: 'bg', label: messages.nationalityBangladesh }]
+      options: [{ value: 'bg', label: messages.nationalityBangladesh }],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherGivenName',
@@ -178,7 +181,8 @@ export const fatherSection: IFormSection = {
       label: messages.fatherGivenName,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherMiddleNames',
@@ -186,14 +190,16 @@ export const fatherSection: IFormSection = {
       label: messages.fatherMiddleNames,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherFamilyName',
       type: 'text',
       label: messages.fatherFamilyName,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherGivenNameEng',
@@ -201,7 +207,8 @@ export const fatherSection: IFormSection = {
       label: messages.fatherGivenNameEng,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherMiddleNamesEng',
@@ -209,14 +216,16 @@ export const fatherSection: IFormSection = {
       label: messages.fatherMiddleNamesEng,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherFamilyNameEng',
       type: 'text',
       label: messages.fatherFamilyNameEng,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherDateOfBirth',
@@ -224,7 +233,8 @@ export const fatherSection: IFormSection = {
       label: messages.fatherDateOfBirth,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'maritalStatus',
@@ -245,7 +255,8 @@ export const fatherSection: IFormSection = {
           value: 'NOT_STATED',
           label: maritalStatusMessages.maritalStatusNotStated
         }
-      ]
+      ],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherDateOfMarriage',
@@ -253,7 +264,8 @@ export const fatherSection: IFormSection = {
       label: maritalStatusMessages.dateOfMarriage,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'fatherEducationAttainment',
@@ -295,7 +307,8 @@ export const fatherSection: IFormSection = {
           value: 'NOT_STATED',
           label: educationMessages.educationAttainmentNotStated
         }
-      ]
+      ],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'addressSameAsMother',
@@ -307,7 +320,8 @@ export const fatherSection: IFormSection = {
       options: [
         { value: '1', label: addressMessages.confirm },
         { value: '0', label: addressMessages.deny }
-      ]
+      ],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'currentAddress',
@@ -315,7 +329,8 @@ export const fatherSection: IFormSection = {
       label: messages.currentAddress,
       initialValue: '',
       required: false,
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist', 'addressSameAsMother']
     },
     {
       name: 'country',
@@ -324,7 +339,8 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: countries
+      options: countries,
+      conditionals: ['fathersDetailsExist', 'addressSameAsMother']
     },
     {
       name: 'state',
@@ -333,7 +349,8 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: states
+      options: states,
+      conditionals: ['fathersDetailsExist', 'addressSameAsMother', 'country']
     },
     {
       name: 'district',
@@ -342,34 +359,64 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: districts
+      options: districts,
+      conditionals: [
+        'fathersDetailsExist',
+        'addressSameAsMother',
+        'country',
+        'state'
+      ]
     },
     {
       name: 'addressLine4',
       type: 'select',
       label: addressMessages.addressLine4,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
-      options: addressLine4Options
+      options: addressLine4Options,
+      conditionals: [
+        'fathersDetailsExist',
+        'addressSameAsMother',
+        'country',
+        'state',
+        'district'
+      ]
     },
     {
       name: 'addressLine3Options2',
       type: 'select',
       label: addressMessages.addressLine3Options2,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
-      options: addressLine3Options2
+      options: addressLine3Options2,
+      conditionals: [
+        'fathersDetailsExist',
+        'addressSameAsMother',
+        'country',
+        'state',
+        'district',
+        'addressLine4'
+      ]
     },
     {
       name: 'addressLine3Options1',
       type: 'select',
       label: addressMessages.addressLine3Options1,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
-      options: addressLine3Options1
+      options: addressLine3Options1,
+      conditionals: [
+        'fathersDetailsExist',
+        'addressSameAsMother',
+        'country',
+        'state',
+        'district',
+        'addressLine4',
+        'addressLine3Options2'
+      ]
     },
     {
       name: 'addressLine2',
@@ -377,7 +424,16 @@ export const fatherSection: IFormSection = {
       label: addressMessages.addressLine2,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: [
+        'fathersDetailsExist',
+        'addressSameAsMother',
+        'country',
+        'state',
+        'district',
+        'addressLine4',
+        'addressLine3Options2'
+      ]
     },
     {
       name: 'addressLine1',
@@ -385,7 +441,16 @@ export const fatherSection: IFormSection = {
       label: addressMessages.addressLine1,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: [
+        'fathersDetailsExist',
+        'addressSameAsMother',
+        'country',
+        'state',
+        'district',
+        'addressLine4',
+        'addressLine3Options2'
+      ]
     },
     {
       name: 'postCode',
@@ -393,7 +458,16 @@ export const fatherSection: IFormSection = {
       label: addressMessages.postCode,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: [
+        'fathersDetailsExist',
+        'addressSameAsMother',
+        'country',
+        'state',
+        'district',
+        'addressLine4',
+        'addressLine3Options2'
+      ]
     },
     {
       name: 'permanentAddressSameAsMother',
@@ -405,7 +479,8 @@ export const fatherSection: IFormSection = {
       options: [
         { value: '1', label: messages.confirm },
         { value: '0', label: messages.deny }
-      ]
+      ],
+      conditionals: ['fathersDetailsExist']
     },
     {
       name: 'permanentAddress',
@@ -413,7 +488,8 @@ export const fatherSection: IFormSection = {
       label: messages.permanentAddress,
       initialValue: '',
       required: false,
-      validate: []
+      validate: [],
+      conditionals: ['fathersDetailsExist', 'permanentAddressSameAsMother']
     },
     {
       name: 'countryPermanent',
@@ -422,7 +498,8 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: countries
+      options: countries,
+      conditionals: ['fathersDetailsExist', 'permanentAddressSameAsMother']
     },
     {
       name: 'statePermanent',
@@ -431,7 +508,12 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: states
+      options: states,
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent'
+      ]
     },
     {
       name: 'districtPermanent',
@@ -440,34 +522,64 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: districts
+      options: districts,
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent',
+        'statePermanent'
+      ]
     },
     {
       name: 'addressLine4Permanent',
       type: 'select',
       label: addressMessages.addressLine4,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
-      options: addressLine4Options
+      options: addressLine4Options,
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent',
+        'statePermanent',
+        'districtPermanent'
+      ]
     },
     {
       name: 'addressLine3Options2Permanent',
       type: 'select',
       label: addressMessages.addressLine3Options2,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
-      options: addressLine3Options2
+      options: addressLine3Options2,
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent',
+        'statePermanent',
+        'districtPermanent',
+        'addressLine4Permanent'
+      ]
     },
     {
       name: 'addressLine3Options1Permanent',
       type: 'select',
       label: addressMessages.addressLine3Options1,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
-      options: addressLine3Options1
+      options: addressLine3Options1,
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent',
+        'statePermanent',
+        'districtPermanent',
+        'addressLine4Permanent',
+        'addressLine3Options2Permanent'
+      ]
     },
     {
       name: 'addressLine2Permanent',
@@ -475,7 +587,16 @@ export const fatherSection: IFormSection = {
       label: addressMessages.addressLine2,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent',
+        'statePermanent',
+        'districtPermanent',
+        'addressLine4Permanent',
+        'addressLine3Options2Permanent'
+      ]
     },
     {
       name: 'addressLine1Permanent',
@@ -483,7 +604,16 @@ export const fatherSection: IFormSection = {
       label: addressMessages.addressLine1,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent',
+        'statePermanent',
+        'districtPermanent',
+        'addressLine4Permanent',
+        'addressLine3Options2Permanent'
+      ]
     },
     {
       name: 'postCodePermanent',
@@ -491,206 +621,83 @@ export const fatherSection: IFormSection = {
       label: addressMessages.postCode,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: [
+        'fathersDetailsExist',
+        'permanentAddressSameAsMother',
+        'countryPermanent',
+        'statePermanent',
+        'districtPermanent',
+        'addressLine4Permanent',
+        'addressLine3Options2Permanent'
+      ]
     }
   ],
   conditionals: [
     {
+      id: 'fathersDetailsExist',
       action: 'hide',
-      expressions: [
-        {
-          code: 'values.fathersDetailsExist === 1',
-          affects: [
-            'fatherIDType',
-            'fatherID',
-            'nationality',
-            'fatherGivenName',
-            'fatherMiddleNames',
-            'fatherFamilyName',
-            'fatherGivenNameEng',
-            'fatherMiddleNamesEng',
-            'fatherFamilyNameEng',
-            'fatherDateOfBirth',
-            'maritalStatus',
-            'fatherDateOfMarriage',
-            'fatherEducationAttainment',
-            'addressSameAsMother',
-            'currentAddress',
-            'country',
-            'state',
-            'district',
-            'addressLine4',
-            'addressLine3Options2',
-            'addressLine3Options1',
-            'addressLine2',
-            'addressLine1',
-            'postCode',
-            'permanentAddressSameAsMother',
-            'permanentAddress',
-            'countryPermanent',
-            'statePermanent',
-            'districtPermanent',
-            'addressLine4Permanent',
-            'addressLine3Options2Permanent',
-            'addressLine3Options1Permanent',
-            'addressLine2Permanent',
-            'addressLine1Permanent',
-            'postCodePermanent'
-          ]
-        },
-        {
-          code: 'values.permanentAddressSameAsMother === 1',
-          affects: [
-            // permanentAddressSameAsMother
-            'permanentAddress',
-            'countryPermanent',
-            'statePermanent',
-            'districtPermanent',
-            'addressLine4Permanent',
-            'addressLine3Options2Permanent',
-            'addressLine3Options1Permanent',
-            'addressLine2Permanent',
-            'addressLine1Permanent',
-            'postCodePermanent'
-          ]
-        },
-        {
-          code: 'values.addressSameAsMother === 1',
-          affects: [
-            // addressSameAsMother
-            'currentAddress',
-            'country',
-            'state',
-            'district',
-            'addressLine4',
-            'addressLine3Options2',
-            'addressLine3Options1',
-            'addressLine2',
-            'addressLine1',
-            'postCode'
-          ]
-        },
-        {
-          code: '!values.countryPermanent',
-          affects: [
-            // countryPermanent
-            'statePermanent',
-            'districtPermanent',
-            'addressLine4Permanent',
-            'addressLine3Options2Permanent',
-            'addressLine3Options1Permanent',
-            'addressLine2Permanent',
-            'addressLine1Permanent',
-            'postCodePermanent'
-          ]
-        },
-        {
-          code: '!values.statePermanent',
-          affects: [
-            // statePermanent
-            'districtPermanent',
-            'addressLine4Permanent',
-            'addressLine3Options2Permanent',
-            'addressLine3Options1Permanent',
-            'addressLine2Permanent',
-            'addressLine1Permanent',
-            'postCodePermanent'
-          ]
-        },
-        {
-          code: '!values.districtPermanent',
-          affects: [
-            // districtPermanent
-            'addressLine4Permanent',
-            'addressLine3Options2Permanent',
-            'addressLine3Options1Permanent',
-            'addressLine2Permanent',
-            'addressLine1Permanent',
-            'postCodePermanent'
-          ]
-        },
-        {
-          code: '!values.addressLine4Permanent',
-          affects: [
-            // addressLine4Permanent
-            'addressLine3Options2Permanent',
-            'addressLine3Options1Permanent',
-            'addressLine2Permanent',
-            'addressLine1Permanent',
-            'postCodePermanent'
-          ]
-        },
-        {
-          code: '!values.addressLine3Options2Permanent',
-          affects: [
-            // addressLine3Options2Permanent
-            'addressLine3Options1Permanent',
-            'addressLine2Permanent',
-            'addressLine1Permanent',
-            'postCodePermanent'
-          ]
-        },
-        {
-          code: '!values.country',
-          affects: [
-            // country
-            'state',
-            'district',
-            'addressLine4',
-            'addressLine3Options2',
-            'addressLine3Options1',
-            'addressLine2',
-            'addressLine1',
-            'postCode'
-          ]
-        },
-        {
-          code: '!values.state',
-          affects: [
-            // state
-            'district',
-            'addressLine4',
-            'addressLine3Options2',
-            'addressLine3Options1',
-            'addressLine2',
-            'addressLine1',
-            'postCode'
-          ]
-        },
-        {
-          code: '!values.district',
-          affects: [
-            // district
-            'addressLine4',
-            'addressLine3Options2',
-            'addressLine3Options1',
-            'addressLine2',
-            'addressLine1',
-            'postCode'
-          ]
-        },
-        {
-          code: '!values.addressLine4',
-          affects: [
-            // addressLine4
-            'addressLine3Options2',
-            'addressLine3Options1',
-            'addressLine2',
-            'addressLine1',
-            'postCode'
-          ]
-        },
-        {
-          code: '!values.addressLine3Options2',
-          affects: [
-            // addressLine3Options2
-            'addressLine3Options1',
-            'addressLine2',
-            'addressLine1',
-            'postCode'
-          ]
-        }
-      ]
+      expression: 'values.fathersDetailsExist == 0'
+    },
+    {
+      id: 'permanentAddressSameAsMother',
+      action: 'hide',
+      expression: 'values.permanentAddressSameAsMother == 1'
+    },
+    {
+      id: 'addressSameAsMother',
+      action: 'hide',
+      expression: 'values.addressSameAsMother == 1'
+    },
+    {
+      id: 'countryPermanent',
+      action: 'hide',
+      expression: '!values.countryPermanent'
+    },
+    {
+      id: 'statePermanent',
+      action: 'hide',
+      expression: '!values.statePermanent'
+    },
+    {
+      id: 'districtPermanent',
+      action: 'hide',
+      expression: '!values.districtPermanent'
+    },
+    {
+      id: 'addressLine4Permanent',
+      action: 'hide',
+      expression: '!values.addressLine4Permanent'
+    },
+    {
+      id: 'addressLine3Options2Permanent',
+      action: 'hide',
+      expression: '!values.addressLine3Options2Permanent'
+    },
+    {
+      id: 'country',
+      action: 'hide',
+      expression: '!values.country'
+    },
+    {
+      id: 'state',
+      action: 'hide',
+      expression: '!values.state'
+    },
+    {
+      id: 'district',
+      action: 'hide',
+      expression: '!values.district'
+    },
+    {
+      id: 'addressLine4',
+      action: 'hide',
+      expression: '!values.addressLine4'
+    },
+    {
+      id: 'addressLine3Options2',
+      action: 'hide',
+      expression: '!values.addressLine3Options2'
     }
   ]
 }
