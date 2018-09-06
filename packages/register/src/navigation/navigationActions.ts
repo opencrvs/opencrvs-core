@@ -22,11 +22,15 @@ export function goToBirthRegistrationAsParent(draftId: number) {
   )
 }
 
-export function goToTab(draftId: number, tabId: string) {
+export function goToTab(
+  draftId: number,
+  tabId: string,
+  fieldNameHash?: string
+) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM_TAB, {
       draftId: draftId.toString(),
       tabId
-    })
+    }) + (fieldNameHash ? `#${fieldNameHash}` : '')
   )
 }
