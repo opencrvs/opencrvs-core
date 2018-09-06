@@ -1,18 +1,5 @@
 import { defineMessages } from 'react-intl'
 
-export const countryMessages = defineMessages({
-  bd: {
-    id: 'countries.bd',
-    defaultMessage: 'Bangladesh',
-    description: 'ISO Country: bd'
-  },
-  gb: {
-    id: 'countries.gb',
-    defaultMessage: 'United Kingdome',
-    description: 'ISO Country: gb'
-  }
-})
-
 export const stateMessages = defineMessages({
   greaterLondon: {
     id: 'states.greaterLondon',
@@ -77,11 +64,6 @@ export const upazilas = defineMessages({
     description: 'Test upazila2'
   }
 })
-
-export const countries = [
-  { value: 'BD', label: countryMessages.bd },
-  { value: 'GB', label: countryMessages.gb }
-]
 
 export const states = [
   { value: 'Greater London', label: stateMessages.greaterLondon },

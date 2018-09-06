@@ -2,13 +2,13 @@ import { defineMessages } from 'react-intl'
 import { ValidIndicator } from '@opencrvs/components/lib/forms'
 import {
   messages as addressMessages,
-  countries,
   states,
   districts,
   addressLine4Options,
   addressLine3Options2,
   addressLine3Options1
 } from '../address'
+import { countries } from '../countries'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
