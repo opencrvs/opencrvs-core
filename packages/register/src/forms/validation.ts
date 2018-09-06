@@ -18,7 +18,7 @@ export type Errors = { [key: string]: string }
 export function getValidationErrorsForForm(
   fields: IFormField[],
   values: IFormSectionData
-) {
+): { [key: string]: IValidationResult[] } {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     const value = values[field.name]
     const validationErrors = getValidationErrorsForField(field, value)

@@ -15,6 +15,6 @@ export const colors = {
   copy: '#35495D',
   hoverGradientDark: '#376fb7',
   inputBackground: '#F9F9F9',
-  white: '#FFFFFF'
+  white: '#FFFFFF',
+  danger: '#D53F3F'
 }
-

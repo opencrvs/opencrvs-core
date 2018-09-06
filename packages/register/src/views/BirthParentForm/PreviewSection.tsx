@@ -1,16 +1,18 @@
 import * as React from 'react'
-
-import { Box } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-
+import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
-import styled from '../../styled-components'
+import { Box } from '@opencrvs/components/lib/interface'
+import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
 
-import { birthParentForm } from '../../forms/birth-parent'
-import { IFormSection, IFormField } from '../../forms'
+import styled from 'src/styled-components'
 
-import { IDraft } from '../../drafts'
+import { birthParentForm } from 'src/forms/birth-parent'
+import { IFormSection, IFormField } from 'src/forms'
+
+import { IDraft } from 'src/drafts'
+import { getValidationErrorsForForm } from 'src/forms/validation'
+import { goToTab } from 'src/navigation/navigationActions'
 
 const FormAction = styled.div`
   display: flex;
@@ -26,9 +28,16 @@ export const messages = defineMessages({
     id: 'register.form.submit',
     defaultMessage: 'Submit',
     description: 'Submit button'
+  },
+  informationMissing: {
+    id: 'register.form.informationMissing',
+    defaultMessage: 'Information missing',
+    description: 'Message when a field doesnt have a value'
   }
 })
-
+type DispatchProps = {
+  goToTab: typeof goToTab
+}
 type Props = {
   draft: IDraft
   onSubmit: () => void
@@ -64,8 +73,17 @@ const ListItemValue = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   font-size: 18px;
 `
+const InformationMissingLink = styled(Button)`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.danger};
+  font-size: 16px;
+  text-decoration: underline;
+  padding: 0;
+`
 
-class PreviewSectionForm extends React.Component<Props & InjectedIntlProps> {
+class PreviewSectionForm extends React.Component<
+  Props & DispatchProps & InjectedIntlProps
+> {
   render() {
     const { intl, draft } = this.props
 
@@ -75,40 +93,73 @@ class PreviewSectionForm extends React.Component<Props & InjectedIntlProps> {
 
     return (
       <>
-        {formSections.map((section: IFormSection, i) => (
-          <PreviewBox key={section.id}>
-            <PreviewSectionTitle>
-              {intl.formatMessage(section.title)}
-            </PreviewSectionTitle>
-            <List>
-              {section.fields.map((field: IFormField) => (
-                <ListItem key={field.name}>
-                  <ListItemLabel>
-                    {intl.formatMessage(field.label)}
-                  </ListItemLabel>
-                  <ListItemValue>
-                    {draft.data[section.id] &&
-                      draft.data[section.id][field.name]}
-                  </ListItemValue>
-                </ListItem>
-              ))}
-            </List>
+        {formSections.map((section: IFormSection, i) => {
+          const errors = getValidationErrorsForForm(
+            section.fields,
+            draft.data[section.id] || {}
+          )
 
-            {i === formSections.length - 1 && (
-              <FormAction>
-                <FormPrimaryButton
-                  onClick={this.props.onSubmit}
-                  id="submit_form"
-                >
-                  {intl.formatMessage(messages.submit)}
-                </FormPrimaryButton>
-              </FormAction>
-            )}
-          </PreviewBox>
-        ))}
+          return (
+            <PreviewBox key={section.id}>
+              <PreviewSectionTitle>
+                {intl.formatMessage(section.title)}
+              </PreviewSectionTitle>
+              <List>
+                {section.fields.map((field: IFormField) => {
+                  const validationErrors = errors[field.name]
+
+                  const value = draft.data[section.id]
+                    ? draft.data[section.id][field.name]
+                    : null
+
+                  const informationMissing =
+                    validationErrors.length > 0 || value === null
+
+                  return (
+                    <ListItem key={field.name}>
+                      <ListItemLabel>
+                        {intl.formatMessage(field.label)}
+                      </ListItemLabel>
+                      <ListItemValue>
+                        {informationMissing ? (
+                          <InformationMissingLink
+                            onClick={() =>
+                              this.props.goToTab(
+                                draft.id,
+                                section.id,
+                                field.name
+                              )
+                            }
+                          >
+                            {intl.formatMessage(messages.informationMissing)}
+                          </InformationMissingLink>
+                        ) : (
+                          value
+                        )}
+                      </ListItemValue>
+                    </ListItem>
+                  )
+                })}
+              </List>
+
+              {i === formSections.length - 1 && (
+                <FormAction>
+                  <FormPrimaryButton
+                    onClick={this.props.onSubmit}
+                    id="submit_form"
+                  >
+                    {intl.formatMessage(messages.submit)}
+                  </FormPrimaryButton>
+                </FormAction>
+              )}
+            </PreviewBox>
+          )
+        })}
       </>
     )
   }
 }
 
-export const PreviewSection = injectIntl<Props>(PreviewSectionForm)
+export const PreviewSection = connect<Props, DispatchProps>(null, {
+  goToTab
+})(injectIntl<Props>(PreviewSectionForm))
