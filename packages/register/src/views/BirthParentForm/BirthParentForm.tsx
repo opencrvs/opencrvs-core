@@ -16,6 +16,7 @@ import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
+import { PreviewSection } from '@opencrvs/register/src/views/BirthParentForm/PreviewSection'
 
 const FormAction = styled.div`
   display: flex;
@@ -46,11 +47,6 @@ export const messages = defineMessages({
     id: 'register.form.next',
     defaultMessage: 'Next',
     description: 'Next button'
-  },
-  submit: {
-    id: 'register.form.submit',
-    defaultMessage: 'Submit',
-    description: 'Submit button'
   }
 })
 
@@ -111,37 +107,6 @@ type Props = {
   setAllFieldsDirty: boolean
 }
 
-const PreviewSectionTitle = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
-`
-const PreviewBox = styled(Box)`
-  margin-bottom: 30px;
-`
-
-const List = styled.ul`
-  padding: 0;
-`
-
-const ListItem = styled.li`
-  display: flex;
-  padding-top: 10px;
-  padding-bottom: 2px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.background};
-`
-
-const ListItemLabel = styled.div`
-  flex-basis: 50%;
-  font-size: 16px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.placeholder};
-`
-const ListItemValue = styled.div`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.copy};
-  font-size: 18px;
-`
-
 class BirthParentFormView extends React.Component<
   Props & DispatchProps & InjectedIntlProps
 > {
@@ -169,9 +134,6 @@ class BirthParentFormView extends React.Component<
     } = this.props
 
     const nextSection = getNextSection(birthParentForm.sections, activeSection)
-    const formSections = birthParentForm.sections.filter(
-      ({ viewType }) => viewType === 'form'
-    )
 
     return (
       <FormViewContainer>
@@ -188,39 +150,7 @@ class BirthParentFormView extends React.Component<
         </ViewHeaderWithTabs>
         <FormContainer>
           {activeSection.viewType === 'preview' && (
-            <>
-              {formSections.map((section: IFormSection, i) => (
-                <PreviewBox key={section.id}>
-                  <PreviewSectionTitle>
-                    {intl.formatMessage(section.title)}
-                  </PreviewSectionTitle>
-                  <List>
-                    {section.fields.map((field: IFormField) => (
-                      <ListItem key={field.name}>
-                        <ListItemLabel>
-                          {intl.formatMessage(field.label)}
-                        </ListItemLabel>
-                        <ListItemValue>
-                          {draft.data[section.id] &&
-                            draft.data[section.id][field.name]}
-                        </ListItemValue>
-                      </ListItem>
-                    ))}
-                  </List>
-
-                  {i === formSections.length - 1 && (
-                    <FormAction>
-                      <FormPrimaryButton
-                        onClick={this.submitForm}
-                        id="submit_form"
-                      >
-                        {intl.formatMessage(messages.submit)}
-                      </FormPrimaryButton>
-                    </FormAction>
-                  )}
-                </PreviewBox>
-              ))}
-            </>
+            <PreviewSection draft={draft} onSubmit={this.submitForm} />
           )}
           {activeSection.viewType === 'form' && (
             <Box>
