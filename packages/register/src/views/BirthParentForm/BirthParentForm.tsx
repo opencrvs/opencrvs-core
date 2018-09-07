@@ -103,6 +103,7 @@ type DispatchProps = {
 type Props = {
   draft: IDraft
   activeSection: IFormSection
+  setAllFieldsDirty: boolean
 }
 
 class BirthParentFormView extends React.Component<
@@ -119,7 +120,13 @@ class BirthParentFormView extends React.Component<
     })
   }
   render() {
-    const { goToTab, intl, activeSection, draft } = this.props
+    const {
+      goToTab,
+      intl,
+      activeSection,
+      setAllFieldsDirty,
+      draft
+    } = this.props
 
     const nextSection = getNextSection(birthParentForm.sections, activeSection)
 
@@ -146,6 +153,7 @@ class BirthParentFormView extends React.Component<
                 <Form
                   id={activeSection.id}
                   onChange={this.modifyDraft}
+                  setAllFieldsDirty={setAllFieldsDirty}
                   title={intl.formatMessage(activeSection.title)}
                   fields={activeSection.fields}
                 />
@@ -207,13 +215,27 @@ function mapStateToProps(
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
   }
 
+  const visitedSections = birthParentForm.sections.filter(({ id }) =>
+    Boolean(draft.data[id])
+  )
+
+  const rightMostVisited = visitedSections[visitedSections.length - 1]
+
+  const setAllFieldsDirty =
+    rightMostVisited &&
+    birthParentForm.sections.indexOf(activeSection) <
+      birthParentForm.sections.indexOf(rightMostVisited)
+
+  const fields = replaceInitialValues(
+    activeSection.fields,
+    draft.data[activeSectionId] || {}
+  )
+
   return {
+    setAllFieldsDirty,
     activeSection: {
       ...activeSection,
-      fields: replaceInitialValues(
-        activeSection.fields,
-        draft.data[activeSectionId] || {}
-      )
+      fields
     },
     draft
   }
