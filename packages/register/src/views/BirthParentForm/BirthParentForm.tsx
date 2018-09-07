@@ -80,7 +80,7 @@ type Props = {
 }
 
 class BirthParentFormView extends React.Component<
-  Props & DispatchProps & InjectedIntlProps
+  Props & DispatchProps & InjectedIntlProps & RouteComponentProps<History>
 > {
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
@@ -98,7 +98,8 @@ class BirthParentFormView extends React.Component<
       intl,
       activeSection,
       setAllFieldsDirty,
-      draft
+      draft,
+      history
     } = this.props
 
     const nextSection = getNextSection(birthParentForm.sections, activeSection)

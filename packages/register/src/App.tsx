@@ -22,6 +22,7 @@ import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
 import { BirthParentForm } from './views/BirthParentForm/BirthParentForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
+import ScrollToTop from '@opencrvs/register/src/components/ScrollToTop'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -43,33 +44,35 @@ export class App extends React.Component<IAppProps, {}> {
           <I18nContainer>
             <ThemeProvider theme={getTheme(config.LOCALE)}>
               <ConnectedRouter history={this.props.history}>
-                <Page>
-                  <Switch>
-                    <ProtectedRoute
-                      exact
-                      path={routes.SELECT_VITAL_EVENT}
-                      component={SelectVitalEvent}
-                    />
-                    <ProtectedRoute
-                      exact
-                      path={routes.SELECT_INFORMANT}
-                      component={SelectInformant}
-                    />
-                    <ProtectedRoute
-                      exact
-                      path={routes.DRAFT_BIRTH_PARENT_FORM}
-                      component={BirthParentForm}
-                    />
-                    <ProtectedRoute
-                      path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
-                      component={BirthParentForm}
-                    />
-                    <ProtectedRoute
-                      path={routes.SAVED_REGISTRATION}
-                      component={SavedRegistration}
-                    />
-                  </Switch>
-                </Page>
+                <ScrollToTop>
+                  <Page>
+                    <Switch>
+                      <ProtectedRoute
+                        exact
+                        path={routes.SELECT_VITAL_EVENT}
+                        component={SelectVitalEvent}
+                      />
+                      <ProtectedRoute
+                        exact
+                        path={routes.SELECT_INFORMANT}
+                        component={SelectInformant}
+                      />
+                      <ProtectedRoute
+                        exact
+                        path={routes.DRAFT_BIRTH_PARENT_FORM}
+                        component={BirthParentForm}
+                      />
+                      <ProtectedRoute
+                        path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                        component={BirthParentForm}
+                      />
+                      <ProtectedRoute
+                        path={routes.SAVED_REGISTRATION}
+                        component={SavedRegistration}
+                      />
+                    </Switch>
+                  </Page>
+                </ScrollToTop>
               </ConnectedRouter>
             </ThemeProvider>
           </I18nContainer>

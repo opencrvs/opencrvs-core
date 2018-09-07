@@ -189,7 +189,7 @@ class SavedRegistrationView extends React.Component<
   InjectedIntlProps & RouteComponentProps<History>
 > {
   render() {
-    const { intl } = this.props
+    const { intl, history } = this.props
     const online = navigator.onLine
 
     return (
