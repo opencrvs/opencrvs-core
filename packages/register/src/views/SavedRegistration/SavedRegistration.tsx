@@ -2,11 +2,16 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { ViewHeader } from '../../components/ViewHeader'
-import { Box, Header } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Box } from '@opencrvs/components/lib/interface'
 import styled from 'styled-components'
 import CompleteTick from './CompleteTick.svg'
 import NoConnectivity from './NoConnectivity.svg'
+import {
+  ViewFooter,
+  FooterAction,
+  FooterPrimaryButton
+} from '@opencrvs/register/src/components/interface/footer'
+import { RouteComponentProps } from 'react-router'
 
 const messages = defineMessages({
   onlineTitle: {
@@ -180,36 +185,9 @@ const StyledPWhite = styled(StyledP)`
   color: ${({ theme }) => theme.colors.white};
 `
 
-// The following copied from BirthParentForm (generalise these)
-
-const FormAction = styled.div`
-  display: flex;
-  justify-content: center;
-`
-
-const FormPrimaryButton = styled(PrimaryButton)`
-  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
-`
-
-const ViewFooter = styled(Header)`
-  flex-grow: 1;
-  margin-top: -50px;
-  padding-top: 100px;
-  padding-bottom: 40px;
-  /* stylelint-disable */
-  ${FormPrimaryButton} {
-    /* stylelint-enable */
-    width: 270px;
-    justify-content: center;
-  }
-  /* stylelint-disable */
-  ${FormAction} {
-    /* stylelint-enable */
-    margin-bottom: 1em;
-  }
-`
-
-class SavedRegistrationView extends React.Component<InjectedIntlProps> {
+class SavedRegistrationView extends React.Component<
+  InjectedIntlProps & RouteComponentProps<History>
+> {
   render() {
     const { intl } = this.props
     const online = navigator.onLine
@@ -273,16 +251,16 @@ class SavedRegistrationView extends React.Component<InjectedIntlProps> {
           </NextBox>
         </Container>
         <ViewFooter>
-          <FormAction>
-            <FormPrimaryButton>
+          <FooterAction>
+            <FooterPrimaryButton onClick={() => history.push('/')}>
               {intl.formatMessage(messages.backButton)}
-            </FormPrimaryButton>
-          </FormAction>
-          <FormAction>
-            <FormPrimaryButton>
+            </FooterPrimaryButton>
+          </FooterAction>
+          <FooterAction>
+            <FooterPrimaryButton onClick={() => history.push('/')}>
               {intl.formatMessage(messages.newButton)}
-            </FormPrimaryButton>
-          </FormAction>
+            </FooterPrimaryButton>
+          </FooterAction>
         </ViewFooter>
       </>
     )

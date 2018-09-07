@@ -1,30 +1,21 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-
-import { Box, Header } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Box } from '@opencrvs/components/lib/interface'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
-
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
 import styled from '../../styled-components'
-
 import { goToTab as goToTabAction } from '../../navigation/navigationActions'
 import { birthParentForm } from '../../forms/birth-parent'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
-
-const FormAction = styled.div`
-  display: flex;
-  justify-content: center;
-`
-
-const FormPrimaryButton = styled(PrimaryButton)`
-  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
-`
+import {
+  FooterAction,
+  FooterPrimaryButton,
+  ViewFooter
+} from '@opencrvs/register/src/components/interface/footer'
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -59,24 +50,6 @@ const FormViewContainer = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-`
-
-const ViewFooter = styled(Header)`
-  flex-grow: 1;
-  margin-top: -50px;
-  padding-top: 100px;
-  padding-bottom: 40px;
-  /* stylelint-disable */
-  ${FormPrimaryButton} {
-    /* stylelint-enable */
-    width: 270px;
-    justify-content: center;
-  }
-  /* stylelint-disable */
-  ${FormAction} {
-    /* stylelint-enable */
-    margin-bottom: 1em;
-  }
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -157,27 +130,30 @@ class BirthParentFormView extends React.Component<
                   title={intl.formatMessage(activeSection.title)}
                   fields={activeSection.fields}
                 />
-                <FormAction>
+                <FooterAction>
                   {nextSection && (
-                    <FormPrimaryButton
+                    <FooterPrimaryButton
                       onClick={() => goToTab(draft.id, nextSection.id)}
                       id="next_section"
                       icon={() => <ArrowForward />}
                     >
                       {intl.formatMessage(messages.next)}
-                    </FormPrimaryButton>
+                    </FooterPrimaryButton>
                   )}
-                </FormAction>
+                </FooterAction>
               </>
             )}
           </Box>
         </FormContainer>
         <ViewFooter>
-          <FormAction>
-            <FormPrimaryButton id="save_draft">
+          <FooterAction>
+            <FooterPrimaryButton
+              id="save_draft"
+              onClick={() => history.push('/saved')}
+            >
               {intl.formatMessage(messages.saveDraft)}
-            </FormPrimaryButton>
-          </FormAction>
+            </FooterPrimaryButton>
+          </FooterAction>
         </ViewFooter>
       </FormViewContainer>
     )
