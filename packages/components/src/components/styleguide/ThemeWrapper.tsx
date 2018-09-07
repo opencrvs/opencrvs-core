@@ -4,7 +4,7 @@ import { getTheme } from '../theme'
 
 const locale = process.env.REACT_APP_LOCALE
   ? process.env.REACT_APP_LOCALE
-  : 'gb'
+  : 'gbr'
 
 const Wrapper = styled.div`
   /* stylelint-disable */
