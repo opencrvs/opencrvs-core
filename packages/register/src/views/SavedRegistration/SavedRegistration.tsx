@@ -11,12 +11,14 @@ export const messages = defineMessages({
   savedRegistrationOnlineTitle: {
     id: 'register.savedRegistration.online.title',
     defaultMessage: 'Declaration submitted',
-    description: 'The title that appears on the saved registration page when the client is online'
+    description:
+      'The title that appears on the saved registration page when the client is online'
   },
-  savedRegistrationOfflineTitle: {
+  savedRegistrationOnlineDesc: {
     id: 'register.savedRegistration.online.desc',
     defaultMessage: 'The declaration is now on its way for validation.',
-    description: 'The description that appears on the saved registration page when the client is online'
+    description:
+      'The description that appears on the saved registration page when the client is online'
   }
 })
 
@@ -27,8 +29,8 @@ const Container = styled.div`
 `
 
 const TrackingBox = styled(Box)`
-  background: linear-gradient(137.89deg, #4C68C1 0%, #5E93ED 100%);
-  color: #FFFFFF;
+  background: linear-gradient(137.89deg, #4c68c1 0%, #5e93ed 100%);
+  color: #ffffff;
   text-align: center;
   margin: 15px 0;
 `
@@ -38,7 +40,7 @@ const NextBox = styled(Box)`
 `
 
 const BoxHeader = styled.h2`
-  color: #35495D;
+  color: #35495d;
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 24px;
   font-weight: 300;
@@ -46,7 +48,7 @@ const BoxHeader = styled.h2`
 `
 
 const StyledP = styled.p`
-  color: #35495D;
+  color: #35495d;
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
   font-weight: 500;
@@ -63,17 +65,17 @@ const Img = styled.img`
 `
 
 const TrackingHeader = styled.h3`
-font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
 `
 
 const TrackingNumber = styled.h1`
-font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 30px;
 `
 
 const StyledPWhite = styled(StyledP)`
-  color: #FFFFFF;
+  color: #ffffff;
 `
 
 // The following copied from BirthParentForm (generalise these)
@@ -112,7 +114,9 @@ class SavedRegistrationView extends React.Component<InjectedIntlProps> {
       <>
         <ViewHeader
           title={intl.formatMessage(messages.savedRegistrationOnlineTitle)}
-          description={intl.formatMessage(messages.savedRegistrationOfflineTitle)}
+          description={intl.formatMessage(
+            messages.savedRegistrationOnlineDesc
+          )}
           id="saved_registration_view"
         />
         <Container>
@@ -122,18 +126,29 @@ class SavedRegistrationView extends React.Component<InjectedIntlProps> {
               <BoxHeader>All done!</BoxHeader>
             </ImgHeaderContainer>
             <StyledP>
-              The birth declaration of <b>First Middle Last Name</b> has been successfully submitted to the registration office.
+              The birth declaration of <b>First Middle Last Name</b> has been
+              successfully submitted to the registration office.
             </StyledP>
           </Box>
           <TrackingBox>
             <TrackingHeader>Tracking ID number:</TrackingHeader>
             <TrackingNumber>187 372 019 2819</TrackingNumber>
-            <StyledPWhite>The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.</StyledPWhite>
+            <StyledPWhite>
+              The informant will receive this number via SMS, but make sure they
+              write it down and keep it safe. They should use the number as a
+              reference if enquiring about their registration.
+            </StyledPWhite>
           </TrackingBox>
           <NextBox>
             <BoxHeader>What next?</BoxHeader>
-            <StyledP>You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.</StyledP>
-            <StyledP>The informant has given their contact details and will also be informed when the registration is complete.</StyledP>
+            <StyledP>
+              You will be notified through OpenCRVS when registration is
+              complete or if there are any delays in the process.
+            </StyledP>
+            <StyledP>
+              The informant has given their contact details and will also be
+              informed when the registration is complete.
+            </StyledP>
           </NextBox>
         </Container>
         <ViewFooter>
@@ -149,6 +164,4 @@ class SavedRegistrationView extends React.Component<InjectedIntlProps> {
   }
 }
 
-export const SavedRegistration = injectIntl(
-  connect()(SavedRegistrationView)
-)
+export const SavedRegistration = injectIntl(connect()(SavedRegistrationView))

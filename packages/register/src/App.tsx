@@ -21,7 +21,7 @@ import { Page } from './components/Page'
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
 import { BirthParentForm } from './views/BirthParentForm/BirthParentForm'
-import { SavedRegistration } from './views/SavedRegistration/SavedRegistration';
+import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
