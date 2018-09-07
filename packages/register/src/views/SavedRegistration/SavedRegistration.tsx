@@ -127,8 +127,12 @@ const Container = styled.div`
 `
 
 const TrackingBox = styled(Box)`
-  background: linear-gradient(137.89deg, #4c68c1 0%, #5e93ed 100%);
-  color: #ffffff;
+  background: linear-gradient(
+    137.89deg,
+    ${({ theme }) => theme.colors.primary} 0%,
+    ${({ theme }) => theme.colors.cardGradientEnd} 100%
+  );
+  color: ${({ theme }) => theme.colors.white};
   text-align: center;
   margin: 15px 0;
 `
@@ -138,7 +142,7 @@ const NextBox = styled(Box)`
 `
 
 const BoxHeader = styled.h2`
-  color: #35495d;
+  color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 24px;
   font-weight: 300;
@@ -146,7 +150,7 @@ const BoxHeader = styled.h2`
 `
 
 const StyledP = styled.p`
-  color: #35495d;
+  color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
   font-weight: 500;
@@ -173,7 +177,7 @@ const TrackingNumber = styled.h1`
 `
 
 const StyledPWhite = styled(StyledP)`
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.white};
 `
 
 // The following copied from BirthParentForm (generalise these)

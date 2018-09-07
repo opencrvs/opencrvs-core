@@ -16,6 +16,7 @@ export interface IColors {
   hoverGradientDark: string
   inputBackground: string
   white: string
+  cardGradientEnd: string
 }
 
 export const colors: IColors = {
@@ -35,5 +36,6 @@ export const colors: IColors = {
   copy: '#35495D',
   hoverGradientDark: '#376fb7',
   inputBackground: '#F9F9F9',
-  white: '#FFFFFF'
+  white: '#FFFFFF',
+  cardGradientEnd: '#5E93ED'
 }
