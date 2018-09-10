@@ -52,9 +52,11 @@ function getSelectedOption(
   value: string,
   options: ISelectOption[]
 ): ISelectOption | null {
-  const selectedOption = options.find((x: ISelectOption) => x.value === value)
-  if (selectedOption) {
-    return selectedOption
+  if (options) {
+    const selectedOption = options.find((x: ISelectOption) => x.value === value)
+    if (selectedOption) {
+      return selectedOption
+    }
   }
   return null
 }

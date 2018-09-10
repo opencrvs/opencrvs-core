@@ -130,30 +130,73 @@ class RegisterFormView extends React.Component<
             addressOptionsMap[values.statePermanent].districts
           )
         case 'addressLine4':
-          return internationaliseOptions(
-            this.props.intl,
+          if (
+            addressOptionsMap[values.state][values.district] &&
             addressOptionsMap[values.state][values.district].upazilas
-          )
+          ) {
+            return internationaliseOptions(
+              this.props.intl,
+              addressOptionsMap[values.state][values.district].upazilas
+            )
+          } else {
+            return []
+          }
         case 'addressLine4Permanent':
-          return internationaliseOptions(
-            this.props.intl,
+          if (
+            addressOptionsMap[values.statePermanent][
+              values.districtPermanent
+            ] &&
             addressOptionsMap[values.statePermanent][values.districtPermanent]
               .upazilas
-          )
+          ) {
+            return internationaliseOptions(
+              this.props.intl,
+              addressOptionsMap[values.statePermanent][values.districtPermanent]
+                .upazilas
+            )
+          } else {
+            return []
+          }
         case 'addressLine3Options1':
-          return internationaliseOptions(
-            this.props.intl,
+          if (
+            addressOptionsMap[values.state][values.district] &&
+            addressOptionsMap[values.state][values.district][
+              values.addressLine4
+            ] &&
             addressOptionsMap[values.state][values.district][
               values.addressLine4
             ].unions
-          )
+          ) {
+            return internationaliseOptions(
+              this.props.intl,
+              addressOptionsMap[values.state][values.district][
+                values.addressLine4
+              ].unions
+            )
+          } else {
+            return []
+          }
         case 'addressLine3Options1Permanent':
-          return internationaliseOptions(
-            this.props.intl,
+          if (
+            addressOptionsMap[values.statePermanent][
+              values.districtPermanent
+            ] &&
+            addressOptionsMap[values.statePermanent][values.districtPermanent][
+              values.addressLine4Permanent
+            ] &&
             addressOptionsMap[values.statePermanent][values.districtPermanent][
               values.addressLine4Permanent
             ].unions
-          )
+          ) {
+            return internationaliseOptions(
+              this.props.intl,
+              addressOptionsMap[values.statePermanent][
+                values.districtPermanent
+              ][values.addressLine4Permanent].unions
+            )
+          } else {
+            return []
+          }
         default:
           return []
       }
