@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
   documentsTitle: {
     id: 'register.form.section.documentsTitle',
-    defaultMessage: 'Documents',
+    defaultMessage: 'Supporting documents',
     description: 'Form section title for Documents'
   },
   previewTab: {
@@ -111,7 +111,15 @@ export const birthParentForm: IForm = {
       viewType: 'form',
       name: messages.documentsTab,
       title: messages.documentsTitle,
-      fields: []
+      fields: [
+        {
+          name: 'documents',
+          type: 'documents',
+          initialValue: '',
+          label: messages.fathersDetailsExist,
+          validate: []
+        }
+      ]
     },
     {
       id: 'preview',
