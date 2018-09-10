@@ -5,62 +5,8 @@ import { countries } from '../countries'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
-import { IFormSection, IConditionals } from '../index'
-
-const conditionals: IConditionals = {
-  fathersDetailsExist: {
-    action: 'hide',
-    expression: 'values.fathersDetailsExist == 0'
-  },
-  permanentAddressSameAsMother: {
-    action: 'hide',
-    expression: 'values.permanentAddressSameAsMother == 1'
-  },
-  addressSameAsMother: {
-    action: 'hide',
-    expression: 'values.addressSameAsMother == 1'
-  },
-  countryPermanent: {
-    action: 'hide',
-    expression: '!values.countryPermanent'
-  },
-  statePermanent: {
-    action: 'hide',
-    expression: '!values.statePermanent'
-  },
-  districtPermanent: {
-    action: 'hide',
-    expression: '!values.districtPermanent'
-  },
-  addressLine4Permanent: {
-    action: 'hide',
-    expression: '!values.addressLine4Permanent'
-  },
-  addressLine3Options1Permanent: {
-    action: 'hide',
-    expression: '!values.addressLine3Options1Permanent'
-  },
-  country: {
-    action: 'hide',
-    expression: '!values.country'
-  },
-  state: {
-    action: 'hide',
-    expression: '!values.state'
-  },
-  district: {
-    action: 'hide',
-    expression: '!values.district'
-  },
-  addressLine4: {
-    action: 'hide',
-    expression: '!values.addressLine4'
-  },
-  addressLine3Options1: {
-    action: 'hide',
-    expression: '!values.addressLine3Options1'
-  }
-}
+import { IFormSection } from '../index'
+import { conditionals } from '../utils'
 
 export const messages = defineMessages({
   fatherTab: {
@@ -363,7 +309,7 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: addressMessages.addressSameAsMother,
       required: true,
-      initialValue: '',
+      initialValue: '1',
       validate: [],
       options: [
         { value: '1', label: addressMessages.confirm },
@@ -516,7 +462,7 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: addressMessages.permanentAddressSameAsMother,
       required: true,
-      initialValue: '',
+      initialValue: '1',
       validate: [],
       options: [
         { value: '1', label: messages.confirm },
