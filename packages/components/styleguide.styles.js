@@ -2,7 +2,7 @@
 require('dotenv').config()
 const { styleGuideLocaleFonts } = require('./styleguide.fonts')
 
-const locale = process.env.REACT_APP_LOCALE || 'gb'
+const locale = process.env.REACT_APP_LOCALE || 'gbr'
 
 const fontFaces = [
   {

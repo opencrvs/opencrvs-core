@@ -15,12 +15,12 @@ export interface IFonts {
 }
 
 const localeFonts = {
-  bd: {
+  bgd: {
     boldFontFamily: 'noto_sans_bengalibold',
     lightFontFamily: 'noto_sans_bengalilight',
     regularFontFamily: 'noto_sans_bengaliregular'
   },
-  gb: {
+  gbr: {
     boldFontFamily: 'noto_sansbold',
     lightFontFamily: 'noto_sanslight',
     regularFontFamily: 'noto_sansregular'
