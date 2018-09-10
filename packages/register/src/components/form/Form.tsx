@@ -20,6 +20,7 @@ import styled from '../../styled-components'
 import {
   IFormField,
   Ii18nFormField,
+  Ii18nSelectOption,
   IFormSectionData,
   IConditional
 } from '../../forms'
@@ -36,23 +37,16 @@ const FormSectionTitle = styled.h2`
 
 const getConditionalsToRun = (
   field: Ii18nFormField,
-  values: IFormSectionData,
-  conditionals: IConditional[]
+  values: IFormSectionData
 ): string[] => {
-  const conditionalsToRun = []
+  const conditionalsToRun: string[] = []
   if (field.conditionals) {
-    for (const conditionalID of field.conditionals) {
-      const conditionalObject = conditionals.find(
-        conditional => conditional.id === conditionalID
-      )
-      if (conditionalObject) {
-        /* tslint:disable-next-line: no-eval */
-        if (eval(conditionalObject.expression)) {
-          conditionalsToRun.push(conditionalObject.action)
-          break
-        }
+    field.conditionals.forEach((conditional: IConditional) => {
+      /* tslint:disable-next-line: no-eval */
+      if (eval(conditional.expression)) {
+        conditionalsToRun.push(conditional.action)
       }
-    }
+    })
   }
   return conditionalsToRun
 }
@@ -62,8 +56,11 @@ type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
   values: IFormSectionData
-  conditionals: IConditional[]
   onChange: (e: React.ChangeEvent<any>) => void
+  onGetDynamicSelectOptions: (
+    field: Ii18nFormField,
+    values: IFormSectionData
+  ) => Ii18nSelectOption[]
   onSetFieldValue: (name: string, value: string) => void
 } & Omit<IInputFieldProps, 'id'> &
   InputProps
@@ -73,21 +70,37 @@ function GeneratedInputField({
   values,
   onChange,
   onSetFieldValue,
-  conditionals,
+  onGetDynamicSelectOptions,
   ...props
 }: GeneratedInputFieldProps) {
-  const conditionalsToRun = getConditionalsToRun(field, values, conditionals)
+  const conditionalsToRun: string[] = getConditionalsToRun(field, values)
   if (!conditionalsToRun.includes('hide')) {
     if (field.type === 'select') {
-      return (
-        <InputField
-          component={Select}
-          id={field.name}
-          onChange={(value: string) => onSetFieldValue(field.name, value)}
-          {...field}
-          {...props}
-        />
+      const dynamicSelectOptions: Ii18nSelectOption[] = onGetDynamicSelectOptions(
+        field,
+        values
       )
+      if (dynamicSelectOptions && dynamicSelectOptions.length) {
+        return (
+          <InputField
+            component={Select}
+            id={field.name}
+            onChange={(value: string) => onSetFieldValue(field.name, value)}
+            options={dynamicSelectOptions}
+            {...props}
+          />
+        )
+      } else {
+        return (
+          <InputField
+            component={Select}
+            id={field.name}
+            onChange={(value: string) => onSetFieldValue(field.name, value)}
+            {...field}
+            {...props}
+          />
+        )
+      }
     }
     if (field.type === 'radioGroup') {
       return (
@@ -169,8 +182,11 @@ interface IFormSectionProps {
   fields: IFormField[]
   title: string
   id: string
-  conditionals: IConditional[]
   onChange: (values: IFormSectionData) => void
+  onGetDynamicSelectOptions: (
+    field: Ii18nFormField,
+    values: IFormSectionData
+  ) => Ii18nSelectOption[]
 }
 
 type Props = IFormSectionProps &
@@ -191,10 +207,10 @@ class FormSectionComponent extends React.Component<Props> {
       values,
       fields,
       setFieldValue,
+      onGetDynamicSelectOptions,
       id,
       intl,
-      title,
-      conditionals
+      title
     } = this.props
 
     /*
@@ -227,8 +243,8 @@ class FormSectionComponent extends React.Component<Props> {
                   values={values}
                   onChange={handleChange}
                   onSetFieldValue={setFieldValue}
+                  onGetDynamicSelectOptions={onGetDynamicSelectOptions}
                   value={values[field.name]}
-                  conditionals={conditionals}
                 />
               </FormItem>
             )

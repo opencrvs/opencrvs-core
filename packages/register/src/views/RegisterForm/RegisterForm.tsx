@@ -7,11 +7,19 @@ import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
 import { goToTab as goToTabAction } from '../../navigation/navigationActions'
-import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
+import {
+  IForm,
+  IFormSection,
+  IFormField,
+  IFormSectionData,
+  Ii18nFormField
+} from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
 import { getRegisterForm } from '../../forms/register/selectors'
+import { addressOptionsMap } from '../../forms/address'
+import { internationaliseOptions } from '../../forms/utils'
 
 const FormAction = styled.div`
   display: flex;
@@ -105,6 +113,55 @@ type Props = {
 class RegisterFormView extends React.Component<
   Props & DispatchProps & InjectedIntlProps
 > {
+  getDynamicSelectOptions = (
+    field: Ii18nFormField,
+    values: IFormSectionData
+  ) => {
+    if (field.dynamicOptions) {
+      switch (field.name) {
+        case 'district':
+          return internationaliseOptions(
+            this.props.intl,
+            addressOptionsMap[values.state].districts
+          )
+        case 'districtPermanent':
+          return internationaliseOptions(
+            this.props.intl,
+            addressOptionsMap[values.statePermanent].districts
+          )
+        case 'addressLine4':
+          return internationaliseOptions(
+            this.props.intl,
+            addressOptionsMap[values.state][values.district].upazilas
+          )
+        case 'addressLine4Permanent':
+          return internationaliseOptions(
+            this.props.intl,
+            addressOptionsMap[values.statePermanent][values.districtPermanent]
+              .upazilas
+          )
+        case 'addressLine3Options1':
+          return internationaliseOptions(
+            this.props.intl,
+            addressOptionsMap[values.state][values.district][
+              values.addressLine4
+            ].unions
+          )
+        case 'addressLine3Options1Permanent':
+          return internationaliseOptions(
+            this.props.intl,
+            addressOptionsMap[values.statePermanent][values.districtPermanent][
+              values.addressLine4Permanent
+            ].unions
+          )
+        default:
+          return []
+      }
+    } else {
+      return []
+    }
+  }
+
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     this.props.modifyDraft({
@@ -140,7 +197,7 @@ class RegisterFormView extends React.Component<
               onChange={this.modifyDraft}
               title={intl.formatMessage(activeSection.title)}
               fields={activeSection.fields}
-              conditionals={activeSection.conditionals}
+              onGetDynamicSelectOptions={this.getDynamicSelectOptions}
             />
             <FormAction>
               {nextSection && (

@@ -252,6 +252,5 @@ export const motherSection: IFormSection = {
       ]
     }
     // TODO: add address when component is ready
-  ],
-  conditionals: []
+  ]
 }

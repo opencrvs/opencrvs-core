@@ -1,4 +1,9 @@
-import { IFormField, Ii18nFormField, Ii18nSelectOption } from './'
+import {
+  IFormField,
+  Ii18nFormField,
+  Ii18nSelectOption,
+  ISelectOption
+} from './'
 import { InjectedIntl } from 'react-intl'
 
 export const internationaliseFieldObject = (
@@ -17,4 +22,16 @@ export const internationaliseFieldObject = (
         })
       : undefined
   } as Ii18nFormField
+}
+
+export const internationaliseOptions = (
+  intl: InjectedIntl,
+  options: ISelectOption[]
+): Ii18nSelectOption[] => {
+  return options.map(opt => {
+    return {
+      ...opt,
+      label: intl.formatMessage(opt.label)
+    } as Ii18nSelectOption
+  })
 }
