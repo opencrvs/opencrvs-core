@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { flatten, identity } from 'lodash-es'
 
 import { Box } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
@@ -43,12 +44,16 @@ type Props = {
   onSubmit: () => void
 }
 
+const PreviewBox = styled(Box)`
+  margin-bottom: 30px;
+  font-size: 18px;
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.copy};
+`
+
 const PreviewSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
-`
-const PreviewBox = styled(Box)`
-  margin-bottom: 30px;
 `
 
 const List = styled.ul`
@@ -64,21 +69,24 @@ const ListItem = styled.li`
 
 const ListItemLabel = styled.div`
   flex-basis: 50%;
-  font-size: 16px;
   font-family: ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.placeholder};
 `
 const ListItemValue = styled.div`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.copy};
-  font-size: 18px;
 `
 const InformationMissingLink = styled(Button)`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.danger};
-  font-size: 16px;
   text-decoration: underline;
   padding: 0;
+`
+
+const PreviewHeadingBox = styled(PreviewBox)`
+  ${InformationMissingLink} {
+    margin-right: 1em;
+  }
 `
 
 class PreviewSectionForm extends React.Component<
@@ -91,14 +99,77 @@ class PreviewSectionForm extends React.Component<
       ({ viewType }) => viewType === 'form'
     )
 
+    // REFACTOR
+    const emptyFieldsBySection = formSections.reduce(
+      (sections, section: IFormSection) => {
+        const errors = getValidationErrorsForForm(
+          section.fields,
+          draft.data[section.id] || {}
+        )
+
+        return {
+          ...sections,
+          [section.id]: section.fields.reduce((fields, field) => {
+            // REFACTOR
+            const validationErrors = errors[field.name]
+
+            const value = draft.data[section.id]
+              ? draft.data[section.id][field.name]
+              : null
+
+            const informationMissing =
+              validationErrors.length > 0 || value === null
+
+            return { ...fields, [field.name]: informationMissing }
+          }, {})
+        }
+      },
+      {}
+    )
+
+    const numberOfErrors = flatten(
+      Object.values(emptyFieldsBySection).map(Object.values)
+    ).filter(identity).length
+
+    const sectionsWithErrors = formSections.filter(section =>
+      Object.values(emptyFieldsBySection[section.id]).some(identity)
+    )
+
     return (
       <>
-        {formSections.map((section: IFormSection, i) => {
-          const errors = getValidationErrorsForForm(
-            section.fields,
-            draft.data[section.id] || {}
-          )
+        <PreviewHeadingBox>
+          The following information will be submitted for validation. Please
+          make sure all required details have been filled in correctly. There
+          are {numberOfErrors} missing mandatory fields in your form:<br />
+          <br />
+          {sectionsWithErrors.map((section: IFormSection) => {
+            const emptyFields = Object.entries(emptyFieldsBySection[section.id])
+              .filter(([, empty]) => empty)
+              .map(([id]) =>
+                section.fields.find(field => id === field.name)
+              ) as IFormField[]
 
+            return (
+              <div key={section.id}>
+                <strong>{intl.formatMessage(section.title)}</strong>
+                <br />
+                {emptyFields.map(({ label, name }) => (
+                  <InformationMissingLink
+                    key={name}
+                    onClick={() =>
+                      this.props.goToTab(draft.id, section.id, name)
+                    }
+                  >
+                    {intl.formatMessage(label)}
+                  </InformationMissingLink>
+                ))}
+                <br />
+                <br />
+              </div>
+            )
+          })}
+        </PreviewHeadingBox>
+        {formSections.map((section: IFormSection, i) => {
           return (
             <PreviewBox key={section.id}>
               <PreviewSectionTitle>
@@ -106,14 +177,8 @@ class PreviewSectionForm extends React.Component<
               </PreviewSectionTitle>
               <List>
                 {section.fields.map((field: IFormField) => {
-                  const validationErrors = errors[field.name]
-
-                  const value = draft.data[section.id]
-                    ? draft.data[section.id][field.name]
-                    : null
-
                   const informationMissing =
-                    validationErrors.length > 0 || value === null
+                    emptyFieldsBySection[section.id][field.name]
 
                   return (
                     <ListItem key={field.name}>
@@ -134,7 +199,7 @@ class PreviewSectionForm extends React.Component<
                             {intl.formatMessage(messages.informationMissing)}
                           </InformationMissingLink>
                         ) : (
-                          value
+                          draft.data[section.id][field.name]
                         )}
                       </ListItemValue>
                     </ListItem>
