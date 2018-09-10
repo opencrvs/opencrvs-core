@@ -35,6 +35,14 @@ export const messages = defineMessages({
     id: 'register.form.informationMissing',
     defaultMessage: 'Information missing',
     description: 'Message when a field doesnt have a value'
+  },
+  missingFieldsDescription: {
+    id: 'register.form.missingFieldsDescription',
+    defaultMessage: `The following information will be submitted for validation. Please
+    make sure all required details have been filled in correctly. There
+    are {numberOfErrors} missing mandatory fields in your form:`,
+    description:
+      'Message shown in the box summarising the missing fields of the form'
   }
 })
 type DispatchProps = {
@@ -158,9 +166,10 @@ class PreviewSectionForm extends React.Component<
         {numberOfErrors > 0 && (
           <PreviewHeadingBox>
             <MissingFieldsWarningIcon />
-            The following information will be submitted for validation. Please
-            make sure all required details have been filled in correctly. There
-            are {numberOfErrors} missing mandatory fields in your form:<br />
+            {intl.formatMessage(messages.missingFieldsDescription, {
+              numberOfErrors
+            })}
+            <br />
             <br />
             {sectionsWithErrors.map((section: IFormSection) => {
               const emptyFields = Object.entries(
