@@ -74,7 +74,9 @@ function GeneratedInputField({
   ...props
 }: GeneratedInputFieldProps) {
   const conditionalActions: string[] = getConditionalActions(field, values)
-  if (!conditionalActions.includes('hide')) {
+  if (conditionalActions.includes('hide')) {
+    return null
+  } else {
     if (field.type === 'select') {
       const dynamicSelectOptions: Ii18nSelectOption[] = onGetDynamicSelectOptions(
         field,
@@ -170,8 +172,6 @@ function GeneratedInputField({
         {...props}
       />
     )
-  } else {
-    return null
   }
 }
 
