@@ -131,6 +131,14 @@ const Container = styled.div`
   z-index: 1;
 `
 
+const StyledP = styled.p`
+  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+`
+
 const TrackingBox = styled(Box)`
   background: linear-gradient(
     137.89deg,
@@ -140,6 +148,12 @@ const TrackingBox = styled(Box)`
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
   margin: 15px 0;
+
+  /* stylelint-disable */
+  ${StyledP} {
+    /* stylelint-enable */
+    color: ${({ theme }) => theme.colors.white};
+  }
 `
 
 const NextBox = styled(Box)`
@@ -152,14 +166,6 @@ const BoxHeader = styled.h2`
   font-size: 24px;
   font-weight: 300;
   line-height: 33px;
-`
-
-const StyledP = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 24px;
 `
 
 const ImgHeaderContainer = styled.div`
@@ -179,10 +185,6 @@ const TrackingHeader = styled.h3`
 const TrackingNumber = styled.h1`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 30px;
-`
-
-const StyledPWhite = styled(StyledP)`
-  color: ${({ theme }) => theme.colors.white};
 `
 
 class SavedRegistrationView extends React.Component<
@@ -228,9 +230,7 @@ class SavedRegistrationView extends React.Component<
               {intl.formatMessage(messages.trackingCardTitle)}
             </TrackingHeader>
             <TrackingNumber>187 372 019 2819</TrackingNumber>
-            <StyledPWhite>
-              {intl.formatMessage(messages.trackingCardText)}
-            </StyledPWhite>
+            <StyledP>{intl.formatMessage(messages.trackingCardText)}</StyledP>
           </TrackingBox>
           <NextBox>
             <BoxHeader>{intl.formatMessage(messages.nextCardTitle)}</BoxHeader>
