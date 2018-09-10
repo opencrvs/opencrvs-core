@@ -106,7 +106,6 @@ const ErrorDot = styled.div`
   border-radius: 4px;
   display: inline-block;
   vertical-align: 0.65em;
-}
 `
 
 const MissingFieldsWarningIcon = styled(Warning)`
