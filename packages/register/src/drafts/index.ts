@@ -1,4 +1,6 @@
 import { IFormData } from '../forms'
+import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
+import { loop, Cmd, getModel } from 'redux-loop'
 
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
@@ -44,9 +46,25 @@ export function modifyDraft(draft: IDraft) {
 
 export function draftsReducerTMP(
   state: IDraftsState = initialState,
-  action: Action
+  action: Action | NavigationAction
 ) {
   switch (action.type) {
+    case GO_TO_TAB: {
+      const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
+
+      if (!draft || draft.data[action.payload.tabId]) {
+        return state
+      }
+      const modifiedDraft = {
+        ...draft,
+        data: {
+          ...draft.data,
+          [action.payload.tabId]: {}
+        }
+      }
+
+      return loop(state, Cmd.action(modifyDraft(modifiedDraft)))
+    }
     case STORE_DRAFT:
       return {
         ...state,
@@ -76,7 +94,8 @@ export function draftsReducer(
   state: IDraftsState = initialState,
   action: Action
 ) {
-  const newState = draftsReducerTMP(state, action)
-  window.localStorage.setItem('tmp', JSON.stringify(newState.drafts))
-  return newState
+  const stateOrLoop = draftsReducerTMP(state, action)
+  const model = getModel(stateOrLoop)
+  window.localStorage.setItem('tmp', JSON.stringify(model.drafts))
+  return stateOrLoop
 }

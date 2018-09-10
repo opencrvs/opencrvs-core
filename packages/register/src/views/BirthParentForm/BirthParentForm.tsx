@@ -10,13 +10,13 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 import styled from '../../styled-components'
 
-import { goToTab as goToTabAction } from '../../navigation/navigationActions'
+import { goToTab as goToTabAction } from 'src/navigation'
 import { birthParentForm } from '../../forms/birth-parent'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
-import { PreviewSection } from '@opencrvs/register/src/views/BirthParentForm/PreviewSection'
+import { PreviewSection } from 'src/views/BirthParentForm/PreviewSection'
 
 const FormAction = styled.div`
   display: flex;

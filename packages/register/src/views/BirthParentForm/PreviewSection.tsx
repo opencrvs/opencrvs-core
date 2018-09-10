@@ -12,7 +12,7 @@ import { IFormSection, IFormField } from 'src/forms'
 
 import { IDraft } from 'src/drafts'
 import { getValidationErrorsForForm } from 'src/forms/validation'
-import { goToTab } from 'src/navigation/navigationActions'
+import { goToTab } from 'src/navigation'
 
 const FormAction = styled.div`
   display: flex;
