@@ -155,39 +155,43 @@ class PreviewSectionForm extends React.Component<
 
     return (
       <>
-        <PreviewHeadingBox>
-          <MissingFieldsWarningIcon />
-          The following information will be submitted for validation. Please
-          make sure all required details have been filled in correctly. There
-          are {numberOfErrors} missing mandatory fields in your form:<br />
-          <br />
-          {sectionsWithErrors.map((section: IFormSection) => {
-            const emptyFields = Object.entries(emptyFieldsBySection[section.id])
-              .filter(([, empty]) => empty)
-              .map(([id]) =>
-                section.fields.find(field => id === field.name)
-              ) as IFormField[]
+        {numberOfErrors > 0 && (
+          <PreviewHeadingBox>
+            <MissingFieldsWarningIcon />
+            The following information will be submitted for validation. Please
+            make sure all required details have been filled in correctly. There
+            are {numberOfErrors} missing mandatory fields in your form:<br />
+            <br />
+            {sectionsWithErrors.map((section: IFormSection) => {
+              const emptyFields = Object.entries(
+                emptyFieldsBySection[section.id]
+              )
+                .filter(([, empty]) => empty)
+                .map(([id]) =>
+                  section.fields.find(field => id === field.name)
+                ) as IFormField[]
 
-            return (
-              <div key={section.id}>
-                <strong>{intl.formatMessage(section.title)}</strong>
-                <br />
-                {emptyFields.map(({ label, name }) => (
-                  <InformationMissingLink
-                    key={name}
-                    onClick={() =>
-                      this.props.goToTab(draft.id, section.id, name)
-                    }
-                  >
-                    {intl.formatMessage(label)}
-                  </InformationMissingLink>
-                ))}
-                <br />
-                <br />
-              </div>
-            )
-          })}
-        </PreviewHeadingBox>
+              return (
+                <div key={section.id}>
+                  <strong>{intl.formatMessage(section.title)}</strong>
+                  <br />
+                  {emptyFields.map(({ label, name }) => (
+                    <InformationMissingLink
+                      key={name}
+                      onClick={() =>
+                        this.props.goToTab(draft.id, section.id, name)
+                      }
+                    >
+                      {intl.formatMessage(label)}
+                    </InformationMissingLink>
+                  ))}
+                  <br />
+                  <br />
+                </div>
+              )
+            })}
+          </PreviewHeadingBox>
+        )}
         {formSections.map((section: IFormSection, i) => {
           return (
             <PreviewBox key={section.id}>
