@@ -35,20 +35,20 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-const getConditionalsToRun = (
+const getConditionalActions = (
   field: Ii18nFormField,
   values: IFormSectionData
 ): string[] => {
-  const conditionalsToRun: string[] = []
+  const conditionalActions: string[] = []
   if (field.conditionals) {
     field.conditionals.forEach((conditional: IConditional) => {
       /* tslint:disable-next-line: no-eval */
       if (eval(conditional.expression)) {
-        conditionalsToRun.push(conditional.action)
+        conditionalActions.push(conditional.action)
       }
     })
   }
-  return conditionalsToRun
+  return conditionalActions
 }
 
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
@@ -73,8 +73,8 @@ function GeneratedInputField({
   onGetDynamicSelectOptions,
   ...props
 }: GeneratedInputFieldProps) {
-  const conditionalsToRun: string[] = getConditionalsToRun(field, values)
-  if (!conditionalsToRun.includes('hide')) {
+  const conditionalActions: string[] = getConditionalActions(field, values)
+  if (!conditionalActions.includes('hide')) {
     if (field.type === 'select') {
       const dynamicSelectOptions: Ii18nSelectOption[] = onGetDynamicSelectOptions(
         field,
