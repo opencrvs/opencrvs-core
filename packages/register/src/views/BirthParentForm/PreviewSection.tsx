@@ -5,6 +5,7 @@ import { flatten, identity } from 'lodash-es'
 
 import { Box } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
+import { Warning } from '@opencrvs/components/lib/icons'
 
 import styled from 'src/styled-components'
 
@@ -84,9 +85,26 @@ const InformationMissingLink = styled(Button)`
 `
 
 const PreviewHeadingBox = styled(PreviewBox)`
+  position: relative;
   ${InformationMissingLink} {
     margin-right: 1em;
   }
+`
+
+const ErrorDot = styled.div`
+  height: 7px;
+  width: 7px;
+  background-color: ${({ theme }) => theme.colors.error};
+  border-radius: 4px;
+  display: inline-block;
+  vertical-align: 0.65em;
+}
+`
+
+const MissingFieldsWarningIcon = styled(Warning)`
+  position: absolute;
+  top: -16px;
+  left: -16px;
 `
 
 class PreviewSectionForm extends React.Component<
@@ -138,6 +156,7 @@ class PreviewSectionForm extends React.Component<
     return (
       <>
         <PreviewHeadingBox>
+          <MissingFieldsWarningIcon />
           The following information will be submitted for validation. Please
           make sure all required details have been filled in correctly. There
           are {numberOfErrors} missing mandatory fields in your form:<br />
@@ -173,7 +192,7 @@ class PreviewSectionForm extends React.Component<
           return (
             <PreviewBox key={section.id}>
               <PreviewSectionTitle>
-                {intl.formatMessage(section.title)}
+                {intl.formatMessage(section.title)} <ErrorDot />
               </PreviewSectionTitle>
               <List>
                 {section.fields.map((field: IFormField) => {
