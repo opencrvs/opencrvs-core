@@ -87,6 +87,9 @@ function GeneratedInputField({
             id={field.name}
             onChange={(value: string) => onSetFieldValue(field.name, value)}
             options={dynamicSelectOptions}
+            label={field.label}
+            name={field.name}
+            required={field.required}
             {...props}
           />
         )

@@ -847,12 +847,12 @@ export const messages = defineMessages({
   },
   addressLine3Options1: {
     id: 'formFields.addressLine3Options1',
-    defaultMessage: 'Ward / Cantonement',
+    defaultMessage: 'Union / Cantonement',
     description: 'Title for the address line 3 option 1'
   },
   addressLine3Options2: {
     id: 'formFields.addressLine3Options2',
-    defaultMessage: 'Union / Cantonement',
+    defaultMessage: 'Ward / Cantonement',
     description: 'Title for the address line 3 option 2'
   },
   addressLine4: {
