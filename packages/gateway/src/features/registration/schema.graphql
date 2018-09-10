@@ -141,7 +141,7 @@ type BirthRegistration { # -> Composition
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
   birthRegistrationType: BirthRegType # -> Observation.valueString
-  presentAtBirthRegistration: BirthRegPresence
+  presentAtBirthRegistration: BirthRegPresence # -> Observation.valueString
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
