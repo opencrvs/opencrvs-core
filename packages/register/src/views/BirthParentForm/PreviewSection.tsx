@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { flatten, identity } from 'lodash-es'
+import { flatten, identity } from 'lodash'
 
 import { Box } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'

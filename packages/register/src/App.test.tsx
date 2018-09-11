@@ -120,11 +120,14 @@ describe('when user has a valid token in local storage', () => {
     })
 
     describe('when user clicks the "mother" tab', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#tab_mother')
           .hostNodes()
           .simulate('click')
+
+        await flushPromises()
+        app.update()
       })
       it('changes to the mother details section', () => {
         expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
@@ -150,11 +153,13 @@ describe('when user has a valid token in local storage', () => {
     })
 
     describe('when user clicks "next" button', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#next_section')
           .hostNodes()
           .simulate('click')
+        await flushPromises()
+        app.update()
       })
       it('changes to the mother details section', () => {
         expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
@@ -163,11 +168,14 @@ describe('when user has a valid token in local storage', () => {
       })
     })
     describe('when user clicks the "father" tab', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#tab_father')
           .hostNodes()
           .simulate('click')
+
+        await flushPromises()
+        app.update()
       })
       it('changes to the father details section', () => {
         expect(app.find('#form_section_title_father').hostNodes()).toHaveLength(
