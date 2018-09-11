@@ -38,6 +38,9 @@ const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
 `
+const DocumentUpload = styled.img`
+  width: 100%;
+`
 
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
@@ -99,6 +102,15 @@ function GeneratedInputField({
         id={field.name}
         {...field}
         {...props}
+      />
+    )
+  }
+
+  if (field.type === 'documents') {
+    return (
+      <DocumentUpload
+        src="/assets/document-upload.jpg"
+        alt="Dummy document upload"
       />
     )
   }

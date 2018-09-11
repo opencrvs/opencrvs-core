@@ -26,7 +26,7 @@ export const ENGLISH_STATE = {
     'register.form.tabs.registrationTab': 'Registration',
     'register.form.section.registrationTitle': 'Registration',
     'register.form.tabs.documentsTab': 'Documents',
-    'register.form.section.documentsTitle': 'Documents',
+    'register.form.section.documentsTitle': 'Supporting documents',
     'formFields.firstName': 'First name',
     'formFields.mothersFirstName': "Mother's first name",
     'formFields.defaultLabel': 'Label goes here',
