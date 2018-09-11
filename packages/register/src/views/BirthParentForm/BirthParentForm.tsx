@@ -3,9 +3,10 @@ import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import { Box } from '@opencrvs/components/lib/interface'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
-import { goToTab as goToTabAction } from '../../navigation/navigationActions'
+import { goToTab as goToTabAction } from 'src/navigation'
 import { birthParentForm } from '../../forms/birth-parent'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
@@ -15,7 +16,18 @@ import {
   FooterAction,
   FooterPrimaryButton,
   ViewFooter
-} from '@opencrvs/register/src/components/interface/footer'
+} from 'src/components/interface/footer'
+
+import { PreviewSection } from 'src/views/BirthParentForm/PreviewSection'
+
+const FormAction = styled.div`
+  display: flex;
+  justify-content: center;
+`
+
+const FormPrimaryButton = styled(PrimaryButton)`
+  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
+`
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -92,6 +104,10 @@ class BirthParentFormView extends React.Component<
       }
     })
   }
+
+  submitForm() {
+    console.log('Submit')
+  }
   render() {
     const {
       goToTab,
@@ -118,33 +134,31 @@ class BirthParentFormView extends React.Component<
           />
         </ViewHeaderWithTabs>
         <FormContainer>
-          <Box>
-            {activeSection.viewType === 'preview' && (
-              <h1>preview stuff here</h1>
-            )}
-            {activeSection.viewType === 'form' && (
-              <>
-                <Form
-                  id={activeSection.id}
-                  onChange={this.modifyDraft}
-                  setAllFieldsDirty={setAllFieldsDirty}
-                  title={intl.formatMessage(activeSection.title)}
-                  fields={activeSection.fields}
-                />
-                <FooterAction>
-                  {nextSection && (
-                    <FooterPrimaryButton
-                      onClick={() => goToTab(draft.id, nextSection.id)}
-                      id="next_section"
-                      icon={() => <ArrowForward />}
-                    >
-                      {intl.formatMessage(messages.next)}
-                    </FooterPrimaryButton>
-                  )}
-                </FooterAction>
-              </>
-            )}
-          </Box>
+          {activeSection.viewType === 'preview' && (
+            <PreviewSection draft={draft} onSubmit={this.submitForm} />
+          )}
+          {activeSection.viewType === 'form' && (
+            <Box>
+              <Form
+                id={activeSection.id}
+                onChange={this.modifyDraft}
+                setAllFieldsDirty={setAllFieldsDirty}
+                title={intl.formatMessage(activeSection.title)}
+                fields={activeSection.fields}
+              />
+              <FormAction>
+                {nextSection && (
+                  <FormPrimaryButton
+                    onClick={() => goToTab(draft.id, nextSection.id)}
+                    id="next_section"
+                    icon={() => <ArrowForward />}
+                  >
+                    {intl.formatMessage(messages.next)}
+                  </FormPrimaryButton>
+                )}
+              </FormAction>
+            </Box>
+          )}
         </FormContainer>
         <ViewFooter>
           <FooterAction>
