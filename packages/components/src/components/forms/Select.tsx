@@ -52,12 +52,11 @@ function getSelectedOption(
   value: string,
   options: ISelectOption[]
 ): ISelectOption | null {
-  if (options) {
-    const selectedOption = options.find((x: ISelectOption) => x.value === value)
-    if (selectedOption) {
-      return selectedOption
-    }
+  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  if (selectedOption) {
+    return selectedOption
   }
+
   return null
 }
 export class Select extends React.Component<
