@@ -1,5 +1,6 @@
 import { defineMessages } from 'react-intl'
 import { ValidIndicator } from '@opencrvs/components/lib/forms'
+import { ViewType } from 'src/forms'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -195,7 +196,7 @@ const messages = defineMessages({
 
 export const motherSection = {
   id: 'mother',
-  viewType: 'form',
+  viewType: 'form' as ViewType,
   name: messages.motherTab,
   title: messages.motherTitle,
   fields: [

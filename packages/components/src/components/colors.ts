@@ -1,24 +1,4 @@
-export interface IColors {
-  accent: string
-  accentGradientDark: string
-  accentGradientLight: string
-  background: string
-  disabled: string
-  error: string
-  headerGradientDark: string
-  headerGradientLight: string
-  placeholder: string
-  primary: string
-  secondary: string
-  success: string
-  warning: string
-  copy: string
-  hoverGradientDark: string
-  inputBackground: string
-  white: string
-}
-
-export const colors: IColors = {
+export const colors = {
   accent: '#4C68C1',
   accentGradientDark: '#629FCC',
   accentGradientLight: '#7DC1EA',
@@ -27,7 +7,7 @@ export const colors: IColors = {
   error: '#D77160',
   headerGradientDark: '#42506B',
   headerGradientLight: '#485F88',
-  placeholder: '#969696',
+  placeholder: '#58727E',
   primary: '#4C68C1',
   secondary: '#35495D',
   success: '#49B78D',
@@ -35,5 +15,7 @@ export const colors: IColors = {
   copy: '#35495D',
   hoverGradientDark: '#376fb7',
   inputBackground: '#F9F9F9',
-  white: '#FFFFFF'
+  white: '#FFFFFF',
+  danger: '#D53F3F',
+  cardGradientEnd: '#5E93ED'
 }

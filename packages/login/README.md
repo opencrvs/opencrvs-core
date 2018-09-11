@@ -881,6 +881,26 @@ Note that [you may need to configure your production server to support client-si
 
 ## Adding Custom Environment Variables
 
+Docker adds production environment variables and they must be added into the main OpenCRVS package Dockerfile-login
+
+The following variables exist.
+
+```
+ENV REACT_APP_AUTH_API_URL
+ENV REACT_APP_REGISTER_APP_URL
+ENV REACT_APP_LOCALE=gbr
+ENV REACT_APP_LANGUAGE=en
+```
+
+For ENV REACT_APP_AUTH_API_URL link to auth package URL
+For ENV REACT_APP_REGISTER_APP_URL link to the register package URL
+
+For REACT_APP_LOCALE, use lowercase two-letter [ISO "Alpha-3" country code](https://unstats.un.org/unsd/methodology/m49/)
+
+E.G. test by setting to "bgd" for bangladesh
+
+For REACT_APP_LANGUAGE, use lowercase two-letter [ISO 639-1 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+
 >Note: this feature is available with `react-scripts@0.2.3` and higher.
 
 Your project can consume variables declared in your environment as if they were declared locally in your JS files. By

@@ -1,21 +1,24 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-
-import { Box, Header } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Box } from '@opencrvs/components/lib/interface'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
-
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
 import styled from '../../styled-components'
-
-import { goToTab as goToTabAction } from '../../navigation/navigationActions'
+import { goToTab as goToTabAction } from 'src/navigation'
 import { birthParentForm } from '../../forms/birth-parent'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
+import {
+  FooterAction,
+  FooterPrimaryButton,
+  ViewFooter
+} from 'src/components/interface/footer'
+
+import { PreviewSection } from 'src/views/BirthParentForm/PreviewSection'
 
 const FormAction = styled.div`
   display: flex;
@@ -61,24 +64,6 @@ const FormViewContainer = styled.div`
   flex-direction: column;
 `
 
-const ViewFooter = styled(Header)`
-  flex-grow: 1;
-  margin-top: -50px;
-  padding-top: 100px;
-  padding-bottom: 40px;
-  /* stylelint-disable */
-  ${FormPrimaryButton} {
-    /* stylelint-enable */
-    width: 270px;
-    justify-content: center;
-  }
-  /* stylelint-disable */
-  ${FormAction} {
-    /* stylelint-enable */
-    margin-bottom: 1em;
-  }
-`
-
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
   return viewParams.tabId || form.sections[0].id
 }
@@ -103,10 +88,11 @@ type DispatchProps = {
 type Props = {
   draft: IDraft
   activeSection: IFormSection
+  setAllFieldsDirty: boolean
 }
 
 class BirthParentFormView extends React.Component<
-  Props & DispatchProps & InjectedIntlProps
+  Props & DispatchProps & InjectedIntlProps & RouteComponentProps<History>
 > {
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
@@ -118,8 +104,19 @@ class BirthParentFormView extends React.Component<
       }
     })
   }
+
+  submitForm() {
+    console.log('Submit')
+  }
   render() {
-    const { goToTab, intl, activeSection, draft } = this.props
+    const {
+      goToTab,
+      intl,
+      activeSection,
+      setAllFieldsDirty,
+      draft,
+      history
+    } = this.props
 
     const nextSection = getNextSection(birthParentForm.sections, activeSection)
 
@@ -137,39 +134,41 @@ class BirthParentFormView extends React.Component<
           />
         </ViewHeaderWithTabs>
         <FormContainer>
-          <Box>
-            {activeSection.viewType === 'preview' && (
-              <h1>preview stuff here</h1>
-            )}
-            {activeSection.viewType === 'form' && (
-              <>
-                <Form
-                  id={activeSection.id}
-                  onChange={this.modifyDraft}
-                  title={intl.formatMessage(activeSection.title)}
-                  fields={activeSection.fields}
-                />
-                <FormAction>
-                  {nextSection && (
-                    <FormPrimaryButton
-                      onClick={() => goToTab(draft.id, nextSection.id)}
-                      id="next_section"
-                      icon={() => <ArrowForward />}
-                    >
-                      {intl.formatMessage(messages.next)}
-                    </FormPrimaryButton>
-                  )}
-                </FormAction>
-              </>
-            )}
-          </Box>
+          {activeSection.viewType === 'preview' && (
+            <PreviewSection draft={draft} onSubmit={this.submitForm} />
+          )}
+          {activeSection.viewType === 'form' && (
+            <Box>
+              <Form
+                id={activeSection.id}
+                onChange={this.modifyDraft}
+                setAllFieldsDirty={setAllFieldsDirty}
+                title={intl.formatMessage(activeSection.title)}
+                fields={activeSection.fields}
+              />
+              <FormAction>
+                {nextSection && (
+                  <FormPrimaryButton
+                    onClick={() => goToTab(draft.id, nextSection.id)}
+                    id="next_section"
+                    icon={() => <ArrowForward />}
+                  >
+                    {intl.formatMessage(messages.next)}
+                  </FormPrimaryButton>
+                )}
+              </FormAction>
+            </Box>
+          )}
         </FormContainer>
         <ViewFooter>
-          <FormAction>
-            <FormPrimaryButton id="save_draft">
+          <FooterAction>
+            <FooterPrimaryButton
+              id="save_draft"
+              onClick={() => history.push('/saved')}
+            >
               {intl.formatMessage(messages.saveDraft)}
-            </FormPrimaryButton>
-          </FormAction>
+            </FooterPrimaryButton>
+          </FooterAction>
         </ViewFooter>
       </FormViewContainer>
     )
@@ -207,13 +206,27 @@ function mapStateToProps(
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
   }
 
+  const visitedSections = birthParentForm.sections.filter(({ id }) =>
+    Boolean(draft.data[id])
+  )
+
+  const rightMostVisited = visitedSections[visitedSections.length - 1]
+
+  const setAllFieldsDirty =
+    rightMostVisited &&
+    birthParentForm.sections.indexOf(activeSection) <
+      birthParentForm.sections.indexOf(rightMostVisited)
+
+  const fields = replaceInitialValues(
+    activeSection.fields,
+    draft.data[activeSectionId] || {}
+  )
+
   return {
+    setAllFieldsDirty,
     activeSection: {
       ...activeSection,
-      fields: replaceInitialValues(
-        activeSection.fields,
-        draft.data[activeSectionId] || {}
-      )
+      fields
     },
     draft
   }

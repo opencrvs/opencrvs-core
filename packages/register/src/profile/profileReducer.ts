@@ -1,6 +1,12 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from './profileActions'
-import { getTokenPayload, ITokenPayload } from '../utils/authUtils'
+import {
+  getTokenPayload,
+  ITokenPayload,
+  storeToken,
+  getToken,
+  isTokenStillValid
+} from '../utils/authUtils'
 import { config } from '../config'
 
 export type ProfileState = {
@@ -26,19 +32,31 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
         })
       )
     case actions.CHECK_AUTH:
-      const tokenPayload = getTokenPayload()
-      if (tokenPayload) {
-        return {
+      const token = getToken()
+      const payload = getTokenPayload(token)
+
+      if (!payload) {
+        return loop(
+          {
+            ...state,
+            authenticated: false
+          },
+          Cmd.action(actions.redirectToAuthentication())
+        )
+      }
+
+      return loop(
+        {
           ...state,
           authenticated: true,
-          tokenPayload
-        }
-      } else {
-        return {
-          ...state,
-          authenticated: false
-        }
-      }
+          tokenPayload: payload
+        },
+        Cmd.run(() => {
+          if (isTokenStillValid(payload)) {
+            storeToken(token)
+          }
+        })
+      )
 
     default:
       return state

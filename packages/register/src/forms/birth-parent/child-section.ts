@@ -1,4 +1,5 @@
 import { defineMessages } from 'react-intl'
+import { ViewType } from 'src/forms'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -187,7 +188,7 @@ const messages = defineMessages({
 
 export const childSection = {
   id: 'child',
-  viewType: 'form',
+  viewType: 'form' as ViewType,
   name: messages.childTab,
   title: messages.childTitle,
   fields: [

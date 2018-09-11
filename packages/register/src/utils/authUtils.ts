@@ -2,7 +2,7 @@ import * as queryString from 'query-string'
 import * as decode from 'jwt-decode'
 
 export interface IURLParams {
-  [key: string]: string
+  [key: string]: string | string[] | undefined
 }
 export interface ITokenPayload {
   subject: string
@@ -11,20 +11,22 @@ export interface ITokenPayload {
   roles: string[]
 }
 
-const isTokenStillValid = (decoded: ITokenPayload) => {
+export const isTokenStillValid = (decoded: ITokenPayload) => {
   return Number(decoded.exp) * 1000 > Date.now()
 }
 
-function getToken() {
+export function getToken() {
   return (
     queryString.parse(window.location.search).token ||
     localStorage.getItem('opencrvs')
   )
 }
 
-export const getTokenPayload = () => {
-  const token = getToken()
+export function storeToken(token: string) {
+  localStorage.setItem('opencrvs', token)
+}
 
+export const getTokenPayload = (token: string) => {
   if (!token) {
     return null
   }
@@ -32,13 +34,6 @@ export const getTokenPayload = () => {
   try {
     decoded = decode(token)
   } catch (err) {
-    return null
-  }
-
-  if (isTokenStillValid(decoded)) {
-    localStorage.setItem('opencrvs', token)
-  } else {
-    localStorage.removeItem('opencrvs')
     return null
   }
 
