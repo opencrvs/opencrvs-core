@@ -39,16 +39,15 @@ const getConditionalActions = (
   field: Ii18nFormField,
   values: IFormSectionData
 ): string[] => {
-  const conditionalActions: string[] = []
-  if (field.conditionals) {
-    field.conditionals.forEach((conditional: IConditional) => {
-      /* tslint:disable-next-line: no-eval */
-      if (eval(conditional.expression)) {
-        conditionalActions.push(conditional.action)
-      }
-    })
+  if (!field.conditionals) {
+    return []
   }
-  return conditionalActions
+  return field.conditionals
+    .filter(conditional =>
+      /* tslint:disable-next-line: no-eval */
+      eval(conditional.expression)
+    )
+    .map((conditional: IConditional) => conditional.action)
 }
 
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
