@@ -13,17 +13,33 @@ export interface IFormField {
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
+  dynamicOptions?: string
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
   initialValue?: string
-  conditionals?: string[]
+  conditionals?: IConditional[]
 }
 
 export interface IConditional {
-  id: string
   action: string
   expression: string
+}
+
+export interface IConditionals {
+  fathersDetailsExist: IConditional
+  permanentAddressSameAsMother: IConditional
+  addressSameAsMother: IConditional
+  countryPermanent: IConditional
+  statePermanent: IConditional
+  districtPermanent: IConditional
+  addressLine4Permanent: IConditional
+  addressLine3Options1Permanent: IConditional
+  country: IConditional
+  state: IConditional
+  district: IConditional
+  addressLine4: IConditional
+  addressLine3Options1: IConditional
 }
 
 export interface IFormSection {
@@ -32,7 +48,6 @@ export interface IFormSection {
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
-  conditionals: IConditional[]
 }
 
 export interface IForm {
@@ -50,10 +65,11 @@ export interface Ii18nFormField {
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
+  dynamicOptions?: string
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
-  conditionals?: string[]
+  conditionals?: IConditional[]
 }
 
 export interface IFormSectionData {

@@ -53,24 +53,21 @@ export const initialState: IRegisterFormState = {
         viewType: 'form',
         name: messages.registrationTab,
         title: messages.registrationTitle,
-        fields: [],
-        conditionals: []
+        fields: []
       },
       {
         id: 'documents',
         viewType: 'form',
         name: messages.documentsTab,
         title: messages.documentsTitle,
-        fields: [],
-        conditionals: []
+        fields: []
       },
       {
         id: 'preview',
         viewType: 'preview',
         name: messages.previewTab,
         title: messages.previewTitle,
-        fields: [],
-        conditionals: []
+        fields: []
       }
     ]
   }

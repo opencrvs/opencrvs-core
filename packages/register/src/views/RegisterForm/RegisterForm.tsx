@@ -140,7 +140,6 @@ class RegisterFormView extends React.Component<
               onChange={this.modifyDraft}
               title={intl.formatMessage(activeSection.title)}
               fields={activeSection.fields}
-              conditionals={activeSection.conditionals}
             />
             <FormAction>
               {nextSection && (
