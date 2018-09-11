@@ -14,12 +14,17 @@ import {
   ITextInputProps,
   IInputFieldProps,
   RadioGroup,
-  IAddressProps,
-  Address
+  SubSectionDivider
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
-import { IFormField, Ii18nFormField, IFormSectionData } from '../../forms'
+import {
+  IFormField,
+  Ii18nFormField,
+  IFormSectionData,
+  IConditional
+} from '../../forms'
 import { Omit } from '../../utils'
+import { addressOptions } from '../../forms/address'
 
 export const FormItem = styled.div`
   margin-bottom: 2em;
@@ -30,11 +35,22 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-type InputProps =
-  | ISelectProps
-  | ITextInputProps
-  | IDateFieldProps
-  | IAddressProps
+const getConditionalActions = (
+  field: IFormField,
+  values: IFormSectionData
+): string[] => {
+  if (!field.conditionals) {
+    return []
+  }
+  return field.conditionals
+    .filter(conditional =>
+      /* tslint:disable-next-line: no-eval */
+      eval(conditional.expression)
+    )
+    .map((conditional: IConditional) => conditional.action)
+}
+
+type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
@@ -43,6 +59,82 @@ type GeneratedInputFieldProps = {
   onSetFieldValue: (name: string, value: string) => void
 } & Omit<IInputFieldProps, 'id'> &
   InputProps
+
+const getDynamicSelectOptions = (
+  field: IFormField,
+  values: IFormSectionData
+) => {
+  switch (field.name) {
+    case 'district':
+      return addressOptions[values.state].districts
+
+    case 'districtPermanent':
+      return addressOptions[values.statePermanent].districts
+
+    case 'addressLine4':
+      if (
+        addressOptions[values.state][values.district] &&
+        addressOptions[values.state][values.district].upazilas
+      ) {
+        return addressOptions[values.state][values.district].upazilas
+      } else {
+        return []
+      }
+    case 'addressLine4Permanent':
+      if (
+        addressOptions[values.statePermanent][values.districtPermanent] &&
+        addressOptions[values.statePermanent][values.districtPermanent].upazilas
+      ) {
+        return addressOptions[values.statePermanent][values.districtPermanent]
+          .upazilas
+      } else {
+        return []
+      }
+    case 'addressLine3Options1':
+      if (
+        addressOptions[values.state][values.district] &&
+        addressOptions[values.state][values.district][values.addressLine4] &&
+        addressOptions[values.state][values.district][values.addressLine4]
+          .unions
+      ) {
+        return addressOptions[values.state][values.district][
+          values.addressLine4
+        ].unions
+      } else {
+        return []
+      }
+    case 'addressLine3Options1Permanent':
+      if (
+        addressOptions[values.statePermanent][values.districtPermanent] &&
+        addressOptions[values.statePermanent][values.districtPermanent][
+          values.addressLine4Permanent
+        ] &&
+        addressOptions[values.statePermanent][values.districtPermanent][
+          values.addressLine4Permanent
+        ].unions
+      ) {
+        return addressOptions[values.statePermanent][values.districtPermanent][
+          values.addressLine4Permanent
+        ].unions
+      } else {
+        return []
+      }
+    default:
+      return []
+  }
+}
+
+function generateDynamicOptionsForField(
+  field: IFormField,
+  values: IFormSectionData
+) {
+  return {
+    ...field,
+    options: field.dynamicOptions
+      ? getDynamicSelectOptions(field, values)
+      : field.options
+  }
+}
 
 function GeneratedInputField({
   field,
@@ -96,9 +188,28 @@ function GeneratedInputField({
       />
     )
   }
-  if (field.type === 'address') {
-    return <Address id={field.name} values={values} {...field} {...props} />
+  if (field.type === 'textarea') {
+    return (
+      <InputField
+        component={TextArea}
+        id={field.name}
+        onChange={onChange}
+        {...field}
+        {...props}
+      />
+    )
   }
+  if (field.type === 'subSection') {
+    return (
+      <SubSectionDivider
+        key={`${field.name}`}
+        label={field.label}
+        {...field}
+        {...props}
+      />
+    )
+  }
+
   return (
     <InputField
       component={TextInput}
@@ -161,6 +272,7 @@ class FormSectionComponent extends React.Component<Props> {
     const fieldsWithValuesDefined = fields.filter(
       field => values[field.name] !== undefined
     )
+
     return (
       <section>
         <FormSectionTitle id={`form_section_title_${id}`}>
@@ -168,10 +280,22 @@ class FormSectionComponent extends React.Component<Props> {
         </FormSectionTitle>
         <form onSubmit={handleSubmit}>
           {fieldsWithValuesDefined.map(field => {
+            const conditionalActions: string[] = getConditionalActions(
+              field,
+              values
+            )
+
+            if (conditionalActions.includes('hide')) {
+              return null
+            }
+
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
-                  field={internationaliseFieldObject(intl, field)}
+                  field={internationaliseFieldObject(
+                    intl,
+                    generateDynamicOptionsForField(field, values)
+                  )}
                   onBlur={handleBlur}
                   values={values}
                   onChange={handleChange}

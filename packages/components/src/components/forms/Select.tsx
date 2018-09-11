@@ -56,6 +56,7 @@ function getSelectedOption(
   if (selectedOption) {
     return selectedOption
   }
+
   return null
 }
 export class Select extends React.Component<
