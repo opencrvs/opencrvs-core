@@ -895,7 +895,7 @@ export const messages = defineMessages({
   }
 })
 
-export const addressOptionsMap = {
+export const addressOptions = {
   state1: {
     districts: []
   },

@@ -15,12 +15,7 @@ export const internationaliseFieldObject = (
     ...field,
     label: intl.formatMessage(field.label),
     options: field.options
-      ? field.options.map(opt => {
-          return {
-            ...opt,
-            label: intl.formatMessage(opt.label)
-          } as Ii18nSelectOption
-        })
+      ? internationaliseOptions(intl, field.options)
       : undefined
   } as Ii18nFormField
 }
