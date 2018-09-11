@@ -20,7 +20,7 @@ docker swarm join --token <TOKEN> opencrvs-staging.jembi.org:2377
 
 # check state from manager:
 docker node ls
-# login to private registry on manager
+# login to private registry on all nodes
 docker login
 
 # on manger, create required directories

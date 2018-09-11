@@ -14,6 +14,10 @@ const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
 
+function flushPromises() {
+  return new Promise(resolve => setImmediate(resolve))
+}
+
 beforeEach(() => {
   history.replaceState({}, '', '/')
   assign.mockClear()
@@ -25,6 +29,8 @@ it('renders without crashing', async () => {
 
 it("redirects user to SSO if user doesn't have a token", async () => {
   createTestApp()
+  await flushPromises()
+
   expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
 })
 
@@ -114,11 +120,14 @@ describe('when user has a valid token in local storage', () => {
     })
 
     describe('when user clicks the "mother" tab', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#tab_mother')
           .hostNodes()
           .simulate('click')
+
+        await flushPromises()
+        app.update()
       })
       it('changes to the mother details section', () => {
         expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
@@ -144,11 +153,13 @@ describe('when user has a valid token in local storage', () => {
     })
 
     describe('when user clicks "next" button', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#next_section')
           .hostNodes()
           .simulate('click')
+        await flushPromises()
+        app.update()
       })
       it('changes to the mother details section', () => {
         expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
@@ -157,11 +168,14 @@ describe('when user has a valid token in local storage', () => {
       })
     })
     describe('when user clicks the "father" tab', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#tab_father')
           .hostNodes()
           .simulate('click')
+
+        await flushPromises()
+        app.update()
       })
       it('changes to the father details section', () => {
         expect(app.find('#form_section_title_father').hostNodes()).toHaveLength(

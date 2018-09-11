@@ -162,7 +162,7 @@ type Location { # -> Location (mostly the same property name except:)
 input AddressInput {
   use: String
   type: AddressType
-  text: String # -> Reserve for geo-code
+  text: String # Reserve for geo-code
   line: [String]
   city: String
   district: String
@@ -176,7 +176,7 @@ input AddressInput {
 type Address { # -> Address (mostly the same property name except:)
   use: String
   type: AddressType
-  text: String # -> Reserve for geo-code
+  text: String # Reserve for geo-code
   line: [String]
   city: String
   district: String

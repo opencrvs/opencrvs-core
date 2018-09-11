@@ -19,9 +19,11 @@ export interface IFormField {
   fields?: IFormField[]
 }
 
+export type ViewType = 'form' | 'preview'
+
 export interface IFormSection {
   id: string
-  viewType: string
+  viewType: ViewType
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]

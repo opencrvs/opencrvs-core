@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from '../../components/ViewHeader'
-import { goToBirthRegistrationAsParent } from '../../navigation/navigationActions'
+import { goToBirthRegistrationAsParent } from 'src/navigation'
 import { createDraft, storeDraft } from '../../drafts'
 
 export const messages = defineMessages({

@@ -4,6 +4,7 @@ import { addressSameAsMother, permanentAddressSameAsMother } from '../address'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
+import { ViewType } from 'src/forms'
 
 export interface IFatherSectionFormData {
   firstName: string
@@ -107,7 +108,7 @@ export const messages = defineMessages({
 
 export const fatherSection = {
   id: 'father',
-  viewType: 'form',
+  viewType: 'form' as ViewType,
   name: messages.fatherTab,
   title: messages.fatherTitle,
   fields: [

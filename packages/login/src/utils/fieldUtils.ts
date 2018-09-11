@@ -41,7 +41,3 @@ export const getFieldProps = (
     label
   }
 }
-
-export const getFocusState = (id: string, fieldToFocus?: string): boolean => {
-  return fieldToFocus === id
-}

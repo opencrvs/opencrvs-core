@@ -3,6 +3,7 @@ import { ValidIndicator } from '@opencrvs/components/lib/forms'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
+import { ViewType } from 'src/forms'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -78,7 +79,7 @@ const messages = defineMessages({
 
 export const motherSection = {
   id: 'mother',
-  viewType: 'form',
+  viewType: 'form' as ViewType,
   name: messages.motherTab,
   title: messages.motherTitle,
   fields: [

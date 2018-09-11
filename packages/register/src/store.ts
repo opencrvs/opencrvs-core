@@ -22,6 +22,7 @@ import {
   registerFormReducer,
   IRegisterFormState
 } from './forms/register/reducer'
+import { navigationReducer, INavigationState } from 'src/navigation'
 
 export interface IStoreState {
   profile: ProfileState
@@ -29,6 +30,7 @@ export interface IStoreState {
   i18n: IntlState
   drafts: IDraftsState
   registerForm: IRegisterFormState
+  navigation: INavigationState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -36,7 +38,8 @@ const reducers = combineReducers<IStoreState>({
   router: routerReducer,
   i18n: intlReducer,
   drafts: draftsReducer,
-  registerForm: registerFormReducer
+  registerForm: registerFormReducer,
+  navigation: navigationReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator
