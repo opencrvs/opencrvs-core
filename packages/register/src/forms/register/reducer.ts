@@ -50,7 +50,7 @@ export const initialState: IRegisterFormState = {
             name: 'documents',
             type: 'documents',
             // Just a dummy message here - not actually shown anywhere
-            label: messages.registrationTab,
+            label: messages.documentsTab,
             required: false,
             initialValue: '',
             validate: []
