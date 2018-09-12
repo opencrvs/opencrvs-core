@@ -14,7 +14,8 @@ import {
   ITextInputProps,
   IInputFieldProps,
   RadioGroup,
-  SubSectionDivider
+  SubSectionDivider,
+  CheckboxGroup
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
 import {
@@ -63,7 +64,7 @@ type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
-  onSetFieldValue: (name: string, value: string) => void
+  onSetFieldValue: (name: string, value: string | string[]) => void
   onChange: (e: React.ChangeEvent<any>) => void
   meta: MetaPropsWithMessageDescriptors
 } & Omit<Omit<IInputFieldProps, 'id'>, 'meta'> &
@@ -170,6 +171,17 @@ function GeneratedInputField({
         component={RadioGroup}
         id={field.name}
         onChange={(value: string) => onSetFieldValue(field.name, value)}
+        {...field}
+        {...props}
+      />
+    )
+  }
+  if (field.type === 'checkboxGroup') {
+    return (
+      <LocalizedInputField
+        component={CheckboxGroup}
+        id={field.name}
+        onChange={(value: string[]) => onSetFieldValue(field.name, value)}
         {...field}
         {...props}
       />

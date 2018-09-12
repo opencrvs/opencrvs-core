@@ -89,6 +89,21 @@ const messages = defineMessages({
     defaultMessage: 'Comments or notes',
     id: 'formFields.registration.commentsOrNotes',
     description: 'Input label for comments or notes textarea'
+  },
+  registrationCertificateBN: {
+    id: 'formFields.registration.certificateLanguage.bn',
+    description: 'Selection label for "bn" option',
+    defaultMessage: 'Bangla'
+  },
+  registrationCertificateEN: {
+    id: 'formFields.registration.certificateLanguage.en',
+    description: 'Selection label for "en" option',
+    defaultMessage: 'English'
+  },
+  registrationCertificateOther: {
+    id: 'formFields.registration.certificateLanguage.other',
+    description: 'Selection label for "other" option',
+    defaultMessage: 'Other'
   }
 })
 
@@ -167,13 +182,26 @@ export const registrationSection: IFormSection = {
       validate: [phoneNumberFormat]
     },
     {
-      // TODO
       name: 'registrationCertificateLanguage',
-      type: 'text',
+      type: 'checkboxGroup',
       label: messages.registrationCertificateLanguage,
       required: true,
-      initialValue: '',
-      validate: []
+      initialValue: [],
+      validate: [],
+      options: [
+        {
+          value: 'bn',
+          label: messages.registrationCertificateBN
+        },
+        {
+          value: 'en',
+          label: messages.registrationCertificateEN
+        },
+        {
+          value: 'other',
+          label: messages.registrationCertificateOther
+        }
+      ]
     },
     {
       name: 'paperFormNumber',

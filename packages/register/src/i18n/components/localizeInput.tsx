@@ -12,7 +12,7 @@ export type MetaPropsWithMessageDescriptors = {
 
 type PropsForFinalComponent = Omit<IInputFieldProps, 'meta'> & {
   meta: MetaPropsWithMessageDescriptors
-  onChange: (value: string | React.ChangeEvent<any>) => void
+  onChange: (value: string | string[] | React.ChangeEvent<any>) => void
 }
 
 export function localizeInput<InputComponentProps>(

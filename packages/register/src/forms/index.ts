@@ -17,7 +17,7 @@ export interface IFormField {
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
-  initialValue?: string
+  initialValue?: string | string[]
   conditionals?: IConditional[]
 }
 
