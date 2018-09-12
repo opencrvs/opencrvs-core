@@ -12,6 +12,83 @@ const messages = defineMessages({
     id: 'register.form.section.registrationTitle',
     defaultMessage: 'Registration',
     description: 'Form section title for Registration'
+  },
+  whoIsPresentLabel: {
+    defaultMessage: "Who's present for the registration",
+    id: 'formFields.registration.whoIsPresent',
+    description: "Input label for Who's present input"
+  },
+  presentBoth: {
+    id: 'formFields.registration.whoIsPresent.both',
+    defaultMessage: 'Both Parents',
+    description: 'Label for "Both Parents" select option'
+  },
+  presentMother: {
+    id: 'formFields.registration.whoIsPresent.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for "Mother" select option'
+  },
+  presentFather: {
+    id: 'formFields.registration.whoIsPresent.father',
+    defaultMessage: 'Father',
+    description: 'Label for "Father" select option'
+  },
+  presentOther: {
+    id: 'formFields.registration.whoIsPresent.other',
+    defaultMessage: 'Other',
+    description: 'Label for "Other" select option'
+  },
+  whoseContactDetailsLabel: {
+    defaultMessage:
+      'Whose contact details would the informant want to share for communication purposes?',
+    id: 'formFields.registration.whoseContactDetails',
+    description: 'Input label for contact details person'
+  },
+  contactDetailsBoth: {
+    id: 'formFields.registration.whoseContactDetails.both',
+    defaultMessage: 'Both Parents',
+    description: 'Label for "Both Parents" select option'
+  },
+  contactDetailsMother: {
+    id: 'formFields.registration.whoseContactDetails.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for "Mother" select option'
+  },
+  contactDetailsFather: {
+    id: 'formFields.registration.whoseContactDetails.father',
+    defaultMessage: 'Father',
+    description: 'Label for "Father" select option'
+  },
+  contactDetailsOther: {
+    id: 'formFields.registration.whoseContactDetails.other',
+    defaultMessage: 'Other',
+    description: 'Label for "Other" select option'
+  },
+  registrationEmailLabel: {
+    defaultMessage: 'Email address',
+    id: 'formFields.registration.email',
+    description: 'Input label for email input'
+  },
+  registrationPhoneLabel: {
+    defaultMessage: 'Phone number',
+    id: 'formFields.registration.phone',
+    description: 'Input label for phone input'
+  },
+  registrationCertificateLanguage: {
+    defaultMessage:
+      'Which languages does the informant want the certificate issued in?',
+    id: 'formFields.registration.certificateLanguage',
+    description: 'Input label for certificate language checkboxes'
+  },
+  paperFormNumberLabel: {
+    defaultMessage: 'Paper form number',
+    id: 'formFields.registration.paperFormNumber',
+    description: 'Input label for paper form number input'
+  },
+  commentsOrNotesLabel: {
+    defaultMessage: 'Comments or notes',
+    id: 'formFields.registration.commentsOrNotes',
+    description: 'Input label for comments or notes textarea'
   }
 })
 
@@ -24,104 +101,59 @@ export const registrationSection: IFormSection = {
     {
       name: 'whoIsPresent',
       type: 'select',
-      label: {
-        defaultMessage: "Who's present for the registration",
-        id: 'formFields.registration.whoIsPresent',
-        description: "Input label for Who's present input"
-      },
+      label: messages.whoIsPresentLabel,
       required: true,
       initialValue: '',
       validate: [],
       options: [
         {
           value: 'BOTH',
-          label: {
-            id: 'formFields.registration.whoIsPresent.both',
-            defaultMessage: 'Both Parents',
-            description: 'Label for "Both Parents" select option'
-          }
+          label: messages.presentBoth
         },
         {
           value: 'MOTHER',
-          label: {
-            id: 'formFields.registration.whoIsPresent.mother',
-            defaultMessage: 'Mother',
-            description: 'Label for "Mother" select option'
-          }
+          label: messages.presentMother
         },
         {
           value: 'FATHER',
-          label: {
-            id: 'formFields.registration.whoIsPresent.father',
-            defaultMessage: 'Father',
-            description: 'Label for "Father" select option'
-          }
+          label: messages.presentFather
         },
         {
           value: 'OTHER',
-          label: {
-            id: 'formFields.registration.whoIsPresent.other',
-            defaultMessage: 'Other',
-            description: 'Label for "Other" select option'
-          }
+          label: messages.presentOther
         }
       ]
     },
     {
       name: 'whoseContactDetails',
       type: 'select',
-      label: {
-        defaultMessage:
-          'Whose contact details would the informant want to share for communication purposes?',
-        id: 'formFields.registration.whoseContactDetails',
-        description: 'Input label for contact details person'
-      },
+      label: messages.whoseContactDetailsLabel,
       required: true,
       initialValue: '',
       validate: [],
       options: [
         {
           value: 'BOTH',
-          label: {
-            id: 'formFields.registration.whoseContactDetails.both',
-            defaultMessage: 'Both Parents',
-            description: 'Label for "Both Parents" select option'
-          }
+          label: messages.contactDetailsBoth
         },
         {
           value: 'MOTHER',
-          label: {
-            id: 'formFields.registration.whoseContactDetails.mother',
-            defaultMessage: 'Mother',
-            description: 'Label for "Mother" select option'
-          }
+          label: messages.contactDetailsMother
         },
         {
           value: 'FATHER',
-          label: {
-            id: 'formFields.registration.whoseContactDetails.father',
-            defaultMessage: 'Father',
-            description: 'Label for "Father" select option'
-          }
+          label: messages.contactDetailsFather
         },
         {
           value: 'OTHER',
-          label: {
-            id: 'formFields.registration.whoseContactDetails.other',
-            defaultMessage: 'Other',
-            description: 'Label for "Other" select option'
-          }
+          label: messages.contactDetailsOther
         }
       ]
     },
     {
       name: 'registrationEmail',
       type: 'text',
-      label: {
-        defaultMessage: 'Email address',
-        id: 'formFields.registration.email',
-        description: 'Input label for email input'
-      },
+      label: messages.registrationEmailLabel,
       required: true,
       initialValue: '',
       validate: []
@@ -129,25 +161,16 @@ export const registrationSection: IFormSection = {
     {
       name: 'registrationPhone',
       type: 'text',
-      label: {
-        defaultMessage: 'Phone number',
-        id: 'formFields.registration.phone',
-        description: 'Input label for phone input'
-      },
+      label: messages.registrationPhoneLabel,
       required: true,
       initialValue: '',
       validate: [phoneNumberFormat]
     },
     {
+      // TODO
       name: 'registrationCertificateLanguage',
       type: 'text',
-      label: {
-        // TODO
-        defaultMessage:
-          'Which languages does the informant want the certificate issued in?',
-        id: 'formFields.registration.certificateLanguage',
-        description: 'Input label for certificate language checkboxes'
-      },
+      label: messages.registrationCertificateLanguage,
       required: true,
       initialValue: '',
       validate: []
@@ -155,11 +178,7 @@ export const registrationSection: IFormSection = {
     {
       name: 'paperFormNumber',
       type: 'text',
-      label: {
-        defaultMessage: 'Paper form number',
-        id: 'formFields.registration.paperFormNumber',
-        description: 'Input label for paper form number input'
-      },
+      label: messages.paperFormNumberLabel,
       required: true,
       initialValue: '',
       validate: []
@@ -167,11 +186,7 @@ export const registrationSection: IFormSection = {
     {
       name: 'commentsOrNotes',
       type: 'text',
-      label: {
-        defaultMessage: 'Comments or notes',
-        id: 'formFields.registration.commentsOrNotes',
-        description: 'Input label for comments or notes textarea'
-      },
+      label: messages.commentsOrNotesLabel,
       required: false,
       initialValue: '',
       validate: []
