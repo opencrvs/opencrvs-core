@@ -1,12 +1,12 @@
 import React = require('react')
 import styled from 'styled-components'
-import { Cross } from 'src/components/icons'
+import { Cross } from '../icons'
 
 interface IProps {
   title: string
-  actions: React.ComponentClass[]
+  actions: JSX.Element[]
   show: boolean
-  handleClose: () => {}
+  handleClose: () => void
 }
 
 const Backdrop = styled.div`
@@ -17,13 +17,15 @@ const Backdrop = styled.div`
   height: 100%;
   background-color: rgba(53, 73, 93, 0.78);
   z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 const ModalContent = styled.div`
-  width: 80%;
+  width: 70%;
   border-radius: 2px;
   background-color: ${({ theme }) => theme.colors.white};
-  margin: 50% auto;
   padding: 50px;
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
@@ -59,7 +61,7 @@ const ActionItems = styled.div`
   }
 `
 
-const TopRight = styled.button`
+const TopRight = styled.span`
   position: absolute;
   top: 15px;
   right: 15px;

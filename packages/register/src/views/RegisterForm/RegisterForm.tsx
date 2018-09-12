@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-import { Box } from '@opencrvs/components/lib/interface'
+import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
@@ -40,15 +40,26 @@ export const messages = defineMessages({
     defaultMessage: 'Save draft',
     description: 'Save draft button'
   },
-  preview: {
-    id: 'register.form.preview',
-    defaultMessage: 'Preview',
-    description: 'Preview button'
-  },
   next: {
     id: 'register.form.next',
     defaultMessage: 'Next',
     description: 'Next button'
+  },
+  preview: {
+    id: 'register.form.modal.preview',
+    defaultMessage: 'Preview',
+    description: 'Preview button on submit modal'
+  },
+  submitDescription: {
+    id: 'register.form.modal.submitDescription',
+    defaultMessage:
+      'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
+    description: 'Submit description text on submit modal'
+  },
+  submitButton: {
+    id: 'register.form.modal.submitButton',
+    defaultMessage: 'Submit',
+    description: 'Submit button on submit modal'
   }
 })
 
@@ -62,6 +73,11 @@ const FormViewContainer = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
+`
+
+const PreviewButton = styled.a`
+  text-decoration: underline;
+  color: ${({ theme }) => theme.colors.primary};
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -92,9 +108,23 @@ type Props = {
   setAllFieldsDirty: boolean
 }
 
-class RegisterFormView extends React.Component<
-  Props & DispatchProps & InjectedIntlProps & RouteComponentProps<{}>
-> {
+type FullProps = Props &
+  DispatchProps &
+  InjectedIntlProps &
+  RouteComponentProps<{}>
+
+type State = {
+  showSubmitModal: boolean
+}
+
+class RegisterFormView extends React.Component<FullProps, State> {
+  constructor(props: FullProps) {
+    super(props)
+    this.state = {
+      showSubmitModal: false
+    }
+  }
+
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     this.props.modifyDraft({
@@ -106,9 +136,16 @@ class RegisterFormView extends React.Component<
     })
   }
 
-  submitForm() {
-    console.log('Submit')
+  submitForm = () => {
+    this.setState({ showSubmitModal: true })
   }
+
+  toggleSubmitModalOpen = () => {
+    this.setState((prevState: State) => ({
+      showSubmitModal: !prevState.showSubmitModal
+    }))
+  }
+
   render() {
     const {
       goToTab,
@@ -172,6 +209,27 @@ class RegisterFormView extends React.Component<
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
+        <Modal
+          title="Are you ready to submit?"
+          actions={[
+            <PrimaryButton key="submit" onClick={() => history.push('/saved')}>
+              {intl.formatMessage(messages.submitButton)}
+            </PrimaryButton>,
+            <PreviewButton
+              key="preview"
+              onClick={() => {
+                this.toggleSubmitModalOpen()
+                document.documentElement.scrollTop = 0
+              }}
+            >
+              {intl.formatMessage(messages.preview)}
+            </PreviewButton>
+          ]}
+          show={this.state.showSubmitModal}
+          handleClose={this.toggleSubmitModalOpen}
+        >
+          {intl.formatMessage(messages.submitDescription)}
+        </Modal>
       </FormViewContainer>
     )
   }
