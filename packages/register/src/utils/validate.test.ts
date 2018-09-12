@@ -112,7 +112,8 @@ describe('validate', () => {
         },
         props: {
           locale: config.LOCALE.toUpperCase(),
-          format: '07123456789'
+          format: '07123456789',
+          min: 10
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)
