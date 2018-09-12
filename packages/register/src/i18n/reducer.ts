@@ -7,25 +7,25 @@ export interface IntlMessages {
   [key: string]: string
 }
 
+const languages = {
+  en: ENGLISH_STATE,
+  bn: BENGALI_STATE
+}
+
 export type IntlState = {
-  LANGUAGE: string
+  language: string
   messages: IntlMessages
+  languages: typeof languages
 }
 
 export const initialState: IntlState = {
-  LANGUAGE: 'en',
-  messages: ENGLISH_STATE.messages
+  language: 'en',
+  messages: ENGLISH_STATE.messages,
+  languages
 }
 
 const getNextMessages = (language: string): IntlMessages => {
-  switch (language) {
-    case 'en':
-      return ENGLISH_STATE.messages
-    case 'bn':
-      return BENGALI_STATE.messages
-    default:
-      return ENGLISH_STATE.messages
-  }
+  return languages[language]
 }
 
 export const intlReducer: LoopReducer<IntlState, actions.Action> = (
@@ -34,11 +34,11 @@ export const intlReducer: LoopReducer<IntlState, actions.Action> = (
 ): IntlState | Loop<IntlState, actions.Action> => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:
-      const messages = getNextMessages(action.payload.LANGUAGE)
+      const messages = getNextMessages(action.payload.language)
 
       return {
         ...state,
-        LANGUAGE: action.payload.LANGUAGE,
+        language: action.payload.language,
         messages
       }
     default:
