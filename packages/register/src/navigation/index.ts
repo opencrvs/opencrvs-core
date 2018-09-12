@@ -1,4 +1,4 @@
-import { push } from 'react-router-redux'
+import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
@@ -27,6 +27,10 @@ export type Action = GoToTabAction
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
+}
+
+export function goBack() {
+  return back()
 }
 
 export function goToBirthRegistrationAsParent(draftId: number) {

@@ -5,6 +5,8 @@ import { Hamburger, ArrowBack } from '@opencrvs/components/lib/icons'
 import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 import styled from '../styled-components'
+import { goBack as goBackAction } from 'src/navigation'
+import { connect } from 'react-redux'
 
 const messages = defineMessages({
   back: {
@@ -62,12 +64,14 @@ const BackButtonText = styled.span`
   margin-left: 14px;
 `
 
-class TopMenuComponent extends React.Component<InjectedIntlProps> {
+class TopMenuComponent extends React.Component<
+  { goBack: typeof goBackAction } & InjectedIntlProps
+> {
   render() {
-    const { intl } = this.props
+    const { intl, goBack } = this.props
     return (
       <TopMenuContainer>
-        <BackButtonContainer>
+        <BackButtonContainer onClick={goBack}>
           <BackButton icon={() => <ArrowBack />} />
           <BackButtonText>{intl.formatMessage(messages.back)}</BackButtonText>
         </BackButtonContainer>
@@ -79,4 +83,6 @@ class TopMenuComponent extends React.Component<InjectedIntlProps> {
   }
 }
 
-export const TopMenu = injectIntl<{}>(TopMenuComponent)
+export const TopMenu = connect(null, { goBack: goBackAction })(
+  injectIntl<{}>(TopMenuComponent)
+)
