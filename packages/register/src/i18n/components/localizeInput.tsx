@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, InjectedIntlProps, FormattedMessage } from 'react-intl'
 import { IInputFieldProps } from '@opencrvs/components/lib/forms'
 import { IValidationResult } from '../../utils/validate'
 import { Omit } from '../../utils'
@@ -10,9 +10,13 @@ export type MetaPropsWithMessageDescriptors = {
   touched: boolean
 }
 
-type PropsForFinalComponent = Omit<IInputFieldProps, 'meta'> & {
+type PropsForFinalComponent = Omit<
+  Omit<IInputFieldProps, 'meta'>,
+  'description'
+> & {
   meta: MetaPropsWithMessageDescriptors
-  onChange: (value: string | React.ChangeEvent<any>) => void
+  description?: FormattedMessage.MessageDescriptor
+  onChange: (value: string | string[] | React.ChangeEvent<any>) => void
 }
 
 export function localizeInput<InputComponentProps>(
@@ -23,11 +27,19 @@ export function localizeInput<InputComponentProps>(
     {}
   > {
     render() {
-      const { meta, intl } = this.props
+      const { meta, intl, description } = this.props
 
       return (
         <Component
           {...this.props}
+          description={
+            description &&
+            intl.formatMessage(
+              // No idea why cast was needed. Typescript doesn't
+              // seem to figure out it can't be undefined anymore
+              description as FormattedMessage.MessageDescriptor
+            )
+          }
           meta={{
             touched: meta.touched,
             error:

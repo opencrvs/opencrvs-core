@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { withFormik, FormikProps } from 'formik'
 import { isEqual } from 'lodash'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl, FormattedMessage } from 'react-intl'
 import { internationaliseFieldObject } from '../../forms/utils'
 import {
   InputField,
@@ -14,7 +14,8 @@ import {
   ITextInputProps,
   IInputFieldProps,
   RadioGroup,
-  SubSectionDivider
+  SubSectionDivider,
+  CheckboxGroup
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
 import {
@@ -63,9 +64,10 @@ type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
-  onSetFieldValue: (name: string, value: string) => void
+  onSetFieldValue: (name: string, value: string | string[]) => void
   onChange: (e: React.ChangeEvent<any>) => void
   meta: MetaPropsWithMessageDescriptors
+  description?: FormattedMessage.MessageDescriptor
 } & Omit<Omit<IInputFieldProps, 'id'>, 'meta'> &
   InputProps
 
@@ -175,6 +177,17 @@ function GeneratedInputField({
       />
     )
   }
+  if (field.type === 'checkboxGroup') {
+    return (
+      <LocalizedInputField
+        component={CheckboxGroup}
+        id={field.name}
+        onChange={(value: string[]) => onSetFieldValue(field.name, value)}
+        {...field}
+        {...props}
+      />
+    )
+  }
 
   if (field.type === 'date') {
     return (
@@ -182,17 +195,6 @@ function GeneratedInputField({
         component={DateField}
         onChange={(value: string) => onSetFieldValue(field.name, value)}
         id={field.name}
-        {...field}
-        {...props}
-      />
-    )
-  }
-  if (field.type === 'textarea') {
-    return (
-      <LocalizedInputField
-        component={TextArea}
-        id={field.name}
-        onChange={onChange}
         {...field}
         {...props}
       />
