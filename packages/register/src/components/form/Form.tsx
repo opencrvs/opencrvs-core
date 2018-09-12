@@ -198,17 +198,6 @@ function GeneratedInputField({
       />
     )
   }
-  if (field.type === 'textarea') {
-    return (
-      <LocalizedInputField
-        component={TextArea}
-        id={field.name}
-        onChange={onChange}
-        {...field}
-        {...props}
-      />
-    )
-  }
   if (field.type === 'subSection') {
     return (
       <SubSectionDivider

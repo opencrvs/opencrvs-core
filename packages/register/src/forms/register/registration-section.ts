@@ -185,7 +185,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'commentsOrNotes',
-      type: 'text',
+      type: 'textarea',
       label: messages.commentsOrNotesLabel,
       required: false,
       initialValue: '',
