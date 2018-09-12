@@ -55,10 +55,8 @@ export const messages = defineMessages({
 })
 
 const dynamicValidationProps = {
-  minLength: {
-    min: 10
-  },
   phoneNumberFormat: {
+    min: 10,
     locale: config.LOCALE.toUpperCase(),
     format: messages.mobileNumberFormat.defaultMessage
   }
@@ -77,7 +75,7 @@ export const required: Validation = (value: string) =>
 
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
-    ? { message: messages.minLength, values: dynamicValidationProps.minLength }
+    ? { message: messages.minLength, props: { min } }
     : undefined
 }
 
@@ -91,6 +89,6 @@ export const phoneNumberFormat: Validation = (value: string) => {
     ? undefined
     : {
         message: messages.phoneNumberFormat,
-        values: dynamicValidationProps.phoneNumberFormat
+        props: dynamicValidationProps.phoneNumberFormat
       }
 }
