@@ -9,7 +9,7 @@ const styledInputLabel = styled.label.attrs<IInputLabel>({})
 
 const StyledInputLabel = styledInputLabel`
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
+  font-size: 18px;
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.accent};
 
