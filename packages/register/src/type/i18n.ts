@@ -1,5 +1,5 @@
 export interface Ii18n {
-  LANGUAGE: string
+  language: string
 }
 
 export interface IntlMessages {
