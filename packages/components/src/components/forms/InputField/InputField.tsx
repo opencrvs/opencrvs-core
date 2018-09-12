@@ -9,6 +9,7 @@ export interface IInputFieldProps {
   id: string
   label?: string
   placeholder?: string
+  description?: string
   required?: boolean
   disabled?: boolean
   maxLength?: number
@@ -53,6 +54,12 @@ const Padding = styled.span`
   color: ${({ theme }) => theme.colors.accent};
 `
 
+const InputDescription = styled.p`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.copy};
+`
+
 const renderComponentOrString = (
   componentOrString: React.ComponentClass<any> | string
 ) => {
@@ -72,6 +79,7 @@ export class InputField<
       label,
       required = true,
       placeholder,
+      description,
       component = TextInput,
       meta
     } = this.props
@@ -116,6 +124,8 @@ export class InputField<
               {meta.error}
             </InputError>
           )}
+
+        {description && <InputDescription>{description}</InputDescription>}
       </div>
     )
   }

@@ -4,18 +4,9 @@ import { defineMessages } from 'react-intl'
 import { childSection } from './child-section'
 import { motherSection } from './mother-section'
 import { fatherSection } from './father-section'
+import { registrationSection } from './registration-section'
 
 const messages = defineMessages({
-  registrationTab: {
-    id: 'register.form.tabs.registrationTab',
-    defaultMessage: 'Registration',
-    description: 'Tab title for Registration'
-  },
-  registrationTitle: {
-    id: 'register.form.section.registrationTitle',
-    defaultMessage: 'Registration',
-    description: 'Form section title for Registration'
-  },
   documentsTab: {
     id: 'register.form.tabs.documentsTab',
     defaultMessage: 'Documents',
@@ -48,13 +39,7 @@ export const initialState: IRegisterFormState = {
       childSection,
       motherSection,
       fatherSection,
-      {
-        id: 'registration',
-        viewType: 'form',
-        name: messages.registrationTab,
-        title: messages.registrationTitle,
-        fields: []
-      },
+      registrationSection,
       {
         id: 'documents',
         viewType: 'form',
@@ -65,7 +50,7 @@ export const initialState: IRegisterFormState = {
             name: 'documents',
             type: 'documents',
             // Just a dummy message here - not actually shown anywhere
-            label: messages.registrationTab,
+            label: messages.documentsTab,
             required: false,
             initialValue: '',
             validate: []
