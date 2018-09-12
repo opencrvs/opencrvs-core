@@ -60,7 +60,17 @@ export const initialState: IRegisterFormState = {
         viewType: 'form',
         name: messages.documentsTab,
         title: messages.documentsTitle,
-        fields: []
+        fields: [
+          {
+            name: 'documents',
+            type: 'documents',
+            // Just a dummy message here - not actually shown anywhere
+            label: messages.registrationTab,
+            required: false,
+            initialValue: '',
+            validate: []
+          }
+        ]
       },
       {
         id: 'preview',
