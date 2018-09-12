@@ -20,40 +20,20 @@ interface IRadioOption {
 
 export interface IRadioGroup {
   options: IRadioOption[]
-  defaultValue?: string
   name: string
+  value: string
   onChange: (value: string) => {}
 }
 
-interface IState {
-  selected: string
-}
-
-export class RadioGroup extends React.Component<IRadioGroup, IState> {
-  constructor(props: IRadioGroup) {
-    super(props)
-    if (props.defaultValue) {
-      this.state = {
-        selected: props.defaultValue
-      }
-    } else {
-      this.state = {
-        selected: ''
-      }
+export class RadioGroup extends React.Component<IRadioGroup> {
+  change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (this.props.onChange) {
+      this.props.onChange(event.target.value)
     }
   }
 
-  change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const target = event.target
-    this.setState({ selected: target.value }, () => {
-      if (this.props.onChange) {
-        this.props.onChange(target.value)
-      }
-    })
-  }
-
   render() {
-    const { options, name, ...props } = this.props
+    const { options, value, name, ...props } = this.props
     return (
       <Wrapper>
         <List>
@@ -65,7 +45,7 @@ export class RadioGroup extends React.Component<IRadioGroup, IState> {
                 name={name}
                 label={option.label}
                 value={option.value}
-                selected={this.state.selected}
+                selected={value}
                 onChange={this.change}
               />
             )
