@@ -85,11 +85,6 @@ const messages = defineMessages({
     id: 'formFields.registration.paperFormNumber',
     description: 'Input label for paper form number input'
   },
-  commentsOrNotesLabel: {
-    defaultMessage: 'Comments or notes',
-    id: 'formFields.registration.commentsOrNotes',
-    description: 'Input label for comments or notes textarea'
-  },
   registrationCertificateBN: {
     id: 'formFields.registration.certificateLanguage.bn',
     description: 'Selection label for "bn" option',
@@ -104,6 +99,17 @@ const messages = defineMessages({
     id: 'formFields.registration.certificateLanguage.other',
     description: 'Selection label for "other" option',
     defaultMessage: 'Other'
+  },
+  commentsOrNotesLabel: {
+    defaultMessage: 'Comments or notes',
+    id: 'formFields.registration.commentsOrNotes',
+    description: 'Input label for comments or notes textarea'
+  },
+  commentsOrNotesDescription: {
+    id: 'formFields.registration.commentsOrNotes.description',
+    description: 'Help text for the notes field',
+    defaultMessage:
+      'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.'
   }
 })
 
@@ -217,7 +223,8 @@ export const registrationSection: IFormSection = {
       label: messages.commentsOrNotesLabel,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [],
+      description: messages.commentsOrNotesDescription
     }
   ]
 }

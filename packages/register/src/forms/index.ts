@@ -19,6 +19,7 @@ export interface IFormField {
   disabled?: boolean
   initialValue?: string | string[]
   conditionals?: IConditional[]
+  description?: FormattedMessage.MessageDescriptor
 }
 
 export interface IConditional {

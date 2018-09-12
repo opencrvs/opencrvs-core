@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { withFormik, FormikProps } from 'formik'
 import { isEqual } from 'lodash'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl, FormattedMessage } from 'react-intl'
 import { internationaliseFieldObject } from '../../forms/utils'
 import {
   InputField,
@@ -67,6 +67,7 @@ type GeneratedInputFieldProps = {
   onSetFieldValue: (name: string, value: string | string[]) => void
   onChange: (e: React.ChangeEvent<any>) => void
   meta: MetaPropsWithMessageDescriptors
+  description?: FormattedMessage.MessageDescriptor
 } & Omit<Omit<IInputFieldProps, 'id'>, 'meta'> &
   InputProps
 
