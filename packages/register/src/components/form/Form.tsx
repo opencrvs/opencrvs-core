@@ -63,7 +63,6 @@ type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
-  values: IFormSectionData
   onSetFieldValue: (name: string, value: string) => void
   onChange: (e: React.ChangeEvent<any>) => void
   meta: MetaPropsWithMessageDescriptors
@@ -150,7 +149,6 @@ function generateDynamicOptionsForField(
 
 function GeneratedInputField({
   field,
-  values,
   onChange,
   onSetFieldValue,
   ...props
@@ -358,7 +356,6 @@ class FormSectionComponent extends React.Component<Props> {
                     generateDynamicOptionsForField(field, values)
                   )}
                   onBlur={this.handleBlur}
-                  values={values}
                   value={values[field.name]}
                   onChange={handleChange}
                   meta={meta}
