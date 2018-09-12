@@ -224,7 +224,7 @@ function GeneratedInputField({
   if (field.type === 'documents') {
     return (
       <DocumentUpload
-        src="/assets/document-upload.jpg"
+        src="/assets/document-upload.png"
         alt="Dummy document upload"
       />
     )
