@@ -32,7 +32,7 @@ const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.secondary};
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 14px;
+  font-size: 16px;
   margin: 0;
   margin-top: 3px;
   strong {
