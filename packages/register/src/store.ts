@@ -18,6 +18,10 @@ import { profileReducer, ProfileState } from './profile/profileReducer'
 
 import { intlReducer, IntlState } from './i18n/reducer'
 import { draftsReducer, IDraftsState } from './drafts'
+import {
+  registerFormReducer,
+  IRegisterFormState
+} from './forms/register/reducer'
 import { navigationReducer, INavigationState } from 'src/navigation'
 
 export interface IStoreState {
@@ -25,6 +29,7 @@ export interface IStoreState {
   router: RouterState
   i18n: IntlState
   drafts: IDraftsState
+  registerForm: IRegisterFormState
   navigation: INavigationState
 }
 
@@ -33,6 +38,7 @@ const reducers = combineReducers<IStoreState>({
   router: routerReducer,
   i18n: intlReducer,
   drafts: draftsReducer,
+  registerForm: registerFormReducer,
   navigation: navigationReducer
 })
 

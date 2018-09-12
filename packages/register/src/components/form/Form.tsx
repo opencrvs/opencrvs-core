@@ -2,7 +2,7 @@ import * as React from 'react'
 import { withFormik, FormikProps } from 'formik'
 import { isEqual } from 'lodash'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-
+import { internationaliseFieldObject } from '../../forms/utils'
 import {
   InputField,
   TextInput,
@@ -13,14 +13,15 @@ import {
   IDateFieldProps,
   ITextInputProps,
   IInputFieldProps,
-  RadioGroup
+  RadioGroup,
+  SubSectionDivider
 } from '@opencrvs/components/lib/forms'
 import styled from '../../styled-components'
 import {
   IFormField,
   Ii18nFormField,
-  Ii18nSelectOption,
-  IFormSectionData
+  IFormSectionData,
+  IConditional
 } from '../../forms'
 import { Omit } from '../../utils'
 import { IValidationResult } from '../../utils/validate'
@@ -29,6 +30,7 @@ import {
   MetaPropsWithMessageDescriptors
 } from '../../i18n/components/localizeInput'
 import { getValidationErrorsForForm } from '../../forms/validation'
+import { addressOptions } from '../../forms/address'
 
 const FormItem = styled.div`
   margin-bottom: 2em;
@@ -42,11 +44,26 @@ const DocumentUpload = styled.img`
   width: 100%;
 `
 
+const getConditionalActions = (
+  field: IFormField,
+  values: IFormSectionData
+): string[] => {
+  if (!field.conditionals) {
+    return []
+  }
+  return field.conditionals
+    .filter(conditional =>
+      /* tslint:disable-next-line: no-eval */
+      eval(conditional.expression)
+    )
+    .map((conditional: IConditional) => conditional.action)
+}
+
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
   field: Ii18nFormField
-  setFieldValue: (name: string, value: string) => void
+  onSetFieldValue: (name: string, value: string) => void
   onChange: (e: React.ChangeEvent<any>) => void
   meta: MetaPropsWithMessageDescriptors
 } & Omit<Omit<IInputFieldProps, 'id'>, 'meta'> &
@@ -54,10 +71,86 @@ type GeneratedInputFieldProps = {
 
 const LocalizedInputField = localizeInput(InputField)
 
+const getDynamicSelectOptions = (
+  field: IFormField,
+  values: IFormSectionData
+) => {
+  switch (field.name) {
+    case 'district':
+      return addressOptions[values.state].districts
+
+    case 'districtPermanent':
+      return addressOptions[values.statePermanent].districts
+
+    case 'addressLine4':
+      if (
+        addressOptions[values.state][values.district] &&
+        addressOptions[values.state][values.district].upazilas
+      ) {
+        return addressOptions[values.state][values.district].upazilas
+      } else {
+        return []
+      }
+    case 'addressLine4Permanent':
+      if (
+        addressOptions[values.statePermanent][values.districtPermanent] &&
+        addressOptions[values.statePermanent][values.districtPermanent].upazilas
+      ) {
+        return addressOptions[values.statePermanent][values.districtPermanent]
+          .upazilas
+      } else {
+        return []
+      }
+    case 'addressLine3Options1':
+      if (
+        addressOptions[values.state][values.district] &&
+        addressOptions[values.state][values.district][values.addressLine4] &&
+        addressOptions[values.state][values.district][values.addressLine4]
+          .unions
+      ) {
+        return addressOptions[values.state][values.district][
+          values.addressLine4
+        ].unions
+      } else {
+        return []
+      }
+    case 'addressLine3Options1Permanent':
+      if (
+        addressOptions[values.statePermanent][values.districtPermanent] &&
+        addressOptions[values.statePermanent][values.districtPermanent][
+          values.addressLine4Permanent
+        ] &&
+        addressOptions[values.statePermanent][values.districtPermanent][
+          values.addressLine4Permanent
+        ].unions
+      ) {
+        return addressOptions[values.statePermanent][values.districtPermanent][
+          values.addressLine4Permanent
+        ].unions
+      } else {
+        return []
+      }
+    default:
+      return []
+  }
+}
+
+function generateDynamicOptionsForField(
+  field: IFormField,
+  values: IFormSectionData
+) {
+  return {
+    ...field,
+    options: field.dynamicOptions
+      ? getDynamicSelectOptions(field, values)
+      : field.options
+  }
+}
+
 function GeneratedInputField({
   field,
   onChange,
-  setFieldValue,
+  onSetFieldValue,
   ...props
 }: GeneratedInputFieldProps) {
   if (field.type === 'select') {
@@ -65,7 +158,7 @@ function GeneratedInputField({
       <LocalizedInputField
         component={Select}
         id={field.name}
-        onChange={(value: string) => setFieldValue(field.name, value)}
+        onChange={(value: string) => onSetFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -76,7 +169,7 @@ function GeneratedInputField({
       <LocalizedInputField
         component={RadioGroup}
         id={field.name}
-        onChange={(value: string) => setFieldValue(field.name, value)}
+        onChange={(value: string) => onSetFieldValue(field.name, value)}
         {...field}
         {...props}
       />
@@ -86,8 +179,8 @@ function GeneratedInputField({
   if (field.type === 'date') {
     return (
       <LocalizedInputField
-        onChange={(value: string) => setFieldValue(field.name, value)}
         component={DateField}
+        onChange={(value: string) => onSetFieldValue(field.name, value)}
         id={field.name}
         {...field}
         {...props}
@@ -98,14 +191,34 @@ function GeneratedInputField({
     return (
       <LocalizedInputField
         component={TextArea}
-        onChange={onChange}
         id={field.name}
+        onChange={onChange}
         {...field}
         {...props}
       />
     )
   }
-
+  if (field.type === 'textarea') {
+    return (
+      <LocalizedInputField
+        component={TextArea}
+        id={field.name}
+        onChange={onChange}
+        {...field}
+        {...props}
+      />
+    )
+  }
+  if (field.type === 'subSection') {
+    return (
+      <SubSectionDivider
+        key={`${field.name}`}
+        label={field.label}
+        {...field}
+        {...props}
+      />
+    )
+  }
   if (field.type === 'documents') {
     return (
       <DocumentUpload
@@ -192,21 +305,6 @@ class FormSectionComponent extends React.Component<Props> {
       [key: string]: IValidationResult[]
     }
 
-    function internationaliseFieldObject(field: IFormField): Ii18nFormField {
-      return {
-        ...field,
-        label: intl.formatMessage(field.label),
-        options: field.options
-          ? field.options.map(opt => {
-              return {
-                ...opt,
-                label: intl.formatMessage(opt.label)
-              } as Ii18nSelectOption
-            })
-          : undefined
-      } as Ii18nFormField
-    }
-
     /*
      * HACK
      *
@@ -235,20 +333,33 @@ class FormSectionComponent extends React.Component<Props> {
             } as MetaPropsWithMessageDescriptors
 
             const fieldErrors = errors[field.name]
+
             if (fieldErrors && fieldErrors.length > 0) {
               const [firstError] = fieldErrors
               meta.error = firstError
             }
 
+            const conditionalActions: string[] = getConditionalActions(
+              field,
+              values
+            )
+
+            if (conditionalActions.includes('hide')) {
+              return null
+            }
+
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
-                  field={internationaliseFieldObject(field)}
+                  field={internationaliseFieldObject(
+                    intl,
+                    generateDynamicOptionsForField(field, values)
+                  )}
                   onBlur={this.handleBlur}
-                  onChange={handleChange}
-                  setFieldValue={setFieldValue}
                   value={values[field.name]}
+                  onChange={handleChange}
                   meta={meta}
+                  onSetFieldValue={setFieldValue}
                 />
               </FormItem>
             )

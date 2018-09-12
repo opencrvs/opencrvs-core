@@ -7,6 +7,7 @@ export interface IChildSectionFormData {
   bar: string
   baz: string
 }
+import { IFormSection } from '../index'
 
 const messages = defineMessages({
   childTab: {
@@ -186,7 +187,7 @@ const messages = defineMessages({
   }
 })
 
-export const childSection = {
+export const childSection: IFormSection = {
   id: 'child',
   viewType: 'form' as ViewType,
   name: messages.childTab,

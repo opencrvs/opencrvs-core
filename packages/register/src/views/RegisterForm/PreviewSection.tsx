@@ -9,12 +9,13 @@ import { Warning } from '@opencrvs/components/lib/icons'
 
 import styled from 'src/styled-components'
 
-import { birthParentForm } from 'src/forms/birth-parent'
-import { IFormSection, IFormField } from 'src/forms'
+import { IFormSection, IFormField, IForm } from 'src/forms'
 
 import { IDraft } from 'src/drafts'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
+import { getRegisterForm } from 'src/forms/register/selectors'
+import { IStoreState } from 'src/store'
 
 const FormAction = styled.div`
   display: flex;
@@ -48,9 +49,12 @@ export const messages = defineMessages({
 type DispatchProps = {
   goToTab: typeof goToTab
 }
-type Props = {
+type OwnProps = {
   draft: IDraft
   onSubmit: () => void
+}
+type Props = {
+  registerForm: IForm
 }
 
 const PreviewBox = styled(Box)`
@@ -115,12 +119,12 @@ const MissingFieldsWarningIcon = styled(Warning)`
 `
 
 class PreviewSectionForm extends React.Component<
-  Props & DispatchProps & InjectedIntlProps
+  Props & OwnProps & DispatchProps & InjectedIntlProps
 > {
   render() {
-    const { intl, draft } = this.props
+    const { intl, draft, registerForm } = this.props
 
-    const formSections = birthParentForm.sections.filter(
+    const formSections = registerForm.sections.filter(
       ({ viewType }) => viewType === 'form'
     )
 
@@ -256,6 +260,13 @@ class PreviewSectionForm extends React.Component<
   }
 }
 
-export const PreviewSection = connect<Props, DispatchProps>(null, {
-  goToTab
-})(injectIntl<Props>(PreviewSectionForm))
+export const PreviewSection = connect<Props, DispatchProps, OwnProps>(
+  (state: IStoreState, { draft, onSubmit }: OwnProps) => ({
+    onSubmit,
+    draft,
+    registerForm: getRegisterForm(state)
+  }),
+  {
+    goToTab
+  }
+)(injectIntl<Props & OwnProps>(PreviewSectionForm))
