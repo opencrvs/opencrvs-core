@@ -308,6 +308,7 @@ export const childSection: IFormSection = {
       type: 'text',
       label: messages.orderOfBirth,
       required: true,
+      initialValue: '',
       validate: []
     },
     {
@@ -323,7 +324,6 @@ export const childSection: IFormSection = {
       name: 'placeOfDelivery',
       type: 'select',
       label: messages.placeOfDelivery,
-      required: true,
       initialValue: '',
       validate: [],
       options: [{ value: '?', label: messages.defaultLabel }]
@@ -332,7 +332,6 @@ export const childSection: IFormSection = {
       name: 'deliveryInstitution',
       type: 'select',
       label: messages.deliveryInstitution,
-      required: true,
       initialValue: '',
       validate: [],
       options: [{ value: '?', label: messages.defaultLabel }]
@@ -341,7 +340,6 @@ export const childSection: IFormSection = {
       name: 'deliveryAddress',
       type: 'textarea',
       label: messages.deliveryAddress,
-      required: true,
       initialValue: '',
       validate: [],
       disabled: true
