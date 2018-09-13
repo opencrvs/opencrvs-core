@@ -23,7 +23,8 @@ import { SelectInformant } from './views/SelectInformant/SelectInformant'
 
 import { RegisterForm } from './views/RegisterForm/RegisterForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
-import ScrollToTop from '@opencrvs/register/src/components/ScrollToTop'
+import ScrollToTop from 'src/components/ScrollToTop'
+import { Home } from 'src/views/Home/Home'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -48,6 +49,11 @@ export class App extends React.Component<IAppProps, {}> {
                 <ScrollToTop>
                   <Page>
                     <Switch>
+                      <ProtectedRoute
+                        exact
+                        path={routes.HOME}
+                        component={Home}
+                      />
                       <ProtectedRoute
                         exact
                         path={routes.SELECT_VITAL_EVENT}
