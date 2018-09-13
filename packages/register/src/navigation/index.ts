@@ -2,7 +2,8 @@ import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_BIRTH_PARENT_FORM_TAB
+  DRAFT_BIRTH_PARENT_FORM_TAB,
+  SELECT_VITAL_EVENT
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 
@@ -27,6 +28,9 @@ export type Action = GoToTabAction
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
+}
+export function goToEvents() {
+  return push(SELECT_VITAL_EVENT)
 }
 
 export function goBack() {

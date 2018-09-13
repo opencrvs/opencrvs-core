@@ -73,6 +73,7 @@ describe('when user has a valid token in local storage', () => {
   describe('when user is in vital event selection view', () => {
     beforeEach(() => {
       history.replace(SELECT_VITAL_EVENT)
+      app.update()
     })
     it('lists the options', () => {
       expect(app.find('button#select_birth_event')).toHaveLength(1)
