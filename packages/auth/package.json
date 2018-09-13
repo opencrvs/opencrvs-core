@@ -11,7 +11,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "precommit": "lint-staged",
-    "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token"
+    "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
+    "request-token": "NODE_PATH=. ts-node resources/request-token"
   },
   "dependencies": {
     "@types/dotenv": "^4.0.3",
