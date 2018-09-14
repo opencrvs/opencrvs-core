@@ -68,17 +68,17 @@ export const messages = defineMessages({
     description: 'Label for form field: Family name'
   },
   fatherGivenNameEng: {
-    id: 'formFields.fatherGivenName',
+    id: 'formFields.fatherGivenNameEng',
     defaultMessage: 'Given name (in english)',
     description: 'Label for form field: Given name in english'
   },
   fatherMiddleNamesEng: {
-    id: 'formFields.fatherMiddleNames',
+    id: 'formFields.fatherMiddleNamesEng',
     defaultMessage: 'Middle name(s) (in english)',
     description: 'Label for form field: Middle names in english'
   },
   fatherFamilyNameEng: {
-    id: 'formFields.fatherFamilyName',
+    id: 'formFields.fatherFamilyNameEng',
     defaultMessage: 'Family name (in english)',
     description: 'Label for form field: Family name in english'
   },
@@ -172,7 +172,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: messages.nationality,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [conditionals.fathersDetailsExist]
@@ -342,7 +342,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [
@@ -495,7 +495,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [
