@@ -26,14 +26,16 @@ export interface IRadioGroup {
 }
 
 export class RadioGroup extends React.Component<IRadioGroup> {
-  change = (event: React.ChangeEvent<HTMLInputElement>) => {
+  change = (value: any) => {
     if (this.props.onChange) {
-      this.props.onChange(event.target.value)
+      this.props.onChange(value)
     }
   }
 
   render() {
     const { options, value, name, ...props } = this.props
+    //tslint:disable
+
     return (
       <Wrapper>
         <List>

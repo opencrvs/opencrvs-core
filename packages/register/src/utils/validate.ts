@@ -70,8 +70,12 @@ export const isAValidPhoneNumberFormat = (value: string): boolean => {
 export const requiredSymbol: Validation = (value: string) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: string) =>
-  value ? undefined : { message: messages.required }
+export const required: Validation = (value: string | boolean) => {
+  if (typeof value === 'string') {
+    return value !== '' ? undefined : { message: messages.required }
+  }
+  return value !== undefined ? undefined : { message: messages.required }
+}
 
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min

@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  InjectedIntlProps,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
 import { flatten, identity } from 'lodash'
 
 import { Box } from '@opencrvs/components/lib/interface'
@@ -9,7 +14,7 @@ import { Warning } from '@opencrvs/components/lib/icons'
 
 import styled from 'src/styled-components'
 
-import { IFormSection, IFormField, IForm } from 'src/forms'
+import { IFormSection, IFormField, IForm, IFormFieldValue } from 'src/forms'
 
 import { IDraft } from 'src/drafts'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -28,6 +33,16 @@ const FormPrimaryButton = styled(PrimaryButton)`
 `
 
 export const messages = defineMessages({
+  valueYes: {
+    id: 'register.form.valueYes',
+    defaultMessage: 'Yes',
+    description: 'Label for "Yes" answer'
+  },
+  valueNo: {
+    id: 'register.form.valueNo',
+    defaultMessage: 'No',
+    description: 'Label for "No" answer'
+  },
   submit: {
     id: 'register.form.submit',
     defaultMessage: 'Submit',
@@ -119,6 +134,18 @@ const MissingFieldsWarningIcon = styled(Warning)`
   top: -16px;
   left: -16px;
 `
+
+function renderValue(value: IFormFieldValue, intl: InjectedIntl) {
+  if (typeof value === 'string') {
+    return value
+  }
+  if (typeof value === 'boolean') {
+    return value
+      ? intl.formatMessage(messages.valueYes)
+      : intl.formatMessage(messages.valueNo)
+  }
+  return value
+}
 
 class PreviewSectionForm extends React.Component<
   Props & OwnProps & DispatchProps & InjectedIntlProps
@@ -246,7 +273,10 @@ class PreviewSectionForm extends React.Component<
                               {intl.formatMessage(messages.informationMissing)}
                             </InformationMissingLink>
                           ) : (
-                            draft.data[section.id][field.name]
+                            renderValue(
+                              draft.data[section.id][field.name],
+                              intl
+                            )
                           )}
                         </ListItemValue>
                       </ListItem>

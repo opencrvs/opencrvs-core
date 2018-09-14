@@ -2,9 +2,11 @@ import { Validation } from '../utils/validate'
 import { FormattedMessage } from 'react-intl'
 
 export interface ISelectOption {
-  value: string
+  value: string | boolean
   label: FormattedMessage.MessageDescriptor
 }
+
+export type IFormFieldValue = string | string[] | boolean
 
 export interface IFormField {
   name: string
@@ -17,7 +19,7 @@ export interface IFormField {
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
-  initialValue?: string | string[]
+  initialValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
 }

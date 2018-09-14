@@ -120,11 +120,11 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: messages.fathersDetailsExist,
       required: true,
-      initialValue: '',
+      initialValue: false,
       validate: [],
       options: [
-        { value: '1', label: messages.confirm },
-        { value: '0', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ]
     },
     {
@@ -317,11 +317,11 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: addressMessages.addressSameAsMother,
       required: true,
-      initialValue: '1',
+      initialValue: true,
       validate: [],
       options: [
-        { value: '1', label: addressMessages.confirm },
-        { value: '0', label: addressMessages.deny }
+        { value: true, label: addressMessages.confirm },
+        { value: false, label: addressMessages.deny }
       ],
       conditionals: [conditionals.fathersDetailsExist]
     },
@@ -470,11 +470,11 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: addressMessages.permanentAddressSameAsMother,
       required: true,
-      initialValue: '1',
+      initialValue: true,
       validate: [],
       options: [
-        { value: '1', label: messages.confirm },
-        { value: '0', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.fathersDetailsExist]
     },
