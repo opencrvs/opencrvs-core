@@ -52,15 +52,15 @@ export const getConditionalActionsForField = (
 export const conditionals: IConditionals = {
   fathersDetailsExist: {
     action: 'hide',
-    expression: 'values.fathersDetailsExist == 0'
+    expression: '!values.fathersDetailsExist'
   },
   permanentAddressSameAsMother: {
     action: 'hide',
-    expression: 'values.permanentAddressSameAsMother == 1'
+    expression: 'values.permanentAddressSameAsMother'
   },
   addressSameAsMother: {
     action: 'hide',
-    expression: 'values.addressSameAsMother == 1'
+    expression: 'values.addressSameAsMother'
   },
   countryPermanent: {
     action: 'hide',
