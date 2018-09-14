@@ -459,64 +459,63 @@ export const BENGALI_STATE = {
     'validations.mobilePhoneRegex': '07[0-9]{9,10}',
     'validations.mobileNumberFormat': '07123456789',
     'validations.requiredSymbol': '',
-    'register.form.submit': 'Submit',
-    'register.form.informationMissing': 'Information missing',
+    'register.form.submit': 'জমা দিন',
+    'register.form.informationMissing': 'অনুপস্থিত তথ্য',
     'register.form.missingFieldsDescription':
-      'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
-    'register.form.newBirthRegistration': 'New birth declaration',
-    'register.form.saveDraft': 'Save draft',
-    'register.form.next': 'Next',
-    'register.form.modal.preview': 'Preview',
+      'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
+    'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
+    'register.form.saveDraft': 'খসড়া সংরক্ষণ',
+    'register.form.next': 'পরবর্তী',
+    'register.form.modal.preview': 'প্রিভিউ',
     'register.form.modal.submitDescription':
-      'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
-    'register.form.modal.submitButton': 'Submit',
-    'register.savedRegistration.online.title': 'Declaration submitted',
+      '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
+    'register.form.modal.submitButton': 'জমা দিন',
+    'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
     'register.savedRegistration.online.desc':
-      'The declaration is now on its way for validation.',
-    'register.savedRegistration.offline.title':
-      'Declaration pending connectivity',
+      'তথ্য বিবরনী বৈধতা জন্য পর্যালোচিত হচ্ছে',
+    'register.savedRegistration.offline.title': 'অসম্পূর্ণ  সংযোগ',
     'register.savedRegistration.offline.desc':
-      'The declaration will automatically be sent out for validation once your device has internet connectivity.',
-    'register.savedRegistration.online.noticeCard.title': 'All done!',
-    'register.savedRegistration.offline.noticeCard.title': 'Almost there',
+      'ডিভাইসে ইন্টারনেট সংযোগ কালীন  ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
+    'register.savedRegistration.online.noticeCard.title': 'সমাপ্ত !',
+    'register.savedRegistration.offline.noticeCard.title': 'সম্পূর্ণ হচ্ছে',
     'register.savedRegistration.online.noticeCard.text':
-      'The birth declaration of First Middle Last Name has been successfully submitted to the registration office.',
+      'নবজাতের "নাম" সফলভাবে রেজিস্ট্রেশন অফিসে জমা দেওয়া হয়েছে।',
     'register.savedRegistration.offline.noticeCard.text':
-      'The birth declaration of First Middle Last Name is pending due to no internet connection. ',
-    'register.savedRegistration.trackingCard.title': 'Tracking ID number:',
+      'ডিভাইসে ইন্টারনেট সংযোগ কালীন ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
+    'register.savedRegistration.trackingCard.title': 'ট্র্যাকিং আইডি নম্বর:',
     'register.savedRegistration.trackingCard.text':
-      'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',
-    'register.savedRegistration.nextCard.title': 'What next?',
+      'এসএমএসের মাধ্যমে সংবাদদাতা নম্বরটি পাবেন, তবে নিশ্চিত করুন যে নম্বরটি লিখে রেখে পরবর্তী রেজিস্ট্রেশনের ধাপ এর জন্য সংরক্ষন করতে হবে।',
+    'register.savedRegistration.nextCard.title': 'পরবর্তী',
     'register.savedRegistration.online.nextCard.text1':
-      'You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.',
+      'রেজিস্ট্রেশন সম্পূর্ণ হলে অথবা প্রক্রিয়ায় কোন বিলম্ব থাকলে আপনাকে OpenCRVS এর মাধ্যমে জানানো হবে।',
     'register.savedRegistration.offline.nextCard.text1':
-      'All you need to do is login once you have internet connectivity on your device within the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.',
+      'পরবর্তী 7 দিনের মধ্যে ডিভাইসে ইন্টারনেট সংযোগ স্থাপন করার পরে আপনাকে লগইন করতে হবে। OpenCRVS স্বয়ংক্রিয়ভাবে ফর্ম জমা দেবে, তাই আপনাকে অন্য কিছু করার প্রয়োজন হবে না।',
     'register.savedRegistration.online.nextCard.text2':
-      'The informant has given their contact details and will also be informed when the registration is complete.',
+      'নিবন্ধন প্রক্রিয়া সম্পুর্ণ হলে সংবাদদাতা নিজ দায়িত্তে পৌছে দেবেন। ',
     'register.savedRegistration.offline.nextCard.text2':
-      'Once the declaration is succesfully submited, you and the informant will be notified when the registration is complete.',
-    'register.savedRegistration.buttons.back': 'Back to homescreen',
-    'register.savedRegistration.buttons.newDeclaration': 'New declaration',
-    'register.selectInformant.newBirthRegistration': 'New birth declaration',
-    'register.selectInformant.informantTitle': 'Who is the informant?',
+      'ঘোষণাটি সফলভাবে দাখিল করা হলে রেজিস্ট্রেশন শেষ। আপনি এবং সংবাদদাতাকে অবহিত করা হবে।',
+    'register.savedRegistration.buttons.back': 'হোমপেইজে ফিরে  যান',
+    'register.savedRegistration.buttons.newDeclaration': 'নতুন ঘোষণা', // Google translated
+    'register.selectInformant.newBirthRegistration': ' জন্ম ঘোষণা',
+    'register.selectInformant.informantTitle': 'সংবাদদাতা',
     'register.selectInformant.informantDescription':
-      'Tell us who is providing the details, and check what information is needed to submit the form.',
-    'register.selectInformant.parentInformantTitle': 'Parent',
+      'কে ঘোষণা ফর্মে বিস্তারিত ও প্রয়োজনীয় তথ্য উপাত্ত পর্যবেক্ষণ ও জমাদান করিবে।',
+    'register.selectInformant.parentInformantTitle': 'পিতামাতা',
     'register.selectInformant.parentInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>child, mother</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>father.</strong>',
-    'register.selectInformant.otherInformantTitle': 'Someone else',
+      '<strong>প্রয়োজনীয়</strong>: শিশু এবং মায়ের বিবরণ' +
+      '<br /><strong>ঐচ্ছিক</strong>: বাবা বিস্তারিত বিবরণ',
+    'register.selectInformant.otherInformantTitle': 'অন্য কেউ',
     'register.selectInformant.otherInformantDescription':
-      'Required: Details of the child and informant. Optional: Details of the mother/father.',
-    'register.selectInformant.selfInformantTitle': 'Self (18+)',
+      'প্রয়োজনীয়: শিশু এবং তথ্যপ্রদানকারীর বিবরণ. ঐচ্ছিক: মা / বাবা বিস্তারিত বিবরণ.',
+    'register.selectInformant.selfInformantTitle': 'নিজ (১৮+)',
     'register.selectInformant.selfInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
+      '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
+      '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle':
-      'Declare a new vital event',
+      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
     'register.selectVitalEvent.registerNewEventDesc':
-      'Start by selecting the event you want to declare.',
-    'register.selectVitalEvent.birthActionTitle': 'Birth',
-    'register.selectVitalEvent.deathActionTitle': 'Death'
+      'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
+    'register.selectVitalEvent.birthActionTitle': 'জন্ম',
+    'register.selectVitalEvent.deathActionTitle': 'মৃত্যু'
   }
 }
