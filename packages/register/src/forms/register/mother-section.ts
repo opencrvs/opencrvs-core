@@ -140,9 +140,9 @@ export const motherSection: IFormSection = {
       type: 'select',
       label: messages.nationality,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
-      options: [{ value: 'bg', label: messages.nationalityBangladesh }]
+      options: countries
     },
     {
       name: 'motherGivenName',
@@ -282,7 +282,7 @@ export const motherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries
     },
@@ -395,7 +395,7 @@ export const motherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries
     },
