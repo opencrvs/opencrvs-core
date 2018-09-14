@@ -172,7 +172,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: messages.nationality,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [conditionals.fathersDetailsExist]
@@ -342,7 +342,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [
@@ -495,7 +495,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [
