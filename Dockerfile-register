@@ -9,8 +9,8 @@ ENV NPM_CONFIG_LOGLEVEL warn
 # Default build env
 ENV REACT_APP_API_GATEWAY_URL=https://gateway.opencrvs-staging.jembi.org/
 ENV REACT_APP_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
-ENV REACT_APP_LOCALE=gbr
-ENV REACT_APP_LANGUAGE=en
+ENV REACT_APP_LOCALE=bgd
+ENV REACT_APP_LANGUAGE=bn
 
 # Install and configure `serve`.
 RUN yarn global add serve
