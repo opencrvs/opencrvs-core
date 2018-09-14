@@ -50,17 +50,17 @@ const messages = defineMessages({
     description: 'Label for form field: Family name'
   },
   motherGivenNameEng: {
-    id: 'formFields.motherGivenName',
+    id: 'formFields.motherGivenNameEng',
     defaultMessage: 'Given name (in english)',
     description: 'Label for form field: Given name in english'
   },
   motherMiddleNamesEng: {
-    id: 'formFields.motherMiddleNames',
+    id: 'formFields.motherMiddleNamesEng',
     defaultMessage: 'Middle name(s) (in english)',
     description: 'Label for form field: Middle names in english'
   },
   motherFamilyNameEng: {
-    id: 'formFields.motherFamilyName',
+    id: 'formFields.motherFamilyNameEng',
     defaultMessage: 'Family name (in english)',
     description: 'Label for form field: Family name in english'
   },
