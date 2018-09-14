@@ -16,6 +16,7 @@ import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { getRegisterForm } from 'src/forms/register/selectors'
 import { IStoreState } from 'src/store'
+import { getConditionalActionsForField } from 'src/forms/utils'
 
 const FormAction = styled.div`
   display: flex;
@@ -94,6 +95,7 @@ const InformationMissingLink = styled(Button)`
   color: ${({ theme }) => theme.colors.danger};
   text-decoration: underline;
   padding: 0;
+  text-align: left;
 `
 
 const PreviewHeadingBox = styled(PreviewBox)`
@@ -164,6 +166,14 @@ class PreviewSectionForm extends React.Component<
       Object.values(emptyFieldsBySection[section.id]).some(identity)
     )
 
+    const isVisibleField = (field: IFormField, section: IFormSection) => {
+      const conditionalActions = getConditionalActionsForField(
+        field,
+        draft.data[section.id] || {}
+      )
+      return !conditionalActions.includes('hide')
+    }
+
     return (
       <>
         {numberOfErrors > 0 && (
@@ -211,35 +221,37 @@ class PreviewSectionForm extends React.Component<
                 {intl.formatMessage(section.title)} <ErrorDot />
               </PreviewSectionTitle>
               <List>
-                {section.fields.map((field: IFormField) => {
-                  const informationMissing =
-                    emptyFieldsBySection[section.id][field.name]
+                {section.fields
+                  .filter(field => isVisibleField(field, section))
+                  .map((field: IFormField) => {
+                    const informationMissing =
+                      emptyFieldsBySection[section.id][field.name]
 
-                  return (
-                    <ListItem key={field.name}>
-                      <ListItemLabel>
-                        {intl.formatMessage(field.label)}
-                      </ListItemLabel>
-                      <ListItemValue>
-                        {informationMissing ? (
-                          <InformationMissingLink
-                            onClick={() =>
-                              this.props.goToTab(
-                                draft.id,
-                                section.id,
-                                field.name
-                              )
-                            }
-                          >
-                            {intl.formatMessage(messages.informationMissing)}
-                          </InformationMissingLink>
-                        ) : (
-                          draft.data[section.id][field.name]
-                        )}
-                      </ListItemValue>
-                    </ListItem>
-                  )
-                })}
+                    return (
+                      <ListItem key={field.name}>
+                        <ListItemLabel>
+                          {intl.formatMessage(field.label)}
+                        </ListItemLabel>
+                        <ListItemValue>
+                          {informationMissing ? (
+                            <InformationMissingLink
+                              onClick={() =>
+                                this.props.goToTab(
+                                  draft.id,
+                                  section.id,
+                                  field.name
+                                )
+                              }
+                            >
+                              {intl.formatMessage(messages.informationMissing)}
+                            </InformationMissingLink>
+                          ) : (
+                            draft.data[section.id][field.name]
+                          )}
+                        </ListItemValue>
+                      </ListItem>
+                    )
+                  })}
               </List>
 
               {i === formSections.length - 1 && (
