@@ -69,15 +69,20 @@ const Input = styled.input`
   }
 `
 
+type Value = string | number | boolean
+
 interface IRadio {
   name: string
   label: string
-  value: string | number
+  value: Value
   selected: string
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange: (value: Value) => void
 }
 
 export class Radio extends React.Component<IRadio> {
+  onChange = () => {
+    this.props.onChange(this.props.value)
+  }
   render() {
     const { name, selected, label, value, onChange } = this.props
     return (
@@ -88,8 +93,8 @@ export class Radio extends React.Component<IRadio> {
           checked={value === selected}
           type="radio"
           name={name}
-          value={value}
-          onChange={onChange}
+          value={value.toString()}
+          onChange={this.onChange}
         />
         <Check />
         <Label>{label}</Label>
