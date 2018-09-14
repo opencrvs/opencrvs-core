@@ -25,7 +25,7 @@ export const initialState: IntlState = {
 }
 
 const getNextMessages = (language: string): IntlMessages => {
-  return languages[language]
+  return languages[language].messages
 }
 
 export const intlReducer: LoopReducer<IntlState, actions.Action> = (
