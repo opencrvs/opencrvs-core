@@ -495,7 +495,7 @@ export const BENGALI_STATE = {
     'register.savedRegistration.offline.nextCard.text2':
       'ঘোষণাটি সফলভাবে দাখিল করা হলে রেজিস্ট্রেশন শেষ। আপনি এবং সংবাদদাতাকে অবহিত করা হবে।',
     'register.savedRegistration.buttons.back': 'হোমপেইজে ফিরে  যান',
-    'register.savedRegistration.buttons.newDeclaration': 'নতুন ঘোষণা', // Google translated
+    'register.savedRegistration.buttons.newDeclaration': 'নতুন ঘোষণা', // TODO: Check, Google translated
     'register.selectInformant.newBirthRegistration': ' জন্ম ঘোষণা',
     'register.selectInformant.informantTitle': 'সংবাদদাতা',
     'register.selectInformant.informantDescription':
