@@ -3,7 +3,9 @@ import {
   Ii18nFormField,
   Ii18nSelectOption,
   ISelectOption,
-  IConditionals
+  IConditionals,
+  IFormSectionData,
+  IConditional
 } from './'
 import { InjectedIntl } from 'react-intl'
 
@@ -30,6 +32,21 @@ export const internationaliseOptions = (
       label: intl.formatMessage(opt.label)
     } as Ii18nSelectOption
   })
+}
+
+export const getConditionalActionsForField = (
+  field: IFormField,
+  values: IFormSectionData
+): string[] => {
+  if (!field.conditionals) {
+    return []
+  }
+  return field.conditionals
+    .filter(conditional =>
+      /* tslint:disable-next-line: no-eval */
+      eval(conditional.expression)
+    )
+    .map((conditional: IConditional) => conditional.action)
 }
 
 export const conditionals: IConditionals = {

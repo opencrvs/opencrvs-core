@@ -1,7 +1,18 @@
 import { required, IValidationResult } from '../utils/validate'
 import { IFormField, IFormSectionData } from './'
+import { getConditionalActionsForField } from '@opencrvs/register/src/forms/utils'
 
-export function getValidationErrorsForField(field: IFormField, value: string) {
+export function getValidationErrorsForField(
+  field: IFormField,
+  values: IFormSectionData
+) {
+  const value = values[field.name]
+  const conditionalActions = getConditionalActionsForField(field, values)
+
+  if (conditionalActions.includes('hide')) {
+    return []
+  }
+
   const validators = Array.from(field.validate)
 
   if (field.required) {
@@ -20,8 +31,7 @@ export function getValidationErrorsForForm(
   values: IFormSectionData
 ): { [key: string]: IValidationResult[] } {
   return fields.reduce((errorsForAllFields: Errors, field) => {
-    const value = values[field.name]
-    const validationErrors = getValidationErrorsForField(field, value)
+    const validationErrors = getValidationErrorsForField(field, values)
     return {
       ...errorsForAllFields,
       [field.name]: validationErrors
