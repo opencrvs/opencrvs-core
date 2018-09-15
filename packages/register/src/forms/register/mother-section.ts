@@ -303,7 +303,7 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'district',
+      dynamicOptions: 'addressOptions[values.state].districts',
       conditionals: [conditionals.country, conditionals.state]
     },
     {
@@ -314,7 +314,7 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine4',
+      dynamicOptions: 'addressOptions[values.state][values.district].upazilas',
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -329,7 +329,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine3Options1',
+      dynamicOptions:
+        'addressOptions[values.state][values.district][values.addressLine4].unions',
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -417,7 +418,7 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'districtPermanent',
+      dynamicOptions: 'addressOptions[values.statePermanent].districts',
       conditionals: [conditionals.countryPermanent, conditionals.statePermanent]
     },
     {
@@ -428,7 +429,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine4Permanent',
+      dynamicOptions:
+        'addressOptions[values.statePermanent][values.districtPermanent].upazilas',
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -443,7 +445,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine3Options1Permanent',
+      dynamicOptions:
+        'addressOptions[values.statePermanent][values.districtPermanent][values.addressLine4Permanent].unions',
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,

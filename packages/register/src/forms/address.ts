@@ -1,5 +1,7 @@
 import { defineMessages } from 'react-intl'
 
+import { IFormField, IFormSectionData } from './index'
+
 export const stateMessages = defineMessages({
   state1: {
     id: 'states.state1',
@@ -1039,5 +1041,21 @@ export const addressOptions = {
   },
   state7: {
     districts: []
+  }
+}
+
+export const getAddressOptions = (
+  field: IFormField,
+  values: IFormSectionData
+) => {
+  if (field.dynamicOptions) {
+    /* tslint:disable-next-line: no-eval */
+    const dynamicOptions = eval(field.dynamicOptions)
+    console.log(!dynamicOptions.length)
+    if (dynamicOptions.length) {
+      return dynamicOptions
+    } else {
+      return []
+    }
   }
 }

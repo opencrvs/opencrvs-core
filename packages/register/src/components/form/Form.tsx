@@ -31,7 +31,7 @@ import {
   MetaPropsWithMessageDescriptors
 } from '../../i18n/components/localizeInput'
 import { getValidationErrorsForForm } from '../../forms/validation'
-import { addressOptions } from '../../forms/address'
+import { getAddressOptions } from '../../forms/address'
 
 const FormItem = styled.div`
   margin-bottom: 2em;
@@ -73,70 +73,6 @@ type GeneratedInputFieldProps = {
 
 const LocalizedInputField = localizeInput(InputField)
 
-const getDynamicSelectOptions = (
-  field: IFormField,
-  values: IFormSectionData
-) => {
-  switch (field.name) {
-    case 'district':
-      return addressOptions[values.state].districts
-
-    case 'districtPermanent':
-      return addressOptions[values.statePermanent].districts
-
-    case 'addressLine4':
-      if (
-        addressOptions[values.state][values.district] &&
-        addressOptions[values.state][values.district].upazilas
-      ) {
-        return addressOptions[values.state][values.district].upazilas
-      } else {
-        return []
-      }
-    case 'addressLine4Permanent':
-      if (
-        addressOptions[values.statePermanent][values.districtPermanent] &&
-        addressOptions[values.statePermanent][values.districtPermanent].upazilas
-      ) {
-        return addressOptions[values.statePermanent][values.districtPermanent]
-          .upazilas
-      } else {
-        return []
-      }
-    case 'addressLine3Options1':
-      if (
-        addressOptions[values.state][values.district] &&
-        addressOptions[values.state][values.district][values.addressLine4] &&
-        addressOptions[values.state][values.district][values.addressLine4]
-          .unions
-      ) {
-        return addressOptions[values.state][values.district][
-          values.addressLine4
-        ].unions
-      } else {
-        return []
-      }
-    case 'addressLine3Options1Permanent':
-      if (
-        addressOptions[values.statePermanent][values.districtPermanent] &&
-        addressOptions[values.statePermanent][values.districtPermanent][
-          values.addressLine4Permanent
-        ] &&
-        addressOptions[values.statePermanent][values.districtPermanent][
-          values.addressLine4Permanent
-        ].unions
-      ) {
-        return addressOptions[values.statePermanent][values.districtPermanent][
-          values.addressLine4Permanent
-        ].unions
-      } else {
-        return []
-      }
-    default:
-      return []
-  }
-}
-
 function generateDynamicOptionsForField(
   field: IFormField,
   values: IFormSectionData
@@ -144,7 +80,7 @@ function generateDynamicOptionsForField(
   return {
     ...field,
     options: field.dynamicOptions
-      ? getDynamicSelectOptions(field, values)
+      ? getAddressOptions(field, values)
       : field.options
   }
 }

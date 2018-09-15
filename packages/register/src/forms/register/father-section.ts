@@ -371,7 +371,7 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'district',
+      dynamicOptions: 'addressOptions[values.state].districts',
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -387,7 +387,7 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine4',
+      dynamicOptions: 'addressOptions[values.state][values.district].upazilas',
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -404,7 +404,8 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine3Options1',
+      dynamicOptions:
+        'addressOptions[values.state][values.district][values.addressLine4].unions',
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -525,7 +526,7 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'districtPermanent',
+      dynamicOptions: 'addressOptions[values.statePermanent].districts',
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
@@ -541,7 +542,8 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine4Permanent',
+      dynamicOptions:
+        'addressOptions[values.statePermanent][values.districtPermanent].upazilas',
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
@@ -558,7 +560,8 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressLine3Options1Permanent',
+      dynamicOptions:
+        'addressOptions[values.statePermanent][values.districtPermanent][values.addressLine4Permanent].unions',
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
