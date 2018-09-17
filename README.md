@@ -17,12 +17,13 @@ On Linux you will also need so increase you file watch limit using: `echo fs.ino
 Then:
 1. Clone the repo
 2. Run `yarn` to install deps
-3. Run `yarn dev` to up the dev environment (frontend will autoreload and backend services are started via docker-compose)
+3. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose)
+4. Run `cd packages/user-mgnt/ && yarn populate && cd ../..` to populate the db with test users.
 
 Apps can be found running in following URLs:
 
 * Styleguide: http://localhost:6060/
-* Login: http://localhost:3020/
+* Login: http://localhost:3020/ - A test user you can use is u: 07111111111, p: test, code: 000000
 * Register: http://localhost:3000/
 
 You can open all of them by running `yarn open`
