@@ -6,15 +6,24 @@ This repo contains the frontend components and frontend related middleware for t
 
 ## Development environment setup
 
+Pre-requisites:
+
+* [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
+* [Yarn](https://yarnpkg.com/lang/en/docs/install)
+* [Docker](https://docs.docker.com/install/)
+
+On Linux you will also need so increase you file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+
+Then:
 1. Clone the repo
 2. Run `yarn` to install deps
 3. Run `yarn dev` to up the dev environment (frontend will autoreload and backend services are started via docker-compose)
 
 Apps can be found running in following URLs:
 
-Styleguide: http://localhost:6060/
-Login: http://localhost:3020/
-Register: http://localhost:3000/
+* Styleguide: http://localhost:6060/
+* Login: http://localhost:3020/
+* Register: http://localhost:3000/
 
 You can open all of them by running `yarn open`
 
