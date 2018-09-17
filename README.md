@@ -10,7 +10,7 @@ Pre-requisites:
 
 * [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
 * [Yarn](https://yarnpkg.com/lang/en/docs/install)
-* [Docker](https://docs.docker.com/install/)
+* [Docker](https://docs.docker.com/install/) - if on linux you will need to make sure docker can be run by your user, not only by root or using sudo - see [here](https://docs.docker.com/install/linux/linux-postinstall/).
 
 On Linux you will also need so increase you file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
 
