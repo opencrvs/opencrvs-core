@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 
-import { IFormField, IFormSectionData } from './index'
+import { IFormField, IFormSectionData, IDynamicOptions } from './index'
 
 export const stateMessages = defineMessages({
   state1: {
@@ -1044,18 +1044,35 @@ export const addressOptions = {
   }
 }
 
+const checkOptions = (options: IDynamicOptions): boolean => {
+  let optionsExist: boolean = true
+  const numberOfDimensions: number = options.dimensions.length
+  if (!addressOptions[options.dimensions[0]]) {
+    optionsExist = false
+  }
+  if (numberOfDimensions === 2) {
+    if (!addressOptions[options.dimensions[0][options.dimensions[1]]]) {
+      optionsExist = false
+    }
+  }
+  return optionsExist
+}
+
 export const getAddressOptions = (
   field: IFormField,
   values: IFormSectionData
 ) => {
   if (field.dynamicOptions) {
-    /* tslint:disable-next-line: no-eval */
-    const dynamicOptions = eval(field.dynamicOptions)
-    console.log(!dynamicOptions.length)
-    if (dynamicOptions.length) {
-      return dynamicOptions
-    } else {
-      return []
+    const optionsExist: boolean = checkOptions(field.dynamicOptions)
+    if (optionsExist) {
+      /* tslint:disable-next-line: no-eval */
+      const dynamicOptions = eval(field.dynamicOptions)
+      console.log(!dynamicOptions.length)
+      if (dynamicOptions.length) {
+        return dynamicOptions
+      } else {
+        return []
+      }
     }
   }
 }

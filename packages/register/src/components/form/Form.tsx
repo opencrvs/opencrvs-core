@@ -2,7 +2,10 @@ import * as React from 'react'
 import { withFormik, FormikProps } from 'formik'
 import { isEqual } from 'lodash'
 import { InjectedIntlProps, injectIntl, FormattedMessage } from 'react-intl'
-import { internationaliseFieldObject } from '../../forms/utils'
+import {
+  internationaliseFieldObject,
+  generateDynamicOptionsForField
+} from '../../forms/utils'
 import {
   InputField,
   TextInput,
@@ -31,7 +34,6 @@ import {
   MetaPropsWithMessageDescriptors
 } from '../../i18n/components/localizeInput'
 import { getValidationErrorsForForm } from '../../forms/validation'
-import { getAddressOptions } from '../../forms/address'
 
 const FormItem = styled.div`
   margin-bottom: 2em;
@@ -72,18 +74,6 @@ type GeneratedInputFieldProps = {
   InputProps
 
 const LocalizedInputField = localizeInput(InputField)
-
-function generateDynamicOptionsForField(
-  field: IFormField,
-  values: IFormSectionData
-) {
-  return {
-    ...field,
-    options: field.dynamicOptions
-      ? getAddressOptions(field, values)
-      : field.options
-  }
-}
 
 function GeneratedInputField({
   field,

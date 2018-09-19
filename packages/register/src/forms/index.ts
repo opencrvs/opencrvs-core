@@ -6,6 +6,12 @@ export interface ISelectOption {
   label: FormattedMessage.MessageDescriptor
 }
 
+export interface IDynamicOptions {
+  collection: string
+  dimensions: string[]
+  value: string
+}
+
 export interface IFormField {
   name: string
   type: string
@@ -13,7 +19,7 @@ export interface IFormField {
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
-  dynamicOptions?: string
+  dynamicOptions?: IDynamicOptions
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean
@@ -68,7 +74,7 @@ export interface Ii18nFormField {
   validate: Validation[]
   required?: boolean
   options?: ISelectOption[]
-  dynamicOptions?: string
+  dynamicOptions?: IDynamicOptions
   prefix?: React.ComponentClass<any> | string
   postfix?: React.ComponentClass<any> | string
   disabled?: boolean

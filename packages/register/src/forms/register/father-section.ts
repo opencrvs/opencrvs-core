@@ -371,7 +371,11 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'addressOptions[values.state].districts',
+      dynamicOptions: {
+        collection: 'addressOptions',
+        dimensions: ['values.state'],
+        value: 'districts'
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -387,7 +391,11 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressOptions[values.state][values.district].upazilas',
+      dynamicOptions: {
+        collection: 'addressOptions',
+        dimensions: ['values.state', 'values.district'],
+        value: 'upazilas'
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -404,8 +412,11 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions:
-        'addressOptions[values.state][values.district][values.addressLine4].unions',
+      dynamicOptions: {
+        collection: 'addressOptions',
+        dimensions: ['values.state', 'values.district', 'values.addressLine4'],
+        value: 'unions'
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -526,7 +537,11 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions: 'addressOptions[values.statePermanent].districts',
+      dynamicOptions: {
+        collection: 'addressOptions',
+        dimensions: ['values.statePermanent'],
+        value: 'districts'
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
@@ -542,8 +557,11 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions:
-        'addressOptions[values.statePermanent][values.districtPermanent].upazilas',
+      dynamicOptions: {
+        collection: 'addressOptions',
+        dimensions: ['values.statePermanent', 'values.districtPermanent'],
+        value: 'upazilas'
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
@@ -560,8 +578,15 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [],
-      dynamicOptions:
-        'addressOptions[values.statePermanent][values.districtPermanent][values.addressLine4Permanent].unions',
+      dynamicOptions: {
+        collection: 'addressOptions',
+        dimensions: [
+          'values.statePermanent',
+          'values.districtPermanent',
+          'values.addressLine4Permanent'
+        ],
+        value: 'unions'
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,

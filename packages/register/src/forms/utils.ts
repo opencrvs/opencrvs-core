@@ -1,11 +1,13 @@
 import {
   IFormField,
   Ii18nFormField,
+  IFormSectionData,
   Ii18nSelectOption,
   ISelectOption,
   IConditionals
 } from './'
 import { InjectedIntl } from 'react-intl'
+import { getAddressOptions } from './address'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -30,6 +32,18 @@ export const internationaliseOptions = (
       label: intl.formatMessage(opt.label)
     } as Ii18nSelectOption
   })
+}
+
+export const generateDynamicOptionsForField = (
+  field: IFormField,
+  values: IFormSectionData
+) => {
+  return {
+    ...field,
+    options: field.dynamicOptions
+      ? getAddressOptions(field, values)
+      : field.options
+  }
 }
 
 export const conditionals: IConditionals = {
