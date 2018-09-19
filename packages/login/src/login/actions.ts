@@ -20,46 +20,46 @@ export const RESEND_SMS = 'login/RESEND_SMS'
 export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
 export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
 
-type AuthenticationDataAction = {
+export type AuthenticationDataAction = {
   type: typeof AUTHENTICATE
   payload: IAuthenticationData
 }
 
-type AuthenticateResponseAction = {
+export type AuthenticateResponseAction = {
   type: typeof AUTHENTICATION_COMPLETED
   payload: IAuthenticateResponse
 }
 
-type AuthenticationFailedAction = {
+export type AuthenticationFailedAction = {
   type: typeof AUTHENTICATION_FAILED
   payload: Error
 }
 
-type ResendSMSAction = {
+export type ResendSMSAction = {
   type: typeof RESEND_SMS
 }
 
-type ResendSMSCompleteAction = {
+export type ResendSMSCompleteAction = {
   type: typeof RESEND_SMS_COMPLETED
   payload: IAuthenticateResponse
 }
 
-type ResendSMSFailedAction = {
+export type ResendSMSFailedAction = {
   type: typeof RESEND_SMS_FAILED
   payload: Error
 }
 
-type VerifyCodeAction = {
+export type VerifyCodeAction = {
   type: typeof VERIFY_CODE
   payload: { code: string }
 }
 
-type VerifyCodeCompleteAction = {
+export type VerifyCodeCompleteAction = {
   type: typeof VERIFY_CODE_COMPLETED
   payload: ITokenResponse
 }
 
-type VerifyCodeFailedAction = {
+export type VerifyCodeFailedAction = {
   type: typeof VERIFY_CODE_FAILED
   payload: Error
 }

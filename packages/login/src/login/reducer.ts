@@ -35,7 +35,10 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           resentSMS: false,
           stepOneDetails: action.payload
         },
-        Cmd.run(authApi.authenticate, {
+        Cmd.run<
+          | actions.AuthenticateResponseAction
+          | actions.AuthenticationFailedAction
+        >(authApi.authenticate, {
           successActionCreator: actions.completeAuthentication,
           failActionCreator: actions.failAuthentication,
           args: [action.payload]
@@ -64,7 +67,9 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           submissionError: false,
           resentSMS: false
         },
-        Cmd.run(authApi.resendSMS, {
+        Cmd.run<
+          actions.ResendSMSCompleteAction | actions.ResendSMSFailedAction
+        >(authApi.resendSMS, {
           successActionCreator: actions.completeSMSResend,
           failActionCreator: actions.failSMSResend,
           args: [state.authenticationDetails.nonce]
@@ -91,7 +96,9 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           submissionError: false,
           resentSMS: false
         },
-        Cmd.run(authApi.verifyCode, {
+        Cmd.run<
+          actions.VerifyCodeCompleteAction | actions.VerifyCodeFailedAction
+        >(authApi.verifyCode, {
           successActionCreator: actions.completeVerifyCode,
           failActionCreator: actions.failVerifyCode,
           args: [{ code, nonce: state.authenticationDetails.nonce }]
