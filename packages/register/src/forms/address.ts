@@ -899,7 +899,7 @@ export const messages = defineMessages({
 
 export const addressOptions = {
   state1: {
-    districts: []
+    districts: null
   },
   state2: {
     districts: state2Districts,
@@ -1044,35 +1044,53 @@ export const addressOptions = {
   }
 }
 
-const checkOptions = (options: IDynamicOptions): boolean => {
-  let optionsExist: boolean = true
-  const numberOfDimensions: number = options.dimensions.length
-  if (!addressOptions[options.dimensions[0]]) {
-    optionsExist = false
-  }
-  if (numberOfDimensions === 2) {
-    if (!addressOptions[options.dimensions[0][options.dimensions[1]]]) {
-      optionsExist = false
-    }
-  }
-  return optionsExist
-}
-
 export const getAddressOptions = (
   field: IFormField,
   values: IFormSectionData
 ) => {
   if (field.dynamicOptions) {
-    const optionsExist: boolean = checkOptions(field.dynamicOptions)
-    if (optionsExist) {
+    const dependenciesExist: boolean = field.dynamicOptions.dependencies.every(
+      (dependency: string, index: number) => {
+        const options = field.dynamicOptions as IDynamicOptions
+        /* tslint:disable-next-line: no-eval */
+        if (!eval(dependency)) {
+          return false
+        } else {
+          switch (index) {
+            case 0:
+              /* tslint:disable-next-line: no-eval */
+              return addressOptions[eval(dependency)]
+              break
+            case 1:
+              /* tslint:disable-next-line: no-eval */
+              return addressOptions[eval(options.dependencies[0])][
+                /* tslint:disable-next-line: no-eval */
+                eval(dependency)
+              ]
+              break
+            case 2:
+              /* tslint:disable-next-line: no-eval */
+              return addressOptions[eval(options.dependencies[0])][
+                /* tslint:disable-next-line: no-eval */
+                eval(options.dependencies[1])
+                /* tslint:disable-next-line: no-eval */
+              ][eval(dependency)]
+
+              break
+          }
+        }
+      }
+    )
+    if (dependenciesExist) {
       /* tslint:disable-next-line: no-eval */
-      const dynamicOptions = eval(field.dynamicOptions)
-      console.log(!dynamicOptions.length)
+      const dynamicOptions = eval(field.dynamicOptions.value)
       if (dynamicOptions.length) {
         return dynamicOptions
       } else {
         return []
       }
+    } else {
+      return []
     }
   }
 }

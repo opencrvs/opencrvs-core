@@ -7,8 +7,7 @@ export interface ISelectOption {
 }
 
 export interface IDynamicOptions {
-  collection: string
-  dimensions: string[]
+  dependencies: string[]
   value: string
 }
 
