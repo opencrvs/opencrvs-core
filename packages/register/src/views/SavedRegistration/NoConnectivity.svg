@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="65px" height="65px" viewBox="0 0 65 65" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>8EDAB14B-3D83-4F1E-8361-6B939D7A97CE</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="95.9356936%" x2="50%" y2="3.0001566%" id="linearGradient-1">
+            <stop stop-color="#4C68C1" offset="0%"></stop>
+            <stop stop-color="#B0C8F1" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="UI" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="New-Birth-Declaration/NoConnectivity" transform="translate(-49.000000, -336.000000)">
+            <g id="Icons/No-Connectivity" transform="translate(51.000000, 338.000000)">
+                <g id="Icons/Tick/CompleteTick" fill-rule="nonzero" stroke="url(#linearGradient-1)" stroke-width="2.8">
+                    <circle id="Oval" cx="30.5" cy="30.5" r="30.5"></circle>
+                </g>
+                <g id="noun_wifi_1405288" transform="translate(16.000000, 21.000000)">
+                    <g id="Group">
+                        <g>
+                            <path d="M24.1666667,9.85714286 C18.8279141,5.47619047 10.1720859,5.47619047 4.83333333,9.85714286 M29,4.92857143 C20.9918712,-1.64285714 8.00812888,-1.64285714 0,4.92857143 M19.3333333,14.7857143 C16.6639571,12.5952382 12.3360429,12.5952382 9.66666667,14.7857143" id="Shape" stroke="#5E93ED" stroke-width="3.168" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <ellipse id="Oval" fill="#5E93ED" fill-rule="nonzero" cx="14.5" cy="20.5357143" rx="2.41666667" ry="2.46428571"></ellipse>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

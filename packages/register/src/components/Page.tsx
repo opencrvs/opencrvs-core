@@ -1,29 +1,20 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
-import * as QueryString from 'query-string'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 
-import { IURLParams } from '@opencrvs/register/src/utils/authUtils'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import * as actions from '@opencrvs/register/src/profile/profileActions'
 
 interface IPageProps {
   language?: string
 }
 
-export interface IDispatchProps {
-  checkAuth: (urlValues: IURLParams) => void
-}
-
-type IPage = IPageProps & IDispatchProps
-
 const languageFromProps = ({ language }: IPageProps) => language
 
-const StyledPage = styled.div.attrs<IPage>({})`
-  background: #f4f4f4;
+const StyledPage = styled.div.attrs<IPageProps>({})`
+  background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -65,10 +56,22 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 `
 
-class Component extends React.Component<RouteComponentProps<{}> & IPage> {
-  componentWillMount() {
-    const values = QueryString.parse(this.props.location.search)
-    this.props.checkAuth(values)
+class Component extends React.Component<RouteComponentProps<{}> & IPageProps> {
+  componentWillReceiveProps(nextProps: RouteComponentProps<{}>) {
+    const { hash } = nextProps.location
+    const hashChanged = hash && hash !== this.props.location.hash
+    if (hashChanged) {
+      // Push onto callback queue so it runs after the DOM is updated,
+      // this is required when navigating from a different page so that
+      // the element is rendered on the page before trying to getElementById.
+      setTimeout(() => {
+        const id = hash.replace('#', '')
+        const element = document.getElementById(id)
+        if (element) {
+          element.scrollIntoView()
+        }
+      }, 0)
+    }
   }
   render() {
     const { children } = this.props
@@ -86,12 +89,4 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
   }
 }
 
-const mapDispatchToProps = {
-  checkAuth: actions.checkAuth
-}
-
-export const Page = withRouter(
-  connect<IPageProps, IDispatchProps>(mapStateToProps, mapDispatchToProps)(
-    Component
-  )
-)
+export const Page = withRouter(connect<IPageProps>(mapStateToProps)(Component))

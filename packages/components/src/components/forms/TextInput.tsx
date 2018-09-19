@@ -24,7 +24,7 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   ${({ theme }) => theme.fonts.defaultFontStyle};
   color: ${({ theme }) => theme.colors.secondary};
   &[type='text'] {
-    background: #f9f9f9;
+    background: ${({ theme }) => theme.colors.inputBackground};
   }
 
   &:focus {
@@ -64,25 +64,24 @@ export class TextInput extends React.Component<ITextInputProps> {
     this.$element = React.createRef()
   }
   focusField(): void {
-    this.$element.current!.focus()
-  }
-  onBlur(e: any) {
-    e.preventDefault()
+    /*
+     * Needs to be run on the next tick
+     * so that 'value' prop has enough time to flow back here
+     * if the focusInput prop is called right after keydown
+     */
+    setTimeout(() => {
+      this.$element.current!.focus()
+    })
   }
   componentWillReceiveProps(nextProps: ITextInputProps) {
-    if (nextProps.focusInput) {
+    if (!this.props.focusInput && nextProps.focusInput) {
       this.focusField()
     }
   }
+
   render() {
     const { focusInput, ...props } = this.props
 
-    return (
-      <StyledInput
-        innerRef={this.$element}
-        {...this.props}
-        onBlur={this.onBlur}
-      />
-    )
+    return <StyledInput innerRef={this.$element} {...this.props} />
   }
 }

@@ -9,7 +9,10 @@ import { ViewHeading, IViewHeadingProps } from '../components/ViewHeading'
 const StretchedHeader = styled(Header)`
   justify-content: flex-end;
   padding-bottom: 50px;
+
+  /* stylelint-disable */
   + ${ActionList} {
+    /* stylelint-enable */
     margin-top: -50px;
   }
 `

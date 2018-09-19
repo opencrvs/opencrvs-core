@@ -2,30 +2,30 @@
 require('dotenv').config()
 const { styleGuideLocaleFonts } = require('./styleguide.fonts')
 
-const locale = process.env.REACT_APP_LOCALE || 'gb'
+const locale = process.env.REACT_APP_LOCALE || 'gbr'
 
 const fontFaces = [
   {
     fontFamily: styleGuideLocaleFonts[locale].lightFontFamily,
     fontStyle: 'normal',
     fontWeight: '300',
-    src: `url('${process.env.REACT_APP_CDN}notosans-light-webfont-${
+    src: `url('notosans-light-webfont-${
       process.env.REACT_APP_LANGUAGE
-    }.woff') format('woff')`
+    }.ttf') format('truetype')`
   },
   {
     fontFamily: styleGuideLocaleFonts[locale].regularFontFamily,
     fontStyle: 'normal',
-    src: `url('${process.env.REACT_APP_CDN}notosans-regular-webfont-${
+    src: `url('notosans-regular-webfont-${
       process.env.REACT_APP_LANGUAGE
-    }.woff') format('woff')`
+    }.ttf') format('truetype')`
   },
   {
     fontFamily: styleGuideLocaleFonts[locale].boldFontFamily,
     fontStyle: 'normal',
-    src: `url('${process.env.REACT_APP_CDN}notosans-bold-webfont-${
+    src: `url('notosans-bold-webfont-${
       process.env.REACT_APP_LANGUAGE
-    }.woff') format('woff')`
+    }.ttf') format('truetype')`
   }
 ]
 
@@ -164,6 +164,9 @@ const styles = {
   },
   StyleGuide: {
     '@font-face': fontFaces,
+    '@global *': {
+      boxSizing: 'border-box'
+    },
     content: {
       paddingTop: rhythm(2.5),
       '@media (max-width: 600px)': {

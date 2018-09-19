@@ -1,10 +1,16 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
 
 import { Hamburger, ArrowBack } from '@opencrvs/components/lib/icons'
 import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 import styled from '../styled-components'
+import { goBack as goBackAction } from 'src/navigation'
+import { getLanguages } from 'src/i18n/selectors'
+import { IStoreState } from 'src/store'
+import { IntlState } from 'src/i18n/reducer'
+import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
 
 const messages = defineMessages({
   back: {
@@ -28,12 +34,18 @@ const TopMenuContainer = styled.div`
 
 const MenuButton = styled(PrimaryButton)`
   height: 100%;
+  background: ${({ theme }) => theme.colors.primary};
   padding: 0 30px;
-  background: #4c68c1;
-  text-transform: uppercase;
-  font-size: 14px;
-  letter-spacing: 2px;
-  color: #fff;
+  select {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    width: 100%;
+    color: ${({ theme }) => theme.colors.white};
+    font-size: 14px;
+  }
 `
 
 const BackButtonContainer = styled.div`
@@ -47,8 +59,9 @@ const BackButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
-
+  /* stylelint-disable */
   ${ButtonIcon} {
+    /* stylelint-enable */
     margin-left: 0em;
   }
 `
@@ -61,21 +74,44 @@ const BackButtonText = styled.span`
   margin-left: 14px;
 `
 
-class TopMenuComponent extends React.Component<InjectedIntlProps> {
+class TopMenuComponent extends React.Component<
+  {
+    goBack: typeof goBackAction
+    changeLanguage: typeof changeLanguageAction
+    languages: IntlState['languages']
+  } & InjectedIntlProps
+> {
+  changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    this.props.changeLanguage({ language: e.target.value })
+  }
   render() {
-    const { intl } = this.props
+    const { intl, goBack, languages } = this.props
+    const languageKeys = Object.keys(languages)
+
     return (
       <TopMenuContainer>
-        <BackButtonContainer>
+        <BackButtonContainer onClick={goBack}>
           <BackButton icon={() => <ArrowBack />} />
           <BackButtonText>{intl.formatMessage(messages.back)}</BackButtonText>
         </BackButtonContainer>
         <MenuButton icon={() => <Hamburger />}>
-          {intl.formatMessage(messages.menu)}
+          <select value={'en'} onChange={this.changeLanguage}>
+            <option value={'en'}>{intl.formatMessage(messages.menu)}</option>
+            {languageKeys.map(languageKey => (
+              <option key={languageKey} value={languageKey}>
+                {languageKey}
+              </option>
+            ))}
+          </select>
         </MenuButton>
       </TopMenuContainer>
     )
   }
 }
 
-export const TopMenu = injectIntl<{}>(TopMenuComponent)
+export const TopMenu = connect(
+  (state: IStoreState) => ({
+    languages: getLanguages(state)
+  }),
+  { goBack: goBackAction, changeLanguage: changeLanguageAction }
+)(injectIntl<{}>(TopMenuComponent))

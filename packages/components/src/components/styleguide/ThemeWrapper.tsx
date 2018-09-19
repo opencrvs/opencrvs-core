@@ -4,10 +4,12 @@ import { getTheme } from '../theme'
 
 const locale = process.env.REACT_APP_LOCALE
   ? process.env.REACT_APP_LOCALE
-  : 'gb'
+  : 'gbr'
 
 const Wrapper = styled.div`
+  /* stylelint-disable */
   background: #ebf1f3;
+  /* stylelint-enable */
   padding: 2em;
 `
 

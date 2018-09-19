@@ -55,10 +55,8 @@ export const messages = defineMessages({
 })
 
 const dynamicValidationProps = {
-  minLength: {
-    min: 10
-  },
   phoneNumberFormat: {
+    min: 10,
     locale: config.LOCALE.toUpperCase(),
     format: messages.mobileNumberFormat.defaultMessage
   }
@@ -72,12 +70,16 @@ export const isAValidPhoneNumberFormat = (value: string): boolean => {
 export const requiredSymbol: Validation = (value: string) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: string) =>
-  value ? undefined : { message: messages.required }
+export const required: Validation = (value: string | boolean) => {
+  if (typeof value === 'string') {
+    return value !== '' ? undefined : { message: messages.required }
+  }
+  return value !== undefined ? undefined : { message: messages.required }
+}
 
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
-    ? { message: messages.minLength, values: dynamicValidationProps.minLength }
+    ? { message: messages.minLength, props: { min } }
     : undefined
 }
 
@@ -91,6 +93,6 @@ export const phoneNumberFormat: Validation = (value: string) => {
     ? undefined
     : {
         message: messages.phoneNumberFormat,
-        values: dynamicValidationProps.phoneNumberFormat
+        props: dynamicValidationProps.phoneNumberFormat
       }
 }

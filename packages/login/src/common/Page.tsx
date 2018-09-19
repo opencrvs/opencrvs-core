@@ -7,8 +7,14 @@ export interface IPage {
   language?: string
 }
 
+const languageFromProps = ({ language }: IPage) => language
+
 const StyledPage = styled(PageWrapper).attrs<IPage>({})`
 
+  background: ${({ theme }) => theme.colors.background};
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   * {
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
@@ -24,8 +30,8 @@ const StyledPage = styled(PageWrapper).attrs<IPage>({})`
   @font-face {
     font-family: ${({ theme }) => theme.fonts.lightFont};
     src:
-      url('/fonts/notosans-light-webfont-${({ language }) => language}.woff')
-      format('woff');
+      url('/fonts/notosans-extra-light-webfont-${languageFromProps}.ttf')
+      format('truetype');
     font-weight: 300;
     font-style: normal;
   }
@@ -33,25 +39,16 @@ const StyledPage = styled(PageWrapper).attrs<IPage>({})`
   @font-face {
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
-      url('/fonts/notosans-regular-webfont-${({ language }) => language}.woff')
-      format('woff');
+      url('/fonts/notosans-light-webfont-${languageFromProps}.ttf')
+      format('truetype');
     font-style: normal;
   }
 
   @font-face {
     font-family: ${({ theme }) => theme.fonts.boldFont};
     src:
-      url('/fonts/notosans-bold-webfont-${({ language }) => language}.woff')
-      format('woff');
-    font-style: normal;
-  }
-
-
-  @font-face {
-    font-family: noto_sansregular;
-    src:
-      url('/fonts/notosans-regular-webfont-en.woff')
-      format('woff');
+      url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
+      format('truetype');
     font-style: normal;
   }
 `

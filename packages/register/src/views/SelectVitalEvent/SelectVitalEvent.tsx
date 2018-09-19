@@ -2,8 +2,9 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
-import { ViewHeader } from '../../components/ViewHeader'
-import { goToBirthRegistration } from '../../navigation/navigationActions'
+
+import { ViewHeader } from 'src/components/ViewHeader'
+import { goToBirthRegistration } from 'src/navigation'
 
 export const messages = defineMessages({
   registerNewEventTitle: {

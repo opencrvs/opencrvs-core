@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "cypress run",
-    "open": "CYPRESS_REGISTER_URL=http://localhost:3020/ cypress open"
+    "open": "CYPRESS_REGISTER_URL=http://localhost:3020/ cypress open",
+    "open:staging": "CYPRESS_REGISTER_URL=https://login.opencrvs-staging.jembi.org/ cypress open"
   }
 }

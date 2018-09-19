@@ -72,4 +72,56 @@ const Select = require('../Select').Select;
 />
 ```
 
+**Field with prefix and postfix**
 
+The prefix postfix props can take either a `string` or a `Component` to render.
+
+```js
+<InputField
+  id="optional-input"
+  label="Dollar weight?"
+  prefix="$"
+  postfix="kg"
+/>
+```
+
+**Select field with postfix as a component**
+
+```js
+<InputField
+  id="optional-input"
+  label="Select a way forward"
+  component={Select}
+  options={[
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' }
+  ]}
+  postfix={ArrowWithGradient}
+/>
+```
+
+**Text field with postfix for async validity**
+
+This is used for async validation.
+
+```js
+<InputField
+  id="optional-input"
+  label="Is Valid?"
+  postfix={VerifyingIndicator}
+/>
+```
+
+
+**Text field with postfix for async validity**
+
+This is used for async validation.
+
+```js
+<InputField
+  id="optional-input"
+  label="Is Valid?"
+  postfix={ValidIndicator}
+/>
+```

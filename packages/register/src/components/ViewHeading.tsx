@@ -31,6 +31,7 @@ const ViewDescription = styled.p`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   margin: 0;
   margin-top: 5px;
+  font-size: 18px;
 `
 
 export function ViewHeading({

@@ -3,15 +3,28 @@ import { default as ReactSelect } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 
-export interface ISelectProps {
+export interface ISelectProps extends Props<any> {
+  id: string
   error?: boolean
   touched?: boolean
+  options: ISelectOption[]
+}
+
+interface ISelectOption {
+  value: string
+  label: string
+}
+
+interface IReactSelectOverrides {
+  onChange: (value: string) => void
 }
 
 const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
+  width: 100%;
+
   ${({ theme }) => theme.fonts.defaultFontStyle};
   .react-select__control {
-    background: #f9f9f9;
+    background: ${({ theme }) => theme.colors.inputBackground};
     border-radius: 0;
     border: 0;
     box-shadow: none;
@@ -31,9 +44,36 @@ const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
     border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
   }
 `
+interface IState {
+  selectedOption: ISelectOption
+}
 
-export class Select extends React.Component<Props<any>> {
+function getSelectedOption(
+  value: string,
+  options: ISelectOption[]
+): ISelectOption | null {
+  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  if (selectedOption) {
+    return selectedOption
+  }
+
+  return null
+}
+export class Select extends React.Component<
+  ISelectProps & IReactSelectOverrides,
+  IState
+> {
+  change = (selectedOption: ISelectOption) => {
+    this.props.onChange(selectedOption.value)
+  }
   render() {
-    return <StyledSelect classNamePrefix="react-select" {...this.props} />
+    return (
+      <StyledSelect
+        classNamePrefix="react-select"
+        {...this.props}
+        onChange={this.change}
+        value={getSelectedOption(this.props.value, this.props.options)}
+      />
+    )
   }
 }

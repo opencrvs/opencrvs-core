@@ -9,11 +9,14 @@ export interface IInputFieldProps {
   id: string
   label?: string
   placeholder?: string
+  description?: string
   required?: boolean
   disabled?: boolean
   maxLength?: number
   meta?: { touched: boolean; error: string }
   component?: React.ComponentClass<any>
+  prefix?: React.ComponentClass<any> | string
+  postfix?: React.ComponentClass<any> | string
 }
 
 const applyDefaultIfNotDisabled = (
@@ -38,6 +41,36 @@ const Optional = styled.div.attrs<
   flex-grow: 0;
 `
 
+const ComponentWrapper = styled.span`
+  display: flex;
+`
+
+const Padding = styled.span`
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.accent};
+`
+
+const InputDescription = styled.p`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.copy};
+`
+
+const renderComponentOrString = (
+  componentOrString: React.ComponentClass<any> | string
+) => {
+  if (typeof componentOrString === 'string') {
+    return componentOrString
+  } else {
+    const Component = componentOrString
+    return <Component />
+  }
+}
+
 export class InputField<
   P = ITextInputProps | ISelectProps
 > extends React.Component<IInputFieldProps & P, {}> {
@@ -46,9 +79,12 @@ export class InputField<
       label,
       required = true,
       placeholder,
+      description,
       component = TextInput,
       meta
     } = this.props
+    const prefix = this.props.prefix as React.ComponentClass<any> | string
+    const postfix = this.props.postfix as React.ComponentClass<any> | string
 
     const Component = component
 
@@ -63,16 +99,21 @@ export class InputField<
           )}
         </InputHeader>
 
-        <Component
-          {...this.props}
-          placeholder={
-            placeholder
-              ? placeholder
-              : applyDefaultIfNotDisabled(this.props.disabled, placeholder)
-          }
-          error={Boolean(meta && meta.error)}
-          touched={meta && meta.touched}
-        />
+        <ComponentWrapper>
+          {prefix && <Padding>{renderComponentOrString(prefix)}</Padding>}
+          <Component
+            {...this.props}
+            placeholder={
+              placeholder
+                ? placeholder
+                : applyDefaultIfNotDisabled(this.props.disabled, placeholder)
+            }
+            error={Boolean(meta && meta.error)}
+            touched={meta && meta.touched}
+          />
+          {postfix && <Padding>{renderComponentOrString(postfix)}</Padding>}
+        </ComponentWrapper>
+
         {meta &&
           meta.error &&
           meta.touched && (
@@ -83,6 +124,8 @@ export class InputField<
               {meta.error}
             </InputError>
           )}
+
+        {description && <InputDescription>{description}</InputDescription>}
       </div>
     )
   }
