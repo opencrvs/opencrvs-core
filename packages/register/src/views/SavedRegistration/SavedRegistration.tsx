@@ -188,7 +188,7 @@ const TrackingNumber = styled.h1`
 `
 
 class SavedRegistrationView extends React.Component<
-  InjectedIntlProps & RouteComponentProps<History>
+  InjectedIntlProps & RouteComponentProps<{}>
 > {
   render() {
     const { intl, history } = this.props

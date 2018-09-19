@@ -1,7 +1,26 @@
 import * as validations from '../../utils/validate'
-import { IFieldGroup } from '../../utils/fieldUtils'
 
-export const stepOneFields: IFieldGroup = {
+import { defineMessages } from 'react-intl'
+
+export const messages = defineMessages({
+  mobileLabel: {
+    id: 'login.mobileLabel',
+    defaultMessage: 'Mobile number',
+    description: 'The label that appears on the mobile number input'
+  },
+  mobilePlaceholder: {
+    id: 'login.mobilePlaceholder',
+    defaultMessage: '07XXXXXXXXX',
+    description: 'The placeholder that appears on the mobile number input'
+  },
+  passwordLabel: {
+    id: 'login.passwordLabel',
+    defaultMessage: 'Password',
+    description: 'The label that appears on the password input'
+  }
+})
+
+export const stepOneFields = {
   mobile: {
     id: 'mobile',
     name: 'mobile',
@@ -9,7 +28,9 @@ export const stepOneFields: IFieldGroup = {
     validate: [validations.required, validations.phoneNumberFormat],
     disabled: false,
     type: 'tel',
-    focusInput: false
+    focusInput: false,
+    label: messages.mobileLabel,
+    placeholder: messages.mobilePlaceholder
   },
   password: {
     id: 'password',
@@ -17,6 +38,7 @@ export const stepOneFields: IFieldGroup = {
     validate: [validations.required],
     disabled: false,
     type: 'password',
-    focusInput: false
+    focusInput: false,
+    label: messages.passwordLabel
   }
 }

@@ -1,5 +1,11 @@
 import { defineMessages } from 'react-intl'
-import { IFormSection } from 'src/forms'
+import {
+  IFormSection,
+  SELECT_WITH_OPTIONS,
+  TEXT,
+  CHECKBOX_GROUP,
+  TEXTAREA
+} from 'src/forms'
 import { phoneNumberFormat } from 'src/utils/validate'
 
 const messages = defineMessages({
@@ -121,7 +127,7 @@ export const registrationSection: IFormSection = {
   fields: [
     {
       name: 'whoIsPresent',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.whoIsPresentLabel,
       required: true,
       initialValue: '',
@@ -147,7 +153,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'whoseContactDetails',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.whoseContactDetailsLabel,
       required: true,
       initialValue: '',
@@ -173,7 +179,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'registrationEmail',
-      type: 'text',
+      type: TEXT,
       label: messages.registrationEmailLabel,
       required: true,
       initialValue: '',
@@ -181,7 +187,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'registrationPhone',
-      type: 'text',
+      type: TEXT,
       label: messages.registrationPhoneLabel,
       required: true,
       initialValue: '',
@@ -189,7 +195,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'registrationCertificateLanguage',
-      type: 'checkboxGroup',
+      type: CHECKBOX_GROUP,
       label: messages.registrationCertificateLanguage,
       required: true,
       initialValue: [],
@@ -211,7 +217,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'paperFormNumber',
-      type: 'text',
+      type: TEXT,
       label: messages.paperFormNumberLabel,
       required: true,
       initialValue: '',
@@ -219,7 +225,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'commentsOrNotes',
-      type: 'textarea',
+      type: TEXTAREA,
       label: messages.commentsOrNotesLabel,
       required: false,
       initialValue: '',

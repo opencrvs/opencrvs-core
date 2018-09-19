@@ -3,20 +3,20 @@ import { default as ReactSelect } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 
-export interface ISelectProps extends Props<any> {
-  id: string
-  error?: boolean
-  touched?: boolean
-  options: ISelectOption[]
-}
-
-interface ISelectOption {
+export interface ISelectOption {
   value: string
   label: string
 }
 
 interface IReactSelectOverrides {
   onChange: (value: string) => void
+}
+
+export interface ISelectProps extends Props<any> {
+  id: string
+  error?: boolean
+  touched?: boolean
+  options: ISelectOption[]
 }
 
 const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
