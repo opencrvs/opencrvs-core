@@ -9,6 +9,7 @@
     "@types/react-redux": "^6.0.0",
     "@types/react-router-redux": "^5.0.14",
     "apollo-boost": "^0.1.6",
+    "email-validator": "^2.0.4",
     "formik": "^1.0.3",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
