@@ -1,8 +1,21 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps, FormattedMessage } from 'react-intl'
+import {
+  injectIntl,
+  InjectedIntlProps,
+  FormattedMessage,
+  defineMessages
+} from 'react-intl'
 import { IInputFieldProps } from '@opencrvs/components/lib/forms'
 import { IValidationResult } from '../../utils/validate'
 import { Omit } from '../../utils'
+
+const messages = defineMessages({
+  optionalLabel: {
+    id: 'formFields.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
+  }
+})
 
 // Wrapped component takes a validation object to be translated instead of an error string
 export type MetaPropsWithMessageDescriptors = {
@@ -40,6 +53,7 @@ export function localizeInput<InputComponentProps>(
               description as FormattedMessage.MessageDescriptor
             )
           }
+          optionalLabel={intl.formatMessage(messages.optionalLabel)}
           meta={{
             touched: meta.touched,
             error:
