@@ -457,7 +457,7 @@ export const fatherSection: IFormSection = {
       name: 'postCode',
       type: 'text',
       label: addressMessages.postCode,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -611,7 +611,7 @@ export const fatherSection: IFormSection = {
       name: 'postCodePermanent',
       type: 'text',
       label: addressMessages.postCode,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
