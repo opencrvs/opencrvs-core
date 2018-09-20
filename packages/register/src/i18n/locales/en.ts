@@ -369,7 +369,7 @@ export const ENGLISH_STATE = {
     'formFields.iDTypeAlienNumber': 'Alien Number',
     'formFields.iD': 'National ID number',
     'formFields.maritalStatus': 'Marital status',
-    'formFields.maritalStatusSingle': 'Single',
+    'formFields.maritalStatusSingle': 'Unmarried',
     'formFields.maritalStatusMarried': 'Married',
     'formFields.maritalStatusWidowed': 'Widowed',
     'formFields.maritalStatusDivorced': 'Divorced',

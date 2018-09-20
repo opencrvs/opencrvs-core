@@ -208,7 +208,7 @@ export const motherSection: IFormSection = {
       type: 'select',
       label: maritalStatusMessages.maritalStatus,
       required: true,
-      initialValue: '',
+      initialValue: 'MARRIED',
       validate: [],
       options: [
         { value: 'SINGLE', label: maritalStatusMessages.maritalStatusSingle },
@@ -228,7 +228,7 @@ export const motherSection: IFormSection = {
       name: 'motherDateOfMarriage',
       type: 'date',
       label: maritalStatusMessages.dateOfMarriage,
-      required: true,
+      required: false,
       initialValue: '',
       validate: []
     },
