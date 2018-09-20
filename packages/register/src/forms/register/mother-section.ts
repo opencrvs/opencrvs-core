@@ -228,7 +228,7 @@ export const motherSection: IFormSection = {
       name: 'motherDateOfMarriage',
       type: 'date',
       label: maritalStatusMessages.dateOfMarriage,
-      required: true,
+      required: false,
       initialValue: '',
       validate: []
     },
