@@ -1,16 +1,21 @@
 import * as React from 'react'
-import { InjectedIntlProps, defineMessages } from 'react-intl'
-import { InjectedFormProps } from 'redux-form'
-import { InputField } from '@opencrvs/components/lib/forms'
+import {
+  InjectedIntlProps,
+  defineMessages,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
+
+import styled from 'styled-components'
+import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
+
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/interface'
 import { EnglishText } from '@opencrvs/components/lib/typography'
-import styled from 'styled-components'
-import { stepOneFields } from './stepOneFields'
-import { getFieldProps } from '../../utils/fieldUtils'
-import { Field } from 'redux-form'
-import { localizeInput } from '../../i18n/components/localizeInput'
 import { IAuthenticationData } from '@opencrvs/login/src/utils/authApi'
+import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+
+import { stepOneFields } from './stepOneFields'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -105,7 +110,58 @@ export interface IDispatchProps {
 
 type IStepOneForm = IProps & IDispatchProps
 
-const LocalizedInputField = localizeInput(InputField)
+const mobileField = stepOneFields.mobile
+const passwordField = stepOneFields.password
+
+function translateMetaField(
+  intl: InjectedIntl,
+  meta: WrappedFieldProps['meta']
+) {
+  return {
+    touched: meta.touched,
+    error: meta.error && intl.formatMessage(meta.error)
+  }
+}
+
+const MobileInput = injectIntl(
+  (props: WrappedFieldProps & InjectedIntlProps) => {
+    const { intl, meta, input, ...otherProps } = props
+    return (
+      <InputField
+        {...mobileField}
+        {...otherProps}
+        meta={translateMetaField(intl, meta)}
+        label={intl.formatMessage(mobileField.label)}
+      >
+        <TextInput
+          {...mobileField}
+          {...input}
+          type="tel"
+          placeholder={intl.formatMessage(mobileField.placeholder)}
+        />
+      </InputField>
+    )
+  }
+)
+
+const PasswordInput = injectIntl(
+  (props: WrappedFieldProps & InjectedIntlProps) => {
+    const { intl, meta, input, ...otherProps } = props
+    return (
+      <InputField
+        {...passwordField}
+        {...otherProps}
+        meta={{
+          touched: meta.touched,
+          error: meta.error && intl.formatMessage(meta.error)
+        }}
+        label={props.intl.formatMessage(passwordField.label)}
+      >
+        <TextInput {...passwordField} {...input} type="password" />
+      </InputField>
+    )
+  }
+)
 
 export class StepOneForm extends React.Component<
   InjectedIntlProps &
@@ -120,6 +176,7 @@ export class StepOneForm extends React.Component<
       submitAction,
       submissionError
     } = this.props
+
     return (
       <StyledBox id="login-step-one-box">
         <Title>
@@ -137,14 +194,16 @@ export class StepOneForm extends React.Component<
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
             <Field
-              {...getFieldProps(intl, stepOneFields.mobile, messages)}
-              component={LocalizedInputField}
+              name={mobileField.name}
+              validate={mobileField.validate}
+              component={MobileInput}
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
-              {...getFieldProps(intl, stepOneFields.password, messages)}
-              component={LocalizedInputField}
+              name={passwordField.name}
+              validate={passwordField.validate}
+              component={PasswordInput}
             />
           </FieldWrapper>
           <ActionWrapper>

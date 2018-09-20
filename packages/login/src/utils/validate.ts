@@ -2,14 +2,12 @@ import { defineMessages } from 'react-intl'
 import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
 
-export type Validation = (
-  value: string
-) =>
-  | {
-      message: FormattedMessage.MessageDescriptor
-      props?: { [key: string]: MessageValue }
-    }
-  | undefined
+export interface IValidationResult {
+  message: FormattedMessage.MessageDescriptor
+  props?: { [key: string]: MessageValue }
+}
+
+export type Validation = (value: string) => IValidationResult | undefined
 
 export const messages = defineMessages({
   required: {
@@ -79,7 +77,7 @@ export const required: Validation = (value: string) =>
 
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
-    ? { message: messages.minLength, values: dynamicValidationProps.minLength }
+    ? { message: messages.minLength, props: dynamicValidationProps.minLength }
     : undefined
 }
 
@@ -93,6 +91,6 @@ export const phoneNumberFormat: Validation = (value: string) => {
     ? undefined
     : {
         message: messages.phoneNumberFormat,
-        values: dynamicValidationProps.phoneNumberFormat
+        props: dynamicValidationProps.phoneNumberFormat
       }
 }

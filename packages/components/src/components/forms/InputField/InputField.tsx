@@ -3,28 +3,6 @@ import styled, { StyledFunction } from 'styled-components'
 import { ITextInputProps, TextInput } from '../TextInput'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
-import { ISelectProps } from '../Select'
-
-export interface IInputFieldProps {
-  id: string
-  label?: string
-  placeholder?: string
-  description?: string
-  required?: boolean
-  disabled?: boolean
-  maxLength?: number
-  meta?: { touched: boolean; error: string }
-  component?: React.ComponentClass<any>
-  prefix?: React.ComponentClass<any> | string
-  postfix?: React.ComponentClass<any> | string
-}
-
-const applyDefaultIfNotDisabled = (
-  disabled?: boolean,
-  label?: string
-): string => {
-  return !disabled && label ? label : ''
-}
 
 const InputHeader = styled.div`
   display: flex;
@@ -71,22 +49,25 @@ const renderComponentOrString = (
   }
 }
 
-export class InputField<
-  P = ITextInputProps | ISelectProps
-> extends React.Component<IInputFieldProps & P, {}> {
+export interface IInputFieldProps {
+  id: string
+  label?: string
+  description?: string
+  required?: boolean
+  disabled?: boolean
+  maxLength?: number
+  meta?: { touched: boolean; error: string }
+  prefix?: React.ComponentClass<any> | string
+  postfix?: React.ComponentClass<any> | string
+}
+
+export class InputField extends React.Component<IInputFieldProps, {}> {
   render() {
-    const {
-      label,
-      required = true,
-      placeholder,
-      description,
-      component = TextInput,
-      meta
-    } = this.props
-    const prefix = this.props.prefix as React.ComponentClass<any> | string
+    const { label, required = true, description, meta } = this.props
+
     const postfix = this.props.postfix as React.ComponentClass<any> | string
 
-    const Component = component
+    const { children, prefix } = this.props
 
     return (
       <div>
@@ -101,16 +82,7 @@ export class InputField<
 
         <ComponentWrapper>
           {prefix && <Padding>{renderComponentOrString(prefix)}</Padding>}
-          <Component
-            {...this.props}
-            placeholder={
-              placeholder
-                ? placeholder
-                : applyDefaultIfNotDisabled(this.props.disabled, placeholder)
-            }
-            error={Boolean(meta && meta.error)}
-            touched={meta && meta.touched}
-          />
+          {children}
           {postfix && <Padding>{renderComponentOrString(postfix)}</Padding>}
         </ComponentWrapper>
 

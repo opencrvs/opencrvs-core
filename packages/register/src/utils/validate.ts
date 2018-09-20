@@ -1,13 +1,16 @@
 import { defineMessages } from 'react-intl'
 import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
+import { IFormFieldValue } from '@opencrvs/register/src/forms'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
   props?: { [key: string]: MessageValue }
 }
 
-export type Validation = (value: string) => IValidationResult | undefined
+export type Validation = (
+  value: IFormFieldValue
+) => IValidationResult | undefined
 
 export const messages = defineMessages({
   required: {

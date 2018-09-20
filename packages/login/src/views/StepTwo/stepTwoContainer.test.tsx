@@ -5,9 +5,6 @@ import { getFieldToFocus, StepTwoContainer } from './StepTwoContainer'
 import { createTestComponent, wait, mockState } from '../../tests/util'
 import { client } from '../../utils/authApi'
 
-interface ITestProps {
-  test: string
-}
 describe('Login app step two', () => {
   beforeEach(() => {
     moxios.install(client)
@@ -17,12 +14,9 @@ describe('Login app step two', () => {
   })
   describe('Step Two Container test', () => {
     let component: ReactWrapper
-    let props: ITestProps
+
     beforeEach(() => {
-      props = {
-        test: ''
-      }
-      component = createTestComponent(<StepTwoContainer {...props} />)
+      component = createTestComponent(<StepTwoContainer />)
       component
         .find('input#code1')
         .simulate('change', { target: { value: '' } })
