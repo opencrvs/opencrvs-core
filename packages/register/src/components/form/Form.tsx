@@ -185,6 +185,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <Select
           {...inputProps}
+          value={value as string}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           options={fieldDefinition.options}
         />

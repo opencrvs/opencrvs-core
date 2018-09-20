@@ -2,24 +2,21 @@ import * as React from 'react'
 import { default as ReactSelect } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
+import { Omit } from '../omit'
 
 export interface ISelectOption {
   value: string
   label: string
 }
 
-interface IReactSelectOverrides {
-  onChange: (value: string) => void
-}
-
-export interface ISelectProps extends Props<any> {
+export interface IStyledSelectProps extends Props<ISelectOption> {
   id: string
   error?: boolean
   touched?: boolean
   options: ISelectOption[]
 }
 
-const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
+const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   width: 100%;
 
   ${({ theme }) => theme.fonts.defaultFontStyle};
@@ -44,9 +41,6 @@ const StyledSelect = styled(ReactSelect).attrs<ISelectProps>({})`
     border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
   }
 `
-interface IState {
-  selectedOption: ISelectOption
-}
 
 function getSelectedOption(
   value: string,
@@ -59,10 +53,13 @@ function getSelectedOption(
 
   return null
 }
-export class Select extends React.Component<
-  ISelectProps & IReactSelectOverrides,
-  IState
-> {
+
+interface ISelectProps extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
+  onChange: (value: string) => void
+  value: string
+}
+
+export class Select extends React.Component<ISelectProps> {
   change = (selectedOption: ISelectOption) => {
     if (this.props.onChange) {
       this.props.onChange(selectedOption.value)

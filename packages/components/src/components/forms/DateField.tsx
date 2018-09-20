@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ITextInputProps, TextInput } from './TextInput'
+import { Omit } from '../omit'
 
 export interface IProps {
   id: string
@@ -16,7 +17,6 @@ export interface IState {
   yyyy: string
 }
 
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
