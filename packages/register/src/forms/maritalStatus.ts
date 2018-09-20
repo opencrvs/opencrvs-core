@@ -8,7 +8,7 @@ export const messages = defineMessages({
   },
   maritalStatusSingle: {
     id: 'formFields.maritalStatusSingle',
-    defaultMessage: 'Single',
+    defaultMessage: 'Unmarried',
     description: 'Option for form field: Marital status'
   },
   maritalStatusMarried: {
