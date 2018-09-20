@@ -13,19 +13,19 @@ const List = styled.ul`
   padding: 0;
 `
 
-interface IRadioOption {
+export interface IRadioOption {
   label: string
-  value: string
+  value: string | boolean
 }
 
-export interface IRadioGroup {
+export interface IRadioGroupProps {
   options: IRadioOption[]
   name: string
   value: string
-  onChange: (value: string) => {}
+  onChange: (value: string) => void
 }
 
-export class RadioGroup extends React.Component<IRadioGroup> {
+export class RadioGroup extends React.Component<IRadioGroupProps> {
   change = (value: any) => {
     if (this.props.onChange) {
       this.props.onChange(value)
@@ -34,7 +34,6 @@ export class RadioGroup extends React.Component<IRadioGroup> {
 
   render() {
     const { options, value, name, ...props } = this.props
-    //tslint:disable
 
     return (
       <Wrapper>

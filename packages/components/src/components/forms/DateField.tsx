@@ -4,10 +4,10 @@ import { ITextInputProps, TextInput } from './TextInput'
 
 export interface IProps {
   id: string
-  disabled: boolean
+  disabled?: boolean
   meta?: { touched: boolean; error: string }
-  focusInput: boolean
-  onChange: (dateString: string) => {}
+  focusInput?: boolean
+  onChange: (dateString: string) => void
 }
 
 export interface IState {
@@ -16,7 +16,8 @@ export interface IState {
   yyyy: string
 }
 
-export type IDateFieldProps = IProps & ITextInputProps
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
   width: 4em;

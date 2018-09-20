@@ -1,16 +1,18 @@
 import * as React from 'react'
-import { InjectedIntlProps, defineMessages } from 'react-intl'
-import { InjectedFormProps } from 'redux-form'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
+
+import styled from 'styled-components'
+import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
+
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/interface'
 import { EnglishText } from '@opencrvs/components/lib/typography'
-import styled from 'styled-components'
+import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+
 import { stepOneFields } from './stepOneFields'
-import { getFieldProps } from '../../utils/fieldUtils'
-import { Field } from 'redux-form'
-import { localizeInput } from '../../i18n/components/localizeInput'
-import { IAuthenticationData } from '@opencrvs/login/src/utils/authApi'
+
+import { IAuthenticationData } from '../../utils/authApi'
+import { localiseValidationError } from '../../forms/i18n'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -48,6 +50,11 @@ export const messages = defineMessages({
     defaultMessage: 'Sorry that mobile number and password did not work.',
     description:
       'The error that appears when the user entered details are unauthorised'
+  },
+  optionalLabel: {
+    id: 'login.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
   }
 })
 
@@ -105,7 +112,49 @@ export interface IDispatchProps {
 
 type IStepOneForm = IProps & IDispatchProps
 
-const LocalizedInputField = localizeInput(InputField)
+const mobileField = stepOneFields.mobile
+const passwordField = stepOneFields.password
+
+type Props = WrappedFieldProps & InjectedIntlProps
+
+const MobileInput = injectIntl((props: Props) => {
+  const { intl, meta, input, ...otherProps } = props
+
+  return (
+    <InputField
+      {...mobileField}
+      {...otherProps}
+      touched={meta.touched}
+      error={meta.error && localiseValidationError(intl, meta.error)}
+      label={intl.formatMessage(mobileField.label)}
+      optionalLabel={intl.formatMessage(messages.optionalLabel)}
+    >
+      <TextInput
+        {...mobileField}
+        {...input}
+        type="tel"
+        placeholder={intl.formatMessage(mobileField.placeholder)}
+      />
+    </InputField>
+  )
+})
+
+const PasswordInput = injectIntl((props: Props) => {
+  const { intl, meta, input, ...otherProps } = props
+
+  return (
+    <InputField
+      {...passwordField}
+      {...otherProps}
+      touched={meta.touched}
+      error={meta.error && localiseValidationError(intl, meta.error)}
+      label={intl.formatMessage(passwordField.label)}
+      optionalLabel={intl.formatMessage(messages.optionalLabel)}
+    >
+      <TextInput {...passwordField} {...input} type="password" />
+    </InputField>
+  )
+})
 
 export class StepOneForm extends React.Component<
   InjectedIntlProps &
@@ -120,6 +169,7 @@ export class StepOneForm extends React.Component<
       submitAction,
       submissionError
     } = this.props
+
     return (
       <StyledBox id="login-step-one-box">
         <Title>
@@ -137,14 +187,22 @@ export class StepOneForm extends React.Component<
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
             <Field
-              {...getFieldProps(intl, stepOneFields.mobile, messages)}
-              component={LocalizedInputField}
+              name={mobileField.name}
+              validate={mobileField.validate}
+              component={
+                // tslint:disable-next-line no-any
+                MobileInput as React.ComponentClass<any>
+              }
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
-              {...getFieldProps(intl, stepOneFields.password, messages)}
-              component={LocalizedInputField}
+              name={passwordField.name}
+              validate={passwordField.validate}
+              component={
+                // tslint:disable-next-line no-any
+                PasswordInput as React.ComponentClass<any>
+              }
             />
           </FieldWrapper>
           <ActionWrapper>

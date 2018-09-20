@@ -68,7 +68,7 @@ describe('validate', () => {
           description:
             'The error message that appears on fields with a minimum length'
         },
-        values: {
+        props: {
           min: 10
         }
       }
@@ -110,7 +110,7 @@ describe('validate', () => {
           description:
             'The error message that appears on phone numbers where the first character must be a 0'
         },
-        values: {
+        props: {
           locale: config.LOCALE.toUpperCase(),
           format: '07123456789'
         }
