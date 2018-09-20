@@ -269,7 +269,7 @@ export const fatherSection: IFormSection = {
       name: 'fatherDateOfMarriage',
       type: 'date',
       label: maritalStatusMessages.dateOfMarriage,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [conditionals.fathersDetailsExist]
