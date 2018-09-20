@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { withFormik, Field, FormikProps } from 'formik'
+import { withFormik, Field, FormikProps, FieldProps } from 'formik'
 import { isEqual } from 'lodash'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import {
@@ -375,7 +375,7 @@ class FormSectionComponent extends React.Component<Props> {
             return (
               <FormItem key={`${field.name}`}>
                 <Field name={field.name}>
-                  {(formikFieldProps: any /* TODO */) => (
+                  {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
                         intl,
@@ -383,7 +383,7 @@ class FormSectionComponent extends React.Component<Props> {
                       )}
                       onSetFieldValue={setFieldValue}
                       {...formikFieldProps.field}
-                      touched={touched[field.name]}
+                      touched={touched[field.name] || false}
                       error={error}
                     />
                   )}
