@@ -480,6 +480,7 @@ export const ENGLISH_STATE = {
     'validations.numberRequired': 'Must be a number',
     'validations.phoneNumberFormat':
       'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
+    'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.mobilePhoneRegex': '07[0-9]{9,10}',
     'validations.mobileNumberFormat': '07123456789',
     'validations.requiredSymbol': '',
