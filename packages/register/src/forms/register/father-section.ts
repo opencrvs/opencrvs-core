@@ -3,7 +3,6 @@ import { ValidIndicator } from '@opencrvs/components/lib/forms'
 import {
   messages as addressMessages,
   states,
-  addressOptions,
   stateDistrictMap,
   districtUpazilaMap,
   upazilaUnionMap
@@ -385,10 +384,7 @@ export const fatherSection: IFormSection = {
       validate: [],
       dynamicOptions: {
         dependency: 'state',
-        options: Object.keys(addressOptions).reduce((options, state) => {
-          options[state] = addressOptions[state].districts
-          return options
-        }, {})
+        options: stateDistrictMap
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -407,10 +403,7 @@ export const fatherSection: IFormSection = {
       options: [],
       dynamicOptions: {
         dependency: 'district',
-        options: Object.keys(addressOptions).reduce((options, state) => {
-          options[state] = addressOptions[state].upazilas
-          return options
-        }, {})
+        options: districtUpazilaMap
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -430,10 +423,7 @@ export const fatherSection: IFormSection = {
       options: [],
       dynamicOptions: {
         dependency: 'addressLine4',
-        options: Object.keys(addressOptions).reduce((options, state) => {
-          options[state] = addressOptions[state].unions
-          return options
-        }, {})
+        options: upazilaUnionMap
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -554,7 +544,6 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'statePermanent',
         options: stateDistrictMap
@@ -573,7 +562,6 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'districtPermanent',
         options: districtUpazilaMap
@@ -593,7 +581,6 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'addressLine4Permanent',
         options: upazilaUnionMap

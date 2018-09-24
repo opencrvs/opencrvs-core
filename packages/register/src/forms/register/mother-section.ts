@@ -327,7 +327,6 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'district',
         options: districtUpazilaMap
@@ -345,7 +344,6 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'addressLine4',
         options: upazilaUnionMap
@@ -436,7 +434,6 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'statePermanent',
         options: stateDistrictMap
@@ -450,7 +447,6 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'districtPermanent',
         options: districtUpazilaMap
@@ -468,7 +464,6 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: {
         dependency: 'addressLine4Permanent',
         options: upazilaUnionMap
