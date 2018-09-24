@@ -4,7 +4,8 @@ import {
   IFormSectionData,
   Ii18nSelectOption,
   ISelectOption,
-  IConditionals
+  IConditionals,
+  IConditional
 } from './'
 import { InjectedIntl } from 'react-intl'
 import { getAddressOptions } from './address'
@@ -40,24 +41,37 @@ export const generateDynamicOptionsForField = (
 ) => {
   return {
     ...field,
-    options: field.dynamicOptions
-      ? getAddressOptions(field, values)
-      : field.options
+    options: getAddressOptions(field, values)
   }
+}
+
+export const getConditionalActionsForField = (
+  field: IFormField,
+  values: IFormSectionData
+): string[] => {
+  if (!field.conditionals) {
+    return []
+  }
+  return field.conditionals
+    .filter(conditional =>
+      /* tslint:disable-next-line: no-eval */
+      eval(conditional.expression)
+    )
+    .map((conditional: IConditional) => conditional.action)
 }
 
 export const conditionals: IConditionals = {
   fathersDetailsExist: {
     action: 'hide',
-    expression: 'values.fathersDetailsExist == 0'
+    expression: '!values.fathersDetailsExist'
   },
   permanentAddressSameAsMother: {
     action: 'hide',
-    expression: 'values.permanentAddressSameAsMother == 1'
+    expression: 'values.permanentAddressSameAsMother'
   },
   addressSameAsMother: {
     action: 'hide',
-    expression: 'values.addressSameAsMother == 1'
+    expression: 'values.addressSameAsMother'
   },
   countryPermanent: {
     action: 'hide',

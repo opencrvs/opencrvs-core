@@ -3,10 +3,6 @@ import { withFormik, FormikProps } from 'formik'
 import { isEqual } from 'lodash'
 import { InjectedIntlProps, injectIntl, FormattedMessage } from 'react-intl'
 import {
-  internationaliseFieldObject,
-  generateDynamicOptionsForField
-} from '../../forms/utils'
-import {
   InputField,
   TextInput,
   Select,
@@ -20,20 +16,20 @@ import {
   SubSectionDivider,
   CheckboxGroup
 } from '@opencrvs/components/lib/forms'
-import styled from '../../styled-components'
 import {
-  IFormField,
-  Ii18nFormField,
-  IFormSectionData,
-  IConditional
-} from '../../forms'
-import { Omit } from '../../utils'
-import { IValidationResult } from '../../utils/validate'
+  internationaliseFieldObject,
+  getConditionalActionsForField,
+  generateDynamicOptionsForField
+} from 'src/forms/utils'
+import styled from 'src/styled-components'
+import { IFormField, Ii18nFormField, IFormSectionData } from 'src/forms'
+import { Omit } from 'src/utils'
+import { IValidationResult } from 'src/utils/validate'
 import {
   localizeInput,
   MetaPropsWithMessageDescriptors
-} from '../../i18n/components/localizeInput'
-import { getValidationErrorsForForm } from '../../forms/validation'
+} from 'src/i18n/components/localizeInput'
+import { getValidationErrorsForForm } from 'src/forms/validation'
 
 const FormItem = styled.div`
   margin-bottom: 2em;
@@ -47,21 +43,6 @@ const DocumentUpload = styled.img`
   width: 100%;
 `
 
-const getConditionalActions = (
-  field: IFormField,
-  values: IFormSectionData
-): string[] => {
-  if (!field.conditionals) {
-    return []
-  }
-  return field.conditionals
-    .filter(conditional =>
-      /* tslint:disable-next-line: no-eval */
-      eval(conditional.expression)
-    )
-    .map((conditional: IConditional) => conditional.action)
-}
-
 type InputProps = ISelectProps | ITextInputProps | IDateFieldProps
 
 type GeneratedInputFieldProps = {
@@ -70,7 +51,7 @@ type GeneratedInputFieldProps = {
   onChange: (e: React.ChangeEvent<any>) => void
   meta: MetaPropsWithMessageDescriptors
   description?: FormattedMessage.MessageDescriptor
-} & Omit<Omit<IInputFieldProps, 'id'>, 'meta'> &
+} & Omit<IInputFieldProps, 'id' | 'meta'> &
   InputProps
 
 const LocalizedInputField = localizeInput(InputField)
@@ -267,7 +248,7 @@ class FormSectionComponent extends React.Component<Props> {
               meta.error = firstError
             }
 
-            const conditionalActions: string[] = getConditionalActions(
+            const conditionalActions: string[] = getConditionalActionsForField(
               field,
               values
             )

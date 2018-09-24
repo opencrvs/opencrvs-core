@@ -11,6 +11,7 @@ export interface IInputFieldProps {
   placeholder?: string
   description?: string
   required?: boolean
+  optionalLabel?: string
   disabled?: boolean
   maxLength?: number
   meta?: { touched: boolean; error: string }
@@ -80,6 +81,7 @@ export class InputField<
       required = true,
       placeholder,
       description,
+      optionalLabel,
       component = TextInput,
       meta
     } = this.props
@@ -95,7 +97,9 @@ export class InputField<
             <InputLabel disabled={this.props.disabled}>{label}</InputLabel>
           )}
           {!required && (
-            <Optional disabled={this.props.disabled}>•&nbsp;Optional</Optional>
+            <Optional disabled={this.props.disabled}>
+              •&nbsp;{optionalLabel || 'Optional'}
+            </Optional>
           )}
         </InputHeader>
 

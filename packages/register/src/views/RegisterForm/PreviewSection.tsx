@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  InjectedIntlProps,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
 import { flatten, identity } from 'lodash'
 
 import { Box } from '@opencrvs/components/lib/interface'
@@ -9,13 +14,14 @@ import { Warning } from '@opencrvs/components/lib/icons'
 
 import styled from 'src/styled-components'
 
-import { IFormSection, IFormField, IForm } from 'src/forms'
+import { IFormSection, IFormField, IForm, IFormFieldValue } from 'src/forms'
 
 import { IDraft } from 'src/drafts'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { getRegisterForm } from 'src/forms/register/selectors'
 import { IStoreState } from 'src/store'
+import { getConditionalActionsForField } from 'src/forms/utils'
 
 const FormAction = styled.div`
   display: flex;
@@ -27,6 +33,16 @@ const FormPrimaryButton = styled(PrimaryButton)`
 `
 
 export const messages = defineMessages({
+  valueYes: {
+    id: 'register.form.valueYes',
+    defaultMessage: 'Yes',
+    description: 'Label for "Yes" answer'
+  },
+  valueNo: {
+    id: 'register.form.valueNo',
+    defaultMessage: 'No',
+    description: 'Label for "No" answer'
+  },
   submit: {
     id: 'register.form.submit',
     defaultMessage: 'Submit',
@@ -94,6 +110,7 @@ const InformationMissingLink = styled(Button)`
   color: ${({ theme }) => theme.colors.danger};
   text-decoration: underline;
   padding: 0;
+  text-align: left;
 `
 
 const PreviewHeadingBox = styled(PreviewBox)`
@@ -117,6 +134,18 @@ const MissingFieldsWarningIcon = styled(Warning)`
   top: -16px;
   left: -16px;
 `
+
+function renderValue(value: IFormFieldValue, intl: InjectedIntl) {
+  if (typeof value === 'string') {
+    return value
+  }
+  if (typeof value === 'boolean') {
+    return value
+      ? intl.formatMessage(messages.valueYes)
+      : intl.formatMessage(messages.valueNo)
+  }
+  return value
+}
 
 class PreviewSectionForm extends React.Component<
   Props & OwnProps & DispatchProps & InjectedIntlProps
@@ -163,6 +192,14 @@ class PreviewSectionForm extends React.Component<
     const sectionsWithErrors = formSections.filter(section =>
       Object.values(emptyFieldsBySection[section.id]).some(identity)
     )
+
+    const isVisibleField = (field: IFormField, section: IFormSection) => {
+      const conditionalActions = getConditionalActionsForField(
+        field,
+        draft.data[section.id] || {}
+      )
+      return !conditionalActions.includes('hide')
+    }
 
     return (
       <>
@@ -211,35 +248,40 @@ class PreviewSectionForm extends React.Component<
                 {intl.formatMessage(section.title)} <ErrorDot />
               </PreviewSectionTitle>
               <List>
-                {section.fields.map((field: IFormField) => {
-                  const informationMissing =
-                    emptyFieldsBySection[section.id][field.name]
+                {section.fields
+                  .filter(field => isVisibleField(field, section))
+                  .map((field: IFormField) => {
+                    const informationMissing =
+                      emptyFieldsBySection[section.id][field.name]
 
-                  return (
-                    <ListItem key={field.name}>
-                      <ListItemLabel>
-                        {intl.formatMessage(field.label)}
-                      </ListItemLabel>
-                      <ListItemValue>
-                        {informationMissing ? (
-                          <InformationMissingLink
-                            onClick={() =>
-                              this.props.goToTab(
-                                draft.id,
-                                section.id,
-                                field.name
-                              )
-                            }
-                          >
-                            {intl.formatMessage(messages.informationMissing)}
-                          </InformationMissingLink>
-                        ) : (
-                          draft.data[section.id][field.name]
-                        )}
-                      </ListItemValue>
-                    </ListItem>
-                  )
-                })}
+                    return (
+                      <ListItem key={field.name}>
+                        <ListItemLabel>
+                          {intl.formatMessage(field.label)}
+                        </ListItemLabel>
+                        <ListItemValue>
+                          {informationMissing ? (
+                            <InformationMissingLink
+                              onClick={() =>
+                                this.props.goToTab(
+                                  draft.id,
+                                  section.id,
+                                  field.name
+                                )
+                              }
+                            >
+                              {intl.formatMessage(messages.informationMissing)}
+                            </InformationMissingLink>
+                          ) : (
+                            renderValue(
+                              draft.data[section.id][field.name],
+                              intl
+                            )
+                          )}
+                        </ListItemValue>
+                      </ListItem>
+                    )
+                  })}
               </List>
 
               {i === formSections.length - 1 && (

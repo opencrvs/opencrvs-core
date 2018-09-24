@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 import { IFormSection } from 'src/forms'
-import { phoneNumberFormat } from 'src/utils/validate'
+import { phoneNumberFormat, emailAddressFormat } from 'src/utils/validate'
 
 const messages = defineMessages({
   registrationTab: {
@@ -177,7 +177,7 @@ export const registrationSection: IFormSection = {
       label: messages.registrationEmailLabel,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [emailAddressFormat]
     },
     {
       name: 'registrationPhone',

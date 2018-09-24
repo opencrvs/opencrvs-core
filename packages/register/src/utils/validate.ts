@@ -2,6 +2,8 @@ import { defineMessages } from 'react-intl'
 import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
 
+import { validate as validateEmail } from 'email-validator'
+
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
   props?: { [key: string]: MessageValue }
@@ -51,6 +53,12 @@ export const messages = defineMessages({
     defaultMessage: '',
     description:
       'A blank error message. Used for highlighting a required field without showing an error'
+  },
+  emailAddressFormat: {
+    id: 'validations.emailAddressFormat',
+    defaultMessage: 'Must be a valid email address',
+    description:
+      'The error message appears when the email addresses are not valid'
   }
 })
 
@@ -66,12 +74,19 @@ export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const numberRexExp = new RegExp(messages.mobilePhoneRegex.defaultMessage)
   return numberRexExp.test(value)
 }
+export const isAValidEmailAddressFormat = (value: string): boolean => {
+  return validateEmail(value)
+}
 
 export const requiredSymbol: Validation = (value: string) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: string) =>
-  value ? undefined : { message: messages.required }
+export const required: Validation = (value: string | boolean) => {
+  if (typeof value === 'string') {
+    return value !== '' ? undefined : { message: messages.required }
+  }
+  return value !== undefined ? undefined : { message: messages.required }
+}
 
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
@@ -90,5 +105,13 @@ export const phoneNumberFormat: Validation = (value: string) => {
     : {
         message: messages.phoneNumberFormat,
         props: dynamicValidationProps.phoneNumberFormat
+      }
+}
+
+export const emailAddressFormat: Validation = (value: string) => {
+  return value && isAValidEmailAddressFormat(value)
+    ? undefined
+    : {
+        message: messages.emailAddressFormat
       }
 }

@@ -2,6 +2,7 @@ import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from './actions'
 import { ENGLISH_STATE } from './locales/en'
 import { BENGALI_STATE } from './locales/bn'
+import { config } from 'src/config'
 
 export interface IntlMessages {
   [key: string]: string
@@ -19,13 +20,13 @@ export type IntlState = {
 }
 
 export const initialState: IntlState = {
-  language: 'en',
-  messages: ENGLISH_STATE.messages,
+  language: config.LANGUAGE,
+  messages: languages[config.LANGUAGE].messages,
   languages
 }
 
 const getNextMessages = (language: string): IntlMessages => {
-  return languages[language]
+  return languages[language].messages
 }
 
 export const intlReducer: LoopReducer<IntlState, actions.Action> = (

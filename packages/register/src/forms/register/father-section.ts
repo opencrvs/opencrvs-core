@@ -75,17 +75,17 @@ export const messages = defineMessages({
     description: 'Label for form field: Family name'
   },
   fatherGivenNameEng: {
-    id: 'formFields.fatherGivenName',
+    id: 'formFields.fatherGivenNameEng',
     defaultMessage: 'Given name (in english)',
     description: 'Label for form field: Given name in english'
   },
   fatherMiddleNamesEng: {
-    id: 'formFields.fatherMiddleNames',
+    id: 'formFields.fatherMiddleNamesEng',
     defaultMessage: 'Middle name(s) (in english)',
     description: 'Label for form field: Middle names in english'
   },
   fatherFamilyNameEng: {
-    id: 'formFields.fatherFamilyName',
+    id: 'formFields.fatherFamilyNameEng',
     defaultMessage: 'Family name (in english)',
     description: 'Label for form field: Family name in english'
   },
@@ -113,6 +113,11 @@ export const messages = defineMessages({
     id: 'formFields.permanentAddress',
     defaultMessage: 'Permanent Address',
     description: 'Title for the permanent address fields'
+  },
+  optionalLabel: {
+    id: 'formFields.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
   }
 })
 
@@ -127,11 +132,11 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: messages.fathersDetailsExist,
       required: true,
-      initialValue: '',
+      initialValue: false,
       validate: [],
       options: [
-        { value: '1', label: messages.confirm },
-        { value: '0', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ]
     },
     {
@@ -179,7 +184,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: messages.nationality,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [conditionals.fathersDetailsExist]
@@ -250,7 +255,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: maritalStatusMessages.maritalStatus,
       required: true,
-      initialValue: '',
+      initialValue: 'MARRIED',
       validate: [],
       options: [
         { value: 'SINGLE', label: maritalStatusMessages.maritalStatusSingle },
@@ -271,7 +276,7 @@ export const fatherSection: IFormSection = {
       name: 'fatherDateOfMarriage',
       type: 'date',
       label: maritalStatusMessages.dateOfMarriage,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [conditionals.fathersDetailsExist]
@@ -324,11 +329,11 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: addressMessages.addressSameAsMother,
       required: true,
-      initialValue: '1',
+      initialValue: true,
       validate: [],
       options: [
-        { value: '1', label: addressMessages.confirm },
-        { value: '0', label: addressMessages.deny }
+        { value: true, label: addressMessages.confirm },
+        { value: false, label: addressMessages.deny }
       ],
       conditionals: [conditionals.fathersDetailsExist]
     },
@@ -349,7 +354,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [
@@ -477,7 +482,7 @@ export const fatherSection: IFormSection = {
       name: 'postCode',
       type: 'text',
       label: addressMessages.postCode,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -495,11 +500,11 @@ export const fatherSection: IFormSection = {
       type: 'radioGroup',
       label: addressMessages.permanentAddressSameAsMother,
       required: true,
-      initialValue: '1',
+      initialValue: true,
       validate: [],
       options: [
-        { value: '1', label: messages.confirm },
-        { value: '0', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.fathersDetailsExist]
     },
@@ -520,7 +525,7 @@ export const fatherSection: IFormSection = {
       type: 'select',
       label: addressMessages.country,
       required: true,
-      initialValue: '',
+      initialValue: 'BGD',
       validate: [],
       options: countries,
       conditionals: [
@@ -640,7 +645,7 @@ export const fatherSection: IFormSection = {
       name: 'postCodePermanent',
       type: 'text',
       label: addressMessages.postCode,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [

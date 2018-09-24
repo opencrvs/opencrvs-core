@@ -36,17 +36,17 @@ const messages = defineMessages({
     description: 'Label for form field: Family name'
   },
   childGivenNameEng: {
-    id: 'formFields.childGivenName',
+    id: 'formFields.childGivenNameEng',
     defaultMessage: 'Given name (in english)',
     description: 'Label for form field: Given name in english'
   },
   childMiddleNamesEng: {
-    id: 'formFields.childMiddleNames',
+    id: 'formFields.childMiddleNamesEng',
     defaultMessage: 'Middle name(s) (in english)',
     description: 'Label for form field: Middle names in english'
   },
   childFamilyNameEng: {
-    id: 'formFields.childFamilyName',
+    id: 'formFields.childFamilyNameEng',
     defaultMessage: 'Family name (in english)',
     description: 'Label for form field: Family name in english'
   },
@@ -86,42 +86,37 @@ const messages = defineMessages({
     description: 'Label for form field: Attendant at birth'
   },
   attendantAtBirthPhysician: {
-    id: 'formFields.attendantAtBirth',
+    id: 'formFields.attendantAtBirthPhysician',
     defaultMessage: 'Physician',
     description: 'Label for form field: Attendant at birth'
   },
   attendantAtBirthNurse: {
-    id: 'formFields.attendantAtBirth',
+    id: 'formFields.attendantAtBirthNurse',
     defaultMessage: 'Nurse',
     description: 'Label for form field: Attendant at birth'
   },
-  attendantAtBirthNurseMidwife: {
-    id: 'formFields.attendantAtBirth',
-    defaultMessage: 'Nurse midwife',
-    description: 'Label for form field: Attendant at birth'
-  },
   attendantAtBirthMidwife: {
-    id: 'formFields.attendantAtBirth',
+    id: 'formFields.attendantAtBirthMidwife',
     defaultMessage: 'Midwife',
     description: 'Label for form field: Attendant at birth'
   },
   attendantAtBirthOtherParamedicalPersonnel: {
-    id: 'formFields.attendantAtBirth',
+    id: 'formFields.attendantAtBirthOtherParamedicalPersonnel',
     defaultMessage: 'Other paramedical personnel',
     description: 'Label for form field: Attendant at birth'
   },
   attendantAtBirthLayperson: {
-    id: 'formFields.attendantAtBirth',
+    id: 'formFields.attendantAtBirthLayperson',
     defaultMessage: 'Layperson',
     description: 'Label for form field: Attendant at birth'
   },
   attendantAtBirthNone: {
-    id: 'formFields.attendantAtBirth',
+    id: 'formFields.attendantAtBirthNone',
     defaultMessage: 'None',
     description: 'Label for form field: Attendant at birth'
   },
   attendantAtBirthOther: {
-    id: 'formFields.attendantAtBirth',
+    id: 'formFields.attendantAtBirthOther',
     defaultMessage: 'Other',
     description: 'Label for form field: Attendant at birth'
   },
@@ -131,27 +126,27 @@ const messages = defineMessages({
     description: 'Label for form field: Type of birth'
   },
   typeOfBirthSingle: {
-    id: 'formFields.typeOfBirth',
+    id: 'formFields.typeOfBirthSingle',
     defaultMessage: 'Single',
     description: 'Label for form field: Type of birth'
   },
   typeOfBirthTwin: {
-    id: 'formFields.typeOfBirth',
+    id: 'formFields.typeOfBirthTwin',
     defaultMessage: 'Twin',
     description: 'Label for form field: Type of birth'
   },
   typeOfBirthTriplet: {
-    id: 'formFields.typeOfBirth',
+    id: 'formFields.typeOfBirthTriplet',
     defaultMessage: 'Triplet',
     description: 'Label for form field: Type of birth'
   },
   typeOfBirthQuadruplet: {
-    id: 'formFields.typeOfBirth',
+    id: 'formFields.typeOfBirthQuadruplet',
     defaultMessage: 'Quadruplet',
     description: 'Label for form field: Type of birth'
   },
   typeOfBirthHigherMultipleDelivery: {
-    id: 'formFields.typeOfBirth',
+    id: 'formFields.typeOfBirthHigherMultipleDelivery',
     defaultMessage: 'Higher multiple delivery',
     description: 'Label for form field: Type of birth'
   },
@@ -180,10 +175,30 @@ const messages = defineMessages({
     defaultMessage: 'Address of place of delivery',
     description: 'Label for form field: Address of place of delivery'
   },
-  defaultLabel: {
-    id: 'formFields.defaultLabel',
-    defaultMessage: 'Label goes here',
-    description: 'default label'
+  hospital: {
+    id: 'formFields.hospital',
+    defaultMessage: 'Hospital',
+    description: 'Select item for hospital'
+  },
+  otherHealthInstitution: {
+    id: 'formFields.otherHealthInstitution',
+    defaultMessage: 'Other Health Institution',
+    description: 'Select item for Other Health Institution'
+  },
+  privateHome: {
+    id: 'formFields.privateHome',
+    defaultMessage: 'Private Home',
+    description: 'Select item for Private Home'
+  },
+  otherInstitution: {
+    id: 'formFields.otherInstitution',
+    defaultMessage: 'Other Institution',
+    description: 'Select item for Other Institution'
+  },
+  optionalLabel: {
+    id: 'formFields.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
   }
 })
 
@@ -271,10 +286,6 @@ export const childSection: IFormSection = {
       options: [
         { value: 'PHYSICIAN', label: messages.attendantAtBirthPhysician },
         { value: 'NURSE', label: messages.attendantAtBirthNurse },
-        {
-          value: 'NURSE_MIDWIFE',
-          label: messages.attendantAtBirthNurseMidwife
-        },
         { value: 'MIDWIFE', label: messages.attendantAtBirthMidwife },
         {
           value: 'OTHER_PARAMEDICAL_PERSONNEL',
@@ -326,7 +337,15 @@ export const childSection: IFormSection = {
       label: messages.placeOfDelivery,
       initialValue: '',
       validate: [],
-      options: [{ value: '?', label: messages.defaultLabel }]
+      options: [
+        { value: 'HOSPITAL', label: messages.hospital },
+        {
+          value: 'OTHER_HEALTH_INSTITUTION',
+          label: messages.otherHealthInstitution
+        },
+        { value: 'PRIVATE_HOME', label: messages.privateHome },
+        { value: 'OTHER', label: messages.otherInstitution }
+      ]
     },
     {
       name: 'deliveryInstitution',
@@ -334,7 +353,7 @@ export const childSection: IFormSection = {
       label: messages.deliveryInstitution,
       initialValue: '',
       validate: [],
-      options: [{ value: '?', label: messages.defaultLabel }]
+      options: [{ value: '?', label: messages.deliveryInstitution }]
     },
     {
       name: 'deliveryAddress',
