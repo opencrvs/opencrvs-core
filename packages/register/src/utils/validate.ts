@@ -3,6 +3,8 @@ import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
 import * as XRegExp from 'xregexp'
 
+import { validate as validateEmail } from 'email-validator'
+
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
   props?: { [key: string]: MessageValue }
@@ -64,6 +66,12 @@ export const messages = defineMessages({
     defaultMessage: '',
     description:
       'A blank error message. Used for highlighting a required field without showing an error'
+  },
+  emailAddressFormat: {
+    id: 'validations.emailAddressFormat',
+    defaultMessage: 'Must be a valid email address',
+    description:
+      'The error message appears when the email addresses are not valid'
   }
 })
 
@@ -78,6 +86,9 @@ const dynamicValidationProps = {
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const numberRexExp = new RegExp(messages.mobilePhoneRegex.defaultMessage)
   return numberRexExp.test(value)
+}
+export const isAValidEmailAddressFormat = (value: string): boolean => {
+  return validateEmail(value)
 }
 
 export const requiredSymbol: Validation = (value: string) =>
@@ -182,4 +193,12 @@ export const englishNameFormat: Validation = (value: string) => {
   return isValidEnglishName(value)
     ? undefined
     : { message: messages.englishNameFormat }
+}
+
+export const emailAddressFormat: Validation = (value: string) => {
+  return value && isAValidEmailAddressFormat(value)
+    ? undefined
+    : {
+        message: messages.emailAddressFormat
+      }
 }

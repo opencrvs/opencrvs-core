@@ -209,7 +209,7 @@ export const motherSection: IFormSection = {
       type: 'select',
       label: maritalStatusMessages.maritalStatus,
       required: true,
-      initialValue: '',
+      initialValue: 'MARRIED',
       validate: [],
       options: [
         { value: 'SINGLE', label: maritalStatusMessages.maritalStatusSingle },
@@ -229,7 +229,7 @@ export const motherSection: IFormSection = {
       name: 'motherDateOfMarriage',
       type: 'date',
       label: maritalStatusMessages.dateOfMarriage,
-      required: true,
+      required: false,
       initialValue: '',
       validate: []
     },
@@ -377,7 +377,7 @@ export const motherSection: IFormSection = {
       name: 'postCode',
       type: 'text',
       label: addressMessages.postCode,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -491,7 +491,7 @@ export const motherSection: IFormSection = {
       name: 'postCodePermanent',
       type: 'text',
       label: addressMessages.postCode,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
