@@ -11,6 +11,7 @@ export const ENGLISH_STATE = {
       'Sorry that mobile number and password did not work.',
     'login.codeSubmissionError': 'Sorry that code did not work.',
     'login.resendMobile': 'Resend SMS',
+    'login.optionalLabel': 'Optional',
     'login.stepTwoTitle': 'Verify your mobile phone',
     'login.stepTwoInstruction':
       'Please enter the sms code we have sent to your mobile phone.',

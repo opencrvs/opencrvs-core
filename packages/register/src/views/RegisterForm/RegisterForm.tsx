@@ -295,4 +295,4 @@ function mapStateToProps(
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
   goToTab: goToTabAction
-})(injectIntl<Props>(RegisterFormView))
+})(injectIntl<Props & InjectedIntlProps>(RegisterFormView))
