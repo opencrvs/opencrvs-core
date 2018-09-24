@@ -11,6 +11,7 @@ export type IFormFieldValue = string | string[] | boolean
 export interface IFormField {
   name: string
   type: string
+  step?: number
   label: FormattedMessage.MessageDescriptor
   validate: Validation[]
   required?: boolean

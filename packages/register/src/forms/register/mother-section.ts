@@ -374,7 +374,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCode',
-      type: 'text',
+      type: 'number',
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
@@ -488,7 +488,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCodePermanent',
-      type: 'text',
+      type: 'number',
       label: addressMessages.postCode,
       required: false,
       initialValue: '',

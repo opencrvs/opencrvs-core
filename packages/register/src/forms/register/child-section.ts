@@ -316,7 +316,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'orderOfBirth',
-      type: 'text',
+      type: 'number',
       label: messages.orderOfBirth,
       required: true,
       initialValue: '',
@@ -324,7 +324,8 @@ export const childSection: IFormSection = {
     },
     {
       name: 'weightAtBirth',
-      type: 'text',
+      type: 'number',
+      step: 0.01,
       label: messages.weightAtBirth,
       required: true,
       initialValue: '',
