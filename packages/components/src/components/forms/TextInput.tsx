@@ -26,6 +26,9 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   &[type='text'] {
     background: ${({ theme }) => theme.colors.inputBackground};
   }
+  &[type='number'] {
+    background: ${({ theme }) => theme.colors.inputBackground};
+  }
 
   &:focus {
     border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
