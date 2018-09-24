@@ -4,7 +4,9 @@ import {
   required,
   minLength,
   isNumber,
-  phoneNumberFormat
+  phoneNumberFormat,
+  bengaliNameFormat,
+  englishNameFormat
 } from './validate'
 import { config } from '../config'
 
@@ -122,6 +124,103 @@ describe('validate', () => {
       const goodValue = '07111111111'
       const response = undefined
       expect(phoneNumberFormat(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('bengaliNameFormat. Checks a value is a valid Bengali name', () => {
+    it('should error when a number is given', () => {
+      const badValue = 'মাসুম১'
+      const response = {
+        message: {
+          id: 'validations.bengaliNameFormat',
+          defaultMessage: 'Must contain only Bengali letters',
+          description:
+            'The error message that appears when a non letter character is used in a Bengali name'
+        }
+      }
+      expect(bengaliNameFormat(badValue)).toEqual(response)
+    })
+    it('should error when a Bengali punctuation is given', () => {
+      const badValue = 'মাসুম।'
+      const response = {
+        message: {
+          id: 'validations.bengaliNameFormat',
+          defaultMessage: 'Must contain only Bengali letters',
+          description:
+            'The error message that appears when a non letter character is used in a Bengali name'
+        }
+      }
+      expect(bengaliNameFormat(badValue)).toEqual(response)
+    })
+    it('should error when a non Bengali character is given', () => {
+      const badValue = 'Masum'
+      const response = {
+        message: {
+          id: 'validations.bengaliNameFormat',
+          defaultMessage: 'Must contain only Bengali letters',
+          description:
+            'The error message that appears when a non letter character is used in a Bengali name'
+        }
+      }
+      expect(bengaliNameFormat(badValue)).toEqual(response)
+    })
+    it('should pass when given a good name in Bengali', () => {
+      const goodValue = 'মাসুম'
+      const response = undefined
+      expect(bengaliNameFormat(goodValue)).toEqual(response)
+    })
+    it.skip('should pass when given a good name in Bengali with multiple words', () => {
+      const goodValue = 'আব্দুল জলিল'
+      const response = undefined
+      expect(bengaliNameFormat(goodValue)).toEqual(response)
+    })
+  })
+  describe('englishNameFormat. Checks a value is a valid English name', () => {
+    it('should error when a number is given', () => {
+      const badValue = 'John1'
+      const response = {
+        message: {
+          id: 'validations.englishNameFormat',
+          defaultMessage: 'Must contain only English letters',
+          description:
+            'The error message that appears when a non letter character is used in an English name'
+        }
+      }
+      expect(englishNameFormat(badValue)).toEqual(response)
+    })
+    it('should error when an English punctuation is given', () => {
+      const badValue = 'John.'
+      const response = {
+        message: {
+          id: 'validations.englishNameFormat',
+          defaultMessage: 'Must contain only English letters',
+          description:
+            'The error message that appears when a non letter character is used in an English name'
+        }
+      }
+      expect(englishNameFormat(badValue)).toEqual(response)
+    })
+    it('should error when a non English character is given', () => {
+      const badValue = 'জন'
+      const response = {
+        message: {
+          id: 'validations.englishNameFormat',
+          defaultMessage: 'Must contain only English letters',
+          description:
+            'The error message that appears when a non letter character is used in an English name'
+        }
+      }
+      expect(englishNameFormat(badValue)).toEqual(response)
+    })
+    it('should pass when given a good name in English', () => {
+      const goodValue = 'John'
+      const response = undefined
+      expect(englishNameFormat(goodValue)).toEqual(response)
+    })
+    it.skip('should pass when given a good name in English with multiple words', () => {
+      const goodValue = 'John Doe'
+      const response = undefined
+      expect(englishNameFormat(goodValue)).toEqual(response)
     })
   })
 })

@@ -6,6 +6,7 @@ import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
 import { ViewType } from 'src/forms'
+import { bengaliNameFormat, englishNameFormat } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
   firstName: string
@@ -188,7 +189,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherGivenName,
       required: true,
       initialValue: '',
-      validate: [],
+      validate: [bengaliNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -197,7 +198,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherMiddleNames,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [bengaliNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -205,7 +206,7 @@ export const fatherSection: IFormSection = {
       type: 'text',
       label: messages.fatherFamilyName,
       initialValue: '',
-      validate: [],
+      validate: [bengaliNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -214,7 +215,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherGivenNameEng,
       required: true,
       initialValue: '',
-      validate: [],
+      validate: [englishNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -223,7 +224,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherMiddleNamesEng,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [englishNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -231,7 +232,7 @@ export const fatherSection: IFormSection = {
       type: 'text',
       label: messages.fatherFamilyNameEng,
       initialValue: '',
-      validate: [],
+      validate: [englishNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {

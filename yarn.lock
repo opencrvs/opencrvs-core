@@ -625,6 +625,10 @@
   dependencies:
     "@types/node" "*"
 
+"@types/xregexp@^3.0.29":
+  version "3.0.29"
+  resolved "https://registry.yarnpkg.com/@types/xregexp/-/xregexp-3.0.29.tgz#9f2f819712ab41fd8b434036ec4b14cbb9dbe654"
+
 "@types/zen-observable@^0.5.3":
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/@types/zen-observable/-/zen-observable-0.5.3.tgz#91b728599544efbb7386d8b6633693a3c2e7ade5"
@@ -13359,6 +13363,10 @@ xml-name-validator@^3.0.0:
 xmlhttprequest-ssl@~1.5.4:
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.5.tgz#c2876b06168aadc40e57d97e81191ac8f4398b3e"
+
+xregexp@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/xregexp/-/xregexp-4.2.0.tgz#33f09542b0d7cabed46728eeacac4d5bd764ccf5"
 
 xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:
   version "4.0.1"

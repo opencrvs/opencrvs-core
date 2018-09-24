@@ -1,6 +1,7 @@
 import { defineMessages } from 'react-intl'
 import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
+import * as XRegExp from 'xregexp'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
@@ -45,6 +46,18 @@ export const messages = defineMessages({
     defaultMessage: '07123456789',
     description:
       'The format of the mobile number that appears in an error message'
+  },
+  bengaliNameFormat: {
+    id: 'validations.bengaliNameFormat',
+    defaultMessage: 'Must contain only Bengali letters',
+    description:
+      'The error message that appears when a non letter character is used in a Bengali name'
+  },
+  englishNameFormat: {
+    id: 'validations.englishNameFormat',
+    defaultMessage: 'Must contain only English letters',
+    description:
+      'The error message that appears when a non letter character is used in an English name'
   },
   requiredSymbol: {
     id: 'validations.requiredSymbol',
@@ -95,4 +108,78 @@ export const phoneNumberFormat: Validation = (value: string) => {
         message: messages.phoneNumberFormat,
         props: dynamicValidationProps.phoneNumberFormat
       }
+}
+
+/*
+ * TODO: The name validation functions should be refactored out.
+ *
+ * Name validation has some complexities. These will vary from country to
+ * country too. e.g. in Bangladesh there is actually no given name or
+ * family name. Or first name/last name. To fit names in the common western
+ * format, people have to use multiple words in a "first name" or a "last name".
+ *
+ * Another complexity is what letters are allowed. Should we allow hyphens?
+ * Then in Bengali, there are some rules which we can build to ensure better
+ * quality input. e.g. a word can not start with a "mark" or diatribe.
+ *
+ * For now, we are going with simple validation that just prevents non-letter
+ * input.
+ */
+
+//
+// Each character has to be a part of the Unicode Bengali script
+// and it has to be a part of the Unicode letter category.
+//
+export const isValidBengaliLettersWord = (value: string): boolean => {
+  const bengaliRe = XRegExp.cache('^\\p{Bengali}+$')
+  const nameLettersRe = XRegExp.cache('^[\\pL\\pM]+$')
+
+  return bengaliRe.test(value) && nameLettersRe.test(value)
+}
+
+//
+// Simple pattern. Allow only english letters.
+//
+export const isValidEnglishLettersWord = (value: string): boolean => {
+  // Still using XRegExp for its caching ability
+  const englishRe = XRegExp.cache('^[A-Za-z]+$')
+
+  return englishRe.test(value)
+}
+
+type Checker = (value: string) => boolean
+
+//
+// Utility 2nd order function. Does a little common task then passes on to
+// the callback.
+//
+const checkNameWords = (value: string, checker: Checker): boolean => {
+  const trimmedValue = value === undefined || value === null ? '' : value.trim()
+
+  if (!trimmedValue) {
+    return true
+  }
+
+  const parts: string[] = trimmedValue.split(/\s+/)
+  return parts.every(checker)
+}
+
+export const isValidBengaliName = (value: string): boolean => {
+  return checkNameWords(value, isValidBengaliLettersWord)
+}
+
+export const isValidEnglishName = (value: string): boolean => {
+  return checkNameWords(value, isValidEnglishLettersWord)
+}
+
+export const bengaliNameFormat: Validation = (value: string) => {
+  return isValidBengaliName(value)
+    ? undefined
+    : { message: messages.bengaliNameFormat }
+}
+
+export const englishNameFormat: Validation = (value: string) => {
+  return isValidEnglishName(value)
+    ? undefined
+    : { message: messages.englishNameFormat }
 }

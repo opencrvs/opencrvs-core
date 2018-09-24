@@ -1,5 +1,6 @@
 import { defineMessages } from 'react-intl'
 import { ViewType } from 'src/forms'
+import { bengaliNameFormat, englishNameFormat } from 'src/utils/validate'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -214,7 +215,7 @@ export const childSection: IFormSection = {
       label: messages.childGivenName,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [bengaliNameFormat]
     },
     {
       name: 'childMiddleNames',
@@ -222,14 +223,14 @@ export const childSection: IFormSection = {
       label: messages.childMiddleNames,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [bengaliNameFormat]
     },
     {
       name: 'childFamilyName',
       type: 'text',
       label: messages.childFamilyName,
       initialValue: '',
-      validate: []
+      validate: [bengaliNameFormat]
     },
     {
       name: 'childGivenNameEng',
@@ -237,7 +238,7 @@ export const childSection: IFormSection = {
       label: messages.childGivenNameEng,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [englishNameFormat]
     },
     {
       name: 'childMiddleNamesEng',
@@ -245,14 +246,14 @@ export const childSection: IFormSection = {
       label: messages.childMiddleNamesEng,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [englishNameFormat]
     },
     {
       name: 'childFamilyNameEng',
       type: 'text',
       label: messages.childFamilyNameEng,
       initialValue: '',
-      validate: []
+      validate: [englishNameFormat]
     },
     {
       name: 'childSex',
