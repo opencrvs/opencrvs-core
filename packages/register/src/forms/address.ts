@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 
-import { IFormField, IFormSectionData, IDynamicOptions } from './index'
+import { IFormField, IFormSectionData } from './index'
 
 export const stateMessages = defineMessages({
   state1: {
@@ -899,7 +899,7 @@ export const messages = defineMessages({
 
 export const addressOptions = {
   state1: {
-    districts: null
+    districts: []
   },
   state2: {
     districts: state2Districts,
@@ -1044,53 +1044,50 @@ export const addressOptions = {
   }
 }
 
+export const stateDistrictMap = Object.keys(addressOptions).reduce(
+  (stateDistrictsMap, state) => {
+    stateDistrictsMap[state] = addressOptions[state].districts
+    return stateDistrictsMap
+  },
+  {}
+)
+
+export const districtUpazilaMap = Object.keys(addressOptions).reduce(
+  (districtUpazilasMap, state) => {
+    Object.keys(addressOptions[state])
+      .filter(district => district !== 'districts')
+      .forEach(district => {
+        districtUpazilasMap[district] = addressOptions[state][district].upazilas
+      })
+    return districtUpazilasMap
+  },
+  {}
+)
+
+export const upazilaUnionMap = Object.keys(addressOptions).reduce(
+  (upazilaUnionsMap, state) => {
+    Object.keys(addressOptions[state])
+      .filter(district => district !== 'districts')
+      .forEach(district => {
+        Object.keys(addressOptions[state][district])
+          .filter(upazila => upazila !== 'upazilas')
+          .forEach(upazila => {
+            upazilaUnionsMap[upazila] =
+              addressOptions[state][district][upazila].unions
+          })
+      })
+    return upazilaUnionsMap
+  },
+  {}
+)
+
 export const getAddressOptions = (
   field: IFormField,
   values: IFormSectionData
 ) => {
-  if (field.dynamicOptions) {
-    const dependenciesExist: boolean = field.dynamicOptions.dependencies.every(
-      (dependency: string, index: number) => {
-        const options = field.dynamicOptions as IDynamicOptions
-        /* tslint:disable-next-line: no-eval */
-        if (!eval(dependency)) {
-          return false
-        } else {
-          switch (index) {
-            case 0:
-              /* tslint:disable-next-line: no-eval */
-              return addressOptions[eval(dependency)]
-              break
-            case 1:
-              /* tslint:disable-next-line: no-eval */
-              return addressOptions[eval(options.dependencies[0])][
-                /* tslint:disable-next-line: no-eval */
-                eval(dependency)
-              ]
-              break
-            case 2:
-              /* tslint:disable-next-line: no-eval */
-              return addressOptions[eval(options.dependencies[0])][
-                /* tslint:disable-next-line: no-eval */
-                eval(options.dependencies[1])
-                /* tslint:disable-next-line: no-eval */
-              ][eval(dependency)]
-
-              break
-          }
-        }
-      }
-    )
-    if (dependenciesExist) {
-      /* tslint:disable-next-line: no-eval */
-      const dynamicOptions = eval(field.dynamicOptions.value)
-      if (dynamicOptions.length) {
-        return dynamicOptions
-      } else {
-        return []
-      }
-    } else {
-      return []
-    }
+  if (field.dynamicOptions && values[field.dynamicOptions.dependency]) {
+    return field.dynamicOptions.options[values[field.dynamicOptions.dependency]]
   }
+
+  return []
 }

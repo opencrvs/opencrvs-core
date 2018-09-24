@@ -7,8 +7,8 @@ export interface ISelectOption {
 }
 
 export interface IDynamicOptions {
-  dependencies: string[]
-  value: string
+  dependency: string
+  options: { [key: string]: ISelectOption[] }
 }
 
 export interface IFormField {

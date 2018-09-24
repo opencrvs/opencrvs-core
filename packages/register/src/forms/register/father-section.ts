@@ -1,6 +1,13 @@
 import { defineMessages } from 'react-intl'
 import { ValidIndicator } from '@opencrvs/components/lib/forms'
-import { messages as addressMessages, states } from '../address'
+import {
+  messages as addressMessages,
+  states,
+  addressOptions,
+  stateDistrictMap,
+  districtUpazilaMap,
+  upazilaUnionMap
+} from '../address'
 import { countries } from '../countries'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
@@ -372,8 +379,11 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       dynamicOptions: {
-        dependencies: ['values.state'],
-        value: 'addressOptions[values.state].districts'
+        dependency: 'state',
+        options: Object.keys(addressOptions).reduce((options, state) => {
+          options[state] = addressOptions[state].districts
+          return options
+        }, {})
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -391,8 +401,11 @@ export const fatherSection: IFormSection = {
       validate: [],
       options: [],
       dynamicOptions: {
-        dependencies: ['values.state', 'values.district'],
-        value: 'addressOptions[values.state][values.district].upazilas'
+        dependency: 'district',
+        options: Object.keys(addressOptions).reduce((options, state) => {
+          options[state] = addressOptions[state].upazilas
+          return options
+        }, {})
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -411,13 +424,11 @@ export const fatherSection: IFormSection = {
       validate: [],
       options: [],
       dynamicOptions: {
-        dependencies: [
-          'values.state',
-          'values.district',
-          'values.addressLine4'
-        ],
-        value:
-          'addressOptions[values.state][values.district][values.addressLine4].unions'
+        dependency: 'addressLine4',
+        options: Object.keys(addressOptions).reduce((options, state) => {
+          options[state] = addressOptions[state].unions
+          return options
+        }, {})
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -540,8 +551,8 @@ export const fatherSection: IFormSection = {
       validate: [],
       options: [],
       dynamicOptions: {
-        dependencies: ['values.statePermanent'],
-        value: 'addressOptions[values.statePermanent].districts'
+        dependency: 'statePermanent',
+        options: stateDistrictMap
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -559,9 +570,8 @@ export const fatherSection: IFormSection = {
       validate: [],
       options: [],
       dynamicOptions: {
-        dependencies: ['values.statePermanent', 'values.districtPermanent'],
-        value:
-          'addressOptions[values.statePermanent][values.districtPermanent].upazilas'
+        dependency: 'districtPermanent',
+        options: districtUpazilaMap
       },
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -580,13 +590,8 @@ export const fatherSection: IFormSection = {
       validate: [],
       options: [],
       dynamicOptions: {
-        dependencies: [
-          'values.statePermanent',
-          'values.districtPermanent',
-          'values.addressLine4Permanent'
-        ],
-        value:
-          'addressOptions[values.statePermanent][values.districtPermanent][values.addressLine4Permanent].unions'
+        dependency: 'addressLine4Permanent',
+        options: upazilaUnionMap
       },
       conditionals: [
         conditionals.fathersDetailsExist,
