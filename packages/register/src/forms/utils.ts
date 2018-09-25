@@ -8,7 +8,6 @@ import {
   IConditional
 } from './'
 import { InjectedIntl } from 'react-intl'
-import { getAddressOptions } from './address'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -35,14 +34,29 @@ export const internationaliseOptions = (
   })
 }
 
-export const generateDynamicOptionsForField = (
+export const getFieldOptions = (
   field: IFormField,
   values: IFormSectionData
 ) => {
-  return {
-    ...field,
-    options: getAddressOptions(field, values)
+  if (!field.dynamicOptions) {
+    return field.options || []
   }
+
+  const dependencyVal = values[field.dynamicOptions.dependency]
+  if (!dependencyVal) {
+    return []
+  }
+
+  const options = field.dynamicOptions.options[dependencyVal]
+  if (!options) {
+    throw new Error(
+      `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object. Option keys are ${Object.keys(
+        field.dynamicOptions.options
+      )}`
+    )
+  }
+
+  return options
 }
 
 export const getConditionalActionsForField = (

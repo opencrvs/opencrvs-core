@@ -19,7 +19,7 @@ import {
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
-  generateDynamicOptionsForField
+  getFieldOptions
 } from 'src/forms/utils'
 import styled from 'src/styled-components'
 import { IFormField, Ii18nFormField, IFormSectionData } from 'src/forms'
@@ -260,10 +260,10 @@ class FormSectionComponent extends React.Component<Props> {
             return (
               <FormItem key={`${field.name}`}>
                 <GeneratedInputField
-                  field={internationaliseFieldObject(
-                    intl,
-                    generateDynamicOptionsForField(field, values)
-                  )}
+                  field={internationaliseFieldObject(intl, {
+                    ...field,
+                    options: getFieldOptions(field, values)
+                  })}
                   onBlur={this.handleBlur}
                   value={values[field.name]}
                   onChange={handleChange}

@@ -1,7 +1,5 @@
 import { defineMessages } from 'react-intl'
 
-import { IFormField, IFormSectionData } from './index'
-
 export const stateMessages = defineMessages({
   state1: {
     id: 'states.state1',
@@ -1083,28 +1081,3 @@ export const upazilaUnionMap = Object.keys(addressOptions).reduce(
   },
   {}
 )
-
-export const getAddressOptions = (
-  field: IFormField,
-  values: IFormSectionData
-) => {
-  if (!field.dynamicOptions) {
-    return field.options || []
-  }
-
-  const dependencyVal = values[field.dynamicOptions.dependency]
-  if (!dependencyVal) {
-    return []
-  }
-
-  const options = field.dynamicOptions.options[dependencyVal]
-  if (!options) {
-    throw new Error(
-      `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object. Option keys are ${Object.keys(
-        field.dynamicOptions.options
-      )}`
-    )
-  }
-
-  return options
-}
