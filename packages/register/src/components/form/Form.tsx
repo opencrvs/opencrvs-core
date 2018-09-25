@@ -30,7 +30,8 @@ import {
   DATE,
   TEXTAREA,
   SUBSECTION,
-  ISelectFormFieldWithDynamicOptions
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -283,11 +284,12 @@ class FormSectionComponent extends React.Component<Props> {
               field.type === SELECT_WITH_DYNAMIC_OPTIONS
                 ? ({
                     ...field,
+                    type: SELECT_WITH_OPTIONS,
                     options: getFieldOptions(
                       field as ISelectFormFieldWithDynamicOptions,
                       values
                     )
-                  } as ISelectFormFieldWithDynamicOptions)
+                  } as ISelectFormFieldWithOptions)
                 : field
 
             return (
