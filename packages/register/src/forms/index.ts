@@ -153,12 +153,6 @@ export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   options: SelectComponentOption[]
 }
 
-export interface Ii18nSelectFormFieldWithDynamicOptions
-  extends Ii18nFormFieldBase {
-  type: typeof SELECT_WITH_DYNAMIC_OPTIONS
-  dynamicOptions: IDynamicOptions
-}
-
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
   options: RadioComponentOption[]
@@ -187,7 +181,6 @@ export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nSelectFormField
-  | Ii18nSelectFormFieldWithDynamicOptions
   | Ii18nRadioGroupFormField
   | Ii18nCheckboxGroupFormField
   | Ii18nDateFormField
