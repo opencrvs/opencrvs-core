@@ -1,9 +1,16 @@
 import { defineMessages } from 'react-intl'
-import { ValidIndicator } from '@opencrvs/components/lib/forms'
+
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
-import { ViewType } from 'src/forms'
+import {
+  ViewType,
+  SELECT_WITH_OPTIONS,
+  TEXT,
+  DATE,
+  SUBSECTION,
+  SELECT_WITH_DYNAMIC_OPTIONS
+} from 'src/forms'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -104,7 +111,7 @@ export const motherSection: IFormSection = {
   fields: [
     {
       name: 'motherIDType',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: identityMessages.iDType,
       required: true,
       initialValue: '',
@@ -133,16 +140,15 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherID',
-      type: 'text',
+      type: TEXT,
       label: identityMessages.iD,
       required: true,
       initialValue: '',
-      validate: [],
-      postfix: ValidIndicator
+      validate: []
     },
     {
       name: 'nationality',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.nationality,
       required: true,
       initialValue: 'BGD',
@@ -151,7 +157,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherGivenName',
-      type: 'text',
+      type: TEXT,
       label: messages.motherGivenName,
       required: true,
       initialValue: '',
@@ -159,7 +165,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherMiddleNames',
-      type: 'text',
+      type: TEXT,
       label: messages.motherMiddleNames,
       required: false,
       initialValue: '',
@@ -167,14 +173,14 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherFamilyName',
-      type: 'text',
+      type: TEXT,
       label: messages.motherFamilyName,
       initialValue: '',
       validate: []
     },
     {
       name: 'motherGivenNameEng',
-      type: 'text',
+      type: TEXT,
       label: messages.motherGivenNameEng,
       required: true,
       initialValue: '',
@@ -182,7 +188,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherMiddleNamesEng',
-      type: 'text',
+      type: TEXT,
       label: messages.motherMiddleNamesEng,
       required: false,
       initialValue: '',
@@ -190,14 +196,14 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherFamilyNameEng',
-      type: 'text',
+      type: TEXT,
       label: messages.motherFamilyNameEng,
       initialValue: '',
       validate: []
     },
     {
       name: 'motherDateOfBirth',
-      type: 'date',
+      type: DATE,
       label: messages.motherDateOfBirth,
       required: true,
       initialValue: '',
@@ -205,7 +211,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'maritalStatus',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: maritalStatusMessages.maritalStatus,
       required: true,
       initialValue: 'MARRIED',
@@ -226,7 +232,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherDateOfMarriage',
-      type: 'date',
+      type: DATE,
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
@@ -234,7 +240,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherEducationAttainment',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.motherEducationAttainment,
       required: true,
       initialValue: '',
@@ -276,7 +282,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'currentAddress',
-      type: 'subSection',
+      type: SUBSECTION,
       label: messages.currentAddress,
       initialValue: '',
       required: false,
@@ -284,7 +290,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'country',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
       initialValue: 'BGD',
@@ -293,7 +299,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'state',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: addressMessages.state,
       required: true,
       initialValue: '',
@@ -303,7 +309,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'district',
-      type: 'select',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.district,
       required: true,
       initialValue: '',
@@ -313,12 +319,11 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine4',
-      type: 'select',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine4,
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: 'addressLine4',
       conditionals: [
         conditionals.country,
@@ -328,12 +333,11 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine3Options1',
-      type: 'select',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3Options1,
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: 'addressLine3Options1',
       conditionals: [
         conditionals.country,
@@ -344,7 +348,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine2',
-      type: 'text',
+      type: TEXT,
       label: addressMessages.addressLine2,
       required: false,
       initialValue: '',
@@ -359,7 +363,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine1',
-      type: 'text',
+      type: TEXT,
       label: addressMessages.addressLine1,
       required: true,
       initialValue: '',
@@ -374,7 +378,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCode',
-      type: 'text',
+      type: TEXT,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
@@ -389,7 +393,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'permanentAddress',
-      type: 'subSection',
+      type: SUBSECTION,
       label: messages.permanentAddress,
       initialValue: '',
       required: false,
@@ -397,7 +401,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'countryPermanent',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
       initialValue: 'BGD',
@@ -406,7 +410,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'statePermanent',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: addressMessages.state,
       required: true,
       initialValue: '',
@@ -416,23 +420,22 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'districtPermanent',
-      type: 'select',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.district,
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
       dynamicOptions: 'districtPermanent',
       conditionals: [conditionals.countryPermanent, conditionals.statePermanent]
     },
     {
       name: 'addressLine4Permanent',
-      type: 'select',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine4,
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
+
       dynamicOptions: 'addressLine4Permanent',
       conditionals: [
         conditionals.countryPermanent,
@@ -442,12 +445,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine3Options1Permanent',
-      type: 'select',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3Options1,
       required: true,
       initialValue: '',
       validate: [],
-      options: [],
+
       dynamicOptions: 'addressLine3Options1Permanent',
       conditionals: [
         conditionals.countryPermanent,
@@ -458,7 +461,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine2Permanent',
-      type: 'text',
+      type: TEXT,
       label: addressMessages.addressLine2,
       required: false,
       initialValue: '',
@@ -473,7 +476,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine1Permanent',
-      type: 'text',
+      type: TEXT,
       label: addressMessages.addressLine1,
       required: true,
       initialValue: '',
@@ -488,7 +491,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCodePermanent',
-      type: 'text',
+      type: TEXT,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
