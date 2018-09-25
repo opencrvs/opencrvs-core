@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm } from 'src/forms'
+import { IForm, DOCUMENTS } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { childSection } from './child-section'
 import { motherSection } from './mother-section'
@@ -48,7 +48,7 @@ export const initialState: IRegisterFormState = {
         fields: [
           {
             name: 'documents',
-            type: 'documents',
+            type: DOCUMENTS,
             // Just a dummy message here - not actually shown anywhere
             label: messages.documentsTab,
             required: false,

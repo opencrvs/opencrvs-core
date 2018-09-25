@@ -19,10 +19,7 @@ describe('Login app step one', () => {
     let component: ReactWrapper
 
     beforeEach(() => {
-      const props = {
-        test: ''
-      }
-      component = createTestComponent(<StepOneContainer {...props} />)
+      component = createTestComponent(<StepOneContainer />)
     })
     it('renders successfully', () => {
       expect(component.find('form#STEP_ONE')).toHaveLength(1)

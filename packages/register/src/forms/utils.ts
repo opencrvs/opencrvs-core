@@ -1,11 +1,16 @@
 import {
   IFormField,
   Ii18nFormField,
-  IFormSectionData,
-  Ii18nSelectOption,
   ISelectOption,
   IConditionals,
-  IConditional
+  IFormSectionData,
+  IConditional,
+  SELECT_WITH_OPTIONS,
+  RADIO_GROUP,
+  CHECKBOX_GROUP,
+  IRadioOption,
+  ICheckboxOption,
+  ISelectFormFieldWithDynamicOptions
 } from './'
 import { InjectedIntl } from 'react-intl'
 
@@ -13,36 +18,39 @@ export const internationaliseFieldObject = (
   intl: InjectedIntl,
   field: IFormField
 ): Ii18nFormField => {
-  return {
+  const base = {
     ...field,
     label: intl.formatMessage(field.label),
-    options: field.options
-      ? internationaliseOptions(intl, field.options)
-      : undefined
-  } as Ii18nFormField
+    description: field.description && intl.formatMessage(field.description)
+  }
+
+  if (
+    base.type === SELECT_WITH_OPTIONS ||
+    base.type === RADIO_GROUP ||
+    base.type === CHECKBOX_GROUP
+  ) {
+    ;(base as any).options = internationaliseOptions(intl, base.options)
+  }
+  return base as Ii18nFormField
 }
 
 export const internationaliseOptions = (
   intl: InjectedIntl,
-  options: ISelectOption[]
-): Ii18nSelectOption[] => {
+  options: Array<ISelectOption | IRadioOption | ICheckboxOption>
+) => {
   return options.map(opt => {
     return {
       ...opt,
       label: intl.formatMessage(opt.label)
-    } as Ii18nSelectOption
+    }
   })
 }
 
 export const getFieldOptions = (
-  field: IFormField,
+  field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData
 ) => {
-  if (!field.dynamicOptions) {
-    return field.options || []
-  }
-
-  const dependencyVal = values[field.dynamicOptions.dependency]
+  const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (!dependencyVal) {
     return []
   }
