@@ -1039,5 +1039,45 @@ export const addressOptions = {
   },
   state7: {
     districts: []
+  },
+  state8: {
+    districts: []
   }
 }
+
+export const stateDistrictMap = Object.keys(addressOptions).reduce(
+  (stateDistrictsMap, state) => {
+    stateDistrictsMap[state] = addressOptions[state].districts
+    return stateDistrictsMap
+  },
+  {}
+)
+
+export const districtUpazilaMap = Object.keys(addressOptions).reduce(
+  (districtUpazilasMap, state) => {
+    Object.keys(addressOptions[state])
+      .filter(district => district !== 'districts')
+      .forEach(district => {
+        districtUpazilasMap[district] = addressOptions[state][district].upazilas
+      })
+    return districtUpazilasMap
+  },
+  {}
+)
+
+export const upazilaUnionMap = Object.keys(addressOptions).reduce(
+  (upazilaUnionsMap, state) => {
+    Object.keys(addressOptions[state])
+      .filter(district => district !== 'districts')
+      .forEach(district => {
+        Object.keys(addressOptions[state][district])
+          .filter(upazila => upazila !== 'upazilas')
+          .forEach(upazila => {
+            upazilaUnionsMap[upazila] =
+              addressOptions[state][district][upazila].unions
+          })
+      })
+    return upazilaUnionsMap
+  },
+  {}
+)

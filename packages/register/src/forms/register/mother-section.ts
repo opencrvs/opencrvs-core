@@ -16,7 +16,13 @@ export interface IMotherSectionFormData {
   firstName: string
 }
 import { IFormSection } from '../index'
-import { messages as addressMessages, states } from '../address'
+import {
+  messages as addressMessages,
+  states,
+  stateDistrictMap,
+  districtUpazilaMap,
+  upazilaUnionMap
+} from '../address'
 import { countries } from '../countries'
 import { conditionals } from '../utils'
 
@@ -314,7 +320,10 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'district',
+      dynamicOptions: {
+        dependency: 'state',
+        options: stateDistrictMap
+      },
       conditionals: [conditionals.country, conditionals.state]
     },
     {
@@ -324,7 +333,10 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'addressLine4',
+      dynamicOptions: {
+        dependency: 'district',
+        options: districtUpazilaMap
+      },
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -338,7 +350,10 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'addressLine3Options1',
+      dynamicOptions: {
+        dependency: 'addressLine4',
+        options: upazilaUnionMap
+      },
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -425,7 +440,10 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'districtPermanent',
+      dynamicOptions: {
+        dependency: 'statePermanent',
+        options: stateDistrictMap
+      },
       conditionals: [conditionals.countryPermanent, conditionals.statePermanent]
     },
     {
@@ -435,8 +453,10 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-
-      dynamicOptions: 'addressLine4Permanent',
+      dynamicOptions: {
+        dependency: 'districtPermanent',
+        options: districtUpazilaMap
+      },
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -450,8 +470,10 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-
-      dynamicOptions: 'addressLine3Options1Permanent',
+      dynamicOptions: {
+        dependency: 'addressLine4Permanent',
+        options: upazilaUnionMap
+      },
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,

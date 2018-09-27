@@ -13,7 +13,8 @@ import {
 } from '@opencrvs/components/lib/forms'
 import {
   internationaliseFieldObject,
-  getConditionalActionsForField
+  getConditionalActionsForField,
+  getFieldOptions
 } from 'src/forms/utils'
 import styled from 'src/styled-components'
 import {
@@ -21,22 +22,21 @@ import {
   Ii18nFormField,
   IFormSectionData,
   IFormFieldValue,
-  ISelectFormFieldWithDynamicOptions,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  ISelectFormFieldWithOptions,
   DOCUMENTS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
   DATE,
   TEXTAREA,
-  SUBSECTION
+  SUBSECTION,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
 
 import { getValidationErrorsForForm } from 'src/forms/validation'
-import { addressOptions } from 'src/forms/address'
 import { InputField } from 'src/components/form/InputField'
 
 const FormItem = styled.div`
@@ -50,94 +50,6 @@ const FormSectionTitle = styled.h2`
 const DocumentUpload = styled.img`
   width: 100%;
 `
-
-const getDynamicSelectOptions = (
-  field: IFormField,
-  values: IFormSectionData
-) => {
-  const stringValues = values as { [key: string]: string }
-  switch (field.name) {
-    case 'district':
-      return addressOptions[stringValues.state].districts
-
-    case 'districtPermanent':
-      return addressOptions[stringValues.statePermanent].districts
-
-    case 'addressLine4':
-      if (
-        addressOptions[stringValues.state][stringValues.district] &&
-        addressOptions[stringValues.state][stringValues.district].upazilas
-      ) {
-        return addressOptions[stringValues.state][stringValues.district]
-          .upazilas
-      } else {
-        return []
-      }
-    case 'addressLine4Permanent':
-      if (
-        addressOptions[stringValues.statePermanent][
-          stringValues.districtPermanent
-        ] &&
-        addressOptions[stringValues.statePermanent][
-          stringValues.districtPermanent
-        ].upazilas
-      ) {
-        return addressOptions[stringValues.statePermanent][
-          stringValues.districtPermanent
-        ].upazilas
-      } else {
-        return []
-      }
-    case 'addressLine3Options1':
-      if (
-        addressOptions[stringValues.state][stringValues.district] &&
-        addressOptions[stringValues.state][stringValues.district][
-          stringValues.addressLine4
-        ] &&
-        addressOptions[stringValues.state][stringValues.district][
-          stringValues.addressLine4
-        ].unions
-      ) {
-        return addressOptions[stringValues.state][stringValues.district][
-          stringValues.addressLine4
-        ].unions
-      } else {
-        return []
-      }
-    case 'addressLine3Options1Permanent':
-      if (
-        addressOptions[stringValues.statePermanent][
-          stringValues.districtPermanent
-        ] &&
-        addressOptions[stringValues.statePermanent][
-          stringValues.districtPermanent
-        ][stringValues.addressLine4Permanent] &&
-        addressOptions[stringValues.statePermanent][
-          stringValues.districtPermanent
-        ][stringValues.addressLine4Permanent].unions
-      ) {
-        return addressOptions[stringValues.statePermanent][
-          stringValues.districtPermanent
-        ][stringValues.addressLine4Permanent].unions
-      } else {
-        return []
-      }
-    default:
-      return []
-  }
-}
-
-function generateDynamicOptionsForField(
-  field: ISelectFormFieldWithDynamicOptions,
-  values: IFormSectionData
-): ISelectFormFieldWithOptions {
-  const { dynamicOptions, ...otherProps } = field
-  return {
-    ...otherProps,
-    options: getDynamicSelectOptions(field, values),
-    type: SELECT_WITH_OPTIONS
-  }
-}
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
@@ -370,7 +282,14 @@ class FormSectionComponent extends React.Component<Props> {
 
             const withDynamicallyGeneratedFields =
               field.type === SELECT_WITH_DYNAMIC_OPTIONS
-                ? generateDynamicOptionsForField(field, values)
+                ? ({
+                    ...field,
+                    type: SELECT_WITH_OPTIONS,
+                    options: getFieldOptions(
+                      field as ISelectFormFieldWithDynamicOptions,
+                      values
+                    )
+                  } as ISelectFormFieldWithOptions)
                 : field
 
             return (

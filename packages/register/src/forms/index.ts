@@ -29,6 +29,11 @@ export interface ICheckboxOption {
   label: FormattedMessage.MessageDescriptor
 }
 
+export interface IDynamicOptions {
+  dependency: string
+  options: { [key: string]: ISelectOption[] }
+}
+
 export type IFormFieldValue = string | string[] | boolean
 
 export interface IFormFieldBase {
@@ -51,7 +56,7 @@ export interface ISelectFormFieldWithOptions extends IFormFieldBase {
 }
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
-  dynamicOptions: string
+  dynamicOptions: IDynamicOptions
 }
 
 export interface IRadioGroupFormField extends IFormFieldBase {

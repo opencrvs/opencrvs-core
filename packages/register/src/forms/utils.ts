@@ -9,7 +9,8 @@ import {
   RADIO_GROUP,
   CHECKBOX_GROUP,
   IRadioOption,
-  ICheckboxOption
+  ICheckboxOption,
+  ISelectFormFieldWithDynamicOptions
 } from './'
 import { InjectedIntl } from 'react-intl'
 
@@ -43,6 +44,27 @@ export const internationaliseOptions = (
       label: intl.formatMessage(opt.label)
     }
   })
+}
+
+export const getFieldOptions = (
+  field: ISelectFormFieldWithDynamicOptions,
+  values: IFormSectionData
+) => {
+  const dependencyVal = values[field.dynamicOptions.dependency] as string
+  if (!dependencyVal) {
+    return []
+  }
+
+  const options = field.dynamicOptions.options[dependencyVal]
+  if (!options) {
+    throw new Error(
+      `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object. Option keys are ${Object.keys(
+        field.dynamicOptions.options
+      )}`
+    )
+  }
+
+  return options
 }
 
 export const getConditionalActionsForField = (

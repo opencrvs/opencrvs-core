@@ -1,6 +1,11 @@
 import { defineMessages } from 'react-intl'
-
-import { messages as addressMessages, states } from '../address'
+import {
+  messages as addressMessages,
+  states,
+  districtUpazilaMap,
+  upazilaUnionMap,
+  stateDistrictMap
+} from '../address'
 import { countries } from '../countries'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
@@ -383,7 +388,10 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'district',
+      dynamicOptions: {
+        dependency: 'state',
+        options: stateDistrictMap
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -398,7 +406,10 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'addressLine4',
+      dynamicOptions: {
+        dependency: 'district',
+        options: districtUpazilaMap
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.addressSameAsMother,
@@ -414,11 +425,11 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'addressLine3Options1',
+      dynamicOptions: {
+        dependency: 'addressLine4',
+        options: upazilaUnionMap
+      },
       conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother,
-        conditionals.country,
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4
@@ -534,7 +545,10 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'districtPermanent',
+      dynamicOptions: {
+        dependency: 'statePermanent',
+        options: stateDistrictMap
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
@@ -549,7 +563,10 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'addressLine4Permanent',
+      dynamicOptions: {
+        dependency: 'districtPermanent',
+        options: districtUpazilaMap
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
@@ -565,7 +582,10 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: 'addressLine3Options1Permanent',
+      dynamicOptions: {
+        dependency: 'addressLine4Permanent',
+        options: upazilaUnionMap
+      },
       conditionals: [
         conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
