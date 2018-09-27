@@ -8,12 +8,17 @@ type RedirectToAuthenticationAction = {
   type: typeof REDIRECT_TO_AUTHENTICATION
 }
 
+type CheckAuthAction = {
+  type: typeof CHECK_AUTH
+  payload: IURLParams
+}
+
 export type Action =
   | { type: typeof CHECK_AUTH; payload: IURLParams }
   | RedirectToAuthenticationAction
   | RouterAction
 
-export const checkAuth = (payload: IURLParams): Action => ({
+export const checkAuth = (payload: IURLParams): CheckAuthAction => ({
   type: CHECK_AUTH,
   payload
 })
