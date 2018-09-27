@@ -20,7 +20,7 @@ import {
   internationaliseFieldObject,
   getConditionalActionsForField
 } from 'src/forms/utils'
-import styled from 'src/styled-components'
+import styled, { keyframes } from 'src/styled-components'
 import { IFormField, Ii18nFormField, IFormSectionData } from 'src/forms'
 import { Omit } from 'src/utils'
 import { IValidationResult } from 'src/utils/validate'
@@ -31,8 +31,14 @@ import {
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { addressOptions } from 'src/forms/address'
 
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+
 const FormItem = styled.div`
   margin-bottom: 2em;
+  animation: ${fadeIn} 500ms;
 `
 
 const FormSectionTitle = styled.h2`
