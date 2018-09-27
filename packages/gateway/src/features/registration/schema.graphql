@@ -99,7 +99,7 @@ input CertificateInput {
   createdAt: Date
 }
 
-type Certificate {
+type Certificate { # In manual register system (signature) not in BDRIS2
   id: ID!
   paperId: ID!
   reciever: Person
@@ -115,14 +115,14 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: PersonInput
   birthLocation: LocationInput
-  birthType: BirthType
-  weightAtBirth: Float
-  attendantAtBirth: AttendantType
+  birthType: BirthType # Not in BDRIS2
+  weightAtBirth: Float # Not in BDRIS2
+  attendantAtBirth: AttendantType # Not in BDRIS2
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence
-  childrenBornAliveToMother: Int
-  foetalDeathsToMother: Int
-  lastPreviousLiveBirth: Date
+  presentAtBirthRegistration: BirthRegPresence # Informant in BDRIS2
+  childrenBornAliveToMother: Int # Not in BDRIS2
+  foetalDeathsToMother: Int # Not in BDRIS2
+  lastPreviousLiveBirth: Date # Not in BDRIS2
   # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
   birthOrder: Int
   createdAt: Date
@@ -161,21 +161,22 @@ input DeathRegistrationInput {
   # need to track multiple spouses for muslim countries
   spouse: [PersonInput]
   deathLocation: LocationInput
-  causeOfDeath: CauseOfDeath
+  causeOfDeath: CauseOfDeath # need to store ICD-10? More types of cause of death
   createdAt: Date
   updatedAt: Date
 }
 
+# In BDRIS2 BRN is used to link to birth - Must have BRN to register death. Only deathLocation and current address is captures for death as the rest is the same as birth registration
 type DeathRegistration { # -> Composition
   id: ID! # long uuid
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  mother: Person # -> .section(code='mother-details').entry.reference
-  father: Person # -> .section(code='fater-details').entry.reference
+  mother: Person # -> .section(code='mother-details').entry.reference - create link to existing?
+  father: Person # -> .section(code='fater-details').entry.reference - create link to existing?
   informant: Person # -> .section(code='informant-details').entry.reference
   # need to track multiple spouses for muslim countries
-  spouse: [Person] # -> .section(code='spouse-details').entry.reference
+  spouse: [Person] # -> .section(code='spouse-details').entry.reference # Not in BDRIS2
   deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
   causeOfDeath: CauseOfDeath # -> Observation.valueCodeableConcept
   createdAt: Date # -> .date($first)
