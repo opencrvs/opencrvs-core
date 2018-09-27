@@ -1,20 +1,19 @@
-import { Field } from 'redux-form'
+import { Field, WrappedFieldProps } from 'redux-form'
 import * as React from 'react'
 import styled from 'styled-components'
-import { InjectedIntlProps, defineMessages } from 'react-intl'
+import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
 import { InjectedFormProps, reset } from 'redux-form'
 
-import { InputField, ITextInputProps } from '@opencrvs/components/lib/forms'
 import {
   SecondaryButton,
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { Link } from '@opencrvs/components/lib/typography'
 import { FlexGrid } from '@opencrvs/components/lib/grid'
+import { TextInput, InputField } from '@opencrvs/components/lib/forms'
 
 import { stepTwoFields } from './stepTwoFields'
-import { getFieldProps } from '../../utils/fieldUtils'
-import { localizeInput } from '../../i18n/components/localizeInput'
+
 import { store } from '../../App'
 import {
   StyledBox,
@@ -23,8 +22,12 @@ import {
   FormWrapper,
   ActionWrapper
 } from '../StepOne/StepOneForm'
-import { IVerifyCodeNumbers } from '@opencrvs/login/src/login/actions'
-import { FORM_NAME } from '@opencrvs/login/src/views/StepTwo/contants'
+
+import { IVerifyCodeNumbers } from '../../login/actions'
+import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
+import { localiseValidationError } from '../../forms/i18n'
+
+import { FORM_NAME } from './contants'
 
 const messages = defineMessages({
   stepTwoTitle: {
@@ -58,6 +61,11 @@ const messages = defineMessages({
     id: 'login.resentSMS',
     defaultMessage: 'We have delivered a new SMS to your mobile phone',
     description: 'The message that appears when the resend button is clicked.'
+  },
+  optionalLabel: {
+    id: 'login.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
   }
 })
 
@@ -92,8 +100,6 @@ const SecondaryButtonStyled = styled(SecondaryButton)`
   margin-right: 1em;
 `
 
-const LocalizedInputField = localizeInput<ITextInputProps>(InputField)
-
 const ClearFormLink = styled(Link)`
   position: relative;
   float: right;
@@ -113,6 +119,35 @@ export interface IDispatchProps {
 }
 
 type IStepTwoForm = IProps & IDispatchProps
+
+const CodeInput = injectIntl(
+  (
+    props: WrappedFieldProps & { field: Ii18nReduxFormFieldProps } & {
+      isFocused: boolean
+    } & InjectedIntlProps
+  ) => {
+    const { field, meta, intl, ...otherProps } = props
+    return (
+      <InputField
+        {...field}
+        {...otherProps}
+        touched={meta.touched}
+        error={meta.error && localiseValidationError(intl, meta.error)}
+        optionalLabel={intl.formatMessage(messages.optionalLabel)}
+        label=""
+      >
+        <TextInput
+          {...field}
+          {...props.input}
+          touched={Boolean(meta.touched)}
+          error={Boolean(meta.error)}
+          focusInput={props.isFocused}
+          placeholder="0"
+        />
+      </InputField>
+    )
+  }
+)
 
 export class StepTwoForm extends React.Component<
   InjectedIntlProps &
@@ -150,69 +185,30 @@ export class StepTwoForm extends React.Component<
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FlexGrid>
-            <FieldWrapper>
-              <Field
-                {...getFieldProps(intl, stepTwoFields.code1, messages)}
-                component={LocalizedInputField}
-                placeholder="0"
-                focusInput={stepTwoFields.code1.id === fieldToFocus}
-              />
-            </FieldWrapper>
-            <Separator>
-              <Circle />
-            </Separator>
-            <FieldWrapper>
-              <Field
-                {...getFieldProps(intl, stepTwoFields.code2, messages)}
-                component={LocalizedInputField}
-                placeholder="0"
-                focusInput={stepTwoFields.code2.id === fieldToFocus}
-              />
-            </FieldWrapper>
-            <Separator>
-              <Circle />
-            </Separator>
-            <FieldWrapper>
-              <Field
-                {...getFieldProps(intl, stepTwoFields.code3, messages)}
-                component={LocalizedInputField}
-                placeholder="0"
-                focusInput={stepTwoFields.code3.id === fieldToFocus}
-              />
-            </FieldWrapper>
-            <Separator>
-              <Circle />
-            </Separator>
-            <FieldWrapper>
-              <Field
-                {...getFieldProps(intl, stepTwoFields.code4, messages)}
-                component={LocalizedInputField}
-                placeholder="0"
-                focusInput={stepTwoFields.code4.id === fieldToFocus}
-              />
-            </FieldWrapper>
-            <Separator>
-              <Circle />
-            </Separator>
-            <FieldWrapper>
-              <Field
-                {...getFieldProps(intl, stepTwoFields.code5, messages)}
-                component={LocalizedInputField}
-                placeholder="0"
-                focusInput={stepTwoFields.code5.id === fieldToFocus}
-              />
-            </FieldWrapper>
-            <Separator>
-              <Circle />
-            </Separator>
-            <FieldWrapper>
-              <Field
-                {...getFieldProps(intl, stepTwoFields.code6, messages)}
-                component={LocalizedInputField}
-                placeholder="0"
-                focusInput={stepTwoFields.code6.id === fieldToFocus}
-              />
-            </FieldWrapper>
+            {Array(6)
+              .fill(null)
+              .map((_, i) => {
+                const field = stepTwoFields[`code${i + 1}`]
+
+                return (
+                  <React.Fragment key={i}>
+                    <FieldWrapper>
+                      <Field
+                        name={field.name}
+                        validate={field.validate}
+                        component={CodeInput}
+                        field={field}
+                        isFocused={field.id === fieldToFocus}
+                      />
+                    </FieldWrapper>
+                    {i !== 5 && (
+                      <Separator>
+                        <Circle />
+                      </Separator>
+                    )}
+                  </React.Fragment>
+                )
+              })}
           </FlexGrid>
 
           {fieldToFocus && (

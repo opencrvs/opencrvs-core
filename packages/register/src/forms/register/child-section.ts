@@ -1,5 +1,5 @@
 import { defineMessages } from 'react-intl'
-import { ViewType } from 'src/forms'
+import { ViewType, TEXT, TEXTAREA, DATE, SELECT_WITH_OPTIONS } from 'src/forms'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -210,7 +210,7 @@ export const childSection: IFormSection = {
   fields: [
     {
       name: 'childGivenName',
-      type: 'text',
+      type: TEXT,
       label: messages.childGivenName,
       required: true,
       initialValue: '',
@@ -218,7 +218,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'childMiddleNames',
-      type: 'text',
+      type: TEXT,
       label: messages.childMiddleNames,
       required: false,
       initialValue: '',
@@ -226,14 +226,14 @@ export const childSection: IFormSection = {
     },
     {
       name: 'childFamilyName',
-      type: 'text',
+      type: TEXT,
       label: messages.childFamilyName,
       initialValue: '',
       validate: []
     },
     {
       name: 'childGivenNameEng',
-      type: 'text',
+      type: TEXT,
       label: messages.childGivenNameEng,
       required: true,
       initialValue: '',
@@ -241,7 +241,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'childMiddleNamesEng',
-      type: 'text',
+      type: TEXT,
       label: messages.childMiddleNamesEng,
       required: false,
       initialValue: '',
@@ -249,14 +249,14 @@ export const childSection: IFormSection = {
     },
     {
       name: 'childFamilyNameEng',
-      type: 'text',
+      type: TEXT,
       label: messages.childFamilyNameEng,
       initialValue: '',
       validate: []
     },
     {
       name: 'childSex',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.childSex,
       required: true,
       initialValue: '',
@@ -270,7 +270,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'dateOfBirth',
-      type: 'date',
+      type: DATE,
       label: messages.childDateOfBirth,
       required: true,
       initialValue: '',
@@ -278,7 +278,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'attendantAtBirth',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.attendantAtBirth,
       required: true,
       initialValue: '',
@@ -298,7 +298,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'typeOfBirth',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.typeOfBirth,
       required: true,
       initialValue: '',
@@ -316,7 +316,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'orderOfBirth',
-      type: 'text',
+      type: TEXT,
       label: messages.orderOfBirth,
       required: true,
       initialValue: '',
@@ -324,7 +324,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'weightAtBirth',
-      type: 'text',
+      type: TEXT,
       label: messages.weightAtBirth,
       required: true,
       initialValue: '',
@@ -333,7 +333,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'placeOfDelivery',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.placeOfDelivery,
       initialValue: '',
       validate: [],
@@ -349,7 +349,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'deliveryInstitution',
-      type: 'select',
+      type: SELECT_WITH_OPTIONS,
       label: messages.deliveryInstitution,
       initialValue: '',
       validate: [],
@@ -357,7 +357,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'deliveryAddress',
-      type: 'textarea',
+      type: TEXTAREA,
       label: messages.deliveryAddress,
       initialValue: '',
       validate: [],

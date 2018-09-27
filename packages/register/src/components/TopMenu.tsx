@@ -74,13 +74,13 @@ const BackButtonText = styled.span`
   margin-left: 14px;
 `
 
-class TopMenuComponent extends React.Component<
-  {
-    goBack: typeof goBackAction
-    changeLanguage: typeof changeLanguageAction
-    languages: IntlState['languages']
-  } & InjectedIntlProps
-> {
+type Props = {
+  goBack: typeof goBackAction
+  changeLanguage: typeof changeLanguageAction
+  languages: IntlState['languages']
+}
+
+class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
   changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     this.props.changeLanguage({ language: e.target.value })
   }
@@ -114,4 +114,4 @@ export const TopMenu = connect(
     languages: getLanguages(state)
   }),
   { goBack: goBackAction, changeLanguage: changeLanguageAction }
-)(injectIntl<{}>(TopMenuComponent))
+)(injectIntl<Props>(TopMenuComponent))

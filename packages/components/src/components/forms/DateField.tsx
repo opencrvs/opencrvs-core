@@ -1,13 +1,14 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ITextInputProps, TextInput } from './TextInput'
+import { Omit } from '../omit'
 
 export interface IProps {
   id: string
-  disabled: boolean
+  disabled?: boolean
   meta?: { touched: boolean; error: string }
-  focusInput: boolean
-  onChange: (dateString: string) => {}
+  focusInput?: boolean
+  onChange: (dateString: string) => void
 }
 
 export interface IState {
@@ -16,7 +17,7 @@ export interface IState {
   yyyy: string
 }
 
-export type IDateFieldProps = IProps & ITextInputProps
+export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
   width: 4em;
