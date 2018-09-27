@@ -14,7 +14,7 @@ After all the planning is done the sprint will be started. From there the follow
 2. Pickup a task from the 'TODO' column and move it into the 'In Progress' column in Jira, this will automatically assign it to you.
 3. Create a new branch off of the **latest** master code using a descriptive name e.g. 'adding-xyz-component' or 'fix-scrolling-bug'.
 4. Write code man! Commit often and write tests as you go.
-5. When you think the issue is resolved _OR_ when you have a question about design or your current approach, open up a PR. You may want to set the correct labels for the PR.
+5. When you think the issue is resolved _OR_ when you have a question about design or your current approach, open up a PR. You may want to set the correct labels for the PR. **Note:** please add the Jira issue number to the bottom of description of the PR so it will be linked to the issue in Jira so reviewers can find it easily.
 6. Move the issue to 'Ready for Review' if it is complete OR if you just have a question, ping someone on chat to have a look at the PR.
 7. As a reviewer, when you pick up an issue to review, move it to 'In Review' then provide any comments in the PR. If the code requires work move the issue back to 'In Progress' and assign it to the original author. If all looks good then merge the PR, click the delete branch button in github and move the issue to 'Done' in Jira. Repeat this step as necessary.
 8. As an author of the PR, keep track of the comments made on the PR and push new commit to the PR to address them.
