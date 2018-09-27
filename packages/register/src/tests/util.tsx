@@ -17,6 +17,7 @@ import { ThemeProvider } from 'styled-components'
 import { ENGLISH_STATE } from '../i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { config } from '../config'
+import { I18nContainer } from '@opencrvs/register/src/i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
 
@@ -75,18 +76,21 @@ function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
 
 export function createTestComponent(node: React.ReactElement<ITestView>) {
   const { store } = createStore()
-
-  return mount(
+  const component = mount(
     <Provider store={store}>
-      <ThemeProvider theme={getTheme(config.LOCALE)}>
-        {nodeWithIntlProp(node)}
-      </ThemeProvider>
+      <I18nContainer>
+        <ThemeProvider theme={getTheme(config.LOCALE)}>
+          {nodeWithIntlProp(node)}
+        </ThemeProvider>
+      </I18nContainer>
     </Provider>,
     {
       context: { intl },
       childContextTypes: { intl: intlShape }
     }
   )
+
+  return { component, store }
 }
 
 export const wait = () => new Promise(res => process.nextTick(res))
