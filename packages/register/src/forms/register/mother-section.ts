@@ -11,6 +11,10 @@ import {
   SUBSECTION,
   SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
+import {
+  bengaliOnlyNameFormat,
+  englishOnlyNameFormat
+} from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -167,7 +171,7 @@ export const motherSection: IFormSection = {
       label: messages.motherGivenName,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'motherMiddleNames',
@@ -175,14 +179,14 @@ export const motherSection: IFormSection = {
       label: messages.motherMiddleNames,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'motherFamilyName',
       type: TEXT,
       label: messages.motherFamilyName,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'motherGivenNameEng',
@@ -190,7 +194,7 @@ export const motherSection: IFormSection = {
       label: messages.motherGivenNameEng,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'motherMiddleNamesEng',
@@ -198,14 +202,14 @@ export const motherSection: IFormSection = {
       label: messages.motherMiddleNamesEng,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'motherFamilyNameEng',
       type: TEXT,
       label: messages.motherFamilyNameEng,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'motherDateOfBirth',

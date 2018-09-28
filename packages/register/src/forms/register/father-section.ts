@@ -19,6 +19,10 @@ import {
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
+import {
+  bengaliOnlyNameFormat,
+  englishOnlyNameFormat
+} from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
   firstName: string
@@ -200,7 +204,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherGivenName,
       required: true,
       initialValue: '',
-      validate: [],
+      validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -209,7 +213,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherMiddleNames,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -217,7 +221,7 @@ export const fatherSection: IFormSection = {
       type: TEXT,
       label: messages.fatherFamilyName,
       initialValue: '',
-      validate: [],
+      validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -226,7 +230,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherGivenNameEng,
       required: true,
       initialValue: '',
-      validate: [],
+      validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -235,7 +239,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherMiddleNamesEng,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -243,7 +247,7 @@ export const fatherSection: IFormSection = {
       type: TEXT,
       label: messages.fatherFamilyNameEng,
       initialValue: '',
-      validate: [],
+      validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {

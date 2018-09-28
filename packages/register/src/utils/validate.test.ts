@@ -1,11 +1,14 @@
 import {
+  messages,
   isAValidPhoneNumberFormat,
   requiredSymbol,
   required,
   minLength,
   isNumber,
   phoneNumberFormat,
-  emailAddressFormat
+  emailAddressFormat,
+  bengaliOnlyNameFormat,
+  englishOnlyNameFormat
 } from './validate'
 import { config } from '../config'
 
@@ -160,6 +163,52 @@ describe('validate', () => {
       const goodValue = 'root@opencrvs.org'
       const response = undefined
       expect(emailAddressFormat(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('bengaliOnlyNameFormat. Checks a value is a valid Bengali name', () => {
+    it('should error when a Bengali punctuation is given', () => {
+      const badValue = 'মাসুম।'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
+    it('should error when a non Bengali character is given', () => {
+      const badValue = 'Masum'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
+    it('should pass when given a good name in Bengali', () => {
+      const goodValue = 'মাসুম'
+      expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it.skip('should pass when given a good name in Bengali with multiple words', () => {
+      const goodValue = 'আব্দুল জলিল'
+      expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+  })
+
+  describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
+    it('should error when an English punctuation is given', () => {
+      const badValue = 'John.'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should error when a non English character is given', () => {
+      const badValue = 'জন'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should pass when given a good name in English', () => {
+      const goodValue = 'John'
+      expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it.skip('should pass when given a good name in English with multiple words', () => {
+      const goodValue = 'John Doe'
+      expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
     })
   })
 })
