@@ -7,6 +7,7 @@ import {
 } from '@opencrvs/components/lib/forms'
 
 export const TEXT = 'TEXT'
+export const NUMBER = 'NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const DATE = 'DATE'
@@ -67,6 +68,10 @@ export interface IRadioGroupFormField extends IFormFieldBase {
 export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
 }
+export interface INumberFormField extends IFormFieldBase {
+  type: typeof NUMBER
+  step?: number
+}
 export interface ICheckboxGroupFormField extends IFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: ICheckboxOption[]
@@ -86,6 +91,7 @@ export interface IDocumentsFormField extends IFormFieldBase {
 
 export type IFormField =
   | ITextFormField
+  | INumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
   | IRadioGroupFormField
@@ -161,6 +167,10 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
 export interface Ii18nTextFormField extends Ii18nFormFieldBase {
   type: typeof TEXT
 }
+export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
+  type: typeof NUMBER
+  step?: number
+}
 export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: CheckboxComponentOption[]
@@ -180,6 +190,7 @@ export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
 
 export type Ii18nFormField =
   | Ii18nTextFormField
+  | Ii18nNumberFormField
   | Ii18nSelectFormField
   | Ii18nRadioGroupFormField
   | Ii18nCheckboxGroupFormField
