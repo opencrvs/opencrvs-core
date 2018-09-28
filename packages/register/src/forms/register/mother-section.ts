@@ -7,6 +7,7 @@ import {
   ViewType,
   SELECT_WITH_OPTIONS,
   TEXT,
+  NUMBER,
   DATE,
   SUBSECTION,
   SELECT_WITH_DYNAMIC_OPTIONS
@@ -393,7 +394,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCode',
-      type: TEXT,
+      type: NUMBER,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
@@ -513,7 +514,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCodePermanent',
-      type: TEXT,
+      type: NUMBER,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',

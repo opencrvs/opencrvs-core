@@ -14,6 +14,7 @@ import {
   ViewType,
   RADIO_GROUP,
   TEXT,
+  NUMBER,
   DATE,
   SUBSECTION,
   SELECT_WITH_OPTIONS,
@@ -471,7 +472,7 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'postCode',
-      type: TEXT,
+      type: NUMBER,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
@@ -631,7 +632,7 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'postCodePermanent',
-      type: TEXT,
+      type: NUMBER,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
