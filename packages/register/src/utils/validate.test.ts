@@ -22,6 +22,7 @@ describe('validate', () => {
       expect(isAValidPhoneNumberFormat(goodValue)).toEqual(response)
     })
   })
+
   describe('requiredSymbol. Used for number fields that use a symbol (e.g.: x) as an error message', () => {
     it('Should error when supplied a bad value. ', () => {
       const badValue = ''
@@ -41,6 +42,7 @@ describe('validate', () => {
       expect(requiredSymbol(goodValue)).toEqual(response)
     })
   })
+
   describe('required. Used for fields that must have a value', () => {
     it('Should error when supplied a bad value. ', () => {
       const badValue = ''
@@ -59,6 +61,7 @@ describe('validate', () => {
       expect(required(goodValue)).toEqual(response)
     })
   })
+
   describe('minLength. Used for fields that have a minimum length', () => {
     it('Should error when supplied a bad value. ', () => {
       const badValue = '1'
@@ -81,6 +84,7 @@ describe('validate', () => {
       expect(minLength(10)(goodValue)).toEqual(response)
     })
   })
+
   describe('isNumber. Checks a value is a number', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
@@ -100,6 +104,7 @@ describe('validate', () => {
       expect(isNumber(goodValue)).toEqual(response)
     })
   })
+
   describe('phoneNumberFormat. Checks a value is a valid phone number returning the message descriptor', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
@@ -125,6 +130,7 @@ describe('validate', () => {
       expect(phoneNumberFormat(goodValue)).toEqual(response)
     })
   })
+
   describe('emailAddressFormat. Checks a value is a valid email address returning the message descriptor', () => {
     it('should error when supplied a value invalid email.', () => {
       const badValue = 'user@domain'

@@ -51,17 +51,17 @@ export const messages = defineMessages({
     description:
       'The format of the mobile number that appears in an error message'
   },
-  requiredSymbol: {
-    id: 'validations.requiredSymbol',
-    defaultMessage: '',
-    description:
-      'A blank error message. Used for highlighting a required field without showing an error'
-  },
   emailAddressFormat: {
     id: 'validations.emailAddressFormat',
     defaultMessage: 'Must be a valid email address',
     description:
       'The error message appears when the email addresses are not valid'
+  },
+  requiredSymbol: {
+    id: 'validations.requiredSymbol',
+    defaultMessage: '',
+    description:
+      'A blank error message. Used for highlighting a required field without showing an error'
   }
 })
 
