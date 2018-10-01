@@ -4,7 +4,8 @@ import {
   required,
   minLength,
   isNumber,
-  phoneNumberFormat
+  phoneNumberFormat,
+  emailAddressFormat
 } from './validate'
 import { config } from '../config'
 
@@ -122,6 +123,37 @@ describe('validate', () => {
       const goodValue = '07111111111'
       const response = undefined
       expect(phoneNumberFormat(goodValue)).toEqual(response)
+    })
+  })
+  describe('emailAddressFormat. Checks a value is a valid email address returning the message descriptor', () => {
+    it('should error when supplied a value invalid email.', () => {
+      const badValue = 'user@domain'
+      const response = {
+        message: {
+          id: 'validations.emailAddressFormat',
+          defaultMessage: 'Must be a valid email address',
+          description:
+            'The error message appears when the email addresses are not valid'
+        }
+      }
+      expect(emailAddressFormat(badValue)).toEqual(response)
+    })
+    it('should error when supplied a value with invalid domain.', () => {
+      const badValue = 'user@example.c'
+      const response = {
+        message: {
+          id: 'validations.emailAddressFormat',
+          defaultMessage: 'Must be a valid email address',
+          description:
+            'The error message appears when the email addresses are not valid'
+        }
+      }
+      expect(emailAddressFormat(badValue)).toEqual(response)
+    })
+    it('should pass when supplied a good value.', () => {
+      const goodValue = 'root@opencrvs.org'
+      const response = undefined
+      expect(emailAddressFormat(goodValue)).toEqual(response)
     })
   })
 })

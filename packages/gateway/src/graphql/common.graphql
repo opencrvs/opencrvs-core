@@ -62,7 +62,8 @@ enum MaritalStatusType {
 enum AddressType {
   CURRENT
   PERMANENT
-  MILITARY_BASE_OR_CANTONMENT
+  # BIRTH_PLACE
+  MILITARY_BASE_OR_CANTONMENT # Move the next three out to catchment areas
   IDP_CAMP # -> Disaster Camp
   UNHCR_CAMP # -> UNHCR Camp
 }
@@ -83,15 +84,15 @@ input PersonInput {
   telecom: [ContactPointInput]
   gender: String
   birthDate: String
-  maritalStatus: MaritalStatusType
-  dateOfMarriage: Date
+  maritalStatus: MaritalStatusType # Not in BDRIS2 - keep as optional
+  dateOfMarriage: Date # Not in BDRIS2
   # For order of birth 3 equals 3rd born
-  multipleBirth: Int
+  multipleBirth: Int # Not in BDRIS2
   address: [AddressInput]
   photo: AttachmentInput
   deceased: Boolean
-  nationality: [String]
-  educationalAttainment: EducationType
+  nationality: [String] # In BDRIS2 for father and mother only
+  educationalAttainment: EducationType # Not in BDRIS2
 }
 
 type Person { # -> Patient
@@ -169,8 +170,8 @@ input AddressInput {
   state: String
   postalCode: String
   country: String
-  from: Date
-  to: Date
+  from: Date # Not in BDRIS2 use Current/Permenant
+  to: Date # Not in BDRIS2 use Current/Permenant
 }
 
 type Address { # -> Address (mostly the same property name except:)

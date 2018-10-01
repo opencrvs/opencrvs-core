@@ -13,7 +13,7 @@ const List = styled.ul`
   padding: 0;
 `
 
-interface ICheckboxOption {
+export interface ICheckboxOption {
   label: string
   value: string
 }
@@ -23,7 +23,7 @@ export interface ICheckboxGroup {
   name: string
   id: string
   value: string[]
-  onChange: (value: string[]) => {}
+  onChange: (value: string[]) => void
 }
 
 export class CheckboxGroup extends React.Component<ICheckboxGroup> {

@@ -5,6 +5,7 @@
   },
   "rules": {
     "ordered-imports": false,
+    "jsx-no-lambda": false,
     "no-console": false,
     "object-literal-sort-keys": false,
     "jsx-boolean-value": false,

@@ -20,19 +20,65 @@ export const RESEND_SMS = 'login/RESEND_SMS'
 export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
 export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
 
-export type Action =
-  | { type: typeof AUTHENTICATE; payload: IAuthenticationData }
-  | { type: typeof AUTHENTICATION_COMPLETED; payload: IAuthenticateResponse }
-  | { type: typeof AUTHENTICATION_FAILED; payload: Error }
-  | { type: typeof VERIFY_CODE; payload: { code: string } }
-  | { type: typeof VERIFY_CODE_COMPLETED; payload: ITokenResponse }
-  | { type: typeof VERIFY_CODE_FAILED; payload: Error }
-  | { type: typeof RESEND_SMS }
-  | { type: typeof RESEND_SMS_COMPLETED; payload: IAuthenticateResponse }
-  | { type: typeof RESEND_SMS_FAILED; payload: Error }
-  | RouterAction
+export type AuthenticationDataAction = {
+  type: typeof AUTHENTICATE
+  payload: IAuthenticationData
+}
 
-export const authenticate = (values: IAuthenticationData): Action => {
+export type AuthenticateResponseAction = {
+  type: typeof AUTHENTICATION_COMPLETED
+  payload: IAuthenticateResponse
+}
+
+export type AuthenticationFailedAction = {
+  type: typeof AUTHENTICATION_FAILED
+  payload: Error
+}
+
+export type ResendSMSAction = {
+  type: typeof RESEND_SMS
+}
+
+export type ResendSMSCompleteAction = {
+  type: typeof RESEND_SMS_COMPLETED
+  payload: IAuthenticateResponse
+}
+
+export type ResendSMSFailedAction = {
+  type: typeof RESEND_SMS_FAILED
+  payload: Error
+}
+
+export type VerifyCodeAction = {
+  type: typeof VERIFY_CODE
+  payload: { code: string }
+}
+
+export type VerifyCodeCompleteAction = {
+  type: typeof VERIFY_CODE_COMPLETED
+  payload: ITokenResponse
+}
+
+export type VerifyCodeFailedAction = {
+  type: typeof VERIFY_CODE_FAILED
+  payload: Error
+}
+
+export type Action =
+  | RouterAction
+  | AuthenticationDataAction
+  | AuthenticateResponseAction
+  | AuthenticationFailedAction
+  | ResendSMSAction
+  | ResendSMSCompleteAction
+  | ResendSMSFailedAction
+  | VerifyCodeAction
+  | VerifyCodeCompleteAction
+  | VerifyCodeFailedAction
+
+export const authenticate = (
+  values: IAuthenticationData
+): AuthenticationDataAction => {
   const cleanedData = {
     mobile: convertToMSISDN(values.mobile, config.LOCALE),
     password: values.password
@@ -46,17 +92,19 @@ export const authenticate = (values: IAuthenticationData): Action => {
 
 export const completeAuthentication = (
   response: IAuthenticateResponse
-): Action => ({
+): AuthenticateResponseAction => ({
   type: AUTHENTICATION_COMPLETED,
   payload: response
 })
 
-export const failAuthentication = (error: AxiosError): Action => ({
+export const failAuthentication = (
+  error: AxiosError
+): AuthenticationFailedAction => ({
   type: AUTHENTICATION_FAILED,
   payload: error
 })
 
-export const resendSMS = (): Action => ({
+export const resendSMS = (): ResendSMSAction => ({
   type: RESEND_SMS
 })
 
@@ -69,17 +117,19 @@ export interface IVerifyCodeNumbers {
   code6: string
 }
 
-export const completeSMSResend = (response: IAuthenticateResponse): Action => ({
+export const completeSMSResend = (
+  response: IAuthenticateResponse
+): ResendSMSCompleteAction => ({
   type: RESEND_SMS_COMPLETED,
   payload: response
 })
 
-export const failSMSResend = (error: AxiosError): Action => ({
+export const failSMSResend = (error: AxiosError): ResendSMSFailedAction => ({
   type: RESEND_SMS_FAILED,
   payload: error
 })
 
-export const verifyCode = (values: IVerifyCodeNumbers): Action => {
+export const verifyCode = (values: IVerifyCodeNumbers): VerifyCodeAction => {
   const code = Object.values(values).join('')
 
   return {
@@ -88,12 +138,14 @@ export const verifyCode = (values: IVerifyCodeNumbers): Action => {
   }
 }
 
-export const completeVerifyCode = (response: ITokenResponse): Action => ({
+export const completeVerifyCode = (
+  response: ITokenResponse
+): VerifyCodeCompleteAction => ({
   type: VERIFY_CODE_COMPLETED,
   payload: response
 })
 
-export const failVerifyCode = (error: AxiosError): Action => ({
+export const failVerifyCode = (error: AxiosError): VerifyCodeFailedAction => ({
   type: VERIFY_CODE_FAILED,
   payload: error
 })
