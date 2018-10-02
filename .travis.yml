@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "lts/*"
+  - 'lts/*'
 cache: yarn
 jobs:
   include:
@@ -20,7 +20,9 @@ jobs:
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start --record
       env:
-        CYPRESS_REGISTER_URL=http://localhost:3020/
+        - CYPRESS_LOGIN_URL=http://localhost:3020/
+        - CYPRESS_REGISTER_URL=http://localhost:3000/
+        - CYPRESS_AUTH_URL=http://localhost:4040/
       services:
         - docker
 
@@ -46,4 +48,6 @@ jobs:
       install: skip
       script: cd packages/e2e && yarn && yarn start --record
       env:
-        CYPRESS_REGISTER_URL=https://login.opencrvs-staging.jembi.org/
+        - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
+        - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org
+        - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
