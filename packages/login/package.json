@@ -24,11 +24,13 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3020 react-scripts-ts start",
+    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "build": "yarn verify-build-config && react-scripts-ts build && sw-precache --root='build/' --config sw-precache-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
     "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
-    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
-    "build": "yarn verify-build-config && react-scripts-ts build && sw-precache --root='build/' --config sw-precache-config.js",
+    "test:watch": "yarn test -- --watch",
+    "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3020 build"
@@ -37,7 +39,8 @@
     "src/**/*.{ts,tsx,json}": [
       "prettier --write",
       "tslint",
-      "stylelint"
+      "stylelint",
+      "git add"
     ]
   },
   "devDependencies": {
@@ -53,6 +56,7 @@
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
     "moxios": "^0.4.0",
+    "opener": "^1.5.1",
     "prettier": "^1.12.1",
     "redux-mock-store": "^1.5.3",
     "serve": "^10.0.0",
@@ -68,6 +72,12 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
     ]
   },
   "description": "The login application for OpenCRVS"

@@ -4,6 +4,7 @@ import { FormattedMessage, MessageValue } from 'react-intl'
 import { IFormFieldValue } from '@opencrvs/register/src/forms'
 
 import { validate as validateEmail } from 'email-validator'
+import * as XRegExp from 'xregexp'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
@@ -51,17 +52,29 @@ export const messages = defineMessages({
     description:
       'The format of the mobile number that appears in an error message'
   },
+  emailAddressFormat: {
+    id: 'validations.emailAddressFormat',
+    defaultMessage: 'Must be a valid email address',
+    description:
+      'The error message appears when the email addresses are not valid'
+  },
   requiredSymbol: {
     id: 'validations.requiredSymbol',
     defaultMessage: '',
     description:
       'A blank error message. Used for highlighting a required field without showing an error'
   },
-  emailAddressFormat: {
-    id: 'validations.emailAddressFormat',
-    defaultMessage: 'Must be a valid email address',
+  bengaliOnlyNameFormat: {
+    id: 'validations.bengaliOnlyNameFormat',
+    defaultMessage: 'Must contain only Bengali characters',
     description:
-      'The error message appears when the email addresses are not valid'
+      'The error message that appears when a non bengali character is used in a Bengali name'
+  },
+  englishOnlyNameFormat: {
+    id: 'validations.englishOnlyNameFormat',
+    defaultMessage: 'Must contain only English characters',
+    description:
+      'The error message that appears when a non English character is used in an English name'
   }
 })
 
@@ -117,4 +130,76 @@ export const emailAddressFormat: Validation = (value: string) => {
     : {
         message: messages.emailAddressFormat
       }
+}
+
+/*
+ * TODO: The name validation functions should be refactored out.
+ *
+ * Name validation has some complexities. These will vary from country to
+ * country too. e.g. in Bangladesh there is actually no given name or
+ * family name. Or first name/last name. To fit names in the common western
+ * format, people have to use multiple words in a "first name" or a "last name".
+ *
+ * Another complexity is what letters are allowed. Should we allow hyphens?
+ * Then in Bengali, there are some rules which we can build to ensure better
+ * quality input. e.g. a word can not start with a "mark" or diatribe.
+ *
+ * For now, we are going with simple validation that just prevents entering
+ * an English name in the Bengali name field and vice versa.
+ */
+
+//
+// Each character has to be a part of the Unicode Bengali script or the hyphen.
+//
+export const isValidBengaliWord = (value: string): boolean => {
+  const bengaliRe = XRegExp.cache('^[\\p{Bengali}-]+$')
+
+  return bengaliRe.test(value)
+}
+
+//
+// Simple pattern. Allow only English (Latin) characters and the hyphen.
+//
+export const isValidEnglishWord = (value: string): boolean => {
+  // Still using XRegExp for its caching ability
+  const englishRe = XRegExp.cache('^[\\p{Latin}\\d-]+$')
+
+  return englishRe.test(value)
+}
+
+type Checker = (value: string) => boolean
+
+//
+// Utility 2nd order function. Does a little common task then passes on to
+// the callback.
+//
+const checkNameWords = (value: string, checker: Checker): boolean => {
+  const trimmedValue = value === undefined || value === null ? '' : value.trim()
+
+  if (!trimmedValue) {
+    return true
+  }
+
+  const parts: string[] = trimmedValue.split(/\s+/)
+  return parts.every(checker)
+}
+
+export const isValidBengaliName = (value: string): boolean => {
+  return checkNameWords(value, isValidBengaliWord)
+}
+
+export const isValidEnglishName = (value: string): boolean => {
+  return checkNameWords(value, isValidEnglishWord)
+}
+
+export const bengaliOnlyNameFormat: Validation = (value: string) => {
+  return isValidBengaliName(value)
+    ? undefined
+    : { message: messages.bengaliOnlyNameFormat }
+}
+
+export const englishOnlyNameFormat: Validation = (value: string) => {
+  return isValidEnglishName(value)
+    ? undefined
+    : { message: messages.englishOnlyNameFormat }
 }
