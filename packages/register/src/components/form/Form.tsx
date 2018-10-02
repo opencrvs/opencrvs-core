@@ -26,12 +26,12 @@ import {
   IFormFieldValue,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  DOCUMENTS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
   DATE,
   TEXTAREA,
   SUBSECTION,
+  LIST,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions
 } from 'src/forms'
@@ -40,6 +40,7 @@ import { IValidationResult } from 'src/utils/validate'
 
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
+import { FormList } from './FormList'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -54,9 +55,6 @@ const FormItem = styled.div`
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
-`
-const DocumentUpload = styled.img`
-  width: 100%;
 `
 
 type GeneratedInputFieldProps = {
@@ -167,13 +165,8 @@ function GeneratedInputField({
       </InputField>
     )
   }
-  if (fieldDefinition.type === DOCUMENTS) {
-    return (
-      <DocumentUpload
-        src="/assets/document-upload.png"
-        alt="Dummy document upload"
-      />
-    )
+  if (fieldDefinition.type === LIST) {
+    return <FormList list={fieldDefinition.items} />
   }
 
   return (
