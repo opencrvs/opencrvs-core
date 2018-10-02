@@ -31,6 +31,7 @@ import {
   CHECKBOX_GROUP,
   DATE,
   TEXTAREA,
+  NUMBER,
   SUBSECTION,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions
@@ -175,10 +176,26 @@ function GeneratedInputField({
       />
     )
   }
+  if (fieldDefinition.type === NUMBER) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TextInput
+          type="number"
+          step={fieldDefinition.step}
+          {...inputProps}
+          value={inputProps.value as string}
+        />
+      </InputField>
+    )
+  }
 
   return (
     <InputField {...inputFieldProps}>
-      <TextInput {...inputProps} value={inputProps.value as string} />
+      <TextInput
+        type="text"
+        {...inputProps}
+        value={inputProps.value as string}
+      />
     </InputField>
   )
 }

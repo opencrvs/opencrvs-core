@@ -1,5 +1,12 @@
 import { defineMessages } from 'react-intl'
-import { ViewType, TEXT, TEXTAREA, DATE, SELECT_WITH_OPTIONS } from 'src/forms'
+import {
+  ViewType,
+  TEXT,
+  NUMBER,
+  TEXTAREA,
+  DATE,
+  SELECT_WITH_OPTIONS
+} from 'src/forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat
@@ -320,7 +327,7 @@ export const childSection: IFormSection = {
     },
     {
       name: 'orderOfBirth',
-      type: TEXT,
+      type: NUMBER,
       label: messages.orderOfBirth,
       required: true,
       initialValue: '',
@@ -328,7 +335,8 @@ export const childSection: IFormSection = {
     },
     {
       name: 'weightAtBirth',
-      type: TEXT,
+      type: NUMBER,
+      step: 0.01,
       label: messages.weightAtBirth,
       required: true,
       initialValue: '',
