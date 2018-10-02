@@ -1,11 +1,14 @@
 import {
+  messages,
   isAValidPhoneNumberFormat,
   requiredSymbol,
   required,
   minLength,
   isNumber,
   phoneNumberFormat,
-  emailAddressFormat
+  emailAddressFormat,
+  bengaliOnlyNameFormat,
+  englishOnlyNameFormat
 } from './validate'
 import { config } from '../config'
 
@@ -22,6 +25,7 @@ describe('validate', () => {
       expect(isAValidPhoneNumberFormat(goodValue)).toEqual(response)
     })
   })
+
   describe('requiredSymbol. Used for number fields that use a symbol (e.g.: x) as an error message', () => {
     it('Should error when supplied a bad value. ', () => {
       const badValue = ''
@@ -41,6 +45,7 @@ describe('validate', () => {
       expect(requiredSymbol(goodValue)).toEqual(response)
     })
   })
+
   describe('required. Used for fields that must have a value', () => {
     it('Should error when supplied a bad value. ', () => {
       const badValue = ''
@@ -59,6 +64,7 @@ describe('validate', () => {
       expect(required(goodValue)).toEqual(response)
     })
   })
+
   describe('minLength. Used for fields that have a minimum length', () => {
     it('Should error when supplied a bad value. ', () => {
       const badValue = '1'
@@ -81,6 +87,7 @@ describe('validate', () => {
       expect(minLength(10)(goodValue)).toEqual(response)
     })
   })
+
   describe('isNumber. Checks a value is a number', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
@@ -100,6 +107,7 @@ describe('validate', () => {
       expect(isNumber(goodValue)).toEqual(response)
     })
   })
+
   describe('phoneNumberFormat. Checks a value is a valid phone number returning the message descriptor', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
@@ -125,6 +133,7 @@ describe('validate', () => {
       expect(phoneNumberFormat(goodValue)).toEqual(response)
     })
   })
+
   describe('emailAddressFormat. Checks a value is a valid email address returning the message descriptor', () => {
     it('should error when supplied a value invalid email.', () => {
       const badValue = 'user@domain'
@@ -154,6 +163,52 @@ describe('validate', () => {
       const goodValue = 'root@opencrvs.org'
       const response = undefined
       expect(emailAddressFormat(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('bengaliOnlyNameFormat. Checks a value is a valid Bengali name', () => {
+    it('should error when a Bengali punctuation is given', () => {
+      const badValue = 'মাসুম।'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
+    it('should error when a non Bengali character is given', () => {
+      const badValue = 'Masum'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
+    it('should pass when given a good name in Bengali', () => {
+      const goodValue = 'মাসুম'
+      expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it.skip('should pass when given a good name in Bengali with multiple words', () => {
+      const goodValue = 'আব্দুল জলিল'
+      expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+  })
+
+  describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
+    it('should error when an English punctuation is given', () => {
+      const badValue = 'John.'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should error when a non English character is given', () => {
+      const badValue = 'জন'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should pass when given a good name in English', () => {
+      const goodValue = 'John'
+      expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it.skip('should pass when given a good name in English with multiple words', () => {
+      const goodValue = 'John Doe'
+      expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
     })
   })
 })
