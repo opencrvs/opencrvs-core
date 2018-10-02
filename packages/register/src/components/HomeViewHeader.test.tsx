@@ -5,7 +5,7 @@ import { HomeViewHeader } from './HomeViewHeader'
 describe('home view header component', () => {
   const testComponent = createShallowRenderedComponent(<HomeViewHeader />)
 
-  it('renders the select labels', () => {
+  it('renders without crashing', () => {
     expect(testComponent).toMatchSnapshot()
   })
 })
