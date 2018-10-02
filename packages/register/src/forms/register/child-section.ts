@@ -7,6 +7,10 @@ import {
   DATE,
   SELECT_WITH_OPTIONS
 } from 'src/forms'
+import {
+  bengaliOnlyNameFormat,
+  englishOnlyNameFormat
+} from 'src/utils/validate'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -221,7 +225,7 @@ export const childSection: IFormSection = {
       label: messages.childGivenName,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'childMiddleNames',
@@ -229,14 +233,14 @@ export const childSection: IFormSection = {
       label: messages.childMiddleNames,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'childFamilyName',
       type: TEXT,
       label: messages.childFamilyName,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'childGivenNameEng',
@@ -244,7 +248,7 @@ export const childSection: IFormSection = {
       label: messages.childGivenNameEng,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'childMiddleNamesEng',
@@ -252,14 +256,14 @@ export const childSection: IFormSection = {
       label: messages.childMiddleNamesEng,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'childFamilyNameEng',
       type: TEXT,
       label: messages.childFamilyNameEng,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'childSex',

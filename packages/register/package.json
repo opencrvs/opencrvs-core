@@ -8,6 +8,7 @@
     "@types/react-intl": "^2.3.8",
     "@types/react-redux": "^6.0.0",
     "@types/react-router-redux": "^5.0.14",
+    "@types/xregexp": "^3.0.29",
     "apollo-boost": "^0.1.6",
     "email-validator": "^2.0.4",
     "formik": "^1.0.3",
@@ -28,7 +29,8 @@
     "react-router-redux": "next",
     "react-scripts-ts": "2.16.0",
     "redux": "^4.0.0",
-    "redux-loop": "^4.3.3"
+    "redux-loop": "^4.3.3",
+    "xregexp": "^4.2.0"
   },
   "scripts": {
     "precommit": "lint-staged",
