@@ -441,7 +441,7 @@ export const ENGLISH_STATE = {
     'formFields.optionalLabel': 'Optional',
 
     'register.form.tabs.documentsTab': 'Documents',
-    'register.form.section.documentsTitle': 'Documents',
+    'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.documents.paragraph':
