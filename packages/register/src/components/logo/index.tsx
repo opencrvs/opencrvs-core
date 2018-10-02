@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import logo from './opencrvs_logo.svg'
+import logo from './OpenCRVSLogo.svg'
 export interface ISpinner {
   className?: string
 }
