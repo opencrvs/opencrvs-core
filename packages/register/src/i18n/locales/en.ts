@@ -444,6 +444,18 @@ export const ENGLISH_STATE = {
     'register.form.section.documentsTitle': 'Documents',
     'register.form.tabs.previewTab': 'Preview',
     'register.form.section.previewTitle': 'Preview',
+    'register.form.section.documents.paragraph':
+      'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
+    'register.form.section.documents.list.informantAttestation':
+      'Attestation of the informant, or',
+    'register.form.section.documents.list.attestedVaccination':
+      'Attested copy of the vaccination (EPI) card, or',
+    'register.form.section.documents.list.attestedBirthRecord':
+      'Attested copy of hospital document or birth record, or',
+    'register.form.section.documents.list.certification':
+      'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
+    'register.form.section.documents.list.otherDocuments':
+      'Attested copy(s) of the document as prescribed by the Registrar',
     'register.form.tabs.registrationTab': 'Registration',
     'register.form.section.registrationTitle': 'Registration',
     'formFields.registration.whoIsPresent':
