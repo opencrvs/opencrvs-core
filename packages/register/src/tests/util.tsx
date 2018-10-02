@@ -8,7 +8,7 @@ import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as en from 'react-intl/locale-data/en'
-import { mount, configure } from 'enzyme'
+import { mount, configure, shallow } from 'enzyme'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '../App'
@@ -91,6 +91,12 @@ export function createTestComponent(node: React.ReactElement<ITestView>) {
   )
 
   return { component, store }
+}
+
+export function createShallowRenderedComponent(
+  node: React.ReactElement<ITestView>
+) {
+  return shallow(node)
 }
 
 export const wait = () => new Promise(res => process.nextTick(res))
