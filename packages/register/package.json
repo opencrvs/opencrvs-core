@@ -48,7 +48,8 @@
     "src/**/*.{ts,tsx,json}": [
       "prettier --write",
       "tslint",
-      "stylelint"
+      "stylelint",
+      "git add"
     ]
   },
   "devDependencies": {
