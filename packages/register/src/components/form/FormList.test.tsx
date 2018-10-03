@@ -6,7 +6,7 @@ import { defineMessages } from 'react-intl'
 import * as actions from 'src/i18n/actions'
 import { Store } from 'redux'
 
-describe('when user is in the preview page', () => {
+describe('when user is in the document upload page', () => {
   let store: Store
   let formListComponent: ReactWrapper<{}, {}>
   const messages = defineMessages({
@@ -55,20 +55,34 @@ describe('when user is in the preview page', () => {
     const items = formListComponent.find('ul li')
     expect(items.length).toBe(listItems.length)
   })
+  it('check first list item', () => {
+    const firstItem = formListComponent.find('ul li').first()
+
+    expect(firstItem.text()).toBe(listItems[0].defaultMessage)
+  })
+  it('check last list item', () => {
+    const lastItem = formListComponent.find('ul li').last()
+
+    expect(lastItem.text()).toBe(listItems[listItems.length - 1].defaultMessage)
+  })
+  it('renders first list item text in bengali', async () => {
+    const action = actions.changeLanguage({ language: 'bn' })
+    store.dispatch(action)
+
+    const firstItem = formListComponent.find('ul li').first()
+    expect(firstItem.text()).toBe('সত্যায়িত সংবাদদাতার প্রচয় অথবা,')
+  })
   it('renders last list item text in bengali', async () => {
     const action = actions.changeLanguage({ language: 'bn' })
     store.dispatch(action)
 
-    const firstItem = formListComponent.find('ul li').last()
-    expect(firstItem.text()).toBe(
+    const lastItem = formListComponent.find('ul li').last()
+    expect(lastItem.text()).toBe(
       'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি'
     )
   })
-  it('renders first list item text in english', async () => {
-    const action = actions.changeLanguage({ language: 'en' })
-    store.dispatch(action)
-
-    const firstItem = formListComponent.find('ul li').first()
-    expect(firstItem.text()).toBe(listItems[0].defaultMessage)
+  it('check for zero list item', () => {
+    const items = formListComponent.find('ul li')
+    expect(items.length).toBeTruthy()
   })
 })
