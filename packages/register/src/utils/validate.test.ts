@@ -173,6 +173,18 @@ describe('validate', () => {
         message: messages.bengaliOnlyNameFormat
       })
     })
+    it('should error when a Bengali number is given', () => {
+      const badValue = 'মাসুম১'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
+    it('should error when an English number is given', () => {
+      const badValue = 'মাসুম1'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
     it('should error when a non Bengali character is given', () => {
       const badValue = 'Masum'
       expect(bengaliOnlyNameFormat(badValue)).toEqual({
@@ -183,8 +195,12 @@ describe('validate', () => {
       const goodValue = 'মাসুম'
       expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
     })
-    it.skip('should pass when given a good name in Bengali with multiple words', () => {
+    it('should pass when given a good name in Bengali with multiple words', () => {
       const goodValue = 'আব্দুল জলিল'
+      expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it('should pass when a hyphenated Bengali name is given', () => {
+      const goodValue = 'আব্দুল-জলিল'
       expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
     })
   })
@@ -192,6 +208,18 @@ describe('validate', () => {
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
     it('should error when an English punctuation is given', () => {
       const badValue = 'John.'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should error when an English number is given', () => {
+      const badValue = 'John1'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should error when a Bengali number is given', () => {
+      const badValue = 'John১'
       expect(englishOnlyNameFormat(badValue)).toEqual({
         message: messages.englishOnlyNameFormat
       })
@@ -206,8 +234,12 @@ describe('validate', () => {
       const goodValue = 'John'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
     })
-    it.skip('should pass when given a good name in English with multiple words', () => {
+    it('should pass when given a good name in English with multiple words', () => {
       const goodValue = 'John Doe'
+      expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it('should pass when a hyphenated English name is given', () => {
+      const goodValue = 'Anne-Marie'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
     })
   })

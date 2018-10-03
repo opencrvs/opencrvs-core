@@ -153,8 +153,9 @@ export const emailAddressFormat: Validation = (value: string) => {
 //
 export const isValidBengaliWord = (value: string): boolean => {
   const bengaliRe = XRegExp.cache('^[\\p{Bengali}-]+$')
+  const lettersRe = XRegExp.cache('^[\\pL\\pM-]+$')
 
-  return bengaliRe.test(value)
+  return bengaliRe.test(value) && lettersRe.test(value)
 }
 
 //
@@ -162,7 +163,7 @@ export const isValidBengaliWord = (value: string): boolean => {
 //
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
-  const englishRe = XRegExp.cache('^[\\p{Latin}\\d-]+$')
+  const englishRe = XRegExp.cache('^[\\p{Latin}-]+$')
 
   return englishRe.test(value)
 }
