@@ -5,7 +5,7 @@ import { childSection } from './child-section'
 import { motherSection } from './mother-section'
 import { fatherSection } from './father-section'
 import { registrationSection } from './registration-section'
-import { DocumentsSection } from './documents-section'
+import { documentsSection } from './documents-section'
 
 const messages = defineMessages({
   previewTab: {
@@ -31,7 +31,7 @@ export const initialState: IRegisterFormState = {
       motherSection,
       fatherSection,
       registrationSection,
-      DocumentsSection,
+      documentsSection,
       {
         id: 'preview',
         viewType: 'preview',

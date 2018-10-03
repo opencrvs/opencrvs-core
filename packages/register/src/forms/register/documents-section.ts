@@ -47,7 +47,7 @@ const messages = defineMessages({
   }
 })
 
-export const DocumentsSection: IFormSection = {
+export const documentsSection: IFormSection = {
   id: 'documents',
   viewType: 'form',
   name: messages.documentsTab,
