@@ -23,7 +23,12 @@
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": ["prettier --write", "tslint", "stylelint"]
+    "src/**/*.{ts,tsx,json}": [
+      "prettier --write",
+      "tslint",
+      "stylelint",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@types/jest": "^22.2.3",

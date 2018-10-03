@@ -14,7 +14,14 @@ import { Warning } from '@opencrvs/components/lib/icons'
 
 import styled from 'src/styled-components'
 
-import { IFormSection, IFormField, IForm, IFormFieldValue } from 'src/forms'
+import {
+  IFormSection,
+  IFormField,
+  IForm,
+  IFormFieldValue,
+  ISelectOption,
+  SELECT_WITH_OPTIONS
+} from 'src/forms'
 
 import { IDraft } from 'src/drafts'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -115,7 +122,7 @@ const InformationMissingLink = styled(Button)`
 
 const PreviewHeadingBox = styled(PreviewBox)`
   position: relative;
-  ${InformationMissingLink} {
+  ${/* sc-sel */ InformationMissingLink} {
     margin-right: 1em;
   }
 `
@@ -135,7 +142,23 @@ const MissingFieldsWarningIcon = styled(Warning)`
   left: -16px;
 `
 
-function renderValue(value: IFormFieldValue, intl: InjectedIntl) {
+function renderSelectLabel(
+  value: IFormFieldValue,
+  options: ISelectOption[],
+  intl: InjectedIntl
+) {
+  const selectedOption = options.find(option => option.value === value)
+  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+}
+
+function renderValue(
+  value: IFormFieldValue,
+  field: IFormField,
+  intl: InjectedIntl
+) {
+  if (field.type === SELECT_WITH_OPTIONS && field.options) {
+    return renderSelectLabel(value, field.options, intl)
+  }
   if (typeof value === 'string') {
     return value
   }
@@ -255,11 +278,16 @@ class PreviewSectionForm extends React.Component<
                       emptyFieldsBySection[section.id][field.name]
 
                     return (
-                      <ListItem key={field.name}>
+                      <ListItem
+                        id={`listItem_${section.id}_${field.name}`}
+                        key={field.name}
+                      >
                         <ListItemLabel>
                           {intl.formatMessage(field.label)}
                         </ListItemLabel>
-                        <ListItemValue>
+                        <ListItemValue
+                          id={`listItem_value_${section.id}_${field.name}`}
+                        >
                           {informationMissing ? (
                             <InformationMissingLink
                               onClick={() =>
@@ -275,6 +303,7 @@ class PreviewSectionForm extends React.Component<
                           ) : (
                             renderValue(
                               draft.data[section.id][field.name],
+                              field,
                               intl
                             )
                           )}
@@ -306,9 +335,10 @@ export const PreviewSection = connect<Props, DispatchProps, OwnProps>(
   (state: IStoreState, { draft, onSubmit }: OwnProps) => ({
     onSubmit,
     draft,
+    language: state.i18n.language,
     registerForm: getRegisterForm(state)
   }),
   {
     goToTab
   }
-)(injectIntl<Props & OwnProps>(PreviewSectionForm))
+)(injectIntl(PreviewSectionForm))
