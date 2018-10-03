@@ -1,17 +1,15 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
-import { List } from '@opencrvs/components/lib/interface'
+import { injectIntl, InjectedIntlProps, FormattedMessage } from 'react-intl'
+import { List } from '@opencrvs/components/lib/typography'
 
-interface IListType {
-  id: string
-  defaultMessage: string
-}
 export interface IProps {
-  list: IListType[]
+  list: FormattedMessage.MessageDescriptor[]
 }
 
 const FormListComponent = ({ list, intl }: IProps & InjectedIntlProps) => {
-  const localizedList = list.map((item: IListType) => intl.formatMessage(item))
+  const localizedList = list.map((item: FormattedMessage.MessageDescriptor) =>
+    intl.formatMessage(item)
+  )
 
   return <List list={localizedList} />
 }

@@ -11,6 +11,7 @@ import {
   TextArea,
   SubSectionDivider
 } from '@opencrvs/components/lib/forms'
+import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -34,7 +35,8 @@ import {
   SUBSECTION,
   LIST,
   ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions
+  ISelectFormFieldWithOptions,
+  PARAGRAPH
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -165,6 +167,9 @@ function GeneratedInputField({
         <SubSectionDivider label={fieldDefinition.label} />
       </InputField>
     )
+  }
+  if (fieldDefinition.type === PARAGRAPH) {
+    return <Paragraph>{fieldDefinition.label}</Paragraph>
   }
   if (fieldDefinition.type === LIST) {
     return <FormList list={fieldDefinition.items} />

@@ -37,11 +37,6 @@ export interface IDynamicOptions {
   options: { [key: string]: ISelectOption[] }
 }
 
-export interface IListItems {
-  id: string
-  defaultMessage: string
-}
-
 export type IFormFieldValue = string | string[] | boolean
 
 export interface IFormFieldBase {
@@ -95,9 +90,12 @@ export interface ISubsectionFormField extends IFormFieldBase {
 export interface IDocumentsFormField extends IFormFieldBase {
   type: typeof DOCUMENTS
 }
-export interface ILISTFormField extends IFormFieldBase {
+export interface IListFormField extends IFormFieldBase {
   type: typeof LIST
-  items: IListItems[]
+  items: FormattedMessage.MessageDescriptor[]
+}
+export interface IParagraphFormField extends IFormFieldBase {
+  type: typeof PARAGRAPH
 }
 
 export type IFormField =
@@ -111,7 +109,8 @@ export type IFormField =
   | ITextareaFormField
   | ISubsectionFormField
   | IDocumentsFormField
-  | ILISTFormField
+  | IListFormField
+  | IParagraphFormField
 
 export interface IConditional {
   action: string
@@ -201,7 +200,10 @@ export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nListFormField extends Ii18nFormFieldBase {
   type: typeof LIST
-  items: IListItems[]
+  items: FormattedMessage.MessageDescriptor[]
+}
+export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
+  type: typeof PARAGRAPH
 }
 
 export type Ii18nFormField =
@@ -215,6 +217,7 @@ export type Ii18nFormField =
   | Ii18nSubsectionFormField
   | Ii18nDocumentsFormField
   | Ii18nListFormField
+  | Ii18nParagraphFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

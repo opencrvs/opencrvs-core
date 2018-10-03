@@ -1,5 +1,5 @@
 import { defineMessages } from 'react-intl'
-import { IFormSection, LIST } from 'src/forms'
+import { IFormSection, LIST, PARAGRAPH } from 'src/forms'
 
 const messages = defineMessages({
   documentsTab: {
@@ -54,10 +54,16 @@ export const DocumentsSection: IFormSection = {
   title: messages.documentsTitle,
   fields: [
     {
+      name: 'paragraph',
+      type: PARAGRAPH,
+      label: messages.paragraph,
+      initialValue: '',
+      validate: []
+    },
+    {
       name: 'list',
       type: LIST,
       label: messages.documentsTab,
-      required: false,
       initialValue: '',
       validate: [],
       items: [
