@@ -2,7 +2,7 @@
 
 context('Login', () => {
   beforeEach(() => {
-    cy.visit(Cypress.env('REGISTER_URL'))
+    cy.visit(Cypress.env('LOGIN_URL'))
   })
 
   it('takes user to the registration app once correct credentials are given', () => {
