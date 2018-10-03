@@ -1,10 +1,10 @@
 # Object Transformation Module
 
-This module allows an object to be converted field by field into another object. This ensures that every field in the source object has transformation logic as the transformation module will complain if you don't provide a builder for that field.
+This module allows an object to be converted field by field into another object. This ensures that every field in the source object has transformation logic as the transformation module will complain if you don't provide a builder function for that field.
 
 This module works well with GraphQL as it provides us a very similar method to construct a domain object from a GraphQL representation as you would for converting a domain object to a GraphQL representation using GraphQL resolvers.
 
-To use to module you define 'builder' functions (the inverse of resolvers) for each field of the source object. Each field builder is a function that add to a single target object which will be the final representation of the converted object.
+To use this module you define 'builder' functions (the inverse of resolvers) for each field of the source object. Each field builder is a function that adds to a single target object which will be the final representation of the converted object.
 
 Builder function have the following signature:
 
@@ -19,6 +19,8 @@ Example usage
 ```ts
 import transformObj, { IFieldBuilders } from 'src/features/transformation'
 
+// the property name of the builder must match the property name in the incoming
+// source object, these may also be nested if the source object has nested properties
 const fieldBuilders: IFieldBuilders = {
   gender: (accumulatedObj, fieldValue) => {
     accumulatedObj.gender = fieldValue === 'm' ? 'male' : 'female'
