@@ -1,0 +1,110 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`home view header component renders without crashing 1`] = `
+ShallowWrapper {
+  Symbol(enzyme.__root__): [Circular],
+  Symbol(enzyme.__unrendered__): <HomeViewHeader />,
+  Symbol(enzyme.__renderer__): Object {
+    "batchedUpdates": [Function],
+    "getNode": [Function],
+    "render": [Function],
+    "simulateEvent": [Function],
+    "unmount": [Function],
+  },
+  Symbol(enzyme.__node__): Object {
+    "instance": null,
+    "key": undefined,
+    "nodeType": "class",
+    "props": Object {
+      "children": Array [
+        <Connect(InjectIntl(TopMenuComponent))
+          hideBackButton={true}
+        />,
+        <Styled(Logo) />,
+        undefined,
+      ],
+    },
+    "ref": null,
+    "rendered": Array [
+      Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "class",
+        "props": Object {
+          "hideBackButton": true,
+        },
+        "ref": null,
+        "rendered": null,
+        "type": [Function],
+      },
+      Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "class",
+        "props": Object {},
+        "ref": null,
+        "rendered": null,
+        "type": [Function],
+      },
+      undefined,
+    ],
+    "type": [Function],
+  },
+  Symbol(enzyme.__nodes__): Array [
+    Object {
+      "instance": null,
+      "key": undefined,
+      "nodeType": "class",
+      "props": Object {
+        "children": Array [
+          <Connect(InjectIntl(TopMenuComponent))
+            hideBackButton={true}
+          />,
+          <Styled(Logo) />,
+          undefined,
+        ],
+      },
+      "ref": null,
+      "rendered": Array [
+        Object {
+          "instance": null,
+          "key": undefined,
+          "nodeType": "class",
+          "props": Object {
+            "hideBackButton": true,
+          },
+          "ref": null,
+          "rendered": null,
+          "type": [Function],
+        },
+        Object {
+          "instance": null,
+          "key": undefined,
+          "nodeType": "class",
+          "props": Object {},
+          "ref": null,
+          "rendered": null,
+          "type": [Function],
+        },
+        undefined,
+      ],
+      "type": [Function],
+    },
+  ],
+  Symbol(enzyme.__options__): Object {
+    "adapter": ReactSixteenAdapter {
+      "options": Object {
+        "enableComponentDidUpdateOnSetState": true,
+        "lifecycles": Object {
+          "componentDidUpdate": Object {
+            "onSetState": true,
+          },
+          "getSnapshotBeforeUpdate": true,
+        },
+      },
+    },
+    "attachTo": undefined,
+    "hydrateIn": undefined,
+  },
+}
+`;
