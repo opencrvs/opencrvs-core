@@ -5,7 +5,7 @@ import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
 
 import { ApolloLink, Observable } from 'apollo-link'
-import { IStoreState, createStore } from '../store'
+import { IStoreState, createStore, AppStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as en from 'react-intl/locale-data/en'
 import { mount, configure } from 'enzyme'
@@ -74,8 +74,10 @@ function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
   return React.cloneElement(node, { intl })
 }
 
-export function createTestComponent(node: React.ReactElement<ITestView>) {
-  const { store } = createStore()
+export function createTestComponent(
+  node: React.ReactElement<ITestView>,
+  store: AppStore
+) {
   const component = mount(
     <Provider store={store}>
       <I18nContainer>
