@@ -50,11 +50,7 @@ export function IconAction({
     <ActionContainer icon={icon} align={IconAlignment.LEFT} {...props}>
       <div>
         <ActionTitle>{title}</ActionTitle>
-        {description && (
-          <ActionDescription
-            dangerouslySetInnerHTML={{ __html: description }}
-          />
-        )}
+        {description && <ActionDescription>{description}</ActionDescription>}
       </div>
     </ActionContainer>
   )
