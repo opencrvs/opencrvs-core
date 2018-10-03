@@ -18,11 +18,7 @@ class HomeView extends React.Component<
 > {
   render() {
     return (
-      <DummyView
-        id="register"
-        onClick={this.props.goToEvents}
-        src="/assets/home-view.png"
-      />
+      <DummyView onClick={this.props.goToEvents} src="/assets/home-view.png" />
     )
   }
 }
