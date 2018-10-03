@@ -36,6 +36,7 @@ const MenuButton = styled(PrimaryButton)`
   height: 100%;
   background: ${({ theme }) => theme.colors.primary};
   padding: 0 30px;
+  margin-left: auto;
   select {
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -75,6 +76,7 @@ const BackButtonText = styled.span`
 `
 
 type Props = {
+  hideBackButton?: true | false | undefined | null
   goBack: typeof goBackAction
   changeLanguage: typeof changeLanguageAction
   languages: IntlState['languages']
@@ -85,15 +87,17 @@ class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
     this.props.changeLanguage({ language: e.target.value })
   }
   render() {
-    const { intl, goBack, languages } = this.props
+    const { intl, goBack, languages, hideBackButton } = this.props
     const languageKeys = Object.keys(languages)
 
     return (
       <TopMenuContainer>
-        <BackButtonContainer onClick={goBack}>
-          <BackButton icon={() => <ArrowBack />} />
-          <BackButtonText>{intl.formatMessage(messages.back)}</BackButtonText>
-        </BackButtonContainer>
+        {!hideBackButton && (
+          <BackButtonContainer onClick={goBack}>
+            <BackButton icon={() => <ArrowBack />} />
+            <BackButtonText>{intl.formatMessage(messages.back)}</BackButtonText>
+          </BackButtonContainer>
+        )}
         <MenuButton icon={() => <Hamburger />}>
           <select value={'en'} onChange={this.changeLanguage}>
             <option value={'en'}>{intl.formatMessage(messages.menu)}</option>
