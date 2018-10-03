@@ -25,6 +25,16 @@ const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
   font-size: 24px;
   margin-left: 80px;
 `
+const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.secondary};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 16px;
+  margin: 3px 0px 0px 80px;
+  strong {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+  }
+`
 
 interface IIconActionProps extends IActionProps {
   icon: () => React.ReactNode
@@ -32,14 +42,19 @@ interface IIconActionProps extends IActionProps {
 
 export function IconAction({
   title,
-  disabled,
+  description,
   icon,
   ...props
 }: IIconActionProps) {
   return (
     <ActionContainer icon={icon} align={IconAlignment.LEFT} {...props}>
       <div>
-        <ActionTitle disabled={disabled}>{title}</ActionTitle>
+        <ActionTitle>{title}</ActionTitle>
+        {description && (
+          <ActionDescription
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
+        )}
       </div>
     </ActionContainer>
   )
