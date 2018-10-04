@@ -17,6 +17,7 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
+    "typeRoots": ["./types", "./node_modules/@types"],
     // Required for using `react-primitives` types, but
     // also makes typechecking faster in general.
     //
@@ -28,6 +29,7 @@
   },
   "exclude": [
     "node_modules",
+    "types",
     "build",
     "scripts",
     "acceptance-tests",
