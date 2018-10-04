@@ -108,7 +108,10 @@ export const selectOption = (
   selector: string,
   option: string
 ): string => {
-  wrapper.find(`${selector} input`).instance().value = option.charAt(0)
+  const input = wrapper
+    .find(`${selector} input`)
+    .instance() as React.InputHTMLAttributes<HTMLInputElement>
+  input.value = option.charAt(0)
   wrapper.find(`${selector} input`).simulate('change', {
     target: { value: option.charAt(0) }
   })
