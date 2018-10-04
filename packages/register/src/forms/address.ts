@@ -1055,6 +1055,7 @@ export const stateDistrictMap = Object.keys(addressOptions).reduce(
 
 export const districtUpazilaMap = Object.keys(addressOptions).reduce(
   (districtUpazilasMap, state) => {
+    console.log(state)
     Object.keys(addressOptions[state])
       .filter(district => district !== 'districts')
       .forEach(district => {
