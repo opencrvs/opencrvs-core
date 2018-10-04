@@ -16,11 +16,12 @@ interface IProps {
 const styledNotification = styled.div.attrs({})
 
 const NotificationContainer = styledNotification`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   position: fixed;
   left: 0;
   right: 0;
-  bottom: -80px;
-  height:80px;
+  bottom: -100px;
+  height:100px;
   width: 100%;
   display:flex;
   background: ${({ theme }) => theme.colors.accent};
@@ -57,6 +58,7 @@ const NotificationMessage = styled.div`
   padding: 5px 10px;
   margin: 5px;
   color: ${({ theme }) => theme.colors.white};
+  font-weight: bold;
 `
 
 export class Notification extends React.Component<IProps> {
