@@ -23,3 +23,38 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('login', (userType, options = {}) => {
+  const users = {
+    fieldWorker: {
+      mobile: '+447111111111',
+      password: 'test'
+    }
+  }
+  const user = users[userType]
+  cy
+    .request({
+      url: `${Cypress.env('AUTH_URL')}authenticate`,
+      method: 'POST',
+      body: {
+        mobile: user.mobile,
+        password: user.password
+      }
+    })
+    .its('body')
+    .then(body => {
+      cy
+        .request({
+          url: `${Cypress.env('AUTH_URL')}verifyCode`,
+          method: 'POST',
+          body: {
+            nonce: body.nonce,
+            code: '000000'
+          }
+        })
+        .its('body')
+        .then(body => {
+          cy.visit(`${Cypress.env('REGISTER_URL')}?token=${body.token}`)
+        })
+    })
+})

@@ -34,7 +34,7 @@ describe('when user is in the register form', () => {
         component.find('#form_section_title_mother').hostNodes()
       ).toHaveLength(1)
     })
-    it('change country select', async () => {
+    it('changes the country select', async () => {
       const select = selectOption(
         component,
         '#country',

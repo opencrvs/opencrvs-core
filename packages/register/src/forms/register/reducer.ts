@@ -1,22 +1,13 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, DOCUMENTS } from 'src/forms'
+import { IForm } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { childSection } from './child-section'
 import { motherSection } from './mother-section'
 import { fatherSection } from './father-section'
 import { registrationSection } from './registration-section'
+import { documentsSection } from './documents-section'
 
 const messages = defineMessages({
-  documentsTab: {
-    id: 'register.form.tabs.documentsTab',
-    defaultMessage: 'Documents',
-    description: 'Tab title for Documents'
-  },
-  documentsTitle: {
-    id: 'register.form.section.documentsTitle',
-    defaultMessage: 'Documents',
-    description: 'Form section title for Documents'
-  },
   previewTab: {
     id: 'register.form.tabs.previewTab',
     defaultMessage: 'Preview',
@@ -40,23 +31,7 @@ export const initialState: IRegisterFormState = {
       motherSection,
       fatherSection,
       registrationSection,
-      {
-        id: 'documents',
-        viewType: 'form',
-        name: messages.documentsTab,
-        title: messages.documentsTitle,
-        fields: [
-          {
-            name: 'documents',
-            type: DOCUMENTS,
-            // Just a dummy message here - not actually shown anywhere
-            label: messages.documentsTab,
-            required: false,
-            initialValue: '',
-            validate: []
-          }
-        ]
-      },
+      documentsSection,
       {
         id: 'preview',
         viewType: 'preview',

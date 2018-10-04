@@ -1,5 +1,11 @@
 import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
+import { ReactNode } from 'react-redux'
+
+export enum ICON_ALIGNMENT {
+  LEFT,
+  RIGHT
+}
 
 const ButtonBase = styled.button`
   width: auto;
@@ -16,21 +22,32 @@ const ButtonBase = styled.button`
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: () => React.ReactNode
+  align?: ICON_ALIGNMENT
 }
 
-/* TODO this should be the last component of this file,
- * figure out how to define priority for styleguidist
- */
-export function Button({ icon, children, ...otherProps }: IButtonProps) {
+export function Button({
+  icon,
+  children,
+  align = ICON_ALIGNMENT.RIGHT,
+  ...otherProps
+}: IButtonProps) {
   return (
     <ButtonBase {...otherProps}>
+      {icon &&
+        align === ICON_ALIGNMENT.LEFT && (
+          <LeftButtonIcon>{icon()}</LeftButtonIcon>
+        )}
       {children}
-
-      {icon && <ButtonIcon>{icon()}</ButtonIcon>}
+      {icon &&
+        align === ICON_ALIGNMENT.RIGHT && <ButtonIcon>{icon()}</ButtonIcon>}
     </ButtonBase>
   )
 }
 
+const LeftButtonIcon = styled.div`
+  align-self: center;
+  position: absolute;
+`
 export const ButtonIcon = styled.div`
   /* TODO these feel weird..*/
   display: flex;
