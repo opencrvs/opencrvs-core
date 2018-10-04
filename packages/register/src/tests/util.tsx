@@ -8,7 +8,7 @@ import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore, AppStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as en from 'react-intl/locale-data/en'
-import { mount, configure } from 'enzyme'
+import { mount, configure, ReactWrapper } from 'enzyme'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '../App'
@@ -96,3 +96,18 @@ export function createTestComponent(
 }
 
 export const wait = () => new Promise(res => process.nextTick(res))
+
+export const selectOption = (
+  wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
+  selector: string,
+  option: string
+): string => {
+  wrapper.find(`${selector} input`).instance().value = option.charAt(0)
+  wrapper.find(`${selector} input`).simulate('change', {
+    target: { value: option.charAt(0) }
+  })
+  wrapper
+    .find(`${selector} .react-select__menu div[children="${option}"]`)
+    .simulate('click')
+  return `${selector} .react-select__single-value`
+}
