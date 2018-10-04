@@ -21,6 +21,7 @@ const StyledLogo = styled(Logo)`
   margin-right: auto;
   margin-top: -40px;
   margin-left: 40px;
+  margin-bottom: 10px;
 `
 
 export class HomeViewHeader extends React.Component {
