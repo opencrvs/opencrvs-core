@@ -7,7 +7,7 @@ Notification type is optional but it accept the following notification types:
 callback is optional and can be bind with click event
 
 ```js
-const { NOTIF_TYPE } = require('./Notification')
+const { NOTIFICATION_TYPE } = require('./Notification')
 
 class NotificationExample extends React.Component {
   constructor() {
@@ -71,11 +71,11 @@ class NotificationExample extends React.Component {
         </div>
 
         <Notification show={this.state.show} callback={this.toggleShow}>
-          This is a default notification
+          We've made some updates, Please click here to refresh
         </Notification>
 
         <Notification
-          type={NOTIF_TYPE.SUCCESS}
+          type={NOTIFICATION_TYPE.SUCCESS}
           show={this.state.showSuccess}
           callback={this.toggleShowSuccess}
         >
@@ -83,7 +83,7 @@ class NotificationExample extends React.Component {
         </Notification>
 
         <Notification
-          type={NOTIF_TYPE.WARNING}
+          type={NOTIFICATION_TYPE.WARNING}
           show={this.state.showWarning}
           callback={this.toggleShowWarning}
         >
@@ -91,7 +91,7 @@ class NotificationExample extends React.Component {
         </Notification>
 
         <Notification
-          type={NOTIF_TYPE.ERROR}
+          type={NOTIFICATION_TYPE.ERROR}
           show={this.state.showError}
           callback={this.toggleShowError}
         >

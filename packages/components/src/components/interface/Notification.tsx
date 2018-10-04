@@ -1,40 +1,38 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { Button } from '../buttons'
-export enum NOTIF_TYPE {
+export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
   ERROR = 'error'
 }
 interface IProps {
   show: boolean
-  type?: NOTIF_TYPE
+  type?: NOTIFICATION_TYPE
   callback?: any
   children?: any
 }
 
-const styledNotif = styled.div.attrs<IProps>({})
+const styledNotification = styled.div.attrs({})
 
-const slideUp = keyframes`
-  from { bottom: -80px; }
-  to { bottom: 0; }
-`
-
-const NotifContainer = styledNotif`
+const NotificationContainer = styledNotification`
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: -80px;
   height:80px;
   width: 100%;
+  display:flex;
   background: ${({ theme }) => theme.colors.accent};
   z-index: 1;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  transition: visibility 0s, opacity 0.5s linear;
-  display: ${({ show }) => (show ? 'flex' : 'none')};
-  animation: ${slideUp} 500ms;
+  transition: bottom .5s ease-in-out;
+
+  &.show {
+    bottom: 0;
+  }
 
   &.success, &.error, &.warning {
     background: ${({ theme }) => theme.colors.placeholder};
@@ -53,14 +51,12 @@ const NotifContainer = styledNotif`
   }
 `
 
-const NotifButton = styled(Button)`
-  background: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+const NotificationMessage = styled.div`
+  background: ${({ theme }) => theme.colors.copyAlpha80};
   border-radius: 21px;
-  color: ${({ theme }) => theme.colors.white};
-  font-size: 0.95rem;
   padding: 5px 10px;
   margin: 5px;
+  color: ${({ theme }) => theme.colors.white};
 `
 
 export class Notification extends React.Component<IProps> {
@@ -68,9 +64,11 @@ export class Notification extends React.Component<IProps> {
     const { type, show, children, callback } = this.props
 
     return (
-      <NotifContainer className={type} show={show}>
-        <NotifButton onClick={callback}>{children}</NotifButton>
-      </NotifContainer>
+      <NotificationContainer
+        className={(type ? type : '') + (show ? ' show' : '')}
+      >
+        <NotificationMessage onClick={callback}>{children}</NotificationMessage>
+      </NotificationContainer>
     )
   }
 }
