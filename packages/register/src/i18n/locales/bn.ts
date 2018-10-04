@@ -443,6 +443,18 @@ export const BENGALI_STATE = {
     'register.form.tabs.documentsTab': 'সমর্থনকারী কাগজপত্র',
     'register.form.section.documentsTitle': 'সমর্থনকারী কাগজপত্র',
     'register.form.tabs.previewTab': 'প্রিভিউ',
+    'register.form.section.documents.paragraph':
+      'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
+    'register.form.section.documents.list.informantAttestation':
+      'সত্যায়িত সংবাদদাতার প্রচয় অথবা,',
+    'register.form.section.documents.list.attestedVaccination':
+      'সত্যায়িত টিকার কার্ড অনুলিপি (ই পি আই কার্ড) অথবা,',
+    'register.form.section.documents.list.attestedBirthRecord':
+      'সত্যায়িত হাসপাতালের ডকুমেন্টের অনুলিপি য়থবা জন্ম রেকর্ড অথবা,',
+    'register.form.section.documents.list.certification':
+      'রেজিস্টারড এনজিও কর্মকর্তা হইতে প্রাপ্ত জন্মতারিখের সার্টিফিকেট অথবা,',
+    'register.form.section.documents.list.otherDocuments':
+      'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি',
     'register.form.section.previewTitle': 'প্রিভিউ',
     'register.form.tabs.registrationTab': 'নিবন্ধন',
     'register.form.section.registrationTitle': 'নিবন্ধন',
