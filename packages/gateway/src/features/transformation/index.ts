@@ -1,6 +1,7 @@
 export type IFieldBuilderFunction = (
   accumulatedObj: any,
-  fieldValue: string | number
+  fieldValue: string | number,
+  context: any
 ) => void
 
 export interface IFieldBuilders {
@@ -22,42 +23,54 @@ function isBuilderFunction(
 async function transformField(
   sourceVal: any,
   targetObj: any,
-  fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders
+  fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
+  context: any
 ) {
-  if (sourceVal instanceof Object) {
+  if (!(sourceVal instanceof Date) && sourceVal instanceof Object) {
     if (isFieldBuilder(fieldBuilderForVal)) {
-      await transformObj(sourceVal, targetObj, fieldBuilderForVal)
+      await transformObj(sourceVal, targetObj, fieldBuilderForVal, context)
       return targetObj
     }
 
     throw new Error(
-      `Expected ${fieldBuilderForVal} to be a FieldBuilder object. The current field value is ${sourceVal}.`
+      `Expected ${JSON.stringify(
+        fieldBuilderForVal
+      )} to be a FieldBuilder object. The current field value is ${JSON.stringify(
+        sourceVal
+      )}.`
     )
   }
 
   if (isBuilderFunction(fieldBuilderForVal)) {
-    await fieldBuilderForVal(targetObj, sourceVal)
+    await fieldBuilderForVal(targetObj, sourceVal, context)
     return targetObj
   }
 
   throw new Error(
-    `Expected ${fieldBuilderForVal} to be a FieldBuilderFunction. The current field value is ${sourceVal}.`
+    `Expected ${JSON.stringify(
+      fieldBuilderForVal
+    )} to be a FieldBuilderFunction. The current field value is ${JSON.stringify(
+      sourceVal
+    )}.`
   )
 }
 
 export default async function transformObj(
   sourceObj: object,
   targetObj: object,
-  fieldBuilders: IFieldBuilders
+  fieldBuilders: IFieldBuilders,
+  context: any = {}
 ) {
   for (const currentPropName in sourceObj) {
     if (sourceObj.hasOwnProperty(currentPropName)) {
       if (Array.isArray(sourceObj[currentPropName])) {
-        for (const arrayVal of sourceObj[currentPropName]) {
+        for (const [index, arrayVal] of sourceObj[currentPropName].entries()) {
+          context._index = index
           await transformField(
             arrayVal,
             targetObj,
-            fieldBuilders[currentPropName]
+            fieldBuilders[currentPropName],
+            context
           )
         }
 
@@ -67,7 +80,8 @@ export default async function transformObj(
       await transformField(
         sourceObj[currentPropName],
         targetObj,
-        fieldBuilders[currentPropName]
+        fieldBuilders[currentPropName],
+        context
       )
     }
   }

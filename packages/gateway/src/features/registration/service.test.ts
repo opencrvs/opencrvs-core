@@ -1,11 +1,11 @@
 import * as fs from 'fs'
 import { fromFHIR, toFHIR } from './service'
 
-test('should build a correct FHIR registration document without error', () => {
-  const fhir = toFHIR({
+test('should build a minimal FHIR registration document without error', async () => {
+  const fhir = await toFHIR({
     mother: {
       gender: 'female',
-      name: [{ givenName: 'Jane', familyName: 'Doe' }]
+      name: [{ givenName: 'Jane', familyName: 'Doe', use: 'english' }]
     },
     father: { gender: 'male', name: [] },
     child: { gender: 'male', name: [] },
@@ -18,6 +18,7 @@ test('should build a correct FHIR registration document without error', () => {
   expect(fhir.entry[3].resource.gender).toBe('male')
   expect(fhir.entry[1].resource.name[0].given[0]).toBe('Jane')
   expect(fhir.entry[1].resource.name[0].family[0]).toBe('Doe')
+  expect(fhir.entry[1].resource.name[0].use).toBe('english')
 })
 
 test('should build a correct GraphQL object from FHIR', () => {

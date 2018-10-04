@@ -1,145 +1,96 @@
-import { v4 as uuid } from 'uuid'
+import transformObj, { IFieldBuilders } from 'src/features/transformation'
+import {
+  createCompositionTemplate,
+  MOTHER_CODE,
+  FATHER_CODE,
+  CHILD_CODE
+} from 'src/features/fhir/templates'
+import {
+  selectOrCreatePersonResource,
+  createAndSetNameProperty
+} from 'src/features/fhir/utils'
 
-function createMotherSection(refUuid: string) {
+function createNameBuilder(sectionCode: string) {
   return {
-    title: "Mother's details",
-    code: {
-      coding: {
-        system: 'http://opencrvs.org/doc-sections',
-        code: 'mother-details'
-      },
-      text: "Mother's details"
+    use: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetNameProperty(person, fieldValue, 'use', context)
     },
-    text: '',
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
-  }
-}
-
-function createFatherSection(refUuid: string) {
-  return {
-    title: "Father's details",
-    code: {
-      coding: {
-        system: 'http://opencrvs.org/doc-sections',
-        code: 'father-details'
-      },
-      text: "Father's details"
+    givenName: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetNameProperty(person, [fieldValue], 'given', context)
     },
-    text: '',
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
-  }
-}
-
-function createChildSection(refUuid: string) {
-  return {
-    title: 'Child details',
-    code: {
-      coding: {
-        system: 'http://opencrvs.org/doc-sections',
-        code: 'child-details'
-      },
-      text: 'Child details'
-    },
-    text: '',
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
-  }
-}
-
-function createComposition(
-  reg: any,
-  { motherRefUuid, fatherRefUuid, childRefUuid }: any
-) {
-  return {
-    resource: {
-      identifier: {
-        system: 'urn:ietf:rfc:3986',
-        value: uuid()
-      },
-      resourceType: 'Composition',
-      status: 'preliminary',
-      type: {
-        coding: {
-          system: 'http://opencrvs.org/doc-types',
-          code: 'birth-declaration'
-        },
-        text: 'Birth Declaration'
-      },
-      class: {
-        coding: {
-          system: 'http://opencrvs.org/doc-classes',
-          code: 'crvs-document'
-        },
-        text: 'CRVS Document'
-      },
-      subject: {
-        reference: 'Patient/xyz'
-      },
-      date: reg.createdAt,
-      author: [
-        {
-          reference: 'Practitioner/xyz'
-        }
-      ],
-      title: 'Birth Declaration',
-      section: [
-        createMotherSection(motherRefUuid),
-        createFatherSection(fatherRefUuid),
-        createChildSection(childRefUuid)
-      ]
+    familyName: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetNameProperty(person, [fieldValue], 'family', context)
     }
   }
 }
 
-function createPersonEntry(person: any, refUuid: string) {
-  return {
-    fullUrl: `urn:uuid:${refUuid}`,
-    resource: {
-      resourceType: 'Patient',
-      active: true,
-      name: [
-        {
-          use: 'english',
-          family: [person.name[0] ? person.name[0].familyName : undefined],
-          given: [person.name[0] ? person.name[0].givenName : undefined]
-        }
-      ],
-      gender: person.gender
+const builders: IFieldBuilders = {
+  createdAt: (fhirBundle, fieldValue) => {
+    if (!fhirBundle.meta) {
+      fhirBundle.meta = {}
     }
+    fhirBundle.meta.lastUpdated = fieldValue
+    fhirBundle.entry[0].resource.data = fieldValue
+  },
+  mother: {
+    gender: (fhirBundle, fieldValue, context) => {
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        fhirBundle,
+        context
+      )
+      mother.gender = fieldValue
+    },
+    name: createNameBuilder(MOTHER_CODE)
+  },
+  father: {
+    gender: (fhirBundle, fieldValue, context) => {
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        fhirBundle,
+        context
+      )
+      father.gender = fieldValue
+    },
+    name: createNameBuilder(FATHER_CODE)
+  },
+  child: {
+    gender: (fhirBundle, fieldValue, context) => {
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        fhirBundle,
+        context
+      )
+      child.gender = fieldValue
+    },
+    name: createNameBuilder(CHILD_CODE)
   }
 }
 
-export function toFHIR(reg: any) {
-  const refUuids = {
-    motherRefUuid: uuid(),
-    fatherRefUuid: uuid(),
-    childRefUuid: uuid()
-  }
-
-  return {
+export async function toFHIR(reg: any) {
+  const fhirBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    meta: {
-      lastUpdated: reg.createdAt
-    },
-    entry: [
-      createComposition(reg, refUuids),
-      createPersonEntry(reg.mother, refUuids.motherRefUuid),
-      createPersonEntry(reg.father, refUuids.fatherRefUuid),
-      createPersonEntry(reg.child, refUuids.childRefUuid)
-    ]
+    entry: [createCompositionTemplate()]
   }
+
+  await transformObj(reg, fhirBundle, builders)
+  return fhirBundle
 }
 
 export function fromFHIR(compositionBundle: any) {

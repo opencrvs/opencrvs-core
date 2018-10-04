@@ -7,6 +7,7 @@
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
+    "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged"
   },
   "dependencies": {
@@ -64,7 +65,7 @@
     "lab-transform-typescript": "^3.0.1",
     "nodemon": "^1.11.0",
     "nyc": "^11.3.0",
-    "opener": "^1.4.3",
+    "opener": "^1.5.1",
     "prettier": "1.12.1",
     "pretty-quick": "^1.4.1",
     "ts-jest": "^22.4.6",
@@ -99,6 +100,12 @@
     ],
     "modulePaths": [
       "<rootDir>"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
     ]
   },
   "keywords": [
