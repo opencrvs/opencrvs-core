@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools'
 import { readFileSync } from 'fs'
 
