@@ -92,6 +92,20 @@ describe('when user has a valid token in local storage', () => {
         'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।'
       )
     })
+
+    describe('when user clicks the update notification"', () => {
+      beforeEach(() => {
+        app
+          .find('.show')
+          .hostNodes()
+          .childAt(0)
+          .simulate('click')
+        app.update()
+      })
+      it('hides the update notification', () => {
+        expect(store.getState().notification.newContentAvailable).toEqual(false)
+      })
+    })
   })
 
   describe('when user is in vital event selection view', () => {
