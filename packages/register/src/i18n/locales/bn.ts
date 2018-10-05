@@ -543,6 +543,11 @@ export const BENGALI_STATE = {
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle':
       'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
+    'register.home.buttons.registerNewEvent':
+      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
+    'register.home.buttons.mydraft': 'আমার খসড়া',
+    'register.home.buttons.pendingSubimissions': 'মুলতবি জমাগুলি',
+    'register.home.buttons.completedSumissions': 'সমাপ্ত জমা',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
     'register.selectVitalEvent.birthActionTitle': 'জন্ম',

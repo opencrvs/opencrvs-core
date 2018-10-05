@@ -551,6 +551,10 @@ export const ENGLISH_STATE = {
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
     'register.selectVitalEvent.registerNewEventTitle':
       'Declare a new vital event',
+    'register.home.buttons.mydraft': 'My draft',
+    'register.home.buttons.registerNewEvent': 'Declare a new vital event',
+    'register.home.buttons.pendingSubimissions': 'Pending submissions',
+    'register.home.buttons.completedSumissions': 'Completed submissions',
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
     'register.selectVitalEvent.birthActionTitle': 'Birth',
