@@ -68,6 +68,7 @@ class HomeView extends React.Component<
         <ActionList>
           <StyledIconAction
             icon={() => <StyledPlusIcon />}
+            onClick={this.props.goToEvents}
             title={intl.formatMessage(messages.declareNewEventActionTitle)}
           />
           <IconAction
