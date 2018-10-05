@@ -9,7 +9,6 @@ import { IStoreState } from '@opencrvs/register/src/store'
 
 interface IPageProps {
   language?: string
-  newContentAvailable: boolean
 }
 
 const languageFromProps = ({ language }: IPageProps) => language
@@ -75,11 +74,10 @@ class Component extends React.Component<RouteComponentProps<{}> & IPageProps> {
     }
   }
   render() {
-    const { children, newContentAvailable } = this.props
+    const { children } = this.props
     return (
       <div>
         <StyledPage {...this.props}>{children}</StyledPage>
-        {newContentAvailable && <span> Update available</span>}
       </div>
     )
   }
@@ -87,8 +85,7 @@ class Component extends React.Component<RouteComponentProps<{}> & IPageProps> {
 
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
-    language: getLanguage(store),
-    newContentAvailable: store.notification.newContentAvailable
+    language: getLanguage(store)
   }
 }
 
