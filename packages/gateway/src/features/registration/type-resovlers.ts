@@ -18,12 +18,7 @@ export const typeResolvers = {
   },
 
   Person: {
-    gender(patient: any) {
-      return patient.gender
-    },
-    name(patient: any) {
-      return patient.name
-    }
+    /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
   },
 
   BirthRegistration: {
@@ -32,17 +27,17 @@ export const typeResolvers = {
     },
     async mother(composition: any) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
-      const res = await fetch(`${fhirUrl}/${patientSection.reference}`)
+      const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
     async father(composition: any) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
-      const res = await fetch(`${fhirUrl}/${patientSection.reference}`)
+      const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
     async child(composition: any) {
       const patientSection = findCompositionSection(CHILD_CODE, composition)
-      const res = await fetch(`${fhirUrl}/${patientSection.reference}`)
+      const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     }
   }

@@ -6,18 +6,24 @@ import {
   createPersonEntryTemplate
 } from 'src/features/fhir/templates'
 
-export function findCompositionSection(code: string, accumulatedObj: any) {
-  return accumulatedObj.entry[0].resource.section.find(
+export function findCompositionSectionInBundle(code: string, fhirBundle: any) {
+  return fhirBundle.entry[0].resource.section.find(
+    (section: any) => section.code.coding.code === code
+  )
+}
+
+export function findCompositionSection(code: string, composition: any) {
+  return composition.section.find(
     (section: any) => section.code.coding.code === code
   )
 }
 
 export function selectOrCreatePersonResource(
   sectionCode: string,
-  accumulatedObj: any,
+  fhirBundle: any,
   context: any
 ) {
-  const section = findCompositionSection(sectionCode, accumulatedObj)
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   let personEntry
   if (!section) {
@@ -37,12 +43,12 @@ export function selectOrCreatePersonResource(
       default:
         throw new Error(`Unknown section code ${sectionCode}`)
     }
-    accumulatedObj.entry[0].resource.section.push(personSection)
+    fhirBundle.entry[0].resource.section.push(personSection)
     personEntry = createPersonEntryTemplate(ref)
-    accumulatedObj.entry.push(personEntry)
+    fhirBundle.entry.push(personEntry)
     context.motherRef = ref
   } else {
-    personEntry = accumulatedObj.entry.find(
+    personEntry = fhirBundle.entry.find(
       (entry: any) => entry.fullUrl === section.entry[0].reference
     )
   }

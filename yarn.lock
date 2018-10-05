@@ -7953,6 +7953,14 @@ jest-fetch-mock@^1.6.5:
     isomorphic-fetch "^2.2.1"
     promise-polyfill "^7.1.1"
 
+jest-fetch-mock@^1.6.6:
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/jest-fetch-mock/-/jest-fetch-mock-1.6.6.tgz#f07d80912689c21fb01199f313abd121beff5558"
+  integrity sha512-qMorYR8iE0OyOHmroCJVVLuJlRHMcRdrrvYFo1PMY9ErWyCs9ZrL3RGHjkxVgGJSZwKzUlsWgqVFhOK3TMA3eg==
+  dependencies:
+    isomorphic-fetch "^2.2.1"
+    promise-polyfill "^7.1.1"
+
 jest-get-type@^22.1.0, jest-get-type@^22.4.3:
   version "22.4.3"
   resolved "https://registry.yarnpkg.com/jest-get-type/-/jest-get-type-22.4.3.tgz#e3a8504d8479342dd4420236b322869f18900ce4"
