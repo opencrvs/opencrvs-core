@@ -9,6 +9,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { storeDraft, createDraft, IDraft } from './drafts'
+import * as actions from 'src/notification/actions'
 
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
@@ -68,6 +69,17 @@ describe('when user has a valid token in local storage', () => {
 
   it("doesn't redirect user to SSO", async () => {
     expect(assign.mock.calls).toHaveLength(0)
+  })
+
+  describe('when appliation has new update', () => {
+    beforeEach(() => {
+      const action = actions.showNewContentAvailableNotification()
+      store.dispatch(action)
+    })
+
+    it('displays update available notification', () => {
+      expect(app.find('Notification')).toHaveLength(1)
+    })
   })
 
   describe('when user is in vital event selection view', () => {
