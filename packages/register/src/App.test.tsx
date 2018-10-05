@@ -10,6 +10,7 @@ import { History } from 'history'
 import { Store } from 'redux'
 import { storeDraft, createDraft, IDraft } from './drafts'
 import * as actions from 'src/notification/actions'
+import * as i18nActions from 'src/i18n/actions'
 
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
@@ -80,6 +81,16 @@ describe('when user has a valid token in local storage', () => {
 
     it('displays update available notification', () => {
       expect(app.find('Notification')).toHaveLength(1)
+    })
+
+    it('internationalizes update available notification texts', async () => {
+      const action = i18nActions.changeLanguage({ language: 'bn' })
+      store.dispatch(action)
+
+      const label = app.find('Notification').text()
+      expect(label).toBe(
+        'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।'
+      )
     })
   })
 

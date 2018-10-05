@@ -4,11 +4,13 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { Notification } from '@opencrvs/components/lib/interface'
 import { hideNewContentAvailableNotification } from 'src/notification/actions'
 
 type NotificationProps = {
+  language?: string
   newContentAvailable: boolean
 }
 
@@ -55,6 +57,7 @@ class Component extends React.Component<
 
 const mapStateToProps = (store: IStoreState) => {
   return {
+    language: getLanguage(store),
     newContentAvailable: store.notification.newContentAvailable
   }
 }
