@@ -75,6 +75,7 @@ describe('when user has a valid token in local storage', () => {
     beforeEach(() => {
       const action = actions.showNewContentAvailableNotification()
       store.dispatch(action)
+      app.update()
     })
 
     it('displays update available notification', () => {
