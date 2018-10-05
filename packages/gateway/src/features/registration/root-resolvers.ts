@@ -52,6 +52,7 @@ export const resolvers = {
       const resBody = await res.json()
       if (
         !resBody ||
+        !resBody.entry ||
         !resBody.entry[0] ||
         !resBody.entry[0].response ||
         !resBody.entry[0].response.location
