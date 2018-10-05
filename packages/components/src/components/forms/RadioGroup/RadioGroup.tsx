@@ -46,6 +46,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                 name={name}
                 label={option.label}
                 value={option.value}
+                id={`${name}_${option.value}`}
                 selected={value}
                 onChange={this.change}
               />

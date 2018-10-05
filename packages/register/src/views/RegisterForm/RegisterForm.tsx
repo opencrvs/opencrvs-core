@@ -212,7 +212,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         <Modal
           title="Are you ready to submit?"
           actions={[
-            <PrimaryButton key="submit" onClick={() => history.push('/saved')}>
+            <PrimaryButton
+              key="submit"
+              id="submit_confirm"
+              onClick={() => history.push('/saved')}
+            >
               {intl.formatMessage(messages.submitButton)}
             </PrimaryButton>,
             <PreviewButton
