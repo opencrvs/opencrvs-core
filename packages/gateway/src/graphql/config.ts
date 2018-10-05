@@ -1,8 +1,8 @@
 import { importSchema } from 'graphql-import'
 import { makeExecutableSchema } from 'graphql-tools'
 
-import { resolvers as notificationResolvers } from 'src/features/notification/resolvers'
-import { resolvers as registrationResolvers } from 'src/features/registration/resolvers'
+import { resolvers as notificationResolvers } from 'src/features/notification/root-resolvers'
+import { resolvers as registrationResolvers } from 'src/features/registration/root-resolvers'
 
 export const getExecutableSchema = (schemaPath: string) => {
   const typeDefs = importSchema(schemaPath)

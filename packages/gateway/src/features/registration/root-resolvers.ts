@@ -1,7 +1,8 @@
 import fetch from 'node-fetch'
 
 import { fhirUrl } from 'src/constants'
-import { fromFHIR, toFHIR } from './service'
+import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
+import { typeResolvers } from 'src/features/registration/type-resovlers'
 
 const statusMap = {
   declared: 'preliminary',
@@ -9,8 +10,10 @@ const statusMap = {
 }
 
 export const resolvers = {
+  ...typeResolvers,
+
   Query: {
-    async listBirthRegistrations(_: any, { locations, status }: any) {
+    async listBirthRegistrations(_: any, { status }: any) {
       const res = await fetch(
         `${fhirUrl}/Composition?status=${statusMap[status]}`,
         {
@@ -22,35 +25,13 @@ export const resolvers = {
 
       const bundle = await res.json()
 
-      // resolve composition references inline
-      await Promise.all(
-        bundle.entry.map(async (compEntry: any) => {
-          return Promise.all(
-            compEntry.resource.section.map(async (section: any) => {
-              return Promise.all(
-                section.entry.map(async (sectionEntry: any) => {
-                  const sectionResourceRes = await fetch(
-                    `${fhirUrl}/${sectionEntry.reference}`,
-                    {
-                      headers: {
-                        'Content-Type': 'application/fhir+json'
-                      }
-                    }
-                  )
-                  sectionEntry.resource = await sectionResourceRes.json()
-                })
-              )
-            })
-          )
-        })
-      )
-
-      return fromFHIR(bundle)
+      return bundle.entry
     }
   },
+
   Mutation: {
     async createBirthRegistration(_: any, { details }: any) {
-      const doc: any = toFHIR(details)
+      const doc: any = buildFHIRBundle(details)
 
       const res = await fetch(fhirUrl, {
         method: 'POST',
@@ -81,6 +62,5 @@ export const resolvers = {
       // return the Composition's id
       return resBody.entry[0].response.location.split('/')[3]
     }
-  },
-  Registration: {}
+  }
 }

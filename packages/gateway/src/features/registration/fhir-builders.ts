@@ -82,7 +82,7 @@ const builders: IFieldBuilders = {
   }
 }
 
-export async function toFHIR(reg: any) {
+export async function buildFHIRBundle(reg: any) {
   const fhirBundle = {
     resourceType: 'Bundle',
     type: 'document',
@@ -91,50 +91,4 @@ export async function toFHIR(reg: any) {
 
   await transformObj(reg, fhirBundle, builders)
   return fhirBundle
-}
-
-export function fromFHIR(compositionBundle: any) {
-  return compositionBundle.entry.map((compEntry: any) => {
-    const motherResource = compEntry.resource.section.find(
-      (section: any) => section.code.coding.code === 'mother-details'
-    ).entry[0].resource
-    const fatherResource = compEntry.resource.section.find(
-      (section: any) => section.code.coding.code === 'father-details'
-    ).entry[0].resource
-    const childResource = compEntry.resource.section.find(
-      (section: any) => section.code.coding.code === 'child-details'
-    ).entry[0].resource
-
-    return {
-      id: compEntry.resource.id,
-      mother: {
-        gender: motherResource.gender,
-        name: motherResource.name.map((name: any) => {
-          return {
-            givenName: name.given[0],
-            familyName: name.family[0]
-          }
-        })
-      },
-      father: {
-        gender: fatherResource.gender,
-        name: fatherResource.name.map((name: any) => {
-          return {
-            givenName: name.given[0],
-            familyName: name.family[0]
-          }
-        })
-      },
-      child: {
-        gender: childResource.gender,
-        name: childResource.name.map((name: any) => {
-          return {
-            givenName: name.given[0],
-            familyName: name.family[0]
-          }
-        })
-      },
-      createdAt: compEntry.resource.date
-    }
-  })
 }
