@@ -72,6 +72,7 @@ const Input = styled.input`
 type Value = string | number | boolean
 
 interface IRadio {
+  id: string
   name: string
   label: string
   value: Value
@@ -84,7 +85,7 @@ export class Radio extends React.Component<IRadio> {
     this.props.onChange(this.props.value)
   }
   render() {
-    const { name, selected, label, value, onChange } = this.props
+    const { id, name, selected, label, value, onChange } = this.props
     return (
       <Wrapper>
         <Input
