@@ -5,6 +5,7 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { goToEvents as goToEventsAction } from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { ActionList, IconAction } from '@opencrvs/components/lib/buttons'
+import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import {
   Plus,
   DraftDocument,
@@ -47,6 +48,11 @@ const StyledIconAction = styled(IconAction)`
   padding: 0px;
   padding-right: 15px;
   position: relative;
+  /* stylelint-disable */
+  ${ActionTitle} {
+    /* stylelint-enable */
+    margin: -2px 0 -2px 130px;
+  }
 `
 
 class HomeView extends React.Component<
@@ -62,7 +68,6 @@ class HomeView extends React.Component<
         <ActionList>
           <StyledIconAction
             icon={() => <StyledPlusIcon />}
-            prominent
             title={intl.formatMessage(messages.declareNewEventActionTitle)}
           />
           <IconAction

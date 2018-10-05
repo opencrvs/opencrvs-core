@@ -18,16 +18,14 @@ const ActionContainer = styled(Button)`
   }
 `
 
-const ActionTitle = styled.h3.attrs<{
+export const ActionTitle = styled.h3.attrs<{
   disabled?: boolean
-  prominent?: boolean
 }>({})`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 24px;
-  margin: ${({ prominent }) =>
-    prominent ? `-2px 0 -2px 130px` : `0 0 0 80px`};
+  margin-left: 80px;
 `
 const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
   color: ${({ disabled, theme }) =>
@@ -42,20 +40,18 @@ const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
 
 interface IIconActionProps extends IActionProps {
   icon: () => React.ReactNode
-  prominent?: boolean
 }
 
 export function IconAction({
   title,
   description,
   icon,
-  prominent,
   ...props
 }: IIconActionProps) {
   return (
     <ActionContainer icon={icon} align={IconAlignment.LEFT} {...props}>
       <div>
-        <ActionTitle prominent={prominent}>{title}</ActionTitle>
+        <ActionTitle>{title}</ActionTitle>
         {description && <ActionDescription>{description}</ActionDescription>}
       </div>
     </ActionContainer>

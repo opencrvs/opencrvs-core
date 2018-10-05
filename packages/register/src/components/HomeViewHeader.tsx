@@ -9,19 +9,17 @@ import Logo from './Logo'
 const StretchedHeader = styled(Header)`
   justify-content: flex-end;
   padding-bottom: 50px;
+  min-height: 280px;
 
   /* stylelint-disable */
   + ${ActionList} {
     /* stylelint-enable */
-    margin-top: -50px;
+    margin-top: -80px;
   }
 `
 
 const StyledLogo = styled(Logo)`
-  margin-right: auto;
-  margin-top: -40px;
-  margin-left: 40px;
-  margin-bottom: 10px;
+  margin: -40px auto auto 40px;
 `
 
 export class HomeViewHeader extends React.Component {
