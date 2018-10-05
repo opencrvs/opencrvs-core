@@ -43,22 +43,22 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when the request returns an error code', async () => {
       fetch.mockResponseOnce('Boom!', { status: 401 })
-      expect(
+      await expect(
         resolvers.Mutation.createBirthRegistration(
           {},
           { createdAt: new Date() }
         )
-      ).rejects.toThrowError()
+      ).rejects.toThrowError('FHIR post to /fhir failed with [401] body: Boom!')
     })
 
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
-      expect(
+      await expect(
         resolvers.Mutation.createBirthRegistration(
           {},
           { createdAt: new Date() }
         )
-      ).rejects.toThrowError()
+      ).rejects.toThrowError('FHIR response did not send a valid response')
     })
   })
 })
