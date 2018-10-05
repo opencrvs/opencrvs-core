@@ -500,6 +500,8 @@ export const BENGALI_STATE = {
     'register.form.modal.submitDescription':
       '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
+    'register.notification.newContentAvailable':
+      'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
     'register.savedRegistration.online.desc':
       'তথ্য বিবরনী বৈধতা জন্য পর্যালোচিত হচ্ছে',
