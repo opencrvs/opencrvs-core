@@ -18,7 +18,9 @@ const ActionContainer = styled(Button)`
   }
 `
 
-const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
+export const ActionTitle = styled.h3.attrs<{
+  disabled?: boolean
+}>({})`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
   font-family: ${({ theme }) => theme.fonts.lightFont};
