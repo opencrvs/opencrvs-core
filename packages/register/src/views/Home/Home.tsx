@@ -96,7 +96,7 @@ class HomeView extends React.Component<
         </ActionList>
         <ViewFooter>
           <FooterAction>
-            <FooterPrimaryButton id="save_draft">
+            <FooterPrimaryButton>
               {intl.formatMessage(messages.logoutActionTitle)}
             </FooterPrimaryButton>
           </FooterAction>
