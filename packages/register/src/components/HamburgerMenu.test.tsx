@@ -79,6 +79,16 @@ describe('when user is in the menu page', () => {
         .simulate('click')
     })
 
+    it('hides main menu title', () => {
+      const menuName = hamburgerComponent
+        .find(
+          '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title span.submenu-title-wrapper'
+        )
+        .first()
+        .text()
+      expect(menuName).toBe('')
+    })
+
     it('Renders whole list items', () => {
       const items = hamburgerComponent.find(
         '.rc-menu.rc-menu-root ul.rc-menu.rc-menu-sub.rc-menu-inline li'
