@@ -10,6 +10,8 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { storeDraft, createDraft, IDraft } from './drafts'
+import * as actions from 'src/notification/actions'
+import * as i18nActions from 'src/i18n/actions'
 
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
@@ -88,6 +90,51 @@ describe('when user has a valid token in local storage', () => {
       })
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
+      })
+    })
+  })
+
+  describe('when appliation has new update', () => {
+    beforeEach(() => {
+      const action = actions.showNewContentAvailableNotification()
+      store.dispatch(action)
+      app.update()
+    })
+
+    it('displays update available notification', () => {
+      app.debug()
+      expect(
+        app.find('#newContentAvailableNotification').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('internationalizes update available notification texts', async () => {
+      const action = i18nActions.changeLanguage({ language: 'bn' })
+      store.dispatch(action)
+
+      const label = app
+        .find('#newContentAvailableNotification')
+        .hostNodes()
+        .text()
+      expect(label).toBe(
+        'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।'
+      )
+    })
+
+    describe('when user clicks the update notification"', () => {
+      beforeEach(() => {
+        app
+          .find('#newContentAvailableNotification')
+          .hostNodes()
+          .simulate('click')
+        app.update()
+      })
+      it('hides the update notification', () => {
+        expect(store.getState().notification.newContentAvailable).toEqual(false)
+      })
+
+      it('reloads the app', () => {
+        expect(window.location.reload).toHaveBeenCalled()
       })
     })
   })
