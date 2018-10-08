@@ -550,6 +550,7 @@ export const BENGALI_STATE = {
     'register.home.buttons.mydraft': 'আমার খসড়া',
     'register.home.buttons.pendingSubimissions': 'মুলতবি জমাগুলি',
     'register.home.buttons.completedSumissions': 'সমাপ্ত জমা',
+    'register.home.logout': 'প্রস্থান',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
     'register.selectVitalEvent.birthActionTitle': 'জন্ম',

@@ -557,6 +557,7 @@ export const ENGLISH_STATE = {
     'register.home.buttons.registerNewEvent': 'Declare a new vital event',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
     'register.home.buttons.completedSumissions': 'Completed submissions',
+    'register.home.logout': 'Log out',
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
     'register.selectVitalEvent.birthActionTitle': 'Birth',
