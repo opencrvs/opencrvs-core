@@ -84,7 +84,6 @@ describe('when user has a valid token in local storage', () => {
       expect(
         app.find('#newContentAvailableNotification').hostNodes()
       ).toHaveLength(1)
-      // expect(app.find('#newContentAvailableNotification')).toHaveLength(1)
     })
 
     it('internationalizes update available notification texts', async () => {
