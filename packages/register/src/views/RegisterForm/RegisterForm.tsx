@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
+import Swipeable from 'react-swipeable'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
@@ -17,8 +18,8 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from 'src/components/interface/footer'
-
 import { PreviewSection } from './PreviewSection'
+import { logger } from 'src/logger'
 
 const FormAction = styled.div`
   display: flex;
@@ -96,6 +97,21 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
+function getPreviousSection(
+  sections: IFormSection[],
+  fromSection: IFormSection
+) {
+  const currentIndex = sections.findIndex(
+    (section: IFormSection) => section.id === fromSection.id
+  )
+
+  if (currentIndex === 0) {
+    return null
+  }
+
+  return sections[currentIndex - 1]
+}
+
 type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
@@ -115,13 +131,15 @@ type FullProps = Props &
 
 type State = {
   showSubmitModal: boolean
+  selectedTabId: string
 }
 
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
-      showSubmitModal: false
+      showSubmitModal: false,
+      selectedTabId: ''
     }
   }
 
@@ -144,6 +162,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.setState((prevState: State) => ({
       showSubmitModal: !prevState.showSubmitModal
     }))
+  }
+
+  onSwiped = (
+    draftId: number,
+    seclectedSection: IFormSection | null,
+    goToTab: (draftId: number, tabId: string) => void
+  ): void => {
+    if (seclectedSection) {
+      goToTab(draftId, seclectedSection.id)
+    } else {
+      logger.error('No more tab to swipe...')
+    }
   }
 
   render() {
@@ -172,33 +202,45 @@ class RegisterFormView extends React.Component<FullProps, State> {
             onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
           />
         </ViewHeaderWithTabs>
-        <FormContainer>
-          {activeSection.viewType === 'preview' && (
-            <PreviewSection draft={draft} onSubmit={this.submitForm} />
-          )}
-          {activeSection.viewType === 'form' && (
-            <Box>
-              <Form
-                id={activeSection.id}
-                onChange={this.modifyDraft}
-                setAllFieldsDirty={setAllFieldsDirty}
-                title={intl.formatMessage(activeSection.title)}
-                fields={activeSection.fields}
-              />
-              <FormAction>
-                {nextSection && (
-                  <FormPrimaryButton
-                    onClick={() => goToTab(draft.id, nextSection.id)}
-                    id="next_section"
-                    icon={() => <ArrowForward />}
-                  >
-                    {intl.formatMessage(messages.next)}
-                  </FormPrimaryButton>
-                )}
-              </FormAction>
-            </Box>
-          )}
-        </FormContainer>
+        <Swipeable
+          trackMouse
+          onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
+          onSwipedRight={() =>
+            this.onSwiped(
+              draft.id,
+              getPreviousSection(registerForm.sections, activeSection),
+              goToTab
+            )
+          }
+        >
+          <FormContainer>
+            {activeSection.viewType === 'preview' && (
+              <PreviewSection draft={draft} onSubmit={this.submitForm} />
+            )}
+            {activeSection.viewType === 'form' && (
+              <Box>
+                <Form
+                  id={activeSection.id}
+                  onChange={this.modifyDraft}
+                  setAllFieldsDirty={setAllFieldsDirty}
+                  title={intl.formatMessage(activeSection.title)}
+                  fields={activeSection.fields}
+                />
+                <FormAction>
+                  {nextSection && (
+                    <FormPrimaryButton
+                      onClick={() => goToTab(draft.id, nextSection.id)}
+                      id="next_section"
+                      icon={() => <ArrowForward />}
+                    >
+                      {intl.formatMessage(messages.next)}
+                    </FormPrimaryButton>
+                  )}
+                </FormAction>
+              </Box>
+            )}
+          </FormContainer>
+        </Swipeable>
         <ViewFooter>
           <FooterAction>
             <FooterPrimaryButton
