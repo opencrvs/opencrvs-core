@@ -75,21 +75,25 @@ class HomeView extends React.Component<
     return (
       <>
         <HomeViewHeader />
-        <ActionList>
+        <ActionList id="home_action_list">
           <StyledIconAction
+            id="new_event_declaration"
             icon={() => <StyledPlusIcon />}
             onClick={this.props.goToEvents}
             title={intl.formatMessage(messages.declareNewEventActionTitle)}
           />
           <IconAction
+            id="draft_documents"
             icon={() => <DraftDocument />}
             title={intl.formatMessage(messages.myDraftActionTitle)}
           />
           <IconAction
+            id="pending_documents"
             icon={() => <PendingDocument />}
             title={intl.formatMessage(messages.pendingSubmissionsActionTitle)}
           />
           <IconAction
+            id="submitted_documents"
             icon={() => <CompleteDocument />}
             title={intl.formatMessage(messages.completedSubmissionsActionTitle)}
           />
@@ -106,6 +110,6 @@ class HomeView extends React.Component<
   }
 }
 
-export const Home = injectIntl(
-  connect(null, { goToEvents: goToEventsAction })(HomeView)
+export const Home = connect(null, { goToEvents: goToEventsAction })(
+  injectIntl(HomeView)
 )
