@@ -20,3 +20,4 @@ build
 .vscode
 .idea
 data
+.tmuxinator.yml

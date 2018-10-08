@@ -3,7 +3,8 @@ import { config } from '../src/config'
 import {
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
-  DRAFT_BIRTH_PARENT_FORM
+  DRAFT_BIRTH_PARENT_FORM,
+  HOME
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -68,6 +69,27 @@ describe('when user has a valid token in local storage', () => {
 
   it("doesn't redirect user to SSO", async () => {
     expect(assign.mock.calls).toHaveLength(0)
+  })
+
+  describe('when user is in home view', () => {
+    beforeEach(() => {
+      history.replace(HOME)
+      app.update()
+    })
+    it('lists the actions', () => {
+      expect(app.find('#home_action_list').hostNodes()).toHaveLength(1)
+    })
+    describe('when user clicks the "Declare a new vital event" button', () => {
+      beforeEach(() => {
+        app
+          .find('#new_event_declaration')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('changes to new vital event screen', () => {
+        expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
+      })
+    })
   })
 
   describe('when user is in vital event selection view', () => {
