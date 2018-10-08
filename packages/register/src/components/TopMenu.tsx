@@ -72,18 +72,11 @@ class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
       title: 'Change Language',
       key: 'change-language',
       isSubMenu: true,
-      menuItems: [
-        {
-          title: 'Bengali',
-          key: 'bengali',
-          onClick: this.props.changeLanguage.bind(null, { language: 'bn' })
-        },
-        {
-          title: 'English',
-          key: 'english',
-          onClick: this.props.changeLanguage.bind(null, { language: 'en' })
-        }
-      ]
+      menuItems: Object.keys(this.props.languages).map((lang: any) => ({
+        title: lang,
+        key: lang,
+        onClick: this.props.changeLanguage.bind(null, { language: lang })
+      }))
     },
     {
       title: 'Log out',
@@ -93,7 +86,6 @@ class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
 
   render() {
     const { intl, goBack, hideBackButton } = this.props
-    // const languageKeys = Object.keys(languages)
 
     return (
       <TopMenuContainer>
