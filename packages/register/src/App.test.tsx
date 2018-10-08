@@ -105,6 +105,10 @@ describe('when user has a valid token in local storage', () => {
       it('hides the update notification', () => {
         expect(store.getState().notification.newContentAvailable).toEqual(false)
       })
+
+      it('reloads the app', () => {
+        expect(window.location.reload).toHaveBeenCalled()
+      })
     })
   })
 
