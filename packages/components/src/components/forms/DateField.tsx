@@ -66,7 +66,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
     if (['dd', 'mm', 'yyyy'].includes(segmentType)) {
       switch (segmentType) {
         case 'dd':
-          if (val.length > 2) {
+          if (val.length > 2 || Number(val) > 31) {
             return
           }
           if (val.length > 1 && this.mm.current) {
@@ -74,7 +74,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           }
           break
         case 'mm':
-          if (val.length > 2) {
+          if (val.length > 2 || Number(val) > 12) {
             return
           }
           if (val.length > 1 && this.yyyy.current) {
@@ -82,7 +82,11 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           }
           break
         case 'yyyy':
-          if (val.length > 4) {
+          if (
+            val.length > 4 ||
+            Number(val) > 2100 ||
+            (val.length === 4 && Number(val) < 1900)
+          ) {
             return
           }
           break
