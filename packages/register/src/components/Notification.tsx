@@ -44,6 +44,7 @@ class Component extends React.Component<
         {children}
         {newContentAvailable && (
           <Notification
+            id="newContentAvailableNotification"
             show={newContentAvailable}
             callback={this.onNewContentAvailableNotificationClick}
           >

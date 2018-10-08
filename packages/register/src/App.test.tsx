@@ -80,14 +80,21 @@ describe('when user has a valid token in local storage', () => {
     })
 
     it('displays update available notification', () => {
-      expect(app.find('Notification')).toHaveLength(1)
+      app.debug()
+      expect(
+        app.find('#newContentAvailableNotification').hostNodes()
+      ).toHaveLength(1)
+      // expect(app.find('#newContentAvailableNotification')).toHaveLength(1)
     })
 
     it('internationalizes update available notification texts', async () => {
       const action = i18nActions.changeLanguage({ language: 'bn' })
       store.dispatch(action)
 
-      const label = app.find('Notification').text()
+      const label = app
+        .find('#newContentAvailableNotification')
+        .hostNodes()
+        .text()
       expect(label).toBe(
         'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।'
       )
@@ -96,9 +103,8 @@ describe('when user has a valid token in local storage', () => {
     describe('when user clicks the update notification"', () => {
       beforeEach(() => {
         app
-          .find('.show')
+          .find('#newContentAvailableNotification')
           .hostNodes()
-          .childAt(0)
           .simulate('click')
         app.update()
       })
