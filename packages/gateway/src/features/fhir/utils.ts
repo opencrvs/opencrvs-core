@@ -46,7 +46,6 @@ export function selectOrCreatePersonResource(
     fhirBundle.entry[0].resource.section.push(personSection)
     personEntry = createPersonEntryTemplate(ref)
     fhirBundle.entry.push(personEntry)
-    context.motherRef = ref
   } else {
     personEntry = fhirBundle.entry.find(
       (entry: any) => entry.fullUrl === section.entry[0].reference

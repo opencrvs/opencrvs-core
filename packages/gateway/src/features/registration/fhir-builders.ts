@@ -45,7 +45,7 @@ const builders: IFieldBuilders = {
       fhirBundle.meta = {}
     }
     fhirBundle.meta.lastUpdated = fieldValue
-    fhirBundle.entry[0].resource.data = fieldValue
+    fhirBundle.entry[0].resource.date = fieldValue
   },
   mother: {
     gender: (fhirBundle, fieldValue, context) => {

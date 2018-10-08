@@ -26,7 +26,7 @@ async function transformField(
   fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
   context: any
 ) {
-  if (!(sourceVal instanceof Date) && sourceVal instanceof Object) {
+  if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
       await transformObj(sourceVal, targetObj, fieldBuilderForVal, context)
       return targetObj
@@ -61,6 +61,9 @@ export default async function transformObj(
   fieldBuilders: IFieldBuilders,
   context: any = {}
 ) {
+  // ensure the sourceObj has Object in its prototype chain
+  // graphql-js creates objects with Object.create(null)
+  sourceObj = Object.assign({}, sourceObj)
   for (const currentPropName in sourceObj) {
     if (sourceObj.hasOwnProperty(currentPropName)) {
       if (Array.isArray(sourceObj[currentPropName])) {
@@ -74,7 +77,7 @@ export default async function transformObj(
           )
         }
 
-        break
+        continue
       }
 
       await transformField(

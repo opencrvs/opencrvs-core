@@ -2,7 +2,6 @@ import fetch from 'node-fetch'
 
 import { fhirUrl } from 'src/constants'
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
-import { typeResolvers } from 'src/features/registration/type-resovlers'
 
 const statusMap = {
   declared: 'preliminary',
@@ -10,8 +9,6 @@ const statusMap = {
 }
 
 export const resolvers = {
-  ...typeResolvers,
-
   Query: {
     async listBirthRegistrations(_: any, { status }: any) {
       const res = await fetch(
@@ -25,13 +22,13 @@ export const resolvers = {
 
       const bundle = await res.json()
 
-      return bundle.entry
+      return bundle.entry.map((entry: any) => entry.resource)
     }
   },
 
   Mutation: {
     async createBirthRegistration(_: any, { details }: any) {
-      const doc: any = buildFHIRBundle(details)
+      const doc: any = await buildFHIRBundle(Object.assign({}, details))
 
       const res = await fetch(fhirUrl, {
         method: 'POST',

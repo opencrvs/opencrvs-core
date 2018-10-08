@@ -70,7 +70,7 @@ describe('Registration type resolvers', () => {
   it('returns given part of name', () => {
     const given = typeResolvers.HumanName.givenName({
       use: 'test',
-      given: 'John'
+      given: ['John']
     })
     expect(given).toBe('John')
   })
@@ -78,7 +78,7 @@ describe('Registration type resolvers', () => {
   it('returns family part of name', () => {
     const family = typeResolvers.HumanName.familyName({
       use: 'test',
-      family: 'Smith'
+      family: ['Smith']
     })
     expect(family).toBe('Smith')
   })
