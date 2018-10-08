@@ -79,6 +79,22 @@ class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
       }))
     },
     {
+      title: 'Homepage',
+      key: 'homepage'
+    },
+    {
+      title: 'Register',
+      key: 'register'
+    },
+    {
+      title: 'Drafts',
+      key: 'drafts'
+    },
+    {
+      title: 'Settings',
+      key: 'settings'
+    },
+    {
       title: 'Log out',
       key: 'logout'
     }
