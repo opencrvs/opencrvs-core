@@ -45,7 +45,6 @@ const animation = {
 const MenuContainer = styled.div`
   top: 0;
   right: 0;
-  height: 28%;
   width: 180px;
   z-index: 1000;
   background: ${({ theme }) => theme.colors.primary};
