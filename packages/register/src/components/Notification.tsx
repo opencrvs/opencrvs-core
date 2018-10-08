@@ -51,6 +51,7 @@ class Component extends React.Component<
             {intl.formatMessage(messages.newContentAvailable)}
           </Notification>
         )}
+        {/* More notification types can be added here */}
       </div>
     )
   }
