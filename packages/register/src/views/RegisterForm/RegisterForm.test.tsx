@@ -3,6 +3,7 @@ import { createTestComponent, selectOption } from 'src/tests/util'
 import { RegisterForm } from './RegisterForm'
 import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft } from 'src/drafts'
+import { IntlProvider } from 'react-intl'
 import { createStore } from '../../store'
 
 describe('when user is in the register form', () => {
@@ -10,12 +11,15 @@ describe('when user is in the register form', () => {
   const draft = createDraft()
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
+  const intlProvider = new IntlProvider({ locale: 'en' }, {})
+  const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
         <RegisterForm
           location={mock}
+          intl={intl}
           history={history}
           staticContext={mock}
           match={{

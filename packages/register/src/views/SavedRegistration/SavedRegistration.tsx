@@ -209,7 +209,7 @@ class SavedRegistrationView extends React.Component<
           <Box>
             <ImgHeaderContainer>
               <Img src={online ? CompleteTick : NoConnectivity} />
-              <BoxHeader>
+              <BoxHeader id="submission_title">
                 {intl.formatMessage(
                   online
                     ? messages.onlineNoticeCardTitle
@@ -217,7 +217,7 @@ class SavedRegistrationView extends React.Component<
                 )}
               </BoxHeader>
             </ImgHeaderContainer>
-            <StyledP>
+            <StyledP id="submission_text">
               {intl.formatMessage(
                 online
                   ? messages.onlineNoticeCardText
@@ -234,14 +234,14 @@ class SavedRegistrationView extends React.Component<
           </TrackingBox>
           <NextBox>
             <BoxHeader>{intl.formatMessage(messages.nextCardTitle)}</BoxHeader>
-            <StyledP>
+            <StyledP id="whats_next_title">
               {intl.formatMessage(
                 online
                   ? messages.onlineNextCardText1
                   : messages.offlineNextCardText1
               )}
             </StyledP>
-            <StyledP>
+            <StyledP id="whats_next_text">
               {intl.formatMessage(
                 online
                   ? messages.onlineNextCardText2
