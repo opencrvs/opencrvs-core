@@ -6,11 +6,16 @@ import { FormTabs } from '../../components/form'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 
 const StickyFormTabsContainer = styled.div`
-  z-index: 100;
-  background-color: ${({ theme }) => theme.colors.headerGradientDark};
+  div.sticky-inner-wrapper {
+    background: linear-gradient(
+      270deg,
+      ${({ theme }) => theme.colors.headerGradientLight} 0%,
+      ${({ theme }) => theme.colors.headerGradientDark} 100%
+    );
+  }
 `
 
-interface IFormTabProps {
+interface IStickyFormTabProps {
   sections: IFormSection[]
   activeTabId: string
   onTabClick: (tabId: string) => void
@@ -20,17 +25,17 @@ function StickyFormTabsComponent({
   sections,
   activeTabId,
   onTabClick
-}: IFormTabProps & InjectedIntlProps) {
+}: IStickyFormTabProps & InjectedIntlProps) {
   return (
-    <Sticky enabled={true}>
-      <StickyFormTabsContainer>
+    <StickyFormTabsContainer>
+      <Sticky enabled={true} innerZ={100}>
         <FormTabs
           sections={sections}
           activeTabId={activeTabId}
           onTabClick={onTabClick}
         />
-      </StickyFormTabsContainer>
-    </Sticky>
+      </Sticky>
+    </StickyFormTabsContainer>
   )
 }
 
