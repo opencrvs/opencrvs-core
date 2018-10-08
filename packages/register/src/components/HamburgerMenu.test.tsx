@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { createTestComponent } from 'src/tests/util'
-import { HamburgerMenu } from './HamburgerMenu'
+import { HamburgerMenu } from '@opencrvs/register/src/components/HamburgerMenu'
 import { ReactWrapper } from 'enzyme'
 
 describe('when user is in the menu page', () => {
