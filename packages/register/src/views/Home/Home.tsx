@@ -4,6 +4,11 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 
 import { goToEvents as goToEventsAction } from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import {
+  FooterAction,
+  FooterPrimaryButton,
+  ViewFooter
+} from 'src/components/interface/footer'
 import { ActionList, IconAction } from '@opencrvs/components/lib/buttons'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import {
@@ -34,6 +39,11 @@ const messages = defineMessages({
     id: 'register.home.buttons.completedSumissions',
     defaultMessage: 'Completd submissions',
     description: 'The title for completed submissions on an action'
+  },
+  logoutActionTitle: {
+    id: 'register.home.logout',
+    defaultMessage: 'Log out',
+    description: 'The title for log out on an action'
   }
 })
 
@@ -84,6 +94,13 @@ class HomeView extends React.Component<
             title={intl.formatMessage(messages.completedSubmissionsActionTitle)}
           />
         </ActionList>
+        <ViewFooter>
+          <FooterAction>
+            <FooterPrimaryButton id="save_draft">
+              {intl.formatMessage(messages.logoutActionTitle)}
+            </FooterPrimaryButton>
+          </FooterAction>
+        </ViewFooter>
       </>
     )
   }
