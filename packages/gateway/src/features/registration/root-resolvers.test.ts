@@ -5,6 +5,7 @@ describe('Registration root resolvers', () => {
   describe('listBirthRegistrations()', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))
+      // @ts-ignore
       const compositions = await resolvers.Query.listBirthRegistrations(
         {},
         { status: 'preliminary' }
@@ -28,6 +29,7 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
+      // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
         { createAt: new Date() }
@@ -44,6 +46,7 @@ describe('Registration root resolvers', () => {
     it('throws an error when the request returns an error code', async () => {
       fetch.mockResponseOnce('Boom!', { status: 401 })
       await expect(
+        // @ts-ignore
         resolvers.Mutation.createBirthRegistration(
           {},
           { createdAt: new Date() }
@@ -54,6 +57,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
+        // @ts-ignore
         resolvers.Mutation.createBirthRegistration(
           {},
           { createdAt: new Date() }

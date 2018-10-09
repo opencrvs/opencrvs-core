@@ -6,13 +6,14 @@ import {
 } from 'src/features/fhir/templates'
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
+import { GQLResolver } from 'src/graphql/schema'
 
-export const typeResolvers = {
+export const typeResolvers: GQLResolver = {
   HumanName: {
-    givenName(name: any) {
+    givenName(name) {
       return name.given.join(' ')
     },
-    familyName(name: any) {
+    familyName(name) {
       return name.family.join(' ')
     }
   },
@@ -22,10 +23,10 @@ export const typeResolvers = {
   },
 
   BirthRegistration: {
-    createdAt(composition: any) {
+    createdAt(composition) {
       return composition.date
     },
-    async mother(composition: any) {
+    async mother(composition) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
       if (!patientSection) {
         return null
@@ -33,7 +34,7 @@ export const typeResolvers = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async father(composition: any) {
+    async father(composition) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
       if (!patientSection) {
         return null
@@ -41,7 +42,7 @@ export const typeResolvers = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async child(composition: any) {
+    async child(composition) {
       const patientSection = findCompositionSection(CHILD_CODE, composition)
       if (!patientSection) {
         return null

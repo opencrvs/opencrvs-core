@@ -2,17 +2,18 @@ import fetch from 'node-fetch'
 
 import { fhirUrl } from 'src/constants'
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
+import { GQLResolver } from 'src/graphql/schema'
 
 const statusMap = {
   declared: 'preliminary',
   registered: 'final'
 }
 
-export const resolvers = {
+export const resolvers: GQLResolver = {
   Query: {
-    async listBirthRegistrations(_: any, { status }: any) {
+    async listBirthRegistrations(_, { status }) {
       const res = await fetch(
-        `${fhirUrl}/Composition?status=${statusMap[status]}`,
+        `${fhirUrl}/Composition${status ? `status=${statusMap[status]}` : ''}`,
         {
           headers: {
             'Content-Type': 'application/fhir+json'
@@ -22,13 +23,13 @@ export const resolvers = {
 
       const bundle = await res.json()
 
-      return bundle.entry.map((entry: any) => entry.resource)
+      return bundle.entry.map((entry: { resource: {} }) => entry.resource)
     }
   },
 
   Mutation: {
-    async createBirthRegistration(_: any, { details }: any) {
-      const doc: any = await buildFHIRBundle(Object.assign({}, details))
+    async createBirthRegistration(_, { details }) {
+      const doc = await buildFHIRBundle(Object.assign({}, details))
 
       const res = await fetch(fhirUrl, {
         method: 'POST',

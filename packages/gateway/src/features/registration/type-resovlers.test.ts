@@ -10,6 +10,7 @@ describe('Registration type resolvers', () => {
   it('fetches and returns a mother patient resource from a composition section', async () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
+    // @ts-ignore
     const patient = await typeResolvers.BirthRegistration.mother({
       section: [
         {
@@ -30,6 +31,7 @@ describe('Registration type resolvers', () => {
   it('fetches and returns a father patient resource from a composition section', async () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
+    // @ts-ignore
     const patient = await typeResolvers.BirthRegistration.father({
       section: [
         {
@@ -50,6 +52,7 @@ describe('Registration type resolvers', () => {
   it('fetches and returns a child patient resource from a composition section', async () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
+    // @ts-ignore
     const patient = await typeResolvers.BirthRegistration.child({
       section: [
         {
@@ -68,6 +71,7 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns given part of name', () => {
+    // @ts-ignore
     const given = typeResolvers.HumanName.givenName({
       use: 'test',
       given: ['John']
@@ -76,6 +80,7 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns family part of name', () => {
+    // @ts-ignore
     const family = typeResolvers.HumanName.familyName({
       use: 'test',
       family: ['Smith']
@@ -84,6 +89,7 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns createdAt date', () => {
+    // @ts-ignore
     const createdAt = typeResolvers.BirthRegistration.createdAt({
       date: '2018-10-05'
     })

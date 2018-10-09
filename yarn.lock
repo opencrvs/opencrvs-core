@@ -6322,6 +6322,13 @@ graphql-import@^0.5.2:
   dependencies:
     lodash "^4.17.4"
 
+graphql-schema-typescript@^1.2.7:
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/graphql-schema-typescript/-/graphql-schema-typescript-1.2.7.tgz#dccd352bd725b393535c9359e567072c34b34c87"
+  integrity sha512-ECp3WcNqqX452m3HZfjGt4pAYfnuKorXLtw40En5VrwcD99C4lPg0eQMd4GYsyboljJrcVySM+pGz5aXcr3Gvw==
+  dependencies:
+    yargs "^11.0.0"
+
 graphql-tag@^2.4.2, graphql-tag@^2.9.2:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.9.2.tgz#2f60a5a981375f430bf1e6e95992427dc18af686"
