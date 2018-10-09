@@ -85,7 +85,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           if (
             val.length > 4 ||
             Number(val) > 2100 ||
-            (val.length === 4 && Number(val) < 1900)
+            (val.length === 2 && Number(val) < 19)
           ) {
             return
           }
