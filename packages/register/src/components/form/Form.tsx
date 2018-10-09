@@ -65,6 +65,7 @@ type GeneratedInputFieldProps = {
   onSetFieldValue: (name: string, value: string | string[]) => void
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
+  resetDependentSelectValues: (name: string) => void
   value: IFormFieldValue
   touched: boolean
   error: string
@@ -75,6 +76,7 @@ function GeneratedInputField({
   onChange,
   onBlur,
   onSetFieldValue,
+  resetDependentSelectValues,
   error,
   touched,
   value
@@ -107,7 +109,10 @@ function GeneratedInputField({
         <Select
           {...inputProps}
           value={value as string}
-          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          onChange={(val: string) => {
+            resetDependentSelectValues(fieldDefinition.name)
+            onSetFieldValue(fieldDefinition.name, val)
+          }}
           options={fieldDefinition.options}
         />
       </InputField>
@@ -248,6 +253,17 @@ class FormSectionComponent extends React.Component<Props> {
   handleBlur = (e: React.FocusEvent<any>) => {
     this.props.setFieldTouched(e.target.name)
   }
+  resetDependentSelectValues = (fieldName: string) => {
+    const fields = this.props.fields
+    const fieldToReset = fields.find(
+      field =>
+        field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+        field.dynamicOptions.dependency === fieldName
+    )
+    if (fieldToReset) {
+      this.props.setFieldValue(fieldToReset.name, '')
+    }
+  }
   render() {
     const {
       handleSubmit,
@@ -325,6 +341,9 @@ class FormSectionComponent extends React.Component<Props> {
                         withDynamicallyGeneratedFields
                       )}
                       onSetFieldValue={setFieldValue}
+                      resetDependentSelectValues={
+                        this.resetDependentSelectValues
+                      }
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
