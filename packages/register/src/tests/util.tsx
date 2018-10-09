@@ -5,10 +5,10 @@ import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
 
 import { ApolloLink, Observable } from 'apollo-link'
-import { IStoreState, createStore } from '../store'
+import { IStoreState, createStore, AppStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as en from 'react-intl/locale-data/en'
-import { mount, configure, shallow } from 'enzyme'
+import { mount, configure, shallow, ReactWrapper } from 'enzyme'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '../App'
@@ -74,8 +74,10 @@ function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
   return React.cloneElement(node, { intl })
 }
 
-export function createTestComponent(node: React.ReactElement<ITestView>) {
-  const { store } = createStore()
+export function createTestComponent(
+  node: React.ReactElement<ITestView>,
+  store: AppStore
+) {
   const component = mount(
     <Provider store={store}>
       <I18nContainer>
@@ -100,3 +102,21 @@ export function createShallowRenderedComponent(
 }
 
 export const wait = () => new Promise(res => process.nextTick(res))
+
+export const selectOption = (
+  wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
+  selector: string,
+  option: string
+): string => {
+  const input = wrapper
+    .find(`${selector} input`)
+    .instance() as React.InputHTMLAttributes<HTMLInputElement>
+  input.value = option.charAt(0)
+  wrapper.find(`${selector} input`).simulate('change', {
+    target: { value: option.charAt(0) }
+  })
+  wrapper
+    .find(`${selector} .react-select__menu div[children="${option}"]`)
+    .simulate('click')
+  return `${selector} .react-select__single-value`
+}

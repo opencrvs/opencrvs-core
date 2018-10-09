@@ -507,6 +507,8 @@ export const ENGLISH_STATE = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
+    'register.notification.newContentAvailable':
+      "We've made some updates, click here to refresh.",
     'register.savedRegistration.online.title': 'Declaration submitted',
     'register.savedRegistration.online.desc':
       'The declaration is now on its way for validation.',
@@ -551,6 +553,11 @@ export const ENGLISH_STATE = {
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
     'register.selectVitalEvent.registerNewEventTitle':
       'Declare a new vital event',
+    'register.home.buttons.mydraft': 'My draft',
+    'register.home.buttons.registerNewEvent': 'Declare a new vital event',
+    'register.home.buttons.pendingSubimissions': 'Pending submissions',
+    'register.home.buttons.completedSumissions': 'Completed submissions',
+    'register.home.logout': 'Log out',
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
     'register.selectVitalEvent.birthActionTitle': 'Birth',

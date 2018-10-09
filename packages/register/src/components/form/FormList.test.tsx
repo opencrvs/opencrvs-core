@@ -3,10 +3,10 @@ import { createTestComponent } from 'src/tests/util'
 import { FormList } from './FormList'
 import { ReactWrapper } from 'enzyme'
 import * as actions from 'src/i18n/actions'
-import { Store } from 'redux'
+import { createStore } from '../../store'
 
 describe('when user is in the document upload page', () => {
-  let store: Store
+  const { store } = createStore()
   let formListComponent: ReactWrapper<{}, {}>
 
   const listItems = [
@@ -35,9 +35,11 @@ describe('when user is in the document upload page', () => {
   ]
 
   beforeEach(async () => {
-    const testComponent = createTestComponent(<FormList list={listItems} />)
+    const testComponent = createTestComponent(
+      <FormList list={listItems} />,
+      store
+    )
     formListComponent = testComponent.component
-    store = testComponent.store
   })
   it('renders the whole list', () => {
     const items = formListComponent.find('ul li')
