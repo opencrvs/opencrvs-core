@@ -112,7 +112,7 @@ function createPersonEntry(person: any, refUuid: string) {
         {
           use: 'english',
           family: [person.name[0] ? person.name[0].familyName : undefined],
-          given: [person.name[0] ? person.name[0].givenName : undefined]
+          given: [person.name[0] ? person.name[0].firstNames : undefined]
         }
       ],
       gender: person.gender
@@ -160,7 +160,7 @@ export function fromFHIR(compositionBundle: any) {
         gender: motherResource.gender,
         name: motherResource.name.map((name: any) => {
           return {
-            givenName: name.given[0],
+            firstNames: name.given[0],
             familyName: name.family[0]
           }
         })
@@ -169,7 +169,7 @@ export function fromFHIR(compositionBundle: any) {
         gender: fatherResource.gender,
         name: fatherResource.name.map((name: any) => {
           return {
-            givenName: name.given[0],
+            firstNames: name.given[0],
             familyName: name.family[0]
           }
         })
@@ -178,7 +178,7 @@ export function fromFHIR(compositionBundle: any) {
         gender: childResource.gender,
         name: childResource.name.map((name: any) => {
           return {
-            givenName: name.given[0],
+            firstNames: name.given[0],
             familyName: name.family[0]
           }
         })

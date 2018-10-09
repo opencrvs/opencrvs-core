@@ -52,8 +52,8 @@ const messages = defineMessages({
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality'
   },
-  motherGivenName: {
-    id: 'formFields.motherGivenName',
+  motherFirstNames: {
+    id: 'formFields.motherFirstNames',
     defaultMessage: 'First name(s)',
     description: 'Label for form field: First names'
   },
@@ -62,8 +62,8 @@ const messages = defineMessages({
     defaultMessage: 'Family name',
     description: 'Label for form field: Family name'
   },
-  motherGivenNameEng: {
-    id: 'formFields.motherGivenNameEng',
+  motherFirstNamesEng: {
+    id: 'formFields.motherFirstNamesEng',
     defaultMessage: 'First name(s) (in english)',
     description: 'Label for form field: First names in english'
   },
@@ -157,9 +157,9 @@ export const motherSection: IFormSection = {
       options: countries
     },
     {
-      name: 'motherGivenName',
+      name: 'motherFirstNames',
       type: TEXT,
-      label: messages.motherGivenName,
+      label: messages.motherFirstNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
@@ -173,9 +173,9 @@ export const motherSection: IFormSection = {
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'motherGivenNameEng',
+      name: 'motherFirstNamesEng',
       type: TEXT,
-      label: messages.motherGivenNameEng,
+      label: messages.motherFirstNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]

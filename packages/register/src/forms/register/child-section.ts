@@ -31,8 +31,8 @@ const messages = defineMessages({
     defaultMessage: "Child's details",
     description: 'Form section title for Child'
   },
-  childGivenName: {
-    id: 'formFields.childGivenName',
+  childFirstNames: {
+    id: 'formFields.childFirstNames',
     defaultMessage: 'First name(s)',
     description: 'Label for form field: First names'
   },
@@ -41,8 +41,8 @@ const messages = defineMessages({
     defaultMessage: 'Family name',
     description: 'Label for form field: Family name'
   },
-  childGivenNameEng: {
-    id: 'formFields.childGivenNameEng',
+  childFirstNamesEng: {
+    id: 'formFields.childFirstNamesEng',
     defaultMessage: 'First name(s) (in english)',
     description: 'Label for form field: First names in english'
   },
@@ -210,9 +210,9 @@ export const childSection: IFormSection = {
   title: messages.childTitle,
   fields: [
     {
-      name: 'childGivenName',
+      name: 'childFirstNames',
       type: TEXT,
-      label: messages.childGivenName,
+      label: messages.childFirstNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
@@ -226,9 +226,9 @@ export const childSection: IFormSection = {
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'childGivenNameEng',
+      name: 'childFirstNamesEng',
       type: TEXT,
-      label: messages.childGivenNameEng,
+      label: messages.childFirstNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]

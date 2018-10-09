@@ -45,7 +45,7 @@ describe('when user is in the saved registration page', () => {
           .first()
           .text()
       ).toEqual(
-        'The birth declaration of First Middle Last Name has been successfully submitted to the registration office.'
+        'The birth declaration of First Last Name has been successfully submitted to the registration office.'
       )
     })
     it('should show the online whats next title', () => {
@@ -104,7 +104,7 @@ describe('when user is in the saved registration page', () => {
           .first()
           .text()
       ).toEqual(
-        'The birth declaration of First Middle Last Name is pending due to no internet connection. '
+        'The birth declaration of First Last Name is pending due to no internet connection. '
       )
     })
     it('should show the offline whats next title', () => {

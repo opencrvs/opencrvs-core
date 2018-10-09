@@ -377,9 +377,9 @@ export const ENGLISH_STATE = {
     'formFields.dateOfMarriage': 'Date of marriage',
     'register.form.tabs.childTab': 'Child',
     'register.form.section.childTitle': "Child's details",
-    'formFields.childGivenName': 'First name(s)',
+    'formFields.childFirstNames': 'First name(s)',
     'formFields.childFamilyName': 'Family name',
-    'formFields.childGivenNameEng': 'First name(s) (in english)',
+    'formFields.childFirstNamesEng': 'First name(s) (in english)',
     'formFields.childFamilyNameEng': 'Family name (in english)',
     'formFields.childSex': 'Sex',
     'formFields.childSexMale': 'Male',
@@ -413,10 +413,9 @@ export const ENGLISH_STATE = {
     'formFields.fathersDetailsExist': "Do you have the father's details?",
     'formFields.father.nationality': 'Nationality',
     'formFields.father.nationalityBangladesh': 'Bangladesh',
-    'formFields.fatherGivenName': 'First name(s)',
+    'formFields.fatherFirstNames': 'First name(s)',
     'formFields.fatherFamilyName': 'Family name',
-    'formFields.fatherGivenNameEng': 'First name(s) (in english)',
-    'formFields.fatherMiddleNamesEng': 'Middle name(s) (in english)',
+    'formFields.fatherFirstNamesEng': 'First name(s) (in english)',
     'formFields.fatherFamilyNameEng': 'Family name (in english)',
     'formFields.fatherDateOfBirth': 'Date of birth',
     'formFields.fatherEducationAttainment':
@@ -426,9 +425,9 @@ export const ENGLISH_STATE = {
     'register.form.section.motherTitle': "Mother's details",
     'formFields.mother.nationality': 'Nationality',
     'formFields.mother.nationalityBangladesh': 'Bangladesh',
-    'formFields.motherGivenName': 'First name(s)',
+    'formFields.motherFirstNames': 'First name(s)',
     'formFields.motherFamilyName': 'Family name',
-    'formFields.motherGivenNameEng': 'First name(s) (in english)',
+    'formFields.motherFirstNamesEng': 'First name(s) (in english)',
     'formFields.motherFamilyNameEng': 'Family name (in english)',
     'formFields.motherDateOfBirth': 'Date of birth',
     'formFields.motherEducationAttainment':
@@ -514,9 +513,9 @@ export const ENGLISH_STATE = {
     'register.savedRegistration.online.noticeCard.title': 'All done!',
     'register.savedRegistration.offline.noticeCard.title': 'Almost there',
     'register.savedRegistration.online.noticeCard.text':
-      'The birth declaration of First Middle Last Name has been successfully submitted to the registration office.',
+      'The birth declaration of First Last Name has been successfully submitted to the registration office.',
     'register.savedRegistration.offline.noticeCard.text':
-      'The birth declaration of First Middle Last Name is pending due to no internet connection. ',
+      'The birth declaration of First Last Name is pending due to no internet connection. ',
     'register.savedRegistration.trackingCard.title': 'Tracking ID number:',
     'register.savedRegistration.trackingCard.text':
       'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',

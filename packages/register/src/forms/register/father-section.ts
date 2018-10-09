@@ -70,8 +70,8 @@ export const messages = defineMessages({
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality'
   },
-  fatherGivenName: {
-    id: 'formFields.fatherGivenName',
+  fatherFirstNames: {
+    id: 'formFields.fatherFirstNames',
     defaultMessage: 'First name(s)',
     description: 'Label for form field: First name'
   },
@@ -80,8 +80,8 @@ export const messages = defineMessages({
     defaultMessage: 'Family name',
     description: 'Label for form field: Family name'
   },
-  fatherGivenNameEng: {
-    id: 'formFields.fatherGivenNameEng',
+  fatherFirstNamesEng: {
+    id: 'formFields.fatherFirstNamesEng',
     defaultMessage: 'First name(s) (in english)',
     description: 'Label for form field: First names in english'
   },
@@ -190,9 +190,9 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherGivenName',
+      name: 'fatherFirstNames',
       type: TEXT,
-      label: messages.fatherGivenName,
+      label: messages.fatherFirstNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
@@ -208,9 +208,9 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherGivenNameEng',
+      name: 'fatherFirstNamesEng',
       type: TEXT,
-      label: messages.fatherGivenNameEng,
+      label: messages.fatherFirstNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat],
