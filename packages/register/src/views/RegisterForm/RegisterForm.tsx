@@ -201,6 +201,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         </ViewHeaderWithTabs>
         <FormContainer>
           <Swipeable
+            id="swipeable_block"
             trackMouse
             onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
             onSwipedRight={() =>
