@@ -18,5 +18,7 @@ export const colors = {
   inputBackground: '#F9F9F9',
   white: '#FFFFFF',
   danger: '#D53F3F',
-  cardGradientEnd: '#5E93ED'
+  cardGradientEnd: '#5E93ED',
+  itemBorderTop: 'rgba(25, 24, 24, 0.12)',
+  nestedMenuItem: 'rgb(53, 73, 93)'
 }
