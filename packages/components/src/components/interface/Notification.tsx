@@ -7,6 +7,7 @@ export enum NOTIFICATION_TYPE {
   ERROR = 'error'
 }
 interface IProps {
+  id?: string
   show: boolean
   type?: NOTIFICATION_TYPE
   callback?: any
@@ -41,14 +42,14 @@ const NotificationContainer = styledNotification`
   }
 
   &.success {
-    border-color: ${({ theme }) => theme.colors.success};  
+    border-color: ${({ theme }) => theme.colors.success};
   }
 
-  &.error {  
-    border-color: ${({ theme }) => theme.colors.error};  
+  &.error {
+    border-color: ${({ theme }) => theme.colors.error};
   }
-  &.warning {  
-    border-color: ${({ theme }) => theme.colors.warning};  
+  &.warning {
+    border-color: ${({ theme }) => theme.colors.warning};
   }
 `
 
@@ -63,13 +64,15 @@ const NotificationMessage = styled.div`
 
 export class Notification extends React.Component<IProps> {
   render() {
-    const { type, show, children, callback } = this.props
+    const { id, type, show, children, callback } = this.props
 
     return (
       <NotificationContainer
+        id={id}
+        onClick={callback}
         className={(type ? type : '') + (show ? ' show' : '')}
       >
-        <NotificationMessage onClick={callback}>{children}</NotificationMessage>
+        <NotificationMessage>{children}</NotificationMessage>
       </NotificationContainer>
     )
   }

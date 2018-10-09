@@ -20,7 +20,7 @@ const isLocalhost = Boolean(
     )
 )
 
-export default function register() {
+export default function register(onNewConentAvailable?: () => void) {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(
@@ -39,7 +39,7 @@ export default function register() {
 
       if (isLocalhost) {
         // This is running on localhost. Lets check if a service worker still exists or not.
-        checkValidServiceWorker(swUrl)
+        checkValidServiceWorker(swUrl, onNewConentAvailable)
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
@@ -51,13 +51,13 @@ export default function register() {
         })
       } else {
         // Is not local host. Just register service worker
-        registerValidSW(swUrl)
+        registerValidSW(swUrl, onNewConentAvailable)
       }
     })
   }
 }
 
-function registerValidSW(swUrl: string) {
+function registerValidSW(swUrl: string, onNewConentAvailable?: () => void) {
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
@@ -71,6 +71,9 @@ function registerValidSW(swUrl: string) {
                 // the fresh content will have been added to the cache.
                 // It's the perfect time to display a 'New content is
                 // available; please refresh.' message in your web app.
+                if (onNewConentAvailable) {
+                  onNewConentAvailable()
+                }
                 console.log('New content is available; please refresh.')
               } else {
                 // At this point, everything has been precached.
@@ -88,7 +91,10 @@ function registerValidSW(swUrl: string) {
     })
 }
 
-function checkValidServiceWorker(swUrl: string) {
+function checkValidServiceWorker(
+  swUrl: string,
+  onNewConentAvailable?: () => void
+) {
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl)
     .then(response => {
@@ -105,7 +111,7 @@ function checkValidServiceWorker(swUrl: string) {
         })
       } else {
         // Service worker found. Proceed as normal.
-        registerValidSW(swUrl)
+        registerValidSW(swUrl, onNewConentAvailable)
       }
     })
     .catch(() => {
