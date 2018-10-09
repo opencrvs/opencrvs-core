@@ -45,9 +45,10 @@ const animation = {
 const MenuContainer = styled.div`
   top: 0;
   right: 0;
-  width: 180px;
+  height: 90px;
+  width: 168px;
+  background-color: rgb(76, 104, 193);
   z-index: 1000;
-  background: ${({ theme }) => theme.colors.primary};
   position: absolute;
 
   .rc-menu {
@@ -79,24 +80,39 @@ const MenuContainer = styled.div`
     background-color: ${({ theme }) => theme.colors.primary};
   }
   .rc-menu-item.nested-menu-item {
-    background-color: rgb(45, 44, 44);
+    background-color: rgb(53, 73, 93);
   }
   .rc-menu-item,
   .rc-menu-submenu-title {
     margin: 0;
     position: relative;
     display: block;
-    padding: 7px 7px 7px 16px;
+    padding: 10px 7px 7px 16px;
     white-space: nowrap;
     min-height: 50px;
+    color: rgb(255, 255, 255);
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    line-height: 19px;
   }
-  .rc-menu > .rc-menu-item-divider {
-    height: 1px;
-    margin: 1px 0;
-    overflow: hidden;
-    padding: 0;
-    line-height: 0;
-    background-color: rgb(229, 229, 229);
+  .submenu-title-wrapper {
+    height: 20px;
+    width: 80px;
+    color: rgb(255, 255, 255);
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    line-height: 19px;
+  }
+  .rc-menu-submenu.rc-menu-submenu-inline.main-menu
+    > div.rc-menu-submenu-title
+    > span.submenu-title-wrapper {
+    display: inline-block;
+    margin-top: 5px;
+    text-transform: uppercase;
   }
   .rc-menu-submenu-popup .submenu-title-wrapper {
     padding-right: 20px;
@@ -107,7 +123,7 @@ const MenuContainer = styled.div`
   .rc-menu-inline > .rc-menu-item,
   .rc-menu-inline > .rc-menu-submenu.nested-submenu > .rc-menu-submenu-title {
     text-align: right;
-    padding: 8px 15px 8px 10px !important;
+    padding: 15px 15px !important;
   }
   .rc-menu-sub.rc-menu-inline {
     padding: 0;
@@ -131,17 +147,6 @@ const getIcon = (style = {}, icon: any, text?: string) => {
     return <i style={style}>{text}</i>
   }
   return <i style={style}>{icon}</i>
-}
-
-function expandIcon(menuOpen: boolean, props: any) {
-  return getIcon(
-    {
-      right: '20px',
-      marginLeft: '20px',
-      position: 'absolute'
-    },
-    menuOpen ? <Cross /> : <Hamburger />
-  )
 }
 
 interface IMenuItem {
@@ -172,9 +177,19 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
 
   toggleMenu = () => {
     this.setState(() => ({
-      menuOpen: !this.state.menuOpen,
-      menuTitle: this.state.menuOpen ? 'Menu' : ''
+      menuOpen: !this.state.menuOpen
     }))
+  }
+
+  expandIcon = () => {
+    return getIcon(
+      {
+        right: '20px',
+        marginLeft: '20px',
+        position: 'absolute'
+      },
+      this.state.menuOpen ? <Cross /> : <Hamburger />
+    )
   }
 
   render() {
@@ -212,7 +227,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
       <MenuContainer>
         <Menu
           mode="inline"
-          expandIcon={expandIcon.bind(null, this.state.menuOpen)}
+          expandIcon={this.expandIcon}
           openAnimation={animation}
           triggerSubMenuAction="click"
         >
@@ -221,7 +236,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
             className="main-menu"
             title={
               <span className="submenu-title-wrapper">
-                {this.state.menuTitle}
+                {this.state.menuOpen ? '' : this.state.menuTitle}
               </span>
             }
           >
