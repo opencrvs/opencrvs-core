@@ -69,6 +69,15 @@ const MenuContainer = styled.div`
   .rc-menu-item-active,
   .rc-menu-item-selected {
     background-color: ${({ theme }) => theme.colors.primary};
+    font-weight: bold;
+  }
+  .rc-menu.rc-menu-root.rc-menu-inline {
+    margin-top: 0px;
+  }
+  .rc-menu.rc-menu-root.rc-menu-inline
+    > li.rc-menu-submenu
+    > div.rc-menu-submenu-title {
+    padding-top: 30px;
   }
   li.rc-menu-submenu.rc-menu-submenu-inline.main-menu.rc-menu-submenu-open {
     width: 199px;
@@ -76,8 +85,14 @@ const MenuContainer = styled.div`
   ul li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu span.icon {
     opacity: 0;
   }
+  li.rc-menu-submenu.rc-menu-submenu-inline.main-menu
+    > div.rc-menu-submenu-title {
+    min-height: 90px;
+  }
   .rc-menu div.close {
-    font-size: 35px;
+    font-size: 40px;
+    margin-top: 3px;
+    margin-right: 3px;
     font-family: ${({ theme }) => theme.fonts.lightFont};
   }
   .rc-menu.rc-menu-root > li.rc-menu-submenu {
@@ -101,7 +116,6 @@ const MenuContainer = styled.div`
     color: rgb(255, 255, 255);
     font-family: ${({ theme }) => theme.fonts.lightFont};
     font-size: 16px;
-    font-weight: bold;
     letter-spacing: 2px;
     line-height: 19px;
   }
@@ -111,7 +125,6 @@ const MenuContainer = styled.div`
     color: rgb(255, 255, 255);
     font-family: ${({ theme }) => theme.fonts.lightFont};
     font-size: 16px;
-    font-weight: bold;
     letter-spacing: 2px;
     line-height: 19px;
   }
@@ -125,6 +138,8 @@ const MenuContainer = styled.div`
     > span.submenu-title-wrapper {
     display: inline-block;
     margin-top: 5px;
+    margin-left: 40px;
+    font-weight: bold;
     text-transform: uppercase;
   }
   .rc-menu-submenu-popup .submenu-title-wrapper {
@@ -202,7 +217,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
     return getIcon(
       {
         color: 'white',
-        right: '20px',
+        right: '30px',
         marginLeft: '20px',
         position: 'absolute'
       },
