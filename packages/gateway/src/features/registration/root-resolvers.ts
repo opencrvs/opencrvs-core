@@ -13,7 +13,7 @@ export const resolvers: GQLResolver = {
   Query: {
     async listBirthRegistrations(_, { status }) {
       const res = await fetch(
-        `${fhirUrl}/Composition${status ? `status=${statusMap[status]}` : ''}`,
+        `${fhirUrl}/Composition${status ? `?status=${statusMap[status]}` : ''}`,
         {
           headers: {
             'Content-Type': 'application/fhir+json'

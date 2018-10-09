@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\" \"yarn gen:watch\"",
+    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\" \"yarn gen:types:watch\"",
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
     "gen:full-schema": "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\"",
-    "gen": "yarn -s gen:full-schema > src/graphql/schema.graphql && graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts && rm src/graphql/schema.graphql && echo Done",
-    "gen:watch": "nodemon -e graphql -i src/graphql/schema.graphql -x 'yarn gen'"
+    "gen:types": "yarn -s gen:full-schema > src/graphql/schema.graphql && graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts && rm src/graphql/schema.graphql && echo Done",
+    "gen:types:watch": "nodemon -e graphql -i src/graphql/schema.graphql -x 'yarn gen:types'"
   },
   "dependencies": {
     "@types/glob": "^5.0.35",
