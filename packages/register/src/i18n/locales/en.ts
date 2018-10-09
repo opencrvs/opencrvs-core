@@ -507,6 +507,8 @@ export const ENGLISH_STATE = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
+    'register.notification.newContentAvailable':
+      "We've made some updates, click here to refresh.",
     'register.savedRegistration.online.title': 'Declaration submitted',
     'register.savedRegistration.online.desc':
       'The declaration is now on its way for validation.',

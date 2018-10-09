@@ -16,6 +16,7 @@ import { config } from './config'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import * as routes from './navigation/routes'
 
+import { NotificationComponent } from './components/Notification'
 import { Page } from './components/Page'
 
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
@@ -47,38 +48,40 @@ export class App extends React.Component<IAppProps, {}> {
             <ThemeProvider theme={getTheme(config.LOCALE)}>
               <ConnectedRouter history={this.props.history}>
                 <ScrollToTop>
-                  <Page>
-                    <Switch>
-                      <ProtectedRoute
-                        exact
-                        path={routes.HOME}
-                        component={Home}
-                      />
-                      <ProtectedRoute
-                        exact
-                        path={routes.SELECT_VITAL_EVENT}
-                        component={SelectVitalEvent}
-                      />
-                      <ProtectedRoute
-                        exact
-                        path={routes.SELECT_INFORMANT}
-                        component={SelectInformant}
-                      />
-                      <ProtectedRoute
-                        exact
-                        path={routes.DRAFT_BIRTH_PARENT_FORM}
-                        component={RegisterForm}
-                      />
-                      <ProtectedRoute
-                        path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
-                        component={RegisterForm}
-                      />
-                      <ProtectedRoute
-                        path={routes.SAVED_REGISTRATION}
-                        component={SavedRegistration}
-                      />
-                    </Switch>
-                  </Page>
+                  <NotificationComponent>
+                    <Page>
+                      <Switch>
+                        <ProtectedRoute
+                          exact
+                          path={routes.HOME}
+                          component={Home}
+                        />
+                        <ProtectedRoute
+                          exact
+                          path={routes.SELECT_VITAL_EVENT}
+                          component={SelectVitalEvent}
+                        />
+                        <ProtectedRoute
+                          exact
+                          path={routes.SELECT_INFORMANT}
+                          component={SelectInformant}
+                        />
+                        <ProtectedRoute
+                          exact
+                          path={routes.DRAFT_BIRTH_PARENT_FORM}
+                          component={RegisterForm}
+                        />
+                        <ProtectedRoute
+                          path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                          component={RegisterForm}
+                        />
+                        <ProtectedRoute
+                          path={routes.SAVED_REGISTRATION}
+                          component={SavedRegistration}
+                        />
+                      </Switch>
+                    </Page>
+                  </NotificationComponent>
                 </ScrollToTop>
               </ConnectedRouter>
             </ThemeProvider>
