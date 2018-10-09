@@ -136,7 +136,7 @@ const MenuContainer = styled.div`
   .rc-menu-inline > .rc-menu-item,
   .rc-menu-inline > .rc-menu-submenu.nested-submenu > .rc-menu-submenu-title {
     text-align: right;
-    padding: 15px 22px !important;
+    padding: 18px 22px !important;
   }
   .rc-menu-sub.rc-menu-inline {
     padding: 0;
