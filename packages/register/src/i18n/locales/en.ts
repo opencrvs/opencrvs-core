@@ -495,6 +495,7 @@ export const ENGLISH_STATE = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.mobilePhoneRegex': '07[0-9]{9,10}',
     'validations.mobileNumberFormat': '07123456789',
+    'validations.dateFormat': 'Must be a valid date',
     'validations.requiredSymbol': '',
     'register.form.submit': 'Submit',
     'register.form.informationMissing': 'Information missing',

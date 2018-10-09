@@ -22,7 +22,8 @@ import {
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
-  englishOnlyNameFormat
+  englishOnlyNameFormat,
+  dateFormat
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -257,7 +258,7 @@ export const fatherSection: IFormSection = {
       label: messages.fatherDateOfBirth,
       required: true,
       initialValue: '',
-      validate: [],
+      validate: [dateFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
@@ -288,7 +289,7 @@ export const fatherSection: IFormSection = {
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [dateFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
