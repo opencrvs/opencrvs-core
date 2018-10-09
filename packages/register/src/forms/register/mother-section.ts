@@ -54,13 +54,8 @@ const messages = defineMessages({
   },
   motherGivenName: {
     id: 'formFields.motherGivenName',
-    defaultMessage: 'Given name',
-    description: 'Label for form field: Given name'
-  },
-  motherMiddleNames: {
-    id: 'formFields.motherMiddleNames',
-    defaultMessage: 'Middle name(s)',
-    description: 'Label for form field: Middle names'
+    defaultMessage: 'First name(s)',
+    description: 'Label for form field: First names'
   },
   motherFamilyName: {
     id: 'formFields.motherFamilyName',
@@ -69,13 +64,8 @@ const messages = defineMessages({
   },
   motherGivenNameEng: {
     id: 'formFields.motherGivenNameEng',
-    defaultMessage: 'Given name (in english)',
-    description: 'Label for form field: Given name in english'
-  },
-  motherMiddleNamesEng: {
-    id: 'formFields.motherMiddleNamesEng',
-    defaultMessage: 'Middle name(s) (in english)',
-    description: 'Label for form field: Middle names in english'
+    defaultMessage: 'First name(s) (in english)',
+    description: 'Label for form field: First names in english'
   },
   motherFamilyNameEng: {
     id: 'formFields.motherFamilyNameEng',
@@ -170,14 +160,6 @@ export const motherSection: IFormSection = {
       name: 'motherGivenName',
       type: TEXT,
       label: messages.motherGivenName,
-      required: true,
-      initialValue: '',
-      validate: [bengaliOnlyNameFormat]
-    },
-    {
-      name: 'motherMiddleNames',
-      type: TEXT,
-      label: messages.motherMiddleNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
@@ -186,6 +168,7 @@ export const motherSection: IFormSection = {
       name: 'motherFamilyName',
       type: TEXT,
       label: messages.motherFamilyName,
+      required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
     },
@@ -193,14 +176,6 @@ export const motherSection: IFormSection = {
       name: 'motherGivenNameEng',
       type: TEXT,
       label: messages.motherGivenNameEng,
-      required: true,
-      initialValue: '',
-      validate: [englishOnlyNameFormat]
-    },
-    {
-      name: 'motherMiddleNamesEng',
-      type: TEXT,
-      label: messages.motherMiddleNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
@@ -209,6 +184,7 @@ export const motherSection: IFormSection = {
       name: 'motherFamilyNameEng',
       type: TEXT,
       label: messages.motherFamilyNameEng,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
