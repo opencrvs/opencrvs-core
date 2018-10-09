@@ -132,13 +132,13 @@ type Dummy {
 
 type HumanName {
   use: String
-  givenName: String
+  firstNames: String
   familyName: String
 }
 
 input HumanNameInput {
   use: String
-  givenName: String
+  firstNames: String
   familyName: String
 }
 
@@ -173,17 +173,31 @@ type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): ID!
-  updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): BirthRegistration!
+  updateBirthRegistration(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): BirthRegistration!
   markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration
   markBirthAsRegistered(id: ID!, location: LocationInput): BirthRegistration
   markBirthAsCertified(id: ID!, location: LocationInput): BirthRegistration
-  markBirthAsVoided(id: ID!, reason: String!, location: LocationInput): BirthRegistration
+  markBirthAsVoided(
+    id: ID!
+    reason: String!
+    location: LocationInput
+  ): BirthRegistration
   createDeathRegistration(details: DeathRegistrationInput!): ID!
-  updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): DeathRegistration!
+  updateDeathRegistration(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): DeathRegistration!
   markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration
   markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration
   markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsVoided(id: ID!, reason: String!, location: LocationInput): DeathRegistration
+  markDeathAsVoided(
+    id: ID!
+    reason: String!
+    location: LocationInput
+  ): DeathRegistration
 }
 
 type Notification {
@@ -230,9 +244,27 @@ input PersonInput {
 }
 
 type Query {
-  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
-  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [BirthRegistration]
-  listDeathRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [BirthRegistration]
+  listNotifications(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [Notification]
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
+  listDeathRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
 }
 
 type Registration {
