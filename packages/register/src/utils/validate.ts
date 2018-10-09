@@ -52,11 +52,6 @@ export const messages = defineMessages({
     description:
       'The format of the mobile number that appears in an error message'
   },
-  dateFormatRegex: {
-    id: 'validations.dateRegex',
-    defaultMessage: '^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$',
-    description: 'The regular expressoin to use when validating a date'
-  },
   dateFormat: {
     id: 'validations.dateFormat',
     defaultMessage: 'Must be a valid date',
@@ -105,7 +100,8 @@ export const isAValidEmailAddressFormat = (value: string): boolean => {
 }
 
 export const isAValidDateFormat = (value: string): boolean => {
-  const dateRegex = new RegExp(messages.dateFormatRegex.defaultMessage)
+  const dateFormatRegex = '^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$'
+  const dateRegex = new RegExp(dateFormatRegex)
 
   if (!dateRegex.test(value)) {
     return false
