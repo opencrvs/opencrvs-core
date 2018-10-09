@@ -2,11 +2,10 @@ import * as React from 'react'
 import { createTestComponent } from 'src/tests/util'
 import { HamburgerMenu } from '@opencrvs/register/src/components/HamburgerMenu'
 import { ReactWrapper } from 'enzyme'
-import * as actions from 'src/i18n/actions'
-import { Store } from 'redux'
+import { createStore } from '../store'
 
 describe('when user is in the menu page', () => {
-  let store: Store
+  const { store } = createStore()
   let hamburgerComponent: ReactWrapper<{}, {}>
   const menuItems = [
     {
@@ -48,10 +47,10 @@ describe('when user is in the menu page', () => {
 
   beforeEach(async () => {
     const testComponent = createTestComponent(
-      <HamburgerMenu menuItems={menuItems} />
+      <HamburgerMenu menuItems={menuItems} />,
+      store
     )
     hamburgerComponent = testComponent.component
-    store = testComponent.store
   })
   it('renders main menu title', () => {
     const menuName = hamburgerComponent
@@ -72,11 +71,6 @@ describe('when user is in the menu page', () => {
       '.rc-menu.rc-menu-root li.rc-menu-submenu.rc-menu-submenu-inline.main-menu.rc-menu-submenu-open'
     )
     expect(subMenu.length).toBe(1)
-  })
-  it('Change language to bengali', async () => {
-    // this is totally useless test case, just doing to make use of store variable, otherwise travis ci build fails
-    const action = actions.changeLanguage({ language: 'bn' })
-    store.dispatch(action)
   })
   describe('When user opens menu items', () => {
     // Applies only to tests in this describe block
