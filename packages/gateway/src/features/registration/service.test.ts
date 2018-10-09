@@ -5,7 +5,7 @@ test('should build a correct FHIR registration document without error', () => {
   const fhir = toFHIR({
     mother: {
       gender: 'female',
-      name: [{ givenName: 'Jane', familyName: 'Doe' }]
+      name: [{ firstNames: 'Jane', familyName: 'Doe' }]
     },
     father: { gender: 'male', name: [] },
     child: { gender: 'male', name: [] },
@@ -34,7 +34,7 @@ test('should build a correct GraphQL object from FHIR', () => {
         gender: 'female',
         name: [
           {
-            givenName: 'Jane',
+            firstNames: 'Jane',
             familyName: 'Doe'
           }
         ]
@@ -43,7 +43,7 @@ test('should build a correct GraphQL object from FHIR', () => {
         gender: 'male',
         name: [
           {
-            givenName: 'Jack',
+            firstNames: 'Jack',
             familyName: 'Doe'
           }
         ]
@@ -52,7 +52,7 @@ test('should build a correct GraphQL object from FHIR', () => {
         gender: 'male',
         name: [
           {
-            givenName: 'Baby',
+            firstNames: 'Baby',
             familyName: 'Doe'
           }
         ]

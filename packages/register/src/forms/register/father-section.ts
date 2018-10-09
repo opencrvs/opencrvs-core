@@ -71,30 +71,20 @@ export const messages = defineMessages({
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality'
   },
-  fatherGivenName: {
-    id: 'formFields.fatherGivenName',
-    defaultMessage: 'Given name',
-    description: 'Label for form field: Given name'
-  },
-  fatherMiddleNames: {
-    id: 'formFields.fatherMiddleNames',
-    defaultMessage: 'Middle name(s)',
-    description: 'Label for form field: Middle names'
+  fatherFirstNames: {
+    id: 'formFields.fatherFirstNames',
+    defaultMessage: 'First name(s)',
+    description: 'Label for form field: First name'
   },
   fatherFamilyName: {
     id: 'formFields.fatherFamilyName',
     defaultMessage: 'Family name',
     description: 'Label for form field: Family name'
   },
-  fatherGivenNameEng: {
-    id: 'formFields.fatherGivenNameEng',
-    defaultMessage: 'Given name (in english)',
-    description: 'Label for form field: Given name in english'
-  },
-  fatherMiddleNamesEng: {
-    id: 'formFields.fatherMiddleNamesEng',
-    defaultMessage: 'Middle name(s) (in english)',
-    description: 'Label for form field: Middle names in english'
+  fatherFirstNamesEng: {
+    id: 'formFields.fatherFirstNamesEng',
+    defaultMessage: 'First name(s) (in english)',
+    description: 'Label for form field: First names in english'
   },
   fatherFamilyNameEng: {
     id: 'formFields.fatherFamilyNameEng',
@@ -201,18 +191,9 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherGivenName',
+      name: 'fatherFirstNames',
       type: TEXT,
-      label: messages.fatherGivenName,
-      required: true,
-      initialValue: '',
-      validate: [bengaliOnlyNameFormat],
-      conditionals: [conditionals.fathersDetailsExist]
-    },
-    {
-      name: 'fatherMiddleNames',
-      type: TEXT,
-      label: messages.fatherMiddleNames,
+      label: messages.fatherFirstNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
@@ -222,23 +203,15 @@ export const fatherSection: IFormSection = {
       name: 'fatherFamilyName',
       type: TEXT,
       label: messages.fatherFamilyName,
+      required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherGivenNameEng',
+      name: 'fatherFirstNamesEng',
       type: TEXT,
-      label: messages.fatherGivenNameEng,
-      required: true,
-      initialValue: '',
-      validate: [englishOnlyNameFormat],
-      conditionals: [conditionals.fathersDetailsExist]
-    },
-    {
-      name: 'fatherMiddleNamesEng',
-      type: TEXT,
-      label: messages.fatherMiddleNamesEng,
+      label: messages.fatherFirstNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat],
@@ -248,6 +221,7 @@ export const fatherSection: IFormSection = {
       name: 'fatherFamilyNameEng',
       type: TEXT,
       label: messages.fatherFamilyNameEng,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]

@@ -32,30 +32,20 @@ const messages = defineMessages({
     defaultMessage: "Child's details",
     description: 'Form section title for Child'
   },
-  childGivenName: {
-    id: 'formFields.childGivenName',
-    defaultMessage: 'Given name',
-    description: 'Label for form field: Given name'
-  },
-  childMiddleNames: {
-    id: 'formFields.childMiddleNames',
-    defaultMessage: 'Middle name(s)',
-    description: 'Label for form field: Middle names'
+  childFirstNames: {
+    id: 'formFields.childFirstNames',
+    defaultMessage: 'First name(s)',
+    description: 'Label for form field: First names'
   },
   childFamilyName: {
     id: 'formFields.childFamilyName',
     defaultMessage: 'Family name',
     description: 'Label for form field: Family name'
   },
-  childGivenNameEng: {
-    id: 'formFields.childGivenNameEng',
-    defaultMessage: 'Given name (in english)',
-    description: 'Label for form field: Given name in english'
-  },
-  childMiddleNamesEng: {
-    id: 'formFields.childMiddleNamesEng',
-    defaultMessage: 'Middle name(s) (in english)',
-    description: 'Label for form field: Middle names in english'
+  childFirstNamesEng: {
+    id: 'formFields.childFirstNamesEng',
+    defaultMessage: 'First name(s) (in english)',
+    description: 'Label for form field: First names in english'
   },
   childFamilyNameEng: {
     id: 'formFields.childFamilyNameEng',
@@ -221,17 +211,9 @@ export const childSection: IFormSection = {
   title: messages.childTitle,
   fields: [
     {
-      name: 'childGivenName',
+      name: 'childFirstNames',
       type: TEXT,
-      label: messages.childGivenName,
-      required: true,
-      initialValue: '',
-      validate: [bengaliOnlyNameFormat]
-    },
-    {
-      name: 'childMiddleNames',
-      type: TEXT,
-      label: messages.childMiddleNames,
+      label: messages.childFirstNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
@@ -240,21 +222,14 @@ export const childSection: IFormSection = {
       name: 'childFamilyName',
       type: TEXT,
       label: messages.childFamilyName,
+      required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'childGivenNameEng',
+      name: 'childFirstNamesEng',
       type: TEXT,
-      label: messages.childGivenNameEng,
-      required: true,
-      initialValue: '',
-      validate: [englishOnlyNameFormat]
-    },
-    {
-      name: 'childMiddleNamesEng',
-      type: TEXT,
-      label: messages.childMiddleNamesEng,
+      label: messages.childFirstNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
@@ -263,6 +238,7 @@ export const childSection: IFormSection = {
       name: 'childFamilyNameEng',
       type: TEXT,
       label: messages.childFamilyNameEng,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },

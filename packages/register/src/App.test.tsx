@@ -209,16 +209,16 @@ describe('when user has a valid token in local storage', () => {
     describe('when user types in something', () => {
       beforeEach(() => {
         app
-          .find('#childGivenName')
+          .find('#childFirstNames')
           .hostNodes()
           .simulate('change', {
-            target: { id: 'childGivenName', value: 'hello' }
+            target: { id: 'childFirstNames', value: 'hello' }
           })
       })
       it('stores the value to a new draft', () => {
         const [, data] = setItem.mock.calls[setItem.mock.calls.length - 1]
         const storedDrafts = JSON.parse(data)
-        expect(storedDrafts[0].data.child.childGivenName).toEqual('hello')
+        expect(storedDrafts[0].data.child.childFirstNames).toEqual('hello')
       })
     })
 
