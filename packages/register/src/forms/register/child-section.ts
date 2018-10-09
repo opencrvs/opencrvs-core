@@ -9,7 +9,8 @@ import {
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
-  englishOnlyNameFormat
+  englishOnlyNameFormat,
+  dateFormat
 } from 'src/utils/validate'
 
 export interface IChildSectionFormData {
@@ -285,7 +286,7 @@ export const childSection: IFormSection = {
       label: messages.childDateOfBirth,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [dateFormat]
     },
     {
       name: 'attendantAtBirth',
