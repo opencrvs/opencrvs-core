@@ -36,10 +36,10 @@ export const BENGALI_STATE = {
     'states.state2.district2.upazila5.union1': 'বাহাদুরশাদী',
     'states.state2.district2.upazila5.union2': 'বক্তারপুর',
     'states.state2.district2.upazila5.union3': 'জামালপুর',
-    'states.state2.district2.upazila5.union4': 'জাঙ্গালিয়া',
+    'states.state2.district2.upazila5.union4': 'জাঙ্গালিয়া',
     'states.state2.district2.upazila5.union5': 'মোক্তারপুর',
     'states.state2.district2.upazila5.union6': 'নাগরী',
-    'states.state2.district2.upazila5.union7': 'তুমুলিয়া',
+    'states.state2.district2.upazila5.union7': 'তুমুলিয়া',
     'states.state4.district1.upazila1': 'বকশীগঞ্জ',
     'states.state4.district1.upazila2': 'দেওয়ানগঞ্জ',
     'states.state4.district1.upazila3': 'ইসলামপুর',
@@ -376,11 +376,9 @@ export const BENGALI_STATE = {
     'formFields.dateOfMarriage': 'বিয়ের তারিখ',
     'register.form.tabs.childTab': 'শিশু',
     'register.form.section.childTitle': 'শিশু এর বিবরণ',
-    'formFields.childGivenName': 'নামের প্রথমাংশ',
-    'formFields.childMiddleNames': 'মধ্যম নাম',
+    'formFields.childFirstNames': 'নামের প্রথমাংশ',
     'formFields.childFamilyName': 'পারিবারিক নাম',
-    'formFields.childGivenNameEng': 'নামের প্রথমাংশ (in english)',
-    'formFields.childMiddleNamesEng': 'মধ্যম নাম (in english)',
+    'formFields.childFirstNamesEng': 'নামের প্রথমাংশ (in english)',
     'formFields.childFamilyNameEng': 'পারিবারিক নাম (in english)',
     'formFields.childSex': 'লিঙ্গ',
     'formFields.childSexMale': 'পুরুষ',
@@ -414,11 +412,9 @@ export const BENGALI_STATE = {
     'formFields.fathersDetailsExist': 'আপনার কাছে কি পিতার বিবরণ আছে?',
     'formFields.father.nationality': 'জাতীয়তা',
     'formFields.father.nationalityBangladesh': 'বাংলাদেশী',
-    'formFields.fatherGivenName': 'নামের প্রথমাংশ',
-    'formFields.fatherMiddleNames': 'মধ্যম নাম',
+    'formFields.fatherFirstNames': 'নামের প্রথমাংশ',
     'formFields.fatherFamilyName': 'পারিবারিক নাম',
-    'formFields.fatherGivenNameEng': 'নামের প্রথমাংশ (in english)',
-    'formFields.fatherMiddleNamesEng': 'মধ্যম নাম (in english)',
+    'formFields.fatherFirstNamesEng': 'নামের প্রথমাংশ (in english)',
     'formFields.fatherFamilyNameEng': 'পারিবারিক নাম (in english)',
     'formFields.fatherDateOfBirth': 'জন্ম তারিখ',
     'formFields.fatherEducationAttainment': 'পিতার আনুষ্ঠানিক শিক্ষা',
@@ -427,11 +423,9 @@ export const BENGALI_STATE = {
     'register.form.section.motherTitle': 'মা এর বিবরণ',
     'formFields.mother.nationality': 'জাতীয়তা',
     'formFields.mother.nationalityBangladesh': 'বাংলাদেশী',
-    'formFields.motherGivenName': 'নামের প্রথমাংশ',
-    'formFields.motherMiddleNames': 'মধ্যম নাম',
+    'formFields.motherFirstNames': 'নামের প্রথমাংশ',
     'formFields.motherFamilyName': 'পারিবারিক নাম',
-    'formFields.motherGivenNameEng': 'নামের প্রথমাংশ (in english)',
-    'formFields.motherMiddleNamesEng': 'মধ্যম নাম (in english)',
+    'formFields.motherFirstNamesEng': 'নামের প্রথমাংশ (in english)',
     'formFields.motherFamilyNameEng': 'পারিবারিক নাম (in english)',
     'formFields.motherDateOfBirth': 'জন্ম তারিখ',
     'formFields.motherEducationAttainment': 'মায়ের আনুষ্ঠানিক শিক্ষা',
@@ -444,17 +438,17 @@ export const BENGALI_STATE = {
     'register.form.section.documentsTitle': 'সমর্থনকারী কাগজপত্র',
     'register.form.tabs.previewTab': 'প্রিভিউ',
     'register.form.section.documents.paragraph':
-      'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
+      'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
     'register.form.section.documents.list.informantAttestation':
-      'সত্যায়িত সংবাদদাতার প্রচয় অথবা,',
+      'সত্যায়িত সংবাদদাতার প্রচয় অথবা,',
     'register.form.section.documents.list.attestedVaccination':
-      'সত্যায়িত টিকার কার্ড অনুলিপি (ই পি আই কার্ড) অথবা,',
+      'সত্যায়িত টিকার কার্ড অনুলিপি (ই পি আই কার্ড) অথবা,',
     'register.form.section.documents.list.attestedBirthRecord':
-      'সত্যায়িত হাসপাতালের ডকুমেন্টের অনুলিপি য়থবা জন্ম রেকর্ড অথবা,',
+      'সত্যায়িত হাসপাতালের ডকুমেন্টের অনুলিপি য়থবা জন্ম রেকর্ড অথবা,',
     'register.form.section.documents.list.certification':
       'রেজিস্টারড এনজিও কর্মকর্তা হইতে প্রাপ্ত জন্মতারিখের সার্টিফিকেট অথবা,',
     'register.form.section.documents.list.otherDocuments':
-      'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি',
+      'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি',
     'register.form.section.previewTitle': 'প্রিভিউ',
     'register.form.tabs.registrationTab': 'নিবন্ধন',
     'register.form.section.registrationTitle': 'নিবন্ধন',
@@ -464,7 +458,7 @@ export const BENGALI_STATE = {
     'formFields.registration.whoIsPresent.father': 'পিতা',
     'formFields.registration.whoIsPresent.other': 'অন্যান্য',
     'formFields.registration.whoseContactDetails':
-      'যোগাযোগের মধ্যম হিসেবে  তথ্যপ্রদানকারী কাকে পরিচয় করিয়ে দিতে সাচ্ছন্দ্যবোধ করেন',
+      'যোগাযোগের মধ্যম হিসেবে  তথ্যপ্রদানকারী কাকে পরিচয় করিয়ে দিতে সাচ্ছন্দ্যবোধ করেন',
     'formFields.registration.whoseContactDetails.both': 'মাতাপিতা উভয়',
     'formFields.registration.whoseContactDetails.mother': 'মা',
     'formFields.registration.whoseContactDetails.father': 'পিতা',
@@ -484,8 +478,9 @@ export const BENGALI_STATE = {
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
     'validations.phoneNumberFormat':
-      'যথাযথ মোবাইল ফোন নম্বর হতে হবে। শূন্য দিয়ে শুরু করতে হবে, যেমন: {example}',
+      'যথাযথ মোবাইল ফোন নম্বর হতে হবে। শূন্য দিয়ে শুরু করতে হবে, যেমন: {example}',
     'validations.emailAddressFormat': 'Must be a valid email address',
+    'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
     'validations.requiredSymbol': '',
     'register.form.submit': 'জমা দিন',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
@@ -496,7 +491,7 @@ export const BENGALI_STATE = {
     'register.form.next': 'পরবর্তী',
     'register.form.modal.preview': 'প্রিভিউ',
     'register.form.modal.submitDescription':
-      '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
+      '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.notification.newContentAvailable':
       'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
@@ -521,7 +516,7 @@ export const BENGALI_STATE = {
     'register.savedRegistration.offline.nextCard.text1':
       'পরবর্তী 7 দিনের মধ্যে ডিভাইসে ইন্টারনেট সংযোগ স্থাপন করার পরে আপনাকে লগইন করতে হবে। OpenCRVS স্বয়ংক্রিয়ভাবে ফর্ম জমা দেবে, তাই আপনাকে অন্য কিছু করার প্রয়োজন হবে না।',
     'register.savedRegistration.online.nextCard.text2':
-      'নিবন্ধন প্রক্রিয়া সম্পুর্ণ হলে সংবাদদাতা নিজ দায়িত্তে পৌছে দেবেন। ',
+      'নিবন্ধন প্রক্রিয়া সম্পুর্ণ হলে সংবাদদাতা নিজ দায়িত্তে পৌছে দেবেন। ',
     'register.savedRegistration.offline.nextCard.text2':
       'ঘোষণাটি সফলভাবে দাখিল করা হলে রেজিস্ট্রেশন শেষ। আপনি এবং সংবাদদাতাকে অবহিত করা হবে।',
     'register.savedRegistration.buttons.back': 'হোমপেইজে ফিরে  যান',
@@ -529,7 +524,7 @@ export const BENGALI_STATE = {
     'register.selectInformant.newBirthRegistration': ' জন্ম ঘোষণা',
     'register.selectInformant.informantTitle': 'সংবাদদাতা',
     'register.selectInformant.informantDescription':
-      'কে ঘোষণা ফর্মে বিস্তারিত ও প্রয়োজনীয় তথ্য উপাত্ত পর্যবেক্ষণ ও জমাদান করিবে।',
+      'কে ঘোষণা ফর্মে বিস্তারিত ও প্রয়োজনীয় তথ্য উপাত্ত পর্যবেক্ষণ ও জমাদান করিবে।',
     'register.selectInformant.parentInformantTitle': 'পিতামাতা',
     'register.selectInformant.parentInformantDescription':
       '<strong>প্রয়োজনীয়</strong>: শিশু এবং মায়ের বিবরণ' +
@@ -545,7 +540,7 @@ export const BENGALI_STATE = {
       'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
     'register.home.buttons.registerNewEvent':
       'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
-    'register.home.buttons.mydraft': 'আমার খসড়া',
+    'register.home.buttons.mydraft': 'আমার খসড়া',
     'register.home.buttons.pendingSubimissions': 'মুলতবি জমাগুলি',
     'register.home.buttons.completedSumissions': 'সমাপ্ত জমা',
     'register.home.logout': 'প্রস্থান',

@@ -6,6 +6,7 @@ import {
   minLength,
   isNumber,
   phoneNumberFormat,
+  dateFormat,
   emailAddressFormat,
   bengaliOnlyNameFormat,
   englishOnlyNameFormat
@@ -170,6 +171,35 @@ describe('validate', () => {
       const goodValue = 'root@opencrvs.org'
       const response = undefined
       expect(emailAddressFormat(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('dateFormat. Checks a given date is a valid date', () => {
+    it('should error when input invalid chararcters', () => {
+      const invalidDate = '1901-+2-2e'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should error when input invalid format', () => {
+      const invalidDate = '190-2-21'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should error when input invalid date', () => {
+      const invalidDate = '2017-2-29'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should pass when supplied a valid date with single digit', () => {
+      const validDate = '2011-8-12'
+      const response = undefined
+      expect(dateFormat(validDate)).toEqual(response)
+    })
+
+    it('should pass when supplied a valid date', () => {
+      const validDate = '2011-08-12'
+      const response = undefined
+      expect(dateFormat(validDate)).toEqual(response)
     })
   })
 

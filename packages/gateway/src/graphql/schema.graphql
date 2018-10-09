@@ -269,13 +269,13 @@ type Mutation {
 
 input HumanNameInput {
   use: String # traditional (Bangla) or English
-  givenName: String
+  firstNames: String
   familyName: String
 }
 
 type HumanName {
   use: String # traditional (Bangla) or English
-  givenName: String
+  firstNames: String
   familyName: String
 }
 

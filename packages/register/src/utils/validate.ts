@@ -40,6 +40,11 @@ export const messages = defineMessages({
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
   },
+  dateFormat: {
+    id: 'validations.dateFormat',
+    defaultMessage: 'Must be a valid date',
+    description: 'The error message appears when the given date is not valid'
+  },
   emailAddressFormat: {
     id: 'validations.emailAddressFormat',
     defaultMessage: 'Must be a valid email address',
@@ -92,6 +97,37 @@ export const isAValidEmailAddressFormat = (value: string): boolean => {
   return validateEmail(value)
 }
 
+export const isAValidDateFormat = (value: string): boolean => {
+  const dateFormatRegex = '^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$'
+  const dateRegex = new RegExp(dateFormatRegex)
+
+  if (!dateRegex.test(value)) {
+    return false
+  }
+
+  const pad = (n: number) => {
+    return (str: string) => {
+      while (str.length < n) {
+        str = '0' + str
+      }
+      return str
+    }
+  }
+
+  const valueISOString = value
+    .split(/-/g)
+    .map(pad(2))
+    .join('-')
+
+  const givenDate = new Date(valueISOString)
+
+  if (Number.isNaN(givenDate.getTime())) {
+    return false
+  }
+
+  return givenDate.toISOString().slice(0, 10) === valueISOString
+}
+
 export const requiredSymbol: Validation = (value: string) =>
   value ? undefined : { message: messages.requiredSymbol }
 
@@ -142,6 +178,13 @@ export const emailAddressFormat: Validation = (value: string) => {
       }
 }
 
+export const dateFormat: Validation = (value: string) => {
+  return value && isAValidDateFormat(value)
+    ? undefined
+    : {
+        message: messages.dateFormat
+      }
+}
 /*
  * TODO: The name validation functions should be refactored out.
  *
