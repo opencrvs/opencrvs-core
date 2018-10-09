@@ -46,8 +46,7 @@ const MenuContainer = styled.div`
   top: 0;
   right: 0;
   height: 90px;
-  min-width: 168px;
-  max-width: 199px;
+  width: 199px;
   background-color: ${({ theme }) => theme.colors.primary};
   z-index: 1000;
   position: absolute;
