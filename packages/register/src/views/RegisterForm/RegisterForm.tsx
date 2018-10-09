@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-import Swipeable from 'react-swipeable'
+import * as Swipeable from 'react-swipeable'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
@@ -167,8 +167,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     draftId: number,
     seclectedSection: IFormSection | null,
     goToTab: (draftId: number, tabId: string) => void
-  ) => {
-    return seclectedSection && goToTab(draftId, seclectedSection.id)
+  ): void => {
+    if (seclectedSection) {
+      goToTab(draftId, seclectedSection.id)
+    }
   }
 
   render() {
