@@ -37,16 +37,11 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3000 react-scripts-ts start",
-    "verify-build-config":
-      "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
-    "build":
-      "yarn verify-build-config && react-scripts-ts build && sw-precache --root='build/' --config sw-precache-config.js",
-    "docker:build":
-      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
-    "docker:run":
-      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test":
-      "PORT=3000 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "build": "yarn verify-build-config && react-scripts-ts build && sw-precache --root='build/' --config sw-precache-config.js",
+    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "test": "PORT=3000 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
@@ -90,7 +85,12 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ],
-    "coverageReporters": ["json", "lcov", "text", "html"],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ],
     "moduleNameMapper": {
       "^src(.*)$": "<rootDir>/src$1"
     }
