@@ -46,8 +46,9 @@ const MenuContainer = styled.div`
   top: 0;
   right: 0;
   height: 90px;
-  width: 168px;
-  background-color: rgb(76, 104, 193);
+  min-width: 168px;
+  max-width: 199px;
+  background-color: ${({ theme }) => theme.colors.primary};
   z-index: 1000;
   position: absolute;
 
@@ -70,6 +71,9 @@ const MenuContainer = styled.div`
   .rc-menu-item-selected {
     background-color: ${({ theme }) => theme.colors.primary};
   }
+  li.rc-menu-submenu.rc-menu-submenu-inline.main-menu.rc-menu-submenu-open {
+    width: 199px;
+  }
   ul li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu i {
     opacity: 0;
   }
@@ -80,19 +84,20 @@ const MenuContainer = styled.div`
     background-color: ${({ theme }) => theme.colors.primary};
   }
   .rc-menu-item.nested-menu-item {
-    background-color: rgb(53, 73, 93);
+    background-color: ${({ theme }) => theme.colors.nestedMenuItem};
   }
   .rc-menu-item,
   .rc-menu-submenu-title {
     margin: 0;
+    cursor: pointer;
     position: relative;
     display: block;
     padding: 10px 7px 7px 16px;
     white-space: nowrap;
     min-height: 50px;
     color: rgb(255, 255, 255);
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    font-size: 14px;
+    font-family: ${({ theme }) => theme.fonts.lightFont};
+    font-size: 16px;
     font-weight: bold;
     letter-spacing: 2px;
     line-height: 19px;
@@ -101,11 +106,16 @@ const MenuContainer = styled.div`
     height: 20px;
     width: 80px;
     color: rgb(255, 255, 255);
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    font-size: 14px;
+    font-family: ${({ theme }) => theme.fonts.lightFont};
+    font-size: 16px;
     font-weight: bold;
     letter-spacing: 2px;
     line-height: 19px;
+  }
+  .rc-menu-submenu-inline.main-menu
+    > div.rc-menu-submenu-title
+    > .submenu-title-wrapper {
+    font-size: 14px;
   }
   .rc-menu-submenu.rc-menu-submenu-inline.main-menu
     > div.rc-menu-submenu-title
@@ -123,7 +133,7 @@ const MenuContainer = styled.div`
   .rc-menu-inline > .rc-menu-item,
   .rc-menu-inline > .rc-menu-submenu.nested-submenu > .rc-menu-submenu-title {
     text-align: right;
-    padding: 15px 15px !important;
+    padding: 15px 22px !important;
   }
   .rc-menu-sub.rc-menu-inline {
     padding: 0;
@@ -138,7 +148,7 @@ const MenuContainer = styled.div`
     padding-right: 0;
   }
   ul.rc-menu.rc-menu-sub li {
-    border-top: 1px inset rgba(25, 24, 24, 0.12);
+    border-top: 1px inset ${({ theme }) => theme.colors.itemBorderTop};
   }
 `
 
