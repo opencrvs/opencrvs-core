@@ -484,10 +484,8 @@ export const BENGALI_STATE = {
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
     'validations.phoneNumberFormat':
-      'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
+      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     'validations.emailAddressFormat': 'Must be a valid email address',
-    'validations.mobilePhoneRegex': '07[0-9]{9,10}',
-    'validations.mobileNumberFormat': '07123456789',
     'validations.requiredSymbol': '',
     'register.form.submit': 'জমা দিন',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
