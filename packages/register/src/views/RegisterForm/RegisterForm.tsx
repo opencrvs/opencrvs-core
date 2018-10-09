@@ -9,7 +9,7 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
-import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
+import { Form, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
 import { getRegisterForm } from '../../forms/register/selectors'
@@ -19,6 +19,7 @@ import {
   ViewFooter
 } from 'src/components/interface/footer'
 import { PreviewSection } from './PreviewSection'
+import { StickyFormTabs } from './StickyFormTabs'
 
 const FormAction = styled.div`
   display: flex;
@@ -193,7 +194,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           id="informant_parent_view"
           title={intl.formatMessage(messages.newBirthRegistration)}
         >
-          <FormTabs
+          <StickyFormTabs
             sections={registerForm.sections}
             activeTabId={activeSection.id}
             onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
