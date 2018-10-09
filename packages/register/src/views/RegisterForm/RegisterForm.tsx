@@ -166,11 +166,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSwiped = (
     draftId: number,
-    seclectedSection: IFormSection | null,
+    selectedSection: IFormSection | null,
     goToTab: (draftId: number, tabId: string) => void
   ): void => {
-    if (seclectedSection) {
-      goToTab(draftId, seclectedSection.id)
+    if (selectedSection) {
+      goToTab(draftId, selectedSection.id)
     }
   }
 
