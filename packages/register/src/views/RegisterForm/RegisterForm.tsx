@@ -19,7 +19,6 @@ import {
   ViewFooter
 } from 'src/components/interface/footer'
 import { PreviewSection } from './PreviewSection'
-import { logger } from 'src/logger'
 
 const FormAction = styled.div`
   display: flex;
@@ -168,12 +167,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     draftId: number,
     seclectedSection: IFormSection | null,
     goToTab: (draftId: number, tabId: string) => void
-  ): void => {
-    if (seclectedSection) {
-      goToTab(draftId, seclectedSection.id)
-    } else {
-      logger.error('No more tab to swipe...')
-    }
+  ) => {
+    return seclectedSection && goToTab(draftId, seclectedSection.id)
   }
 
   render() {
@@ -202,18 +197,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
             onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
           />
         </ViewHeaderWithTabs>
-        <Swipeable
-          trackMouse
-          onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
-          onSwipedRight={() =>
-            this.onSwiped(
-              draft.id,
-              getPreviousSection(registerForm.sections, activeSection),
-              goToTab
-            )
-          }
-        >
-          <FormContainer>
+        <FormContainer>
+          <Swipeable
+            trackMouse
+            onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
+            onSwipedRight={() =>
+              this.onSwiped(
+                draft.id,
+                getPreviousSection(registerForm.sections, activeSection),
+                goToTab
+              )
+            }
+          >
             {activeSection.viewType === 'preview' && (
               <PreviewSection draft={draft} onSubmit={this.submitForm} />
             )}
@@ -239,8 +234,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 </FormAction>
               </Box>
             )}
-          </FormContainer>
-        </Swipeable>
+          </Swipeable>
+        </FormContainer>
         <ViewFooter>
           <FooterAction>
             <FooterPrimaryButton
