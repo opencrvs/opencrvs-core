@@ -2,7 +2,7 @@ import * as React from 'react'
 import animate from 'css-animation'
 import styled from '../styled-components'
 import Menu, { SubMenu, MenuItem } from 'rc-menu'
-import { Cross, Hamburger } from '@opencrvs/components/lib/icons'
+import { Hamburger } from '@opencrvs/components/lib/icons'
 
 const animation = {
   enter(node: any, done: any) {
@@ -74,8 +74,12 @@ const MenuContainer = styled.div`
   li.rc-menu-submenu.rc-menu-submenu-inline.main-menu.rc-menu-submenu-open {
     width: 199px;
   }
-  ul li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu i {
+  ul li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu span.icon {
     opacity: 0;
+  }
+  .rc-menu div.close {
+    font-size: 35px;
+    font-family: ${({ theme }) => theme.fonts.lightFont};
   }
   .rc-menu.rc-menu-root > li.rc-menu-submenu {
     padding: 0 !important;
@@ -154,9 +158,13 @@ const MenuContainer = styled.div`
 
 const getIcon = (style = {}, icon: any, text?: string) => {
   if (text) {
-    return <i style={style}>{text}</i>
+    return <span style={style}>{text}</span>
   }
-  return <i style={style}>{icon}</i>
+  return (
+    <span className="icon" style={style}>
+      {icon}
+    </span>
+  )
 }
 
 interface IMenuItem {
@@ -194,11 +202,12 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
   expandIcon = () => {
     return getIcon(
       {
+        color: 'white',
         right: '20px',
         marginLeft: '20px',
         position: 'absolute'
       },
-      this.state.menuOpen ? <Cross /> : <Hamburger />
+      this.state.menuOpen ? <div className="close">&times;</div> : <Hamburger />
     )
   }
 
