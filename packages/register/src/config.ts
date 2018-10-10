@@ -6,3 +6,10 @@ export const config = {
   COUNTRY: process.env.REACT_APP_LOCALE || 'BD',
   LOGIN_URL: process.env.REACT_APP_LOGIN_URL || 'http://localhost:3020'
 }
+
+export const getCountry = (): string => {
+  return config.COUNTRY
+}
+export const setCountry = (country: string) => {
+  config.COUNTRY = country
+}

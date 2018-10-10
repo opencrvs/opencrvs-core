@@ -121,10 +121,6 @@ export const isAValidDateFormat = (value: string): boolean => {
 
   const givenDate = new Date(valueISOString)
 
-  if (Number.isNaN(givenDate.getTime())) {
-    return false
-  }
-
   return givenDate.toISOString().slice(0, 10) === valueISOString
 }
 

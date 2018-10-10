@@ -11,6 +11,7 @@ import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat
 } from './validate'
+import { getCountry, setCountry } from '../config'
 
 describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {
@@ -29,10 +30,15 @@ describe('validate', () => {
       const response = true
       expect(isAValidPhoneNumberFormat(goodValue, 'GB')).toEqual(response)
     })
-    it('should pass when supplied a good value for a British number', () => {
+    it('should pass when supplied a good value for a Bangladeshi number', () => {
       const goodValue = '01720067890'
       const response = true
       expect(isAValidPhoneNumberFormat(goodValue, 'BD')).toEqual(response)
+    })
+    it('should pass when supplied a good value and country is not added to the lookup table', () => {
+      const goodValue = '01720067890'
+      const response = true
+      expect(isAValidPhoneNumberFormat(goodValue, 'TH')).toEqual(response)
     })
   })
 
@@ -70,6 +76,11 @@ describe('validate', () => {
     })
     it('should pass when supplied a good value.', () => {
       const goodValue = 'jkgjgjgkgjkj'
+      const response = undefined
+      expect(required(goodValue)).toEqual(response)
+    })
+    it('should pass when supplied a good boolean value', () => {
+      const goodValue = true
       const response = undefined
       expect(required(goodValue)).toEqual(response)
     })
@@ -139,6 +150,17 @@ describe('validate', () => {
       const goodValue = '01845678912'
       const response = undefined
       expect(phoneNumberFormat(goodValue)).toEqual(response)
+    })
+    it('should pass when supplied a good value and the country is not defined in the lookup table', () => {
+      const goodValue = '01845678912'
+      const response = undefined
+      const savedCountry = getCountry()
+      try {
+        setCountry('TH')
+        expect(phoneNumberFormat(goodValue)).toEqual(response)
+      } finally {
+        setCountry(savedCountry)
+      }
     })
   })
 
