@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { Button } from '../buttons'
+import { classNames } from 'react-select/lib/utils'
 export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
@@ -12,10 +13,14 @@ interface IProps {
   type?: NOTIFICATION_TYPE
   callback?: any
   children?: any
+  className?: string
 }
 
 const styledNotification = styled.div.attrs({})
-
+const easeIn = keyframes`
+  from { bottom: -100px; }
+  to { bottom: 0; }
+`
 const NotificationContainer = styledNotification`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   position: fixed;
@@ -30,10 +35,10 @@ const NotificationContainer = styledNotification`
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  transition: bottom .5s ease-in-out;
 
   &.show {
-    bottom: 0;
+    animation: ${easeIn} 500ms;
+    bottom:0;
   }
 
   &.success, &.error, &.warning {
@@ -64,13 +69,13 @@ const NotificationMessage = styled.div`
 
 export class Notification extends React.Component<IProps> {
   render() {
-    const { id, type, show, children, callback } = this.props
+    const { id, type, show, children, callback, className } = this.props
 
     return (
       <NotificationContainer
         id={id}
         onClick={callback}
-        className={(type ? type : '') + (show ? ' show' : '')}
+        className={(type ? type : '') + (show ? ' show' : '') + ' ' + className}
       >
         <NotificationMessage>{children}</NotificationMessage>
       </NotificationContainer>
