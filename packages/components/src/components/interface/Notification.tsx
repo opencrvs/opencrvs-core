@@ -56,6 +56,9 @@ const NotificationContainer = styledNotification`
   &.warning {
     border-color: ${({ theme }) => theme.colors.warning};
   }
+  &.clickable {
+    cursor:pointer;
+  }
 `
 
 const NotificationMessage = styled.div`
@@ -75,7 +78,13 @@ export class Notification extends React.Component<IProps> {
       <NotificationContainer
         id={id}
         onClick={callback}
-        className={(type ? type : '') + (show ? ' show' : '') + ' ' + className}
+        className={
+          (type ? type : '') +
+          (show ? ' show' : '') +
+          ' ' +
+          className +
+          (callback ? ' clickable' : '')
+        }
       >
         <NotificationMessage>{children}</NotificationMessage>
       </NotificationContainer>
