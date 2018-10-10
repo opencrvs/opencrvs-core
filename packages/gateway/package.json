@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\"",
+    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\" \"yarn gen:types:watch\"",
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
-    "precommit": "lint-staged"
+    "open:cov": "yarn test && opener coverage/index.html",
+    "precommit": "lint-staged",
+    "gen:full-schema": "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\"",
+    "gen:types": "yarn -s gen:full-schema > src/graphql/schema.graphql && graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts && rm src/graphql/schema.graphql && echo Done",
+    "gen:types:watch": "nodemon -e graphql -i src/graphql/schema.graphql -x 'yarn gen:types'"
   },
   "dependencies": {
     "@types/glob": "^5.0.35",
@@ -59,12 +63,14 @@
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
+    "graphql-schema-typescript": "^1.2.7",
     "jest": "^23.4.2",
+    "jest-fetch-mock": "^1.6.6",
     "lab": "^15.1.2",
     "lab-transform-typescript": "^3.0.1",
     "nodemon": "^1.11.0",
     "nyc": "^11.3.0",
-    "opener": "^1.4.3",
+    "opener": "^1.5.1",
     "prettier": "1.12.1",
     "pretty-quick": "^1.4.1",
     "ts-jest": "^22.4.6",
@@ -99,6 +105,12 @@
     ],
     "modulePaths": [
       "<rootDir>"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
     ]
   },
   "keywords": [

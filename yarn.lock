@@ -4440,6 +4440,7 @@ detect-node@^2.0.3:
 detect-passive-events@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/detect-passive-events/-/detect-passive-events-1.0.4.tgz#6ed477e6e5bceb79079735dcd357789d37f9a91a"
+  integrity sha1-btR35uW863kHlzXc01d4nTf5qRo=
 
 detect-port-alt@1.1.6:
   version "1.1.6"
@@ -6338,6 +6339,13 @@ graphql-import@^0.5.2:
   dependencies:
     lodash "^4.17.4"
 
+graphql-schema-typescript@^1.2.7:
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/graphql-schema-typescript/-/graphql-schema-typescript-1.2.7.tgz#dccd352bd725b393535c9359e567072c34b34c87"
+  integrity sha512-ECp3WcNqqX452m3HZfjGt4pAYfnuKorXLtw40En5VrwcD99C4lPg0eQMd4GYsyboljJrcVySM+pGz5aXcr3Gvw==
+  dependencies:
+    yargs "^11.0.0"
+
 graphql-tag@^2.4.2, graphql-tag@^2.9.2:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.9.2.tgz#2f60a5a981375f430bf1e6e95992427dc18af686"
@@ -7966,6 +7974,14 @@ jest-fetch-mock@^1.6.5:
   integrity sha512-qPz5Zf8+W16pu6cvdwXkb2SwRfxGoQbbGB6HcIBFND0gnWKMfQilZew3PSODnOWQZF/pzBPi7ZIT6Yz5D0va1Q==
   dependencies:
     "@types/jest" "^23.0.0"
+    isomorphic-fetch "^2.2.1"
+    promise-polyfill "^7.1.1"
+
+jest-fetch-mock@^1.6.6:
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/jest-fetch-mock/-/jest-fetch-mock-1.6.6.tgz#f07d80912689c21fb01199f313abd121beff5558"
+  integrity sha512-qMorYR8iE0OyOHmroCJVVLuJlRHMcRdrrvYFo1PMY9ErWyCs9ZrL3RGHjkxVgGJSZwKzUlsWgqVFhOK3TMA3eg==
+  dependencies:
     isomorphic-fetch "^2.2.1"
     promise-polyfill "^7.1.1"
 
@@ -10402,7 +10418,7 @@ ono@^4.0.3, ono@^4.0.5:
   dependencies:
     format-util "^1.0.3"
 
-opener@^1.4.3, opener@^1.5.0:
+opener@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.0.tgz#24222fb4ad423ba21f5bf38855cebe44220f6531"
   integrity sha512-MD4s/o61y2slS27zm2s4229V2gAUHX0/e3/XOmY/jsXwhysjjCIHN8lx7gqZCrZk19ym+HjCUWHeMKD7YJtKCQ==
@@ -12054,6 +12070,7 @@ react-styleguidist@^7.0.13:
 react-swipeable@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/react-swipeable/-/react-swipeable-4.3.0.tgz#818c0818ac565f5b169348f442153f343abff8bc"
+  integrity sha512-L21VMbcDvG+AOVF4ZIbQ8sICGIgiKB/plGKWBMw6dkxt5neS7x74ZlTbJ39U8slz798MZBv/uIoE9Vzgp3PODQ==
   dependencies:
     detect-passive-events "^1.0.4"
     prop-types "^15.5.8"
