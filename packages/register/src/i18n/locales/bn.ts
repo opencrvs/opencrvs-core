@@ -376,11 +376,9 @@ export const BENGALI_STATE = {
     'formFields.dateOfMarriage': 'বিয়ের তারিখ',
     'register.form.tabs.childTab': 'শিশু',
     'register.form.section.childTitle': 'শিশু এর বিবরণ',
-    'formFields.childGivenName': 'নামের প্রথমাংশ',
-    'formFields.childMiddleNames': 'মধ্যম নাম',
+    'formFields.childFirstNames': 'নামের প্রথমাংশ',
     'formFields.childFamilyName': 'পারিবারিক নাম',
-    'formFields.childGivenNameEng': 'নামের প্রথমাংশ (in english)',
-    'formFields.childMiddleNamesEng': 'মধ্যম নাম (in english)',
+    'formFields.childFirstNamesEng': 'নামের প্রথমাংশ (in english)',
     'formFields.childFamilyNameEng': 'পারিবারিক নাম (in english)',
     'formFields.childSex': 'লিঙ্গ',
     'formFields.childSexMale': 'পুরুষ',
@@ -414,11 +412,9 @@ export const BENGALI_STATE = {
     'formFields.fathersDetailsExist': 'আপনার কাছে কি পিতার বিবরণ আছে?',
     'formFields.father.nationality': 'জাতীয়তা',
     'formFields.father.nationalityBangladesh': 'বাংলাদেশী',
-    'formFields.fatherGivenName': 'নামের প্রথমাংশ',
-    'formFields.fatherMiddleNames': 'মধ্যম নাম',
+    'formFields.fatherFirstNames': 'নামের প্রথমাংশ',
     'formFields.fatherFamilyName': 'পারিবারিক নাম',
-    'formFields.fatherGivenNameEng': 'নামের প্রথমাংশ (in english)',
-    'formFields.fatherMiddleNamesEng': 'মধ্যম নাম (in english)',
+    'formFields.fatherFirstNamesEng': 'নামের প্রথমাংশ (in english)',
     'formFields.fatherFamilyNameEng': 'পারিবারিক নাম (in english)',
     'formFields.fatherDateOfBirth': 'জন্ম তারিখ',
     'formFields.fatherEducationAttainment': 'পিতার আনুষ্ঠানিক শিক্ষা',
@@ -427,11 +423,9 @@ export const BENGALI_STATE = {
     'register.form.section.motherTitle': 'মা এর বিবরণ',
     'formFields.mother.nationality': 'জাতীয়তা',
     'formFields.mother.nationalityBangladesh': 'বাংলাদেশী',
-    'formFields.motherGivenName': 'নামের প্রথমাংশ',
-    'formFields.motherMiddleNames': 'মধ্যম নাম',
+    'formFields.motherFirstNames': 'নামের প্রথমাংশ',
     'formFields.motherFamilyName': 'পারিবারিক নাম',
-    'formFields.motherGivenNameEng': 'নামের প্রথমাংশ (in english)',
-    'formFields.motherMiddleNamesEng': 'মধ্যম নাম (in english)',
+    'formFields.motherFirstNamesEng': 'নামের প্রথমাংশ (in english)',
     'formFields.motherFamilyNameEng': 'পারিবারিক নাম (in english)',
     'formFields.motherDateOfBirth': 'জন্ম তারিখ',
     'formFields.motherEducationAttainment': 'মায়ের আনুষ্ঠানিক শিক্ষা',
@@ -443,6 +437,18 @@ export const BENGALI_STATE = {
     'register.form.tabs.documentsTab': 'সমর্থনকারী কাগজপত্র',
     'register.form.section.documentsTitle': 'সমর্থনকারী কাগজপত্র',
     'register.form.tabs.previewTab': 'প্রিভিউ',
+    'register.form.section.documents.paragraph':
+      'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
+    'register.form.section.documents.list.informantAttestation':
+      'সত্যায়িত সংবাদদাতার প্রচয় অথবা,',
+    'register.form.section.documents.list.attestedVaccination':
+      'সত্যায়িত টিকার কার্ড অনুলিপি (ই পি আই কার্ড) অথবা,',
+    'register.form.section.documents.list.attestedBirthRecord':
+      'সত্যায়িত হাসপাতালের ডকুমেন্টের অনুলিপি য়থবা জন্ম রেকর্ড অথবা,',
+    'register.form.section.documents.list.certification':
+      'রেজিস্টারড এনজিও কর্মকর্তা হইতে প্রাপ্ত জন্মতারিখের সার্টিফিকেট অথবা,',
+    'register.form.section.documents.list.otherDocuments':
+      'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি',
     'register.form.section.previewTitle': 'প্রিভিউ',
     'register.form.tabs.registrationTab': 'নিবন্ধন',
     'register.form.section.registrationTitle': 'নিবন্ধন',
@@ -476,6 +482,7 @@ export const BENGALI_STATE = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.mobilePhoneRegex': '07[0-9]{9,10}',
     'validations.mobileNumberFormat': '07123456789',
+    'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
     'validations.requiredSymbol': '',
     'register.form.submit': 'জমা দিন',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
@@ -488,6 +495,8 @@ export const BENGALI_STATE = {
     'register.form.modal.submitDescription':
       '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
+    'register.notification.newContentAvailable':
+      'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
     'register.savedRegistration.online.desc':
       'তথ্য বিবরনী বৈধতা জন্য পর্যালোচিত হচ্ছে',
@@ -531,6 +540,12 @@ export const BENGALI_STATE = {
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle':
       'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
+    'register.home.buttons.registerNewEvent':
+      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
+    'register.home.buttons.mydraft': 'আমার খসড়া',
+    'register.home.buttons.pendingSubimissions': 'মুলতবি জমাগুলি',
+    'register.home.buttons.completedSumissions': 'সমাপ্ত জমা',
+    'register.home.logout': 'প্রস্থান',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
     'register.selectVitalEvent.birthActionTitle': 'জন্ম',

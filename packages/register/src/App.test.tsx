@@ -1,6 +1,7 @@
 import { createTestApp } from './tests/util'
 import { config } from '../src/config'
 import {
+  HOME,
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM
@@ -9,6 +10,8 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { storeDraft, createDraft, IDraft } from './drafts'
+import * as actions from 'src/notification/actions'
+import * as i18nActions from 'src/i18n/actions'
 
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
@@ -70,6 +73,72 @@ describe('when user has a valid token in local storage', () => {
     expect(assign.mock.calls).toHaveLength(0)
   })
 
+  describe('when user is in home view', () => {
+    beforeEach(() => {
+      history.replace(HOME)
+      app.update()
+    })
+    it('lists the actions', () => {
+      expect(app.find('#home_action_list').hostNodes()).toHaveLength(1)
+    })
+    describe('when user clicks the "Declare a new vital event" button', () => {
+      beforeEach(() => {
+        app
+          .find('#new_event_declaration')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('changes to new vital event screen', () => {
+        expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
+      })
+    })
+  })
+
+  describe('when appliation has new update', () => {
+    beforeEach(() => {
+      const action = actions.showNewContentAvailableNotification()
+      store.dispatch(action)
+      app.update()
+    })
+
+    it('displays update available notification', () => {
+      app.debug()
+      expect(
+        app.find('#newContentAvailableNotification').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('internationalizes update available notification texts', async () => {
+      const action = i18nActions.changeLanguage({ language: 'bn' })
+      store.dispatch(action)
+
+      const label = app
+        .find('#newContentAvailableNotification')
+        .hostNodes()
+        .text()
+      expect(label).toBe(
+        'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।'
+      )
+    })
+
+    describe('when user clicks the update notification"', () => {
+      beforeEach(() => {
+        app
+          .find('#newContentAvailableNotification')
+          .hostNodes()
+          .simulate('click')
+        app.update()
+      })
+      it('hides the update notification', () => {
+        expect(store.getState().notification.newContentAvailable).toEqual(false)
+      })
+
+      it('reloads the app', () => {
+        expect(window.location.reload).toHaveBeenCalled()
+      })
+    })
+  })
+
   describe('when user is in vital event selection view', () => {
     beforeEach(() => {
       history.replace(SELECT_VITAL_EVENT)
@@ -120,6 +189,99 @@ describe('when user has a valid token in local storage', () => {
       app.update()
     })
 
+    describe('when user types in something', () => {
+      beforeEach(() => {
+        app
+          .find('#childFirstNames')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childFirstNames', value: 'hello' }
+          })
+      })
+      it('stores the value to a new draft', () => {
+        const [, data] = setItem.mock.calls[setItem.mock.calls.length - 1]
+        const storedDrafts = JSON.parse(data)
+        expect(storedDrafts[0].data.child.childFirstNames).toEqual('hello')
+      })
+    })
+
+    describe('when user swipes left from the "child" section', () => {
+      beforeEach(async () => {
+        app
+          .find('#swipeable_block')
+          .hostNodes()
+          .simulate('touchStart', {
+            touches: [
+              {
+                clientX: 150,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchMove', {
+            changedTouches: [
+              {
+                clientX: 100,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchEnd', {
+            changedTouches: [
+              {
+                clientX: 50,
+                clientY: 20
+              }
+            ]
+          })
+        await flushPromises()
+        app.update()
+      })
+      it('changes to the mother details section', () => {
+        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
+          1
+        )
+      })
+    })
+
+    describe('when user swipes right from the "child" section', () => {
+      beforeEach(async () => {
+        app
+          .find('#swipeable_block')
+          .hostNodes()
+          .simulate('touchStart', {
+            touches: [
+              {
+                clientX: 50,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchMove', {
+            changedTouches: [
+              {
+                clientX: 100,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchEnd', {
+            changedTouches: [
+              {
+                clientX: 150,
+                clientY: 20
+              }
+            ]
+          })
+        await flushPromises()
+        app.update()
+      })
+      it('user still stays in the child details section', () => {
+        expect(app.find('#form_section_title_child').hostNodes()).toHaveLength(
+          1
+        )
+      })
+    })
     describe('when user clicks the "mother" tab', () => {
       beforeEach(async () => {
         app
@@ -135,21 +297,43 @@ describe('when user has a valid token in local storage', () => {
           1
         )
       })
-    })
-
-    describe('when user types in something', () => {
-      beforeEach(() => {
-        app
-          .find('#childGivenName')
-          .hostNodes()
-          .simulate('change', {
-            target: { id: 'childGivenName', value: 'hello' }
-          })
-      })
-      it('stores the value to a new draft', () => {
-        const [, data] = setItem.mock.calls[setItem.mock.calls.length - 1]
-        const storedDrafts = JSON.parse(data)
-        expect(storedDrafts[0].data.child.childGivenName).toEqual('hello')
+      describe('when user swipes right from the "mother" section', () => {
+        beforeEach(async () => {
+          app
+            .find('#swipeable_block')
+            .hostNodes()
+            .simulate('touchStart', {
+              touches: [
+                {
+                  clientX: 50,
+                  clientY: 20
+                }
+              ]
+            })
+            .simulate('touchMove', {
+              changedTouches: [
+                {
+                  clientX: 100,
+                  clientY: 20
+                }
+              ]
+            })
+            .simulate('touchEnd', {
+              changedTouches: [
+                {
+                  clientX: 150,
+                  clientY: 20
+                }
+              ]
+            })
+          await flushPromises()
+          app.update()
+        })
+        it('changes to the child details section', () => {
+          expect(
+            app.find('#form_section_title_child').hostNodes()
+          ).toHaveLength(1)
+        })
       })
     })
 

@@ -4,13 +4,13 @@ scalar Date
 
 input HumanNameInput {
   use: String # traditional (Bangla) or English
-  givenName: String
+  firstNames: String
   familyName: String
 }
 
 type HumanName { # -> HumanName
   use: String # traditional (Bangla) or English
-  givenName: String # -> .given
+  firstNames: String # -> .given
   familyName: String # -> .family
 }
 

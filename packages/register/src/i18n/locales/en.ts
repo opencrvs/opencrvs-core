@@ -377,11 +377,9 @@ export const ENGLISH_STATE = {
     'formFields.dateOfMarriage': 'Date of marriage',
     'register.form.tabs.childTab': 'Child',
     'register.form.section.childTitle': "Child's details",
-    'formFields.childGivenName': 'Given name',
-    'formFields.childMiddleNames': 'Middle name(s)',
+    'formFields.childFirstNames': 'First name(s)',
     'formFields.childFamilyName': 'Family name',
-    'formFields.childGivenNameEng': 'Given name (in english)',
-    'formFields.childMiddleNamesEng': 'Middle name(s) (in english)',
+    'formFields.childFirstNamesEng': 'First name(s) (in english)',
     'formFields.childFamilyNameEng': 'Family name (in english)',
     'formFields.childSex': 'Sex',
     'formFields.childSexMale': 'Male',
@@ -415,11 +413,9 @@ export const ENGLISH_STATE = {
     'formFields.fathersDetailsExist': "Do you have the father's details?",
     'formFields.father.nationality': 'Nationality',
     'formFields.father.nationalityBangladesh': 'Bangladesh',
-    'formFields.fatherGivenName': 'Given name',
-    'formFields.fatherMiddleNames': 'Middle name(s)',
+    'formFields.fatherFirstNames': 'First name(s)',
     'formFields.fatherFamilyName': 'Family name',
-    'formFields.fatherGivenNameEng': 'Given name (in english)',
-    'formFields.fatherMiddleNamesEng': 'Middle name(s) (in english)',
+    'formFields.fatherFirstNamesEng': 'First name(s) (in english)',
     'formFields.fatherFamilyNameEng': 'Family name (in english)',
     'formFields.fatherDateOfBirth': 'Date of birth',
     'formFields.fatherEducationAttainment':
@@ -429,11 +425,9 @@ export const ENGLISH_STATE = {
     'register.form.section.motherTitle': "Mother's details",
     'formFields.mother.nationality': 'Nationality',
     'formFields.mother.nationalityBangladesh': 'Bangladesh',
-    'formFields.motherGivenName': 'Given name',
-    'formFields.motherMiddleNames': 'Middle name(s)',
+    'formFields.motherFirstNames': 'First name(s)',
     'formFields.motherFamilyName': 'Family name',
-    'formFields.motherGivenNameEng': 'Given name (in english)',
-    'formFields.motherMiddleNamesEng': 'Middle name(s) (in english)',
+    'formFields.motherFirstNamesEng': 'First name(s) (in english)',
     'formFields.motherFamilyNameEng': 'Family name (in english)',
     'formFields.motherDateOfBirth': 'Date of birth',
     'formFields.motherEducationAttainment':
@@ -441,9 +435,21 @@ export const ENGLISH_STATE = {
     'formFields.optionalLabel': 'Optional',
 
     'register.form.tabs.documentsTab': 'Documents',
-    'register.form.section.documentsTitle': 'Documents',
+    'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
     'register.form.section.previewTitle': 'Preview',
+    'register.form.section.documents.paragraph':
+      'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
+    'register.form.section.documents.list.informantAttestation':
+      'Attestation of the informant, or',
+    'register.form.section.documents.list.attestedVaccination':
+      'Attested copy of the vaccination (EPI) card, or',
+    'register.form.section.documents.list.attestedBirthRecord':
+      'Attested copy of hospital document or birth record, or',
+    'register.form.section.documents.list.certification':
+      'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
+    'register.form.section.documents.list.otherDocuments':
+      'Attested copy(s) of the document as prescribed by the Registrar',
     'register.form.tabs.registrationTab': 'Registration',
     'register.form.section.registrationTitle': 'Registration',
     'formFields.registration.whoIsPresent':
@@ -483,6 +489,7 @@ export const ENGLISH_STATE = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.mobilePhoneRegex': '07[0-9]{9,10}',
     'validations.mobileNumberFormat': '07123456789',
+    'validations.dateFormat': 'Must be a valid date',
     'validations.requiredSymbol': '',
     'register.form.submit': 'Submit',
     'register.form.informationMissing': 'Information missing',
@@ -495,6 +502,8 @@ export const ENGLISH_STATE = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
+    'register.notification.newContentAvailable':
+      "We've made some updates, click here to refresh.",
     'register.savedRegistration.online.title': 'Declaration submitted',
     'register.savedRegistration.online.desc':
       'The declaration is now on its way for validation.',
@@ -505,9 +514,9 @@ export const ENGLISH_STATE = {
     'register.savedRegistration.online.noticeCard.title': 'All done!',
     'register.savedRegistration.offline.noticeCard.title': 'Almost there',
     'register.savedRegistration.online.noticeCard.text':
-      'The birth declaration of First Middle Last Name has been successfully submitted to the registration office.',
+      'The birth declaration of First Last Name has been successfully submitted to the registration office.',
     'register.savedRegistration.offline.noticeCard.text':
-      'The birth declaration of First Middle Last Name is pending due to no internet connection. ',
+      'The birth declaration of First Last Name is pending due to no internet connection. ',
     'register.savedRegistration.trackingCard.title': 'Tracking ID number:',
     'register.savedRegistration.trackingCard.text':
       'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',
@@ -539,6 +548,11 @@ export const ENGLISH_STATE = {
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
     'register.selectVitalEvent.registerNewEventTitle':
       'Declare a new vital event',
+    'register.home.buttons.mydraft': 'My draft',
+    'register.home.buttons.registerNewEvent': 'Declare a new vital event',
+    'register.home.buttons.pendingSubimissions': 'Pending submissions',
+    'register.home.buttons.completedSumissions': 'Completed submissions',
+    'register.home.logout': 'Log out',
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
     'register.selectVitalEvent.birthActionTitle': 'Birth',

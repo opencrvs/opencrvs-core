@@ -24,9 +24,9 @@ In this early stage two demonstrative graphQL queries exist that can be tried ou
 ```graphql
 mutation create {
   createBirthRegistration(details: {
-    mother: {gender: "female", name: [{givenName: "Jane", familyName: "Doe"}]},
-    father: {gender: "male",name: [{givenName: "Jack", familyName: "Doe"}]},
-    child: {gender: "male",name: [{givenName: "Baby", familyName: "Doe"}]},
+    mother: {gender: "female", name: [{firstNames: "Jane", familyName: "Doe"}]},
+    father: {gender: "male",name: [{firstNames: "Jack", familyName: "Doe"}]},
+    child: {gender: "male",name: [{firstNames: "Baby", familyName: "Doe"}]},
     createdAt: "2018-05-23T14:44:58+02:00"
   })
 }
@@ -37,21 +37,21 @@ query list {
     mother {
       gender
       name {
-        givenName
+        firstNames
         familyName
       }
     }
     father {
       gender
       name {
-        givenName
+        firstNames
         familyName
       }
     }
     child {
       gender
       name {
-        givenName
+        firstNames
         familyName
       }
     }

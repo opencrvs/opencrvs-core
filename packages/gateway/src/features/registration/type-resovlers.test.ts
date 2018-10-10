@@ -70,13 +70,22 @@ describe('Registration type resolvers', () => {
     expect(patient).toEqual({ resourceType: 'Patient' })
   })
 
-  it('returns given part of name', () => {
+  it('returns first names part with one name', () => {
     // @ts-ignore
-    const given = typeResolvers.HumanName.givenName({
+    const given = typeResolvers.HumanName.firstNames({
       use: 'test',
       given: ['John']
     })
     expect(given).toBe('John')
+  })
+
+  it('returns first names part with multiple naems', () => {
+    // @ts-ignore
+    const given = typeResolvers.HumanName.firstNames({
+      use: 'test',
+      given: ['John', 'Dean']
+    })
+    expect(given).toBe('John Dean')
   })
 
   it('returns family part of name', () => {

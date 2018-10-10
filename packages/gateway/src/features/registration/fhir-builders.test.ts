@@ -4,7 +4,7 @@ test('should build a minimal FHIR registration document without error', async ()
   const fhir = await buildFHIRBundle({
     mother: {
       gender: 'female',
-      name: [{ givenName: 'Jane', familyName: 'Doe', use: 'english' }]
+      name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'english' }]
     },
     father: { gender: 'male', name: [] },
     child: { gender: 'male', name: [] },

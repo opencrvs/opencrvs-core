@@ -4,20 +4,20 @@ import { PreviewSection } from './PreviewSection'
 import { ReactWrapper } from 'enzyme'
 import { createDraft } from 'src/drafts'
 import * as actions from 'src/i18n/actions'
-import { Store } from 'redux'
+import { createStore } from '../../store'
 
 describe('when user is in the preview page', () => {
-  let store: Store
+  const { store } = createStore()
   let previewSectionComponent: ReactWrapper<{}, {}>
   const draft = createDraft()
   draft.data = { mother: { maritalStatus: 'MARRIED' } }
 
   beforeEach(async () => {
     const testComponent = createTestComponent(
-      <PreviewSection draft={draft} onSubmit={() => ({})} />
+      <PreviewSection draft={draft} onSubmit={() => ({})} />,
+      store
     )
     previewSectionComponent = testComponent.component
-    store = testComponent.store
   })
   it('renders the select labels', () => {
     const label = previewSectionComponent

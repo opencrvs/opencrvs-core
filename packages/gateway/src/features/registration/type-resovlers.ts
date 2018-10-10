@@ -10,7 +10,7 @@ import { GQLResolver } from 'src/graphql/schema'
 
 export const typeResolvers: GQLResolver = {
   HumanName: {
-    givenName(name) {
+    firstNames(name) {
       return name.given.join(' ')
     },
     familyName(name) {

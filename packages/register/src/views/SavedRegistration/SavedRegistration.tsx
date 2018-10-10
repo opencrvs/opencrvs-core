@@ -54,14 +54,14 @@ const messages = defineMessages({
   onlineNoticeCardText: {
     id: 'register.savedRegistration.online.noticeCard.text',
     defaultMessage:
-      'The birth declaration of First Middle Last Name has been successfully submitted to the registration office.',
+      'The birth declaration of First Last Name has been successfully submitted to the registration office.',
     description:
       'The text of the notice card that appears on the saved registration page when the client is online'
   },
   offlineNoticeCardText: {
     id: 'register.savedRegistration.offline.noticeCard.text',
     defaultMessage:
-      'The birth declaration of First Middle Last Name is pending due to no internet connection. ',
+      'The birth declaration of First Last Name is pending due to no internet connection. ',
     description:
       'The text of the notice card that appears on the saved registration page when the client is offline'
   },
@@ -209,7 +209,7 @@ class SavedRegistrationView extends React.Component<
           <Box>
             <ImgHeaderContainer>
               <Img src={online ? CompleteTick : NoConnectivity} />
-              <BoxHeader>
+              <BoxHeader id="submission_title">
                 {intl.formatMessage(
                   online
                     ? messages.onlineNoticeCardTitle
@@ -217,7 +217,7 @@ class SavedRegistrationView extends React.Component<
                 )}
               </BoxHeader>
             </ImgHeaderContainer>
-            <StyledP>
+            <StyledP id="submission_text">
               {intl.formatMessage(
                 online
                   ? messages.onlineNoticeCardText
@@ -234,14 +234,14 @@ class SavedRegistrationView extends React.Component<
           </TrackingBox>
           <NextBox>
             <BoxHeader>{intl.formatMessage(messages.nextCardTitle)}</BoxHeader>
-            <StyledP>
+            <StyledP id="whats_next_title">
               {intl.formatMessage(
                 online
                   ? messages.onlineNextCardText1
                   : messages.offlineNextCardText1
               )}
             </StyledP>
-            <StyledP>
+            <StyledP id="whats_next_text">
               {intl.formatMessage(
                 online
                   ? messages.onlineNextCardText2

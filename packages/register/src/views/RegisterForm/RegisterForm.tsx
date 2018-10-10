@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
+import * as Swipeable from 'react-swipeable'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
@@ -8,7 +9,7 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
-import { Form, FormTabs, ViewHeaderWithTabs } from '../../components/form'
+import { Form, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
 import { getRegisterForm } from '../../forms/register/selectors'
@@ -17,8 +18,8 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from 'src/components/interface/footer'
-
 import { PreviewSection } from './PreviewSection'
+import { StickyFormTabs } from './StickyFormTabs'
 
 const FormAction = styled.div`
   display: flex;
@@ -96,6 +97,21 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
+function getPreviousSection(
+  sections: IFormSection[],
+  fromSection: IFormSection
+) {
+  const currentIndex = sections.findIndex(
+    (section: IFormSection) => section.id === fromSection.id
+  )
+
+  if (currentIndex === 0) {
+    return null
+  }
+
+  return sections[currentIndex - 1]
+}
+
 type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
@@ -115,13 +131,15 @@ type FullProps = Props &
 
 type State = {
   showSubmitModal: boolean
+  selectedTabId: string
 }
 
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
-      showSubmitModal: false
+      showSubmitModal: false,
+      selectedTabId: ''
     }
   }
 
@@ -146,6 +164,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
+  onSwiped = (
+    draftId: number,
+    selectedSection: IFormSection | null,
+    goToTab: (draftId: number, tabId: string) => void
+  ): void => {
+    if (selectedSection) {
+      goToTab(draftId, selectedSection.id)
+    }
+  }
+
   render() {
     const {
       goToTab,
@@ -166,38 +194,51 @@ class RegisterFormView extends React.Component<FullProps, State> {
           id="informant_parent_view"
           title={intl.formatMessage(messages.newBirthRegistration)}
         >
-          <FormTabs
+          <StickyFormTabs
             sections={registerForm.sections}
             activeTabId={activeSection.id}
             onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
           />
         </ViewHeaderWithTabs>
         <FormContainer>
-          {activeSection.viewType === 'preview' && (
-            <PreviewSection draft={draft} onSubmit={this.submitForm} />
-          )}
-          {activeSection.viewType === 'form' && (
-            <Box>
-              <Form
-                id={activeSection.id}
-                onChange={this.modifyDraft}
-                setAllFieldsDirty={setAllFieldsDirty}
-                title={intl.formatMessage(activeSection.title)}
-                fields={activeSection.fields}
-              />
-              <FormAction>
-                {nextSection && (
-                  <FormPrimaryButton
-                    onClick={() => goToTab(draft.id, nextSection.id)}
-                    id="next_section"
-                    icon={() => <ArrowForward />}
-                  >
-                    {intl.formatMessage(messages.next)}
-                  </FormPrimaryButton>
-                )}
-              </FormAction>
-            </Box>
-          )}
+          <Swipeable
+            id="swipeable_block"
+            trackMouse
+            onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
+            onSwipedRight={() =>
+              this.onSwiped(
+                draft.id,
+                getPreviousSection(registerForm.sections, activeSection),
+                goToTab
+              )
+            }
+          >
+            {activeSection.viewType === 'preview' && (
+              <PreviewSection draft={draft} onSubmit={this.submitForm} />
+            )}
+            {activeSection.viewType === 'form' && (
+              <Box>
+                <Form
+                  id={activeSection.id}
+                  onChange={this.modifyDraft}
+                  setAllFieldsDirty={setAllFieldsDirty}
+                  title={intl.formatMessage(activeSection.title)}
+                  fields={activeSection.fields}
+                />
+                <FormAction>
+                  {nextSection && (
+                    <FormPrimaryButton
+                      onClick={() => goToTab(draft.id, nextSection.id)}
+                      id="next_section"
+                      icon={() => <ArrowForward />}
+                    >
+                      {intl.formatMessage(messages.next)}
+                    </FormPrimaryButton>
+                  )}
+                </FormAction>
+              </Box>
+            )}
+          </Swipeable>
         </FormContainer>
         <ViewFooter>
           <FooterAction>
@@ -212,7 +253,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         <Modal
           title="Are you ready to submit?"
           actions={[
-            <PrimaryButton key="submit" onClick={() => history.push('/saved')}>
+            <PrimaryButton
+              key="submit"
+              id="submit_confirm"
+              onClick={() => history.push('/saved')}
+            >
               {intl.formatMessage(messages.submitButton)}
             </PrimaryButton>,
             <PreviewButton
@@ -295,4 +340,4 @@ function mapStateToProps(
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
   goToTab: goToTabAction
-})(injectIntl<Props & InjectedIntlProps>(RegisterFormView))
+})(injectIntl<FullProps>(RegisterFormView))

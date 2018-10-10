@@ -6,6 +6,7 @@ import {
   minLength,
   isNumber,
   phoneNumberFormat,
+  dateFormat,
   emailAddressFormat,
   bengaliOnlyNameFormat,
   englishOnlyNameFormat
@@ -166,9 +167,50 @@ describe('validate', () => {
     })
   })
 
+  describe('dateFormat. Checks a given date is a valid date', () => {
+    it('should error when input invalid chararcters', () => {
+      const invalidDate = '1901-+2-2e'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should error when input invalid format', () => {
+      const invalidDate = '190-2-21'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should error when input invalid date', () => {
+      const invalidDate = '2017-2-29'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should pass when supplied a valid date with single digit', () => {
+      const validDate = '2011-8-12'
+      const response = undefined
+      expect(dateFormat(validDate)).toEqual(response)
+    })
+
+    it('should pass when supplied a valid date', () => {
+      const validDate = '2011-08-12'
+      const response = undefined
+      expect(dateFormat(validDate)).toEqual(response)
+    })
+  })
+
   describe('bengaliOnlyNameFormat. Checks a value is a valid Bengali name', () => {
     it('should error when a Bengali punctuation is given', () => {
       const badValue = 'মাসুম।'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
+    it('should error when a Bengali number is given', () => {
+      const badValue = 'মাসুম১'
+      expect(bengaliOnlyNameFormat(badValue)).toEqual({
+        message: messages.bengaliOnlyNameFormat
+      })
+    })
+    it('should error when an English number is given', () => {
+      const badValue = 'মাসুম1'
       expect(bengaliOnlyNameFormat(badValue)).toEqual({
         message: messages.bengaliOnlyNameFormat
       })
@@ -183,8 +225,12 @@ describe('validate', () => {
       const goodValue = 'মাসুম'
       expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
     })
-    it.skip('should pass when given a good name in Bengali with multiple words', () => {
+    it('should pass when given a good name in Bengali with multiple words', () => {
       const goodValue = 'আব্দুল জলিল'
+      expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it('should pass when a hyphenated Bengali name is given', () => {
+      const goodValue = 'আব্দুল-জলিল'
       expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
     })
   })
@@ -192,6 +238,18 @@ describe('validate', () => {
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
     it('should error when an English punctuation is given', () => {
       const badValue = 'John.'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should error when an English number is given', () => {
+      const badValue = 'John1'
+      expect(englishOnlyNameFormat(badValue)).toEqual({
+        message: messages.englishOnlyNameFormat
+      })
+    })
+    it('should error when a Bengali number is given', () => {
+      const badValue = 'John১'
       expect(englishOnlyNameFormat(badValue)).toEqual({
         message: messages.englishOnlyNameFormat
       })
@@ -206,8 +264,12 @@ describe('validate', () => {
       const goodValue = 'John'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
     })
-    it.skip('should pass when given a good name in English with multiple words', () => {
+    it('should pass when given a good name in English with multiple words', () => {
       const goodValue = 'John Doe'
+      expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    it('should pass when a hyphenated English name is given', () => {
+      const goodValue = 'Anne-Marie'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
     })
   })

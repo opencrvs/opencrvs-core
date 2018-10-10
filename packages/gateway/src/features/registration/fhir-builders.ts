@@ -20,13 +20,13 @@ function createNameBuilder(sectionCode: string) {
       )
       createAndSetNameProperty(person, fieldValue, 'use', context)
     },
-    givenName: (fhirBundle: any, fieldValue: string, context: any) => {
+    firstNames: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
         sectionCode,
         fhirBundle,
         context
       )
-      createAndSetNameProperty(person, [fieldValue], 'given', context)
+      createAndSetNameProperty(person, fieldValue.split(' '), 'given', context)
     },
     familyName: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(

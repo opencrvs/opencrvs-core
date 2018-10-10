@@ -640,6 +640,13 @@
     "@types/react-dom" "*"
     "@types/react-transition-group" "*"
 
+"@types/react-stickynode@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@types/react-stickynode/-/react-stickynode-1.4.0.tgz#7ba60ef8af1ab11a3371c68a4b028663996b7d50"
+  integrity sha512-oBz1zR9w1CWmTym42BtzINVzLolvnpK1AOmWcUDYJhp/YhPT1S06nXQsrIrCSM8jiTdQN8G9YYJHmd0vFQdffg==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-transition-group@*":
   version "2.0.13"
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-2.0.13.tgz#7769fb61eb71d64d087a713956f086a42c3ee171"
@@ -3041,6 +3048,11 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
+classnames@^2.0.0:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
+  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
+
 classnames@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
@@ -4425,6 +4437,11 @@ detect-node@^2.0.3:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.3.tgz#a2033c09cc8e158d37748fbde7507832bd6ce127"
   integrity sha1-ogM8CcyOFY03dI+951B4Mr1s4Sc=
 
+detect-passive-events@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/detect-passive-events/-/detect-passive-events-1.0.4.tgz#6ed477e6e5bceb79079735dcd357789d37f9a91a"
+  integrity sha1-btR35uW863kHlzXc01d4nTf5qRo=
+
 detect-port-alt@1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/detect-port-alt/-/detect-port-alt-1.1.6.tgz#24707deabe932d4a3cf621302027c2b266568275"
@@ -5518,7 +5535,7 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "^2.0.0"
 
-fbjs@^0.8.0:
+fbjs@^0.8.0, fbjs@^0.8.4:
   version "0.8.17"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.17.tgz#c4d598ead6949112653d6588b01a5cdcd9f90fdd"
   integrity sha1-xNWY6taUkRJlPWWIsBpc3Nn5D90=
@@ -11647,7 +11664,7 @@ quick-lru@^1.0.0:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
   integrity sha1-Q2CxfGETatOAeDl/8RQW4Ybc+7g=
 
-raf@3.4.0, raf@^3.4.0:
+raf@3.4.0, raf@^3.0.0, raf@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/raf/-/raf-3.4.0.tgz#a28876881b4bc2ca9117d4138163ddb80f781575"
   integrity sha512-pDP/NMRAXoTfrhCfyfSEwJAKLaxBU9eApMeBPB1TkDouZmvPerIClV8lTAd+uF8ZiTaVl69e1FCxQrAd/VTjGw==
@@ -11720,6 +11737,14 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
+
+"react-addons-shallow-compare@^0.14.2 || ^15.0.0":
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react-addons-shallow-compare/-/react-addons-shallow-compare-15.6.2.tgz#198a00b91fc37623db64a28fd17b596ba362702f"
+  integrity sha1-GYoAuR/DdiPbZKKP0XtZa6NicC8=
+  dependencies:
+    fbjs "^0.8.4"
+    object-assign "^4.1.0"
 
 react-apollo@^2.1.4:
   version "2.1.4"
@@ -11969,6 +11994,16 @@ react-select@^2.0.0:
     react-input-autosize "^2.2.1"
     react-transition-group "^2.2.1"
 
+react-stickynode@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-stickynode/-/react-stickynode-2.0.1.tgz#88e565e07ba4c82d1df7f15e9d738711c38f56e7"
+  integrity sha512-uTNAFsANMT9/CXZPQbi6bsxvL+q4CCf19rJh5OmJom8uyScBcSAjD1+d6I+Y4fT1s0iSQv8xbOjYcZmk2qAmsw==
+  dependencies:
+    classnames "^2.0.0"
+    prop-types "^15.6.0"
+    react-addons-shallow-compare "^0.14.2 || ^15.0.0"
+    subscribe-ui-event "^2.0.0"
+
 react-styleguidist@^7.0.13:
   version "7.0.14"
   resolved "https://registry.yarnpkg.com/react-styleguidist/-/react-styleguidist-7.0.14.tgz#ac6c6e5e7c80cb0e021aebe86f6609122a776a94"
@@ -12031,6 +12066,14 @@ react-styleguidist@^7.0.13:
     unist-util-visit "^1.3.0"
     webpack-dev-server "^2.11.2"
     webpack-merge "^4.1.2"
+
+react-swipeable@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/react-swipeable/-/react-swipeable-4.3.0.tgz#818c0818ac565f5b169348f442153f343abff8bc"
+  integrity sha512-L21VMbcDvG+AOVF4ZIbQ8sICGIgiKB/plGKWBMw6dkxt5neS7x74ZlTbJ39U8slz798MZBv/uIoE9Vzgp3PODQ==
+  dependencies:
+    detect-passive-events "^1.0.4"
+    prop-types "^15.5.8"
 
 react-test-renderer@^16.0.0-0:
   version "16.4.1"
@@ -13783,6 +13826,15 @@ subarg@^1.0.0:
   integrity sha1-9izxdYHplrSPyWVpn1TAauJouNI=
   dependencies:
     minimist "^1.1.0"
+
+subscribe-ui-event@^2.0.0:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/subscribe-ui-event/-/subscribe-ui-event-2.0.4.tgz#2f58d75799a44e5013bc753cfcce1f5958f3ffe5"
+  integrity sha512-RSONnfaJGDux1ErifEFfg+bpDxUzr1+jB/ww8owlqScu4AvcEhFVclTBkiuEyJfI0OWKVAIHi8okexL9TCU5MQ==
+  dependencies:
+    eventemitter3 "^3.0.0"
+    lodash "^4.17.10"
+    raf "^3.0.0"
 
 subtext@6.x.x:
   version "6.0.7"

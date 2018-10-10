@@ -14,7 +14,8 @@ import {
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
-  englishOnlyNameFormat
+  englishOnlyNameFormat,
+  dateFormat
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -52,30 +53,20 @@ const messages = defineMessages({
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality'
   },
-  motherGivenName: {
-    id: 'formFields.motherGivenName',
-    defaultMessage: 'Given name',
-    description: 'Label for form field: Given name'
-  },
-  motherMiddleNames: {
-    id: 'formFields.motherMiddleNames',
-    defaultMessage: 'Middle name(s)',
-    description: 'Label for form field: Middle names'
+  motherFirstNames: {
+    id: 'formFields.motherFirstNames',
+    defaultMessage: 'First name(s)',
+    description: 'Label for form field: First names'
   },
   motherFamilyName: {
     id: 'formFields.motherFamilyName',
     defaultMessage: 'Family name',
     description: 'Label for form field: Family name'
   },
-  motherGivenNameEng: {
-    id: 'formFields.motherGivenNameEng',
-    defaultMessage: 'Given name (in english)',
-    description: 'Label for form field: Given name in english'
-  },
-  motherMiddleNamesEng: {
-    id: 'formFields.motherMiddleNamesEng',
-    defaultMessage: 'Middle name(s) (in english)',
-    description: 'Label for form field: Middle names in english'
+  motherFirstNamesEng: {
+    id: 'formFields.motherFirstNamesEng',
+    defaultMessage: 'First name(s) (in english)',
+    description: 'Label for form field: First names in english'
   },
   motherFamilyNameEng: {
     id: 'formFields.motherFamilyNameEng',
@@ -167,17 +158,9 @@ export const motherSection: IFormSection = {
       options: countries
     },
     {
-      name: 'motherGivenName',
+      name: 'motherFirstNames',
       type: TEXT,
-      label: messages.motherGivenName,
-      required: true,
-      initialValue: '',
-      validate: [bengaliOnlyNameFormat]
-    },
-    {
-      name: 'motherMiddleNames',
-      type: TEXT,
-      label: messages.motherMiddleNames,
+      label: messages.motherFirstNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
@@ -186,21 +169,14 @@ export const motherSection: IFormSection = {
       name: 'motherFamilyName',
       type: TEXT,
       label: messages.motherFamilyName,
+      required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'motherGivenNameEng',
+      name: 'motherFirstNamesEng',
       type: TEXT,
-      label: messages.motherGivenNameEng,
-      required: true,
-      initialValue: '',
-      validate: [englishOnlyNameFormat]
-    },
-    {
-      name: 'motherMiddleNamesEng',
-      type: TEXT,
-      label: messages.motherMiddleNamesEng,
+      label: messages.motherFirstNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
@@ -209,6 +185,7 @@ export const motherSection: IFormSection = {
       name: 'motherFamilyNameEng',
       type: TEXT,
       label: messages.motherFamilyNameEng,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
@@ -218,7 +195,7 @@ export const motherSection: IFormSection = {
       label: messages.motherDateOfBirth,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [dateFormat]
     },
     {
       name: 'maritalStatus',
@@ -247,7 +224,7 @@ export const motherSection: IFormSection = {
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [dateFormat]
     },
     {
       name: 'motherEducationAttainment',

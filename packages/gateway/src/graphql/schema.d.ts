@@ -63,7 +63,7 @@ export enum GQLIdentityIDType {
 
 export interface GQLHumanName {
   use?: string
-  givenName?: string
+  firstNames?: string
   familyName?: string
 }
 
@@ -321,7 +321,7 @@ export interface GQLIdentityInput {
 
 export interface GQLHumanNameInput {
   use?: string
-  givenName?: string
+  firstNames?: string
   familyName?: string
 }
 
@@ -699,7 +699,7 @@ export interface IdentityTypeToTypeResolver<TParent = any, TResult = any> {
 
 export interface GQLHumanNameTypeResolver<TParent = any> {
   use?: HumanNameToUseResolver<TParent>
-  givenName?: HumanNameToGivenNameResolver<TParent>
+  firstNames?: HumanNameToFirstNamesResolver<TParent>
   familyName?: HumanNameToFamilyNameResolver<TParent>
 }
 
@@ -707,7 +707,7 @@ export interface HumanNameToUseResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface HumanNameToGivenNameResolver<TParent = any, TResult = any> {
+export interface HumanNameToFirstNamesResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
