@@ -15,12 +15,12 @@ describe('actions', () => {
       const action = {
         type: actions.AUTHENTICATE,
         payload: {
-          mobile: '+447111111111',
+          mobile: '+8801711111111',
           password: 'test'
         }
       }
       expect(
-        actions.authenticate({ mobile: '07111111111', password: 'test' })
+        actions.authenticate({ mobile: '01711111111', password: 'test' })
       ).toEqual(action)
     })
   })

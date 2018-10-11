@@ -114,4 +114,6 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
   }
 }
 
-export const Page = withRouter(connect<IPageProps>(mapStateToProps)(Component))
+export const Page = withRouter(
+  connect<IPageProps, {}>(mapStateToProps)(Component)
+)

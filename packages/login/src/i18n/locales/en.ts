@@ -15,6 +15,7 @@ export const ENGLISH_STATE = {
     'login.stepTwoTitle': 'Verify your mobile phone',
     'login.stepTwoInstruction':
       'Please enter the sms code we have sent to your mobile phone.',
+    'login.clearForm': 'Clear form',
     'validations.required': 'required',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',

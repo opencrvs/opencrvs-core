@@ -65,6 +65,10 @@ export const StyledBox = styled(Box)`
   padding: 0px;
   margin: 0px;
   transform: translate(50%, -50%);
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 90%;
+  }
 `
 
 export const FormWrapper = styled.form`
