@@ -11,7 +11,7 @@ import { mockState } from '../tests/util'
 
 describe('actions', () => {
   describe('authenticate', () => {
-    it('cleans mobile number by locale and dispatch START_STEP_ONE action', () => {
+    it('cleans mobile number by country and dispatch START_STEP_ONE action', () => {
       const action = {
         type: actions.AUTHENTICATE,
         payload: {

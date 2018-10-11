@@ -71,14 +71,14 @@ export const messages = defineMessages({
   }
 })
 
-const fallbackCountry = 'BD'
+const fallbackCountry = config.COUNTRY
 
 const mobilePhonePatternTable = {
-  GB: {
+  gbr: {
     pattern: /^07[0-9]{9,10}$/,
     example: '07123456789'
   },
-  BD: {
+  bgd: {
     pattern: /^01[156789][0-9]{8}$/,
     example: '01741234567'
   }

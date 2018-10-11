@@ -11,6 +11,7 @@ export const BENGALI_STATE = {
     'login.submissionError': 'দুঃখিত যে মোবাইল নম্বর এবং পাসওয়ার্ড কাজ করে নি',
     'login.codeSubmissionError': 'দুঃখিত যে কোড কাজ না।',
     'login.resendMobile': 'অন্য এসএমএস পাঠান',
+    'login.optionalLabel': 'Optional',
     'login.stepTwoTitle': 'আপনার মোবাইল যাচাই করুন',
     'login.stepTwoInstruction':
       'দয়া করে এসএমএস কোড লিখুন যা আমরা আপনার মোবাইল ফোনে পাঠিয়েছি।',
@@ -18,7 +19,7 @@ export const BENGALI_STATE = {
     'validations.minLength': '{Min} অক্ষর বা আরো হওয়া আবশ্যক',
     'validations.numberRequired': 'অবশ্যই একটি সংখ্যা হবেr',
     'validations.phoneNumberFormat':
-      'একটি বৈধ {locale} মোবাইল ফোন নম্বর থাকা আবশ্যক। 0.২ ই.পি. {format}',
+      'যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}',
     'validations.mobilePhoneRegex': '017[0-9]{9,10}',
     'validations.mobileNumberFormat': '01723456789',
     'validations.requiredSymbol': 'x'

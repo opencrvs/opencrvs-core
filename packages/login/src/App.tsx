@@ -15,13 +15,12 @@ import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from './views/StepOne/StepOneContainer'
 
 export const store = createStore()
-
 export class App extends React.Component {
   public render() {
     return (
       <Provider store={store}>
         <IntlContainer>
-          <ThemeProvider theme={getTheme(config.LOCALE)}>
+          <ThemeProvider theme={getTheme(config.COUNTRY)}>
             <ConnectedRouter history={history}>
               <PageContainer>
                 <Switch>

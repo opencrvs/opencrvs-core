@@ -81,7 +81,7 @@ export function createTestComponent(
   const component = mount(
     <Provider store={store}>
       <I18nContainer>
-        <ThemeProvider theme={getTheme(config.LOCALE)}>
+        <ThemeProvider theme={getTheme(config.COUNTRY)}>
           {nodeWithIntlProp(node)}
         </ThemeProvider>
       </I18nContainer>

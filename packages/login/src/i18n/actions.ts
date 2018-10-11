@@ -1,5 +1,5 @@
 interface Ii18n {
-  LANGUAGE: string
+  language: string
 }
 
 export const CHANGE_LANGUAGE = 'I18N/CHANGE_LANGUAGE'

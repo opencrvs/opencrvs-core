@@ -1,15 +1,7 @@
 export const config = {
   API_GATEWAY_URL:
     process.env.REACT_APP_API_GATEWAY_URL || 'http://localhost:7070/',
-  LANGUAGE: process.env.REACT_APP_LANGUAGE || 'en',
-  LOCALE: process.env.REACT_APP_LOCALE || 'gbr',
-  COUNTRY: process.env.REACT_APP_LOCALE || 'BD',
+  LANGUAGE: process.env.REACT_APP_LANGUAGE || 'bn',
+  COUNTRY: process.env.REACT_APP_COUNTRY || 'bgd',
   LOGIN_URL: process.env.REACT_APP_LOGIN_URL || 'http://localhost:3020'
-}
-
-export const getCountry = (): string => {
-  return config.COUNTRY
-}
-export const setCountry = (country: string) => {
-  config.COUNTRY = country
 }
