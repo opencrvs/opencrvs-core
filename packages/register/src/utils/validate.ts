@@ -36,21 +36,9 @@ export const messages = defineMessages({
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
     defaultMessage:
-      'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
+      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
-  },
-  mobilePhoneRegex: {
-    id: 'validations.mobilePhoneRegex',
-    defaultMessage: '07[0-9]{9,10}',
-    description:
-      'The regular expression to use when validating a local mobile phone number'
-  },
-  mobileNumberFormat: {
-    id: 'validations.mobileNumberFormat',
-    defaultMessage: '07123456789',
-    description:
-      'The format of the mobile number that appears in an error message'
   },
   dateFormat: {
     id: 'validations.dateFormat',
@@ -83,17 +71,27 @@ export const messages = defineMessages({
   }
 })
 
-const dynamicValidationProps = {
-  phoneNumberFormat: {
-    min: 10,
-    locale: config.LOCALE.toUpperCase(),
-    format: messages.mobileNumberFormat.defaultMessage
+const fallbackCountry = config.COUNTRY
+
+const mobilePhonePatternTable = {
+  gbr: {
+    pattern: /^07[0-9]{9,10}$/,
+    example: '07123456789'
+  },
+  bgd: {
+    pattern: /^01[156789][0-9]{8}$/,
+    example: '01741234567'
   }
 }
 
-export const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const numberRexExp = new RegExp(messages.mobilePhoneRegex.defaultMessage)
-  return numberRexExp.test(value)
+export const isAValidPhoneNumberFormat = (
+  value: string,
+  country: string
+): boolean => {
+  const countryMobileTable =
+    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
+  const { pattern } = countryMobileTable
+  return pattern.test(value)
 }
 export const isAValidEmailAddressFormat = (value: string): boolean => {
   return validateEmail(value)
@@ -123,10 +121,6 @@ export const isAValidDateFormat = (value: string): boolean => {
 
   const givenDate = new Date(valueISOString)
 
-  if (Number.isNaN(givenDate.getTime())) {
-    return false
-  }
-
   return givenDate.toISOString().slice(0, 10) === valueISOString
 }
 
@@ -152,11 +146,23 @@ export const isNumber: Validation = (value: string) =>
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  return value && isAValidPhoneNumberFormat(value)
+  const country = config.COUNTRY
+  const countryMobileTable =
+    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
+  const { example } = countryMobileTable
+  const validationProps = { example }
+
+  const trimmedValue = value === undefined || value === null ? '' : value.trim()
+
+  if (!trimmedValue) {
+    return undefined
+  }
+
+  return isAValidPhoneNumberFormat(trimmedValue, country)
     ? undefined
     : {
         message: messages.phoneNumberFormat,
-        props: dynamicValidationProps.phoneNumberFormat
+        props: validationProps
       }
 }
 

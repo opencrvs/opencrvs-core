@@ -865,14 +865,14 @@ The following variables exist.
 ```
 ENV REACT_APP_API_GATEWAY_URL
 ENV REACT_APP_LOGIN_URL
-ENV REACT_APP_LOCALE
+ENV REACT_APP_COUNTRY
 ENV REACT_APP_LANGUAGE
 ```
 
 For ENV REACT_APP_API_GATEWAY_URL link to gateway package URL
 For ENV REACT_APP_LOGIN_URL link to the login package URL
 
-For REACT_APP_LOCALE, use lowercase two-letter [ISO "Alpha-3" country code](https://unstats.un.org/unsd/methodology/m49/)
+For REACT_APP_COUNTRY, use lowercase two-letter [ISO "Alpha-3" country code](https://unstats.un.org/unsd/methodology/m49/)
 
 For REACT_APP_LANGUAGE, use lowercase two-letter [ISO 639-1 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 

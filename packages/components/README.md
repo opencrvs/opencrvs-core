@@ -1,11 +1,11 @@
 ## Environment Variables
 
 ```
-REACT_APP_LOCALE = gbr
+REACT_APP_COUNTRY = gbr
 REACT_APP_LANGUAGE = en
 ```
 
-For REACT_APP_LOCALE, use lowercase two-letter [ISO "Alpha-3" country code](https://unstats.un.org/unsd/methodology/m49/)
+For REACT_APP_COUNTRY, use lowercase two-letter [ISO "Alpha-3" country code](https://unstats.un.org/unsd/methodology/m49/)
 
 E.G. test by setting to "bgd" for bangladesh
 

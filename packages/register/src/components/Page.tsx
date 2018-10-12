@@ -33,6 +33,31 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   @font-face {
     font-family: ${({ theme }) => theme.fonts.lightFont};
     src:
+      url('/fonts/notosans-extra-light-webfont-en.ttf')
+      format('truetype');
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    src:
+      url('/fonts/notosans-light-webfont-en.ttf')
+      format('truetype');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+    src:
+      url('/fonts/notosans-regular-webfont-en.ttf')
+      format('truetype');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.lightFont};
+    src:
       url('/fonts/notosans-extra-light-webfont-${languageFromProps}.ttf')
       format('truetype');
     font-weight: 300;
@@ -89,4 +114,6 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
   }
 }
 
-export const Page = withRouter(connect<IPageProps>(mapStateToProps)(Component))
+export const Page = withRouter(
+  connect<IPageProps, {}>(mapStateToProps)(Component)
+)

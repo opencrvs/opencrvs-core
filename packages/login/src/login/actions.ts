@@ -80,7 +80,7 @@ export const authenticate = (
   values: IAuthenticationData
 ): AuthenticationDataAction => {
   const cleanedData = {
-    mobile: convertToMSISDN(values.mobile, config.LOCALE),
+    mobile: convertToMSISDN(values.mobile, config.COUNTRY),
     password: values.password
   }
 

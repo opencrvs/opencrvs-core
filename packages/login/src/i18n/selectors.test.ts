@@ -1,17 +1,17 @@
 import { getLanguage, getMessages } from './selectors'
 import { mockState } from '../tests/util'
-import { ENGLISH_STATE } from './locales/en'
+import { BENGALI_STATE } from './locales/bn'
 
 describe('intl selectors', () => {
   describe('getLanguage', () => {
     it('should return language locale string', () => {
-      const locale = 'en'
+      const locale = 'bn'
       expect(getLanguage(mockState)).toEqual(locale)
     })
   })
   describe('getMessages', () => {
     it('should return messages object', () => {
-      const messages = ENGLISH_STATE.messages
+      const messages = BENGALI_STATE.messages
       expect(getMessages(mockState)).toEqual(messages)
     })
   })

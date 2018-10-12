@@ -6,19 +6,33 @@ import {
   isNumber,
   phoneNumberFormat
 } from './validate'
-import { config } from '../config'
 
 describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
       const response = false
-      expect(isAValidPhoneNumberFormat(badValue)).toEqual(response)
+      expect(isAValidPhoneNumberFormat(badValue, 'bgd')).toEqual(response)
     })
-    it('should pass when supplied a good value.', () => {
+    it('should error when given an invalid phone number', () => {
+      const badNumber = '01200345678'
+      const response = false
+      expect(isAValidPhoneNumberFormat(badNumber, 'bgd')).toEqual(response)
+    })
+    it('should pass when supplied a good value for a British number', () => {
       const goodValue = '07111111111'
       const response = true
-      expect(isAValidPhoneNumberFormat(goodValue)).toEqual(response)
+      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(response)
+    })
+    it('should pass when supplied a good value for a Bangladeshi number', () => {
+      const goodValue = '01720067890'
+      const response = true
+      expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(response)
+    })
+    it('should pass when supplied a good value and country is not added to the lookup table', () => {
+      const goodValue = '01720067890'
+      const response = true
+      expect(isAValidPhoneNumberFormat(goodValue, 'th')).toEqual(response)
     })
   })
   describe('requiredSymbol. Used for number fields that use a symbol (e.g.: x) as an error message', () => {
@@ -106,19 +120,18 @@ describe('validate', () => {
         message: {
           id: 'validations.phoneNumberFormat',
           defaultMessage:
-            'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
+            'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
           description:
             'The error message that appears on phone numbers where the first character must be a 0'
         },
         props: {
-          locale: config.LOCALE.toUpperCase(),
-          format: '07123456789'
+          example: '01741234567'
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value.', () => {
-      const goodValue = '07111111111'
+      const goodValue = '01845678912'
       const response = undefined
       expect(phoneNumberFormat(goodValue)).toEqual(response)
     })
