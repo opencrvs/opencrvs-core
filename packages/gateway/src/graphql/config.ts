@@ -1,5 +1,5 @@
 import { importSchema } from 'graphql-import'
-import { makeExecutableSchema } from 'graphql-tools'
+import { makeExecutableSchema, IResolvers } from 'graphql-tools'
 
 import { resolvers as notificationRootResolvers } from 'src/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from 'src/features/registration/root-resolvers'
@@ -10,9 +10,11 @@ export const getExecutableSchema = (schemaPath: string) => {
   return makeExecutableSchema({
     typeDefs,
     resolvers: [
-      notificationRootResolvers,
-      registrationRootResolvers,
-      typeResolvers
+      // the types we generate out of our schema aren't
+      // compatible with the types graphql-tools uses internally.
+      notificationRootResolvers as IResolvers,
+      registrationRootResolvers as IResolvers,
+      typeResolvers as IResolvers
     ]
   })
 }
