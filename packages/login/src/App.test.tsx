@@ -28,7 +28,7 @@ describe('Login app step one', () => {
       app = createTestApp()
       app
         .find('input#mobile')
-        .simulate('change', { target: { value: '07111111111' } })
+        .simulate('change', { target: { value: '01711111111' } })
 
       app
         .find('input#password')

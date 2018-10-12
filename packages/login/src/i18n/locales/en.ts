@@ -15,11 +15,12 @@ export const ENGLISH_STATE = {
     'login.stepTwoTitle': 'Verify your mobile phone',
     'login.stepTwoInstruction':
       'Please enter the sms code we have sent to your mobile phone.',
+    'login.clearForm': 'Clear form',
     'validations.required': 'required',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
     'validations.phoneNumberFormat':
-      'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
+      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     'validations.mobilePhoneRegex': '0[0-9]{9,10}',
     'validations.mobileNumberFormat': '07123456789',
     'validations.requiredSymbol': 'x'

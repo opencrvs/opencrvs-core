@@ -6,7 +6,6 @@ import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
 
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/interface'
-import { EnglishText } from '@opencrvs/components/lib/typography'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 
 import { stepOneFields } from './stepOneFields'
@@ -66,6 +65,10 @@ export const StyledBox = styled(Box)`
   padding: 0px;
   margin: 0px;
   transform: translate(50%, -50%);
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 90%;
+  }
 `
 
 export const FormWrapper = styled.form`
@@ -173,10 +176,7 @@ export class StepOneForm extends React.Component<
     return (
       <StyledBox id="login-step-one-box">
         <Title>
-          <h2>
-            <EnglishText>OpenCRVS </EnglishText>
-            {intl.formatMessage(messages.stepOneTitle)}
-          </h2>
+          <h2>{intl.formatMessage(messages.stepOneTitle)}</h2>
           <p>{intl.formatMessage(messages.stepOneInstruction)}</p>
           {submissionError && (
             <ErrorText>

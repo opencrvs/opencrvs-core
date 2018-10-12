@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { PageWrapper } from '@opencrvs/components/lib/layout'
 import { RouteComponentProps } from 'react-router'
+import { LoginHeader } from './LoginHeader'
 
 export interface IPage {
   language?: string
@@ -9,12 +9,12 @@ export interface IPage {
 
 const languageFromProps = ({ language }: IPage) => language
 
-const StyledPage = styled(PageWrapper).attrs<IPage>({})`
-
+const StyledPage = styled.div.attrs<IPage>({})`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  margin-top: -280px;
   * {
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
@@ -25,6 +25,31 @@ const StyledPage = styled(PageWrapper).attrs<IPage>({})`
   *:before,
   *:after {
     box-sizing: border-box;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.lightFont};
+    src:
+      url('/fonts/notosans-extra-light-webfont-en.ttf')
+      format('truetype');
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    src:
+      url('/fonts/notosans-light-webfont-en.ttf')
+      format('truetype');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+    src:
+      url('/fonts/notosans-regular-webfont-en.ttf')
+      format('truetype');
+    font-style: normal;
   }
 
   @font-face {
@@ -55,7 +80,12 @@ const StyledPage = styled(PageWrapper).attrs<IPage>({})`
 
 export class Page extends React.Component<IPage & RouteComponentProps<{}>> {
   render() {
-    const { language, children } = this.props
-    return <StyledPage language={language}>{children}</StyledPage>
+    const { children } = this.props
+    return (
+      <div>
+        <LoginHeader />
+        <StyledPage {...this.props}>{children}</StyledPage>
+      </div>
+    )
   }
 }

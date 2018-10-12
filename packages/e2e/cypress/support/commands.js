@@ -27,7 +27,7 @@
 Cypress.Commands.add('login', (userType, options = {}) => {
   const users = {
     fieldWorker: {
-      mobile: '+447111111111',
+      mobile: '+8801711111111',
       password: 'test'
     }
   }

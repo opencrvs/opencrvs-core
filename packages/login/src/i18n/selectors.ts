@@ -7,8 +7,8 @@ function getKey<K extends keyof IntlState>(store: IStoreState, key: K) {
   return getPartialState(store)[key]
 }
 
-export const getLanguage = (store: IStoreState): IntlState['LANGUAGE'] =>
-  getKey(store, 'LANGUAGE')
+export const getLanguage = (store: IStoreState): IntlState['language'] =>
+  getKey(store, 'language')
 
 export const getMessages = (store: IStoreState): IntlState['messages'] =>
   getKey(store, 'messages')

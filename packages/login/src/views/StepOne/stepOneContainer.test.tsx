@@ -28,7 +28,7 @@ describe('Login app step one', () => {
     it('changes the language from english to bengali', async () => {
       const action = {
         type: actions.CHANGE_LANGUAGE,
-        payload: { LANGUAGE: 'bn' }
+        payload: { language: 'bn' }
       }
       store.dispatch(action)
 
