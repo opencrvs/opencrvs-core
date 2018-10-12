@@ -25,7 +25,7 @@ const gbUserChw = new User({
 
 const bdUserChw = new User({
   email: 'test@test.org',
-  mobile: '+880171111111', // 11 digits long, starts with 017 locally
+  mobile: '+8801711111111', // 11 digits long, starts with 017 locally
   passwordHash: pass.hash,
   salt: pass.salt,
   roles: ['chw', 'demo']
