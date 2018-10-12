@@ -1,6 +1,17 @@
 /// <reference types="Cypress" />
 
 context('Login', () => {
+  before(function() {
+    // remove all resources cached by the service worker for a fresh run
+    return window.caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          return window.caches.delete(cacheName)
+        })
+      )
+    })
+  })
+
   beforeEach(() => {
     cy.visit(Cypress.env('LOGIN_URL'))
   })
