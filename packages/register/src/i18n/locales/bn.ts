@@ -547,6 +547,21 @@ export const BENGALI_STATE = {
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
     'register.selectVitalEvent.birthActionTitle': 'জন্ম',
-    'register.selectVitalEvent.deathActionTitle': 'মৃত্যু'
+    'register.selectVitalEvent.deathActionTitle': 'মৃত্যু',
+    'register.form.upload': 'আপলোড',
+    'register.form.section.upload.documentsName': 'কাগজপত্র আপলোড',
+    'register.form.section.upload.documentsTitle': 'সমর্থনকারী কাগজপত্র',
+    'formFields.uploadDocForWhom':
+      'আপনি কাদের সাসমর্থনকারী কাগজপত্র আপলোড করছেন?',
+    'formFields.uploadDocForChild': 'শিশু',
+    'formFields.uploadDocForMother': 'মা',
+    'formFields.uploadDocForFather': 'পিতা',
+    'formFields.uploadDocForOther': 'অন্যান্য',
+    'formFields.whatDocToUpload': 'আপনি কোন প্রকার কাগজপত্র আপলোড করছেন?',
+    'formFields.docTypeBR': 'জন্ম নিবন্ধন',
+    'formFields.docTypeNID': 'জাতীয় পরিচয়পত্র',
+    'formFields.docTypePassport': 'পাসপোর্ট',
+    'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
+    'formFields.docTypeOther': 'অন্যান্য'
   }
 }

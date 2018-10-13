@@ -6,7 +6,10 @@ import { connect } from 'react-redux'
 
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from '../../components/ViewHeader'
-import { goToBirthRegistrationAsParent } from 'src/navigation'
+import {
+  goToBirthRegistrationAsParent,
+  goToBirthRegistrationDocumentUpload
+} from 'src/navigation'
 import { createDraft, storeDraft } from '../../drafts'
 
 export const messages = defineMessages({
@@ -69,6 +72,7 @@ export const messages = defineMessages({
 export class SelectInformantView extends React.Component<
   {
     goToBirthRegistrationAsParent: () => void
+    goToBirthRegistrationDocumentUpload: () => void
   } & InjectedIntlProps
 > {
   render() {
@@ -94,7 +98,7 @@ export class SelectInformantView extends React.Component<
             id="select_someone_else_informant"
             title={intl.formatMessage(messages.otherInformantTitle)}
             description={intl.formatMessage(messages.otherInformantDescription)}
-            disabled
+            onClick={this.props.goToBirthRegistrationDocumentUpload}
           />
           <Action
             id="select_self_informant"
@@ -116,6 +120,11 @@ export const SelectInformant = connect(null, function mapDispatchToProps(
       const draft = createDraft()
       dispatch(storeDraft(draft))
       dispatch(goToBirthRegistrationAsParent(draft.id))
+    },
+    goToBirthRegistrationDocumentUpload: () => {
+      const draft = createDraft()
+      dispatch(storeDraft(draft))
+      dispatch(goToBirthRegistrationDocumentUpload(draft.id))
     }
   }
 })(injectIntl(SelectInformantView))

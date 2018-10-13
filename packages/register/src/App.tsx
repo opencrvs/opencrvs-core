@@ -23,6 +23,7 @@ import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
 
 import { RegisterForm } from './views/RegisterForm/RegisterForm'
+import { DocumentUploadForm } from './views/RegisterForm/DocumentUploadForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
 import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
@@ -65,6 +66,11 @@ export class App extends React.Component<IAppProps, {}> {
                           exact
                           path={routes.SELECT_INFORMANT}
                           component={SelectInformant}
+                        />
+                        <ProtectedRoute
+                          exact
+                          path={routes.DRAFT_BIRTH_PARENT_DOCUMENT_UPLOAD_FORM}
+                          component={DocumentUploadForm}
                         />
                         <ProtectedRoute
                           exact

@@ -131,6 +131,7 @@ export interface IConditionals {
   district: IConditional
   addressLine4: IConditional
   addressLine3Options1: IConditional
+  uploadDocForWhom: IConditional
 }
 
 export type ViewType = 'form' | 'preview'

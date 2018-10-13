@@ -134,5 +134,9 @@ export const conditionals: IConditionals = {
   addressLine3Options1: {
     action: 'hide',
     expression: '!values.addressLine3Options1'
+  },
+  uploadDocForWhom: {
+    action: 'hide',
+    expression: '!values.uploadDocForWhom'
   }
 }
