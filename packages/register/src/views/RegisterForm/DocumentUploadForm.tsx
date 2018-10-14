@@ -11,7 +11,13 @@ import { Form } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
 import { getDocumentUploadForm } from '../../forms/register/selectors'
+import { getValidationErrorsForForm } from 'src/forms/validation'
 
+const FormContainer = styled.div`
+  padding: 35px 25px;
+  padding-bottom: 0;
+  z-index: 1;
+`
 const FormAction = styled.div`
   display: flex;
   justify-content: center;
@@ -29,11 +35,15 @@ export const messages = defineMessages({
   }
 })
 
-const FormViewContainer = styled.div`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-`
+function hasFormError(fields: IFormField[], values: IFormSectionData) {
+  const errors = getValidationErrorsForForm(fields, values)
+
+  const fieldListWithErrors = Object.keys(errors).filter(key => {
+    return errors[key] && errors[key].length > 0
+  })
+  return fieldListWithErrors && fieldListWithErrors.length > 0
+}
+
 type DispatchProps = {
   modifyDraft: typeof modifyDraft
 }
@@ -41,7 +51,7 @@ type DispatchProps = {
 type Props = {
   draft: IDraft
   documentUploadForm: IFormSection
-  setAllFieldsDirty: boolean
+  fields: IFormField[]
 }
 
 type FullProps = Props &
@@ -49,9 +59,15 @@ type FullProps = Props &
   InjectedIntlProps &
   RouteComponentProps<{}>
 
-class DocumentUploadFormView extends React.Component<FullProps> {
+type State = {
+  showUploadButton: boolean
+}
+class DocumentUploadFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
+    this.state = {
+      showUploadButton: this.shouldShowUploadButton()
+    }
   }
 
   modifyDraft = (documentData: IFormSectionData) => {
@@ -63,28 +79,44 @@ class DocumentUploadFormView extends React.Component<FullProps> {
         [documentUploadForm.id]: documentData
       }
     })
+    if (this.shouldShowUploadButton(documentData)) {
+      this.setState({ showUploadButton: true })
+    }
+  }
+
+  shouldShowUploadButton = (
+    documentData = this.props.draft.data[this.props.documentUploadForm.id]
+  ) => {
+    return (
+      documentData &&
+      !hasFormError(this.props.documentUploadForm.fields, documentData)
+    )
   }
 
   render() {
-    const { intl, documentUploadForm, setAllFieldsDirty } = this.props
-
+    const { intl, documentUploadForm, fields } = this.props
+    const { showUploadButton } = this.state
     return (
-      <FormViewContainer>
+      <FormContainer>
         <Box>
           <Form
             id={documentUploadForm.id}
             onChange={this.modifyDraft}
-            setAllFieldsDirty={setAllFieldsDirty}
-            title={intl.formatMessage(documentUploadForm.title)}
-            fields={documentUploadForm.fields}
+            setAllFieldsDirty={false}
+            fields={fields}
           />
-          <FormAction>
-            <FormPrimaryButton id="upload_doc" icon={() => <ArrowForward />}>
-              {intl.formatMessage(messages.upload)}
-            </FormPrimaryButton>
-          </FormAction>
+          {showUploadButton && (
+            <FormAction>
+              <FormPrimaryButton
+                id="upload_document"
+                icon={() => <ArrowForward />}
+              >
+                {intl.formatMessage(messages.upload)}
+              </FormPrimaryButton>
+            </FormAction>
+          )}
         </Box>
-      </FormViewContainer>
+      </FormContainer>
     )
   }
 }
@@ -111,14 +143,14 @@ function mapStateToProps(
     throw new Error(`Draft "${match.params.draftId}" missing!`)
   }
 
-  replaceInitialValues(
+  const fields = replaceInitialValues(
     documentUploadForm.fields,
     draft.data[documentUploadForm.id] || {}
   )
 
   return {
     documentUploadForm,
-    setAllFieldsDirty: true,
+    fields,
     draft
   }
 }

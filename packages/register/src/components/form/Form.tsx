@@ -211,7 +211,7 @@ const mapFieldsToValues = (fields: IFormField[]) =>
 
 interface IFormSectionProps {
   fields: IFormField[]
-  title: string
+  title?: string
   id: string
   setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
@@ -298,9 +298,11 @@ class FormSectionComponent extends React.Component<Props> {
 
     return (
       <section>
-        <FormSectionTitle id={`form_section_title_${id}`}>
-          {title}
-        </FormSectionTitle>
+        {title && (
+          <FormSectionTitle id={`form_section_title_${id}`}>
+            {title}
+          </FormSectionTitle>
+        )}
         <form onSubmit={handleSubmit}>
           {fieldsWithValuesDefined.map(field => {
             let error: string

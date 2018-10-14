@@ -552,7 +552,7 @@ export const BENGALI_STATE = {
     'register.form.section.upload.documentsName': 'কাগজপত্র আপলোড',
     'register.form.section.upload.documentsTitle': 'সমর্থনকারী কাগজপত্র',
     'formFields.uploadDocForWhom':
-      'আপনি কাদের সাসমর্থনকারী কাগজপত্র আপলোড করছেন?',
+      'আপনি কার সাসমর্থনকারী কাগজপত্র আপলোড করছেন?',
     'formFields.uploadDocForChild': 'শিশু',
     'formFields.uploadDocForMother': 'মা',
     'formFields.uploadDocForFather': 'পিতা',
