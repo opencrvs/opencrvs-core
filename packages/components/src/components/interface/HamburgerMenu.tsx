@@ -90,9 +90,9 @@ const MenuContainer = styled.div`
     min-height: 90px;
   }
   .rc-menu div.close {
-    font-size: 40px;
-    margin-top: 3px;
-    margin-right: 3px;
+    font-size: 50px;
+    margin-top: 2px;
+    margin-right: 2px;
     font-family: ${({ theme }) => theme.fonts.lightFont};
   }
   .rc-menu.rc-menu-root > li.rc-menu-submenu {
