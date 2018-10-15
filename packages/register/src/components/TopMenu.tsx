@@ -72,11 +72,18 @@ class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
       title: 'Change Language',
       key: 'change-language',
       isSubMenu: true,
-      menuItems: Object.keys(this.props.languages).map((lang: any) => ({
-        title: lang,
-        key: lang,
-        onClick: this.props.changeLanguage.bind(null, { language: lang })
-      }))
+      menuItems: [
+        {
+          title: 'English',
+          key: 'english',
+          onClick: this.props.changeLanguage.bind(null, { language: 'en' })
+        },
+        {
+          title: 'Bengali',
+          key: 'bengali',
+          onClick: this.props.changeLanguage.bind(null, { language: 'bn' })
+        }
+      ]
     },
     {
       title: 'Homepage',
