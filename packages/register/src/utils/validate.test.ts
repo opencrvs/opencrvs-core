@@ -6,23 +6,38 @@ import {
   minLength,
   isNumber,
   phoneNumberFormat,
+  dateFormat,
   emailAddressFormat,
   bengaliOnlyNameFormat,
   englishOnlyNameFormat
 } from './validate'
-import { config } from '../config'
 
 describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
       const response = false
-      expect(isAValidPhoneNumberFormat(badValue)).toEqual(response)
+      expect(isAValidPhoneNumberFormat(badValue, 'bgd')).toEqual(response)
     })
-    it('should pass when supplied a good value.', () => {
+    it('should error when given an invalid phone number', () => {
+      const badNumber = '01200345678'
+      const response = false
+      expect(isAValidPhoneNumberFormat(badNumber, 'bgd')).toEqual(response)
+    })
+    it('should pass when supplied a good value for a British number', () => {
       const goodValue = '07111111111'
       const response = true
-      expect(isAValidPhoneNumberFormat(goodValue)).toEqual(response)
+      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(response)
+    })
+    it('should pass when supplied a good value for a Bangladeshi number', () => {
+      const goodValue = '01720067890'
+      const response = true
+      expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(response)
+    })
+    it('should pass when supplied a good value and country is not added to the lookup table', () => {
+      const goodValue = '01720067890'
+      const response = true
+      expect(isAValidPhoneNumberFormat(goodValue, 'th')).toEqual(response)
     })
   })
 
@@ -60,6 +75,11 @@ describe('validate', () => {
     })
     it('should pass when supplied a good value.', () => {
       const goodValue = 'jkgjgjgkgjkj'
+      const response = undefined
+      expect(required(goodValue)).toEqual(response)
+    })
+    it('should pass when supplied a good boolean value', () => {
+      const goodValue = true
       const response = undefined
       expect(required(goodValue)).toEqual(response)
     })
@@ -115,20 +135,18 @@ describe('validate', () => {
         message: {
           id: 'validations.phoneNumberFormat',
           defaultMessage:
-            'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
+            'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
           description:
             'The error message that appears on phone numbers where the first character must be a 0'
         },
         props: {
-          locale: config.LOCALE.toUpperCase(),
-          format: '07123456789',
-          min: 10
+          example: '01741234567'
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value.', () => {
-      const goodValue = '07111111111'
+      const goodValue = '01845678912'
       const response = undefined
       expect(phoneNumberFormat(goodValue)).toEqual(response)
     })
@@ -163,6 +181,35 @@ describe('validate', () => {
       const goodValue = 'root@opencrvs.org'
       const response = undefined
       expect(emailAddressFormat(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('dateFormat. Checks a given date is a valid date', () => {
+    it('should error when input invalid chararcters', () => {
+      const invalidDate = '1901-+2-2e'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should error when input invalid format', () => {
+      const invalidDate = '190-2-21'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should error when input invalid date', () => {
+      const invalidDate = '2017-2-29'
+      expect(dateFormat(invalidDate)).toEqual({ message: messages.dateFormat })
+    })
+
+    it('should pass when supplied a valid date with single digit', () => {
+      const validDate = '2011-8-12'
+      const response = undefined
+      expect(dateFormat(validDate)).toEqual(response)
+    })
+
+    it('should pass when supplied a valid date', () => {
+      const validDate = '2011-08-12'
+      const response = undefined
+      expect(dateFormat(validDate)).toEqual(response)
     })
   })
 

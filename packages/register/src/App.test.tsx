@@ -189,6 +189,99 @@ describe('when user has a valid token in local storage', () => {
       app.update()
     })
 
+    describe('when user types in something', () => {
+      beforeEach(() => {
+        app
+          .find('#childFirstNames')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childFirstNames', value: 'hello' }
+          })
+      })
+      it('stores the value to a new draft', () => {
+        const [, data] = setItem.mock.calls[setItem.mock.calls.length - 1]
+        const storedDrafts = JSON.parse(data)
+        expect(storedDrafts[0].data.child.childFirstNames).toEqual('hello')
+      })
+    })
+
+    describe('when user swipes left from the "child" section', () => {
+      beforeEach(async () => {
+        app
+          .find('#swipeable_block')
+          .hostNodes()
+          .simulate('touchStart', {
+            touches: [
+              {
+                clientX: 150,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchMove', {
+            changedTouches: [
+              {
+                clientX: 100,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchEnd', {
+            changedTouches: [
+              {
+                clientX: 50,
+                clientY: 20
+              }
+            ]
+          })
+        await flushPromises()
+        app.update()
+      })
+      it('changes to the mother details section', () => {
+        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
+          1
+        )
+      })
+    })
+
+    describe('when user swipes right from the "child" section', () => {
+      beforeEach(async () => {
+        app
+          .find('#swipeable_block')
+          .hostNodes()
+          .simulate('touchStart', {
+            touches: [
+              {
+                clientX: 50,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchMove', {
+            changedTouches: [
+              {
+                clientX: 100,
+                clientY: 20
+              }
+            ]
+          })
+          .simulate('touchEnd', {
+            changedTouches: [
+              {
+                clientX: 150,
+                clientY: 20
+              }
+            ]
+          })
+        await flushPromises()
+        app.update()
+      })
+      it('user still stays in the child details section', () => {
+        expect(app.find('#form_section_title_child').hostNodes()).toHaveLength(
+          1
+        )
+      })
+    })
     describe('when user clicks the "mother" tab', () => {
       beforeEach(async () => {
         app
@@ -204,21 +297,43 @@ describe('when user has a valid token in local storage', () => {
           1
         )
       })
-    })
-
-    describe('when user types in something', () => {
-      beforeEach(() => {
-        app
-          .find('#childGivenName')
-          .hostNodes()
-          .simulate('change', {
-            target: { id: 'childGivenName', value: 'hello' }
-          })
-      })
-      it('stores the value to a new draft', () => {
-        const [, data] = setItem.mock.calls[setItem.mock.calls.length - 1]
-        const storedDrafts = JSON.parse(data)
-        expect(storedDrafts[0].data.child.childGivenName).toEqual('hello')
+      describe('when user swipes right from the "mother" section', () => {
+        beforeEach(async () => {
+          app
+            .find('#swipeable_block')
+            .hostNodes()
+            .simulate('touchStart', {
+              touches: [
+                {
+                  clientX: 50,
+                  clientY: 20
+                }
+              ]
+            })
+            .simulate('touchMove', {
+              changedTouches: [
+                {
+                  clientX: 100,
+                  clientY: 20
+                }
+              ]
+            })
+            .simulate('touchEnd', {
+              changedTouches: [
+                {
+                  clientX: 150,
+                  clientY: 20
+                }
+              ]
+            })
+          await flushPromises()
+          app.update()
+        })
+        it('changes to the child details section', () => {
+          expect(
+            app.find('#form_section_title_child').hostNodes()
+          ).toHaveLength(1)
+        })
       })
     })
 

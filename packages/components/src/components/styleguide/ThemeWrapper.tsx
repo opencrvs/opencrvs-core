@@ -2,8 +2,8 @@ import * as React from 'react'
 import styled, { ThemeProvider } from 'styled-components'
 import { getTheme } from '../theme'
 
-const locale = process.env.REACT_APP_LOCALE
-  ? process.env.REACT_APP_LOCALE
+const country = process.env.REACT_APP_COUNTRY
+  ? process.env.REACT_APP_COUNTRY
   : 'gbr'
 
 const Wrapper = styled.div`
@@ -17,7 +17,7 @@ export class ThemeWrapper extends React.Component {
   render() {
     return (
       <Wrapper>
-        <ThemeProvider theme={getTheme(locale)}>
+        <ThemeProvider theme={getTheme(country)}>
           {this.props.children}
         </ThemeProvider>
       </Wrapper>

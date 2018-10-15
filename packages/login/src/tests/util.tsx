@@ -26,7 +26,7 @@ export function createTestComponent(node: React.ReactElement<object>) {
   return mount(
     <Provider store={store}>
       <IntlContainer>
-        <ThemeProvider theme={getTheme(config.LOCALE)}>{node}</ThemeProvider>
+        <ThemeProvider theme={getTheme(config.COUNTRY)}>{node}</ThemeProvider>
       </IntlContainer>
     </Provider>
   )

@@ -45,7 +45,7 @@ export class App extends React.Component<IAppProps, {}> {
       <ApolloProvider client={this.props.client || client}>
         <Provider store={this.props.store}>
           <I18nContainer>
-            <ThemeProvider theme={getTheme(config.LOCALE)}>
+            <ThemeProvider theme={getTheme(config.COUNTRY)}>
               <ConnectedRouter history={this.props.history}>
                 <ScrollToTop>
                   <NotificationComponent>

@@ -66,6 +66,11 @@ const messages = defineMessages({
     id: 'login.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
+  },
+  clearForm: {
+    id: 'login.clearForm',
+    defaultMessage: 'Clear form',
+    description: 'Button to clear the SMS code from the form'
   }
 })
 
@@ -213,7 +218,7 @@ export class StepTwoForm extends React.Component<
 
           {fieldToFocus && (
             <ClearFormLink id="login-clear-form" onClick={this.clearTheForm}>
-              Clear form
+              {intl.formatMessage(messages.clearForm)}
             </ClearFormLink>
           )}
           <ActionWrapper>

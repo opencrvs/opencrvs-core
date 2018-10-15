@@ -30,7 +30,7 @@ export const messages = defineMessages({
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
     defaultMessage:
-      'Must be a valid {locale} mobile phone number. Starting with 0. E.G. {format}',
+      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
   },
@@ -54,19 +54,27 @@ export const messages = defineMessages({
   }
 })
 
-const dynamicValidationProps = {
-  minLength: {
-    min: 10
+const fallbackCountry = config.COUNTRY
+
+const mobilePhonePatternTable = {
+  gbr: {
+    pattern: /^07[0-9]{9,10}$/,
+    example: '07123456789'
   },
-  phoneNumberFormat: {
-    locale: config.LOCALE.toUpperCase(),
-    format: messages.mobileNumberFormat.defaultMessage
+  bgd: {
+    pattern: /^01[156789][0-9]{8}$/,
+    example: '01741234567'
   }
 }
 
-export const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const numberRexExp = new RegExp(messages.mobilePhoneRegex.defaultMessage)
-  return numberRexExp.test(value)
+export const isAValidPhoneNumberFormat = (
+  value: string,
+  country: string
+): boolean => {
+  const countryMobileTable =
+    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
+  const { pattern } = countryMobileTable
+  return pattern.test(value)
 }
 
 export const requiredSymbol: Validation = (value: string) =>
@@ -77,7 +85,7 @@ export const required: Validation = (value: string) =>
 
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
-    ? { message: messages.minLength, props: dynamicValidationProps.minLength }
+    ? { message: messages.minLength, props: { min } }
     : undefined
 }
 
@@ -87,10 +95,22 @@ export const isNumber: Validation = (value: string) =>
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  return value && isAValidPhoneNumberFormat(value)
+  const country = config.COUNTRY
+  const countryMobileTable =
+    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
+  const { example } = countryMobileTable
+  const validationProps = { example }
+
+  const trimmedValue = value === undefined || value === null ? '' : value.trim()
+
+  if (!trimmedValue) {
+    return undefined
+  }
+
+  return isAValidPhoneNumberFormat(trimmedValue, country)
     ? undefined
     : {
         message: messages.phoneNumberFormat,
-        props: dynamicValidationProps.phoneNumberFormat
+        props: validationProps
       }
 }

@@ -54,14 +54,14 @@ const messages = defineMessages({
   onlineNoticeCardText: {
     id: 'register.savedRegistration.online.noticeCard.text',
     defaultMessage:
-      'The birth declaration of First Middle Last Name has been successfully submitted to the registration office.',
+      'The birth declaration of First Last Name has been successfully submitted to the registration office.',
     description:
       'The text of the notice card that appears on the saved registration page when the client is online'
   },
   offlineNoticeCardText: {
     id: 'register.savedRegistration.offline.noticeCard.text',
     defaultMessage:
-      'The birth declaration of First Middle Last Name is pending due to no internet connection. ',
+      'The birth declaration of First Last Name is pending due to no internet connection. ',
     description:
       'The text of the notice card that appears on the saved registration page when the client is offline'
   },

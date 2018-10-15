@@ -49,5 +49,5 @@ jobs:
       script: cd packages/e2e && yarn && yarn start --record
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
-        - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org
+        - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
