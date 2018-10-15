@@ -1,4 +1,4 @@
-import { findCompositionSection } from 'src/features/fhir/utils'
+import { findCompositionSection, findExtension } from 'src/features/fhir/utils'
 import {
   MOTHER_CODE,
   FATHER_CODE,
@@ -20,8 +20,37 @@ export const typeResolvers: GQLResolver = {
 
   Person: {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
-    identifier(identifier) {
-      return identifier
+    dateOfMarriage: person => {
+      const marriageExtension = findExtension(
+        'http://opencrvs.org/specs/extension/date-of-marriage',
+        person.extension
+      )
+      return marriageExtension.valueDateTime
+    },
+    multipleBirth: person => {
+      return person.multipleBirthInteger
+    },
+    deceased: person => {
+      return person.deceasedBoolean
+    },
+    nationality: person => {
+      const nationalityExtension = findExtension(
+        'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+        person.extension
+      )
+      const countryCodeExtension = findExtension(
+        'code',
+        nationalityExtension.extension
+      )
+
+      return countryCodeExtension.valueCodeableConcept.coding.code
+    },
+    educationalAttainment: person => {
+      const educationalAttainmentExtension = findExtension(
+        'http://opencrvs.org/specs/extension/educational-attainment',
+        person.extension
+      )
+      return educationalAttainmentExtension.valueString
     }
   },
 

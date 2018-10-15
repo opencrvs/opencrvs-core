@@ -5,6 +5,7 @@ import {
   CHILD_CODE
 } from 'src/features/fhir/templates'
 import * as fetch from 'jest-fetch-mock'
+import { mockPatient } from 'src/utils/testUtils'
 
 describe('Registration type resolvers', () => {
   it('fetches and returns a mother patient resource from a composition section', async () => {
@@ -105,15 +106,35 @@ describe('Registration type resolvers', () => {
     expect(createdAt).toBe('2018-10-05')
   })
 
-  it('returns identifier', () => {
+  it('returns dateOfMarriage', () => {
     // @ts-ignore
-    const identifier = typeResolvers.Person.identifier([
-      {
-        use: 'test',
-        value: '123456',
-        system: 'PASSPORT'
-      }
-    ])
-    expect(identifier[0].system).toBe('PASSPORT')
+    const dateOfMarriage = typeResolvers.Person.dateOfMarriage(mockPatient)
+    expect(dateOfMarriage).toBe('2014-01-28')
+  })
+
+  it('returns multipleBirth', () => {
+    // @ts-ignore
+    const multipleBirth = typeResolvers.Person.multipleBirth(mockPatient)
+    expect(multipleBirth).toBe(1)
+  })
+
+  it('returns deceased', () => {
+    // @ts-ignore
+    const deceased = typeResolvers.Person.deceased(mockPatient)
+    expect(deceased).toBe('false')
+  })
+
+  it('returns nationality', () => {
+    // @ts-ignore
+    const nationality = typeResolvers.Person.nationality(mockPatient)
+    expect(nationality).toBe('BN')
+  })
+
+  it('returns educationalAttainment', () => {
+    // @ts-ignore
+    const educationalAttainment = typeResolvers.Person.educationalAttainment(
+      mockPatient
+    )
+    expect(educationalAttainment).toBe('SECOND_STAGE_TERTIARY_ISCED_6')
   })
 })
