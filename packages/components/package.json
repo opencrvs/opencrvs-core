@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@types/react-select": "^2.0.2",
+    "css-animation": "^1.4.1",
+    "rc-menu": "^7.4.13",
     "react": "^16.3.2",
     "react-docgen-typescript": "^1.7.0",
     "react-dom": "^16.3.2",

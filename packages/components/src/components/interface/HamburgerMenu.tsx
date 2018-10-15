@@ -1,11 +1,11 @@
 import * as React from 'react'
 import animate from 'css-animation'
-import styled from '../styled-components'
+import styled from 'styled-components'
 import Menu, { SubMenu, MenuItem } from 'rc-menu'
-import { Hamburger } from '@opencrvs/components/lib/icons'
+import { Hamburger } from '../icons'
 
 const animation = {
-  enter(node: any, done: any) {
+  enter(node: any, done: (...args: any[]) => void) {
     let height: number
     return animate(node, 'rc-menu-collapse', {
       start() {
@@ -26,7 +26,7 @@ const animation = {
     return this.enter.apply(this, arguments)
   },
 
-  leave(node: any, done: any) {
+  leave(node: any, done: (...args: any[]) => void) {
     return animate(node, 'rc-menu-collapse', {
       start() {
         node.style.height = `${node.offsetHeight}px`
@@ -189,7 +189,7 @@ interface IMenuItem {
   onClick?: (...args: any[]) => void
 }
 
-export interface IProps {
+interface IProps {
   menuItems: IMenuItem[]
 }
 

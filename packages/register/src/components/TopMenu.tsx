@@ -11,7 +11,7 @@ import { getLanguages } from 'src/i18n/selectors'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
 import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
-import { HamburgerMenu } from './HamburgerMenu'
+import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 
 const messages = defineMessages({
   back: {

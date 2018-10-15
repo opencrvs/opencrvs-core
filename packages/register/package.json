@@ -20,7 +20,6 @@
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
     "query-string": "^6.1.0",
-    "rc-menu": "^7.4.12",
     "react": "^16.3.2",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.3.2",
@@ -29,8 +28,8 @@
     "react-router": "^4.2.0",
     "react-router-redux": "next",
     "react-scripts-ts": "2.16.0",
-    "react-swipeable": "^4.3.0",
     "react-stickynode": "^2.0.1",
+    "react-swipeable": "^4.3.0",
     "redux": "^4.0.0",
     "redux-loop": "^4.3.3",
     "xregexp": "^4.2.0"
