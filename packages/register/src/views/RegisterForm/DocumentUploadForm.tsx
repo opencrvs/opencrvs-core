@@ -2,7 +2,7 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import { Box } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
@@ -23,7 +23,7 @@ const FormAction = styled.div`
   justify-content: center;
 `
 
-const FormPrimaryButton = styled(PrimaryButton)`
+const FormImageUploader = styled(ImageUploader)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
@@ -107,12 +107,11 @@ class DocumentUploadFormView extends React.Component<FullProps, State> {
           />
           {showUploadButton && (
             <FormAction>
-              <FormPrimaryButton
+              <FormImageUploader
                 id="upload_document"
+                title={intl.formatMessage(messages.upload)}
                 icon={() => <ArrowForward />}
-              >
-                {intl.formatMessage(messages.upload)}
-              </FormPrimaryButton>
+              />
             </FormAction>
           )}
         </Box>
