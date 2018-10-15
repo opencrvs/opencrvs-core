@@ -31,17 +31,17 @@ describe('upload photo documents action component', () => {
     store
   ).component
 
-  it('icon renders without crashing', () => {
+  it('renders an icon passed as a prop', () => {
     expect(iconTestComponent.find('#styled-icon').hostNodes()).toHaveLength(1)
   })
 
-  it('icon action renders without crashing', () => {
+  it("adds the 'id' prop to the rendered element", () => {
     expect(
       iconActionTestComponent.find('#styled-icon-action').hostNodes()
     ).toHaveLength(1)
   })
 
-  it('title renders without crashing', () => {
+  it("renders the 'title' prop as a text inside the element", () => {
     expect(testComponent.prop('title')).toMatch('Upload Photo')
   })
 

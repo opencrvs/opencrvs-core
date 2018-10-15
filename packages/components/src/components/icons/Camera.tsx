@@ -10,14 +10,14 @@ export const Camera = (props: React.HTMLAttributes<SVGElement>) => (
   >
     <title>{`DF5D8046-FBAD-431B-A177-989ADF5BC0C9`}</title>
     <defs>
-      <rect id="b" x={0} y={0} width={50} height={50} rx={2.2} />
+      <rect id="camera_b" x={0} y={0} width={50} height={50} rx={2.2} />
       <filter
         x="-39%"
         y="-39%"
         width="178%"
         height="178%"
         filterUnits="objectBoundingBox"
-        id="a"
+        id="camera_a"
       >
         <feOffset in="SourceAlpha" result="shadowOffsetOuter1" />
         <feGaussianBlur
