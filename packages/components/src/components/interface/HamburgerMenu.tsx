@@ -102,7 +102,7 @@ const MenuContainer = styled.div`
     background-color: ${({ theme }) => theme.colors.primary};
   }
   .rc-menu-item.nested-menu-item {
-    background-color: ${({ theme }) => theme.colors.nestedMenuItem};
+    background-color: ${({ theme }) => theme.colors.secondary};
   }
   .rc-menu-item,
   .rc-menu-submenu-title {
@@ -166,7 +166,7 @@ const MenuContainer = styled.div`
     padding-right: 0;
   }
   ul.rc-menu.rc-menu-sub li {
-    border-top: 1px inset ${({ theme }) => theme.colors.itemBorderTop};
+    border-top: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
   }
 `
 

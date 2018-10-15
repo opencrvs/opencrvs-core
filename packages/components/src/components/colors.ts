@@ -17,8 +17,7 @@ export const colors = {
   hoverGradientDark: '#376fb7',
   inputBackground: '#F9F9F9',
   white: '#FFFFFF',
+  blackAlpha20: '#00000020',
   danger: '#D53F3F',
-  cardGradientEnd: '#5E93ED',
-  itemBorderTop: 'rgba(25, 24, 24, 0.12)',
-  nestedMenuItem: 'rgb(53, 73, 93)'
+  cardGradientEnd: '#5E93ED'
 }
