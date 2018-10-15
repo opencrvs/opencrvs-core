@@ -20,6 +20,9 @@ export const typeResolvers: GQLResolver = {
 
   Person: {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
+    identifier(identifier) {
+      return identifier
+    }
   },
 
   BirthRegistration: {

@@ -104,4 +104,16 @@ describe('Registration type resolvers', () => {
     })
     expect(createdAt).toBe('2018-10-05')
   })
+
+  it('returns identifier', () => {
+    // @ts-ignore
+    const identifier = typeResolvers.Person.identifier([
+      {
+        use: 'test',
+        value: '123456',
+        system: 'PASSPORT'
+      }
+    ])
+    expect(identifier[0].system).toBe('PASSPORT')
+  })
 })
