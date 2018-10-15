@@ -35,8 +35,15 @@ const ImageBase = styled.label`
 const HiddenInput = styled.input`
   display: none;
 `
+const Icon = styled.div`
+  /* TODO these feel weird..*/
+  display: flex;
+  justify-content: center;
 
-export interface IImagePickerProps
+  /* TODO 1. only apply margin if not only child */
+  margin-left: 2em;
+`
+interface IImagePickerProps
   extends React.LabelHTMLAttributes<HTMLLabelElement> {
   title: string
   icon?: () => React.ReactNode
@@ -55,12 +62,3 @@ export function ImageUploader({
     </ImageBase>
   )
 }
-
-export const Icon = styled.div`
-  /* TODO these feel weird..*/
-  display: flex;
-  justify-content: center;
-
-  /* TODO 1. only apply margin if not only child */
-  margin-left: 2em;
-`
