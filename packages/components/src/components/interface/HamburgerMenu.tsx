@@ -5,7 +5,7 @@ import Menu, { SubMenu, MenuItem } from 'rc-menu'
 import { Hamburger } from '../icons'
 
 const animation = {
-  enter(node: any, done: (...args: any[]) => void) {
+  enter(node: any, done: () => void) {
     let height: number
     return animate(node, 'rc-menu-collapse', {
       start() {
@@ -26,7 +26,7 @@ const animation = {
     return this.enter.apply(this, arguments)
   },
 
-  leave(node: any, done: (...args: any[]) => void) {
+  leave(node: any, done: () => void) {
     return animate(node, 'rc-menu-collapse', {
       start() {
         node.style.height = `${node.offsetHeight}px`
@@ -213,7 +213,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
   )
 
   render() {
-    const menuOptions = this.props.menuItems.map((menuItem: any) => {
+    const menuOptions = this.props.menuItems.map((menuItem: IMenuItem) => {
       if (menuItem.isSubMenu) {
         return (
           <SubMenu
@@ -221,15 +221,16 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
             className="nested-submenu"
             key={menuItem.key}
           >
-            {menuItem.menuItems.map((item: any) => (
-              <MenuItem
-                key={item.key}
-                onClick={item.onClick}
-                className="nested-menu-item"
-              >
-                {item.title}
-              </MenuItem>
-            ))}
+            {menuItem.menuItems &&
+              menuItem.menuItems.map((item: IMenuItem) => (
+                <MenuItem
+                  key={item.key}
+                  onClick={item.onClick}
+                  className="nested-menu-item"
+                >
+                  {item.title}
+                </MenuItem>
+              ))}
           </SubMenu>
         )
       } else {
