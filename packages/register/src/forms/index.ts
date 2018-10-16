@@ -37,7 +37,14 @@ export interface IDynamicOptions {
   options: { [key: string]: ISelectOption[] }
 }
 
-export type IFormFieldValue = string | string[] | boolean
+export type IFormFieldValue = string | string[] | boolean | IImageValue[]
+
+export type IImageValue = {
+  file: string
+  name: string
+  size?: number
+  base64Value: string
+}
 
 export interface IFormFieldBase {
   name: string

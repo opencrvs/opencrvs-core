@@ -1,17 +1,23 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-import { Box } from '@opencrvs/components/lib/interface'
+import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
-import { IFormSection, IFormField, IFormSectionData } from '../../forms'
+import {
+  IFormSection,
+  IFormField,
+  IFormSectionData,
+  IImageValue
+} from '../../forms'
 import { Form } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
 import { getDocumentUploadForm } from '../../forms/register/selectors'
 import { getValidationErrorsForForm } from 'src/forms/validation'
+import { goBack as goBackAction } from 'src/navigation'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -26,6 +32,7 @@ const FormAction = styled.div`
 const FormImageUploader = styled(ImageUploader)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
+export const imageListKey = 'upoloaded_images'
 
 export const messages = defineMessages({
   upload: {
@@ -35,17 +42,9 @@ export const messages = defineMessages({
   }
 })
 
-function hasFormError(fields: IFormField[], values: IFormSectionData) {
-  const errors = getValidationErrorsForForm(fields, values)
-
-  const fieldListWithErrors = Object.keys(errors).filter(key => {
-    return errors[key] && errors[key].length > 0
-  })
-  return fieldListWithErrors && fieldListWithErrors.length > 0
-}
-
 type DispatchProps = {
   modifyDraft: typeof modifyDraft
+  goBack: typeof goBackAction
 }
 
 type Props = {
@@ -83,7 +82,6 @@ class DocumentUploadFormView extends React.Component<FullProps, State> {
     const reader = new FileReader()
     reader.onloadend = () => {
       if (reader.result) {
-        console.log(uploadedImage.name)
         const { draft, tabId } = this.props
         this.props.modifyDraft({
           ...draft,
@@ -91,12 +89,16 @@ class DocumentUploadFormView extends React.Component<FullProps, State> {
             ...draft.data,
             [tabId]: {
               ...draft.data[tabId],
-              [Object.values(this.state.data)
-                .join(' ')
-                .concat('_uploaded_images')]: reader.result.toString()
+              [imageListKey]: getImageList(this.props, {
+                file: uploadedImage.name,
+                name: Object.values(this.state.data).join(' '),
+                size: uploadedImage.size,
+                base64Value: reader.result.toString()
+              })
             }
           }
         })
+        this.props.goBack()
       }
     }
     reader.readAsDataURL(uploadedImage)
@@ -110,33 +112,51 @@ class DocumentUploadFormView extends React.Component<FullProps, State> {
   }
 
   render() {
-    const { intl, documentUploadForm } = this.props
+    const { intl, documentUploadForm, goBack } = this.props
     const { showUploadButton } = this.state
     return (
-      <FormContainer>
-        <Box>
-          <Form
-            id={documentUploadForm.id}
-            onChange={this.storeData}
-            setAllFieldsDirty={false}
-            fields={documentUploadForm.fields}
-          />
-          {showUploadButton && (
-            <FormAction>
-              <FormImageUploader
-                id="upload_document"
-                title={intl.formatMessage(messages.upload)}
-                icon={() => <ArrowForward />}
-                handleFileChange={this.handleFileChange}
-              />
-            </FormAction>
-          )}
-        </Box>
-      </FormContainer>
+      <ActionPage title={intl.formatMessage(messages.upload)} goBack={goBack}>
+        <FormContainer>
+          <Box>
+            <Form
+              id={documentUploadForm.id}
+              onChange={this.storeData}
+              setAllFieldsDirty={false}
+              fields={documentUploadForm.fields}
+            />
+            {showUploadButton && (
+              <FormAction>
+                <FormImageUploader
+                  id="upload_document"
+                  title={intl.formatMessage(messages.upload)}
+                  icon={() => <ArrowForward />}
+                  handleFileChange={this.handleFileChange}
+                />
+              </FormAction>
+            )}
+          </Box>
+        </FormContainer>
+      </ActionPage>
     )
   }
 }
 
+function hasFormError(fields: IFormField[], values: IFormSectionData) {
+  const errors = getValidationErrorsForForm(fields, values)
+
+  const fieldListWithErrors = Object.keys(errors).filter(key => {
+    return errors[key] && errors[key].length > 0
+  })
+  return fieldListWithErrors && fieldListWithErrors.length > 0
+}
+function getImageList(props: Props, image: IImageValue): IImageValue[] {
+  const { draft, tabId } = props
+  const images = draft.data[tabId]
+    ? (draft.data[tabId][imageListKey] as IImageValue[])
+    : []
+  images.push(image)
+  return images
+}
 function mapStateToProps(
   state: IStoreState,
   props: Props & RouteComponentProps<{ draftId: string; tabId?: string }>
@@ -164,6 +184,7 @@ function mapStateToProps(
 export const DocumentUploadForm = connect<Props, DispatchProps>(
   mapStateToProps,
   {
+    goBack: goBackAction,
     modifyDraft
   }
 )(injectIntl<FullProps>(DocumentUploadFormView))
