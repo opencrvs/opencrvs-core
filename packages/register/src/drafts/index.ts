@@ -1,9 +1,11 @@
 import { IFormData } from '../forms'
 import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { loop, Cmd, getModel } from 'redux-loop'
+import { storage } from 'src/storage'
 
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
+const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 
 export interface IDraft {
   id: number
@@ -22,14 +24,23 @@ type ModifyDraftAction = {
   }
 }
 
-type Action = StoreDraftAction | ModifyDraftAction
+type SetInitialDraftsAction = {
+  type: typeof SET_INITIAL_DRAFTS
+  payload: {
+    drafts: IDraft[]
+  }
+}
+
+type Action = StoreDraftAction | ModifyDraftAction | SetInitialDraftsAction
 
 export interface IDraftsState {
+  initalDraftsLoaded: boolean
   drafts: IDraft[]
 }
 
 const initialState = {
-  drafts: JSON.parse(window.localStorage.getItem('tmp') || '[]')
+  initalDraftsLoaded: false,
+  drafts: []
 }
 
 export function createDraft() {
@@ -42,6 +53,10 @@ export function storeDraft(draft: IDraft): StoreDraftAction {
 
 export function modifyDraft(draft: IDraft) {
   return { type: MODIFY_DRAFT, payload: { draft } }
+}
+
+export function setInitialDrafts(drafts: IDraftsState) {
+  return { type: SET_INITIAL_DRAFTS, payload: { drafts } }
 }
 
 export function draftsReducerTMP(
@@ -80,6 +95,12 @@ export function draftsReducerTMP(
           return draft
         })
       }
+    case SET_INITIAL_DRAFTS:
+      return {
+        ...state,
+        initalDraftsLoaded: true,
+        drafts: action.payload.drafts
+      }
 
     default:
       return state
@@ -96,6 +117,8 @@ export function draftsReducer(
 ) {
   const stateOrLoop = draftsReducerTMP(state, action)
   const model = getModel(stateOrLoop)
-  window.localStorage.setItem('tmp', JSON.stringify(model.drafts))
+  if (state.initalDraftsLoaded && model.drafts) {
+    storage.setItem('tmp', JSON.stringify(model.drafts))
+  }
   return stateOrLoop
 }

@@ -26,6 +26,8 @@ import { RegisterForm } from './views/RegisterForm/RegisterForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
 import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
+import { storage } from 'src/storage'
+import { setInitialDrafts } from 'src/drafts'
 
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -40,6 +42,15 @@ interface IAppProps {
 export const store = createStore()
 
 export class App extends React.Component<IAppProps, {}> {
+  componentWillMount() {
+    this.loadDraftsFromStorage()
+  }
+  async loadDraftsFromStorage() {
+    const draftsString = await storage.getItem('tmp')
+    const drafts = JSON.parse(draftsString ? draftsString : '[]')
+    this.props.store.dispatch(setInitialDrafts(drafts))
+  }
+
   public render() {
     return (
       <ApolloProvider client={this.props.client || client}>
@@ -71,6 +82,7 @@ export class App extends React.Component<IAppProps, {}> {
                           path={routes.DRAFT_BIRTH_PARENT_FORM}
                           component={RegisterForm}
                         />
+
                         <ProtectedRoute
                           path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
                           component={RegisterForm}

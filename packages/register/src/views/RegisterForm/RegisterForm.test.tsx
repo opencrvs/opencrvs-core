@@ -2,13 +2,15 @@ import * as React from 'react'
 import { createTestComponent, selectOption } from 'src/tests/util'
 import { RegisterForm } from './RegisterForm'
 import { ReactWrapper } from 'enzyme'
-import { createDraft, storeDraft } from 'src/drafts'
+import { createDraft, storeDraft, setInitialDrafts } from 'src/drafts'
 import { IntlProvider } from 'react-intl'
 import { createStore } from '../../store'
 
 describe('when user is in the register form', () => {
   const { store, history } = createStore()
   const draft = createDraft()
+  const initalDrafts = JSON.parse('[]')
+  store.dispatch(setInitialDrafts(initalDrafts))
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
   const intlProvider = new IntlProvider({ locale: 'en' }, {})
