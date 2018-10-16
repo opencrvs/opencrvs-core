@@ -7,8 +7,10 @@ import {
 } from 'src/features/fhir/templates'
 import {
   selectOrCreatePersonResource,
-  createAndSetProperty
+  createAndSetProperty,
+  createAndSetExtensionProperty
 } from 'src/features/fhir/utils'
+import { OPENCRVS_SPECIFICATION_URL } from 'src/features/fhir/constants'
 
 function createNameBuilder(sectionCode: string) {
   return {
@@ -95,6 +97,25 @@ function createTelecomBuilder(sectionCode: string) {
   }
 }
 
+function createDateOfMarriageBuilder(sectionCode: string) {
+  return {
+    system: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetExtensionProperty(
+        person,
+        `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
+        fieldValue,
+        'valueDateTime',
+        context
+      )
+    }
+  }
+}
+
 const builders: IFieldBuilders = {
   createdAt: (fhirBundle, fieldValue) => {
     if (!fhirBundle.meta) {
@@ -130,7 +151,8 @@ const builders: IFieldBuilders = {
         context
       )
       mother.maritalStatus = fieldValue
-    }
+    },
+    dateOfMarriage: createDateOfMarriageBuilder(MOTHER_CODE)
   },
   father: {
     gender: (fhirBundle, fieldValue, context) => {
@@ -159,7 +181,8 @@ const builders: IFieldBuilders = {
         context
       )
       father.maritalStatus = fieldValue
-    }
+    },
+    dateOfMarriage: createDateOfMarriageBuilder(FATHER_CODE)
   },
   child: {
     gender: (fhirBundle, fieldValue, context) => {
@@ -188,7 +211,8 @@ const builders: IFieldBuilders = {
         context
       )
       child.maritalStatus = fieldValue
-    }
+    },
+    dateOfMarriage: createDateOfMarriageBuilder(CHILD_CODE)
   }
 }
 

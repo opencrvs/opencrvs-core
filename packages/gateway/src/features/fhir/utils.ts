@@ -72,6 +72,27 @@ export function createAndSetProperty(
   resource[label][context._index][propName] = value
 }
 
+export function createAndSetExtensionProperty(
+  resource: any,
+  url: string,
+  value: string | string[],
+  propName: string,
+  context: any
+) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  if (!findExtension(url, resource.extension)) {
+    resource.extension.push({
+      url
+    })
+  }
+  const extensionIndex = resource.extension.findIndex(
+    (obj: IExtension) => obj.url === url
+  )
+  resource.extension[extensionIndex][propName] = value
+}
+
 export function findExtension(url: string, composition: any): IExtension {
   const extension = composition.find((obj: IExtension) => {
     return obj.url === url
