@@ -50,8 +50,8 @@ type DispatchProps = {
 
 type Props = {
   draft: IDraft
+  tabId: string
   documentUploadForm: IFormSection
-  fields: IFormField[]
 }
 
 type FullProps = Props &
@@ -60,33 +60,49 @@ type FullProps = Props &
   RouteComponentProps<{}>
 
 type State = {
+  data: IFormSectionData
   showUploadButton: boolean
 }
 class DocumentUploadFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
-      showUploadButton: this.shouldShowUploadButton()
+      data: {},
+      showUploadButton: this.shouldShowUploadButton({})
     }
   }
 
-  modifyDraft = (documentData: IFormSectionData) => {
-    const { documentUploadForm, draft } = this.props
-    this.props.modifyDraft({
-      ...draft,
-      data: {
-        ...draft.data,
-        [documentUploadForm.id]: documentData
-      }
-    })
+  storeData = (documentData: IFormSectionData) => {
+    this.setState({ data: documentData })
     if (this.shouldShowUploadButton(documentData)) {
       this.setState({ showUploadButton: true })
     }
   }
 
-  shouldShowUploadButton = (
-    documentData = this.props.draft.data[this.props.documentUploadForm.id]
-  ) => {
+  handleFileChange = (uploadedImage: File) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      if (reader.result) {
+        console.log(uploadedImage.name)
+        const { draft, tabId } = this.props
+        this.props.modifyDraft({
+          ...draft,
+          data: {
+            ...draft.data,
+            [tabId]: {
+              ...draft.data[tabId],
+              [Object.values(this.state.data)
+                .join(' ')
+                .concat('_uploaded_images')]: reader.result.toString()
+            }
+          }
+        })
+      }
+    }
+    reader.readAsDataURL(uploadedImage)
+  }
+
+  shouldShowUploadButton = (documentData: IFormSectionData) => {
     return (
       documentData &&
       !hasFormError(this.props.documentUploadForm.fields, documentData)
@@ -94,16 +110,16 @@ class DocumentUploadFormView extends React.Component<FullProps, State> {
   }
 
   render() {
-    const { intl, documentUploadForm, fields } = this.props
+    const { intl, documentUploadForm } = this.props
     const { showUploadButton } = this.state
     return (
       <FormContainer>
         <Box>
           <Form
             id={documentUploadForm.id}
-            onChange={this.modifyDraft}
+            onChange={this.storeData}
             setAllFieldsDirty={false}
-            fields={fields}
+            fields={documentUploadForm.fields}
           />
           {showUploadButton && (
             <FormAction>
@@ -111,6 +127,7 @@ class DocumentUploadFormView extends React.Component<FullProps, State> {
                 id="upload_document"
                 title={intl.formatMessage(messages.upload)}
                 icon={() => <ArrowForward />}
+                handleFileChange={this.handleFileChange}
               />
             </FormAction>
           )}
@@ -120,16 +137,9 @@ class DocumentUploadFormView extends React.Component<FullProps, State> {
   }
 }
 
-function replaceInitialValues(fields: IFormField[], sectionValues: object) {
-  return fields.map(field => ({
-    ...field,
-    initialValue: sectionValues[field.name] || field.initialValue
-  }))
-}
-
 function mapStateToProps(
   state: IStoreState,
-  props: Props & RouteComponentProps<{ draftId: string }>
+  props: Props & RouteComponentProps<{ draftId: string; tabId?: string }>
 ) {
   const { match } = props
   const documentUploadForm = getDocumentUploadForm(state)
@@ -142,14 +152,11 @@ function mapStateToProps(
     throw new Error(`Draft "${match.params.draftId}" missing!`)
   }
 
-  const fields = replaceInitialValues(
-    documentUploadForm.fields,
-    draft.data[documentUploadForm.id] || {}
-  )
+  const tabId = match.params.tabId ? match.params.tabId : documentUploadForm.id
 
   return {
     documentUploadForm,
-    fields,
+    tabId,
     draft
   }
 }

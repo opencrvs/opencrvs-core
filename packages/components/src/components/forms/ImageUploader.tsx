@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled, { StyledComponentClass } from 'styled-components'
+import { InputHTMLAttributes } from 'react'
 
 const ImageBase = styled.label`
   width: auto;
@@ -43,22 +44,30 @@ const Icon = styled.div`
   /* TODO 1. only apply margin if not only child */
   margin-left: 2em;
 `
-interface IImagePickerProps
-  extends React.LabelHTMLAttributes<HTMLLabelElement> {
+interface IImagePickerProps {
+  id: string
   title: string
   icon?: () => React.ReactNode
+  handleFileChange: (file: File) => void
 }
 
-export function ImageUploader({
-  icon,
-  title,
-  ...otherProps
-}: IImagePickerProps) {
-  return (
-    <ImageBase {...otherProps}>
-      {title}
-      {icon && <Icon>{icon()}</Icon>}
-      <HiddenInput type="file" accept="image/*" />
-    </ImageBase>
-  )
+export class ImageUploader extends React.Component<IImagePickerProps, {}> {
+  handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { files } = event.target
+    return files && this.props.handleFileChange(files[0])
+  }
+  render() {
+    const { icon, title, ...otherProps } = this.props
+    return (
+      <ImageBase {...otherProps}>
+        {title}
+        {icon && <Icon>{icon()}</Icon>}
+        <HiddenInput
+          type="file"
+          accept="image/*"
+          onChange={event => this.handleFileChange(event)}
+        />
+      </ImageBase>
+    )
+  }
 }
