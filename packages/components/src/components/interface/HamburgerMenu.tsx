@@ -205,8 +205,8 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
   }
 
   toggleMenu = () => {
-    this.setState(() => ({
-      menuOpen: !this.state.menuOpen
+    this.setState(state => ({
+      menuOpen: !state.menuOpen
     }))
   }
 
