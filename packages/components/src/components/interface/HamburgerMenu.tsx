@@ -199,7 +199,7 @@ interface IState {
 }
 
 export class HamburgerMenu extends React.Component<IProps, IState> {
-  constructor(props: any) {
+  constructor(props: IProps) {
     super(props)
     this.state = {
       menuTitle: 'Menu',
