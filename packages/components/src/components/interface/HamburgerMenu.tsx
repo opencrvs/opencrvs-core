@@ -83,17 +83,11 @@ const MenuContainer = styled.div`
     width: 199px;
   }
   ul li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu span.icon {
-    opacity: 0;
+    display: none;
   }
   li.rc-menu-submenu.rc-menu-submenu-inline.main-menu
     > div.rc-menu-submenu-title {
     min-height: 90px;
-  }
-  .rc-menu div.close {
-    font-size: 50px;
-    margin-top: 2px;
-    margin-right: 2px;
-    font-family: ${({ theme }) => theme.fonts.lightFont};
   }
   .rc-menu.rc-menu-root > li.rc-menu-submenu {
     padding: 0 !important;
@@ -170,16 +164,19 @@ const MenuContainer = styled.div`
   }
 `
 
-const getIcon = (style = {}, icon: any, text?: string) => {
-  if (text) {
-    return <span style={style}>{text}</span>
-  }
-  return (
-    <span className="icon" style={style}>
-      {icon}
-    </span>
-  )
-}
+const IconWrapper = styled.span`
+  color: ${({ theme }) => theme.colors.white};
+  right: 30px;
+  margin-left: 20px;
+  position: absolute;
+`
+
+const IconClose = styled.div`
+  font-size: 50px;
+  margin-top: 2px;
+  margin-right: 2px;
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+`
 
 interface IMenuItem {
   title: string
@@ -213,17 +210,11 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
     }))
   }
 
-  expandIcon = () => {
-    return getIcon(
-      {
-        color: 'white',
-        right: '30px',
-        marginLeft: '20px',
-        position: 'absolute'
-      },
-      this.state.menuOpen ? <div className="close">&times;</div> : <Hamburger />
-    )
-  }
+  expandIcon = () => (
+    <IconWrapper className="icon">
+      {this.state.menuOpen ? <IconClose>&times;</IconClose> : <Hamburger />}
+    </IconWrapper>
+  )
 
   render() {
     const menuOptions = this.props.menuItems.map((menuItem: any) => {
