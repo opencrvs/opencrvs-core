@@ -45,8 +45,17 @@ describe('when user is in the menu page', () => {
     }
   ]
 
-  const menuTitleElement =
-    '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title span.submenu-title-wrapper'
+  const menuTitleSelector =
+    '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title'
+  const menuTitleTextSelector = `${menuTitleSelector} span`
+
+  const subMenuSelector =
+    'ul.rc-menu.rc-menu-sub.rc-menu-inline li.rc-menu-submenu.rc-menu-submenu-inline'
+
+  const subMenuItemSelector = `${subMenuSelector} ul li.rc-menu-item`
+
+  const wholeListItemsSelector =
+    '.rc-menu.rc-menu-root ul.rc-menu.rc-menu-sub.rc-menu-inline li'
 
   beforeEach(async () => {
     const testComponent = createTestComponent(
@@ -56,50 +65,41 @@ describe('when user is in the menu page', () => {
     hamburgerComponent = testComponent.component
   })
   it('renders main menu title', () => {
-    const menuName = hamburgerComponent.find(menuTitleElement).text()
+    const menuName = hamburgerComponent
+      .find(menuTitleTextSelector)
+      .first()
+      .text()
     expect(menuName).toBe('Menu')
   })
   it('Simulate menu open', () => {
-    hamburgerComponent
-      .find(
-        '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title'
-      )
-      .simulate('click')
+    hamburgerComponent.find(menuTitleSelector).simulate('click')
 
     const subMenu = hamburgerComponent.find(
-      '.rc-menu.rc-menu-root li.rc-menu-submenu.rc-menu-submenu-inline.main-menu.rc-menu-submenu-open'
+      '.rc-menu.rc-menu-root li.rc-menu-submenu.rc-menu-submenu-inline.rc-menu-submenu-open'
     )
     expect(subMenu.length).toBe(1)
   })
   describe('When user opens menu items', () => {
     // Applies only to tests in this describe block
     beforeEach(() => {
-      hamburgerComponent
-        .find(
-          '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title'
-        )
-        .simulate('click')
+      hamburgerComponent.find(menuTitleSelector).simulate('click')
     })
 
     it('hides main menu title', () => {
       const menuName = hamburgerComponent
-        .find(menuTitleElement)
+        .find(menuTitleTextSelector)
         .first()
         .text()
       expect(menuName).toBe('')
     })
 
     it('Renders whole list items', () => {
-      const items = hamburgerComponent.find(
-        '.rc-menu.rc-menu-root ul.rc-menu.rc-menu-sub.rc-menu-inline li'
-      )
+      const items = hamburgerComponent.find(wholeListItemsSelector)
       expect(items.length).toBe(6)
     })
 
     it('Renders nested submenu', () => {
-      const items = hamburgerComponent.find(
-        'ul.rc-menu.rc-menu-sub.rc-menu-inline li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu'
-      )
+      const items = hamburgerComponent.find(subMenuSelector)
       expect(items.length).toBe(1)
     })
 
@@ -107,43 +107,29 @@ describe('when user is in the menu page', () => {
       // Applies only to tests in this describe block
       beforeEach(() => {
         hamburgerComponent
-          .find(
-            'ul.rc-menu.rc-menu-sub.rc-menu-inline li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu div.rc-menu-submenu-title'
-          )
+          .find(`${subMenuSelector} div.rc-menu-submenu-title`)
           .simulate('click')
       })
       it('Renders nested submenu language items', () => {
-        const items = hamburgerComponent.find(
-          'ul.rc-menu.rc-menu-sub.rc-menu-inline li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu ul li.rc-menu-item.nested-menu-item'
-        )
+        const items = hamburgerComponent.find(subMenuItemSelector)
         expect(items.length).toBe(2)
       })
 
       it('Check first submenu item text', () => {
-        const item = hamburgerComponent
-          .find(
-            'ul.rc-menu.rc-menu-sub.rc-menu-inline li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu ul li.rc-menu-item.nested-menu-item'
-          )
-          .first()
+        const item = hamburgerComponent.find(subMenuItemSelector).first()
 
         expect(item.text()).toBe('Bengali')
       })
 
       it('Check last submenu item text', () => {
-        const item = hamburgerComponent
-          .find(
-            'ul.rc-menu.rc-menu-sub.rc-menu-inline li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu ul li.rc-menu-item.nested-menu-item'
-          )
-          .last()
+        const item = hamburgerComponent.find(subMenuItemSelector).last()
 
         expect(item.text()).toBe('English')
       })
     })
 
     it('Check last list item text', () => {
-      const item = hamburgerComponent
-        .find('.rc-menu.rc-menu-root ul.rc-menu.rc-menu-sub.rc-menu-inline li')
-        .last()
+      const item = hamburgerComponent.find(wholeListItemsSelector).last()
       expect(item.text()).toBe('Log out')
     })
   })
