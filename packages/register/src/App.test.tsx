@@ -77,6 +77,16 @@ describe('when user has a valid token in local storage', () => {
     expect(assign.mock.calls).toHaveLength(0)
   })
 
+  describe('when loadDraftsFromStorage method is called', () => {
+    beforeEach(() => {
+      const instance = app.instance() as any
+      instance.loadDraftsFromStorage()
+    })
+    it('should retrive saved drafts from storage', () => {
+      expect(storage.getItem).toBeCalled()
+    })
+  })
+
   describe('when user is in home view', () => {
     beforeEach(() => {
       history.replace(HOME)
