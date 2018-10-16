@@ -6,6 +6,35 @@ import { createDraft, storeDraft, setInitialDrafts } from 'src/drafts'
 import { IntlProvider } from 'react-intl'
 import { createStore } from '../../store'
 
+describe('when user is in the register form before initial draft load', () => {
+  const { store, history } = createStore()
+  let component: ReactWrapper<{}, {}>
+  const intlProvider = new IntlProvider({ locale: 'en' }, {})
+  const { intl } = intlProvider.getChildContext()
+  const mock: any = jest.fn()
+  const testComponent = createTestComponent(
+    <RegisterForm
+      location={mock}
+      intl={intl}
+      history={history}
+      staticContext={mock}
+      match={{
+        params: { draftId: '', tabId: 'mother' },
+        isExact: true,
+        path: '',
+        url: ''
+      }}
+    />,
+    store
+  )
+  component = testComponent.component
+  it('does not render the form', () => {
+    expect(
+      component.find('#form_section_title_mother').hostNodes()
+    ).toHaveLength(0)
+  })
+})
+
 describe('when user is in the register form', () => {
   const { store, history } = createStore()
   const draft = createDraft()
