@@ -85,9 +85,6 @@ const MenuContainer = styled.div`
   .rc-menu-item:hover {
     background-color: ${({ theme }) => theme.colors.primary};
   }
-  .rc-menu-item.nested-menu-item {
-    background-color: ${({ theme }) => theme.colors.secondary};
-  }
   .rc-menu-item,
   .rc-menu-submenu-title {
     margin: 0;
@@ -153,6 +150,10 @@ const StyledNestedSubMenu = styled(SubMenu)`
     text-align: right;
     padding: 18px 22px !important;
   }
+`
+
+const StyledNestedMenuItem = styled(MenuItem)`
+  background-color: ${({ theme }) => theme.colors.secondary};
 `
 
 const SubMenuTitleWrapper = styled.span`
@@ -228,13 +229,9 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
           >
             {menuItem.menuItems &&
               menuItem.menuItems.map((item: IMenuItem) => (
-                <MenuItem
-                  key={item.key}
-                  onClick={item.onClick}
-                  className="nested-menu-item"
-                >
+                <StyledNestedMenuItem key={item.key} onClick={item.onClick}>
                   {item.title}
-                </MenuItem>
+                </StyledNestedMenuItem>
               ))}
           </StyledNestedSubMenu>
         )
