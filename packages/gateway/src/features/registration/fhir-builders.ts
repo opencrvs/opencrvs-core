@@ -7,7 +7,8 @@ import {
 } from 'src/features/fhir/templates'
 import {
   selectOrCreatePersonResource,
-  createAndSetNameProperty
+  createAndSetNameProperty,
+  createAndSetIDProperty
 } from 'src/features/fhir/utils'
 
 function createNameBuilder(sectionCode: string) {
@@ -39,6 +40,27 @@ function createNameBuilder(sectionCode: string) {
   }
 }
 
+function createIDBuilder(sectionCode: string) {
+  return {
+    id: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetIDProperty(person, fieldValue, 'id', context)
+    },
+    type: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetIDProperty(person, fieldValue, 'type', context)
+    }
+  }
+}
+
 const builders: IFieldBuilders = {
   createdAt: (fhirBundle, fieldValue) => {
     if (!fhirBundle.meta) {
@@ -56,6 +78,7 @@ const builders: IFieldBuilders = {
       )
       mother.gender = fieldValue
     },
+    identifier: createIDBuilder(MOTHER_CODE),
     name: createNameBuilder(MOTHER_CODE)
   },
   father: {
@@ -67,6 +90,7 @@ const builders: IFieldBuilders = {
       )
       father.gender = fieldValue
     },
+    identifier: createIDBuilder(FATHER_CODE),
     name: createNameBuilder(FATHER_CODE)
   },
   child: {
@@ -78,6 +102,7 @@ const builders: IFieldBuilders = {
       )
       child.gender = fieldValue
     },
+    identifier: createIDBuilder(CHILD_CODE),
     name: createNameBuilder(CHILD_CODE)
   }
 }

@@ -3,6 +3,7 @@ import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle({
     mother: {
+      identifier: [{ id: '123456', type: 'PASSPORT' }],
       gender: 'female',
       name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'english' }]
     },
@@ -19,4 +20,6 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[1].resource.name[0].given[0]).toBe('Jane')
   expect(fhir.entry[1].resource.name[0].family[0]).toBe('Doe')
   expect(fhir.entry[1].resource.name[0].use).toBe('english')
+  expect(fhir.entry[1].resource.identifier[0].id).toBe('123456')
+  expect(fhir.entry[1].resource.identifier[0].type).toBe('PASSPORT')
 })
