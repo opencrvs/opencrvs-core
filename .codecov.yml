@@ -6,10 +6,6 @@ coverage:
         paths:
           - packages/auth
         threshold: 0.5
-      components:
-        paths:
-          - packages/components
-        threshold: 0.5
       gateway:
         paths:
           - packages/gateway
