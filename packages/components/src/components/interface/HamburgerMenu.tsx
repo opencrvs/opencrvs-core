@@ -94,7 +94,7 @@ const MenuContainer = styled.div`
     padding: 10px 7px 7px 16px;
     white-space: nowrap;
     min-height: 50px;
-    color: rgb(255, 255, 255);
+    color: ${({ theme }) => theme.colors.white};
     font-family: ${({ theme }) => theme.fonts.lightFont};
     font-size: 16px;
     letter-spacing: 2px;
@@ -159,7 +159,7 @@ const StyledNestedMenuItem = styled(MenuItem)`
 const SubMenuTitleWrapper = styled.span`
   height: 20px;
   width: 80px;
-  color: rgb(255, 255, 255);
+  color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 16px;
   letter-spacing: 2px;
