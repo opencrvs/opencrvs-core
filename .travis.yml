@@ -15,7 +15,7 @@ jobs:
         - yarn dev:secrets:gen
         - yarn compose -d
         - sleep 10
-        - yarn start &
+        - yarn start:prod &
         - sleep 60
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start --record
