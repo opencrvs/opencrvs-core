@@ -5,7 +5,6 @@ import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
-import { FileItem } from '@opencrvs/components/lib/files'
 import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistrationAsParent } from 'src/navigation'
 import { createDraft, storeDraft } from '../../drafts'
@@ -104,11 +103,6 @@ export class SelectInformantView extends React.Component<
             disabled
           />
         </ActionList>
-        <FileItem
-          file={{ subject: 'Mother', type: 'Birth registration', data: '' }}
-          onDelete={() => alert('onDelete called')}
-          onPreview={() => alert('onPreview called')}
-        />
       </>
     )
   }
