@@ -1,5 +1,6 @@
 coverage:
   status:
+    patch: 80
     project:
       default: false
       auth:
