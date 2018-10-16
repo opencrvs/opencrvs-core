@@ -16,7 +16,7 @@ jobs:
         - yarn compose -d
         - sleep 10
         - yarn start:prod &
-        - sleep 60
+        - sleep 90
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start --record
       env:
