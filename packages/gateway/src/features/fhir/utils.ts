@@ -5,6 +5,7 @@ import {
   createChildSection,
   createPersonEntryTemplate
 } from 'src/features/fhir/templates'
+import { IExtension } from 'src/type/person'
 
 export function findCompositionSectionInBundle(code: string, fhirBundle: any) {
   return fhirBundle.entry[0].resource.section.find(
@@ -68,4 +69,11 @@ export function createAndSetNameProperty(
     resource.name[context._index] = {}
   }
   resource.name[context._index][propName] = value
+}
+
+export function findExtension(url: string, composition: any): IExtension {
+  const extension = composition.find((obj: IExtension) => {
+    return obj.url === url
+  })
+  return extension
 }
