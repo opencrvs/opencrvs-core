@@ -23,6 +23,7 @@ const Link = styled.a`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
   text-decoration: underline;
+  cursor: pointer;
 `
 
 const PreviewLink = styled(Link)`
