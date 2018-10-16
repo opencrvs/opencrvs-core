@@ -1,0 +1,36 @@
+coverage:
+  status:
+    project:
+      default: false
+      auth:
+        paths:
+          - packages/auth
+        threshold: 0.5
+      components:
+        paths:
+          - packages/components
+        threshold: 0.5
+      gateway:
+        paths:
+          - packages/gateway
+        threshold: 0.5
+      login:
+        paths:
+          - packages/login
+        threshold: 0.5
+      notification:
+        paths:
+          - packages/notification
+        threshold: 0.5
+      register:
+        paths:
+          - packages/register
+        threshold: 0.5
+      user-mgnt:
+        paths:
+          - packages/user-mgnt
+        threshold: 0.5
+      validation:
+        paths:
+          - packages/validation
+        threshold: 0.5
