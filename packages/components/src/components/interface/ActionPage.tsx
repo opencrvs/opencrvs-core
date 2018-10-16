@@ -47,7 +47,8 @@ const BackButtonText = styled.span`
 `
 const MenuTitle = styled.span`
   font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 30px;
+  font-size: 32px;
+  font-weight: 300;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
