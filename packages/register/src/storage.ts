@@ -1,9 +1,9 @@
 import * as localForage from 'localforage'
 
-function configStorage() {
+function configStorage(dbName: string) {
   localForage.config({
     driver: localForage.INDEXEDDB,
-    name: 'OpenCRVS'
+    name: dbName
   })
 }
 
