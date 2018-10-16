@@ -5,9 +5,18 @@ import { childSection } from './child-section'
 import { motherSection } from './mother-section'
 import { fatherSection } from './father-section'
 import { registrationSection } from './registration-section'
-import { documentsSection } from './documents-section'
 
 const messages = defineMessages({
+  documentsTab: {
+    id: 'register.form.tabs.documentsTab',
+    defaultMessage: 'Documents',
+    description: 'Tab title for Documents'
+  },
+  documentsTitle: {
+    id: 'register.form.section.documentsTitle',
+    defaultMessage: 'Supporting documents',
+    description: 'Form section title for Documents'
+  },
   previewTab: {
     id: 'register.form.tabs.previewTab',
     defaultMessage: 'Preview',
@@ -31,7 +40,13 @@ export const initialState: IRegisterFormState = {
       motherSection,
       fatherSection,
       registrationSection,
-      documentsSection,
+      {
+        id: 'documents',
+        viewType: 'document',
+        name: messages.documentsTab,
+        title: messages.documentsTitle,
+        fields: []
+      },
       {
         id: 'preview',
         viewType: 'preview',

@@ -569,6 +569,8 @@ export const ENGLISH_STATE = {
     'formFields.docTypeNID': 'NID',
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
-    'formFields.docTypeOther': 'Other'
+    'formFields.docTypeOther': 'Other',
+    'register.form.section.documents.uploadImage':
+      'Upload a photo of the supporting document'
   }
 }

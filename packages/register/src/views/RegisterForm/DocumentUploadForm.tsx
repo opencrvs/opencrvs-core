@@ -151,9 +151,10 @@ function hasFormError(fields: IFormField[], values: IFormSectionData) {
 }
 function getImageList(props: Props, image: IImageValue): IImageValue[] {
   const { draft, tabId } = props
-  const images = draft.data[tabId]
-    ? (draft.data[tabId][imageListKey] as IImageValue[])
-    : []
+  const images =
+    draft.data[tabId] && draft.data[tabId][imageListKey]
+      ? (draft.data[tabId][imageListKey] as IImageValue[])
+      : []
   images.push(image)
   return images
 }

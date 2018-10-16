@@ -44,10 +44,14 @@ export function goToBirthRegistrationAsParent(draftId: number) {
   )
 }
 
-export function goToBirthRegistrationDocumentUpload(draftId: number) {
+export function goToBirthRegistrationDocumentUpload(
+  draftId: number,
+  tabId: string
+) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_DOCUMENT_UPLOAD_FORM, {
-      draftId: draftId.toString()
+      draftId: draftId.toString(),
+      tabId
     })
   )
 }
