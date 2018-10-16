@@ -79,9 +79,6 @@ const MenuContainer = styled.div`
     > div.rc-menu-submenu-title {
     padding-top: 30px;
   }
-  ul li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu span.icon {
-    display: none;
-  }
   .rc-menu.rc-menu-root > li.rc-menu-submenu {
     padding: 0 !important;
   }
@@ -109,8 +106,7 @@ const MenuContainer = styled.div`
   .rc-menu-submenu > .rc-menu {
     background-color: ${({ theme }) => theme.colors.primary};
   }
-  .rc-menu-inline > .rc-menu-item,
-  .rc-menu-inline > .rc-menu-submenu.nested-submenu > .rc-menu-submenu-title {
+  .rc-menu-inline > .rc-menu-item {
     text-align: right;
     padding: 18px 22px !important;
   }
@@ -146,6 +142,16 @@ const StyledSubMenu = styled(SubMenu)`
     font-weight: bold;
     font-size: 14px;
     text-transform: uppercase;
+  }
+`
+
+const StyledNestedSubMenu = styled(SubMenu)`
+  span:last-child {
+    display: none;
+  }
+  > .rc-menu-submenu-title {
+    text-align: right;
+    padding: 18px 22px !important;
   }
 `
 
@@ -207,7 +213,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
   }
 
   expandIcon = () => (
-    <IconWrapper className="icon">
+    <IconWrapper>
       {this.state.menuOpen ? <IconClose>&times;</IconClose> : <Hamburger />}
     </IconWrapper>
   )
@@ -216,9 +222,8 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
     const menuOptions = this.props.menuItems.map((menuItem: IMenuItem) => {
       if (menuItem.isSubMenu) {
         return (
-          <SubMenu
+          <StyledNestedSubMenu
             title={<SubMenuTitleWrapper>{menuItem.title}</SubMenuTitleWrapper>}
-            className="nested-submenu"
             key={menuItem.key}
           >
             {menuItem.menuItems &&
@@ -231,7 +236,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
                   {item.title}
                 </MenuItem>
               ))}
-          </SubMenu>
+          </StyledNestedSubMenu>
         )
       } else {
         return (
