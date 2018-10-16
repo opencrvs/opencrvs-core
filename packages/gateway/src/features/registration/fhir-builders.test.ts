@@ -7,8 +7,13 @@ test('should build a minimal FHIR registration document without error', async ()
       gender: 'female',
       name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'english' }]
     },
-    father: { gender: 'male', name: [] },
-    child: { gender: 'male', name: [] },
+    father: {
+      gender: 'male',
+      name: [],
+      telecom: [{ use: 'mobile', system: 'phone', value: '0171111111' }],
+      maritalStatus: 'MARRIED'
+    },
+    child: { gender: 'male', name: [], birthDate: '2018-01-28' },
     createdAt: new Date()
   })
   expect(fhir).toBeDefined()
@@ -22,4 +27,9 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[1].resource.name[0].use).toBe('english')
   expect(fhir.entry[1].resource.identifier[0].id).toBe('123456')
   expect(fhir.entry[1].resource.identifier[0].type).toBe('PASSPORT')
+  expect(fhir.entry[2].resource.telecom[0].value).toBe('0171111111')
+  expect(fhir.entry[2].resource.telecom[0].system).toBe('phone')
+  expect(fhir.entry[2].resource.telecom[0].use).toBe('mobile')
+  expect(fhir.entry[3].resource.birthDate).toBe('2018-01-28')
+  expect(fhir.entry[2].resource.maritalStatus).toBe('MARRIED')
 })

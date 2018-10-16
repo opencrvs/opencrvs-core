@@ -56,34 +56,20 @@ export function selectOrCreatePersonResource(
   return personEntry.resource
 }
 
-export function createAndSetNameProperty(
+export function createAndSetProperty(
   resource: any,
+  label: string,
   value: string | string[],
   propName: string,
   context: any
 ) {
-  if (!resource.name) {
-    resource.name = []
+  if (!resource[label]) {
+    resource[label] = []
   }
-  if (!resource.name[context._index]) {
-    resource.name[context._index] = {}
+  if (!resource[label][context._index]) {
+    resource[label][context._index] = {}
   }
-  resource.name[context._index][propName] = value
-}
-
-export function createAndSetIDProperty(
-  resource: any,
-  value: string | string[],
-  propName: string,
-  context: any
-) {
-  if (!resource.identifier) {
-    resource.identifier = []
-  }
-  if (!resource.identifier[context._index]) {
-    resource.identifier[context._index] = {}
-  }
-  resource.identifier[context._index][propName] = value
+  resource[label][context._index][propName] = value
 }
 
 export function findExtension(url: string, composition: any): IExtension {

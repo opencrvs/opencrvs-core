@@ -7,8 +7,7 @@ import {
 } from 'src/features/fhir/templates'
 import {
   selectOrCreatePersonResource,
-  createAndSetNameProperty,
-  createAndSetIDProperty
+  createAndSetProperty
 } from 'src/features/fhir/utils'
 
 function createNameBuilder(sectionCode: string) {
@@ -19,7 +18,7 @@ function createNameBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetNameProperty(person, fieldValue, 'use', context)
+      createAndSetProperty(person, 'name', fieldValue, 'use', context)
     },
     firstNames: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -27,7 +26,13 @@ function createNameBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetNameProperty(person, fieldValue.split(' '), 'given', context)
+      createAndSetProperty(
+        person,
+        'name',
+        fieldValue.split(' '),
+        'given',
+        context
+      )
     },
     familyName: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -35,7 +40,7 @@ function createNameBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetNameProperty(person, [fieldValue], 'family', context)
+      createAndSetProperty(person, 'name', [fieldValue], 'family', context)
     }
   }
 }
@@ -48,7 +53,7 @@ function createIDBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetIDProperty(person, fieldValue, 'id', context)
+      createAndSetProperty(person, 'identifier', fieldValue, 'id', context)
     },
     type: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -56,7 +61,36 @@ function createIDBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetIDProperty(person, fieldValue, 'type', context)
+      createAndSetProperty(person, 'identifier', fieldValue, 'type', context)
+    }
+  }
+}
+
+function createTelecomBuilder(sectionCode: string) {
+  return {
+    system: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetProperty(person, 'telecom', fieldValue, 'system', context)
+    },
+    value: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetProperty(person, 'telecom', fieldValue, 'value', context)
+    },
+    use: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      createAndSetProperty(person, 'telecom', fieldValue, 'use', context)
     }
   }
 }
@@ -79,7 +113,24 @@ const builders: IFieldBuilders = {
       mother.gender = fieldValue
     },
     identifier: createIDBuilder(MOTHER_CODE),
-    name: createNameBuilder(MOTHER_CODE)
+    name: createNameBuilder(MOTHER_CODE),
+    telecom: createTelecomBuilder(MOTHER_CODE),
+    birthDate: (fhirBundle, fieldValue, context) => {
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        fhirBundle,
+        context
+      )
+      mother.birthDate = fieldValue
+    },
+    maritalStatus: (fhirBundle, fieldValue, context) => {
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        fhirBundle,
+        context
+      )
+      mother.maritalStatus = fieldValue
+    }
   },
   father: {
     gender: (fhirBundle, fieldValue, context) => {
@@ -91,7 +142,24 @@ const builders: IFieldBuilders = {
       father.gender = fieldValue
     },
     identifier: createIDBuilder(FATHER_CODE),
-    name: createNameBuilder(FATHER_CODE)
+    name: createNameBuilder(FATHER_CODE),
+    telecom: createTelecomBuilder(FATHER_CODE),
+    birthDate: (fhirBundle, fieldValue, context) => {
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        fhirBundle,
+        context
+      )
+      father.birthDate = fieldValue
+    },
+    maritalStatus: (fhirBundle, fieldValue, context) => {
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        fhirBundle,
+        context
+      )
+      father.maritalStatus = fieldValue
+    }
   },
   child: {
     gender: (fhirBundle, fieldValue, context) => {
@@ -103,7 +171,24 @@ const builders: IFieldBuilders = {
       child.gender = fieldValue
     },
     identifier: createIDBuilder(CHILD_CODE),
-    name: createNameBuilder(CHILD_CODE)
+    name: createNameBuilder(CHILD_CODE),
+    telecom: createTelecomBuilder(CHILD_CODE),
+    birthDate: (fhirBundle, fieldValue, context) => {
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        fhirBundle,
+        context
+      )
+      child.birthDate = fieldValue
+    },
+    maritalStatus: (fhirBundle, fieldValue, context) => {
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        fhirBundle,
+        context
+      )
+      child.maritalStatus = fieldValue
+    }
   }
 }
 
