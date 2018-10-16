@@ -79,15 +79,8 @@ const MenuContainer = styled.div`
     > div.rc-menu-submenu-title {
     padding-top: 30px;
   }
-  li.rc-menu-submenu.rc-menu-submenu-inline.main-menu.rc-menu-submenu-open {
-    width: 199px;
-  }
   ul li.rc-menu-submenu.rc-menu-submenu-inline.nested-submenu span.icon {
     display: none;
-  }
-  li.rc-menu-submenu.rc-menu-submenu-inline.main-menu
-    > div.rc-menu-submenu-title {
-    min-height: 90px;
   }
   .rc-menu.rc-menu-root > li.rc-menu-submenu {
     padding: 0 !important;
@@ -112,32 +105,6 @@ const MenuContainer = styled.div`
     font-size: 16px;
     letter-spacing: 2px;
     line-height: 19px;
-  }
-  .submenu-title-wrapper {
-    height: 20px;
-    width: 80px;
-    color: rgb(255, 255, 255);
-    font-family: ${({ theme }) => theme.fonts.lightFont};
-    font-size: 16px;
-    letter-spacing: 2px;
-    line-height: 19px;
-  }
-  .rc-menu-submenu-inline.main-menu
-    > div.rc-menu-submenu-title
-    > .submenu-title-wrapper {
-    font-size: 14px;
-  }
-  .rc-menu-submenu.rc-menu-submenu-inline.main-menu
-    > div.rc-menu-submenu-title
-    > span.submenu-title-wrapper {
-    display: inline-block;
-    margin-top: 5px;
-    margin-left: 40px;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-  .rc-menu-submenu-popup .submenu-title-wrapper {
-    padding-right: 20px;
   }
   .rc-menu-submenu > .rc-menu {
     background-color: ${({ theme }) => theme.colors.primary};
@@ -164,6 +131,35 @@ const MenuContainer = styled.div`
   }
 `
 
+const StyledSubMenu = styled(SubMenu)`
+  .rc-menu-submenu-open {
+    width: 199px;
+  }
+  > div.rc-menu-submenu-title {
+    min-height: 90px;
+    font-size: 14px;
+  }
+  > div.rc-menu-submenu-title > span {
+    display: inline-block;
+    margin-top: 5px;
+    margin-left: 40px;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+`
+
+const SubMenuTitleWrapper = styled.span`
+  height: 20px;
+  width: 80px;
+  color: rgb(255, 255, 255);
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-size: 16px;
+  letter-spacing: 2px;
+  line-height: 19px;
+  padding-right: 20px;
+`
+
 const IconWrapper = styled.span`
   color: ${({ theme }) => theme.colors.white};
   right: 30px;
@@ -172,7 +168,7 @@ const IconWrapper = styled.span`
 `
 
 const IconClose = styled.div`
-  font-size: 50px;
+  font-size: 45px;
   margin-top: 2px;
   margin-right: 2px;
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -221,9 +217,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
       if (menuItem.isSubMenu) {
         return (
           <SubMenu
-            title={
-              <span className="submenu-title-wrapper">{menuItem.title}</span>
-            }
+            title={<SubMenuTitleWrapper>{menuItem.title}</SubMenuTitleWrapper>}
             className="nested-submenu"
             key={menuItem.key}
           >
@@ -255,17 +249,16 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
           openAnimation={animation}
           triggerSubMenuAction="click"
         >
-          <SubMenu
+          <StyledSubMenu
             onTitleClick={this.toggleMenu}
-            className="main-menu"
             title={
-              <span className="submenu-title-wrapper">
+              <SubMenuTitleWrapper>
                 {this.state.menuOpen ? '' : this.state.menuTitle}
-              </span>
+              </SubMenuTitleWrapper>
             }
           >
             {menuOptions}
-          </SubMenu>
+          </StyledSubMenu>
         </Menu>
       </MenuContainer>
     )
