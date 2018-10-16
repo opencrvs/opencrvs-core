@@ -48,7 +48,7 @@ const MenuContainer = styled.div`
   height: 90px;
   width: 199px;
   background-color: ${({ theme }) => theme.colors.primary};
-  z-index: 1000;
+  z-index: 2;
   position: absolute;
 
   .rc-menu {
