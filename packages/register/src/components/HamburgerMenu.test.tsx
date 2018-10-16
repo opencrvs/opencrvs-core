@@ -45,6 +45,9 @@ describe('when user is in the menu page', () => {
     }
   ]
 
+  const menuTitleElement =
+    '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title span.submenu-title-wrapper'
+
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <HamburgerMenu menuItems={menuItems} />,
@@ -53,11 +56,7 @@ describe('when user is in the menu page', () => {
     hamburgerComponent = testComponent.component
   })
   it('renders main menu title', () => {
-    const menuName = hamburgerComponent
-      .find(
-        '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title span.submenu-title-wrapper'
-      )
-      .text()
+    const menuName = hamburgerComponent.find(menuTitleElement).text()
     expect(menuName).toBe('Menu')
   })
   it('Simulate menu open', () => {
@@ -84,9 +83,7 @@ describe('when user is in the menu page', () => {
 
     it('hides main menu title', () => {
       const menuName = hamburgerComponent
-        .find(
-          '.rc-menu.rc-menu-root li.rc-menu-submenu div.rc-menu-submenu-title span.submenu-title-wrapper'
-        )
+        .find(menuTitleElement)
         .first()
         .text()
       expect(menuName).toBe('')
