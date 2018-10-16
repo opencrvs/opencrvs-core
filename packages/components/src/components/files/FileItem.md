@@ -1,4 +1,4 @@
-An item in a list of files. Pass it a file object and callback to handle `onDelete` and `onPreview` click event when the corresponding button is clicked.
+An item in a list of files. Pass it a file object and callbacks to handle `onDelete` and `onPreview` click events when the corresponding button is clicked.
 
 ```jsx
 <FileItem
