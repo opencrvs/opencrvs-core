@@ -1,6 +1,8 @@
 coverage:
   status:
-    patch: 80
+    patch:
+      default:
+        target: 80
     project:
       default: false
       auth:
