@@ -1,7 +1,8 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { Cross } from '../icons'
 import Uploaded from '../icons/Uploaded'
+import { ITheme } from '../theme'
 
 interface IProps {
   file: {
@@ -11,6 +12,7 @@ interface IProps {
   }
   onDelete: () => void
   onPreview: () => void
+  theme: ITheme
 }
 
 const Container = styled.div`
@@ -24,7 +26,7 @@ const Link = styled.a`
 `
 
 const PreviewLink = styled(Link)`
-  color: #4c68c1;
+  color: ${({ theme }) => theme.colors.primary};
 `
 
 const DeleteLink = styled(Link)`
@@ -35,9 +37,9 @@ const DeleteLink = styled(Link)`
 const FileContainer = styled.div`
   height: 75px;
   min-width: 300px;
-  border: 1px solid #5e93ed;
+  border: 1px solid ${({ theme }) => theme.colors.cardGradientEnd};
   border-radius: 1px;
-  background-color: #f9f9f9;
+  background-color: ${({ theme }) => theme.colors.inputBackground};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
 
   flex: 1;
@@ -58,7 +60,7 @@ const DeleteContainer = styled.div`
 const MetadataContainer = styled.div`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
-  color: #35495d;
+  color: ${({ theme }) => theme.colors.secondary};
 
   display: flex;
   flex-direction: column;
@@ -66,10 +68,10 @@ const MetadataContainer = styled.div`
   margin: 0 16px;
 `
 
-export class FileItem extends React.Component<IProps> {
+class FileItemComponent extends React.Component<IProps> {
   render() {
     const { subject, type } = this.props.file
-    const { onDelete, onPreview } = this.props
+    const { onDelete, onPreview, theme } = this.props
 
     return (
       <Container>
@@ -82,10 +84,12 @@ export class FileItem extends React.Component<IProps> {
           <PreviewLink onClick={onPreview}>Preview</PreviewLink>
         </FileContainer>
         <DeleteContainer onClick={onDelete}>
-          <Cross color="#D53F3F" />
+          <Cross color={theme.colors.danger} />
           <DeleteLink>Delete</DeleteLink>
         </DeleteContainer>
       </Container>
     )
   }
 }
+
+export const FileItem = withTheme(FileItemComponent)
