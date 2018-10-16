@@ -183,7 +183,7 @@ interface IMenuItem {
   key: string
   isSubMenu?: boolean
   menuItems?: IMenuItem[]
-  onClick?: (...args: any[]) => void
+  onClick?: () => void
 }
 
 interface IProps {
