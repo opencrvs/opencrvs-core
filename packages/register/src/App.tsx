@@ -44,17 +44,16 @@ interface IAppProps {
   store: AppStore
   history: History
 }
-
-type State = {
-  initalDraftsLoaded: boolean
+interface IState {
+  initialDraftsLoaded: boolean
 }
 export const store = createStore()
 
-export class App extends React.Component<IAppProps, State> {
+export class App extends React.Component<IAppProps, IState> {
   constructor(props: IAppProps) {
     super(props)
     this.state = {
-      initalDraftsLoaded: false
+      initialDraftsLoaded: false
     }
   }
   componentWillMount() {
@@ -64,12 +63,12 @@ export class App extends React.Component<IAppProps, State> {
     const draftsString = await storage.getItem('drafts')
     const drafts = JSON.parse(draftsString ? draftsString : '[]')
     this.props.store.dispatch(setInitialDrafts(drafts))
-    this.setState({ initalDraftsLoaded: true })
+    this.setState({ initialDraftsLoaded: true })
   }
 
   public render() {
-    const { initalDraftsLoaded } = this.state
-    if (initalDraftsLoaded) {
+    const { initialDraftsLoaded } = this.state
+    if (initialDraftsLoaded) {
       return (
         <ApolloProvider client={this.props.client || client}>
           <Provider store={this.props.store}>

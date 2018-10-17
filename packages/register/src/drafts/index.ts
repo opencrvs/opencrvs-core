@@ -12,26 +12,26 @@ export interface IDraft {
   data: IFormData
 }
 
-type StoreDraftAction = {
+interface IStoreDraftAction {
   type: typeof STORE_DRAFT
   payload: { draft: IDraft }
 }
 
-type ModifyDraftAction = {
+interface IModifyDraftAction {
   type: typeof MODIFY_DRAFT
   payload: {
     draft: IDraft
   }
 }
 
-type SetInitialDraftsAction = {
+interface ISetInitialDraftsAction {
   type: typeof SET_INITIAL_DRAFTS
   payload: {
     drafts: IDraft[]
   }
 }
 
-type Action = StoreDraftAction | ModifyDraftAction | SetInitialDraftsAction
+type Action = IStoreDraftAction | IModifyDraftAction | ISetInitialDraftsAction
 
 export interface IDraftsState {
   initalDraftsLoaded: boolean
@@ -47,7 +47,7 @@ export function createDraft() {
   return { id: Date.now(), data: {} }
 }
 
-export function storeDraft(draft: IDraft): StoreDraftAction {
+export function storeDraft(draft: IDraft): IStoreDraftAction {
   return { type: STORE_DRAFT, payload: { draft } }
 }
 
