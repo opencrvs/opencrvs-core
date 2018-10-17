@@ -19,7 +19,7 @@ describe('when user is in the register form before initial draft load', () => {
       history={history}
       staticContext={mock}
       match={{
-        params: { draftId: '', tabId: 'mother' },
+        params: { draftId: '', tabId: '' },
         isExact: true,
         path: '',
         url: ''
@@ -32,6 +32,14 @@ describe('when user is in the register form before initial draft load', () => {
     expect(
       component.find('#form_section_title_mother').hostNodes()
     ).toHaveLength(0)
+  })
+  it('throws error when draft not found after initial drafts load', () => {
+    const initalDrafts = JSON.parse('[]')
+    try {
+      store.dispatch(setInitialDrafts(initalDrafts))
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error)
+    }
   })
 })
 
