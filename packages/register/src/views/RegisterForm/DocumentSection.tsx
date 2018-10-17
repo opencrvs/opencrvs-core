@@ -80,8 +80,10 @@ const ActionBlock = styled.div`
   display: flex;
   justify-content: center;
 `
-const DataBlock = styled.div`
-  margin-bottom: 10%;
+const LabelBlock = styled.div`
+  margin: 30px 0px 70px 0px;
+  padding-top: 20px;
+  border-top: 2px solid ${({ theme }) => theme.colors.background};
 `
 
 type DispatchProps = {
@@ -99,14 +101,15 @@ class DocumentSectionForm extends React.Component<
     const { intl, draft } = this.props
     return (
       <DocumentBox>
-        <DataBlock>
-          <FormSectionTitle id="form_section_title_document">
-            {intl.formatMessage(messages.documentsTitle)}
-          </FormSectionTitle>
-          <UploadPhotoAction
-            title={intl.formatMessage(messages.uploadImage)}
-            onClick={() => this.props.goToUpload(draft.id, 'documents')}
-          />
+        <FormSectionTitle id="form_section_title_documents">
+          {intl.formatMessage(messages.documentsTitle)}
+        </FormSectionTitle>
+        <UploadPhotoAction
+          id="upload_image_action"
+          title={intl.formatMessage(messages.uploadImage)}
+          onClick={() => this.props.goToUpload(draft.id, 'documents')}
+        />
+        <LabelBlock>
           <Paragraph>{intl.formatMessage(messages.paragraph)}</Paragraph>
           <FormList
             list={[
@@ -117,7 +120,7 @@ class DocumentSectionForm extends React.Component<
               messages.otherDocuments
             ]}
           />
-        </DataBlock>
+        </LabelBlock>
         <ActionBlock>
           <FormPrimaryButton id="next_section" icon={() => <ArrowForward />}>
             {intl.formatMessage(messages.next)}

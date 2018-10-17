@@ -11,7 +11,6 @@ import {
   TextArea,
   SubSectionDivider
 } from '@opencrvs/components/lib/forms'
-import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -33,17 +32,14 @@ import {
   TEXTAREA,
   NUMBER,
   SUBSECTION,
-  LIST,
   ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions,
-  PARAGRAPH
+  ISelectFormFieldWithOptions
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
 
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
-import { FormList } from './FormList'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -172,12 +168,6 @@ function GeneratedInputField({
         <SubSectionDivider label={fieldDefinition.label} />
       </InputField>
     )
-  }
-  if (fieldDefinition.type === PARAGRAPH) {
-    return <Paragraph>{fieldDefinition.label}</Paragraph>
-  }
-  if (fieldDefinition.type === LIST) {
-    return <FormList list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
     return (
