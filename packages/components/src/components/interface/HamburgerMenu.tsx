@@ -150,6 +150,13 @@ const StyledNestedSubMenu = styled(SubMenu)`
     text-align: right;
     padding: 18px 22px !important;
   }
+  .rc-menu-item:hover {
+    background-color: ${({ theme }) => theme.colors.secondary};
+  }
+  .rc-menu-item-selected {
+    background-color: ${({ theme }) => theme.colors.secondary};
+    font-weight: bold;
+  }
 `
 
 const StyledNestedMenuItem = styled(MenuItem)`
