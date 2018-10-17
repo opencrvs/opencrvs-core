@@ -45,6 +45,10 @@ module.exports = {
       ]
     },
     {
+      name: 'Files',
+      components: './src/components/files/**/*.tsx'
+    },
+    {
       name: 'Other',
       components: './src/components/*.tsx'
     }
