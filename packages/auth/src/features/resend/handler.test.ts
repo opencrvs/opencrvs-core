@@ -10,6 +10,13 @@ describe('resend handler receives a request', () => {
 
   describe('resend sms service says nonce is invalid', () => {
     it('returns a 401 response to client', async () => {
+      const authService = require('../authenticate/service')
+      jest
+        .spyOn(authService, 'getStoredUserInformation')
+        .mockImplementation(() => {
+          throw new Error()
+        })
+
       const res = await server.server.inject({
         method: 'POST',
         url: '/resendSms',
@@ -43,6 +50,28 @@ describe('resend handler receives a request', () => {
       })
       expect(spy).toHaveBeenCalled()
       expect(JSON.parse(res.payload).nonce).toBe('12345')
+    })
+
+    it('does not generate new verification code for a demo user', async () => {
+      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+      const codeService = require('../verifyCode/service')
+      const authService = require('../authenticate/service')
+      jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
+        userId: '2',
+        roles: ['demo'],
+        mobile: '+8801712323234'
+      })
+      const spy = jest.spyOn(codeService, 'sendVerificationCode')
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/resendSms',
+        payload: {
+          nonce: '67890'
+        }
+      })
+      expect(spy).not.toHaveBeenCalled()
+      expect(JSON.parse(res.payload).nonce).toBe('67890')
     })
   })
 })
