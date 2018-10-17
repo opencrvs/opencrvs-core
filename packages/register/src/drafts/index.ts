@@ -1,6 +1,6 @@
 import { IFormData } from '../forms'
 import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
-import { loop, Cmd, getModel } from 'redux-loop'
+import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
@@ -40,14 +40,14 @@ export function storeDraft(draft: IDraft): StoreDraftAction {
   return { type: STORE_DRAFT, payload: { draft } }
 }
 
-export function modifyDraft(draft: IDraft) {
+export function modifyDraft(draft: IDraft): ModifyDraftAction {
   return { type: MODIFY_DRAFT, payload: { draft } }
 }
 
-export function draftsReducerTMP(
+export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
   action: Action | NavigationAction
-) {
+): IDraftsState | Loop<IDraftsState, Action> => {
   switch (action.type) {
     case GO_TO_TAB: {
       const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
@@ -62,7 +62,6 @@ export function draftsReducerTMP(
           [action.payload.tabId]: {}
         }
       }
-
       return loop(state, Cmd.action(modifyDraft(modifiedDraft)))
     }
     case STORE_DRAFT:
@@ -84,18 +83,4 @@ export function draftsReducerTMP(
     default:
       return state
   }
-}
-
-/*
- * Should be done as a redux-loop side effect
- */
-
-export function draftsReducer(
-  state: IDraftsState = initialState,
-  action: Action
-) {
-  const stateOrLoop = draftsReducerTMP(state, action)
-  const model = getModel(stateOrLoop)
-  window.localStorage.setItem('tmp', JSON.stringify(model.drafts))
-  return stateOrLoop
 }
