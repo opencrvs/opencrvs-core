@@ -29,8 +29,8 @@ describe('storage tests', () => {
   describe('get item', () => {
     storage.getItem('test')
     it('get item by key', async () => {
-      const [key] = (localForage.setItem as jest.Mock).mock.calls[
-        (localForage.setItem as jest.Mock).mock.calls.length - 1
+      const [key] = (localForage.getItem as jest.Mock).mock.calls[
+        (localForage.getItem as jest.Mock).mock.calls.length - 1
       ]
       expect(key).toEqual('test')
     })
