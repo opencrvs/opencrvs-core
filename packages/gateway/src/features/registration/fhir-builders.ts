@@ -10,7 +10,6 @@ import {
   createAndSetProperty,
   createAndSetExtensionProperty
 } from 'src/features/fhir/utils'
-import { OPENCRVS_SPECIFICATION_URL } from 'src/features/fhir/constants'
 
 function createNameBuilder(sectionCode: string) {
   return {
@@ -107,9 +106,9 @@ function createDateOfMarriageBuilder(sectionCode: string) {
       )
       createAndSetExtensionProperty(
         person,
-        `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
+        'extension',
         fieldValue,
-        'valueDateTime',
+        'dateOfMarriage',
         context
       )
     }

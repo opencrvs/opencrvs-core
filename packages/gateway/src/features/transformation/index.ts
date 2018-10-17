@@ -28,6 +28,7 @@ async function transformField(
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
+      console.log('yes')
       await transformObj(sourceVal, targetObj, fieldBuilderForVal, context)
       return targetObj
     }
