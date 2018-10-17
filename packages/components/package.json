@@ -17,6 +17,7 @@
     "precommit": "lint-staged",
     "clean": "rimraf lib",
     "start": "concurrently 'styleguidist server' 'tsc -w'",
+    "start:prod": "styleguidist server",
     "postinstall": "yarn build",
     "build": "yarn clean && tsc",
     "docker-build": "docker build -t components .",

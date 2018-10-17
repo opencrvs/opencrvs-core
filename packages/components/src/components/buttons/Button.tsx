@@ -1,6 +1,5 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
-import { ReactNode } from 'react-redux'
+import styled from 'styled-components'
 
 export enum ICON_ALIGNMENT {
   LEFT,
