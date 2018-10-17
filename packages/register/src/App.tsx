@@ -6,10 +6,11 @@ import { ApolloProvider } from 'react-apollo'
 import { resolve } from 'url'
 import { History } from 'history'
 import { Switch } from 'react-router'
-import { ThemeProvider } from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { I18nContainer } from './i18n/components/I18nContainer'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { Spinner } from '@opencrvs/components/lib/interface'
 
 import { createStore, AppStore } from './store'
 import { config } from './config'
@@ -29,6 +30,11 @@ import { Home } from 'src/views/Home/Home'
 import { storage } from 'src/storage'
 import { setInitialDrafts } from 'src/drafts'
 
+const StyledSpinner = styled(Spinner)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+`
 const client = new ApolloClient({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
 })
@@ -39,67 +45,86 @@ interface IAppProps {
   history: History
 }
 
+type State = {
+  initalDraftsLoaded: boolean
+}
 export const store = createStore()
 
-export class App extends React.Component<IAppProps, {}> {
+export class App extends React.Component<IAppProps, State> {
+  constructor(props: IAppProps) {
+    super(props)
+    this.state = {
+      initalDraftsLoaded: false
+    }
+  }
   componentWillMount() {
     this.loadDraftsFromStorage()
   }
   async loadDraftsFromStorage() {
-    const draftsString = await storage.getItem('tmp')
+    const draftsString = await storage.getItem('drafts')
     const drafts = JSON.parse(draftsString ? draftsString : '[]')
     this.props.store.dispatch(setInitialDrafts(drafts))
+    this.setState({ initalDraftsLoaded: true })
   }
 
   public render() {
-    return (
-      <ApolloProvider client={this.props.client || client}>
-        <Provider store={this.props.store}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme(config.COUNTRY)}>
-              <ConnectedRouter history={this.props.history}>
-                <ScrollToTop>
-                  <NotificationComponent>
-                    <Page>
-                      <Switch>
-                        <ProtectedRoute
-                          exact
-                          path={routes.HOME}
-                          component={Home}
-                        />
-                        <ProtectedRoute
-                          exact
-                          path={routes.SELECT_VITAL_EVENT}
-                          component={SelectVitalEvent}
-                        />
-                        <ProtectedRoute
-                          exact
-                          path={routes.SELECT_INFORMANT}
-                          component={SelectInformant}
-                        />
-                        <ProtectedRoute
-                          exact
-                          path={routes.DRAFT_BIRTH_PARENT_FORM}
-                          component={RegisterForm}
-                        />
+    const { initalDraftsLoaded } = this.state
+    if (initalDraftsLoaded) {
+      return (
+        <ApolloProvider client={this.props.client || client}>
+          <Provider store={this.props.store}>
+            <I18nContainer>
+              <ThemeProvider theme={getTheme(config.COUNTRY)}>
+                <ConnectedRouter history={this.props.history}>
+                  <ScrollToTop>
+                    <NotificationComponent>
+                      <Page>
+                        <Switch>
+                          <ProtectedRoute
+                            exact
+                            path={routes.HOME}
+                            component={Home}
+                          />
+                          <ProtectedRoute
+                            exact
+                            path={routes.SELECT_VITAL_EVENT}
+                            component={SelectVitalEvent}
+                          />
+                          <ProtectedRoute
+                            exact
+                            path={routes.SELECT_INFORMANT}
+                            component={SelectInformant}
+                          />
+                          <ProtectedRoute
+                            exact
+                            path={routes.DRAFT_BIRTH_PARENT_FORM}
+                            component={RegisterForm}
+                          />
 
-                        <ProtectedRoute
-                          path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
-                          component={RegisterForm}
-                        />
-                        <ProtectedRoute
-                          path={routes.SAVED_REGISTRATION}
-                          component={SavedRegistration}
-                        />
-                      </Switch>
-                    </Page>
-                  </NotificationComponent>
-                </ScrollToTop>
-              </ConnectedRouter>
-            </ThemeProvider>
-          </I18nContainer>
-        </Provider>
-      </ApolloProvider>
-    )
+                          <ProtectedRoute
+                            path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                            component={RegisterForm}
+                          />
+                          <ProtectedRoute
+                            path={routes.SAVED_REGISTRATION}
+                            component={SavedRegistration}
+                          />
+                        </Switch>
+                      </Page>
+                    </NotificationComponent>
+                  </ScrollToTop>
+                </ConnectedRouter>
+              </ThemeProvider>
+            </I18nContainer>
+          </Provider>
+        </ApolloProvider>
+      )
+    } else {
+      return (
+        <ThemeProvider theme={getTheme(config.COUNTRY)}>
+          <StyledSpinner id="appSpinner" />
+        </ThemeProvider>
+      )
+    }
   }
 }
