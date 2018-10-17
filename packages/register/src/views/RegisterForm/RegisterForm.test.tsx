@@ -6,10 +6,6 @@ import { createDraft, storeDraft, setInitialDrafts } from 'src/drafts'
 import { IntlProvider } from 'react-intl'
 import { createStore } from '../../store'
 
-function flushPromises() {
-  return new Promise(resolve => setImmediate(resolve))
-}
-
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
   let component: ReactWrapper<{}, {}>
