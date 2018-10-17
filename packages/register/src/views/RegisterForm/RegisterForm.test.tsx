@@ -8,35 +8,26 @@ import { createStore } from '../../store'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
-  let component: ReactWrapper<{}, {}>
   const intlProvider = new IntlProvider({ locale: 'en' }, {})
   const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
-  const testComponent = createTestComponent(
-    <RegisterForm
-      location={mock}
-      intl={intl}
-      history={history}
-      staticContext={mock}
-      match={{
-        params: { draftId: '', tabId: '' },
-        isExact: true,
-        path: '',
-        url: ''
-      }}
-    />,
-    store
-  )
-  component = testComponent.component
-  it('does not render the form', () => {
-    expect(
-      component.find('#form_section_title_mother').hostNodes()
-    ).toHaveLength(0)
-  })
   it('throws error when draft not found after initial drafts load', () => {
-    const initalDrafts = JSON.parse('[]')
     try {
-      store.dispatch(setInitialDrafts(initalDrafts))
+      createTestComponent(
+        <RegisterForm
+          location={mock}
+          intl={intl}
+          history={history}
+          staticContext={mock}
+          match={{
+            params: { draftId: '', tabId: '' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
     } catch (error) {
       expect(error).toBeInstanceOf(Error)
     }
@@ -85,7 +76,7 @@ describe('when user is in the register form', async () => {
       )
       expect(component.find(select).text()).toEqual('United States of America')
     })
-    it('clicking save button takes user to declaration submitted page', () => {
+    it('takes user to declaration submitted page when save button is clicked', () => {
       component
         .find('#save_draft')
         .hostNodes()
@@ -122,7 +113,7 @@ describe('when user is in the register form preview section', () => {
   )
   component = testComponent.component
 
-  it('clicking submit displays submit confirm modal', () => {
+  it('displays submit confirm modal when submit button clicked', () => {
     component
       .find('#submit_form')
       .hostNodes()

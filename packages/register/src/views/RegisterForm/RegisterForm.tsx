@@ -118,9 +118,9 @@ type DispatchProps = {
 }
 
 type Props = {
-  draft: IDraft | undefined
+  draft: IDraft
   registerForm: IForm
-  activeSection: IFormSection | undefined
+  activeSection: IFormSection
   setAllFieldsDirty: boolean
 }
 
@@ -145,15 +145,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
-    if (draft && activeSection) {
-      this.props.modifyDraft({
-        ...draft,
-        data: {
-          ...draft.data,
-          [activeSection.id]: sectionData
-        }
-      })
-    }
+    this.props.modifyDraft({
+      ...draft,
+      data: {
+        ...draft.data,
+        [activeSection.id]: sectionData
+      }
+    })
   }
 
   submitForm = () => {
@@ -187,102 +185,98 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm
     } = this.props
 
-    if (draft && activeSection) {
-      const nextSection = getNextSection(registerForm.sections, activeSection)
+    const nextSection = getNextSection(registerForm.sections, activeSection)
 
-      return (
-        <FormViewContainer>
-          <ViewHeaderWithTabs
-            breadcrumb="Informant: Parent"
-            id="informant_parent_view"
-            title={intl.formatMessage(messages.newBirthRegistration)}
+    return (
+      <FormViewContainer>
+        <ViewHeaderWithTabs
+          breadcrumb="Informant: Parent"
+          id="informant_parent_view"
+          title={intl.formatMessage(messages.newBirthRegistration)}
+        >
+          <StickyFormTabs
+            sections={registerForm.sections}
+            activeTabId={activeSection.id}
+            onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
+          />
+        </ViewHeaderWithTabs>
+        <FormContainer>
+          <Swipeable
+            id="swipeable_block"
+            trackMouse
+            onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
+            onSwipedRight={() =>
+              this.onSwiped(
+                draft.id,
+                getPreviousSection(registerForm.sections, activeSection),
+                goToTab
+              )
+            }
           >
-            <StickyFormTabs
-              sections={registerForm.sections}
-              activeTabId={activeSection.id}
-              onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
-            />
-          </ViewHeaderWithTabs>
-          <FormContainer>
-            <Swipeable
-              id="swipeable_block"
-              trackMouse
-              onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
-              onSwipedRight={() =>
-                this.onSwiped(
-                  draft.id,
-                  getPreviousSection(registerForm.sections, activeSection),
-                  goToTab
-                )
-              }
+            {activeSection.viewType === 'preview' && (
+              <PreviewSection draft={draft} onSubmit={this.submitForm} />
+            )}
+            {activeSection.viewType === 'form' && (
+              <Box>
+                <Form
+                  id={activeSection.id}
+                  onChange={this.modifyDraft}
+                  setAllFieldsDirty={setAllFieldsDirty}
+                  title={intl.formatMessage(activeSection.title)}
+                  fields={activeSection.fields}
+                />
+                <FormAction>
+                  {nextSection && (
+                    <FormPrimaryButton
+                      onClick={() => goToTab(draft.id, nextSection.id)}
+                      id="next_section"
+                      icon={() => <ArrowForward />}
+                    >
+                      {intl.formatMessage(messages.next)}
+                    </FormPrimaryButton>
+                  )}
+                </FormAction>
+              </Box>
+            )}
+          </Swipeable>
+        </FormContainer>
+        <ViewFooter>
+          <FooterAction>
+            <FooterPrimaryButton
+              id="save_draft"
+              onClick={() => history.push('/saved')}
             >
-              {activeSection.viewType === 'preview' && (
-                <PreviewSection draft={draft} onSubmit={this.submitForm} />
-              )}
-              {activeSection.viewType === 'form' && (
-                <Box>
-                  <Form
-                    id={activeSection.id}
-                    onChange={this.modifyDraft}
-                    setAllFieldsDirty={setAllFieldsDirty}
-                    title={intl.formatMessage(activeSection.title)}
-                    fields={activeSection.fields}
-                  />
-                  <FormAction>
-                    {nextSection && (
-                      <FormPrimaryButton
-                        onClick={() => goToTab(draft.id, nextSection.id)}
-                        id="next_section"
-                        icon={() => <ArrowForward />}
-                      >
-                        {intl.formatMessage(messages.next)}
-                      </FormPrimaryButton>
-                    )}
-                  </FormAction>
-                </Box>
-              )}
-            </Swipeable>
-          </FormContainer>
-          <ViewFooter>
-            <FooterAction>
-              <FooterPrimaryButton
-                id="save_draft"
-                onClick={() => history.push('/saved')}
-              >
-                {intl.formatMessage(messages.saveDraft)}
-              </FooterPrimaryButton>
-            </FooterAction>
-          </ViewFooter>
-          <Modal
-            title="Are you ready to submit?"
-            actions={[
-              <PrimaryButton
-                key="submit"
-                id="submit_confirm"
-                onClick={() => history.push('/saved')}
-              >
-                {intl.formatMessage(messages.submitButton)}
-              </PrimaryButton>,
-              <PreviewButton
-                key="preview"
-                onClick={() => {
-                  this.toggleSubmitModalOpen()
-                  document.documentElement.scrollTop = 0
-                }}
-              >
-                {intl.formatMessage(messages.preview)}
-              </PreviewButton>
-            ]}
-            show={this.state.showSubmitModal}
-            handleClose={this.toggleSubmitModalOpen}
-          >
-            {intl.formatMessage(messages.submitDescription)}
-          </Modal>
-        </FormViewContainer>
-      )
-    } else {
-      return null
-    }
+              {intl.formatMessage(messages.saveDraft)}
+            </FooterPrimaryButton>
+          </FooterAction>
+        </ViewFooter>
+        <Modal
+          title="Are you ready to submit?"
+          actions={[
+            <PrimaryButton
+              key="submit"
+              id="submit_confirm"
+              onClick={() => history.push('/saved')}
+            >
+              {intl.formatMessage(messages.submitButton)}
+            </PrimaryButton>,
+            <PreviewButton
+              key="preview"
+              onClick={() => {
+                this.toggleSubmitModalOpen()
+                document.documentElement.scrollTop = 0
+              }}
+            >
+              {intl.formatMessage(messages.preview)}
+            </PreviewButton>
+          ]}
+          show={this.state.showSubmitModal}
+          handleClose={this.toggleSubmitModalOpen}
+        >
+          {intl.formatMessage(messages.submitDescription)}
+        </Modal>
+      </FormViewContainer>
+    )
   }
 }
 
@@ -304,15 +298,6 @@ function mapStateToProps(
   const activeSection = registerForm.sections.find(
     ({ id }) => id === activeSectionId
   )
-  if (!state.drafts.initalDraftsLoaded) {
-    return {
-      registerForm,
-      setAllFieldsDirty: false,
-      activeSection: undefined,
-      draft: undefined
-    }
-  }
-
   const draft = state.drafts.drafts.find(
     ({ id }) => id === parseInt(match.params.draftId, 10)
   )
