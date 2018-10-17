@@ -2,7 +2,7 @@ import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 
-import { Hamburger, ArrowBack } from '@opencrvs/components/lib/icons'
+import { ArrowBack } from '@opencrvs/components/lib/icons'
 import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 import styled from '../styled-components'
@@ -11,6 +11,7 @@ import { getLanguages } from 'src/i18n/selectors'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
 import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
+import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 
 const messages = defineMessages({
   back: {
@@ -22,6 +23,46 @@ const messages = defineMessages({
     id: 'menu.menu',
     defaultMessage: 'Menu',
     description: 'Menu'
+  },
+  homepage: {
+    id: 'menu.items.homepage',
+    defaultMessage: 'Homepage',
+    description: 'Menu item homepage'
+  },
+  register: {
+    id: 'menu.items.register',
+    defaultMessage: 'Register',
+    description: 'Menu item register'
+  },
+  drafts: {
+    id: 'menu.items.drafts',
+    defaultMessage: 'Drafts',
+    description: 'Menu item drafts'
+  },
+  settings: {
+    id: 'menu.items.settings',
+    defaultMessage: 'Settings',
+    description: 'Menu item settings'
+  },
+  logout: {
+    id: 'menu.items.logout',
+    defaultMessage: 'Log out',
+    description: 'Menu item logout'
+  },
+  changeLanguage: {
+    id: 'menu.items.changeLanguage',
+    defaultMessage: 'Change Language',
+    description: 'Menu item changeLanguage'
+  },
+  english: {
+    id: 'menu.items.changeLanguage.english',
+    defaultMessage: 'English',
+    description: 'Menu item english'
+  },
+  bengali: {
+    id: 'menu.items.changeLanguage.bengali',
+    defaultMessage: 'Bengali',
+    description: 'Menu item bengali'
   }
 })
 
@@ -30,23 +71,6 @@ const TopMenuContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-`
-
-const MenuButton = styled(PrimaryButton)`
-  height: 100%;
-  background: ${({ theme }) => theme.colors.primary};
-  padding: 0 30px;
-  margin-left: auto;
-  select {
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    appearance: none;
-    background: transparent;
-    border: 0;
-    width: 100%;
-    color: ${({ theme }) => theme.colors.white};
-    font-size: 14px;
-  }
 `
 
 const BackButtonContainer = styled.div`
@@ -83,12 +107,48 @@ type Props = {
 }
 
 class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
-  changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    this.props.changeLanguage({ language: e.target.value })
-  }
   render() {
-    const { intl, goBack, languages, hideBackButton } = this.props
-    const languageKeys = Object.keys(languages)
+    const { intl, goBack, hideBackButton } = this.props
+
+    const menuItems = [
+      {
+        title: intl.formatMessage(messages.changeLanguage),
+        key: 'change-language',
+        isSubMenu: true,
+        menuItems: [
+          {
+            title: intl.formatMessage(messages.english),
+            key: 'english',
+            onClick: this.props.changeLanguage.bind(null, { language: 'en' })
+          },
+          {
+            title: intl.formatMessage(messages.bengali),
+            key: 'bengali',
+            onClick: this.props.changeLanguage.bind(null, { language: 'bn' })
+          }
+        ]
+      },
+      {
+        title: intl.formatMessage(messages.homepage),
+        key: 'homepage'
+      },
+      {
+        title: intl.formatMessage(messages.register),
+        key: 'register'
+      },
+      {
+        title: intl.formatMessage(messages.drafts),
+        key: 'drafts'
+      },
+      {
+        title: intl.formatMessage(messages.settings),
+        key: 'settings'
+      },
+      {
+        title: intl.formatMessage(messages.logout),
+        key: 'logout'
+      }
+    ]
 
     return (
       <TopMenuContainer>
@@ -98,16 +158,10 @@ class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
             <BackButtonText>{intl.formatMessage(messages.back)}</BackButtonText>
           </BackButtonContainer>
         )}
-        <MenuButton icon={() => <Hamburger />}>
-          <select value={'en'} onChange={this.changeLanguage}>
-            <option value={'en'}>{intl.formatMessage(messages.menu)}</option>
-            {languageKeys.map(languageKey => (
-              <option key={languageKey} value={languageKey}>
-                {languageKey}
-              </option>
-            ))}
-          </select>
-        </MenuButton>
+        <HamburgerMenu
+          menuItems={menuItems}
+          menuTitle={intl.formatMessage(messages.menu)}
+        />
       </TopMenuContainer>
     )
   }
@@ -115,7 +169,8 @@ class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
 
 export const TopMenu = connect(
   (state: IStoreState) => ({
-    languages: getLanguages(state)
+    languages: getLanguages(state),
+    language: state.i18n.language
   }),
   { goBack: goBackAction, changeLanguage: changeLanguageAction }
 )(injectIntl<Props>(TopMenuComponent))

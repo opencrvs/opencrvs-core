@@ -7,7 +7,7 @@ export const Header = styled.section`
 
   color: ${({ theme }) => theme.colors.white};
 
-  overflow: auto;
+  overflow: visible;
   background: linear-gradient(
     270deg,
     ${({ theme }) => theme.colors.headerGradientLight} 0%,
