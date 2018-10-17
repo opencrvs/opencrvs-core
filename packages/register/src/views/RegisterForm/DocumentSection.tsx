@@ -11,6 +11,7 @@ import { goToTab, goToBirthRegistrationDocumentUpload } from 'src/navigation'
 import { UploadPhotoAction } from 'src/components/UploadPhotoAction'
 import { FormList } from 'src/components/form'
 import { IStoreState } from 'src/store'
+import { DocumentTabId, PreveiwTabId } from 'src/forms/register/reducer'
 
 export const messages = defineMessages({
   documentsTitle: {
@@ -107,7 +108,7 @@ class DocumentSectionForm extends React.Component<
         <UploadPhotoAction
           id="upload_image_action"
           title={intl.formatMessage(messages.uploadImage)}
-          onClick={() => this.props.goToUpload(draft.id, 'documents')}
+          onClick={() => this.props.goToUpload(draft.id, DocumentTabId)}
         />
         <LabelBlock>
           <Paragraph>{intl.formatMessage(messages.paragraph)}</Paragraph>
@@ -122,7 +123,11 @@ class DocumentSectionForm extends React.Component<
           />
         </LabelBlock>
         <ActionBlock>
-          <FormPrimaryButton id="next_section" icon={() => <ArrowForward />}>
+          <FormPrimaryButton
+            id="next_section"
+            icon={() => <ArrowForward />}
+            onClick={() => this.props.goToTab(draft.id, PreveiwTabId)}
+          >
             {intl.formatMessage(messages.next)}
           </FormPrimaryButton>
         </ActionBlock>

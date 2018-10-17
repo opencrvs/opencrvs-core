@@ -32,6 +32,8 @@ const messages = defineMessages({
 export type IRegisterFormState = {
   registerForm: IForm
 }
+export const DocumentTabId = 'documents'
+export const PreveiwTabId = 'preview'
 
 export const initialState: IRegisterFormState = {
   registerForm: {
@@ -41,14 +43,14 @@ export const initialState: IRegisterFormState = {
       fatherSection,
       registrationSection,
       {
-        id: 'documents',
+        id: DocumentTabId,
         viewType: 'document',
         name: messages.documentsTab,
         title: messages.documentsTitle,
         fields: []
       },
       {
-        id: 'preview',
+        id: PreveiwTabId,
         viewType: 'preview',
         name: messages.previewTab,
         title: messages.previewTitle,
