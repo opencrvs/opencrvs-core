@@ -4,6 +4,7 @@ import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
+const WRITE_DRAFT = 'DRAFTS/WRITE_DRAFT'
 
 export interface IDraft {
   id: number
@@ -22,7 +23,18 @@ type ModifyDraftAction = {
   }
 }
 
-type Action = StoreDraftAction | ModifyDraftAction
+type WriteDraftAction = {
+  type: typeof WRITE_DRAFT
+  payload: {
+    draft: IDraftsState
+  }
+}
+
+type Action =
+  | StoreDraftAction
+  | ModifyDraftAction
+  | WriteDraftAction
+  | NavigationAction
 
 export interface IDraftsState {
   drafts: IDraft[]
@@ -44,9 +56,13 @@ export function modifyDraft(draft: IDraft): ModifyDraftAction {
   return { type: MODIFY_DRAFT, payload: { draft } }
 }
 
+function writeDraft(draft: IDraftsState): WriteDraftAction {
+  return { type: WRITE_DRAFT, payload: { draft } }
+}
+
 export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
-  action: Action | NavigationAction
+  action: Action
 ): IDraftsState | Loop<IDraftsState, Action> => {
   switch (action.type) {
     case GO_TO_TAB: {
@@ -65,12 +81,16 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       return loop(state, Cmd.action(modifyDraft(modifiedDraft)))
     }
     case STORE_DRAFT:
-      return {
+      const stateAfterDraftStore = {
         ...state,
         drafts: state.drafts.concat(action.payload.draft)
       }
+      return loop(
+        stateAfterDraftStore,
+        Cmd.action(writeDraft(stateAfterDraftStore))
+      )
     case MODIFY_DRAFT:
-      return {
+      const stateAfterDraftModification = {
         ...state,
         drafts: state.drafts.map(draft => {
           if (draft.id === action.payload.draft.id) {
@@ -79,7 +99,15 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
           return draft
         })
       }
-
+      return loop(
+        stateAfterDraftModification,
+        Cmd.action(writeDraft(stateAfterDraftModification))
+      )
+    case WRITE_DRAFT:
+      window.localStorage.setItem(
+        'tmp',
+        JSON.stringify(action.payload.draft.drafts)
+      )
     default:
       return state
   }
