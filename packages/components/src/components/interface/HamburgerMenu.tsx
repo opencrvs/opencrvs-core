@@ -197,11 +197,11 @@ interface IMenuItem {
 }
 
 interface IProps {
+  menuTitle: string
   menuItems: IMenuItem[]
 }
 
 interface IState {
-  menuTitle: string
   menuOpen: boolean
 }
 
@@ -209,7 +209,6 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
-      menuTitle: 'Menu',
       menuOpen: false
     }
   }
@@ -263,7 +262,7 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
             onTitleClick={this.toggleMenu}
             title={
               <SubMenuTitleWrapper>
-                {this.state.menuOpen ? '' : this.state.menuTitle}
+                {this.state.menuOpen ? '' : this.props.menuTitle}
               </SubMenuTitleWrapper>
             }
           >

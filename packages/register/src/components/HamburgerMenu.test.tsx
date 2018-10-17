@@ -7,6 +7,7 @@ import { createStore } from '../store'
 describe('when user is in the menu page', () => {
   const { store } = createStore()
   let hamburgerComponent: ReactWrapper<{}, {}>
+  const menuTitle = 'Menu'
   const menuItems = [
     {
       title: 'Change Language',
@@ -59,7 +60,7 @@ describe('when user is in the menu page', () => {
 
   beforeEach(async () => {
     const testComponent = createTestComponent(
-      <HamburgerMenu menuItems={menuItems} />,
+      <HamburgerMenu menuTitle={menuTitle} menuItems={menuItems} />,
       store
     )
     hamburgerComponent = testComponent.component
