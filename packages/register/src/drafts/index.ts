@@ -1,7 +1,9 @@
 import { IFormData } from '../forms'
 import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
+import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 
+const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
 const WRITE_DRAFT = 'DRAFTS/WRITE_DRAFT'
@@ -11,52 +13,65 @@ export interface IDraft {
   data: IFormData
 }
 
-type StoreDraftAction = {
+interface IStoreDraftAction {
   type: typeof STORE_DRAFT
   payload: { draft: IDraft }
 }
 
-type ModifyDraftAction = {
+interface IModifyDraftAction {
   type: typeof MODIFY_DRAFT
   payload: {
     draft: IDraft
   }
 }
 
-type WriteDraftAction = {
+interface IWriteDraftAction {
   type: typeof WRITE_DRAFT
   payload: {
     draft: IDraftsState
   }
 }
 
+interface ISetInitialDraftsAction {
+  type: typeof SET_INITIAL_DRAFTS
+  payload: {
+    drafts: IDraft[]
+  }
+}
+
 type Action =
-  | StoreDraftAction
-  | ModifyDraftAction
-  | WriteDraftAction
+  | IStoreDraftAction
+  | IModifyDraftAction
+  | ISetInitialDraftsAction
+  | IWriteDraftAction
   | NavigationAction
 
 export interface IDraftsState {
+  initalDraftsLoaded: boolean
   drafts: IDraft[]
 }
 
 const initialState = {
-  drafts: JSON.parse(window.localStorage.getItem('tmp') || '[]')
+  initalDraftsLoaded: false,
+  drafts: []
 }
 
 export function createDraft() {
   return { id: Date.now(), data: {} }
 }
 
-export function storeDraft(draft: IDraft): StoreDraftAction {
+export function storeDraft(draft: IDraft): IStoreDraftAction {
   return { type: STORE_DRAFT, payload: { draft } }
 }
 
-export function modifyDraft(draft: IDraft): ModifyDraftAction {
+export function modifyDraft(draft: IDraft): IModifyDraftAction {
   return { type: MODIFY_DRAFT, payload: { draft } }
 }
+export function setInitialDrafts(drafts: IDraftsState) {
+  return { type: SET_INITIAL_DRAFTS, payload: { drafts } }
+}
 
-function writeDraft(draft: IDraftsState): WriteDraftAction {
+function writeDraft(draft: IDraftsState): IWriteDraftAction {
   return { type: WRITE_DRAFT, payload: { draft } }
 }
 
@@ -104,10 +119,16 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftModification))
       )
     case WRITE_DRAFT:
-      window.localStorage.setItem(
-        'tmp',
-        JSON.stringify(action.payload.draft.drafts)
-      )
+      if (state.initalDraftsLoaded && state.drafts) {
+        storage.setItem('drafts', JSON.stringify(action.payload.draft.drafts))
+      }
+      return state
+    case SET_INITIAL_DRAFTS:
+      return {
+        ...state,
+        initalDraftsLoaded: true,
+        drafts: action.payload.drafts
+      }
     default:
       return state
   }

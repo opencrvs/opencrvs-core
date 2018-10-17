@@ -18,6 +18,7 @@
     "history": "^4.7.2",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
+    "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "query-string": "^6.1.0",
     "react": "^16.3.2",
