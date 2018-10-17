@@ -5,6 +5,7 @@ module.exports = {
     '**/*.{json,ico,ttf,html,js}'
   ],
   navigateFallback: '/index.html',
-  navigateFallbackBlacklist: [/^\/__.*$/], // fallback for anything that doesn't start with /__ which is used by cypress
-  swDest: 'build/service-worker.js'
+  // fallback for anything that doesn't start with /__ which is used by cypress
+  navigateFallbackBlacklist: [/^\/__.*$/],
+  swDest: 'build/service-worker.js',
 }
