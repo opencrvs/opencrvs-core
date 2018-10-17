@@ -55,6 +55,7 @@ export interface IInputFieldProps {
 export class InputField extends React.Component<IInputFieldProps, {}> {
   render() {
     const {
+      id,
       label,
       optionalLabel,
       required = true,
@@ -71,7 +72,9 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       <div>
         <InputHeader>
           {label && (
-            <InputLabel disabled={this.props.disabled}>{label}</InputLabel>
+            <InputLabel id={`${id}_label`} disabled={this.props.disabled}>
+              {label}
+            </InputLabel>
           )}
           {!required && (
             <Optional disabled={this.props.disabled}>

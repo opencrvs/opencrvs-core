@@ -178,7 +178,8 @@ function mapStateToProps(
   return {
     documentUploadForm,
     tabId,
-    draft
+    draft,
+    language: state.i18n.language
   }
 }
 

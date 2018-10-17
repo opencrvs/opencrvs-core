@@ -5,6 +5,7 @@ import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft } from 'src/drafts'
 import { IntlProvider } from 'react-intl'
 import { createStore } from '../../store'
+import * as actions from 'src/i18n/actions'
 
 describe('when user is in the document upload form', () => {
   const { store, history } = createStore()
@@ -34,9 +35,22 @@ describe('when user is in the document upload form', () => {
     component = testComponent.component
   })
   it('system should ask, for whom user wants to upload document', () => {
-    expect(component.find('#uploadDocForWhom_Mother').hostNodes()).toHaveLength(
-      1
-    )
+    expect(
+      component
+        .find('#uploadDocForWhom_label')
+        .hostNodes()
+        .text()
+    ).toEqual('Whose suppoting document are you uploading?')
+  })
+  it('internationalization supports with the question, for whom user wants to upload document', async () => {
+    const action = actions.changeLanguage({ language: 'bn' })
+    store.dispatch(action)
+    expect(
+      component
+        .find('#uploadDocForWhom_label')
+        .hostNodes()
+        .text()
+    ).toEqual('আপনি কার সাসমর্থনকারী কাগজপত্র আপলোড করছেন?')
   })
   describe('when user selects option for whom they are uploading document', () => {
     beforeEach(() => {
@@ -46,11 +60,28 @@ describe('when user is in the document upload form', () => {
         .simulate('change')
     })
     it('system should ask user about uploaded document type', () => {
-      expect(component.find('#whatDocToUpload_NID').hostNodes()).toHaveLength(1)
-    }),
-      it('user should not see the upload button untill next question is answered', () => {
-        expect(component.find('#upload_document').hostNodes()).toHaveLength(0)
-      })
+      const action = actions.changeLanguage({ language: 'en' })
+      store.dispatch(action)
+      expect(
+        component
+          .find('#whatDocToUpload_label')
+          .hostNodes()
+          .text()
+      ).toEqual('Which document type are you uploading?')
+    })
+    it('internationalization supports with the question, which type of document user is uploading', () => {
+      const action = actions.changeLanguage({ language: 'bn' })
+      store.dispatch(action)
+      expect(
+        component
+          .find('#whatDocToUpload_label')
+          .hostNodes()
+          .text()
+      ).toEqual('আপনি কোন প্রকার কাগজপত্র আপলোড করছেন?')
+    })
+    it('user should not see the upload button untill next question is answered', () => {
+      expect(component.find('#upload_document').hostNodes()).toHaveLength(0)
+    })
     describe('when user selects type of document they are uploading', () => {
       beforeEach(() => {
         component
