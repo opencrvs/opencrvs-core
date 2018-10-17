@@ -6,6 +6,10 @@ import { createDraft, storeDraft, setInitialDrafts } from 'src/drafts'
 import { IntlProvider } from 'react-intl'
 import { createStore } from '../../store'
 
+function flushPromises() {
+  return new Promise(resolve => setImmediate(resolve))
+}
+
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
   let component: ReactWrapper<{}, {}>
@@ -43,7 +47,7 @@ describe('when user is in the register form before initial draft load', () => {
   })
 })
 
-describe('when user is in the register form', () => {
+describe('when user is in the register form', async () => {
   const { store, history } = createStore()
   const draft = createDraft()
   const initalDrafts = JSON.parse('[]')
@@ -85,5 +89,49 @@ describe('when user is in the register form', () => {
       )
       expect(component.find(select).text()).toEqual('United States of America')
     })
+    it('clicking save button takes user to declaration submitted page', () => {
+      component
+        .find('#save_draft')
+        .hostNodes()
+        .simulate('click')
+      expect(history.location.pathname).toEqual('/saved')
+    })
+  })
+})
+
+describe('when user is in the register form preview section', () => {
+  const { store, history } = createStore()
+  const draft = createDraft()
+  const initalDrafts = JSON.parse('[]')
+  store.dispatch(setInitialDrafts(initalDrafts))
+  store.dispatch(storeDraft(draft))
+  let component: ReactWrapper<{}, {}>
+  const intlProvider = new IntlProvider({ locale: 'en' }, {})
+  const { intl } = intlProvider.getChildContext()
+  const mock: any = jest.fn()
+  const testComponent = createTestComponent(
+    <RegisterForm
+      location={mock}
+      intl={intl}
+      history={history}
+      staticContext={mock}
+      match={{
+        params: { draftId: draft.id, tabId: 'preview' },
+        isExact: true,
+        path: '',
+        url: ''
+      }}
+    />,
+    store
+  )
+  component = testComponent.component
+
+  it('clicking submit displays submit confirm modal', () => {
+    component
+      .find('#submit_form')
+      .hostNodes()
+      .simulate('click')
+
+    expect(component.find('#submit_confirm').hostNodes()).toHaveLength(1)
   })
 })
