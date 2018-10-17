@@ -118,7 +118,7 @@ export function draftsReducer(
   const stateOrLoop = draftsReducerTMP(state, action)
   const model = getModel(stateOrLoop)
   if (state.initalDraftsLoaded && model.drafts) {
-    storage.setItem('tmp', JSON.stringify(model.drafts))
+    storage.setItem('drafts', JSON.stringify(model.drafts))
   }
   return stateOrLoop
 }
