@@ -56,7 +56,7 @@ export function selectOrCreatePersonResource(
   return personEntry.resource
 }
 
-export function createAndSetProperty(
+export function setObjectPropInResourceArray(
   resource: any,
   label: string,
   value: string | string[],

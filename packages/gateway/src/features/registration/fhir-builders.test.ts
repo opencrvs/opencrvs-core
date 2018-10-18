@@ -1,5 +1,8 @@
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
-import { OPENCRVS_SPECIFICATION_URL } from 'src/features/fhir/constants'
+import {
+  FHIR_SPECIFICATION_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from 'src/features/fhir/constants'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle({
@@ -44,7 +47,8 @@ test('should build a minimal FHIR registration document without error', async ()
           data: '123456',
           title: 'father-national-id'
         }
-      ]
+      ],
+      educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
     },
     child: {
       gender: 'male',
@@ -54,7 +58,6 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     createdAt: new Date()
   })
-  console.log(fhir.entry[1].resource)
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(3)
   expect(fhir.entry[0].resource.date).toBeDefined()
@@ -78,4 +81,28 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.address[0].line[0]).toBe('2760 Mlosi Street')
   expect(fhir.entry[2].resource.address[1].line[0]).toBe('40 Orbis Wharf')
   expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[1].resource.extension[1]).toEqual({
+    url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
+    extension: [
+      {
+        url: 'code',
+        valueCodeableConcept: {
+          coding: { system: 'urn:iso:std:iso:3166', code: 'BGD' }
+        }
+      },
+      {
+        url: 'period',
+        valuePeriod: {
+          start: '',
+          end: ''
+        }
+      }
+    ]
+  })
+  expect(fhir.entry[2].resource.extension[0].valueString).toBe(
+    'UPPER_SECONDARY_ISCED_3'
+  )
+  expect(fhir.entry[2].resource.extension[0].url).toBe(
+    `${OPENCRVS_SPECIFICATION_URL}educational-attainment`
+  )
 })

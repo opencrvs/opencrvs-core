@@ -7,7 +7,7 @@ import {
 } from 'src/features/fhir/templates'
 import {
   selectOrCreatePersonResource,
-  createAndSetProperty
+  setObjectPropInResourceArray
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -22,7 +22,7 @@ function createNameBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'name', fieldValue, 'use', context)
+      setObjectPropInResourceArray(person, 'name', fieldValue, 'use', context)
     },
     firstNames: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -30,7 +30,7 @@ function createNameBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(
+      setObjectPropInResourceArray(
         person,
         'name',
         fieldValue.split(' '),
@@ -44,7 +44,13 @@ function createNameBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'name', [fieldValue], 'family', context)
+      setObjectPropInResourceArray(
+        person,
+        'name',
+        [fieldValue],
+        'family',
+        context
+      )
     }
   }
 }
@@ -57,7 +63,13 @@ function createIDBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'identifier', fieldValue, 'id', context)
+      setObjectPropInResourceArray(
+        person,
+        'identifier',
+        fieldValue,
+        'id',
+        context
+      )
     },
     type: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -65,7 +77,13 @@ function createIDBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'identifier', fieldValue, 'type', context)
+      setObjectPropInResourceArray(
+        person,
+        'identifier',
+        fieldValue,
+        'type',
+        context
+      )
     }
   }
 }
@@ -78,7 +96,13 @@ function createTelecomBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'telecom', fieldValue, 'system', context)
+      setObjectPropInResourceArray(
+        person,
+        'telecom',
+        fieldValue,
+        'system',
+        context
+      )
     },
     value: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -86,7 +110,13 @@ function createTelecomBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'telecom', fieldValue, 'value', context)
+      setObjectPropInResourceArray(
+        person,
+        'telecom',
+        fieldValue,
+        'value',
+        context
+      )
     },
     use: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -94,7 +124,13 @@ function createTelecomBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'telecom', fieldValue, 'use', context)
+      setObjectPropInResourceArray(
+        person,
+        'telecom',
+        fieldValue,
+        'use',
+        context
+      )
     }
   }
 }
@@ -107,7 +143,13 @@ function createPhotoBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'photo', fieldValue, 'contentType', context)
+      setObjectPropInResourceArray(
+        person,
+        'photo',
+        fieldValue,
+        'contentType',
+        context
+      )
     },
     data: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -115,7 +157,7 @@ function createPhotoBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'photo', fieldValue, 'data', context)
+      setObjectPropInResourceArray(person, 'photo', fieldValue, 'data', context)
     },
     title: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -123,7 +165,13 @@ function createPhotoBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'photo', fieldValue, 'title', context)
+      setObjectPropInResourceArray(
+        person,
+        'photo',
+        fieldValue,
+        'title',
+        context
+      )
     }
   }
 }
@@ -136,7 +184,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'use', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'use',
+        context
+      )
     },
     type: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -144,7 +198,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'type', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'type',
+        context
+      )
     },
     text: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -152,7 +212,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'text', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'text',
+        context
+      )
     },
     line: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -171,7 +237,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'city', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'city',
+        context
+      )
     },
     district: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -179,7 +251,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'district', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'district',
+        context
+      )
     },
     state: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -187,7 +265,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'state', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'state',
+        context
+      )
     },
     postalCode: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -195,7 +279,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'postalCode', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'postalCode',
+        context
+      )
     },
     country: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -203,7 +293,13 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      createAndSetProperty(person, 'address', fieldValue, 'country', context)
+      setObjectPropInResourceArray(
+        person,
+        'address',
+        fieldValue,
+        'country',
+        context
+      )
     }
   }
 }
@@ -239,6 +335,16 @@ function createNationalityBuilder(resource: any, fieldValue: string) {
         }
       }
     ]
+  })
+}
+
+function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
+    valueString: fieldValue
   })
 }
 
@@ -311,6 +417,18 @@ const builders: IFieldBuilders = {
         context
       )
       return createDateOfMarriageBuilder(person, fieldValue)
+    },
+    educationalAttainment: (
+      fhirBundle: any,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        fhirBundle,
+        context
+      )
+      return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
   father: {
@@ -375,6 +493,18 @@ const builders: IFieldBuilders = {
         context
       )
       return createDateOfMarriageBuilder(person, fieldValue)
+    },
+    educationalAttainment: (
+      fhirBundle: any,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        fhirBundle,
+        context
+      )
+      return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
   child: {
@@ -439,6 +569,18 @@ const builders: IFieldBuilders = {
         context
       )
       return createDateOfMarriageBuilder(person, fieldValue)
+    },
+    educationalAttainment: (
+      fhirBundle: any,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        CHILD_CODE,
+        fhirBundle,
+        context
+      )
+      return createEducationalAttainmentBuilder(person, fieldValue)
     }
   }
 }
