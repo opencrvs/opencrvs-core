@@ -1,53 +1,84 @@
 import { IFormData } from '../forms'
 import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
-import { loop, Cmd, getModel } from 'redux-loop'
+import { storage } from 'src/storage'
+import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 
+const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
+const WRITE_DRAFT = 'DRAFTS/WRITE_DRAFT'
 
 export interface IDraft {
   id: number
   data: IFormData
 }
 
-type StoreDraftAction = {
+interface IStoreDraftAction {
   type: typeof STORE_DRAFT
   payload: { draft: IDraft }
 }
 
-type ModifyDraftAction = {
+interface IModifyDraftAction {
   type: typeof MODIFY_DRAFT
   payload: {
     draft: IDraft
   }
 }
 
-type Action = StoreDraftAction | ModifyDraftAction
+interface IWriteDraftAction {
+  type: typeof WRITE_DRAFT
+  payload: {
+    draft: IDraftsState
+  }
+}
+
+interface ISetInitialDraftsAction {
+  type: typeof SET_INITIAL_DRAFTS
+  payload: {
+    drafts: IDraft[]
+  }
+}
+
+type Action =
+  | IStoreDraftAction
+  | IModifyDraftAction
+  | ISetInitialDraftsAction
+  | IWriteDraftAction
+  | NavigationAction
 
 export interface IDraftsState {
+  initalDraftsLoaded: boolean
   drafts: IDraft[]
 }
 
 const initialState = {
-  drafts: JSON.parse(window.localStorage.getItem('tmp') || '[]')
+  initalDraftsLoaded: false,
+  drafts: []
 }
 
 export function createDraft() {
   return { id: Date.now(), data: {} }
 }
 
-export function storeDraft(draft: IDraft): StoreDraftAction {
+export function storeDraft(draft: IDraft): IStoreDraftAction {
   return { type: STORE_DRAFT, payload: { draft } }
 }
 
-export function modifyDraft(draft: IDraft) {
+export function modifyDraft(draft: IDraft): IModifyDraftAction {
   return { type: MODIFY_DRAFT, payload: { draft } }
 }
+export function setInitialDrafts(drafts: IDraftsState) {
+  return { type: SET_INITIAL_DRAFTS, payload: { drafts } }
+}
 
-export function draftsReducerTMP(
+function writeDraft(draft: IDraftsState): IWriteDraftAction {
+  return { type: WRITE_DRAFT, payload: { draft } }
+}
+
+export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
-  action: Action | NavigationAction
-) {
+  action: Action
+): IDraftsState | Loop<IDraftsState, Action> => {
   switch (action.type) {
     case GO_TO_TAB: {
       const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
@@ -62,16 +93,19 @@ export function draftsReducerTMP(
           [action.payload.tabId]: {}
         }
       }
-
       return loop(state, Cmd.action(modifyDraft(modifiedDraft)))
     }
     case STORE_DRAFT:
-      return {
+      const stateAfterDraftStore = {
         ...state,
         drafts: state.drafts.concat(action.payload.draft)
       }
+      return loop(
+        stateAfterDraftStore,
+        Cmd.action(writeDraft(stateAfterDraftStore))
+      )
     case MODIFY_DRAFT:
-      return {
+      const stateAfterDraftModification = {
         ...state,
         drafts: state.drafts.map(draft => {
           if (draft.id === action.payload.draft.id) {
@@ -80,22 +114,22 @@ export function draftsReducerTMP(
           return draft
         })
       }
-
+      return loop(
+        stateAfterDraftModification,
+        Cmd.action(writeDraft(stateAfterDraftModification))
+      )
+    case WRITE_DRAFT:
+      if (state.initalDraftsLoaded && state.drafts) {
+        storage.setItem('drafts', JSON.stringify(action.payload.draft.drafts))
+      }
+      return state
+    case SET_INITIAL_DRAFTS:
+      return {
+        ...state,
+        initalDraftsLoaded: true,
+        drafts: action.payload.drafts
+      }
     default:
       return state
   }
-}
-
-/*
- * Should be done as a redux-loop side effect
- */
-
-export function draftsReducer(
-  state: IDraftsState = initialState,
-  action: Action
-) {
-  const stateOrLoop = draftsReducerTMP(state, action)
-  const model = getModel(stateOrLoop)
-  window.localStorage.setItem('tmp', JSON.stringify(model.drafts))
-  return stateOrLoop
 }

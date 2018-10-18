@@ -21,7 +21,12 @@ const isLocalhost = Boolean(
 )
 
 export default function register(onNewConentAvailable?: () => void) {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if (
+    process.env.NODE_ENV === 'production' &&
+    'serviceWorker' in navigator &&
+    // @ts-ignore
+    !window.Cypress // This disables the service workder for our e2e tests
+  ) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(
       process.env.PUBLIC_URL!,

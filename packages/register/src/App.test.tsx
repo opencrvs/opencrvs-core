@@ -12,7 +12,10 @@ import { Store } from 'redux'
 import { storeDraft, createDraft, IDraft } from './drafts'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
+import { storage } from 'src/storage'
 
+storage.getItem = jest.fn()
+storage.setItem = jest.fn()
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
@@ -63,6 +66,7 @@ describe('when user has a valid token in local storage', () => {
   beforeEach(() => {
     getItem.mockReturnValue(validToken)
     setItem.mockClear()
+
     const testApp = createTestApp()
     app = testApp.app
     history = testApp.history
@@ -71,6 +75,16 @@ describe('when user has a valid token in local storage', () => {
 
   it("doesn't redirect user to SSO", async () => {
     expect(assign.mock.calls).toHaveLength(0)
+  })
+
+  describe('when loadDraftsFromStorage method is called', () => {
+    beforeEach(() => {
+      const instance = app.instance() as any
+      instance.loadDraftsFromStorage()
+    })
+    it('should retrive saved drafts from storage', () => {
+      expect(storage.getItem).toBeCalled()
+    })
   })
 
   describe('when user is in home view', () => {
@@ -199,7 +213,9 @@ describe('when user has a valid token in local storage', () => {
           })
       })
       it('stores the value to a new draft', () => {
-        const [, data] = setItem.mock.calls[setItem.mock.calls.length - 1]
+        const [, data] = (storage.setItem as jest.Mock).mock.calls[
+          (storage.setItem as jest.Mock).mock.calls.length - 1
+        ]
         const storedDrafts = JSON.parse(data)
         expect(storedDrafts[0].data.child.childFirstNames).toEqual('hello')
       })

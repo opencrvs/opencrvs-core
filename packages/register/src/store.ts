@@ -71,6 +71,5 @@ export const createStore = (): { store: AppStore; history: History } => {
     getModel(reducers(undefined, { type: 'NOOP' })),
     enhancer
   )
-
   return { store, history }
 }
