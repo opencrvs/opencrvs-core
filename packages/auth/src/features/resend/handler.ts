@@ -18,21 +18,36 @@ export default async function refreshHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { nonce } = request.payload as IRefreshPayload
-  try {
-    const { mobile } = await getStoredUserInformation(nonce)
-    const verificationCode = await generateVerificationCode(nonce, mobile)
 
-    if (!PRODUCTION) {
-      logger.info('Resending a verification SMS', {
-        mobile,
-        verificationCode
-      })
-    } else {
-      await sendVerificationCode(mobile, verificationCode)
-    }
+  let userInformation
+  try {
+    userInformation = await getStoredUserInformation(nonce)
   } catch (err) {
     return unauthorized()
   }
+
+  const { mobile, roles } = userInformation
+
+  const isDemoUser = roles.indexOf('demo') > -1
+
+  let verificationCode
+  if (isDemoUser) {
+    verificationCode = '000000'
+  } else {
+    console.log('Calling generateVerificationCode')
+    verificationCode = await generateVerificationCode(nonce, mobile)
+  }
+
+  if (!PRODUCTION || isDemoUser) {
+    logger.info('Resending a verification SMS', {
+      mobile,
+      verificationCode
+    })
+  } else {
+    console.log('Calling sendVerificationCode')
+    await sendVerificationCode(mobile, verificationCode)
+  }
+
   return { nonce }
 }
 

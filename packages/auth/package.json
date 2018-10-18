@@ -68,6 +68,12 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ],
     "modulePaths": [
       "<rootDir>"
     ],
