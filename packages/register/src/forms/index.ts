@@ -13,9 +13,12 @@ export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const DATE = 'DATE'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
+export const LIST = 'LIST'
+export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
+export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
@@ -35,13 +38,12 @@ export interface IDynamicOptions {
   options: { [key: string]: ISelectOption[] }
 }
 
-export type IFormFieldValue = string | string[] | boolean | IImageValue[]
+export type IFormFieldValue = string | string[] | boolean | IFileValue[]
 
-export type IImageValue = {
-  file: string
-  name: string
-  size?: number
-  base64Value: string
+export type IFileValue = {
+  subject: string
+  type: string
+  value: string
 }
 
 export interface IFormFieldBase {
@@ -95,6 +97,17 @@ export interface ISubsectionFormField extends IFormFieldBase {
 export interface IDocumentsFormField extends IFormFieldBase {
   type: typeof DOCUMENTS
 }
+export interface IListFormField extends IFormFieldBase {
+  type: typeof LIST
+  items: FormattedMessage.MessageDescriptor[]
+}
+export interface IParagraphFormField extends IFormFieldBase {
+  type: typeof PARAGRAPH
+}
+export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
+  type: typeof IMAGE_UPLOADER_WITH_OPTIONS
+  nestedSection: IFormSection
+}
 
 export type IFormField =
   | ITextFormField
@@ -107,6 +120,9 @@ export type IFormField =
   | ITextareaFormField
   | ISubsectionFormField
   | IDocumentsFormField
+  | IListFormField
+  | IParagraphFormField
+  | IImageUploaderWithOptionsFormField
 
 export interface IConditional {
   action: string
@@ -130,7 +146,7 @@ export interface IConditionals {
   uploadDocForWhom: IConditional
 }
 
-export type ViewType = 'form' | 'preview' | 'document'
+export type ViewType = 'form' | 'preview'
 
 export interface IFormSection {
   id: string
@@ -195,6 +211,18 @@ export interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
 export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
   type: typeof DOCUMENTS
 }
+export interface Ii18nListFormField extends Ii18nFormFieldBase {
+  type: typeof LIST
+  items: FormattedMessage.MessageDescriptor[]
+}
+export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
+  type: typeof PARAGRAPH
+}
+export interface Ii18nImageUploaderWithOptionsFormField
+  extends Ii18nFormFieldBase {
+  type: typeof IMAGE_UPLOADER_WITH_OPTIONS
+  nestedSection: IFormSection
+}
 
 export type Ii18nFormField =
   | Ii18nTextFormField
@@ -206,6 +234,9 @@ export type Ii18nFormField =
   | Ii18nTextareaFormField
   | Ii18nSubsectionFormField
   | Ii18nDocumentsFormField
+  | Ii18nListFormField
+  | Ii18nParagraphFormField
+  | Ii18nImageUploaderWithOptionsFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

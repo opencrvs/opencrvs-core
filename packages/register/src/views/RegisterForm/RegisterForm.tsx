@@ -19,7 +19,6 @@ import {
   ViewFooter
 } from 'src/components/interface/footer'
 import { PreviewSection } from './PreviewSection'
-import { DocumentSection } from './DocumentSection'
 import { StickyFormTabs } from './StickyFormTabs'
 
 const FormAction = styled.div`
@@ -68,13 +67,14 @@ export const messages = defineMessages({
 const FormContainer = styled.div`
   padding: 35px 25px;
   padding-bottom: 0;
-  z-index: 1;
+  z-index: auto;
 `
 
 const FormViewContainer = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
+  z-index: 1;
 `
 
 const PreviewButton = styled.a`
@@ -216,9 +216,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
           >
             {activeSection.viewType === 'preview' && (
               <PreviewSection draft={draft} onSubmit={this.submitForm} />
-            )}
-            {activeSection.viewType === 'document' && (
-              <DocumentSection draft={draft} />
             )}
             {activeSection.viewType === 'form' && (
               <Box>

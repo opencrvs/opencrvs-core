@@ -61,7 +61,7 @@ interface IProps {
 
 export class ActionPage extends React.Component<
   IProps & {
-    goBack: typeof goBackAction
+    goBack: () => void
   }
 > {
   render() {

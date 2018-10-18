@@ -2,7 +2,6 @@ import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_BIRTH_PARENT_DOCUMENT_UPLOAD_FORM,
   DRAFT_BIRTH_PARENT_FORM_TAB,
   SELECT_VITAL_EVENT
 } from 'src/navigation/routes'
@@ -41,18 +40,6 @@ export function goBack() {
 export function goToBirthRegistrationAsParent(draftId: number) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, { draftId: draftId.toString() })
-  )
-}
-
-export function goToBirthRegistrationDocumentUpload(
-  draftId: number,
-  tabId: string
-) {
-  return push(
-    formatUrl(DRAFT_BIRTH_PARENT_DOCUMENT_UPLOAD_FORM, {
-      draftId: draftId.toString(),
-      tabId
-    })
   )
 }
 
