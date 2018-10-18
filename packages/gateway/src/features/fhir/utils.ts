@@ -6,7 +6,6 @@ import {
   createPersonEntryTemplate
 } from 'src/features/fhir/templates'
 import { IExtension } from 'src/type/person'
-import { OPENCRVS_SPECIFICATION_URL } from 'src/features/fhir/constants'
 
 export function findCompositionSectionInBundle(code: string, fhirBundle: any) {
   return fhirBundle.entry[0].resource.section.find(
@@ -71,28 +70,6 @@ export function createAndSetProperty(
     resource[label][context._index] = {}
   }
   resource[label][context._index][propName] = value
-}
-
-export function createAndSetExtensionProperty(
-  resource: any,
-  label: string,
-  value: string | string[],
-  propName: string,
-  context: any
-) {
-  if (!resource[label]) {
-    resource[label] = []
-  }
-  if (!resource[label][context._index]) {
-    resource[label][context._index] = {}
-  }
-
-  if (propName === 'dateOfMarriage') {
-    resource[label][context._index] = {
-      url: `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
-      valueDateTime: value
-    }
-  }
 }
 
 export function findExtension(url: string, composition: any): IExtension {
