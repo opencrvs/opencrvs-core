@@ -102,5 +102,5 @@ export async function deleteUsedVerificationCode(
   nonce: string
 ): Promise<boolean> {
   const count = await del(`verification_${nonce}`)
-  return !!count
+  return Boolean(count)
 }
