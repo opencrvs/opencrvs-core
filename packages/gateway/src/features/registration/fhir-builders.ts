@@ -8,8 +8,11 @@ import {
 import {
   selectOrCreatePersonResource,
   createAndSetProperty
-  // createAndSetExtensionProperty
 } from 'src/features/fhir/utils'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  FHIR_SPECIFICATION_URL
+} from '../fhir/constants'
 
 function createNameBuilder(sectionCode: string) {
   return {
@@ -205,24 +208,39 @@ function createAddressBuilder(sectionCode: string) {
   }
 }
 
-/* function createDateOfMarriageBuilder(sectionCode: string) {
-  return {
-    system: (fhirBundle: any, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(
-        sectionCode,
-        fhirBundle,
-        context
-      )
-      createAndSetExtensionProperty(
-        person,
-        'extension',
-        fieldValue,
-        'dateOfMarriage',
-        context
-      )
-    }
+function createDateOfMarriageBuilder(resource: any, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
   }
-} */
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
+    valueDateTime: fieldValue
+  })
+}
+
+function createNationalityBuilder(resource: any, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
+    extension: [
+      {
+        url: 'code',
+        valueCodeableConcept: {
+          coding: { system: 'urn:iso:std:iso:3166', code: fieldValue }
+        }
+      },
+      {
+        url: 'period',
+        valuePeriod: {
+          start: '',
+          end: ''
+        }
+      }
+    ]
+  })
+}
 
 const builders: IFieldBuilders = {
   createdAt: (fhirBundle, fieldValue) => {
@@ -277,9 +295,23 @@ const builders: IFieldBuilders = {
         context
       )
       mother.deceasedBoolean = fieldValue
+    },
+    nationality: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        fhirBundle,
+        context
+      )
+      return createNationalityBuilder(person, fieldValue)
+    },
+    dateOfMarriage: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        fhirBundle,
+        context
+      )
+      return createDateOfMarriageBuilder(person, fieldValue)
     }
-    // nationality: createNationalityBuilder(MOTHER_CODE),
-    // dateOfMarriage: createDateOfMarriageBuilder(MOTHER_CODE)
   },
   father: {
     gender: (fhirBundle, fieldValue, context) => {
@@ -326,9 +358,24 @@ const builders: IFieldBuilders = {
         context
       )
       father.deceasedBoolean = fieldValue
+    },
+
+    nationality: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        fhirBundle,
+        context
+      )
+      return createNationalityBuilder(person, fieldValue)
+    },
+    dateOfMarriage: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        fhirBundle,
+        context
+      )
+      return createDateOfMarriageBuilder(person, fieldValue)
     }
-    // nationality: createNationalityBuilder(FATHER_CODE),
-    // dateOfMarriage: createDateOfMarriageBuilder(FATHER_CODE)
   },
   child: {
     gender: (fhirBundle, fieldValue, context) => {
@@ -375,9 +422,24 @@ const builders: IFieldBuilders = {
         context
       )
       child.deceasedBoolean = fieldValue
+    },
+
+    nationality: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        CHILD_CODE,
+        fhirBundle,
+        context
+      )
+      return createNationalityBuilder(person, fieldValue)
+    },
+    dateOfMarriage: (fhirBundle: any, fieldValue: string, context: any) => {
+      const person = selectOrCreatePersonResource(
+        CHILD_CODE,
+        fhirBundle,
+        context
+      )
+      return createDateOfMarriageBuilder(person, fieldValue)
     }
-    // nationality: createNationalityBuilder(CHILD_CODE),
-    // dateOfMarriage: createDateOfMarriageBuilder(CHILD_CODE)
   }
 }
 

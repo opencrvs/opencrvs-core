@@ -1,5 +1,5 @@
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
-// import { OPENCRVS_SPECIFICATION_URL } from 'src/features/fhir/constants'
+import { OPENCRVS_SPECIFICATION_URL } from 'src/features/fhir/constants'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle({
@@ -7,8 +7,9 @@ test('should build a minimal FHIR registration document without error', async ()
       identifier: [{ id: '123456', type: 'PASSPORT' }],
       gender: 'female',
       name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'english' }],
-      deceased: false
-      // dateOfMarriage: '2014-01-28'
+      deceased: false,
+      dateOfMarriage: '2014-01-28',
+      nationality: ['BGD']
     },
     father: {
       gender: 'male',
@@ -53,6 +54,7 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     createdAt: new Date()
   })
+  console.log(fhir.entry[1].resource)
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(3)
   expect(fhir.entry[0].resource.date).toBeDefined()
@@ -75,5 +77,5 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.address[0].use).toBe('home')
   expect(fhir.entry[2].resource.address[0].line[0]).toBe('2760 Mlosi Street')
   expect(fhir.entry[2].resource.address[1].line[0]).toBe('40 Orbis Wharf')
-  // expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
 })
