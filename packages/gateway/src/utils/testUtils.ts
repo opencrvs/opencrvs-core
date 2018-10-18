@@ -114,3 +114,43 @@ export const mockPatient = {
     }
   ]
 }
+
+export const mockDocumentReference = {
+  resourceType: 'DocumentReference',
+  masterIdentifier: {
+    system: 'urn:ietf:rfc:3986',
+    value: 'b9648bdf-fb4e-4216-905f-d7fc3930301d'
+  },
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/original-file-name',
+      value: 'scan.pdf'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/system-file-name',
+      value: '1234.pdf'
+    }
+  ],
+  status: 'current',
+  docStatus: 'final', // 'final' when submitted | 'preliminary' when not validated | 'entered-in-error' when deleted
+  type: {
+    coding: {
+      system: 'http://opencrvs.org/specs/supporting-doc-type',
+      code: 'PASSPORT'
+    }
+  },
+  subject: {
+    reference: 'Patient/123', // reference to who this supporting docuemnt is about
+    display: 'MOTHER'
+  },
+  created: '2018-10-18T14:13:03+02:00',
+  indexed: '2018-10-18T14:13:03+02:00',
+  content: [
+    {
+      attachment: {
+        contentType: 'image/jpeg | image/png | application/pdf',
+        data: 'PGJhc2U2NEJpbmFyeT4K'
+      }
+    }
+  ]
+}

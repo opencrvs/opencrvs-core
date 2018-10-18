@@ -5,7 +5,7 @@ import {
   CHILD_CODE
 } from 'src/features/fhir/templates'
 import * as fetch from 'jest-fetch-mock'
-import { mockPatient } from 'src/utils/testUtils'
+import { mockPatient, mockDocumentReference } from 'src/utils/testUtils'
 
 describe('Registration type resolvers', () => {
   it('fetches and returns a mother patient resource from a composition section', async () => {
@@ -136,5 +136,55 @@ describe('Registration type resolvers', () => {
       mockPatient
     )
     expect(educationalAttainment).toBe('SECOND_STAGE_TERTIARY_ISCED_6')
+  })
+
+  describe('Attachment type', () => {
+    it('returns id', () => {
+      // @ts-ignore
+      const id = typeResolvers.Attachment.id(mockDocumentReference)
+      expect(id).toBe('b9648bdf-fb4e-4216-905f-d7fc3930301d')
+    })
+
+    it('returns base64 data', () => {
+      // @ts-ignore
+      const data = typeResolvers.Attachment.data(mockDocumentReference)
+      expect(data).toBe('PGJhc2U2NEJpbmFyeT4K')
+    })
+
+    it('returns originalFileName', () => {
+      // @ts-ignore
+      const originalFileName = typeResolvers.Attachment.originalFileName(
+        mockDocumentReference
+      )
+      expect(originalFileName).toBe('scan.pdf')
+    })
+
+    it('returns systemFileName', () => {
+      // @ts-ignore
+      const systemFileName = typeResolvers.Attachment.systemFileName(
+        mockDocumentReference
+      )
+      expect(systemFileName).toBe('1234.pdf')
+    })
+
+    it('returns type', () => {
+      // @ts-ignore
+      const type = typeResolvers.Attachment.type(mockDocumentReference)
+      expect(type).toBe('PASSPORT')
+    })
+
+    it('returns subject', () => {
+      // @ts-ignore
+      const subject = typeResolvers.Attachment.subject(mockDocumentReference)
+      expect(subject).toBe('MOTHER')
+    })
+
+    it('returns createdAt date', () => {
+      // @ts-ignore
+      const createdAt = typeResolvers.Attachment.createdAt(
+        mockDocumentReference
+      )
+      expect(createdAt).toBe('2018-10-18T14:13:03+02:00')
+    })
   })
 })

@@ -7,6 +7,10 @@ import {
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
 import { GQLResolver } from 'src/graphql/schema'
+import {
+  ORIGINAL_FILE_NAME_SYSTEM,
+  SYSTEM_FILE_NAME_SYSTEM
+} from '../fhir/constants'
 
 export const typeResolvers: GQLResolver = {
   HumanName: {
@@ -51,6 +55,34 @@ export const typeResolvers: GQLResolver = {
         person.extension
       )
       return educationalAttainmentExtension.valueString
+    }
+  },
+
+  Attachment: {
+    id(docRef) {
+      return docRef.masterIdentifier.value
+    },
+    data(docRef) {
+      return docRef.content[0].attachment.data
+    },
+    originalFileName(docRef) {
+      return docRef.identifier.find(
+        (identifier: any) => identifier.system === ORIGINAL_FILE_NAME_SYSTEM
+      ).value
+    },
+    systemFileName(docRef) {
+      return docRef.identifier.find(
+        (identifier: any) => identifier.system === SYSTEM_FILE_NAME_SYSTEM
+      ).value
+    },
+    type(docRef) {
+      return docRef.type.coding.code
+    },
+    subject(docRef) {
+      return docRef.subject.display
+    },
+    createdAt(docRef) {
+      return docRef.created
     }
   },
 
