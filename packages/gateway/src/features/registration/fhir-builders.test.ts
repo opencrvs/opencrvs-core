@@ -53,7 +53,6 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     createdAt: new Date()
   })
-  console.log(fhir.entry[2].resource.address[0].line)
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(3)
   expect(fhir.entry[0].resource.date).toBeDefined()

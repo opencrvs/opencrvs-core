@@ -68,8 +68,7 @@ export default async function transformObj(
     if (sourceObj.hasOwnProperty(currentPropName)) {
       if (Array.isArray(sourceObj[currentPropName])) {
         for (const [index, arrayVal] of sourceObj[currentPropName].entries()) {
-          context[`_index_for_${currentPropName}`] = index
-          context._index = index
+          context._index = { ...context._index, [currentPropName]: index }
 
           /* context._index = {
             [currentPropName]: index

@@ -157,16 +157,10 @@ function createAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      console.log('context', context)
-      if (!person.address[context[`_index_for_address`]].line) {
-        person.address[context[`_index_for_address`]].line = []
-      }
-      person.address[context[`_index_for_address`]].line.push(fieldValue)
-
-      /*if (!person.address[context._index.address].line) {
+      if (!person.address[context._index.address].line) {
         person.address[context._index.address].line = []
       }
-      person.address[context._index.address].line.push(fieldValue)*/
+      person.address[context._index.address].line.push(fieldValue)
     },
     city: (fhirBundle: any, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(

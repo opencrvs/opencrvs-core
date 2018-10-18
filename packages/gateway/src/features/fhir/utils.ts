@@ -66,10 +66,10 @@ export function createAndSetProperty(
   if (!resource[label]) {
     resource[label] = []
   }
-  if (!resource[label][context._index]) {
-    resource[label][context._index] = {}
+  if (!resource[label][context._index[label]]) {
+    resource[label][context._index[label]] = {}
   }
-  resource[label][context._index][propName] = value
+  resource[label][context._index[label]][propName] = value
 }
 
 export function findExtension(url: string, composition: any): IExtension {
