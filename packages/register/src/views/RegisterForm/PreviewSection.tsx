@@ -115,6 +115,7 @@ const ListItemLabel = styled.div`
 const ListItemValue = styled.div`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.copy};
+  flex-basis: 50%;
 `
 const InformationMissingLink = styled(Button)`
   font-family: ${({ theme }) => theme.fonts.regularFont};
