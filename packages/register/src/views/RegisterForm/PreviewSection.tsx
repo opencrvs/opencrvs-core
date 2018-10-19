@@ -20,7 +20,11 @@ import {
   IForm,
   IFormFieldValue,
   ISelectOption,
-  SELECT_WITH_OPTIONS
+  IFileValue,
+  SELECT_WITH_OPTIONS,
+  IMAGE_UPLOADER_WITH_OPTIONS,
+  LIST,
+  PARAGRAPH
 } from 'src/forms'
 
 import { IDraft } from 'src/drafts'
@@ -151,6 +155,10 @@ function renderSelectLabel(
   return selectedOption ? intl.formatMessage(selectedOption.label) : value
 }
 
+function renderFileSubject(files: IFileValue[]) {
+  return files.map(file => file.subject).join(', ')
+}
+
 function renderValue(
   value: IFormFieldValue,
   field: IFormField,
@@ -166,6 +174,9 @@ function renderValue(
     return value
       ? intl.formatMessage(messages.valueYes)
       : intl.formatMessage(messages.valueNo)
+  }
+  if (field.type === IMAGE_UPLOADER_WITH_OPTIONS) {
+    return renderFileSubject(value as IFileValue[])
   }
   return value
 }
@@ -221,7 +232,11 @@ class PreviewSectionForm extends React.Component<
         field,
         draft.data[section.id] || {}
       )
-      return !conditionalActions.includes('hide')
+      return (
+        !conditionalActions.includes('hide') &&
+        field.type !== LIST &&
+        field.type !== PARAGRAPH
+      )
     }
 
     return (
