@@ -81,6 +81,10 @@ export async function checkVerificationCode(
 ): Promise<void> {
   const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
 
+  if (!codeDetails) {
+    throw new Error('sms code not found')
+  }
+
   const codeExpired =
     (Date.now() - codeDetails.createdAt) / 1000 >=
     CONFIG_SMS_CODE_EXPIRY_SECONDS
@@ -97,10 +101,6 @@ export async function checkVerificationCode(
 export async function deleteUsedVerificationCode(
   nonce: string
 ): Promise<boolean> {
-  try {
-    await del(`verification_${nonce}`)
-    return true
-  } catch (err) {
-    throw Error(err.message)
-  }
+  const count = await del(`verification_${nonce}`)
+  return Boolean(count)
 }
