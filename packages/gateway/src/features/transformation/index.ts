@@ -1,7 +1,11 @@
+export interface IValueObject {
+  [key: string]: string | number | Date | IValueObject | Array<unknown>
+}
+
 export type IFieldBuilderFunction = (
-  accumulatedObj: any,
-  fieldValue: string | number,
-  context: any
+  accumulatedObj: IValueObject,
+  fieldValue: string | number | Date,
+  context: IContext
 ) => void
 
 export interface IFieldBuilders {
@@ -21,10 +25,10 @@ function isBuilderFunction(
 }
 
 async function transformField(
-  sourceVal: any,
-  targetObj: any,
+  sourceVal: string | object,
+  targetObj: IValueObject,
   fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
-  context: any
+  context: IContext
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
@@ -55,11 +59,15 @@ async function transformField(
   )
 }
 
+export interface IContext {
+  _index: { [key: string]: number }
+}
+
 export default async function transformObj(
   sourceObj: object,
-  targetObj: object,
+  targetObj: IValueObject,
   fieldBuilders: IFieldBuilders,
-  context: any = {}
+  context: IContext = { _index: {} }
 ) {
   // ensure the sourceObj has Object in its prototype chain
   // graphql-js creates objects with Object.create(null)
@@ -70,9 +78,6 @@ export default async function transformObj(
         for (const [index, arrayVal] of sourceObj[currentPropName].entries()) {
           context._index = { ...context._index, [currentPropName]: index }
 
-          /* context._index = {
-            [currentPropName]: index
-          } */
           await transformField(
             arrayVal,
             targetObj,

@@ -6,23 +6,27 @@ import {
   createPersonEntryTemplate
 } from 'src/features/fhir/templates'
 import { IExtension } from 'src/type/person'
+import { IContext } from '../transformation'
 
-export function findCompositionSectionInBundle(code: string, fhirBundle: any) {
+export function findCompositionSectionInBundle(
+  code: string,
+  fhirBundle: unknown
+) {
   return fhirBundle.entry[0].resource.section.find(
-    (section: any) => section.code.coding.code === code
+    (section: unknown) => section.code.coding.code === code
   )
 }
 
-export function findCompositionSection(code: string, composition: any) {
+export function findCompositionSection(code: string, composition: unknown) {
   return composition.section.find(
-    (section: any) => section.code.coding.code === code
+    (section: unknown) => section.code.coding.code === code
   )
 }
 
 export function selectOrCreatePersonResource(
   sectionCode: string,
-  fhirBundle: any,
-  context: any
+  fhirBundle: unknown,
+  context: IContext
 ) {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
@@ -49,7 +53,7 @@ export function selectOrCreatePersonResource(
     fhirBundle.entry.push(personEntry)
   } else {
     personEntry = fhirBundle.entry.find(
-      (entry: any) => entry.fullUrl === section.entry[0].reference
+      (entry: unknown) => entry.fullUrl === section.entry[0].reference
     )
   }
 
@@ -57,11 +61,11 @@ export function selectOrCreatePersonResource(
 }
 
 export function setObjectPropInResourceArray(
-  resource: any,
+  resource: object,
   label: string,
   value: string | string[],
   propName: string,
-  context: any
+  context: IContext
 ) {
   if (!resource[label]) {
     resource[label] = []
@@ -72,7 +76,7 @@ export function setObjectPropInResourceArray(
   resource[label][context._index[label]][propName] = value
 }
 
-export function findExtension(url: string, composition: any): IExtension {
+export function findExtension(url: string, composition: unknown): IExtension {
   const extension = composition.find((obj: IExtension) => {
     return obj.url === url
   })

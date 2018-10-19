@@ -1,12 +1,12 @@
 export const resolvers = {
   Query: {
-    listNotifications(_: any, { locations, status }: any) {
+    listNotifications(_: unknown, { locations, status }: unknown) {
       // query composition
       return [{ id: '123' }, { id: '321' }]
     }
   },
   Mutation: {
-    createNotification(_: any, { details }: any) {
+    createNotification(_: unknown, { details }: unknown) {
       // create bundle of resources - some sort of mapping
       // put resources in a composition
       // save composition
