@@ -22,10 +22,6 @@ import {
   registerFormReducer,
   IRegisterFormState
 } from './forms/register/reducer'
-import {
-  documentUploadFormReducer,
-  IDocumentUploadState
-} from './forms/register/document-upload-reducer'
 import { navigationReducer, INavigationState } from 'src/navigation'
 import {
   notificationReducer,
@@ -38,7 +34,6 @@ export interface IStoreState {
   i18n: IntlState
   drafts: IDraftsState
   registerForm: IRegisterFormState
-  documentUploadForm: IDocumentUploadState
   navigation: INavigationState
   notification: NotificationState
 }
@@ -49,7 +44,6 @@ const reducers = combineReducers<IStoreState>({
   i18n: intlReducer,
   drafts: draftsReducer,
   registerForm: registerFormReducer,
-  documentUploadForm: documentUploadFormReducer,
   navigation: navigationReducer,
   notification: notificationReducer
 })
@@ -77,6 +71,5 @@ export const createStore = (): { store: AppStore; history: History } => {
     getModel(reducers(undefined, { type: 'NOOP' })),
     enhancer
   )
-
   return { store, history }
 }

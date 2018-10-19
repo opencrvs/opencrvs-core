@@ -13,6 +13,7 @@ import {
   ISelectFormFieldWithDynamicOptions
 } from './'
 import { InjectedIntl } from 'react-intl'
+import { getValidationErrorsForForm } from 'src/forms/validation'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -80,6 +81,18 @@ export const getConditionalActionsForField = (
       eval(conditional.expression)
     )
     .map((conditional: IConditional) => conditional.action)
+}
+
+export const hasFormError = (
+  fields: IFormField[],
+  values: IFormSectionData
+): boolean => {
+  const errors = getValidationErrorsForForm(fields, values)
+
+  const fieldListWithErrors = Object.keys(errors).filter(key => {
+    return errors[key] && errors[key].length > 0
+  })
+  return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
 export const conditionals: IConditionals = {

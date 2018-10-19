@@ -3,6 +3,14 @@ export const BENGALI_STATE = {
   messages: {
     'menu.back': 'পিছনে',
     'menu.menu': 'তালিকা',
+    'menu.items.homepage': 'হোমপেজে',
+    'menu.items.register': 'নিবন্ধন',
+    'menu.items.drafts': 'খসড়া',
+    'menu.items.settings': 'সেটিংস',
+    'menu.items.logout': 'প্রস্থান',
+    'menu.items.changeLanguage': 'ভাষা পরিবর্তন',
+    'menu.items.changeLanguage.english': 'ইংরেজি',
+    'menu.items.changeLanguage.bengali': 'বাংলা',
     'states.state1': 'বরিশাল',
     'states.state2': 'ঢাকা',
     'states.state3': 'খুলনা',
@@ -562,6 +570,8 @@ export const BENGALI_STATE = {
     'formFields.docTypeNID': 'জাতীয় পরিচয়পত্র',
     'formFields.docTypePassport': 'পাসপোর্ট',
     'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
-    'formFields.docTypeOther': 'অন্যান্য'
+    'formFields.docTypeOther': 'অন্যান্য',
+    'register.form.section.documents.uploadImage':
+      'সমর্থনকারী কাগজপত্রর একটি ছবি আপলোড করুন'
   }
 }

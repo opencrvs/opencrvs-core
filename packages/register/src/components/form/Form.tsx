@@ -36,7 +36,9 @@ import {
   LIST,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
-  PARAGRAPH
+  PARAGRAPH,
+  IMAGE_UPLOADER_WITH_OPTIONS,
+  IFileValue
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -44,6 +46,7 @@ import { IValidationResult } from 'src/utils/validate'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'
+import { ImageUploadField } from './ImageUploadField'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -62,7 +65,7 @@ const FormSectionTitle = styled.h2`
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
-  onSetFieldValue: (name: string, value: string | string[]) => void
+  onSetFieldValue: (name: string, value: IFormFieldValue) => void
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
   resetDependentSelectValues: (name: string) => void
@@ -189,6 +192,19 @@ function GeneratedInputField({
           value={inputProps.value as string}
         />
       </InputField>
+    )
+  }
+  if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
+    return (
+      <ImageUploadField
+        id={inputProps.id}
+        title={fieldDefinition.label}
+        nestedSection={fieldDefinition.nestedSection}
+        files={value as IFileValue[]}
+        onComplete={(files: IFileValue[]) =>
+          onSetFieldValue(fieldDefinition.name, files)
+        }
+      />
     )
   }
 

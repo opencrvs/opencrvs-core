@@ -5,6 +5,9 @@ import { App } from './App'
 import registerServiceWorker from './registerServiceWorker'
 import { createStore } from './store'
 import * as actions from 'src/notification/actions'
+import { storage } from 'src/storage'
+
+storage.configStorage('OpenCRVS')
 
 // Injecting global styles for the body tag - used only once
 // tslint:disable-next-line

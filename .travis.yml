@@ -12,11 +12,12 @@ jobs:
     - stage: integration tests
       before_install: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       script:
+        - yarn global add wait-on
         - yarn dev:secrets:gen
         - yarn compose -d
         - sleep 10
-        - yarn start &
-        - sleep 60
+        - yarn start:prod &
+        - wait-on http://localhost:3000 http://localhost:3000
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start --record
       env:

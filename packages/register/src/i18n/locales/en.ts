@@ -3,6 +3,14 @@ export const ENGLISH_STATE = {
   messages: {
     'menu.back': 'Back',
     'menu.menu': 'Menu',
+    'menu.items.homepage': 'Homepage',
+    'menu.items.register': 'Register',
+    'menu.items.drafts': 'Drafts',
+    'menu.items.settings': 'Settings',
+    'menu.items.logout': 'Log out',
+    'menu.items.changeLanguage': 'Change Language',
+    'menu.items.changeLanguage.english': 'English',
+    'menu.items.changeLanguage.bengali': 'Bengali',
     'states.state1': 'Barishal Division',
     'states.state2': 'Dhaka Division',
     'states.state3': 'Khulna Division',
@@ -569,6 +577,8 @@ export const ENGLISH_STATE = {
     'formFields.docTypeNID': 'NID',
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
-    'formFields.docTypeOther': 'Other'
+    'formFields.docTypeOther': 'Other',
+    'register.form.section.documents.uploadImage':
+      'Upload a photo of the supporting document'
   }
 }

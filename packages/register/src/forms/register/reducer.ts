@@ -5,7 +5,7 @@ import { childSection } from './child-section'
 import { motherSection } from './mother-section'
 import { fatherSection } from './father-section'
 import { registrationSection } from './registration-section'
-import { documentsSection } from './documents-section'
+import { documentsSection } from './docuements-section'
 
 const messages = defineMessages({
   previewTab: {
