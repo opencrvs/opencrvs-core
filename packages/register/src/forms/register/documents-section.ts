@@ -137,7 +137,7 @@ export const documentsSection: IFormSection = {
       label: messages.uploadImage,
       initialValue: '',
       validate: [],
-      nestedSection: {
+      optionSection: {
         id: 'documents-upload',
         viewType: 'form',
         name: messages.documentsUploadName,

@@ -43,7 +43,7 @@ export type IFormFieldValue = string | string[] | boolean | IFileValue[]
 export type IFileValue = {
   subject: string
   type: string
-  value: string
+  data: string
 }
 
 export interface IFormFieldBase {
@@ -106,7 +106,7 @@ export interface IParagraphFormField extends IFormFieldBase {
 }
 export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
-  nestedSection: IFormSection
+  optionSection: IFormSection
 }
 
 export type IFormField =
@@ -221,7 +221,7 @@ export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
 export interface Ii18nImageUploaderWithOptionsFormField
   extends Ii18nFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
-  nestedSection: IFormSection
+  optionSection: IFormSection
 }
 
 export type Ii18nFormField =

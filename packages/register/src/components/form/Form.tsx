@@ -199,7 +199,7 @@ function GeneratedInputField({
       <ImageUploadField
         id={inputProps.id}
         title={fieldDefinition.label}
-        nestedSection={fieldDefinition.nestedSection}
+        optionSection={fieldDefinition.optionSection}
         files={value as IFileValue[]}
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
