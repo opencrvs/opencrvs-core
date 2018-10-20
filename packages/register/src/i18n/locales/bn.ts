@@ -572,6 +572,9 @@ export const BENGALI_STATE = {
     'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
     'formFields.docTypeOther': 'অন্যান্য',
     'register.form.section.documents.uploadImage':
-      'সমর্থনকারী কাগজপত্রর একটি ছবি আপলোড করুন'
+      'সমর্থনকারী কাগজপত্রর একটি ছবি আপলোড করুন',
+    'formFields.imageUpload.uploadedList': 'আপলোড করা:',
+    'formFields.imageUpload.delete': 'মুছে ফেলা',
+    'formFields.imageUpload.preview': 'প্রিভিউ'
   }
 }

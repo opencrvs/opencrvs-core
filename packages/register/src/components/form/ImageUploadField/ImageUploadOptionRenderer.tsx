@@ -37,11 +37,13 @@ type State = {
 
 type IProps = {
   option: IFormSection
+  backLabel?: string
+  title?: string
   onComplete: (file: IFileValue) => void
   toggleNestedSection: () => void
 }
 
-export class ImageUploadOptionSection extends React.Component<IProps, State> {
+export class ImageUploadOptionRenderer extends React.Component<IProps, State> {
   constructor(props: IProps) {
     super(props)
     this.state = {
@@ -76,11 +78,12 @@ export class ImageUploadOptionSection extends React.Component<IProps, State> {
   }
 
   render = () => {
-    const { option } = this.props
+    const { option, title, backLabel } = this.props
     return (
       <OverlayContainer>
         <ActionPage
-          title="Upload" // TODO: need to support internationalized text
+          title={title ? title : 'Upload'}
+          backLabel={backLabel}
           goBack={this.props.toggleNestedSection}
         >
           <FormContainer>
@@ -95,7 +98,7 @@ export class ImageUploadOptionSection extends React.Component<IProps, State> {
                 <FormAction>
                   <FormImageUploader
                     id="upload_document"
-                    title="Upload" // TODO: need to support internationalized text
+                    title={title ? title : 'Upload'}
                     icon={() => <ArrowForward />}
                     handleFileChange={this.handleFileChange}
                   />

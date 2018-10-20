@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { IconAction } from '@opencrvs/components/lib/buttons'
 import { Camera } from '@opencrvs/components/lib/icons'
@@ -6,7 +7,7 @@ import { IActionProps } from '@opencrvs/components/lib/buttons/Action'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { FileItem } from '@opencrvs/components/lib/files'
 import { IFormSection, IFileValue } from 'src/forms'
-import { ImageUploadOptionSection } from './ImageUploadOptionSection'
+import { ImageUploadOptionRenderer } from './ImageUploadOptionRenderer'
 
 const Container = styled.div`
   width: 100%;
@@ -43,14 +44,41 @@ const FileViewerLabel = styled.label`
 const FileItemContainer = styled.div`
   margin-top: 12px;
 `
+const messages = defineMessages({
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
+  },
+  uploadedList: {
+    id: 'formFields.imageUpload.uploadedList',
+    defaultMessage: 'Uploaded:',
+    description: 'label for uploaded list'
+  },
+  delete: {
+    id: 'formFields.imageUpload.delete',
+    defaultMessage: 'Delete',
+    description: 'label for delete a uploaded item'
+  },
+  preview: {
+    id: 'formFields.imageUpload.preview',
+    defaultMessage: 'Preview',
+    description: 'label for preview a uploaded item'
+  },
+  upload: {
+    id: 'register.form.upload',
+    defaultMessage: 'Upload',
+    description: 'title for option view'
+  }
+})
 
-type IProps = IActionProps & {
-  files: IFileValue[]
-  optionSection: IFormSection
-  onComplete: (files: IFileValue[]) => void
-}
-
-export class ImageUploadField extends React.Component<
+type IProps = IActionProps &
+  InjectedIntlProps & {
+    files: IFileValue[]
+    optionSection: IFormSection
+    onComplete: (files: IFileValue[]) => void
+  }
+class ImageUploadComponent extends React.Component<
   IProps,
   {
     showNestedOptionSection: boolean
@@ -77,7 +105,7 @@ export class ImageUploadField extends React.Component<
   }
 
   render = () => {
-    const { title, optionSection, files } = this.props
+    const { title, optionSection, files, intl } = this.props
     const fileList =
       files &&
       files.map((file: IFileValue, index: number) => {
@@ -85,10 +113,12 @@ export class ImageUploadField extends React.Component<
           <FileItemContainer key={index}>
             <FileItem
               file={file}
+              deleteLabel={intl.formatMessage(messages.delete)}
               onDelete={() =>
                 /* need to change it for deleting from the file array and push it back on draft */
                 alert(`#${index} deleted`)
               }
+              previewLabel={intl.formatMessage(messages.preview)}
               onPreview={() =>
                 /* need to change it for getting file.data using the index and use it for preview */
                 alert(`#${index} previewed`)
@@ -109,14 +139,18 @@ export class ImageUploadField extends React.Component<
 
         {fileList && (
           <FileViewer>
-            <FileViewerLabel>Uploaded:</FileViewerLabel>
+            <FileViewerLabel>
+              {intl.formatMessage(messages.uploadedList)}
+            </FileViewerLabel>
             {fileList}
           </FileViewer>
         )}
 
         {this.state.showNestedOptionSection && (
-          <ImageUploadOptionSection
+          <ImageUploadOptionRenderer
             option={optionSection}
+            title={intl.formatMessage(messages.upload)}
+            backLabel={intl.formatMessage(messages.back)}
             onComplete={this.onComplete}
             toggleNestedSection={this.toggleNestedSection}
           />
@@ -125,3 +159,4 @@ export class ImageUploadField extends React.Component<
     )
   }
 }
+export const ImageUploadField = injectIntl(ImageUploadComponent)

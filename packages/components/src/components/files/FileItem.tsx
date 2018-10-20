@@ -10,7 +10,9 @@ interface IProps {
     type: string
     data: string
   }
+  deleteLabel?: string
   onDelete: () => void
+  previewLabel?: string
   onPreview: () => void
   theme: ITheme
 }
@@ -72,7 +74,7 @@ const MetadataContainer = styled.div`
 class FileItemComponent extends React.Component<IProps> {
   render() {
     const { subject, type } = this.props.file
-    const { onDelete, onPreview, theme } = this.props
+    const { deleteLabel, onDelete, previewLabel, onPreview, theme } = this.props
 
     return (
       <Container>
@@ -82,11 +84,13 @@ class FileItemComponent extends React.Component<IProps> {
             <span>{subject}</span>
             <span>{type}</span>
           </MetadataContainer>
-          <PreviewLink onClick={onPreview}>Preview</PreviewLink>
+          <PreviewLink onClick={onPreview}>
+            {previewLabel ? previewLabel : 'Preview'}
+          </PreviewLink>
         </FileContainer>
         <DeleteContainer onClick={onDelete}>
           <Cross color={theme.colors.danger} />
-          <DeleteLink>Delete</DeleteLink>
+          <DeleteLink>{deleteLabel ? deleteLabel : 'Delete'}</DeleteLink>
         </DeleteContainer>
       </Container>
     )

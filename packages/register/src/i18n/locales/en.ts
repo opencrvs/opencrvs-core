@@ -579,6 +579,9 @@ export const ENGLISH_STATE = {
     'formFields.docTypeSC': 'School Certificate',
     'formFields.docTypeOther': 'Other',
     'register.form.section.documents.uploadImage':
-      'Upload a photo of the supporting document'
+      'Upload a photo of the supporting document',
+    'formFields.imageUpload.uploadedList': 'Uploaded:',
+    'formFields.imageUpload.delete': 'Delete',
+    'formFields.imageUpload.preview': 'Preview'
   }
 }
