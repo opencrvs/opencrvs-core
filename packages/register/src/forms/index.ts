@@ -41,7 +41,7 @@ export interface IDynamicOptions {
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
 
 export type IFileValue = {
-  subject: string
+  optionValues: IFormFieldValue[]
   type: string
   data: string
 }

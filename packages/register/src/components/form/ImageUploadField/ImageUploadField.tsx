@@ -72,19 +72,19 @@ const messages = defineMessages({
   }
 })
 
-type IProps = IActionProps &
-  InjectedIntlProps & {
-    files: IFileValue[]
-    optionSection: IFormSection
-    onComplete: (files: IFileValue[]) => void
-  }
+type IProps = {
+  files?: IFileValue[]
+  optionSection: IFormSection
+  onComplete: (files: IFileValue[]) => void
+}
+type IFullProps = IActionProps & InjectedIntlProps & IProps
 class ImageUploadComponent extends React.Component<
-  IProps,
+  IFullProps,
   {
     showNestedOptionSection: boolean
   }
 > {
-  constructor(props: IProps) {
+  constructor(props: IFullProps) {
     super(props)
     this.state = {
       showNestedOptionSection: false
@@ -108,7 +108,8 @@ class ImageUploadComponent extends React.Component<
     const { title, optionSection, files, intl } = this.props
     const fileList =
       files &&
-      files.map((file: IFileValue, index: number) => {
+      files.map((file: IFileValue & { subject: string }, index: number) => {
+        file.subject = file.optionValues.join(' ')
         return (
           <FileItemContainer key={index}>
             <FileItem
@@ -159,4 +160,6 @@ class ImageUploadComponent extends React.Component<
     )
   }
 }
-export const ImageUploadField = injectIntl(ImageUploadComponent)
+export const ImageUploadField = injectIntl<IActionProps & IProps>(
+  ImageUploadComponent
+)

@@ -157,7 +157,7 @@ function renderSelectLabel(
 }
 
 function renderFileSubject(files: IFileValue[]) {
-  return files.map(file => file.subject).join(', ')
+  return files.map(file => file.optionValues.join(' ')).join(', ')
 }
 
 function renderValue(
@@ -233,11 +233,11 @@ class PreviewSectionForm extends React.Component<
         field,
         draft.data[section.id] || {}
       )
-      return (
-        !conditionalActions.includes('hide') &&
-        field.type !== LIST &&
-        field.type !== PARAGRAPH
-      )
+      return !conditionalActions.includes('hide')
+    }
+
+    const isViewOnly = (field: IFormField) => {
+      return [LIST, PARAGRAPH].find(type => type === field.type)
     }
 
     return (
@@ -288,7 +288,10 @@ class PreviewSectionForm extends React.Component<
               </PreviewSectionTitle>
               <List>
                 {section.fields
-                  .filter(field => isVisibleField(field, section))
+                  .filter(
+                    field =>
+                      isVisibleField(field, section) && !isViewOnly(field)
+                  )
                   .map((field: IFormField) => {
                     const informationMissing =
                       emptyFieldsBySection[section.id][field.name]

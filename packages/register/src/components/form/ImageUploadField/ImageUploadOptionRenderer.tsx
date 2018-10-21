@@ -68,7 +68,7 @@ export class ImageUploadOptionRenderer extends React.Component<IProps, State> {
     reader.onloadend = () => {
       if (reader.result) {
         this.props.onComplete({
-          subject: Object.values(this.state.data).join(' '),
+          optionValues: Object.values(this.state.data),
           type: uploadedImage.type,
           data: reader.result.toString()
         })
