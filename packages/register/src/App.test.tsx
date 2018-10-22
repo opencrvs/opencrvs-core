@@ -384,6 +384,72 @@ describe('when user has a valid token in local storage', () => {
         )
       })
     })
+    describe('when user is in document tab', () => {
+      beforeEach(async () => {
+        app
+          .find('#tab_documents')
+          .hostNodes()
+          .simulate('click')
+
+        await flushPromises()
+        app.update()
+      })
+      it('image upload field is rendered', () => {
+        expect(app.find('#image_uploader').hostNodes()).toHaveLength(1)
+      })
+      describe('when user clicks image upload field', () => {
+        beforeEach(async () => {
+          app
+            .find('#image_uploader')
+            .hostNodes()
+            .simulate('click')
+
+          await flushPromises()
+          app.update()
+        })
+        it('user should be asked, for whom they are uploading documents', () => {
+          expect(
+            app
+              .find('#uploadDocForWhom_label')
+              .hostNodes()
+              .text()
+          ).toEqual('Whose suppoting document are you uploading?')
+        })
+        describe('when user selects for whom they want to upload document', () => {
+          beforeEach(async () => {
+            app
+              .find('#uploadDocForWhom_Mother')
+              .hostNodes()
+              .simulate('change')
+
+            await flushPromises()
+            app.update()
+          })
+          it('user should be asked about the type of documents', () => {
+            expect(
+              app
+                .find('#whatDocToUpload_label')
+                .hostNodes()
+                .text()
+            ).toEqual('Which document type are you uploading?')
+          })
+          describe('when user selects the type of document', () => {
+            beforeEach(async () => {
+              app
+                .find('#whatDocToUpload_NID')
+                .hostNodes()
+                .simulate('change')
+
+              await flushPromises()
+              app.update()
+            })
+            it('upload button should appear now', () => {
+              expect(app.find('#upload_document').hostNodes()).toHaveLength(1)
+            })
+          })
+        })
+      })
+    })
   })
 })
 it("doesn't redirect user to SSO if user has a token in their URL", async () => {

@@ -139,7 +139,7 @@ class ImageUploadComponent extends React.Component<
         />
 
         {fileList && (
-          <FileViewer>
+          <FileViewer id="file_list_viewer">
             <FileViewerLabel>
               {intl.formatMessage(messages.uploadedList)}
             </FileViewerLabel>
