@@ -7,7 +7,8 @@ import {
 } from 'src/features/fhir/templates'
 import {
   selectOrCreatePersonResource,
-  setObjectPropInResourceArray
+  setObjectPropInResourceArray,
+  getMaritalStatusCode
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -338,6 +339,16 @@ function createNationalityBuilder(resource: any, fieldValue: string) {
   })
 }
 
+function createMaritalStatusBuilder(resource: any, fieldValue: string) {
+  resource.maritalStatus = {
+    coding: {
+      system: `${FHIR_SPECIFICATION_URL}marital-status`,
+      code: getMaritalStatusCode(fieldValue)
+    },
+    text: fieldValue
+  }
+}
+
 function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -377,12 +388,12 @@ const builders: IFieldBuilders = {
       mother.birthDate = fieldValue
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
-      const mother = selectOrCreatePersonResource(
+      const person = selectOrCreatePersonResource(
         MOTHER_CODE,
         fhirBundle,
         context
       )
-      mother.maritalStatus = fieldValue
+      return createMaritalStatusBuilder(person, fieldValue)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(
@@ -452,12 +463,12 @@ const builders: IFieldBuilders = {
       father.birthDate = fieldValue
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
-      const father = selectOrCreatePersonResource(
+      const person = selectOrCreatePersonResource(
         FATHER_CODE,
         fhirBundle,
         context
       )
-      father.maritalStatus = fieldValue
+      return createMaritalStatusBuilder(person, fieldValue)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(
@@ -528,12 +539,12 @@ const builders: IFieldBuilders = {
       child.birthDate = fieldValue
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
-      const child = selectOrCreatePersonResource(
+      const person = selectOrCreatePersonResource(
         CHILD_CODE,
         fhirBundle,
         context
       )
-      child.maritalStatus = fieldValue
+      return createMaritalStatusBuilder(person, fieldValue)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const child = selectOrCreatePersonResource(

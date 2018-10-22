@@ -78,3 +78,20 @@ export function findExtension(url: string, composition: any): IExtension {
   })
   return extension
 }
+
+export function getMaritalStatusCode(fieldValue: string) {
+  switch (fieldValue) {
+    case 'SINGLE':
+      return 'S'
+    case 'WIDOWED':
+      return 'W'
+    case 'DIVORCED':
+      return 'D'
+    case 'NOT_STATED':
+      return 'UNK'
+    case 'MARRIED':
+      return 'M'
+    default:
+      return 'UNK'
+  }
+}
