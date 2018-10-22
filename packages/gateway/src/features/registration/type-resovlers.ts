@@ -2,7 +2,8 @@ import { findCompositionSection, findExtension } from 'src/features/fhir/utils'
 import {
   MOTHER_CODE,
   FATHER_CODE,
-  CHILD_CODE
+  CHILD_CODE,
+  DOCS_CODE
 } from 'src/features/fhir/templates'
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
@@ -55,6 +56,21 @@ export const typeResolvers: GQLResolver = {
         person.extension
       )
       return educationalAttainmentExtension.valueString
+    }
+  },
+
+  Registration: {
+    async attachments(task) {
+      const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
+      const composition = await res.json()
+      const docRefReferences = findCompositionSection(
+        DOCS_CODE,
+        composition
+      ).entry.map((docRefEntry: any) => docRefEntry.reference)
+      return docRefReferences.map(async (docRefReference: string) => {
+        const docRefRes = await fetch(`${fhirUrl}/${docRefReference}`)
+        return docRefRes.json()
+      })
     }
   },
 
@@ -112,6 +128,10 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
+      return res.json()
+    },
+    async registration(composition) {
+      const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`)
       return res.json()
     }
   }

@@ -5,7 +5,16 @@ import {
   CHILD_CODE
 } from 'src/features/fhir/templates'
 import * as fetch from 'jest-fetch-mock'
-import { mockPatient, mockDocumentReference } from 'src/utils/testUtils'
+import {
+  mockPatient,
+  mockDocumentReference,
+  mockTask,
+  mockComposition
+} from 'src/utils/testUtils'
+
+beforeEach(() => {
+  fetch.resetMocks()
+})
 
 describe('Registration type resolvers', () => {
   it('fetches and returns a mother patient resource from a composition section', async () => {
@@ -138,6 +147,22 @@ describe('Registration type resolvers', () => {
     expect(educationalAttainment).toBe('SECOND_STAGE_TERTIARY_ISCED_6')
   })
 
+  describe('Birth Registration type', () => {
+    it('returns a registration object as a task', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({ resourceType: 'Task' })
+      )
+
+      // @ts-ignore
+      const registration = await typeResolvers.BirthRegistration.registration({
+        id: 123
+      })
+      expect(registration).toBeDefined()
+      expect(registration.resourceType).toBe('Task')
+      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Task?focus=123')
+    })
+  })
+
   describe('Attachment type', () => {
     it('returns id', () => {
       // @ts-ignore
@@ -185,6 +210,41 @@ describe('Registration type resolvers', () => {
         mockDocumentReference
       )
       expect(createdAt).toBe('2018-10-18T14:13:03+02:00')
+    })
+  })
+
+  describe('Registration type', () => {
+    it('returns an array of attachments', async () => {
+      const mock = fetch
+        .mockResponseOnce(JSON.stringify(mockComposition))
+        .mockResponseOnce(JSON.stringify({ id: 'xxx' })) // Doc ref xxx
+        .mockResponseOnce(JSON.stringify({ id: 'yyy' })) // Doc ref yyy
+        .mockResponseOnce(JSON.stringify({ id: 'zzz' })) // Doc ref zzz
+
+      // @ts-ignore
+      const attachments = await typeResolvers.Registration.attachments(mockTask)
+      expect(attachments).toBeDefined()
+      expect(attachments).toHaveLength(3)
+
+      const [a1, a2, a3] = await Promise.all(attachments)
+      // @ts-ignore
+      expect(a1.id).toBe('xxx')
+      // @ts-ignore
+      expect(a2.id).toBe('yyy')
+      // @ts-ignore
+      expect(a3.id).toBe('zzz')
+
+      expect(mock).toHaveBeenCalledTimes(4)
+      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Composition/123')
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/DocumentReference/xxx'
+      )
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/DocumentReference/yyy'
+      )
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/DocumentReference/zzz'
+      )
     })
   })
 })
