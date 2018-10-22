@@ -63,6 +63,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
         {title}
         {icon && <Icon>{icon()}</Icon>}
         <HiddenInput
+          id="image_file_uploader_field"
           type="file"
           accept="image/*"
           onChange={event => this.handleFileChange(event)}

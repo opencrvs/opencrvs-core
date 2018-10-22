@@ -446,6 +446,33 @@ describe('when user has a valid token in local storage', () => {
             it('upload button should appear now', () => {
               expect(app.find('#upload_document').hostNodes()).toHaveLength(1)
             })
+            describe('when image is uploaded/captured', () => {
+              beforeEach(async () => {
+                app
+                  .find('#image_file_uploader_field')
+                  .hostNodes()
+                  .simulate('change', {
+                    target: {
+                      files: [new Blob(['junkvalues'], { type: 'image/png' })]
+                    }
+                  })
+                await flushPromises()
+                app.update()
+
+                app
+                  .find('#action_page_back_button')
+                  .hostNodes()
+                  .simulate('click')
+
+                await flushPromises()
+                app.update()
+              })
+              it('uploaded section should appear now', () => {
+                expect(app.find('#file_list_viewer').hostNodes()).toHaveLength(
+                  1
+                )
+              })
+            })
           })
         })
       })

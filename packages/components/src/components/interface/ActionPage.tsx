@@ -70,7 +70,7 @@ export class ActionPage extends React.Component<
     return (
       <ActionContainer>
         <HeaderContainer>
-          <BackButtonContainer onClick={goBack}>
+          <BackButtonContainer id="action_page_back_button" onClick={goBack}>
             <BackButton icon={icon || (() => <ArrowBack />)} />
             <BackButtonText>{backLabel ? backLabel : 'BACK'}</BackButtonText>
           </BackButtonContainer>
