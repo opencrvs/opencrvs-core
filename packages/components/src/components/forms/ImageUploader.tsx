@@ -37,11 +37,8 @@ const HiddenInput = styled.input`
   display: none;
 `
 const Icon = styled.div`
-  /* TODO these feel weird..*/
   display: flex;
   justify-content: center;
-
-  /* TODO 1. only apply margin if not only child */
   margin-left: 2em;
 `
 interface IImagePickerProps {
