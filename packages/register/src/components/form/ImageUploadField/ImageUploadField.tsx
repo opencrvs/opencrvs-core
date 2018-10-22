@@ -99,8 +99,7 @@ class ImageUploadComponent extends React.Component<
 
   onComplete = (file: IFileValue) => {
     const files = this.props.files ? this.props.files : []
-    files.push(file)
-    this.props.onComplete(files)
+    this.props.onComplete(files.concat(file))
     this.toggleNestedSection()
   }
 

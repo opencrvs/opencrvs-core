@@ -67,7 +67,6 @@ export const messages = defineMessages({
 const FormContainer = styled.div`
   padding: 35px 25px;
   padding-bottom: 0;
-  z-index: auto;
 `
 
 const FormViewContainer = styled.div`

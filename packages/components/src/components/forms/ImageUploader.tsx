@@ -1,38 +1,19 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
-import { InputHTMLAttributes } from 'react'
+import styled from 'styled-components'
+import { PrimaryButton } from '../buttons'
 
-const ImageBase = styled.label`
+const ImageBase = styled(PrimaryButton.withComponent('label'))`
   width: auto;
   padding: 15px 35px;
   font-family: ${({ theme }) => theme.fonts.boldFont};
   align-items: center;
   display: inline-flex;
+  border: 0;
   font-size: inherit;
   justify-content: space-between;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.primary};
-  border: ${({ theme }) => theme.colors.white};
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.capsFontStyle};
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => theme.colors.white};
-  }
-
-  &:active {
-    color: ${({ theme }) => theme.colors.accentGradientDark};
-    outline: none;
-  }
-
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.white};
-    cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
-  }
 `
+
 const HiddenInput = styled.input`
   display: none;
 `
