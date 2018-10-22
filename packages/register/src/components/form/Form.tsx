@@ -231,6 +231,7 @@ interface IFormSectionProps {
   id: string
   setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
+  renderOnly?: boolean
 }
 
 type Props = IFormSectionProps &
@@ -280,17 +281,8 @@ class FormSectionComponent extends React.Component<Props> {
       this.props.setFieldValue(fieldToReset.name, '')
     }
   }
-  render() {
-    const {
-      handleSubmit,
-      values,
-      fields,
-      setFieldValue,
-      touched,
-      id,
-      intl,
-      title
-    } = this.props
+  renderChildren = () => {
+    const { values, fields, setFieldValue, touched, intl } = this.props
 
     const errors = (this.props.errors as any) as {
       [key: string]: IValidationResult[]
@@ -313,65 +305,74 @@ class FormSectionComponent extends React.Component<Props> {
     )
 
     return (
+      <>
+        {fieldsWithValuesDefined.map(field => {
+          let error: string
+          const fieldErrors = errors[field.name]
+          if (fieldErrors && fieldErrors.length > 0) {
+            const [firstError] = fieldErrors
+            error = intl.formatMessage(firstError.message, firstError.props)
+          }
+
+          const conditionalActions: string[] = getConditionalActionsForField(
+            field,
+            values
+          )
+
+          if (conditionalActions.includes('hide')) {
+            return null
+          }
+
+          const withDynamicallyGeneratedFields =
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+              ? ({
+                  ...field,
+                  type: SELECT_WITH_OPTIONS,
+                  options: getFieldOptions(
+                    field as ISelectFormFieldWithDynamicOptions,
+                    values
+                  )
+                } as ISelectFormFieldWithOptions)
+              : field
+
+          return (
+            <FormItem key={`${field.name}`}>
+              <Field name={field.name}>
+                {(formikFieldProps: FieldProps<any>) => (
+                  <GeneratedInputField
+                    fieldDefinition={internationaliseFieldObject(
+                      intl,
+                      withDynamicallyGeneratedFields
+                    )}
+                    onSetFieldValue={setFieldValue}
+                    resetDependentSelectValues={this.resetDependentSelectValues}
+                    {...formikFieldProps.field}
+                    touched={touched[field.name] || false}
+                    error={error}
+                  />
+                )}
+              </Field>
+            </FormItem>
+          )
+        })}
+      </>
+    )
+  }
+  render() {
+    const { handleSubmit, id, title, renderOnly = false } = this.props
+
+    return (
       <section>
         {title && (
           <FormSectionTitle id={`form_section_title_${id}`}>
             {title}
           </FormSectionTitle>
         )}
-        <form onSubmit={handleSubmit}>
-          {fieldsWithValuesDefined.map(field => {
-            let error: string
-            const fieldErrors = errors[field.name]
-            if (fieldErrors && fieldErrors.length > 0) {
-              const [firstError] = fieldErrors
-              error = intl.formatMessage(firstError.message, firstError.props)
-            }
-
-            const conditionalActions: string[] = getConditionalActionsForField(
-              field,
-              values
-            )
-
-            if (conditionalActions.includes('hide')) {
-              return null
-            }
-
-            const withDynamicallyGeneratedFields =
-              field.type === SELECT_WITH_DYNAMIC_OPTIONS
-                ? ({
-                    ...field,
-                    type: SELECT_WITH_OPTIONS,
-                    options: getFieldOptions(
-                      field as ISelectFormFieldWithDynamicOptions,
-                      values
-                    )
-                  } as ISelectFormFieldWithOptions)
-                : field
-
-            return (
-              <FormItem key={`${field.name}`}>
-                <Field name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      onSetFieldValue={setFieldValue}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={error}
-                    />
-                  )}
-                </Field>
-              </FormItem>
-            )
-          })}
-        </form>
+        {renderOnly ? (
+          this.renderChildren()
+        ) : (
+          <form onSubmit={handleSubmit}>{this.renderChildren()}</form>
+        )}
       </section>
     )
   }

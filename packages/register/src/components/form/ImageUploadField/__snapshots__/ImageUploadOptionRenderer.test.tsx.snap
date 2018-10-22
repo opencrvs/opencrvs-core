@@ -263,6 +263,7 @@ ShallowWrapper {
               }
               id="documents-upload"
               onChange={[Function]}
+              renderOnly={true}
               setAllFieldsDirty={false}
             />
           </WithTheme(Component)>
@@ -391,6 +392,7 @@ ShallowWrapper {
               }
               id="documents-upload"
               onChange={[Function]}
+              renderOnly={true}
               setAllFieldsDirty={false}
             />
           </WithTheme(Component)>
@@ -518,6 +520,7 @@ ShallowWrapper {
               }
               id="documents-upload"
               onChange={[Function]}
+              renderOnly={true}
               setAllFieldsDirty={false}
             />
           </WithTheme(Component)>,
@@ -642,6 +645,7 @@ ShallowWrapper {
                 }
                 id="documents-upload"
                 onChange={[Function]}
+                renderOnly={true}
                 setAllFieldsDirty={false}
               />,
               false,
@@ -764,6 +768,7 @@ ShallowWrapper {
                 ],
                 "id": "documents-upload",
                 "onChange": [Function],
+                "renderOnly": true,
                 "setAllFieldsDirty": false,
               },
               "ref": null,
@@ -906,6 +911,7 @@ ShallowWrapper {
                 }
                 id="documents-upload"
                 onChange={[Function]}
+                renderOnly={true}
                 setAllFieldsDirty={false}
               />
             </WithTheme(Component)>
@@ -1034,6 +1040,7 @@ ShallowWrapper {
                 }
                 id="documents-upload"
                 onChange={[Function]}
+                renderOnly={true}
                 setAllFieldsDirty={false}
               />
             </WithTheme(Component)>
@@ -1161,6 +1168,7 @@ ShallowWrapper {
                 }
                 id="documents-upload"
                 onChange={[Function]}
+                renderOnly={true}
                 setAllFieldsDirty={false}
               />
             </WithTheme(Component)>,
@@ -1285,6 +1293,7 @@ ShallowWrapper {
                   }
                   id="documents-upload"
                   onChange={[Function]}
+                  renderOnly={true}
                   setAllFieldsDirty={false}
                 />,
                 false,
@@ -1407,6 +1416,7 @@ ShallowWrapper {
                   ],
                   "id": "documents-upload",
                   "onChange": [Function],
+                  "renderOnly": true,
                   "setAllFieldsDirty": false,
                 },
                 "ref": null,

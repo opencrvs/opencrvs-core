@@ -93,6 +93,7 @@ export class ImageUploadOptionRenderer extends React.Component<IProps, State> {
                 onChange={this.storeData}
                 setAllFieldsDirty={false}
                 fields={option.fields}
+                renderOnly={true}
               />
               {this.state.showUploadButton && (
                 <FormAction>
