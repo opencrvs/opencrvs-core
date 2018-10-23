@@ -75,7 +75,7 @@ describe('form component', () => {
   describe('when user is in the moth​​er section', () => {
     it('renders the page', () => {
       expect(
-        component.find('#form_section_title_mother').hostNodes()
+        component.find('#form_section_id_mother').hostNodes()
       ).toHaveLength(1)
     })
     it('changes the state select', async () => {
