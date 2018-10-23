@@ -110,6 +110,7 @@ export interface GQLAttachment {
   originalFileName?: string
   systemFileName?: string
   type?: GQLAttachmentType
+  subject?: GQLAttachmentSubject
   createdAt?: GQLDate
 }
 
@@ -119,6 +120,13 @@ export enum GQLAttachmentType {
   IMMUNISATION_CERTIFICATE = 'IMMUNISATION_CERTIFICATE',
   PAPER_FORM = 'PAPER_FORM',
   PASSPORT_PHOTO = 'PASSPORT_PHOTO',
+  OTHER = 'OTHER'
+}
+
+export enum GQLAttachmentSubject {
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER',
+  CHILD = 'CHILD',
   OTHER = 'OTHER'
 }
 
@@ -351,6 +359,7 @@ export interface GQLAttachmentInput {
   originalFileName?: string
   systemFileName?: string
   type?: GQLAttachmentType
+  subject?: GQLAttachmentSubject
   createdAt?: GQLDate
 }
 
@@ -798,6 +807,7 @@ export interface GQLAttachmentTypeResolver<TParent = any> {
   originalFileName?: AttachmentToOriginalFileNameResolver<TParent>
   systemFileName?: AttachmentToSystemFileNameResolver<TParent>
   type?: AttachmentToTypeResolver<TParent>
+  subject?: AttachmentToSubjectResolver<TParent>
   createdAt?: AttachmentToCreatedAtResolver<TParent>
 }
 
@@ -828,6 +838,10 @@ export interface AttachmentToSystemFileNameResolver<
 }
 
 export interface AttachmentToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AttachmentToSubjectResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
