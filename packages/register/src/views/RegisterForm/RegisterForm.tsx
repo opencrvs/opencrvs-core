@@ -136,7 +136,7 @@ type State = {
   selectedTabId: string
 }
 
-const POST_MUTATION = gql`
+const postMutation = gql`
   mutation submitBirthRegistration($details: BirthRegistrationInput!) {
     createBirthRegistration(details: $details) {
       id
@@ -196,42 +196,42 @@ class RegisterFormView extends React.Component<FullProps, State> {
         name: [
           {
             use: 'Bangla',
-            firstNames: child.childFirstNames,
-            familyName: child.childFamilyName
+            firstNames: child.firstNames,
+            familyName: child.familyName
           },
           {
             use: 'English',
-            firstNames: child.childFirstNamesEng,
-            familyName: child.childFamilyNameEng
+            firstNames: child.firstNamesEng,
+            familyName: child.familyNameEng
           }
         ],
-        gender: child.childSex,
-        birthDate: child.dateOfBirth
+        gender: child.gender,
+        birthDate: child.birthDate
       },
       father: {
         identifier: [
           {
-            id: father.fatherID,
-            type: father.fatherIDType
+            id: father.iD,
+            type: father.iDType
           }
         ],
         name: [
           {
             use: 'Bangla',
-            firstNames: father.fatherFirstNames,
-            familyName: father.fatherFamilyName
+            firstNames: father.firstNames,
+            familyName: father.familyName
           },
           {
             use: 'English',
-            firstNames: father.fatherFirstNamesEng,
-            familyName: father.fatherFamilyNameEng
+            firstNames: father.firstNamesEng,
+            familyName: father.familyNameEng
           }
         ],
-        birthDate: father.fatherDateOfBirth,
-        dateOfMarriage: father.fatherDateOfMarriage,
+        birthDate: father.birthDate,
+        dateOfMarriage: father.dateOfMarriage,
         maritalStatus: father.maritalStatus,
         nationality: [father.nationality],
-        educationalAttainment: father.motherEducationAttainment,
+        educationalAttainment: father.educationalAttainment,
         address: [
           {
             use: 'English',
@@ -266,27 +266,27 @@ class RegisterFormView extends React.Component<FullProps, State> {
       mother: {
         identifier: [
           {
-            id: mother.motherID,
-            type: mother.motherIDType
+            id: mother.iD,
+            type: mother.iDType
           }
         ],
         name: [
           {
             use: 'Bangla',
-            firstNames: mother.motherFirstNames,
-            familyName: mother.motherFamilyName
+            firstNames: mother.firstNames,
+            familyName: mother.familyName
           },
           {
             use: 'English',
-            firstNames: mother.motherFirstNamesEng,
-            familyName: mother.motherFamilyNameEng
+            firstNames: mother.firstNamesEng,
+            familyName: mother.familyNameEng
           }
         ],
-        birthDate: mother.motherDateOfBirth,
-        dateOfMarriage: mother.motherDateOfMarriage,
+        birthDate: mother.birthDate,
+        dateOfMarriage: mother.dateOfMarriage,
         maritalStatus: mother.maritalStatus,
         nationality: [mother.nationality],
-        educationalAttainment: mother.motherEducationAttainment,
+        educationalAttainment: mother.educationalAttainment,
         address: [
           {
             use: 'English',
@@ -410,7 +410,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           </FooterAction>
         </ViewFooter>
         <Mutation
-          mutation={POST_MUTATION}
+          mutation={postMutation}
           variables={{ details: this.processSubmitData }}
         >
           {(submitBirthRegistration, { data }) => {

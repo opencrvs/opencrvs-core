@@ -112,7 +112,7 @@ export const motherSection: IFormSection = {
   title: messages.motherTitle,
   fields: [
     {
-      name: 'motherIDType',
+      name: 'iDType',
       type: SELECT_WITH_OPTIONS,
       label: identityMessages.iDType,
       required: true,
@@ -141,7 +141,7 @@ export const motherSection: IFormSection = {
       ]
     },
     {
-      name: 'motherID',
+      name: 'iD',
       type: TEXT,
       label: identityMessages.iD,
       required: true,
@@ -158,7 +158,7 @@ export const motherSection: IFormSection = {
       options: countries
     },
     {
-      name: 'motherFirstNames',
+      name: 'firstNames',
       type: TEXT,
       label: messages.motherFirstNames,
       required: false,
@@ -166,7 +166,7 @@ export const motherSection: IFormSection = {
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'motherFamilyName',
+      name: 'familyName',
       type: TEXT,
       label: messages.motherFamilyName,
       required: true,
@@ -174,7 +174,7 @@ export const motherSection: IFormSection = {
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'motherFirstNamesEng',
+      name: 'firstNamesEng',
       type: TEXT,
       label: messages.motherFirstNamesEng,
       required: false,
@@ -182,7 +182,7 @@ export const motherSection: IFormSection = {
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'motherFamilyNameEng',
+      name: 'familyNameEng',
       type: TEXT,
       label: messages.motherFamilyNameEng,
       required: true,
@@ -190,7 +190,7 @@ export const motherSection: IFormSection = {
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'motherDateOfBirth',
+      name: 'birthDate',
       type: DATE,
       label: messages.motherDateOfBirth,
       required: true,
@@ -219,7 +219,7 @@ export const motherSection: IFormSection = {
       ]
     },
     {
-      name: 'motherDateOfMarriage',
+      name: 'dateOfMarriage',
       type: DATE,
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
@@ -227,7 +227,7 @@ export const motherSection: IFormSection = {
       validate: [dateFormat]
     },
     {
-      name: 'motherEducationAttainment',
+      name: 'educationalAttainment',
       type: SELECT_WITH_OPTIONS,
       label: messages.motherEducationAttainment,
       required: true,

@@ -206,10 +206,10 @@ describe('when user has a valid token in local storage', () => {
     describe('when user types in something', () => {
       beforeEach(() => {
         app
-          .find('#childFirstNames')
+          .find('#firstNames')
           .hostNodes()
           .simulate('change', {
-            target: { id: 'childFirstNames', value: 'hello' }
+            target: { id: 'firstNames', value: 'hello' }
           })
       })
       it('stores the value to a new draft', () => {
@@ -217,7 +217,7 @@ describe('when user has a valid token in local storage', () => {
           (storage.setItem as jest.Mock).mock.calls.length - 1
         ]
         const storedDrafts = JSON.parse(data)
-        expect(storedDrafts[0].data.child.childFirstNames).toEqual('hello')
+        expect(storedDrafts[0].data.child.firstNames).toEqual('hello')
       })
     })
 
