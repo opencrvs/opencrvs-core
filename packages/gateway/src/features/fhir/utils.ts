@@ -56,19 +56,20 @@ export function selectOrCreatePersonResource(
   return personEntry.resource
 }
 
-export function createAndSetNameProperty(
+export function setObjectPropInResourceArray(
   resource: any,
+  label: string,
   value: string | string[],
   propName: string,
   context: any
 ) {
-  if (!resource.name) {
-    resource.name = []
+  if (!resource[label]) {
+    resource[label] = []
   }
-  if (!resource.name[context._index]) {
-    resource.name[context._index] = {}
+  if (!resource[label][context._index[label]]) {
+    resource[label][context._index[label]] = {}
   }
-  resource.name[context._index][propName] = value
+  resource[label][context._index[label]][propName] = value
 }
 
 export function findExtension(url: string, composition: any): IExtension {
@@ -76,4 +77,21 @@ export function findExtension(url: string, composition: any): IExtension {
     return obj.url === url
   })
   return extension
+}
+
+export function getMaritalStatusCode(fieldValue: string) {
+  switch (fieldValue) {
+    case 'SINGLE':
+      return 'S'
+    case 'WIDOWED':
+      return 'W'
+    case 'DIVORCED':
+      return 'D'
+    case 'NOT_STATED':
+      return 'UNK'
+    case 'MARRIED':
+      return 'M'
+    default:
+      return 'UNK'
+  }
 }

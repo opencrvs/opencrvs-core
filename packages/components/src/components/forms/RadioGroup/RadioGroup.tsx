@@ -26,7 +26,7 @@ export interface IRadioGroupProps {
 }
 
 export class RadioGroup extends React.Component<IRadioGroupProps> {
-  change = (value: any) => {
+  change = (value: string) => {
     if (this.props.onChange) {
       this.props.onChange(value)
     }
