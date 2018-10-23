@@ -69,17 +69,12 @@ export function createLocationResource(refUuid: string) {
       resourceType: 'Location',
       status: 'active',
       mode: 'instance',
-      name: '{{villageName}}',
       physicalType: {
         coding: {
           system: 'http://hl7.org/fhir/ValueSet/location-physical-type',
           code: 'area'
         },
         text: 'Area'
-      },
-      position: {
-        longitude: 18.4392,
-        latitude: -34.08002
       }
     }
   }

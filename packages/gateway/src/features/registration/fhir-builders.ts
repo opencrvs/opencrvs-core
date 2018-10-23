@@ -362,7 +362,7 @@ function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
 }
 
 function createLocationBuilder(fhirBundle: any, fieldValue: string) {
-  const ref = uuid()
+  const ref = fhirBundle.entry[0].resource.identifier.value
   fhirBundle.entry.push(createLocationResource(ref))
 }
 
