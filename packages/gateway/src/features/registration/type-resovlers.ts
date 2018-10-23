@@ -60,13 +60,19 @@ export const typeResolvers: GQLResolver = {
   },
 
   Registration: {
-    async attachments(task) {
+    async attachments(task: fhir.Task) {
+      if (!task.focus) {
+        throw new Error(
+          'Task resource does not have a focus property necessary to lookup the composition'
+        )
+      }
+
       const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
       const composition = await res.json()
       const docRefReferences = findCompositionSection(
         DOCS_CODE,
         composition
-      ).entry.map((docRefEntry: any) => docRefEntry.reference)
+      ).entry.map((docRefEntry: fhir.Reference) => docRefEntry.reference)
       return docRefReferences.map(async (docRefReference: string) => {
         const docRefRes = await fetch(`${fhirUrl}/${docRefReference}`)
         return docRefRes.json()
@@ -75,29 +81,46 @@ export const typeResolvers: GQLResolver = {
   },
 
   Attachment: {
-    id(docRef) {
-      return docRef.masterIdentifier.value
+    id(docRef: fhir.DocumentReference) {
+      return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
-    data(docRef) {
+    data(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data
     },
-    originalFileName(docRef) {
-      return docRef.identifier.find(
-        (identifier: any) => identifier.system === ORIGINAL_FILE_NAME_SYSTEM
-      ).value
+    originalFileName(docRef: fhir.DocumentReference) {
+      const foundIdentifier =
+        docRef.identifier &&
+        docRef.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system === ORIGINAL_FILE_NAME_SYSTEM
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
     },
-    systemFileName(docRef) {
-      return docRef.identifier.find(
-        (identifier: any) => identifier.system === SYSTEM_FILE_NAME_SYSTEM
-      ).value
+    systemFileName(docRef: fhir.DocumentReference) {
+      const foundIdentifier =
+        docRef.identifier &&
+        docRef.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system === SYSTEM_FILE_NAME_SYSTEM
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
     },
-    type(docRef) {
-      return docRef.type.coding.code
+    type(docRef: fhir.DocumentReference) {
+      return (
+        (docRef.type && docRef.type.coding && docRef.type.coding[0].code) ||
+        null
+      )
     },
-    subject(docRef) {
-      return docRef.subject.display
+    subject(docRef: fhir.DocumentReference) {
+      return (docRef.subject && docRef.subject.display) || null
     },
-    createdAt(docRef) {
+    createdAt(docRef: fhir.DocumentReference) {
       return docRef.created
     }
   },

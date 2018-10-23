@@ -184,12 +184,28 @@ describe('Registration type resolvers', () => {
       expect(originalFileName).toBe('scan.pdf')
     })
 
+    it('returns null when originalFileName identifier can not be found', () => {
+      // @ts-ignore
+      const originalFileName = typeResolvers.Attachment.originalFileName({
+        identifer: []
+      })
+      expect(originalFileName).toBeNull()
+    })
+
     it('returns systemFileName', () => {
       // @ts-ignore
       const systemFileName = typeResolvers.Attachment.systemFileName(
         mockDocumentReference
       )
       expect(systemFileName).toBe('1234.pdf')
+    })
+
+    it('returns null when systemFileName identifier can not be found', () => {
+      // @ts-ignore
+      const systemFileName = typeResolvers.Attachment.systemFileName({
+        identifer: []
+      })
+      expect(systemFileName).toBeNull()
     })
 
     it('returns type', () => {
@@ -244,6 +260,13 @@ describe('Registration type resolvers', () => {
       )
       expect(mock).toBeCalledWith(
         'http://localhost:5001/fhir/DocumentReference/zzz'
+      )
+    })
+
+    it('throw when tasks has no focus', async () => {
+      // @ts-ignore
+      expect(typeResolvers.Registration.attachments({})).rejects.toThrowError(
+        'Task resource does not have a focus property necessary to lookup the composition'
       )
     })
   })

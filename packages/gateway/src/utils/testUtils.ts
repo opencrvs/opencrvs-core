@@ -134,10 +134,12 @@ export const mockDocumentReference = {
   status: 'current',
   docStatus: 'final', // 'final' when submitted | 'preliminary' when not validated | 'entered-in-error' when deleted
   type: {
-    coding: {
-      system: 'http://opencrvs.org/specs/supporting-doc-type',
-      code: 'PASSPORT'
-    }
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/supporting-doc-type',
+        code: 'PASSPORT'
+      }
+    ]
   },
   subject: {
     reference: 'Patient/123', // reference to who this supporting docuemnt is about
