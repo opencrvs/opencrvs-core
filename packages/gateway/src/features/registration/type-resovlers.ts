@@ -144,10 +144,10 @@ export const typeResolvers: GQLResolver = {
   },
 
   BirthRegistration: {
-    createdAt(composition) {
+    createdAt(composition: fhir.Composition) {
       return composition.date
     },
-    async mother(composition) {
+    async mother(composition: fhir.Composition) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
       if (!patientSection) {
         return null
@@ -155,7 +155,7 @@ export const typeResolvers: GQLResolver = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async father(composition) {
+    async father(composition: fhir.Composition) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
       if (!patientSection) {
         return null
@@ -163,7 +163,7 @@ export const typeResolvers: GQLResolver = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async child(composition) {
+    async child(composition: fhir.Composition) {
       const patientSection = findCompositionSection(CHILD_CODE, composition)
       if (!patientSection) {
         return null
@@ -171,11 +171,11 @@ export const typeResolvers: GQLResolver = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async registration(composition) {
+    async registration(composition: fhir.Composition) {
       const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`)
       return res.json()
     },
-    async weightAtBirth(composition) {
+    async weightAtBirth(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -191,7 +191,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueQuantity.value
     },
-    async birthType(composition) {
+    async birthType(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -207,7 +207,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueInteger
     },
-    async attendantAtBirth(composition) {
+    async attendantAtBirth(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -223,7 +223,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueString
     },
-    async birthRegistrationType(composition) {
+    async birthRegistrationType(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -239,7 +239,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueString
     },
-    async presentAtBirthRegistration(composition) {
+    async presentAtBirthRegistration(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -255,7 +255,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueString
     },
-    async childrenBornAliveToMother(composition) {
+    async childrenBornAliveToMother(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -271,7 +271,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueInteger
     },
-    async foetalDeathsToMother(composition) {
+    async foetalDeathsToMother(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -287,7 +287,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueInteger
     },
-    async lastPreviousLiveBirth(composition) {
+    async lastPreviousLiveBirth(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -303,7 +303,7 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueDateTime
     },
-    async birthLocation(composition) {
+    async birthLocation(composition: fhir.Composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
