@@ -76,11 +76,17 @@ export function selectOrCreateDocRefResource(
     docRef = createDocRefTemplate(ref)
     fhirBundle.entry.push(docRef)
   } else {
-    docRef = section.entry[context._index.attachments]
+    docRef = fhirBundle.entry.find(
+      (entry: any) =>
+        entry.fullUrl === section.entry[context._index.attachments].reference
+    )
     if (!docRef) {
       const ref = uuid()
       docRef = createDocRefTemplate(ref)
       fhirBundle.entry.push(docRef)
+      section.entry.push({
+        reference: `urn:uuid:${ref}`
+      })
     }
   }
 
