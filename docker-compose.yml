@@ -1,4 +1,4 @@
-version: "3.3"
+version: '3.3'
 
 services:
   register:
@@ -6,6 +6,15 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile-register
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+
+  performance-mgnt:
+    image: jembi/ocrvs-performance-mgnt:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile-performance-mgnt
     restart: unless-stopped
     deploy:
       replicas: 2

@@ -1,13 +1,13 @@
-version: "3.3"
+version: '3.3'
 
 services:
   # configure reverse proxy for public endpoints
   traefik:
     image: traefik
     ports:
-      - "80:80"
-      - "443:443"
-      - "8090:8080"
+      - '80:80'
+      - '443:443'
+      - '8090:8080'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/traefik/acme.json:/acme.json
@@ -23,20 +23,30 @@ services:
   register:
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: register.opencrvs-staging.jembi.org,opencrvs-staging.jembi.org"
-        - "traefik.frontend.redirect.regex=^https?://opencrvs-staging.jembi.org/(.*)"
-        - "traefik.frontend.redirect.replacement=https://register.opencrvs-staging.jembi.org/$${1}"
-        - "traefik.port=5000"
-        - "traefik.docker.network=opencrvs_default"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: register.opencrvs-staging.jembi.org,opencrvs-staging.jembi.org'
+        - 'traefik.frontend.redirect.regex=^https?://opencrvs-staging.jembi.org/(.*)'
+        - 'traefik.frontend.redirect.replacement=https://register.opencrvs-staging.jembi.org/$${1}'
+        - 'traefik.port=5000'
+        - 'traefik.docker.network=opencrvs_default'
+
+  performance-mgnt:
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: performance-mgnt.opencrvs-staging.jembi.org,opencrvs-staging.jembi.org'
+        - 'traefik.frontend.redirect.regex=^https?://opencrvs-staging.jembi.org/(.*)'
+        - 'traefik.frontend.redirect.replacement=https://performance-mgnt.opencrvs-staging.jembi.org/$${1}'
+        - 'traefik.port=5000'
+        - 'traefik.docker.network=opencrvs_default'
 
   login:
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: login.opencrvs-staging.jembi.org"
-        - "traefik.port=5000"
-        - "traefik.docker.network=opencrvs_default"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: login.opencrvs-staging.jembi.org'
+        - 'traefik.port=5000'
+        - 'traefik.docker.network=opencrvs_default'
 
   auth:
     secrets:
@@ -47,10 +57,10 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: auth.opencrvs-staging.jembi.org"
-        - "traefik.port=4040"
-        - "traefik.docker.network=opencrvs_default"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: auth.opencrvs-staging.jembi.org'
+        - 'traefik.port=4040'
+        - 'traefik.docker.network=opencrvs_default'
 
   user-mgnt:
     secrets:
@@ -69,15 +79,15 @@ services:
 
   gateway:
     secrets:
-     - jwt-public-key.{{ts}}
+      - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: gateway.opencrvs-staging.jembi.org"
-        - "traefik.port=7070"
-        - "traefik.docker.network=opencrvs_default"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: gateway.opencrvs-staging.jembi.org'
+        - 'traefik.port=7070'
+        - 'traefik.docker.network=opencrvs_default'
 
   hearth:
     secrets:
