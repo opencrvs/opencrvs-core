@@ -27,4 +27,5 @@ export const ViewFooter = styled(Header)`
     /* stylelint-enable */
     margin-bottom: 1em;
   }
+  z-index: -1;
 `

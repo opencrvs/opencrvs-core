@@ -562,6 +562,26 @@ export const ENGLISH_STATE = {
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
     'register.selectVitalEvent.birthActionTitle': 'Birth',
-    'register.selectVitalEvent.deathActionTitle': 'Death'
+    'register.selectVitalEvent.deathActionTitle': 'Death',
+    'register.form.upload': 'Upload',
+    'register.form.section.upload.documentsName': 'Documents Upload',
+    'register.form.section.upload.documentsTitle': 'Supporting documents',
+    'formFields.uploadDocForWhom':
+      'Whose suppoting document are you uploading?',
+    'formFields.uploadDocForChild': 'Child',
+    'formFields.uploadDocForMother': 'Mother',
+    'formFields.uploadDocForFather': 'Father',
+    'formFields.uploadDocForOther': 'Other',
+    'formFields.whatDocToUpload': 'Which document type are you uploading?',
+    'formFields.docTypeBR': 'Birth Registration',
+    'formFields.docTypeNID': 'NID',
+    'formFields.docTypePassport': 'Passport',
+    'formFields.docTypeSC': 'School Certificate',
+    'formFields.docTypeOther': 'Other',
+    'register.form.section.documents.uploadImage':
+      'Upload a photo of the supporting document',
+    'formFields.imageUpload.uploadedList': 'Uploaded:',
+    'formFields.imageUpload.delete': 'Delete',
+    'formFields.imageUpload.preview': 'Preview'
   }
 }

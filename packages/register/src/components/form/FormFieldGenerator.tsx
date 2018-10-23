@@ -36,7 +36,9 @@ import {
   LIST,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
-  PARAGRAPH
+  PARAGRAPH,
+  IMAGE_UPLOADER_WITH_OPTIONS,
+  IFileValue
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -44,6 +46,7 @@ import { IValidationResult } from 'src/utils/validate'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'
+import { ImageUploadField } from './ImageUploadField'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -55,14 +58,9 @@ const FormItem = styled.div`
   animation: ${fadeIn} 500ms;
 `
 
-const FormSectionTitle = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
-`
-
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
-  onSetFieldValue: (name: string, value: string | string[]) => void
+  onSetFieldValue: (name: string, value: IFormFieldValue) => void
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
   resetDependentSelectValues: (name: string) => void
@@ -191,6 +189,19 @@ function GeneratedInputField({
       </InputField>
     )
   }
+  if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
+    return (
+      <ImageUploadField
+        id={inputProps.id}
+        title={fieldDefinition.label}
+        optionSection={fieldDefinition.optionSection}
+        files={value as IFileValue[]}
+        onComplete={(files: IFileValue[]) =>
+          onSetFieldValue(fieldDefinition.name, files)
+        }
+      />
+    )
+  }
 
   return (
     <InputField {...inputFieldProps}>
@@ -211,7 +222,6 @@ const mapFieldsToValues = (fields: IFormField[]) =>
 
 interface IFormSectionProps {
   fields: IFormField[]
-  title: string
   id: string
   setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
@@ -265,16 +275,7 @@ class FormSectionComponent extends React.Component<Props> {
     }
   }
   render() {
-    const {
-      handleSubmit,
-      values,
-      fields,
-      setFieldValue,
-      touched,
-      id,
-      intl,
-      title
-    } = this.props
+    const { values, fields, setFieldValue, touched, intl } = this.props
 
     const errors = (this.props.errors as any) as {
       [key: string]: IValidationResult[]
@@ -298,68 +299,64 @@ class FormSectionComponent extends React.Component<Props> {
 
     return (
       <section>
-        <FormSectionTitle id={`form_section_title_${id}`}>
-          {title}
-        </FormSectionTitle>
-        <form onSubmit={handleSubmit}>
-          {fieldsWithValuesDefined.map(field => {
-            let error: string
-            const fieldErrors = errors[field.name]
-            if (fieldErrors && fieldErrors.length > 0) {
-              const [firstError] = fieldErrors
-              error = intl.formatMessage(firstError.message, firstError.props)
-            }
+        {fieldsWithValuesDefined.map(field => {
+          let error: string
+          const fieldErrors = errors[field.name]
+          if (fieldErrors && fieldErrors.length > 0) {
+            const [firstError] = fieldErrors
+            error = intl.formatMessage(firstError.message, firstError.props)
+          }
 
-            const conditionalActions: string[] = getConditionalActionsForField(
-              field,
-              values
-            )
+          const conditionalActions: string[] = getConditionalActionsForField(
+            field,
+            values
+          )
 
-            if (conditionalActions.includes('hide')) {
-              return null
-            }
+          if (conditionalActions.includes('hide')) {
+            return null
+          }
 
-            const withDynamicallyGeneratedFields =
-              field.type === SELECT_WITH_DYNAMIC_OPTIONS
-                ? ({
-                    ...field,
-                    type: SELECT_WITH_OPTIONS,
-                    options: getFieldOptions(
-                      field as ISelectFormFieldWithDynamicOptions,
-                      values
-                    )
-                  } as ISelectFormFieldWithOptions)
-                : field
+          const withDynamicallyGeneratedFields =
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+              ? ({
+                  ...field,
+                  type: SELECT_WITH_OPTIONS,
+                  options: getFieldOptions(
+                    field as ISelectFormFieldWithDynamicOptions,
+                    values
+                  )
+                } as ISelectFormFieldWithOptions)
+              : field
 
-            return (
-              <FormItem key={`${field.name}`}>
-                <Field name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      onSetFieldValue={setFieldValue}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={error}
-                    />
-                  )}
-                </Field>
-              </FormItem>
-            )
-          })}
-        </form>
+          return (
+            <FormItem key={`${field.name}`}>
+              <Field name={field.name}>
+                {(formikFieldProps: FieldProps<any>) => (
+                  <GeneratedInputField
+                    fieldDefinition={internationaliseFieldObject(
+                      intl,
+                      withDynamicallyGeneratedFields
+                    )}
+                    onSetFieldValue={setFieldValue}
+                    resetDependentSelectValues={this.resetDependentSelectValues}
+                    {...formikFieldProps.field}
+                    touched={touched[field.name] || false}
+                    error={error}
+                  />
+                )}
+              </Field>
+            </FormItem>
+          )
+        })}
       </section>
     )
   }
 }
 
-export const Form = withFormik<IFormSectionProps, IFormSectionData>({
+export const FormFieldGenerator = withFormik<
+  IFormSectionProps,
+  IFormSectionData
+>({
   mapPropsToValues: props => mapFieldsToValues(props.fields),
   handleSubmit: values => {
     console.log(values)
