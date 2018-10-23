@@ -6,7 +6,8 @@ import { ITheme } from '../theme'
 
 interface IProps {
   file: {
-    subject: string
+    title: string
+    description: string
     type: string
     data: string
   }
@@ -19,6 +20,9 @@ interface IProps {
 
 const Container = styled.div`
   display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    display: block;
+  }
 `
 
 const Link = styled.a`
@@ -39,12 +43,10 @@ const DeleteLink = styled(Link)`
 
 const FileContainer = styled.div`
   height: 75px;
-  min-width: 300px;
   border: 1px solid ${({ theme }) => theme.colors.cardGradientEnd};
   border-radius: 1px;
   background-color: ${({ theme }) => theme.colors.inputBackground};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
-
   flex: 1;
   display: flex;
   align-items: center;
@@ -55,9 +57,9 @@ const DeleteContainer = styled.div`
   height: 75px;
   margin-left: 30px;
   margin-right: 25px;
-  display: flex;
   justify-content: center;
   align-items: center;
+  display: flex;
 `
 
 const MetadataContainer = styled.div`
@@ -73,7 +75,7 @@ const MetadataContainer = styled.div`
 
 class FileItemComponent extends React.Component<IProps> {
   render() {
-    const { subject, type } = this.props.file
+    const { title, description } = this.props.file
     const { deleteLabel, onDelete, previewLabel, onPreview, theme } = this.props
 
     return (
@@ -81,8 +83,8 @@ class FileItemComponent extends React.Component<IProps> {
         <FileContainer>
           <Uploaded />
           <MetadataContainer>
-            <span>{subject}</span>
-            <span>{type}</span>
+            <span>{title}</span>
+            <span>{description}</span>
           </MetadataContainer>
           <PreviewLink onClick={onPreview}>
             {previewLabel ? previewLabel : 'Preview'}

@@ -78,6 +78,21 @@ type IProps = {
   onComplete: (files: IFileValue[]) => void
 }
 type IFullProps = IActionProps & InjectedIntlProps & IProps
+
+type IFullFileValues = IFileValue & {
+  title: string
+  description: string
+}
+/* feels weired may need to change a bit */
+function augmentFile(file: IFullFileValues): IFullFileValues {
+  if (file.optionValues) {
+    file.title = file.optionValues[0].toString()
+    if (file.optionValues.length > 1) {
+      file.description = file.optionValues[1].toString()
+    }
+  }
+  return file
+}
 class ImageUploadComponent extends React.Component<
   IFullProps,
   {
@@ -107,12 +122,11 @@ class ImageUploadComponent extends React.Component<
     const { title, optionSection, files, intl } = this.props
     const fileList =
       files &&
-      files.map((file: IFileValue & { subject: string }, index: number) => {
-        file.subject = file.optionValues.join(' ')
+      files.map((file: IFullFileValues, index: number) => {
         return (
           <FileItemContainer key={index}>
             <FileItem
-              file={file}
+              file={augmentFile(file)}
               deleteLabel={intl.formatMessage(messages.delete)}
               onDelete={() =>
                 /* need to change it for deleting from the file array and push it back on draft */
