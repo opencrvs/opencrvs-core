@@ -267,6 +267,116 @@ describe('Registration type resolvers', () => {
     })
   })
 
+  describe('Birth Registration branch', () => {
+    it('returns mother null', async () => {
+      // @ts-ignore
+      const value = await typeResolvers.BirthRegistration.mother({
+        section: []
+      })
+      expect(value).toEqual(null)
+    })
+    it('returns father null', async () => {
+      // @ts-ignore
+      const father = await typeResolvers.BirthRegistration.father({
+        section: []
+      })
+      expect(father).toEqual(null)
+    })
+    it('returns child null', async () => {
+      // @ts-ignore
+      const child = await typeResolvers.BirthRegistration.father({
+        section: []
+      })
+      expect(child).toEqual(null)
+    })
+    it('returns weight At birth null', async () => {
+      // @ts-ignore
+      const weight = await typeResolvers.BirthRegistration.weightAtBirth({
+        section: []
+      })
+      expect(weight).toEqual(null)
+    })
+    it('returns birthType null', async () => {
+      // @ts-ignore
+      const birthType = await typeResolvers.BirthRegistration.birthType({
+        section: []
+      })
+      expect(birthType).toEqual(null)
+    })
+    it('returns attendantAtBirth null', async () => {
+      // @ts-ignore
+      const attendantAtBirth = await typeResolvers.BirthRegistration.attendantAtBirth(
+        {
+          section: []
+        }
+      )
+      expect(attendantAtBirth).toEqual(null)
+    })
+    it('returns birthRegistrationType null', async () => {
+      // @ts-ignore
+      const birthRegistrationType = await typeResolvers.BirthRegistration.birthRegistrationType(
+        {
+          section: []
+        }
+      )
+      expect(birthRegistrationType).toEqual(null)
+    })
+    it('returns presentAtBirthRegistration null', async () => {
+      // @ts-ignore
+      const presentAtBirthRegistration = await typeResolvers.BirthRegistration.presentAtBirthRegistration(
+        {
+          section: []
+        }
+      )
+      expect(presentAtBirthRegistration).toEqual(null)
+    })
+    it('returns presentAtBirthRegistration null', async () => {
+      // @ts-ignore
+      const presentAtBirthRegistration = await typeResolvers.BirthRegistration.presentAtBirthRegistration(
+        {
+          section: []
+        }
+      )
+      expect(presentAtBirthRegistration).toEqual(null)
+    })
+    it('returns childrenBornAliveToMother null', async () => {
+      // @ts-ignore
+      const childrenBornAliveToMother = await typeResolvers.BirthRegistration.childrenBornAliveToMother(
+        {
+          section: []
+        }
+      )
+      expect(childrenBornAliveToMother).toEqual(null)
+    })
+    it('returns foetalDeathsToMother null', async () => {
+      // @ts-ignore
+      const foetalDeathsToMother = await typeResolvers.BirthRegistration.foetalDeathsToMother(
+        {
+          section: []
+        }
+      )
+      expect(foetalDeathsToMother).toEqual(null)
+    })
+    it('returns lastPreviousLiveBirth null', async () => {
+      // @ts-ignore
+      const lastPreviousLiveBirth = await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
+        {
+          section: []
+        }
+      )
+      expect(lastPreviousLiveBirth).toEqual(null)
+    })
+    it('returns birthLocation null', async () => {
+      // @ts-ignore
+      const birthLocation = await typeResolvers.BirthRegistration.birthLocation(
+        {
+          section: []
+        }
+      )
+      expect(birthLocation).toEqual(null)
+    })
+  })
+
   describe('Attachment type', () => {
     it('returns id', () => {
       // @ts-ignore
