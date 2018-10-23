@@ -9,7 +9,9 @@ import {
   mockPatient,
   mockDocumentReference,
   mockTask,
-  mockComposition
+  mockComposition,
+  mockObservations,
+  mockLocation
 } from 'src/utils/testUtils'
 
 beforeEach(() => {
@@ -161,6 +163,108 @@ describe('Registration type resolvers', () => {
       expect(registration.resourceType).toBe('Task')
       expect(mock).toBeCalledWith('http://localhost:5001/fhir/Task?focus=123')
     })
+
+    it('returns weightAtBirth', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthWeight))
+
+      // @ts-ignore
+      const weight = await typeResolvers.BirthRegistration.weightAtBirth(
+        mockComposition
+      )
+      expect(weight).toEqual(1.25)
+    })
+
+    it('returns birthType', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthType))
+
+      // @ts-ignore
+      const birthType = await typeResolvers.BirthRegistration.birthType(
+        mockComposition
+      )
+      expect(birthType).toEqual(2)
+    })
+
+    it('returns attendantAtBirth', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthAttendant))
+
+      // @ts-ignore
+      const attendantAtBirth = await typeResolvers.BirthRegistration.attendantAtBirth(
+        mockComposition
+      )
+      expect(attendantAtBirth).toEqual('PHYSICIAN')
+    })
+    it('returns birthRegistrationType', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthRegistration))
+
+      // @ts-ignore
+      const birthRegistrationType = await typeResolvers.BirthRegistration.birthRegistrationType(
+        mockComposition
+      )
+      expect(birthRegistrationType).toEqual('BOTH_PARENTS')
+    })
+    it('returns presentAtBirthRegistration', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify(mockObservations.presentAtBirthRegistration)
+      )
+
+      // @ts-ignore
+      const presentAtBirthRegistration = await typeResolvers.BirthRegistration.presentAtBirthRegistration(
+        mockComposition
+      )
+      expect(presentAtBirthRegistration).toEqual('BOTH_PARENTS')
+    })
+    it('returns lastPreviousLiveBirth', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify(mockObservations.lastPreviousLiveBirth)
+      )
+
+      // @ts-ignore
+      const lastPreviousLiveBirth = await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
+        mockComposition
+      )
+      expect(lastPreviousLiveBirth).toEqual('2014-01-28')
+    })
+    it('returns childrenBornAliveToMother', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify(mockObservations.childrenBornAliveToMother)
+      )
+
+      // @ts-ignore
+      const childrenBornAliveToMother = await typeResolvers.BirthRegistration.childrenBornAliveToMother(
+        mockComposition
+      )
+      expect(childrenBornAliveToMother).toEqual(2)
+    })
+    it('returns foetalDeathsToMother', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify(mockObservations.foetalDeathsToMother)
+      )
+
+      // @ts-ignore
+      const foetalDeathsToMother = await typeResolvers.BirthRegistration.foetalDeathsToMother(
+        mockComposition
+      )
+      expect(foetalDeathsToMother).toEqual(0)
+    })
+    it('returns birthLocation', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          location: [
+            {
+              location: {
+                reference: 'Location/123'
+              }
+            }
+          ]
+        })
+      )
+      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      // @ts-ignore
+      const birthLocation = await typeResolvers.BirthRegistration.birthLocation(
+        mockComposition
+      )
+      expect(birthLocation).toBeDefined()
+    })
   })
 
   describe('Attachment type', () => {
@@ -268,6 +372,39 @@ describe('Registration type resolvers', () => {
       expect(typeResolvers.Registration.attachments({})).rejects.toThrowError(
         'Task resource does not have a focus property necessary to lookup the composition'
       )
+    })
+  })
+
+  describe('Location type', () => {
+    const location = {
+      resource: {
+        status: 'active',
+        name: 'village',
+        position: {
+          longitude: 18.4392,
+          latitude: -34.08002
+        }
+      }
+    }
+    it('returns name', () => {
+      // @ts-ignore
+      const name = typeResolvers.Location.name(location)
+      expect(name).toBe('village')
+    })
+    it('returns status', () => {
+      // @ts-ignore
+      const status = typeResolvers.Location.status(location)
+      expect(status).toBe('active')
+    })
+    it('returns longitude', () => {
+      // @ts-ignore
+      const longitude = typeResolvers.Location.longitude(location)
+      expect(longitude).toBe(18.4392)
+    })
+    it('returns name', () => {
+      // @ts-ignore
+      const latitude = typeResolvers.Location.latitude(location)
+      expect(latitude).toBe(-34.08002)
     })
   })
 })

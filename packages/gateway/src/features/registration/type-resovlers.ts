@@ -3,6 +3,7 @@ import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
+  DOCS_CODE,
   BIRTH_ENCOUNTER_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
@@ -16,6 +17,12 @@ import {
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
 import { GQLResolver } from 'src/graphql/schema'
+import {
+  ORIGINAL_FILE_NAME_SYSTEM,
+  SYSTEM_FILE_NAME_SYSTEM,
+  FHIR_SPECIFICATION_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from 'src/features/fhir/constants'
 
 export const typeResolvers: GQLResolver = {
   HumanName: {
@@ -31,7 +38,7 @@ export const typeResolvers: GQLResolver = {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
     dateOfMarriage: person => {
       const marriageExtension = findExtension(
-        'http://opencrvs.org/specs/extension/date-of-marriage',
+        `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
         person.extension
       )
       return marriageExtension.valueDateTime
@@ -44,7 +51,7 @@ export const typeResolvers: GQLResolver = {
     },
     nationality: person => {
       const nationalityExtension = findExtension(
-        'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+        `${FHIR_SPECIFICATION_URL}patient-nationality`,
         person.extension
       )
       const countryCodeExtension = findExtension(
@@ -56,25 +63,89 @@ export const typeResolvers: GQLResolver = {
     },
     educationalAttainment: person => {
       const educationalAttainmentExtension = findExtension(
-        'http://opencrvs.org/specs/extension/educational-attainment',
+        `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
         person.extension
       )
       return educationalAttainmentExtension.valueString
     }
   },
 
-  Registration: {},
+  Registration: {
+    async attachments(task: fhir.Task) {
+      if (!task.focus) {
+        throw new Error(
+          'Task resource does not have a focus property necessary to lookup the composition'
+        )
+      }
+
+      const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
+      const composition = await res.json()
+      const docRefReferences = findCompositionSection(
+        DOCS_CODE,
+        composition
+      ).entry.map((docRefEntry: fhir.Reference) => docRefEntry.reference)
+      return docRefReferences.map(async (docRefReference: string) => {
+        const docRefRes = await fetch(`${fhirUrl}/${docRefReference}`)
+        return docRefRes.json()
+      })
+    }
+  },
+
+  Attachment: {
+    id(docRef: fhir.DocumentReference) {
+      return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
+    },
+    data(docRef: fhir.DocumentReference) {
+      return docRef.content[0].attachment.data
+    },
+    originalFileName(docRef: fhir.DocumentReference) {
+      const foundIdentifier =
+        docRef.identifier &&
+        docRef.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system === ORIGINAL_FILE_NAME_SYSTEM
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
+    },
+    systemFileName(docRef: fhir.DocumentReference) {
+      const foundIdentifier =
+        docRef.identifier &&
+        docRef.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system === SYSTEM_FILE_NAME_SYSTEM
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
+    },
+    type(docRef: fhir.DocumentReference) {
+      return (
+        (docRef.type && docRef.type.coding && docRef.type.coding[0].code) ||
+        null
+      )
+    },
+    subject(docRef: fhir.DocumentReference) {
+      return (docRef.subject && docRef.subject.display) || null
+    },
+    createdAt(docRef: fhir.DocumentReference) {
+      return docRef.created
+    }
+  },
 
   Location: {
-    status: location => location.resource.name
+    name: location => location.resource.name,
+    status: location => location.resource.status,
+    longitude: location => location.resource.position.longitude,
+    latitude: location => location.resource.position.latitude
   },
 
   BirthRegistration: {
     createdAt(composition) {
       return composition.date
-    },
-    registration(composition) {
-      return composition.registration
     },
     async mother(composition) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
@@ -100,6 +171,10 @@ export const typeResolvers: GQLResolver = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
+    async registration(composition) {
+      const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`)
+      return res.json()
+    },
     async weightAtBirth(composition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
@@ -114,7 +189,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BODY_WEIGHT_CODE}`
       )
       const data = await res.json()
-      return data.valueQuantity.value
+      return data.resource.valueQuantity.value
     },
     async birthType(composition) {
       const encounterSection = findCompositionSection(
@@ -130,7 +205,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_TYPE_CODE}`
       )
       const data = await res.json()
-      return data.valueInteger
+      return data.resource.valueInteger
     },
     async attendantAtBirth(composition) {
       const encounterSection = findCompositionSection(
@@ -146,7 +221,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_ATTENDANT_CODE}`
       )
       const data = await res.json()
-      return data.valueInteger
+      return data.resource.valueString
     },
     async birthRegistrationType(composition) {
       const encounterSection = findCompositionSection(
@@ -162,7 +237,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_TYPE_CODE}`
       )
       const data = await res.json()
-      return data.valueString
+      return data.resource.valueString
     },
     async presentAtBirthRegistration(composition) {
       const encounterSection = findCompositionSection(
@@ -178,7 +253,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_PRESENT_CODE}`
       )
       const data = await res.json()
-      return data.valueString
+      return data.resource.valueString
     },
     async childrenBornAliveToMother(composition) {
       const encounterSection = findCompositionSection(
@@ -194,7 +269,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${NUMBER_BORN_ALIVE_CODE}`
       )
       const data = await res.json()
-      return data.valueInteger
+      return data.resource.valueInteger
     },
     async foetalDeathsToMother(composition) {
       const encounterSection = findCompositionSection(
@@ -210,7 +285,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${NUMBER_FOEATAL_DEATH_CODE}`
       )
       const data = await res.json()
-      return data.valueInteger
+      return data.resource.valueInteger
     },
     async lastPreviousLiveBirth(composition) {
       const encounterSection = findCompositionSection(
@@ -226,7 +301,25 @@ export const typeResolvers: GQLResolver = {
         }&code=${LAST_LIVE_BIRTH_CODE}`
       )
       const data = await res.json()
-      return data.valueDateTime
+      return data.resource.valueDateTime
+    },
+    async birthLocation(composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/${encounterSection.entry[0].reference}`
+      )
+      const data = await res.json()
+
+      const locationRes = await fetch(
+        `${fhirUrl}/${data.location[0].location.reference}`
+      )
+      return locationRes.json()
     }
   }
 }
