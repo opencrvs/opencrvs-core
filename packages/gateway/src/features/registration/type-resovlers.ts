@@ -10,8 +10,10 @@ import { fhirUrl } from 'src/constants'
 import { GQLResolver } from 'src/graphql/schema'
 import {
   ORIGINAL_FILE_NAME_SYSTEM,
-  SYSTEM_FILE_NAME_SYSTEM
-} from '../fhir/constants'
+  SYSTEM_FILE_NAME_SYSTEM,
+  FHIR_SPECIFICATION_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from 'src/features/fhir/constants'
 
 export const typeResolvers: GQLResolver = {
   HumanName: {
@@ -27,7 +29,7 @@ export const typeResolvers: GQLResolver = {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
     dateOfMarriage: person => {
       const marriageExtension = findExtension(
-        'http://opencrvs.org/specs/extension/date-of-marriage',
+        `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
         person.extension
       )
       return marriageExtension.valueDateTime
@@ -40,7 +42,7 @@ export const typeResolvers: GQLResolver = {
     },
     nationality: person => {
       const nationalityExtension = findExtension(
-        'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+        `${FHIR_SPECIFICATION_URL}patient-nationality`,
         person.extension
       )
       const countryCodeExtension = findExtension(
@@ -52,7 +54,7 @@ export const typeResolvers: GQLResolver = {
     },
     educationalAttainment: person => {
       const educationalAttainmentExtension = findExtension(
-        'http://opencrvs.org/specs/extension/educational-attainment',
+        `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
         person.extension
       )
       return educationalAttainmentExtension.valueString

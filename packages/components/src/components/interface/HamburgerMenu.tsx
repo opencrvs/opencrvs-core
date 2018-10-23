@@ -5,12 +5,12 @@ import Menu, { SubMenu, MenuItem } from 'rc-menu'
 import { Hamburger } from '../icons'
 
 const animation = {
-  enter(node: any, done: () => void) {
+  enter(node: HTMLElement, done: () => void) {
     let height: number
     return animate(node, 'rc-menu-collapse', {
       start() {
         height = node.offsetHeight
-        node.style.height = 0
+        node.style.height = '0'
       },
       active() {
         node.style.height = `${height}px`
@@ -26,13 +26,13 @@ const animation = {
     return this.enter.apply(this, arguments)
   },
 
-  leave(node: any, done: () => void) {
+  leave(node: HTMLElement, done: () => void) {
     return animate(node, 'rc-menu-collapse', {
       start() {
         node.style.height = `${node.offsetHeight}px`
       },
       active() {
-        node.style.height = 0
+        node.style.height = '0'
       },
       end() {
         node.style.height = ''
