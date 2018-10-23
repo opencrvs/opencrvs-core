@@ -327,7 +327,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       birthOrder: child.orderOfBirth,
       attendantAtBirth: child.attendantAtBirth,
       birthType: child.typeOfBirth,
-      weightAtBirth: child.weightAtBirth
+      weightAtBirth: child.weightAtBirth,
+      presentAtBirthRegistration: registration.presentAtBirthRegistration
     }
 
     return draftDetails

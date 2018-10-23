@@ -126,7 +126,7 @@ export const registrationSection: IFormSection = {
   title: messages.registrationTitle,
   fields: [
     {
-      name: 'whoIsPresent',
+      name: 'presentAtBirthRegistration',
       type: SELECT_WITH_OPTIONS,
       label: messages.whoIsPresentLabel,
       required: true,

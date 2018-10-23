@@ -124,7 +124,11 @@ context('Register', () => {
     cy.get('#postcodePermanent').type('10024')*/
     cy.get('#next_section').click()
     // REGISTRATION
-    cy.selectOption('#whoIsPresent', 'Both Parents', 'Both Parents')
+    cy.selectOption(
+      '#presentAtBirthRegistration',
+      'Both Parents',
+      'Both Parents'
+    )
     cy.selectOption('#whoseContactDetails', 'Both Parents', 'Both Parents')
     cy.get('#registrationEmail').type('test@test.com')
     cy.get('#registrationPhone').type('07111111111')
