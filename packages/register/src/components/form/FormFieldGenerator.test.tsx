@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { createTestComponent, selectOption } from 'src/tests/util'
-import { Form } from './Form'
+import { FormFieldGenerator } from './FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft } from 'src/drafts'
 import { createStore } from '../../store'
@@ -23,7 +23,7 @@ describe('form component', () => {
   const modifyDraft = jest.fn()
   let component: ReactWrapper<{}, {}>
   const testComponent = createTestComponent(
-    <Form
+    <FormFieldGenerator
       id="mother"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
@@ -74,9 +74,7 @@ describe('form component', () => {
   component = testComponent.component
   describe('when user is in the moth​​er section', () => {
     it('renders the page', () => {
-      expect(
-        component.find('#form_section_id_mother').hostNodes()
-      ).toHaveLength(1)
+      expect(component.find('#country_label').hostNodes()).toHaveLength(1)
     })
     it('changes the state select', async () => {
       const select = selectOption(component, '#state', 'Dhaka Division')

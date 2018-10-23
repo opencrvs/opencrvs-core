@@ -225,7 +225,6 @@ interface IFormSectionProps {
   id: string
   setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
-  renderOnly?: boolean
 }
 
 type Props = IFormSectionProps &
@@ -275,7 +274,7 @@ class FormSectionComponent extends React.Component<Props> {
       this.props.setFieldValue(fieldToReset.name, '')
     }
   }
-  renderChildren = () => {
+  render() {
     const { values, fields, setFieldValue, touched, intl } = this.props
 
     const errors = (this.props.errors as any) as {
@@ -299,7 +298,7 @@ class FormSectionComponent extends React.Component<Props> {
     )
 
     return (
-      <>
+      <section>
         {fieldsWithValuesDefined.map(field => {
           let error: string
           const fieldErrors = errors[field.name]
@@ -349,27 +348,15 @@ class FormSectionComponent extends React.Component<Props> {
             </FormItem>
           )
         })}
-      </>
-    )
-  }
-  render() {
-    const { handleSubmit, id, renderOnly = false } = this.props
-
-    return (
-      <section>
-        {renderOnly ? (
-          this.renderChildren()
-        ) : (
-          <form id={`form_section_id_${id}`} onSubmit={handleSubmit}>
-            {this.renderChildren()}
-          </form>
-        )}
       </section>
     )
   }
 }
 
-export const Form = withFormik<IFormSectionProps, IFormSectionData>({
+export const FormFieldGenerator = withFormik<
+  IFormSectionProps,
+  IFormSectionData
+>({
   mapPropsToValues: props => mapFieldsToValues(props.fields),
   handleSubmit: values => {
     console.log(values)

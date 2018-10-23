@@ -9,7 +9,7 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
-import { Form, ViewHeaderWithTabs } from '../../components/form'
+import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft } from '../../drafts'
 import { getRegisterForm } from '../../forms/register/selectors'
@@ -118,6 +118,7 @@ function getPreviousSection(
 type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
+  handleSubmit: (values: unknown) => void
 }
 
 type Props = {
@@ -185,7 +186,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       setAllFieldsDirty,
       draft,
       history,
-      registerForm
+      registerForm,
+      handleSubmit
     } = this.props
 
     const nextSection = getNextSection(registerForm.sections, activeSection)
@@ -224,12 +226,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 <FormSectionTitle id={`form_section_title_${activeSection.id}`}>
                   {intl.formatMessage(activeSection.title)}
                 </FormSectionTitle>
-                <Form
-                  id={activeSection.id}
-                  onChange={this.modifyDraft}
-                  setAllFieldsDirty={setAllFieldsDirty}
-                  fields={activeSection.fields}
-                />
+                <form
+                  id={`form_section_id_${activeSection.id}`}
+                  onSubmit={handleSubmit}
+                >
+                  <FormFieldGenerator
+                    id={activeSection.id}
+                    onChange={this.modifyDraft}
+                    setAllFieldsDirty={setAllFieldsDirty}
+                    fields={activeSection.fields}
+                  />
+                </form>
                 <FormAction>
                   {nextSection && (
                     <FormPrimaryButton
@@ -344,5 +351,8 @@ function mapStateToProps(
 
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
-  goToTab: goToTabAction
+  goToTab: goToTabAction,
+  handleSubmit: values => {
+    console.log(values)
+  }
 })(injectIntl<FullProps>(RegisterFormView))

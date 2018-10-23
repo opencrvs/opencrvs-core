@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
-import { Form } from 'src/components/form'
+import { FormFieldGenerator } from 'src/components/form'
 import { IFormSection, IFormSectionData, IFileValue } from 'src/forms'
 import { hasFormError } from 'src/forms/utils'
 
@@ -88,12 +88,11 @@ export class ImageUploadOption extends React.Component<IProps, State> {
         >
           <FormContainer>
             <Box>
-              <Form
+              <FormFieldGenerator
                 id={option.id}
                 onChange={this.storeData}
                 setAllFieldsDirty={false}
                 fields={option.fields}
-                renderOnly={true}
               />
               {this.state.showUploadButton && (
                 <FormAction>
