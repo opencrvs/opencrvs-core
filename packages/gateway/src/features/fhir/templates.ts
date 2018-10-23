@@ -4,6 +4,15 @@ export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
 export const CHILD_CODE = 'child-details'
 export const DOCS_CODE = 'supporting-documents'
+export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
+export const BODY_WEIGHT_CODE = '3141-9'
+export const BIRTH_TYPE_CODE = '57722-1'
+export const BIRTH_ATTENDANT_CODE = '73764-3'
+export const BIRTH_REG_TYPE_CODE = 'birth-reg-type'
+export const BIRTH_REG_PRESENT_CODE = 'present-at-birth-reg'
+export const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
+export const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
+export const LAST_LIVE_BIRTH_CODE = '68499-3'
 
 export function createMotherSection(refUuid: string) {
   return {

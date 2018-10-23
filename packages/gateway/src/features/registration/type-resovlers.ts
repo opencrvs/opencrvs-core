@@ -3,7 +3,16 @@ import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
-  DOCS_CODE
+  DOCS_CODE,
+  BIRTH_ENCOUNTER_CODE,
+  BODY_WEIGHT_CODE,
+  BIRTH_TYPE_CODE,
+  BIRTH_ATTENDANT_CODE,
+  BIRTH_REG_PRESENT_CODE,
+  BIRTH_REG_TYPE_CODE,
+  LAST_LIVE_BIRTH_CODE,
+  NUMBER_BORN_ALIVE_CODE,
+  NUMBER_FOEATAL_DEATH_CODE
 } from 'src/features/fhir/templates'
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
@@ -127,11 +136,18 @@ export const typeResolvers: GQLResolver = {
     }
   },
 
+  Location: {
+    name: location => location.resource.name,
+    status: location => location.resource.status,
+    longitude: location => location.resource.position.longitude,
+    latitude: location => location.resource.position.latitude
+  },
+
   BirthRegistration: {
-    createdAt(composition) {
+    createdAt(composition: fhir.Composition) {
       return composition.date
     },
-    async mother(composition) {
+    async mother(composition: fhir.Composition) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
       if (!patientSection) {
         return null
@@ -139,7 +155,7 @@ export const typeResolvers: GQLResolver = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async father(composition) {
+    async father(composition: fhir.Composition) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
       if (!patientSection) {
         return null
@@ -147,7 +163,7 @@ export const typeResolvers: GQLResolver = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async child(composition) {
+    async child(composition: fhir.Composition) {
       const patientSection = findCompositionSection(CHILD_CODE, composition)
       if (!patientSection) {
         return null
@@ -155,9 +171,155 @@ export const typeResolvers: GQLResolver = {
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async registration(composition) {
+    async registration(composition: fhir.Composition) {
       const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`)
       return res.json()
+    },
+    async weightAtBirth(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${BODY_WEIGHT_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueQuantity.value
+    },
+    async birthType(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${BIRTH_TYPE_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueInteger
+    },
+    async attendantAtBirth(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${BIRTH_ATTENDANT_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueString
+    },
+    async birthRegistrationType(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${BIRTH_REG_TYPE_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueString
+    },
+    async presentAtBirthRegistration(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${BIRTH_REG_PRESENT_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueString
+    },
+    async childrenBornAliveToMother(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${NUMBER_BORN_ALIVE_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueInteger
+    },
+    async foetalDeathsToMother(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${NUMBER_FOEATAL_DEATH_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueInteger
+    },
+    async lastPreviousLiveBirth(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${LAST_LIVE_BIRTH_CODE}`
+      )
+      const data = await res.json()
+      return data.resource.valueDateTime
+    },
+    async birthLocation(composition: fhir.Composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/${encounterSection.entry[0].reference}`
+      )
+      const data = await res.json()
+
+      const locationRes = await fetch(
+        `${fhirUrl}/${data.location[0].location.reference}`
+      )
+      return locationRes.json()
     }
   }
 }
