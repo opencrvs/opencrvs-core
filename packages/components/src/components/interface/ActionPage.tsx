@@ -44,6 +44,9 @@ const BackButtonText = styled.span`
   font-size: 14px;
   letter-spacing: 2px;
   margin-left: 14px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    display: none;
+  }
 `
 const MenuTitle = styled.span`
   font-family: ${({ theme }) => theme.fonts.lightFont};

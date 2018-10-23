@@ -20,6 +20,7 @@ const OverlayContainer = styled.div`
   z-index: 4;
   width: 100%;
   height: 100%;
+  overflow-y: scroll;
 `
 const FormAction = styled.div`
   display: flex;
