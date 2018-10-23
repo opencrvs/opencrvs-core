@@ -2,7 +2,9 @@ import { findCompositionSection, findExtension } from 'src/features/fhir/utils'
 import {
   MOTHER_CODE,
   FATHER_CODE,
-  CHILD_CODE
+  CHILD_CODE,
+  BIRTH_ENCOUNTER_CODE,
+  BODY_WEIGHT_CODE
 } from 'src/features/fhir/templates'
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
@@ -54,9 +56,16 @@ export const typeResolvers: GQLResolver = {
     }
   },
 
+  Registration: {},
+
+  Location: {},
+
   BirthRegistration: {
     createdAt(composition) {
       return composition.date
+    },
+    registration(composition) {
+      return composition.registration
     },
     async mother(composition) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
@@ -81,6 +90,22 @@ export const typeResolvers: GQLResolver = {
       }
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
+    },
+    async weightAtBirth(composition) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection) {
+        return null
+      }
+      const res = await fetch(
+        `${fhirUrl}/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${BODY_WEIGHT_CODE}`
+      )
+      const data = await res.json()
+      return data.ValueQuantity.value
     }
   }
 }
