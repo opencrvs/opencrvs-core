@@ -40,7 +40,7 @@ export interface GQLPerson {
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddress | null>
-  photo?: GQLAttachment
+  photo?: Array<GQLAttachment | null>
   deceased?: boolean
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
@@ -308,7 +308,7 @@ export interface GQLPersonInput {
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
-  photo?: GQLAttachmentInput
+  photo?: Array<GQLAttachmentInput | null>
   deceased?: boolean
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType

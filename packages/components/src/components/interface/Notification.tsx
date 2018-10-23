@@ -11,8 +11,7 @@ interface IProps {
   id?: string
   show: boolean
   type?: NOTIFICATION_TYPE
-  callback?: any
-  children?: any
+  callback?: ((event: React.MouseEvent<HTMLDivElement>) => void)
   className?: string
 }
 
