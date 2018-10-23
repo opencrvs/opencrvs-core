@@ -44,10 +44,13 @@ const BackButtonText = styled.span`
   font-size: 14px;
   letter-spacing: 2px;
   margin-left: 14px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    display: none;
+  }
 `
 const MenuTitle = styled.span`
   font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 32px;
+  font-size: 25px;
   font-weight: 300;
   position: absolute;
   left: 50%;
@@ -61,7 +64,7 @@ interface IProps {
 
 export class ActionPage extends React.Component<
   IProps & {
-    goBack: typeof goBackAction
+    goBack: () => void
   }
 > {
   render() {
@@ -70,7 +73,7 @@ export class ActionPage extends React.Component<
     return (
       <ActionContainer>
         <HeaderContainer>
-          <BackButtonContainer onClick={goBack}>
+          <BackButtonContainer id="action_page_back_button" onClick={goBack}>
             <BackButton icon={icon || (() => <ArrowBack />)} />
             <BackButtonText>{backLabel ? backLabel : 'BACK'}</BackButtonText>
           </BackButtonContainer>

@@ -18,6 +18,7 @@ export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
+export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
@@ -37,7 +38,13 @@ export interface IDynamicOptions {
   options: { [key: string]: ISelectOption[] }
 }
 
-export type IFormFieldValue = string | string[] | boolean
+export type IFormFieldValue = string | string[] | boolean | IFileValue[]
+
+export type IFileValue = {
+  optionValues: IFormFieldValue[]
+  type: string
+  data: string
+}
 
 export interface IFormFieldBase {
   name: string
@@ -97,6 +104,10 @@ export interface IListFormField extends IFormFieldBase {
 export interface IParagraphFormField extends IFormFieldBase {
   type: typeof PARAGRAPH
 }
+export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
+  type: typeof IMAGE_UPLOADER_WITH_OPTIONS
+  optionSection: IFormSection
+}
 
 export type IFormField =
   | ITextFormField
@@ -111,6 +122,7 @@ export type IFormField =
   | IDocumentsFormField
   | IListFormField
   | IParagraphFormField
+  | IImageUploaderWithOptionsFormField
 
 export interface IConditional {
   action: string
@@ -131,6 +143,7 @@ export interface IConditionals {
   district: IConditional
   addressLine4: IConditional
   addressLine3Options1: IConditional
+  uploadDocForWhom: IConditional
 }
 
 export type ViewType = 'form' | 'preview'
@@ -205,6 +218,11 @@ export interface Ii18nListFormField extends Ii18nFormFieldBase {
 export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
   type: typeof PARAGRAPH
 }
+export interface Ii18nImageUploaderWithOptionsFormField
+  extends Ii18nFormFieldBase {
+  type: typeof IMAGE_UPLOADER_WITH_OPTIONS
+  optionSection: IFormSection
+}
 
 export type Ii18nFormField =
   | Ii18nTextFormField
@@ -218,6 +236,7 @@ export type Ii18nFormField =
   | Ii18nDocumentsFormField
   | Ii18nListFormField
   | Ii18nParagraphFormField
+  | Ii18nImageUploaderWithOptionsFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
