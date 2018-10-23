@@ -20,6 +20,8 @@ import {
 } from 'src/components/interface/footer'
 import { PreviewSection } from './PreviewSection'
 import { StickyFormTabs } from './StickyFormTabs'
+import gql from 'graphql-tag'
+import { Mutation } from 'react-apollo'
 
 const FormAction = styled.div`
   display: flex;
@@ -134,6 +136,14 @@ type State = {
   selectedTabId: string
 }
 
+const POST_MUTATION = gql`
+  mutation submitBirthRegistration($details: BirthRegistrationInput!) {
+    createBirthRegistration(details: $details) {
+      id
+    }
+  }
+`
+
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -172,6 +182,155 @@ class RegisterFormView extends React.Component<FullProps, State> {
     if (selectedSection) {
       goToTab(draftId, selectedSection.id)
     }
+  }
+
+  processSubmitData = () => {
+    const { child, father, mother, registration } = this.props.draft.data
+    const fatherPermanentAddress = father.permanentAddressSameAsMother
+      ? mother
+      : father
+    const fatherCurrentAddress = father.addressSameAsMother ? mother : father
+
+    const draftDetails = {
+      child: {
+        name: [
+          {
+            use: 'Bangla',
+            firstNames: child.childFirstNames,
+            familyName: child.childFamilyName
+          },
+          {
+            use: 'English',
+            firstNames: child.childFirstNamesEng,
+            familyName: child.childFamilyNameEng
+          }
+        ],
+        gender: child.childSex,
+        birthDate: child.dateOfBirth
+      },
+      father: {
+        identifier: [
+          {
+            id: father.fatherID,
+            type: father.fatherIDType
+          }
+        ],
+        name: [
+          {
+            use: 'Bangla',
+            firstNames: father.fatherFirstNames,
+            familyName: father.fatherFamilyName
+          },
+          {
+            use: 'English',
+            firstNames: father.fatherFirstNamesEng,
+            familyName: father.fatherFamilyNameEng
+          }
+        ],
+        birthDate: father.fatherDateOfBirth,
+        dateOfMarriage: father.fatherDateOfMarriage,
+        maritalStatus: father.maritalStatus,
+        nationality: [father.nationality],
+        educationalAttainment: father.motherEducationAttainment,
+        address: [
+          {
+            use: 'English',
+            type: 'PERMANENT',
+            country: fatherPermanentAddress.countryPermanent,
+            state: fatherPermanentAddress.statePermanent,
+            district: fatherPermanentAddress.districtPermanent,
+            postalCode: fatherPermanentAddress.postCodePermanent,
+            line: [
+              fatherPermanentAddress.addressLine1Permanent,
+              fatherPermanentAddress.addressLine2Permanent,
+              fatherPermanentAddress.addressLine3Options1Permanent,
+              fatherPermanentAddress.addressLine4Permanent
+            ]
+          },
+          {
+            use: 'English',
+            type: 'CURRENT',
+            country: fatherCurrentAddress.country,
+            state: fatherCurrentAddress.state,
+            district: fatherCurrentAddress.district,
+            postalCode: fatherCurrentAddress.postCode,
+            line: [
+              fatherCurrentAddress.addressLine1,
+              fatherCurrentAddress.addressLine2,
+              fatherCurrentAddress.addressLine3Options1,
+              fatherCurrentAddress.addressLine4
+            ]
+          }
+        ]
+      },
+      mother: {
+        identifier: [
+          {
+            id: mother.motherID,
+            type: mother.motherIDType
+          }
+        ],
+        name: [
+          {
+            use: 'Bangla',
+            firstNames: mother.motherFirstNames,
+            familyName: mother.motherFamilyName
+          },
+          {
+            use: 'English',
+            firstNames: mother.motherFirstNamesEng,
+            familyName: mother.motherFamilyNameEng
+          }
+        ],
+        birthDate: mother.motherDateOfBirth,
+        dateOfMarriage: mother.motherDateOfMarriage,
+        maritalStatus: mother.maritalStatus,
+        nationality: [mother.nationality],
+        educationalAttainment: mother.motherEducationAttainment,
+        address: [
+          {
+            use: 'English',
+            type: 'PERMANENT',
+            country: mother.countryPermanent,
+            state: mother.statePermanent,
+            district: mother.districtPermanent,
+            postalCode: mother.postCodePermanent,
+            line: [
+              mother.addressLine1Permanent,
+              mother.addressLine2Permanent,
+              mother.addressLine3Options1Permanent,
+              mother.addressLine4Permanent
+            ]
+          },
+          {
+            use: 'English',
+            type: 'CURRENT',
+            country: mother.country,
+            state: mother.state,
+            district: mother.district,
+            postalCode: mother.postCode,
+            line: [
+              mother.addressLine1,
+              mother.addressLine2,
+              mother.addressLine3Options1,
+              mother.addressLine4
+            ]
+          }
+        ]
+      },
+      registration: {
+        paperFormID: registration.paperFormNumber
+      },
+      birthLocation: {
+        type: child.placeOfDelivery
+      },
+      birthOrder: child.orderOfBirth,
+      attendantAtBirth: child.attendantAtBirth,
+      birthType: child.typeOfBirth,
+      weightAtBirth: child.weightAtBirth
+    }
+
+    return draftDetails
   }
 
   render() {
@@ -250,31 +409,45 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Modal
-          title="Are you ready to submit?"
-          actions={[
-            <PrimaryButton
-              key="submit"
-              id="submit_confirm"
-              onClick={() => history.push('/saved')}
-            >
-              {intl.formatMessage(messages.submitButton)}
-            </PrimaryButton>,
-            <PreviewButton
-              key="preview"
-              onClick={() => {
-                this.toggleSubmitModalOpen()
-                document.documentElement.scrollTop = 0
-              }}
-            >
-              {intl.formatMessage(messages.preview)}
-            </PreviewButton>
-          ]}
-          show={this.state.showSubmitModal}
-          handleClose={this.toggleSubmitModalOpen}
+        <Mutation
+          mutation={POST_MUTATION}
+          variables={{ details: this.processSubmitData }}
         >
-          {intl.formatMessage(messages.submitDescription)}
-        </Modal>
+          {(submitBirthRegistration, { data }) => {
+            if (data && data.id) {
+              history.push('/saved')
+            }
+
+            return (
+              <Modal
+                title="Are you ready to submit?"
+                actions={[
+                  <PrimaryButton
+                    key="submit"
+                    id="submit_confirm"
+                    onClick={() => history.push('/saved')}
+                    // onClick={() => submitBirthRegistration()}
+                  >
+                    {intl.formatMessage(messages.submitButton)}
+                  </PrimaryButton>,
+                  <PreviewButton
+                    key="preview"
+                    onClick={() => {
+                      this.toggleSubmitModalOpen()
+                      document.documentElement.scrollTop = 0
+                    }}
+                  >
+                    {intl.formatMessage(messages.preview)}
+                  </PreviewButton>
+                ]}
+                show={this.state.showSubmitModal}
+                handleClose={this.toggleSubmitModalOpen}
+              >
+                {intl.formatMessage(messages.submitDescription)}
+              </Modal>
+            )
+          }}
+        </Mutation>
       </FormViewContainer>
     )
   }
