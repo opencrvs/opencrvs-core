@@ -3,7 +3,9 @@ import {
   createMotherSection,
   createFatherSection,
   createChildSection,
-  createPersonEntryTemplate
+  createPersonEntryTemplate,
+  createSupportingDocumentsSection,
+  createDocRefTemplate
 } from 'src/features/fhir/templates'
 import { IExtension } from 'src/type/person'
 
@@ -54,6 +56,35 @@ export function selectOrCreatePersonResource(
   }
 
   return personEntry.resource
+}
+
+export function selectOrCreateDocRefResource(
+  sectionCode: string,
+  fhirBundle: any,
+  context: any
+) {
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+
+  let docRef
+  if (!section) {
+    const ref = uuid()
+    const docSection = createSupportingDocumentsSection()
+    docSection.entry.push({
+      reference: `urn:uuid:${ref}`
+    })
+    fhirBundle.entry[0].resource.section.push(docSection)
+    docRef = createDocRefTemplate(ref)
+    fhirBundle.entry.push(docRef)
+  } else {
+    docRef = section.entry[context._index.attachments]
+    if (!docRef) {
+      const ref = uuid()
+      docRef = createDocRefTemplate(ref)
+      fhirBundle.entry.push(docRef)
+    }
+  }
+
+  return docRef.resource
 }
 
 export function setObjectPropInResourceArray(

@@ -231,6 +231,7 @@ input AttachmentInput {
 
 type Attachment { # -> DocumentReference
   id: ID! # uuid
+  contentType: String # -> .content.attachment.contentType
   # base64
   data: String # -> .content.attachment.data base64
   # approved/validated/deleted
