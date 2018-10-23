@@ -4,7 +4,6 @@ import styled, { StyledComponentClass } from 'styled-components'
 export interface ISpinner {
   id: string
   baseColor?: string
-  children?: any
   className?: string
 }
 
