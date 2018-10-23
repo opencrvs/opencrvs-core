@@ -1,6 +1,8 @@
 import transformObj, { IFieldBuilders } from 'src/features/transformation'
+import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
+  createLocationResource,
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE
@@ -359,6 +361,11 @@ function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
   })
 }
 
+function createLocationBuilder(fhirBundle: any, fieldValue: string) {
+  const ref = uuid()
+  fhirBundle.entry.push(createLocationResource(ref))
+}
+
 const builders: IFieldBuilders = {
   createdAt: (fhirBundle, fieldValue) => {
     if (!fhirBundle.meta) {
@@ -593,6 +600,9 @@ const builders: IFieldBuilders = {
       )
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
+  },
+  birthLocation: (fhirBundle: any, fieldValue: string) => {
+    return createLocationBuilder(fhirBundle, fieldValue)
   }
 }
 

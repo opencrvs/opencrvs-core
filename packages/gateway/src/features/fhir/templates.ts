@@ -61,6 +61,29 @@ export function createChildSection(refUuid: string) {
   }
 }
 
+export function createLocationResource(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Location',
+      status: 'active',
+      mode: 'instance',
+      name: '{{villageName}}',
+      physicalType: {
+        coding: {
+          system: 'http://hl7.org/fhir/ValueSet/location-physical-type',
+          code: 'area'
+        },
+        text: 'Area'
+      },
+      position: {
+        longitude: 18.4392,
+        latitude: -34.08002
+      }
+    }
+  }
+}
+
 export function createCompositionTemplate() {
   return {
     resource: {
