@@ -58,11 +58,6 @@ const FormItem = styled.div`
   animation: ${fadeIn} 500ms;
 `
 
-const FormSectionTitle = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
-`
-
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
   onSetFieldValue: (name: string, value: IFormFieldValue) => void
@@ -227,7 +222,6 @@ const mapFieldsToValues = (fields: IFormField[]) =>
 
 interface IFormSectionProps {
   fields: IFormField[]
-  title?: string
   id: string
   setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
@@ -359,19 +353,16 @@ class FormSectionComponent extends React.Component<Props> {
     )
   }
   render() {
-    const { handleSubmit, id, title, renderOnly = false } = this.props
+    const { handleSubmit, id, renderOnly = false } = this.props
 
     return (
       <section>
-        {title && (
-          <FormSectionTitle id={`form_section_title_${id}`}>
-            {title}
-          </FormSectionTitle>
-        )}
         {renderOnly ? (
           this.renderChildren()
         ) : (
-          <form onSubmit={handleSubmit}>{this.renderChildren()}</form>
+          <form id={`form_section_id_${id}`} onSubmit={handleSubmit}>
+            {this.renderChildren()}
+          </form>
         )}
       </section>
     )

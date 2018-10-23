@@ -30,7 +30,7 @@ interface IImagePickerProps {
 }
 
 export class ImageUploader extends React.Component<IImagePickerProps, {}> {
-  handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target
     return files && this.props.handleFileChange(files[0])
   }
@@ -44,7 +44,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
           id="image_file_uploader_field"
           type="file"
           accept="image/*"
-          onChange={event => this.handleFileChange(event)}
+          onChange={this.handleFileChange}
         />
       </ImageBase>
     )

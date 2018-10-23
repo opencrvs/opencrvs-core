@@ -21,6 +21,10 @@ import {
 import { PreviewSection } from './PreviewSection'
 import { StickyFormTabs } from './StickyFormTabs'
 
+const FormSectionTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.copy};
+`
 const FormAction = styled.div`
   display: flex;
   justify-content: center;
@@ -73,7 +77,6 @@ const FormViewContainer = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-  z-index: 1;
 `
 
 const PreviewButton = styled.a`
@@ -218,11 +221,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
             )}
             {activeSection.viewType === 'form' && (
               <Box>
+                <FormSectionTitle id={`form_section_title_${activeSection.id}`}>
+                  {intl.formatMessage(activeSection.title)}
+                </FormSectionTitle>
                 <Form
                   id={activeSection.id}
                   onChange={this.modifyDraft}
                   setAllFieldsDirty={setAllFieldsDirty}
-                  title={intl.formatMessage(activeSection.title)}
                   fields={activeSection.fields}
                 />
                 <FormAction>

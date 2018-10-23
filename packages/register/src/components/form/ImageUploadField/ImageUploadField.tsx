@@ -7,7 +7,7 @@ import { IActionProps } from '@opencrvs/components/lib/buttons/Action'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { FileItem } from '@opencrvs/components/lib/files'
 import { IFormSection, IFileValue } from 'src/forms'
-import { ImageUploadOptionRenderer } from './ImageUploadOptionRenderer'
+import { ImageUploadOption } from './ImageUploadOption'
 
 const Container = styled.div`
   width: 100%;
@@ -147,7 +147,7 @@ class ImageUploadComponent extends React.Component<
         )}
 
         {this.state.showNestedOptionSection && (
-          <ImageUploadOptionRenderer
+          <ImageUploadOption
             option={optionSection}
             title={intl.formatMessage(messages.upload)}
             backLabel={intl.formatMessage(messages.back)}

@@ -9,7 +9,6 @@ import { hasFormError } from 'src/forms/utils'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
-  padding-bottom: 0;
 `
 const OverlayContainer = styled.div`
   position: fixed;
@@ -43,7 +42,7 @@ type IProps = {
   toggleNestedSection: () => void
 }
 
-export class ImageUploadOptionRenderer extends React.Component<IProps, State> {
+export class ImageUploadOption extends React.Component<IProps, State> {
   constructor(props: IProps) {
     super(props)
     this.state = {

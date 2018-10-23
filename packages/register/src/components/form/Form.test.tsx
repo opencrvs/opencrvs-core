@@ -27,7 +27,6 @@ describe('form component', () => {
       id="mother"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
-      title="form_section_title_mother"
       fields={[
         {
           name: 'country',
