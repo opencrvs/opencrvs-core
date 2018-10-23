@@ -20,7 +20,11 @@ import {
   IForm,
   IFormFieldValue,
   ISelectOption,
-  SELECT_WITH_OPTIONS
+  IFileValue,
+  SELECT_WITH_OPTIONS,
+  IMAGE_UPLOADER_WITH_OPTIONS,
+  LIST,
+  PARAGRAPH
 } from 'src/forms'
 
 import { IDraft } from 'src/drafts'
@@ -111,6 +115,7 @@ const ListItemLabel = styled.div`
 const ListItemValue = styled.div`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.copy};
+  flex-basis: 50%;
 `
 const InformationMissingLink = styled(Button)`
   font-family: ${({ theme }) => theme.fonts.regularFont};
@@ -151,6 +156,10 @@ function renderSelectLabel(
   return selectedOption ? intl.formatMessage(selectedOption.label) : value
 }
 
+function renderFileSubject(files: IFileValue[]) {
+  return files.map(file => file.optionValues.join(' ')).join(', ')
+}
+
 function renderValue(
   value: IFormFieldValue,
   field: IFormField,
@@ -166,6 +175,9 @@ function renderValue(
     return value
       ? intl.formatMessage(messages.valueYes)
       : intl.formatMessage(messages.valueNo)
+  }
+  if (field.type === IMAGE_UPLOADER_WITH_OPTIONS) {
+    return renderFileSubject(value as IFileValue[])
   }
   return value
 }
@@ -224,6 +236,10 @@ class PreviewSectionForm extends React.Component<
       return !conditionalActions.includes('hide')
     }
 
+    const isViewOnly = (field: IFormField) => {
+      return [LIST, PARAGRAPH].find(type => type === field.type)
+    }
+
     return (
       <>
         {numberOfErrors > 0 && (
@@ -272,7 +288,10 @@ class PreviewSectionForm extends React.Component<
               </PreviewSectionTitle>
               <List>
                 {section.fields
-                  .filter(field => isVisibleField(field, section))
+                  .filter(
+                    field =>
+                      isVisibleField(field, section) && !isViewOnly(field)
+                  )
                   .map((field: IFormField) => {
                     const informationMissing =
                       emptyFieldsBySection[section.id][field.name]
