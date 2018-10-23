@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
 export const CHILD_CODE = 'child-details'
+export const DOCS_CODE = 'supporting-documents'
 
 export function createMotherSection(refUuid: string) {
   return {
