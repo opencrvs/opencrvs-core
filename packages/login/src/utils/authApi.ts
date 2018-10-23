@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { config } from '../config'
 import { resolve } from 'url'
 
@@ -24,9 +24,8 @@ export interface ITokenResponse {
   token: string
 }
 
-const request = (options: AxiosRequestConfig) => {
-  // tslint:disable-next-line no-any
-  const onSuccess = (response: any) => {
+function request<T>(options: AxiosRequestConfig) {
+  const onSuccess = (response: AxiosResponse<T>) => {
     return response.data
   }
 
@@ -48,10 +47,8 @@ const request = (options: AxiosRequestConfig) => {
     .catch(onError)
 }
 
-const authenticate = (
-  data: IAuthenticationData
-): Promise<IAuthenticateResponse> => {
-  return request({
+const authenticate = (data: IAuthenticationData) => {
+  return request<IAuthenticateResponse>({
     url: resolve(config.AUTH_API_URL, 'authenticate'),
     method: 'POST',
     data
