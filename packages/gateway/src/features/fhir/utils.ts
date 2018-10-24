@@ -3,7 +3,10 @@ import {
   createMotherSection,
   createFatherSection,
   createChildSection,
-  createPersonEntryTemplate
+  createPersonEntryTemplate,
+  createEncounterSection,
+  createEncounter,
+  createLocationResource
 } from 'src/features/fhir/templates'
 import { IExtension } from 'src/type/person'
 
@@ -40,7 +43,6 @@ export function selectOrCreatePersonResource(
         break
       case 'child-details':
         personSection = createChildSection(ref)
-        break
       default:
         throw new Error(`Unknown section code ${sectionCode}`)
     }
@@ -54,6 +56,60 @@ export function selectOrCreatePersonResource(
   }
 
   return personEntry.resource
+}
+
+export function selectOrCreateEncounter(
+  sectionCode: string,
+  fhirBundle: any,
+  context: any,
+  locationRef: string
+) {
+  const section = findCompositionSection(sectionCode, fhirBundle)
+  let encounterEntry
+
+  if (!section) {
+    const ref = uuid()
+    let encounterSection
+    if (sectionCode === 'birth-encounter') {
+      encounterSection = createEncounterSection(ref)
+    } else {
+      throw new Error(`Unknown section code ${sectionCode}`)
+    }
+    fhirBundle.entry[0].resource.section.push(encounterSection)
+    encounterEntry = createEncounter(ref, locationRef)
+    fhirBundle.entry.push(encounterEntry)
+  } else {
+    encounterEntry = fhirBundle.entry.find(
+      (entry: any) => entry.fullUrl === section[0].reference
+    )
+  }
+  return encounterEntry.resource
+}
+
+export function selectOrCreateLocation(
+  sectionCode: string,
+  fhirBundle: any,
+  context: any
+) {
+  const section = findCompositionSection(sectionCode, fhirBundle)
+  let encounterEntry
+  if (!section) {
+    const locationRef = uuid()
+    const locationEntry = createLocationResource(locationRef)
+    fhirBundle.entry.push(locationEntry)
+    encounterEntry = selectOrCreateEncounter(
+      sectionCode,
+      fhirBundle,
+      context,
+      locationRef
+    )
+  } else {
+    encounterEntry = fhirBundle.entry.find(
+      (entry: any) => entry.fullUrl === section[0].reference
+    )
+  }
+
+  return encounterEntry.resource.location
 }
 
 export function setObjectPropInResourceArray(

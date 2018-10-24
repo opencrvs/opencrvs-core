@@ -4,6 +4,7 @@ export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
 export const CHILD_CODE = 'child-details'
 export const DOCS_CODE = 'supporting-documents'
+export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
 export function createMotherSection(refUuid: string) {
   return {
@@ -75,6 +76,65 @@ export function createLocationResource(refUuid: string) {
           code: 'area'
         },
         text: 'Area'
+      }
+    }
+  }
+}
+
+export function createEncounterSection(refUuid: string) {
+  return {
+    title: 'Birth Encounter',
+    code: {
+      coding: {
+        system: 'http://opencrvs.org/specs/sections',
+        code: 'birth-encounter'
+      },
+      text: 'Birth encounter'
+    },
+    text: '',
+    entry: [
+      {
+        reference: `urn:uuid:${refUuid}`
+      }
+    ]
+  }
+}
+
+export function createEncounter(refUuid: string, locationRefUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Encounter',
+      status: 'finished',
+      class: {
+        system: 'http://hl7.org/fhir/v3/ActCode',
+        code: 'OBS',
+        display: 'Obstetrics'
+      },
+      type: [
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/encounter-type',
+              code: 'birth-encounter',
+              display: 'Birth Encounter'
+            }
+          ]
+        }
+      ],
+      period: {
+        start: '',
+        end: ''
+      },
+      location: [
+        {
+          location: {
+            reference: `urn:uuid:${locationRefUuid}`
+          }
+        }
+      ],
+      subject: {
+        reference: 'Patient/xyz' // A reference to the person being registered
       }
     }
   }

@@ -2,14 +2,15 @@ import transformObj, { IFieldBuilders } from 'src/features/transformation'
 import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
-  createLocationResource,
   MOTHER_CODE,
   FATHER_CODE,
-  CHILD_CODE
+  CHILD_CODE,
+  BIRTH_ENCOUNTER_CODE
 } from 'src/features/fhir/templates'
 import {
   selectOrCreatePersonResource,
   setObjectPropInResourceArray,
+  selectOrCreateLocation,
   getMaritalStatusCode
 } from 'src/features/fhir/utils'
 import {
@@ -82,6 +83,31 @@ function createIDBuilder(sectionCode: string) {
       )
       setObjectPropInResourceArray(
         person,
+        'identifier',
+        fieldValue,
+        'type',
+        context
+      )
+    }
+  }
+}
+
+function createLocationIDBuilder(sectionCode: string) {
+  return {
+    id: (fhirBundle: any, fieldValue: string, context: any) => {
+      const encounter = selectOrCreateLocation(sectionCode, fhirBundle, context)
+      setObjectPropInResourceArray(
+        encounter.location,
+        'identifier',
+        fieldValue,
+        'id',
+        context
+      )
+    },
+    type: (fhirBundle: any, fieldValue: string, context: any) => {
+      const encounter = selectOrCreateLocation(sectionCode, fhirBundle, context)
+      setObjectPropInResourceArray(
+        encounter.location,
         'identifier',
         fieldValue,
         'type',
@@ -361,11 +387,6 @@ function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
   })
 }
 
-function createLocationBuilder(fhirBundle: any, fieldValue: string) {
-  const ref = fhirBundle.entry[0].resource.identifier.value
-  fhirBundle.entry.push(createLocationResource(ref))
-}
-
 const builders: IFieldBuilders = {
   createdAt: (fhirBundle, fieldValue) => {
     if (!fhirBundle.meta) {
@@ -601,8 +622,17 @@ const builders: IFieldBuilders = {
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
-  birthLocation: (fhirBundle: any, fieldValue: string) => {
-    return createLocationBuilder(fhirBundle, fieldValue)
+  birthLocation: {
+    identifier: createLocationIDBuilder(BIRTH_ENCOUNTER_CODE),
+    status: (fhirBundle: any, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocation(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      location.status = fieldValue
+    }
+    // Need to add more properties
   }
 }
 
