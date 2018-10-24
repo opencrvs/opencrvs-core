@@ -8,6 +8,7 @@ import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { FileItem } from '@opencrvs/components/lib/files'
 import { IFormSection, IFileValue } from 'src/forms'
 import { ImageUploadOption } from './ImageUploadOption'
+import { ImagePreview } from './ImagePreview'
 
 const Container = styled.div`
   width: 100%;
@@ -97,12 +98,14 @@ class ImageUploadComponent extends React.Component<
   IFullProps,
   {
     showNestedOptionSection: boolean
+    previewImage: IFileValue | null
   }
 > {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      showNestedOptionSection: false
+      showNestedOptionSection: false,
+      previewImage: null
     }
   }
 
@@ -110,6 +113,20 @@ class ImageUploadComponent extends React.Component<
     this.setState({
       showNestedOptionSection: !this.state.showNestedOptionSection
     })
+  }
+
+  closePreviewSection = () => {
+    this.setState({ previewImage: null })
+  }
+
+  onDelete = (index: number): void => {
+    const files = this.props.files ? this.props.files : []
+    files.splice(index, 1)
+    this.props.onComplete(files)
+  }
+
+  onPreview = (file: IFileValue): void => {
+    this.setState({ previewImage: file })
   }
 
   onComplete = (file: IFileValue) => {
@@ -126,17 +143,12 @@ class ImageUploadComponent extends React.Component<
         return (
           <FileItemContainer key={index}>
             <FileItem
+              id={`file_item_${index}`}
               file={augmentFile(file)}
               deleteLabel={intl.formatMessage(messages.delete)}
-              onDelete={() =>
-                /* need to change it for deleting from the file array and push it back on draft */
-                alert(`#${index} deleted`)
-              }
+              onDelete={() => this.onDelete(index)}
               previewLabel={intl.formatMessage(messages.preview)}
-              onPreview={() =>
-                /* need to change it for getting file.data using the index and use it for preview */
-                alert(`#${index} previewed`)
-              }
+              onPreview={() => this.onPreview(file)}
             />
           </FileItemContainer>
         )
@@ -151,14 +163,15 @@ class ImageUploadComponent extends React.Component<
           onClick={this.toggleNestedSection}
         />
 
-        {fileList && (
-          <FileViewer id="file_list_viewer">
-            <FileViewerLabel>
-              {intl.formatMessage(messages.uploadedList)}
-            </FileViewerLabel>
-            {fileList}
-          </FileViewer>
-        )}
+        {fileList &&
+          fileList.length > 0 && (
+            <FileViewer id="file_list_viewer">
+              <FileViewerLabel>
+                {intl.formatMessage(messages.uploadedList)}
+              </FileViewerLabel>
+              {fileList}
+            </FileViewer>
+          )}
 
         {this.state.showNestedOptionSection && (
           <ImageUploadOption
@@ -167,6 +180,15 @@ class ImageUploadComponent extends React.Component<
             backLabel={intl.formatMessage(messages.back)}
             onComplete={this.onComplete}
             toggleNestedSection={this.toggleNestedSection}
+          />
+        )}
+
+        {this.state.previewImage && (
+          <ImagePreview
+            previewImage={this.state.previewImage}
+            title={intl.formatMessage(messages.preview)}
+            backLabel={intl.formatMessage(messages.back)}
+            goBack={this.closePreviewSection}
           />
         )}
       </Container>

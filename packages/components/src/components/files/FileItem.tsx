@@ -5,6 +5,7 @@ import Uploaded from '../icons/Uploaded'
 import { ITheme } from '../theme'
 
 interface IProps {
+  id: string
   file: {
     title: string
     description: string
@@ -76,21 +77,28 @@ const MetadataContainer = styled.div`
 class FileItemComponent extends React.Component<IProps> {
   render() {
     const { title, description } = this.props.file
-    const { deleteLabel, onDelete, previewLabel, onPreview, theme } = this.props
+    const {
+      id,
+      deleteLabel,
+      onDelete,
+      previewLabel,
+      onPreview,
+      theme
+    } = this.props
 
     return (
-      <Container>
+      <Container id={id}>
         <FileContainer>
           <Uploaded />
           <MetadataContainer>
             <span>{title}</span>
             <span>{description}</span>
           </MetadataContainer>
-          <PreviewLink onClick={onPreview}>
+          <PreviewLink id={`${id}_preview_link`} onClick={onPreview}>
             {previewLabel ? previewLabel : 'Preview'}
           </PreviewLink>
         </FileContainer>
-        <DeleteContainer onClick={onDelete}>
+        <DeleteContainer id={`${id}_delete_link`} onClick={onDelete}>
           <Cross color={theme.colors.danger} />
           <DeleteLink>{deleteLabel ? deleteLabel : 'Delete'}</DeleteLink>
         </DeleteContainer>
