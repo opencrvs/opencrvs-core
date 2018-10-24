@@ -52,5 +52,5 @@ jobs:
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
         - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
-        - CYPRESS_PERFORMANCE_MGNT_URL=https://performance-mgnt.opencrvs-staging.jembi.org/
+        - CYPRESS_PERFORMANCE_MGNT_URL=https://performance.opencrvs-staging.jembi.org/
         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/

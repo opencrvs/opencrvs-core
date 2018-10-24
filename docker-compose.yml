@@ -10,11 +10,11 @@ services:
     deploy:
       replicas: 2
 
-  performance-mgnt:
-    image: jembi/ocrvs-performance-mgnt:latest
+  performance:
+    image: jembi/ocrvs-performance:latest
     build:
       context: .
-      dockerfile: ./Dockerfile-performance-mgnt
+      dockerfile: ./Dockerfile-performance
     restart: unless-stopped
     deploy:
       replicas: 2

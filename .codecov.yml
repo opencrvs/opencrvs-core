@@ -25,9 +25,9 @@ coverage:
         paths:
           - packages/register
         threshold: 0.5
-      performance-mgnt:
+      performance:
         paths:
-          - packages/performance-mgnt
+          - packages/performance
         threshold: 0.5
       user-mgnt:
         paths:

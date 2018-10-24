@@ -1,5 +1,5 @@
 {
-  "name": "@opencrvs/performance-mgnt",
+  "name": "@opencrvs/performance",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,10 +15,8 @@
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3001 react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "docker:build":
-      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
-    "docker:run":
-      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
     "test": "react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
@@ -27,7 +25,12 @@
     "start:prod": "yarn build && yarn serve -s -l 3001 build"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": ["prettier --write", "tslint", "stylelint", "git add"]
+    "src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "tslint",
+      "stylelint",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
@@ -55,7 +58,12 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ],
-    "coverageReporters": ["json", "lcov", "text", "html"],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ],
     "moduleNameMapper": {
       "^src(.*)$": "<rootDir>/src$1"
     }
