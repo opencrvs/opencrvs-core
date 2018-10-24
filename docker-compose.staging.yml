@@ -30,16 +30,6 @@ services:
         - 'traefik.port=5000'
         - 'traefik.docker.network=opencrvs_default'
 
-  performance-mgnt:
-    deploy:
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: performance-mgnt.opencrvs-staging.jembi.org,opencrvs-staging.jembi.org'
-        - 'traefik.frontend.redirect.regex=^https?://opencrvs-staging.jembi.org/(.*)'
-        - 'traefik.frontend.redirect.replacement=https://performance-mgnt.opencrvs-staging.jembi.org/$${1}'
-        - 'traefik.port=5000'
-        - 'traefik.docker.network=opencrvs_default'
-
   login:
     deploy:
       labels:
