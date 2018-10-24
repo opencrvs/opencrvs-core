@@ -596,97 +596,101 @@ const builders: IFieldBuilders = {
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
-  supporting_documents: {
-    originalFileName: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      if (!docRef.identifier) {
-        docRef.identifier = []
-      }
-      docRef.identifier.push({
-        system: 'http://opencrvs.org/specs/id/original-file-name',
-        value: fieldValue
-      })
-    },
-    systemFileName: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      if (!docRef.identifier) {
-        docRef.identifier = []
-      }
-      docRef.identifier.push({
-        system: 'http://opencrvs.org/specs/id/system-file-name',
-        value: fieldValue
-      })
-    },
-    status: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      docRef.docStatus = fieldValue
-    },
-    type: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      docRef.type = {
-        coding: {
-          system: 'http://opencrvs.org/specs/supporting-doc-type',
-          code: fieldValue
+  registration: {
+    attachments: {
+      originalFileName: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        if (!docRef.identifier) {
+          docRef.identifier = []
         }
-      }
-    },
-    created: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      docRef.created = fieldValue
-    },
-    indexed: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      docRef.indexed = fieldValue
-    },
-    contentType: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      if (!docRef.content) {
-        docRef.content = {
-          attachement: {}
+        docRef.identifier.push({
+          system: 'http://opencrvs.org/specs/id/original-file-name',
+          value: fieldValue
+        })
+      },
+      systemFileName: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        if (!docRef.identifier) {
+          docRef.identifier = []
         }
-      }
-      docRef.content.attachement.contentType = fieldValue
-    },
-    data: (fhirBundle: any, fieldValue: string, context: any) => {
-      const docRef = selectOrCreateDocRefResource(
-        DOCS_CODE,
-        fhirBundle,
-        context
-      )
-      if (!docRef.content) {
-        docRef.content = {
-          attachement: {}
+        docRef.identifier.push({
+          system: 'http://opencrvs.org/specs/id/system-file-name',
+          value: fieldValue
+        })
+      },
+      status: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        docRef.docStatus = fieldValue
+      },
+      type: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        docRef.type = {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/supporting-doc-type',
+              code: fieldValue
+            }
+          ]
         }
+      },
+      created: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        docRef.created = fieldValue
+      },
+      indexed: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        docRef.indexed = fieldValue
+      },
+      contentType: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        if (!docRef.content) {
+          docRef.content = {
+            attachement: {}
+          }
+        }
+        docRef.content.attachement.contentType = fieldValue
+      },
+      data: (fhirBundle: any, fieldValue: string, context: any) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        if (!docRef.content) {
+          docRef.content = {
+            attachement: {}
+          }
+        }
+        docRef.content.attachement.data = fieldValue
       }
-      docRef.content.attachement.data = fieldValue
     }
   }
 }

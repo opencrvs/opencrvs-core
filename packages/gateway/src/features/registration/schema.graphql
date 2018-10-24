@@ -218,6 +218,7 @@ type Registration { # -> Task
 }
 
 input AttachmentInput {
+  contentType: String
   # base64
   data: String
   # approved/validated/deleted

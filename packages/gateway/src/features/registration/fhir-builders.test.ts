@@ -71,10 +71,33 @@ test('should build a minimal FHIR registration document without error', async ()
       nationality: ['BGD'],
       educationalAttainment: 'NO_SCHOOLING'
     },
+    registration: {
+      attachments: [
+        {
+          contentType: 'image/jpeg',
+          data: 'SampleData',
+          status: 'final',
+          originalFileName: 'original.jpeg',
+          systemFileName: 'system.jpg',
+          type: 'NATIONAL_ID',
+          created: '2018-10-22'
+        },
+        {
+          contentType: 'image/jpeg',
+          data: 'SampleData',
+          status: 'final',
+          originalFileName: 'original.jpeg',
+          systemFileName: 'system.jpg',
+          type: 'PASSPORT',
+          created: '2018-10-22'
+        }
+      ]
+    },
     createdAt: new Date()
   })
+
   expect(fhir).toBeDefined()
-  expect(fhir.entry[0].resource.section.length).toBe(3)
+  expect(fhir.entry[0].resource.section.length).toBe(4)
   expect(fhir.entry[0].resource.date).toBeDefined()
   expect(fhir.entry[1].resource.gender).toBe('female')
   expect(fhir.entry[2].resource.gender).toBe('male')
@@ -108,6 +131,8 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.address[1].line[0]).toBe('40 Orbis Wharf')
   expect(fhir.entry[2].resource.address[1].text).toBe('Optional address text')
   expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[4].resource.type.coding[0].code).toBe('NATIONAL_ID')
+  expect(fhir.entry[5].resource.type.coding[0].code).toBe('PASSPORT')
   expect(fhir.entry[1].resource.extension[1]).toEqual({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
     extension: [

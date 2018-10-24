@@ -69,24 +69,25 @@ export function selectOrCreateDocRefResource(
   if (!section) {
     const ref = uuid()
     const docSection = createSupportingDocumentsSection()
-    docSection.entry.push({
+    docSection.entry[context._index.attachments] = {
       reference: `urn:uuid:${ref}`
-    })
+    }
     fhirBundle.entry[0].resource.section.push(docSection)
     docRef = createDocRefTemplate(ref)
     fhirBundle.entry.push(docRef)
   } else {
     docRef = fhirBundle.entry.find(
       (entry: any) =>
+        section.entry[context._index.attachments] &&
         entry.fullUrl === section.entry[context._index.attachments].reference
     )
     if (!docRef) {
       const ref = uuid()
       docRef = createDocRefTemplate(ref)
       fhirBundle.entry.push(docRef)
-      section.entry.push({
+      section.entry[context._index.attachments] = {
         reference: `urn:uuid:${ref}`
-      })
+      }
     }
   }
 
