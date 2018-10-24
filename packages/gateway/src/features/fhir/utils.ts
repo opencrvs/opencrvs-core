@@ -23,7 +23,7 @@ export function findCompositionSection(code: string, composition: any) {
 
 export function selectOrCreatePersonResource(
   sectionCode: string,
-  fhirBundle: any,
+  fhirBundle: fhir.Bundle,
   context: any
 ) {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -60,7 +60,7 @@ export function selectOrCreatePersonResource(
 
 export function selectOrCreateDocRefResource(
   sectionCode: string,
-  fhirBundle: fhir.DocumentReference,
+  fhirBundle: fhir.Bundle,
   context: any
 ) {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
