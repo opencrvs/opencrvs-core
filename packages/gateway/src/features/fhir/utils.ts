@@ -3,7 +3,9 @@ import {
   createMotherSection,
   createFatherSection,
   createChildSection,
-  createPersonEntryTemplate
+  createPersonEntryTemplate,
+  createSupportingDocumentsSection,
+  createDocRefTemplate
 } from 'src/features/fhir/templates'
 import { IExtension } from 'src/type/person'
 
@@ -21,7 +23,7 @@ export function findCompositionSection(code: string, composition: any) {
 
 export function selectOrCreatePersonResource(
   sectionCode: string,
-  fhirBundle: any,
+  fhirBundle: fhir.Bundle,
   context: any
 ) {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -54,6 +56,42 @@ export function selectOrCreatePersonResource(
   }
 
   return personEntry.resource
+}
+
+export function selectOrCreateDocRefResource(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle,
+  context: any
+) {
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+
+  let docRef
+  if (!section) {
+    const ref = uuid()
+    const docSection = createSupportingDocumentsSection()
+    docSection.entry[context._index.attachments] = {
+      reference: `urn:uuid:${ref}`
+    }
+    fhirBundle.entry[0].resource.section.push(docSection)
+    docRef = createDocRefTemplate(ref)
+    fhirBundle.entry.push(docRef)
+  } else {
+    docRef = fhirBundle.entry.find(
+      (entry: any) =>
+        section.entry[context._index.attachments] &&
+        entry.fullUrl === section.entry[context._index.attachments].reference
+    )
+    if (!docRef) {
+      const ref = uuid()
+      docRef = createDocRefTemplate(ref)
+      fhirBundle.entry.push(docRef)
+      section.entry[context._index.attachments] = {
+        reference: `urn:uuid:${ref}`
+      }
+    }
+  }
+
+  return docRef.resource
 }
 
 export function setObjectPropInResourceArray(
