@@ -112,7 +112,7 @@ export function createSupportingDocumentsSection() {
       text: 'Supporting documents'
     },
     text: '',
-    entry: [] as any[]
+    entry: []
   }
 }
 

@@ -77,19 +77,19 @@ test('should build a minimal FHIR registration document without error', async ()
           contentType: 'image/jpeg',
           data: 'SampleData',
           status: 'final',
-          originalFileName: 'original.jpeg',
+          originalFileName: 'original.jpg',
           systemFileName: 'system.jpg',
           type: 'NATIONAL_ID',
-          created: '2018-10-22'
+          createdAt: '2018-10-21'
         },
         {
-          contentType: 'image/jpeg',
-          data: 'SampleData',
-          status: 'final',
-          originalFileName: 'original.jpeg',
-          systemFileName: 'system.jpg',
+          contentType: 'image/png',
+          data: 'ExampleData',
+          status: 'deleted',
+          originalFileName: 'original.png',
+          systemFileName: 'system.png',
           type: 'PASSPORT',
-          created: '2018-10-22'
+          createdAt: '2018-10-22'
         }
       ]
     },
@@ -131,8 +131,6 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.address[1].line[0]).toBe('40 Orbis Wharf')
   expect(fhir.entry[2].resource.address[1].text).toBe('Optional address text')
   expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
-  expect(fhir.entry[4].resource.type.coding[0].code).toBe('NATIONAL_ID')
-  expect(fhir.entry[5].resource.type.coding[0].code).toBe('PASSPORT')
   expect(fhir.entry[1].resource.extension[1]).toEqual({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
     extension: [
@@ -205,4 +203,58 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[3].resource.extension[2].url).toBe(
     `${OPENCRVS_SPECIFICATION_URL}educational-attainment`
   )
+
+  // Attachment Test cases
+  expect(fhir.entry[4].resource.docStatus).toBe('final')
+  expect(fhir.entry[4].resource.created).toBe('2018-10-21')
+  expect(fhir.entry[4].resource.type).toEqual({
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/supporting-doc-type',
+        code: 'NATIONAL_ID'
+      }
+    ]
+  })
+  expect(fhir.entry[4].resource.content).toEqual({
+    attachment: {
+      contentType: 'image/jpeg',
+      data: 'SampleData'
+    }
+  })
+  expect(fhir.entry[4].resource.identifier).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/id/original-file-name',
+      value: 'original.jpg'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/system-file-name',
+      value: 'system.jpg'
+    }
+  ])
+  expect(fhir.entry[5].resource.docStatus).toBe('deleted')
+  expect(fhir.entry[5].resource.created).toBe('2018-10-22')
+  expect(fhir.entry[5].resource.type).toEqual({
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/supporting-doc-type',
+        code: 'PASSPORT'
+      }
+    ]
+  })
+  expect(fhir.entry[5].resource.identifier).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/id/original-file-name',
+      value: 'original.png'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/system-file-name',
+      value: 'system.png'
+    }
+  ])
+  expect(fhir.entry[5].resource.content).toEqual({
+    attachment: {
+      contentType: 'image/png',
+      data: 'ExampleData'
+    }
+  })
 })
