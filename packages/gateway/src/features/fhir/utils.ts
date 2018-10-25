@@ -63,7 +63,7 @@ export function selectOrCreatePersonResource(
 
 export function selectOrCreateEncounter(
   sectionCode: string,
-  fhirBundle: any,
+  fhirBundle: fhir.Bundle,
   context: any,
   locationRef: string
 ) {
@@ -89,16 +89,18 @@ export function selectOrCreateEncounter(
   return encounterEntry.resource
 }
 
-export function selectOrCreateLocationRefResouce(
+export function selectOrCreateLocationRefResource(
   sectionCode: string,
-  fhirBundle: any,
+  fhirBundle: fhir.Bundle,
   context: any
 ) {
   const section = findCompositionSection(sectionCode, fhirBundle)
   let encounterEntry
+  let locationEntry
+
   if (!section) {
     const locationRef = uuid()
-    const locationEntry = createLocationResource(locationRef)
+    locationEntry = createLocationResource(locationRef)
     fhirBundle.entry.push(locationEntry)
     encounterEntry = selectOrCreateEncounter(
       sectionCode,
@@ -110,9 +112,13 @@ export function selectOrCreateLocationRefResouce(
     encounterEntry = fhirBundle.entry.find(
       (entry: any) => entry.fullUrl === section[0].reference
     )
+    locationEntry = fhirBundle.entry.find(
+      (entry: any) =>
+        entry.fullUrl === encounterEntry.resource.location[0].location.reference
+    )
   }
 
-  return encounterEntry.resource.location
+  return locationEntry.resource
 }
 
 export function selectOrCreateDocRefResource(

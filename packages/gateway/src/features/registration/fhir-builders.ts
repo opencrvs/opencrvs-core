@@ -96,13 +96,13 @@ function createIDBuilder(sectionCode: string) {
 function createLocationIDBuilder(sectionCode: string) {
   return {
     id: (fhirBundle: any, fieldValue: string, context: any) => {
-      const encounter = selectOrCreateLocationRefResource(
+      const location = selectOrCreateLocationRefResource(
         sectionCode,
         fhirBundle,
         context
       )
       setObjectPropInResourceArray(
-        encounter.location,
+        location,
         'identifier',
         fieldValue,
         'id',
@@ -110,19 +110,76 @@ function createLocationIDBuilder(sectionCode: string) {
       )
     },
     type: (fhirBundle: any, fieldValue: string, context: any) => {
-      const encounter = selectOrCreateLocationRefResource(
+      const location = selectOrCreateLocationRefResource(
         sectionCode,
         fhirBundle,
         context
       )
       setObjectPropInResourceArray(
-        encounter.location,
+        location,
         'identifier',
         fieldValue,
         'type',
         context
       )
     }
+  }
+}
+
+function createLocationTelecomBuilder(sectionCode: string) {
+  return {
+    system: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      setObjectPropInResourceArray(
+        location,
+        'telecom',
+        fieldValue,
+        'system',
+        context
+      )
+    },
+    value: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      setObjectPropInResourceArray(
+        location,
+        'telecom',
+        fieldValue,
+        'value',
+        context
+      )
+    },
+    use: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      setObjectPropInResourceArray(
+        location,
+        'telecom',
+        fieldValue,
+        'use',
+        context
+      )
+    }
+  }
+}
+
+function createLocationTypeBuilder(resource: any, fieldValue: string) {
+  resource.physicalType = {
+    coding: {
+      system: 'http://hl7.org/fhir/ValueSet/location-physical-type',
+      code: fieldValue // Not sure
+    },
+    text: fieldValue
   }
 }
 
@@ -661,13 +718,85 @@ const builders: IFieldBuilders = {
   },
   birthLocation: {
     identifier: createLocationIDBuilder(BIRTH_ENCOUNTER_CODE),
-    status: (fhirBundle, fieldValue, context) => {
+    status: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
       const location = selectOrCreateLocationRefResource(
         BIRTH_ENCOUNTER_CODE,
         fhirBundle,
         fieldValue
       )
       location.status = fieldValue
+    },
+    name: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      location.name = fieldValue
+    },
+    description: (
+      fhirBundle: fhir.Bundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      location.description = fieldValue
+    },
+    type: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+
+      return createLocationTypeBuilder(location, fieldValue)
+    },
+    telecom: createLocationTelecomBuilder(BIRTH_ENCOUNTER_CODE),
+    latitude: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      setObjectPropInResourceArray(
+        location,
+        'position',
+        fieldValue,
+        'latitude',
+        context
+      )
+    },
+    longitude: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      setObjectPropInResourceArray(
+        location,
+        'position',
+        fieldValue,
+        'longitude',
+        context
+      )
+    },
+    altitude: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      setObjectPropInResourceArray(
+        location,
+        'position',
+        fieldValue,
+        'altitude',
+        context
+      )
     }
   },
   registration: {
