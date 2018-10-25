@@ -17,6 +17,7 @@ export const colors = {
   hoverGradientDark: '#376fb7',
   inputBackground: '#F9F9F9',
   white: '#FFFFFF',
+  black: '#000000',
   blackAlpha20: '#00000020',
   danger: '#D53F3F',
   cardGradientEnd: '#5E93ED'
