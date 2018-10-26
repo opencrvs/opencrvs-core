@@ -38,7 +38,8 @@ import {
   ISelectFormFieldWithOptions,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
-  IFileValue
+  IFileValue,
+  TEL
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -161,6 +162,17 @@ function GeneratedInputField({
     return (
       <InputField {...inputFieldProps}>
         <TextArea {...inputProps} />
+      </InputField>
+    )
+  }
+  if (fieldDefinition.type === TEL) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TextInput
+          type="tel"
+          {...inputProps}
+          value={inputProps.value as string}
+        />
       </InputField>
     )
   }
