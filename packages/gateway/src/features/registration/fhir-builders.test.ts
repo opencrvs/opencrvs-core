@@ -93,11 +93,17 @@ test('should build a minimal FHIR registration document without error', async ()
         }
       ]
     },
+    birthLocation: {
+      name: 'HOSPITAL',
+      status: 'active',
+      latitude: 23.777176,
+      longitude: 90.399452
+    },
     createdAt: new Date()
   })
 
   expect(fhir).toBeDefined()
-  expect(fhir.entry[0].resource.section.length).toBe(4)
+  expect(fhir.entry[0].resource.section.length).toBe(5)
   expect(fhir.entry[0].resource.date).toBeDefined()
   expect(fhir.entry[1].resource.gender).toBe('female')
   expect(fhir.entry[2].resource.gender).toBe('male')
@@ -257,4 +263,8 @@ test('should build a minimal FHIR registration document without error', async ()
       data: 'ExampleData'
     }
   })
+  expect(fhir.entry[7].resource.name).toBe('HOSPITAL')
+  expect(fhir.entry[7].resource.status).toBe('active')
+  expect(fhir.entry[7].resource.position.latitude).toBe(23.777176)
+  expect(fhir.entry[7].resource.position.longitude).toBe(90.399452)
 })

@@ -61,13 +61,12 @@ export function selectOrCreatePersonResource(
   return personEntry.resource
 }
 
-export function selectOrCreateEncounter(
+export function selectOrCreateEncounterResource(
   sectionCode: string,
   fhirBundle: fhir.Bundle,
-  context: any,
-  locationRef: string
+  context: any
 ) {
-  const section = findCompositionSection(sectionCode, fhirBundle)
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
   let encounterEntry
 
   if (!section) {
@@ -79,13 +78,14 @@ export function selectOrCreateEncounter(
       throw new Error(`Unknown section code ${sectionCode}`)
     }
     fhirBundle.entry[0].resource.section.push(encounterSection)
-    encounterEntry = createEncounter(ref, locationRef)
+    encounterEntry = createEncounter(ref)
     fhirBundle.entry.push(encounterEntry)
   } else {
     encounterEntry = fhirBundle.entry.find(
-      (entry: any) => entry.fullUrl === section[0].reference
+      (entry: any) => entry.fullUrl === section.entry[0].reference
     )
   }
+
   return encounterEntry.resource
 }
 
@@ -94,27 +94,23 @@ export function selectOrCreateLocationRefResource(
   fhirBundle: fhir.Bundle,
   context: any
 ) {
-  const section = findCompositionSection(sectionCode, fhirBundle)
-  let encounterEntry
+  let encounter
   let locationEntry
 
-  if (!section) {
+  encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle, context)
+
+  if (!encounter.location) {
+    // create location
     const locationRef = uuid()
     locationEntry = createLocationResource(locationRef)
     fhirBundle.entry.push(locationEntry)
-    encounterEntry = selectOrCreateEncounter(
-      sectionCode,
-      fhirBundle,
-      context,
-      locationRef
-    )
+    encounter.location = []
+    encounter.location.push({
+      location: { reference: `urn:uuid:${locationRef}` }
+    })
   } else {
-    encounterEntry = fhirBundle.entry.find(
-      (entry: any) => entry.fullUrl === section[0].reference
-    )
     locationEntry = fhirBundle.entry.find(
-      (entry: any) =>
-        entry.fullUrl === encounterEntry.resource.location[0].location.reference
+      (entry: any) => entry.fullUrl === encounter.location[0].location.reference
     )
   }
 

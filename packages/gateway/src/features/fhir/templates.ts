@@ -76,15 +76,7 @@ export function createLocationResource(refUuid: string) {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Location',
-      status: 'active',
-      mode: 'instance',
-      physicalType: {
-        coding: {
-          system: 'http://hl7.org/fhir/ValueSet/location-physical-type',
-          code: 'area'
-        },
-        text: 'Area'
-      }
+      mode: 'instance'
     }
   }
 }
@@ -108,42 +100,12 @@ export function createEncounterSection(refUuid: string) {
   }
 }
 
-export function createEncounter(refUuid: string, locationRefUuid: string) {
+export function createEncounter(refUuid: string) {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Encounter',
-      status: 'finished',
-      class: {
-        system: 'http://hl7.org/fhir/v3/ActCode',
-        code: 'OBS',
-        display: 'Obstetrics'
-      },
-      type: [
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/encounter-type',
-              code: 'birth-encounter',
-              display: 'Birth Encounter'
-            }
-          ]
-        }
-      ],
-      period: {
-        start: '',
-        end: ''
-      },
-      location: [
-        {
-          location: {
-            reference: `urn:uuid:${locationRefUuid}`
-          }
-        }
-      ],
-      subject: {
-        reference: 'Patient/xyz' // A reference to the person being registered
-      }
+      status: 'finished'
     }
   }
 }
