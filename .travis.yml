@@ -23,7 +23,7 @@ jobs:
       env:
         - CYPRESS_LOGIN_URL=http://localhost:3020/
         - CYPRESS_REGISTER_URL=http://localhost:3000/
-        - CYPRESS_PERFORMANCE_MGNT_URL=http://localhost:3002/
+        - CYPRESS_PERFORMANCE_URL=http://localhost:3002/
         - CYPRESS_AUTH_URL=http://localhost:4040/
       services:
         - docker
@@ -52,5 +52,5 @@ jobs:
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
         - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
-        - CYPRESS_PERFORMANCE_MGNT_URL=https://performance.opencrvs-staging.jembi.org/
+        - CYPRESS_PERFORMANCE_URL=https://performance.opencrvs-staging.jembi.org/
         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
