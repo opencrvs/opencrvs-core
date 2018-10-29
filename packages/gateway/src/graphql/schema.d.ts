@@ -105,7 +105,6 @@ export enum GQLAddressType {
 
 export interface GQLAttachment {
   id: string
-  contentType?: string
   data?: string
   status?: string
   originalFileName?: string
@@ -355,7 +354,6 @@ export interface GQLAddressInput {
 }
 
 export interface GQLAttachmentInput {
-  contentType?: string
   data?: string
   status?: string
   originalFileName?: string
@@ -804,7 +802,6 @@ export interface AddressToToResolver<TParent = any, TResult = any> {
 
 export interface GQLAttachmentTypeResolver<TParent = any> {
   id?: AttachmentToIdResolver<TParent>
-  contentType?: AttachmentToContentTypeResolver<TParent>
   data?: AttachmentToDataResolver<TParent>
   status?: AttachmentToStatusResolver<TParent>
   originalFileName?: AttachmentToOriginalFileNameResolver<TParent>
@@ -815,10 +812,6 @@ export interface GQLAttachmentTypeResolver<TParent = any> {
 }
 
 export interface AttachmentToIdResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface AttachmentToContentTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
