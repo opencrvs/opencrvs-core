@@ -939,12 +939,7 @@ const builders: IFieldBuilders = {
         fhirBundle,
         context
       )
-      if (!location.position) {
-        location.position = {
-          latitude: {},
-          longitude: {}
-        }
-      }
+      !location.position && (location.position = {})
       location.position.latitude = fieldValue
     },
     longitude: (fhirBundle: fhir.Bundle, fieldValue: number, context: any) => {
@@ -953,12 +948,7 @@ const builders: IFieldBuilders = {
         fhirBundle,
         context
       )
-      if (!location.position) {
-        location.position = {
-          latitude: {},
-          longitude: {}
-        }
-      }
+
       location.position.longitude = fieldValue
     }
   },
