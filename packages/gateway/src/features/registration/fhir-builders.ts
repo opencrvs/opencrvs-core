@@ -334,9 +334,8 @@ function createDateOfMarriageBuilder(resource: any, fieldValue: string) {
 }
 
 function createNationalityBuilder(resource: any, fieldValue: string) {
-  if (!resource.extension) {
-    resource.extension = []
-  }
+  !resource.extension && (resource.extension = [])
+
   resource.extension.push({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
     extension: [
@@ -368,9 +367,8 @@ function createMaritalStatusBuilder(resource: any, fieldValue: string) {
 }
 
 function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
-  if (!resource.extension) {
-    resource.extension = []
-  }
+  !resource.extension && (resource.extension = [])
+
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
     valueString: fieldValue
@@ -822,9 +820,8 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.identifier) {
-          docRef.identifier = []
-        }
+        !docRef.identifier && (docRef.identifier = [])
+
         docRef.identifier.push({
           system: 'http://opencrvs.org/specs/id/original-file-name',
           value: fieldValue
@@ -840,9 +837,8 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.identifier) {
-          docRef.identifier = []
-        }
+        !docRef.identifier && (docRef.identifier = [])
+
         docRef.identifier.push({
           system: 'http://opencrvs.org/specs/id/system-file-name',
           value: fieldValue
@@ -894,11 +890,10 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.content) {
-          docRef.content = {
+        !docRef.content &&
+          (docRef.content = {
             attachment: {}
-          }
-        }
+          })
         docRef.content.attachment.contentType = fieldValue
       },
       data: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
@@ -907,11 +902,10 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.content) {
-          docRef.content = {
+        !docRef.content &&
+          (docRef.content = {
             attachment: {}
-          }
-        }
+          })
         docRef.content.attachment.data = fieldValue
       }
     }
@@ -948,7 +942,7 @@ const builders: IFieldBuilders = {
         fhirBundle,
         context
       )
-
+      !location.position && (location.position = {})
       location.position.longitude = fieldValue
     }
   },
