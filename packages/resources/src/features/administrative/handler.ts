@@ -1,12 +1,16 @@
 import * as Hapi from 'hapi'
-import { getLocationData } from './service'
-import { logger } from 'src/logger'
+import { getLocationData, getDistrictData, ILocation } from './service'
+// import { logger } from 'src/logger'
 
 export default async function administrativeStructureHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const divisions = await getLocationData('division')
+  const divisions: ILocation[] = await getLocationData('division', 0)
 
-  return { divisions }
+  const districts: ILocation[] = await getDistrictData(divisions)
+
+  const locations = divisions.concat(districts)
+
+  return { locations }
 }
