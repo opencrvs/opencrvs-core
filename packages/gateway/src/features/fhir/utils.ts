@@ -109,7 +109,7 @@ export function createObservationResource(
   )
   if (encounterEntry && encounter) {
     observationEntry.resource.context = {
-      reference: `urn:uuid:${encounterEntry.fullUrl}`
+      reference: `${encounterEntry.fullUrl}`
     }
   }
   fhirBundle.entry.push(observationEntry)

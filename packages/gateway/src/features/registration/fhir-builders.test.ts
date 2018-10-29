@@ -1,7 +1,8 @@
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  FHIR_OBSERVATION_CATEGORY_URL
 } from 'src/features/fhir/constants'
 
 import {
@@ -282,6 +283,12 @@ test('should build a minimal FHIR registration document without error', async ()
       data: 'ExampleData'
     }
   })
+  // Encounter
+  expect(fhir.entry[6].resource.resourceType).toBe('Encounter')
+  expect(fhir.entry[6].resource.location[0].location.reference).toEqual(
+    fhir.entry[7].fullUrl
+  )
+  // Location
   expect(fhir.entry[7].resource.name).toBe('HOSPITAL')
   expect(fhir.entry[7].resource.status).toBe('active')
   expect(fhir.entry[7].resource.position.latitude).toBe(23.777176)
@@ -289,6 +296,20 @@ test('should build a minimal FHIR registration document without error', async ()
 
   // Observation
   expect(fhir.entry[8].resource.valueInteger).toBe(2)
+  expect(fhir.entry[8].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[8].resource.category).toEqual([
+    {
+      coding: [
+        {
+          system: FHIR_OBSERVATION_CATEGORY_URL,
+          code: 'procedure',
+          display: 'Procedure'
+        }
+      ]
+    }
+  ])
   expect(fhir.entry[8].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
@@ -297,6 +318,20 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[9].resource.valueQuantity.value).toBe(3)
+  expect(fhir.entry[9].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[9].resource.category).toEqual([
+    {
+      coding: [
+        {
+          system: FHIR_OBSERVATION_CATEGORY_URL,
+          code: 'vital-signs',
+          display: 'Vital Signs'
+        }
+      ]
+    }
+  ])
   expect(fhir.entry[9].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
@@ -305,6 +340,20 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[10].resource.valueString).toBe('NURSE')
+  expect(fhir.entry[10].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[10].resource.category).toEqual([
+    {
+      coding: [
+        {
+          system: FHIR_OBSERVATION_CATEGORY_URL,
+          code: 'procedure',
+          display: 'Procedure'
+        }
+      ]
+    }
+  ])
   expect(fhir.entry[10].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
@@ -313,6 +362,9 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[11].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[11].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
   expect(fhir.entry[11].resource.code.coding).toEqual([
     {
       system: 'http://opencrvs.org/specs/obs-type',
@@ -321,6 +373,9 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[12].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[12].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
   expect(fhir.entry[12].resource.code.coding).toEqual([
     {
       system: 'http://opencrvs.org/specs/obs-type',
@@ -329,6 +384,9 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[13].resource.valueInteger).toBe(2)
+  expect(fhir.entry[13].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
   expect(fhir.entry[13].resource.code.coding).toEqual([
     {
       system: 'http://opencrvs.org/specs/obs-type',
@@ -337,6 +395,9 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[14].resource.valueInteger).toBe(0)
+  expect(fhir.entry[14].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
   expect(fhir.entry[14].resource.code.coding).toEqual([
     {
       system: 'http://opencrvs.org/specs/obs-type',
@@ -345,6 +406,9 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[15].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[15].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
   expect(fhir.entry[15].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
