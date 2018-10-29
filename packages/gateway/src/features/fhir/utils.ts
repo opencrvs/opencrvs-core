@@ -7,6 +7,7 @@ import {
   createEncounterSection,
   createEncounter,
   createLocationResource,
+  createObservationEntryTemplate,
   createSupportingDocumentsSection,
   createDocRefTemplate
 } from 'src/features/fhir/templates'
@@ -87,6 +88,33 @@ export function selectOrCreateEncounterResource(
   }
 
   return encounterEntry.resource
+}
+
+export function createObservationResource(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle,
+  context: any
+) {
+  let observationEntry
+  let encounterEntry
+  let encounter
+
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+  encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle, context)
+
+  const ref = uuid()
+  observationEntry = createObservationEntryTemplate(ref)
+  encounterEntry = fhirBundle.entry.find(
+    (entry: any) => entry.fullUrl === section.entry[0].reference
+  )
+  if (encounterEntry && encounter) {
+    observationEntry.resource.context = {
+      reference: `urn:uuid:${encounterEntry.fullUrl}`
+    }
+  }
+  fhirBundle.entry.push(observationEntry)
+
+  return observationEntry.resource
 }
 
 export function selectOrCreateLocationRefResource(

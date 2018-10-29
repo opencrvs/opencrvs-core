@@ -99,6 +99,14 @@ test('should build a minimal FHIR registration document without error', async ()
       latitude: 23.777176,
       longitude: 90.399452
     },
+    birthType: 2,
+    weightAtBirth: 3,
+    attendantAtBirth: 'NURSE',
+    birthRegistrationType: 'INFORMANT_ONLY',
+    presentAtBirthRegistration: 'INFORMANT_ONLY',
+    childrenBornAliveToMother: 2,
+    foetalDeathsToMother: 0,
+    lastPreviousLiveBirth: '2014-01-28',
     createdAt: new Date()
   })
 
@@ -267,4 +275,14 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[7].resource.status).toBe('active')
   expect(fhir.entry[7].resource.position.latitude).toBe(23.777176)
   expect(fhir.entry[7].resource.position.longitude).toBe(90.399452)
+
+  // Observation
+  expect(fhir.entry[8].resource.valueInteger).toBe(2)
+  expect(fhir.entry[9].resource.valueQuantity.value).toBe(3)
+  expect(fhir.entry[10].resource.valueString).toBe('NURSE')
+  expect(fhir.entry[11].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[12].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[13].resource.valueInteger).toBe(2)
+  expect(fhir.entry[14].resource.valueInteger).toBe(0)
+  expect(fhir.entry[15].resource.valueDateTime).toBe('2014-01-28')
 })

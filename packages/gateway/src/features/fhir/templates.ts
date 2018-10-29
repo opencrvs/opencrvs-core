@@ -177,3 +177,13 @@ export function createDocRefTemplate(refUuid: string) {
     }
   }
 }
+
+export function createObservationEntryTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Observation',
+      status: 'final'
+    }
+  }
+}
