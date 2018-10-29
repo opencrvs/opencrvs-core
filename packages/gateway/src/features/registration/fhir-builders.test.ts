@@ -4,6 +4,17 @@ import {
   OPENCRVS_SPECIFICATION_URL
 } from 'src/features/fhir/constants'
 
+import {
+  BIRTH_TYPE_CODE,
+  BODY_WEIGHT_CODE,
+  BIRTH_ATTENDANT_CODE,
+  BIRTH_REG_TYPE_CODE,
+  BIRTH_REG_PRESENT_CODE,
+  NUMBER_BORN_ALIVE_CODE,
+  NUMBER_FOEATAL_DEATH_CODE,
+  LAST_LIVE_BIRTH_CODE
+} from 'src/features/fhir/templates'
+
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle({
     mother: {
@@ -278,11 +289,67 @@ test('should build a minimal FHIR registration document without error', async ()
 
   // Observation
   expect(fhir.entry[8].resource.valueInteger).toBe(2)
+  expect(fhir.entry[8].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: BIRTH_TYPE_CODE,
+      display: 'Birth plurality of Pregnancy'
+    }
+  ])
   expect(fhir.entry[9].resource.valueQuantity.value).toBe(3)
+  expect(fhir.entry[9].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: BODY_WEIGHT_CODE,
+      display: 'Body weight Measured'
+    }
+  ])
   expect(fhir.entry[10].resource.valueString).toBe('NURSE')
+  expect(fhir.entry[10].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: BIRTH_ATTENDANT_CODE,
+      display: 'Birth attendant title'
+    }
+  ])
   expect(fhir.entry[11].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[11].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: BIRTH_REG_TYPE_CODE,
+      display: 'Birth registration type'
+    }
+  ])
   expect(fhir.entry[12].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[12].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: BIRTH_REG_PRESENT_CODE,
+      display: 'Present at birth registration'
+    }
+  ])
   expect(fhir.entry[13].resource.valueInteger).toBe(2)
+  expect(fhir.entry[13].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: NUMBER_BORN_ALIVE_CODE,
+      display: 'Number born alive to mother'
+    }
+  ])
   expect(fhir.entry[14].resource.valueInteger).toBe(0)
+  expect(fhir.entry[14].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: NUMBER_FOEATAL_DEATH_CODE,
+      display: 'Number foetal deaths to mother'
+    }
+  ])
   expect(fhir.entry[15].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[15].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: LAST_LIVE_BIRTH_CODE,
+      display: 'Date last live birth'
+    }
+  ])
 })
