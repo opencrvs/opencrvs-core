@@ -5,18 +5,25 @@ import Uploaded from '../icons/Uploaded'
 import { ITheme } from '../theme'
 
 interface IProps {
+  id: string
   file: {
-    subject: string
+    title: string
+    description: string
     type: string
     data: string
   }
+  deleteLabel?: string
   onDelete: () => void
+  previewLabel?: string
   onPreview: () => void
   theme: ITheme
 }
 
 const Container = styled.div`
   display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: block;
+  }
 `
 
 const Link = styled.a`
@@ -37,12 +44,10 @@ const DeleteLink = styled(Link)`
 
 const FileContainer = styled.div`
   height: 75px;
-  min-width: 300px;
   border: 1px solid ${({ theme }) => theme.colors.cardGradientEnd};
   border-radius: 1px;
   background-color: ${({ theme }) => theme.colors.inputBackground};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
-
   flex: 1;
   display: flex;
   align-items: center;
@@ -53,9 +58,9 @@ const DeleteContainer = styled.div`
   height: 75px;
   margin-left: 30px;
   margin-right: 25px;
-  display: flex;
   justify-content: center;
   align-items: center;
+  display: flex;
 `
 
 const MetadataContainer = styled.div`
@@ -71,22 +76,31 @@ const MetadataContainer = styled.div`
 
 class FileItemComponent extends React.Component<IProps> {
   render() {
-    const { subject, type } = this.props.file
-    const { onDelete, onPreview, theme } = this.props
+    const { title, description } = this.props.file
+    const {
+      id,
+      deleteLabel,
+      onDelete,
+      previewLabel,
+      onPreview,
+      theme
+    } = this.props
 
     return (
-      <Container>
+      <Container id={id}>
         <FileContainer>
           <Uploaded />
           <MetadataContainer>
-            <span>{subject}</span>
-            <span>{type}</span>
+            <span>{title}</span>
+            <span>{description}</span>
           </MetadataContainer>
-          <PreviewLink onClick={onPreview}>Preview</PreviewLink>
+          <PreviewLink id={`${id}_preview_link`} onClick={onPreview}>
+            {previewLabel ? previewLabel : 'Preview'}
+          </PreviewLink>
         </FileContainer>
-        <DeleteContainer onClick={onDelete}>
+        <DeleteContainer id={`${id}_delete_link`} onClick={onDelete}>
           <Cross color={theme.colors.danger} />
-          <DeleteLink>Delete</DeleteLink>
+          <DeleteLink>{deleteLabel ? deleteLabel : 'Delete'}</DeleteLink>
         </DeleteContainer>
       </Container>
     )

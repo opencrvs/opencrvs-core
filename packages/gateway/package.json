@@ -52,6 +52,7 @@
     "@types/bunyan": "^1.8.4",
     "@types/code": "^4.0.3",
     "@types/dotenv": "^4.0.2",
+    "@types/fhir": "^0.0.30",
     "@types/graphql": "^0.13.1",
     "@types/jest": "^22.2.3",
     "@types/joi": "^10.4.0",

@@ -49,6 +49,13 @@ enum AttachmentType {
   OTHER
 }
 
+enum AttachmentSubject {
+  MOTHER
+  FATHER
+  CHILD
+  OTHER
+}
+
 enum RegistrationType {
   BIRTH
   DEATH
@@ -211,6 +218,7 @@ type Registration { # -> Task
 }
 
 input AttachmentInput {
+  contentType: String
   # base64
   data: String
   # approved/validated/deleted
@@ -218,11 +226,13 @@ input AttachmentInput {
   originalFileName: String
   systemFileName: String
   type: AttachmentType
+  subject: AttachmentSubject
   createdAt: Date
 }
 
 type Attachment { # -> DocumentReference
   id: ID! # uuid
+  contentType: String # -> .content.attachment.contentType
   # base64
   data: String # -> .content.attachment.data base64
   # approved/validated/deleted
@@ -230,6 +240,7 @@ type Attachment { # -> DocumentReference
   originalFileName: String # -> .identifier
   systemFileName: String # -> .identifier
   type: AttachmentType # -> .type
+  subject: AttachmentSubject # -> .subject (convert this to a reference to the person resoure in FHIR)
   createdAt: Date # -> .created
 }
 
