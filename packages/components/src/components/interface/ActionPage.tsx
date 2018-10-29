@@ -44,7 +44,7 @@ const BackButtonText = styled.span`
   font-size: 14px;
   letter-spacing: 2px;
   margin-left: 14px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `

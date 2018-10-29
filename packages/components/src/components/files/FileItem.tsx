@@ -21,7 +21,7 @@ interface IProps {
 
 const Container = styled.div`
   display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
   }
 `
