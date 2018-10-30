@@ -1,22 +1,31 @@
-import * as React from 'react';
-import './App.css';
+import * as React from 'react'
+import './App.css'
 
-import logo from './logo.svg';
+import { Header } from '@opencrvs/components/lib/interface'
+import { getTheme } from '@opencrvs/components/lib/theme'
+
+import { Page } from 'src/components/Page'
+import styled, { ThemeProvider } from './styled-components'
+import { config } from './config'
+import Logo from './components/Logo'
+
+const StyledHeader = styled(Header)`
+  padding: 0 26px;
+  box-shadow: none;
+`
 
 class App extends React.Component {
   public render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </div>
-    );
+      <ThemeProvider theme={getTheme(config.COUNTRY)}>
+        <Page>
+          <StyledHeader>
+            <Logo />
+          </StyledHeader>
+        </Page>
+      </ThemeProvider>
+    )
   }
 }
 
-export default App;
+export default App

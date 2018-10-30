@@ -4,12 +4,13 @@
   "private": true,
   "dependencies": {
     "@opencrvs/components": "^0.1.0",
-    "serve": "^10.0.2",
     "formik": "^1.0.3",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-intl": "^2.4.0",
-    "react-scripts-ts": "2.16.0"
+    "react-scripts-ts": "2.16.0",
+    "serve": "^10.0.2",
+    "styled-components": "^3.3.3"
   },
   "scripts": {
     "precommit": "lint-staged",
