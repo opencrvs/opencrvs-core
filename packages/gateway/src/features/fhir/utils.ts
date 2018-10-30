@@ -4,6 +4,10 @@ import {
   createFatherSection,
   createChildSection,
   createPersonEntryTemplate,
+  createEncounterSection,
+  createEncounter,
+  createLocationResource,
+  createObservationEntryTemplate,
   createSupportingDocumentsSection,
   createDocRefTemplate
 } from 'src/features/fhir/templates'
@@ -58,6 +62,89 @@ export function selectOrCreatePersonResource(
   return personEntry.resource
 }
 
+export function selectOrCreateEncounterResource(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle,
+  context: any
+) {
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+  let encounterEntry
+
+  if (!section) {
+    const ref = uuid()
+    let encounterSection
+    if (sectionCode === 'birth-encounter') {
+      encounterSection = createEncounterSection(ref)
+    } else {
+      throw new Error(`Unknown section code ${sectionCode}`)
+    }
+    fhirBundle.entry[0].resource.section.push(encounterSection)
+    encounterEntry = createEncounter(ref)
+    fhirBundle.entry.push(encounterEntry)
+  } else {
+    encounterEntry = fhirBundle.entry.find(
+      (entry: any) => entry.fullUrl === section.entry[0].reference
+    )
+  }
+
+  return encounterEntry.resource
+}
+
+export function createObservationResource(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle,
+  context: any
+) {
+  let observationEntry
+  let encounterEntry
+  let encounter
+
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+  encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle, context)
+
+  const ref = uuid()
+  observationEntry = createObservationEntryTemplate(ref)
+  encounterEntry = fhirBundle.entry.find(
+    (entry: any) => entry.fullUrl === section.entry[0].reference
+  )
+  if (encounterEntry && encounter) {
+    observationEntry.resource.context = {
+      reference: `${encounterEntry.fullUrl}`
+    }
+  }
+  fhirBundle.entry.push(observationEntry)
+
+  return observationEntry.resource
+}
+
+export function selectOrCreateLocationRefResource(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle,
+  context: any
+) {
+  let encounter
+  let locationEntry
+
+  encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle, context)
+
+  if (!encounter.location) {
+    // create location
+    const locationRef = uuid()
+    locationEntry = createLocationResource(locationRef)
+    fhirBundle.entry.push(locationEntry)
+    encounter.location = []
+    encounter.location.push({
+      location: { reference: `urn:uuid:${locationRef}` }
+    })
+  } else {
+    locationEntry = fhirBundle.entry.find(
+      (entry: any) => entry.fullUrl === encounter.location[0].location.reference
+    )
+  }
+
+  return locationEntry.resource
+}
+
 export function selectOrCreateDocRefResource(
   sectionCode: string,
   fhirBundle: fhir.Bundle,
@@ -108,6 +195,18 @@ export function setObjectPropInResourceArray(
     resource[label][context._index[label]] = {}
   }
   resource[label][context._index[label]][propName] = value
+}
+
+export function setArrayPropInResourceObject(
+  resource: fhir.Resource,
+  label: string,
+  value: Array<{}>,
+  propName: string
+) {
+  if (!resource[label]) {
+    resource[label] = {}
+  }
+  resource[label][propName] = value
 }
 
 export function findExtension(url: string, composition: any): IExtension {

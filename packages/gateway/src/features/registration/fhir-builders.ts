@@ -4,17 +4,30 @@ import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
-  DOCS_CODE
+  BIRTH_ENCOUNTER_CODE,
+  BIRTH_TYPE_CODE,
+  DOCS_CODE,
+  BODY_WEIGHT_CODE,
+  BIRTH_ATTENDANT_CODE,
+  BIRTH_REG_TYPE_CODE,
+  BIRTH_REG_PRESENT_CODE,
+  NUMBER_BORN_ALIVE_CODE,
+  NUMBER_FOEATAL_DEATH_CODE,
+  LAST_LIVE_BIRTH_CODE
 } from 'src/features/fhir/templates'
 import {
   selectOrCreatePersonResource,
   selectOrCreateDocRefResource,
+  selectOrCreateLocationRefResource,
   setObjectPropInResourceArray,
-  getMaritalStatusCode
+  getMaritalStatusCode,
+  createObservationResource,
+  setArrayPropInResourceObject
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
-  FHIR_SPECIFICATION_URL
+  FHIR_SPECIFICATION_URL,
+  FHIR_OBSERVATION_CATEGORY_URL
 } from '../fhir/constants'
 
 function createNameBuilder(sectionCode: string) {
@@ -311,7 +324,10 @@ function createAddressBuilder(sectionCode: string) {
   }
 }
 
-function createDateOfMarriageBuilder(resource: any, fieldValue: string) {
+function createDateOfMarriageBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
   if (!resource.extension) {
     resource.extension = []
   }
@@ -321,10 +337,9 @@ function createDateOfMarriageBuilder(resource: any, fieldValue: string) {
   })
 }
 
-function createNationalityBuilder(resource: any, fieldValue: string) {
-  if (!resource.extension) {
-    resource.extension = []
-  }
+function createNationalityBuilder(resource: fhir.Resource, fieldValue: string) {
+  !resource.extension && (resource.extension = [])
+
   resource.extension.push({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
     extension: [
@@ -345,7 +360,10 @@ function createNationalityBuilder(resource: any, fieldValue: string) {
   })
 }
 
-function createMaritalStatusBuilder(resource: any, fieldValue: string) {
+function createMaritalStatusBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
   resource.maritalStatus = {
     coding: {
       system: `${FHIR_SPECIFICATION_URL}marital-status`,
@@ -355,14 +373,180 @@ function createMaritalStatusBuilder(resource: any, fieldValue: string) {
   }
 }
 
-function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
-  if (!resource.extension) {
-    resource.extension = []
-  }
+function createEducationalAttainmentBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  !resource.extension && (resource.extension = [])
+
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
     valueString: fieldValue
   })
+}
+
+function createBirthTypeBuilder(resource: fhir.Resource, fieldValue: number) {
+  const categoryCoding = {
+    coding: [
+      {
+        system: FHIR_OBSERVATION_CATEGORY_URL,
+        code: 'procedure',
+        display: 'Procedure'
+      }
+    ]
+  }
+
+  if (!resource.category) {
+    resource.category = []
+  }
+  resource.category.push(categoryCoding)
+
+  const coding = [
+    {
+      system: 'http://loinc.org',
+      code: BIRTH_TYPE_CODE,
+      display: 'Birth plurality of Pregnancy'
+    }
+  ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+  resource.valueInteger = fieldValue
+}
+
+function createBirthWeightBuilder(resource: fhir.Resource, fieldValue: number) {
+  const categoryCoding = {
+    coding: [
+      {
+        system: FHIR_OBSERVATION_CATEGORY_URL,
+        code: 'vital-signs',
+        display: 'Vital Signs'
+      }
+    ]
+  }
+  if (!resource.category) {
+    resource.category = []
+  }
+  resource.category.push(categoryCoding)
+
+  const coding = [
+    {
+      system: 'http://loinc.org',
+      code: BODY_WEIGHT_CODE,
+      display: 'Body weight Measured'
+    }
+  ]
+
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+
+  resource.valueQuantity = {
+    value: fieldValue,
+    unit: 'kg',
+    system: 'http://unitsofmeasure.org',
+    code: 'kg'
+  }
+}
+
+function createBirthAttendantBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  const categoryCoding = {
+    coding: [
+      {
+        system: FHIR_OBSERVATION_CATEGORY_URL,
+        code: 'procedure',
+        display: 'Procedure'
+      }
+    ]
+  }
+  if (!resource.category) {
+    resource.category = []
+  }
+  resource.category.push(categoryCoding)
+
+  const coding = [
+    {
+      system: 'http://loinc.org',
+      code: BIRTH_ATTENDANT_CODE,
+      display: 'Birth attendant title'
+    }
+  ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+  resource.valueString = fieldValue
+}
+
+function createBirthRegTypeBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  const coding = [
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: BIRTH_REG_TYPE_CODE,
+      display: 'Birth registration type'
+    }
+  ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+  resource.valueString = fieldValue
+}
+
+function createPresentAtBirthBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  const coding = [
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: BIRTH_REG_PRESENT_CODE,
+      display: 'Present at birth registration'
+    }
+  ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+  resource.valueString = fieldValue
+}
+
+function createChildrenBornAliveToMotherBuilder(
+  resource: fhir.Resource,
+  fieldValue: number
+) {
+  const coding = [
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: NUMBER_BORN_ALIVE_CODE,
+      display: 'Number born alive to mother'
+    }
+  ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+  resource.valueInteger = fieldValue
+}
+
+function createNumberFoetalDeathsToMotherBuilder(
+  resource: fhir.Resource,
+  fieldValue: number
+) {
+  const coding = [
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: NUMBER_FOEATAL_DEATH_CODE,
+      display: 'Number foetal deaths to mother'
+    }
+  ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+  resource.valueInteger = fieldValue
+}
+
+function createLastPreviousLiveBirthBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  const coding = [
+    {
+      system: 'http://loinc.org',
+      code: LAST_LIVE_BIRTH_CODE,
+      display: 'Date last live birth'
+    }
+  ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+  resource.valueDateTime = fieldValue
 }
 
 const builders: IFieldBuilders = {
@@ -636,9 +820,8 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.identifier) {
-          docRef.identifier = []
-        }
+        !docRef.identifier && (docRef.identifier = [])
+
         docRef.identifier.push({
           system: 'http://opencrvs.org/specs/id/original-file-name',
           value: fieldValue
@@ -654,9 +837,8 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.identifier) {
-          docRef.identifier = []
-        }
+        !docRef.identifier && (docRef.identifier = [])
+
         docRef.identifier.push({
           system: 'http://opencrvs.org/specs/id/system-file-name',
           value: fieldValue
@@ -708,11 +890,10 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.content) {
-          docRef.content = {
+        !docRef.content &&
+          (docRef.content = {
             attachment: {}
-          }
-        }
+          })
         docRef.content.attachment.contentType = fieldValue
       },
       data: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
@@ -721,14 +902,141 @@ const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-        if (!docRef.content) {
-          docRef.content = {
+        !docRef.content &&
+          (docRef.content = {
             attachment: {}
-          }
-        }
+          })
         docRef.content.attachment.data = fieldValue
       }
     }
+  },
+  birthLocation: {
+    status: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        fieldValue
+      )
+      location.status = fieldValue
+    },
+    name: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      location.name = fieldValue
+    },
+    latitude: (fhirBundle: fhir.Bundle, fieldValue: number, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      !location.position && (location.position = {})
+      location.position.latitude = fieldValue
+    },
+    longitude: (fhirBundle: fhir.Bundle, fieldValue: number, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      !location.position && (location.position = {})
+      location.position.longitude = fieldValue
+    }
+  },
+  birthType: (fhirBundle: fhir.Bundle, fieldValue: number, context: any) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createBirthTypeBuilder(observation, fieldValue)
+  },
+  weightAtBirth: (
+    fhirBundle: fhir.Bundle,
+    fieldValue: number,
+    context: any
+  ) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createBirthWeightBuilder(observation, fieldValue)
+  },
+  attendantAtBirth: (
+    fhirBundle: fhir.Bundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createBirthAttendantBuilder(observation, fieldValue)
+  },
+  birthRegistrationType: (
+    fhirBundle: fhir.Bundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createBirthRegTypeBuilder(observation, fieldValue)
+  },
+  presentAtBirthRegistration: (
+    fhirBundle: fhir.Bundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createPresentAtBirthBuilder(observation, fieldValue)
+  },
+  childrenBornAliveToMother: (
+    fhirBundle: fhir.Bundle,
+    fieldValue: number,
+    context: any
+  ) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createChildrenBornAliveToMotherBuilder(observation, fieldValue)
+  },
+  foetalDeathsToMother: (
+    fhirBundle: fhir.Bundle,
+    fieldValue: number,
+    context: any
+  ) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createNumberFoetalDeathsToMotherBuilder(observation, fieldValue)
+  },
+  lastPreviousLiveBirth: (
+    fhirBundle: fhir.Bundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = createObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      fhirBundle,
+      context
+    )
+    return createLastPreviousLiveBirthBuilder(observation, fieldValue)
   }
 }
 
