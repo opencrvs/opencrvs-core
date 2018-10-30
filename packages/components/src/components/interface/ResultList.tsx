@@ -1,22 +1,22 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { StatusGreen, StatusOrange, StatusGray } from '../icons'
+import { Status } from './Status'
+import { LabelValue, IProp } from './LabelValue'
 
-interface IProp {
-  label: string
-  value: string
-}
 interface IStatus {
   label: string
-  color: string
+  type: string
 }
 interface IResult {
   name: IProp
   dob?: IProp
   dod?: IProp
   dom?: IProp
-  doa: IProp
-  trackingID: IProp
+  doa?: IProp
+  doc?: IProp
+  trackingID?: IProp
+  regNo?: IProp
   status: IStatus[]
 }
 interface IList {
@@ -35,6 +35,7 @@ const ListItemContainer = styled.li`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   background-color: ${({ theme }) => theme.colors.white};
   display: flex;
+  flex-flow: row wrap;
   justify-content: space-between;
   color: ${({ theme }) => theme.colors.copy};
   width: 100%;
@@ -45,24 +46,26 @@ const ListItemContainer = styled.li`
     margin-bottom: 0;
   }
 `
+
+const InfoDiv = styled.div`
+  flex-grow: 1;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
+`
+
+const StatusDiv = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-end;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+    margin-top: 10px;
+  }
+`
 const StyledLabel = styled.label`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-weight: bold;
-`
-
-const StyledStatus = styled.div`
-  background-color: rgba(150, 150, 150, 0.1);
-  border-radius: 17px;
-  padding: 5px 10px 6px;
-  margin: 0 5px;
-  display: inline-flex;
-  align-items: center;
-  text-transform: uppercase;
-  font-size: 14px;
-  & span {
-    font-weight: bold;
-    margin-left: 5px;
-  }
 `
 export class ResultList extends React.Component<IList> {
   render() {
@@ -71,37 +74,50 @@ export class ResultList extends React.Component<IList> {
       <StyledList>
         {list.map((item: IResult, index: number) => (
           <ListItemContainer key={index}>
-            <div>
-              <div>
-                <StyledLabel>{item.name.label}: </StyledLabel>
-                {item.name.value}
-                &nbsp;|&nbsp;
-                {item.dob && <StyledLabel>{item.dob.label}: </StyledLabel>}
-                {item.dob && item.dob.value}
-                {item.dod && <StyledLabel>{item.dod.label}: </StyledLabel>}
-                {item.dod && item.dod.value}
-                {item.dom && <StyledLabel>{item.dom.label}: </StyledLabel>}
-                {item.dom && item.dom.value}
-              </div>
-              <div>
-                <StyledLabel>{item.trackingID.label}: </StyledLabel>
-                {item.trackingID.value}
-              </div>
-              <div>
-                <StyledLabel>{item.doa.label}: </StyledLabel>
-                {item.doa.value}
-              </div>
-            </div>
-            <div>
+            <InfoDiv>
+              <LabelValue label={item.name.label} value={item.name.value} />
+              {item.dob && (
+                <LabelValue label={item.dob.label} value={item.dob.value} />
+              )}
+              {item.dod && (
+                <LabelValue label={item.dod.label} value={item.dod.value} />
+              )}
+              {item.dom && (
+                <LabelValue label={item.dom.label} value={item.dom.value} />
+              )}
+              {item.doa && (
+                <LabelValue label={item.doa.label} value={item.doa.value} />
+              )}
+              {item.doc && (
+                <LabelValue label={item.doc.label} value={item.doc.value} />
+              )}
+              {item.trackingID && (
+                <LabelValue
+                  label={item.trackingID.label}
+                  value={item.trackingID.value}
+                />
+              )}
+              {item.regNo && (
+                <LabelValue label={item.regNo.label} value={item.regNo.value} />
+              )}
+            </InfoDiv>
+            <StatusDiv>
               {item.status.map((sts: IStatus) => (
-                <StyledStatus>
-                  {sts.color === 'orange' && <StatusOrange />}
-                  {sts.color === 'gray' && <StatusGray />}
-                  {sts.color === 'green' && <StatusGreen />}
-                  <span>{sts.label}</span>
-                </StyledStatus>
+                <Status
+                  icon={() =>
+                    sts.type === 'orange' ? (
+                      <StatusOrange />
+                    ) : sts.type === 'gray' ? (
+                      <StatusGray />
+                    ) : (
+                      <StatusGreen />
+                    )
+                  }
+                >
+                  <strong>{sts.label}</strong>
+                </Status>
               ))}
-            </div>
+            </StatusDiv>
           </ListItemContainer>
         ))}
       </StyledList>

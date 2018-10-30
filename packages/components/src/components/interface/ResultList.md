@@ -3,7 +3,7 @@ const list = [
   {
     name: {
       label: 'Name',
-      value: 'Atiq'
+      value: 'John Doe'
     },
     dob: {
       label: 'D.o.B',
@@ -20,18 +20,18 @@ const list = [
     status: [
       {
         label: 'BIRTH',
-        color: 'gray'
+        type: 'gray'
       },
       {
         label: 'APPLICATION',
-        color: 'orange'
+        type: 'orange'
       }
     ]
   },
   {
     name: {
       label: 'Name',
-      value: 'Mehedi'
+      value: 'Jane Doe'
     },
     dod: {
       label: 'D.o.D',
@@ -48,39 +48,39 @@ const list = [
     status: [
       {
         label: 'DEATH',
-        color: 'gray'
+        type: 'gray'
       },
       {
         label: 'APPLICATION',
-        color: 'orange'
+        type: 'orange'
       }
     ]
   },
   {
     name: {
       label: 'Name',
-      value: 'Laila'
+      value: 'Jackson Strong'
     },
     dod: {
       label: 'D.o.M',
       value: '10.10.2018'
     },
     doa: {
-      label: 'Date of application',
+      label: 'Date of registration',
       value: '10.10.2018'
     },
-    trackingID: {
-      label: 'Tracking ID',
+    regNo: {
+      label: 'Registration number',
       value: '1234567'
     },
     status: [
       {
         label: 'MARRIAGE',
-        color: 'gray'
+        type: 'gray'
       },
       {
         label: 'REGISTERED',
-        color: 'green'
+        type: 'green'
       }
     ]
   }
