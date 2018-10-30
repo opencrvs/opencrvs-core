@@ -10,6 +10,7 @@ import { config } from './config'
 import Logo from './components/Logo'
 
 const StyledHeader = styled(Header)`
+  padding: 0 26px;
   box-shadow: none;
 `
 
