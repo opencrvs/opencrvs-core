@@ -38,7 +38,7 @@ export const typeResolvers: GQLResolver = {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
     dateOfMarriage: person => {
       const marriageExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
         person.extension
       )
       return marriageExtension.valueDateTime
@@ -63,7 +63,7 @@ export const typeResolvers: GQLResolver = {
     },
     educationalAttainment: person => {
       const educationalAttainmentExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
         person.extension
       )
       return educationalAttainmentExtension.valueString
