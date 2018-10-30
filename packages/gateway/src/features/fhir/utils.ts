@@ -197,6 +197,18 @@ export function setObjectPropInResourceArray(
   resource[label][context._index[label]][propName] = value
 }
 
+export function setArrayPropInResourceObject(
+  resource: fhir.Resource,
+  label: string,
+  value: Array<{}>,
+  propName: string
+) {
+  if (!resource[label]) {
+    resource[label] = {}
+  }
+  resource[label][propName] = value
+}
+
 export function findExtension(url: string, composition: any): IExtension {
   const extension = composition.find((obj: IExtension) => {
     return obj.url === url

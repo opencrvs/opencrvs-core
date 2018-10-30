@@ -21,7 +21,8 @@ import {
   selectOrCreateLocationRefResource,
   setObjectPropInResourceArray,
   getMaritalStatusCode,
-  createObservationResource
+  createObservationResource,
+  setArrayPropInResourceObject
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -323,7 +324,10 @@ function createAddressBuilder(sectionCode: string) {
   }
 }
 
-function createDateOfMarriageBuilder(resource: any, fieldValue: string) {
+function createDateOfMarriageBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
   if (!resource.extension) {
     resource.extension = []
   }
@@ -333,7 +337,7 @@ function createDateOfMarriageBuilder(resource: any, fieldValue: string) {
   })
 }
 
-function createNationalityBuilder(resource: any, fieldValue: string) {
+function createNationalityBuilder(resource: fhir.Resource, fieldValue: string) {
   !resource.extension && (resource.extension = [])
 
   resource.extension.push({
@@ -356,7 +360,10 @@ function createNationalityBuilder(resource: any, fieldValue: string) {
   })
 }
 
-function createMaritalStatusBuilder(resource: any, fieldValue: string) {
+function createMaritalStatusBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
   resource.maritalStatus = {
     coding: {
       system: `${FHIR_SPECIFICATION_URL}marital-status`,
@@ -366,7 +373,10 @@ function createMaritalStatusBuilder(resource: any, fieldValue: string) {
   }
 }
 
-function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
+function createEducationalAttainmentBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
   !resource.extension && (resource.extension = [])
 
   resource.extension.push({
@@ -375,7 +385,7 @@ function createEducationalAttainmentBuilder(resource: any, fieldValue: string) {
   })
 }
 
-function createBirthTypeBuilder(resource: any, fieldValue: number) {
+function createBirthTypeBuilder(resource: fhir.Resource, fieldValue: number) {
   const categoryCoding = {
     coding: [
       {
@@ -391,21 +401,18 @@ function createBirthTypeBuilder(resource: any, fieldValue: number) {
   }
   resource.category.push(categoryCoding)
 
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+  const coding = [
     {
       system: 'http://loinc.org',
       code: BIRTH_TYPE_CODE,
       display: 'Birth plurality of Pregnancy'
     }
   ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
   resource.valueInteger = fieldValue
 }
 
-function createBirthWeightBuilder(resource: any, fieldValue: number) {
+function createBirthWeightBuilder(resource: fhir.Resource, fieldValue: number) {
   const categoryCoding = {
     coding: [
       {
@@ -420,17 +427,16 @@ function createBirthWeightBuilder(resource: any, fieldValue: number) {
   }
   resource.category.push(categoryCoding)
 
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+  const coding = [
     {
       system: 'http://loinc.org',
       code: BODY_WEIGHT_CODE,
       display: 'Body weight Measured'
     }
   ]
+
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
+
   resource.valueQuantity = {
     value: fieldValue,
     unit: 'kg',
@@ -439,7 +445,10 @@ function createBirthWeightBuilder(resource: any, fieldValue: number) {
   }
 }
 
-function createBirthAttendantBuilder(resource: any, fieldValue: string) {
+function createBirthAttendantBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
   const categoryCoding = {
     coding: [
       {
@@ -454,98 +463,89 @@ function createBirthAttendantBuilder(resource: any, fieldValue: string) {
   }
   resource.category.push(categoryCoding)
 
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+  const coding = [
     {
       system: 'http://loinc.org',
       code: BIRTH_ATTENDANT_CODE,
       display: 'Birth attendant title'
     }
   ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
   resource.valueString = fieldValue
 }
 
-function createBirthRegTypeBuilder(resource: any, fieldValue: string) {
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+function createBirthRegTypeBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  const coding = [
     {
       system: 'http://opencrvs.org/specs/obs-type',
       code: BIRTH_REG_TYPE_CODE,
       display: 'Birth registration type'
     }
   ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
   resource.valueString = fieldValue
 }
 
-function createPresentAtBirthBuilder(resource: any, fieldValue: string) {
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+function createPresentAtBirthBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  const coding = [
     {
       system: 'http://opencrvs.org/specs/obs-type',
       code: BIRTH_REG_PRESENT_CODE,
       display: 'Present at birth registration'
     }
   ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
   resource.valueString = fieldValue
 }
 
 function createChildrenBornAliveToMotherBuilder(
-  resource: any,
+  resource: fhir.Resource,
   fieldValue: number
 ) {
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+  const coding = [
     {
       system: 'http://opencrvs.org/specs/obs-type',
       code: NUMBER_BORN_ALIVE_CODE,
       display: 'Number born alive to mother'
     }
   ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
   resource.valueInteger = fieldValue
 }
 
 function createNumberFoetalDeathsToMotherBuilder(
-  resource: any,
+  resource: fhir.Resource,
   fieldValue: number
 ) {
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+  const coding = [
     {
       system: 'http://opencrvs.org/specs/obs-type',
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
   ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
   resource.valueInteger = fieldValue
 }
 
-function createLastPreviousLiveBirthBuilder(resource: any, fieldValue: string) {
-  if (!resource.code) {
-    resource.code = {}
-  }
-
-  resource.code.coding = [
+function createLastPreviousLiveBirthBuilder(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  const coding = [
     {
       system: 'http://loinc.org',
       code: LAST_LIVE_BIRTH_CODE,
       display: 'Date last live birth'
     }
   ]
+  setArrayPropInResourceObject(resource, 'code', coding, 'coding')
   resource.valueDateTime = fieldValue
 }
 
