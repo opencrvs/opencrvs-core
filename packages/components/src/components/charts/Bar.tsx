@@ -1,16 +1,14 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-// tslint:disable
-
-type DataPoint = {
+interface IDataPoint {
   value: number
   estimate?: boolean
   total?: boolean
 }
 
 export interface IBarChartProps {
-  data: DataPoint[]
+  data: IDataPoint[]
 }
 
 const Container = styled.div`
@@ -51,10 +49,9 @@ const Section = styled.div.attrs<{ size: number; colour: string }>({})`
   background: ${({ colour }) => colour};
 `
 
-// TODO
 const colours = ['#a7b0cf', '#6575AA', '#233A86']
 
-const getTotal = (points: DataPoint[]) =>
+const calculateSum = (points: IDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
 
 export function Bar(props: IBarChartProps) {
@@ -63,18 +60,21 @@ export function Bar(props: IBarChartProps) {
 
   const estimatePoint = fromLargest.find(({ estimate }) => Boolean(estimate))
 
-  const totalPoints = fromLargest.filter(({ total }) => !total)
-  const otherPoints = fromLargest.filter(({ estimate }) => !estimate)
-  const otherTotal = getTotal(otherPoints)
+  const allTotalPoints = fromLargest.filter(({ total }) => !total)
+  const allOtherPoints = fromLargest.filter(({ estimate }) => !estimate)
 
-  const totalValue = totalPoints.length > 0 ? getTotal(totalPoints) : otherTotal
+  const otherPointsValue = calculateSum(allOtherPoints)
+  const sumOfTotalPoints = calculateSum(allTotalPoints)
+
+  const totalValue =
+    allTotalPoints.length > 0 ? sumOfTotalPoints : otherPointsValue
 
   if (estimatePoint) {
     return (
       <Container>
         <Estimate>
           <SectionContainer>
-            {otherPoints.map((item, i) => {
+            {allOtherPoints.map((item, i) => {
               if (item.total) {
                 return (
                   <Total
@@ -101,7 +101,7 @@ export function Bar(props: IBarChartProps) {
   return (
     <Container>
       <SectionContainer>
-        {otherPoints.map((item, i) => {
+        {allOtherPoints.map((item, i) => {
           if (item.total) {
             return <Total key={i} size={1} colour={colours[i]} />
           }

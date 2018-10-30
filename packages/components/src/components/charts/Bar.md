@@ -19,7 +19,7 @@ Component for visualizing values in a bar chart format.
   },
   {
     value: 4000,
-    label: 'Estimated Births in [time period]:',
+    label: 'Estimated Births in [time period]',
     estimate: true
   }
 ]} />
