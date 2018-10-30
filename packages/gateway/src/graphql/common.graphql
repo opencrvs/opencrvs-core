@@ -188,7 +188,50 @@ type Address { # -> Address (mostly the same property name except:)
   to: Date # -> .period.end
 }
 
+# TODO: Move to user feature when built out - manage through a user management microservice
+input UserInput {
+  userName: String
+  created: Date
+  lastLoggedIn: Date
+  firstName: String
+  lastName: String
+  telecom: [ContactPointInput]
+  identifier: [IdentityInput]
+  role: [UserRoleInput]!
+  address: AddressInput
+  primaryOffice: LocationInput
+  currentLocation: LocationInput
+  catchmentArea: [LocationInput]
+}
+
+type User {
+  id: ID!
+  userName: String
+  created: Date
+  lastLoggedIn: Date
+  firstName: String
+  lastName: String
+  telecom: [ContactPoint]
+  identifier: [IdentityType]
+  role: [UserRole]!
+  address: Address
+  primaryOffice: Location
+  currentLocation: Location
+  catchmentArea: [Location]
+}
+
+input UserRoleInput {
+  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
+}
+
+type UserRole {
+  id: ID!
+  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
+}
+
 type Query {
+  user(id: Int!): User
+
   locationsByParent(parentId: String): [Location] # if partentId is not provided, return level 1 locations
   locationsByName(name: String): [Location]
 }
