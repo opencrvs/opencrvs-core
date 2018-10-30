@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { default as ReactSelect } from 'react-select'
+import { default as ReactSelect, components } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 import { Omit } from '../omit'
+import { ArrowDownBlue } from '../icons'
 
 export interface ISelectOption {
   value: string
@@ -16,6 +17,18 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   options: ISelectOption[]
 }
 
+const DropdownIndicator = (props: any) => {
+  return (
+    components.DropdownIndicator && (
+      <components.DropdownIndicator {...props}>
+        <ArrowDownBlue />
+      </components.DropdownIndicator>
+    )
+  )
+}
+
+const IndicatorSeparator = () => null
+
 const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   width: 100%;
 
@@ -26,6 +39,7 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
     border: 0;
     box-shadow: none;
     font-size: 16px;
+    padding: 0 5px;
     border-bottom: solid 1px
       ${({ error, touched, theme }) =>
         error && touched ? theme.colors.error : theme.colors.disabled};
@@ -69,6 +83,7 @@ export class Select extends React.Component<ISelectProps> {
     return (
       <StyledSelect
         classNamePrefix="react-select"
+        components={{ DropdownIndicator, IndicatorSeparator }}
         {...this.props}
         onChange={this.change}
         value={getSelectedOption(this.props.value, this.props.options)}
