@@ -472,6 +472,36 @@ describe('when user has a valid token in local storage', () => {
                   1
                 )
               })
+              describe('when preview link is clicked for an uploaded image', () => {
+                beforeEach(async () => {
+                  app
+                    .find('#file_item_0_preview_link')
+                    .hostNodes()
+                    .simulate('click')
+
+                  await flushPromises()
+                  app.update()
+                })
+                it('preview image is loaded', () => {
+                  expect(
+                    app.find('#preview_image_field').hostNodes()
+                  ).toHaveLength(1)
+                })
+              })
+              describe('when delete link is clicked for an uploaded image', () => {
+                beforeEach(async () => {
+                  app
+                    .find('#file_item_0_delete_link')
+                    .hostNodes()
+                    .simulate('click')
+
+                  await flushPromises()
+                  app.update()
+                })
+                it('uploaded image should not be available anymore', () => {
+                  expect(app.find('#file_item_0').hostNodes()).toHaveLength(0)
+                })
+              })
             })
           })
         })

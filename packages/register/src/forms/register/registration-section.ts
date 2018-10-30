@@ -3,6 +3,7 @@ import {
   IFormSection,
   SELECT_WITH_OPTIONS,
   TEXT,
+  TEL,
   CHECKBOX_GROUP,
   TEXTAREA
 } from 'src/forms'
@@ -187,7 +188,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'registrationPhone',
-      type: TEXT,
+      type: TEL,
       label: messages.registrationPhoneLabel,
       required: true,
       initialValue: '',
