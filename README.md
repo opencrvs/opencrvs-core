@@ -25,6 +25,7 @@ Apps can be found running in following URLs:
 * Styleguide: http://localhost:6060/
 * Login: http://localhost:3020/ - A test user you can use is u: 07111111111, p: test, code: 000000
 * Register: http://localhost:3000/
+* Performance management: http://localhost:3001/
 
 You can open all of them by running `yarn open`
 

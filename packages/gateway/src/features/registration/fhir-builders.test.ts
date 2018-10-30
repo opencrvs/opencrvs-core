@@ -1,8 +1,20 @@
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  FHIR_OBSERVATION_CATEGORY_URL
 } from 'src/features/fhir/constants'
+
+import {
+  BIRTH_TYPE_CODE,
+  BODY_WEIGHT_CODE,
+  BIRTH_ATTENDANT_CODE,
+  BIRTH_REG_TYPE_CODE,
+  BIRTH_REG_PRESENT_CODE,
+  NUMBER_BORN_ALIVE_CODE,
+  NUMBER_FOEATAL_DEATH_CODE,
+  LAST_LIVE_BIRTH_CODE
+} from 'src/features/fhir/templates'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle({
@@ -93,11 +105,25 @@ test('should build a minimal FHIR registration document without error', async ()
         }
       ]
     },
+    birthLocation: {
+      name: 'HOSPITAL',
+      status: 'active',
+      latitude: 23.777176,
+      longitude: 90.399452
+    },
+    birthType: 2,
+    weightAtBirth: 3,
+    attendantAtBirth: 'NURSE',
+    birthRegistrationType: 'INFORMANT_ONLY',
+    presentAtBirthRegistration: 'INFORMANT_ONLY',
+    childrenBornAliveToMother: 2,
+    foetalDeathsToMother: 0,
+    lastPreviousLiveBirth: '2014-01-28',
     createdAt: new Date()
   })
 
   expect(fhir).toBeDefined()
-  expect(fhir.entry[0].resource.section.length).toBe(4)
+  expect(fhir.entry[0].resource.section.length).toBe(5)
   expect(fhir.entry[0].resource.date).toBeDefined()
   expect(fhir.entry[1].resource.gender).toBe('female')
   expect(fhir.entry[2].resource.gender).toBe('male')
@@ -257,4 +283,137 @@ test('should build a minimal FHIR registration document without error', async ()
       data: 'ExampleData'
     }
   })
+  // Encounter
+  expect(fhir.entry[6].resource.resourceType).toBe('Encounter')
+  expect(fhir.entry[6].resource.location[0].location.reference).toEqual(
+    fhir.entry[7].fullUrl
+  )
+  // Location
+  expect(fhir.entry[7].resource.name).toBe('HOSPITAL')
+  expect(fhir.entry[7].resource.status).toBe('active')
+  expect(fhir.entry[7].resource.position.latitude).toBe(23.777176)
+  expect(fhir.entry[7].resource.position.longitude).toBe(90.399452)
+
+  // Observation
+  expect(fhir.entry[8].resource.valueInteger).toBe(2)
+  expect(fhir.entry[8].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[8].resource.category).toEqual([
+    {
+      coding: [
+        {
+          system: FHIR_OBSERVATION_CATEGORY_URL,
+          code: 'procedure',
+          display: 'Procedure'
+        }
+      ]
+    }
+  ])
+  expect(fhir.entry[8].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: BIRTH_TYPE_CODE,
+      display: 'Birth plurality of Pregnancy'
+    }
+  ])
+  expect(fhir.entry[9].resource.valueQuantity.value).toBe(3)
+  expect(fhir.entry[9].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[9].resource.category).toEqual([
+    {
+      coding: [
+        {
+          system: FHIR_OBSERVATION_CATEGORY_URL,
+          code: 'vital-signs',
+          display: 'Vital Signs'
+        }
+      ]
+    }
+  ])
+  expect(fhir.entry[9].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: BODY_WEIGHT_CODE,
+      display: 'Body weight Measured'
+    }
+  ])
+  expect(fhir.entry[10].resource.valueString).toBe('NURSE')
+  expect(fhir.entry[10].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[10].resource.category).toEqual([
+    {
+      coding: [
+        {
+          system: FHIR_OBSERVATION_CATEGORY_URL,
+          code: 'procedure',
+          display: 'Procedure'
+        }
+      ]
+    }
+  ])
+  expect(fhir.entry[10].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: BIRTH_ATTENDANT_CODE,
+      display: 'Birth attendant title'
+    }
+  ])
+  expect(fhir.entry[11].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[11].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[11].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: BIRTH_REG_TYPE_CODE,
+      display: 'Birth registration type'
+    }
+  ])
+  expect(fhir.entry[12].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[12].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[12].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: BIRTH_REG_PRESENT_CODE,
+      display: 'Present at birth registration'
+    }
+  ])
+  expect(fhir.entry[13].resource.valueInteger).toBe(2)
+  expect(fhir.entry[13].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[13].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: NUMBER_BORN_ALIVE_CODE,
+      display: 'Number born alive to mother'
+    }
+  ])
+  expect(fhir.entry[14].resource.valueInteger).toBe(0)
+  expect(fhir.entry[14].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[14].resource.code.coding).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/obs-type',
+      code: NUMBER_FOEATAL_DEATH_CODE,
+      display: 'Number foetal deaths to mother'
+    }
+  ])
+  expect(fhir.entry[15].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[15].resource.context.reference).toEqual(
+    fhir.entry[6].fullUrl
+  )
+  expect(fhir.entry[15].resource.code.coding).toEqual([
+    {
+      system: 'http://loinc.org',
+      code: LAST_LIVE_BIRTH_CODE,
+      display: 'Date last live birth'
+    }
+  ])
 })
