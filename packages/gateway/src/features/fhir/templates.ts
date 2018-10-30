@@ -71,6 +71,45 @@ export function createChildSection(refUuid: string) {
   }
 }
 
+export function createLocationResource(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Location',
+      mode: 'instance'
+    }
+  }
+}
+
+export function createEncounterSection(refUuid: string) {
+  return {
+    title: 'Birth Encounter',
+    code: {
+      coding: {
+        system: 'http://opencrvs.org/specs/sections',
+        code: 'birth-encounter'
+      },
+      text: 'Birth encounter'
+    },
+    text: '',
+    entry: [
+      {
+        reference: `urn:uuid:${refUuid}`
+      }
+    ]
+  }
+}
+
+export function createEncounter(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Encounter',
+      status: 'finished'
+    }
+  }
+}
+
 export function createCompositionTemplate() {
   return {
     resource: {
@@ -135,6 +174,16 @@ export function createDocRefTemplate(refUuid: string) {
         value: refUuid
       },
       status: 'current'
+    }
+  }
+}
+
+export function createObservationEntryTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Observation',
+      status: 'final'
     }
   }
 }
