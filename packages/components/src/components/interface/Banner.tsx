@@ -8,6 +8,9 @@ export interface IBannerProps {
 
 const StyledBanner = styled.div`
   padding: 25px;
+  height: 109px;
+  width: 940px;
+  border-radius: 1px;
   font-family: ${({ theme }) => theme.fonts.regularFont};
   background-color: ${({ theme }) => theme.colors.accentBlue};
 `
@@ -24,12 +27,12 @@ const StatusOrange = () => (
 )
 
 const StyledStatus = styled.div`
-  width: 70px;
+  width: 64px;
   display: flex;
   flex-flow: row nowrap;
-  border-radius: 17px;
+  border-radius: 16px;
   padding: 5px 10px 5px 7px;
-  margin: 2px 5px 2px 0;
+  margin: 13px 5px 2px 0;
   align-items: center;
   background-color: ${({ theme }) => theme.colors.bannerStatusBackground};
   height: 32px;
@@ -38,13 +41,22 @@ const StyledText = styled.div`
   color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   float: left;
-  margin-top: 5px;
-  margin-right: 10px;
+  height: 38px;
+  width: 475px;
+  margin-top: 13px;
+  margin-left: 10px;
   display: inline-block;
-  font-size: 20px;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 25px;
 `
 
 const StyledNumber = styled.span`
+  height: 25px;
+  width: 46px;
+  font-size: 20px;
+  line-height: 27px;
+  text-align: center;
   margin-left: 10px;
   color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.fonts.regularFont};
