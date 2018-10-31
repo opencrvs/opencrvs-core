@@ -1,8 +1,11 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { StatusGreen, StatusOrange, StatusGray } from '../icons'
-import { Status } from './Status'
-import { LabelValue, IProp } from './LabelValue'
+
+interface IProp {
+  label: string
+  value: string
+}
 
 interface IStatus {
   label: string
@@ -63,10 +66,38 @@ const StatusDiv = styled.div`
     margin-top: 10px;
   }
 `
-const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-weight: bold;
+const StyledStatus = styled.div`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  background-color: rgba(150, 150, 150, 0.1);
+  border-radius: 17px;
+  padding: 5px 10px 5px 7px;
+  margin: 2px 5px 2px 0;
+  display: flex;
+  align-items: center;
+  ${({ theme }) => theme.fonts.capsFontStyle};
+  & span {
+    margin-left: 5px;
+    font-size: 13px;
+  }
 `
+
+const StyledLabel = styled.label`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  margin-right: 3px;
+`
+const StyledValue = styled.span`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+`
+
+function LabelValue({ label, value }: IProp) {
+  return (
+    <div>
+      <StyledLabel>{label}:</StyledLabel>
+      <StyledValue>{value}</StyledValue>
+    </div>
+  )
+}
+
 export class ResultList extends React.Component<IList> {
   render() {
     const { list } = this.props
@@ -103,19 +134,12 @@ export class ResultList extends React.Component<IList> {
             </InfoDiv>
             <StatusDiv>
               {item.status.map((sts: IStatus) => (
-                <Status
-                  icon={() =>
-                    sts.type === 'orange' ? (
-                      <StatusOrange />
-                    ) : sts.type === 'gray' ? (
-                      <StatusGray />
-                    ) : (
-                      <StatusGreen />
-                    )
-                  }
-                >
-                  <strong>{sts.label}</strong>
-                </Status>
+                <StyledStatus>
+                  {sts.type === 'orange' && <StatusOrange />}
+                  {sts.type === 'gray' && <StatusGray />}
+                  {sts.type === 'green' && <StatusGreen />}
+                  <span>{sts.label}</span>
+                </StyledStatus>
               ))}
             </StatusDiv>
           </ListItemContainer>
