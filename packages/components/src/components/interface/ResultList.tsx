@@ -1,6 +1,11 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { StatusGreen, StatusOrange, StatusGray } from '../icons'
+import {
+  StatusGreen,
+  StatusOrange,
+  StatusGray,
+  StatusCollected
+} from '../icons'
 
 interface IProp {
   label: string
@@ -12,14 +17,7 @@ interface IStatus {
   type: string
 }
 interface IResult {
-  name: IProp
-  dob?: IProp
-  dod?: IProp
-  dom?: IProp
-  doa?: IProp
-  doc?: IProp
-  trackingID?: IProp
-  regNo?: IProp
+  info: IProp[]
   status: IStatus[]
 }
 interface IList {
@@ -74,8 +72,9 @@ const StyledStatus = styled.div`
   margin: 2px 5px 2px 0;
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  height: 32px;
   & span {
+    text-transform: uppercase;
     margin-left: 5px;
     font-size: 13px;
   }
@@ -106,31 +105,9 @@ export class ResultList extends React.Component<IList> {
         {list.map((item: IResult, index: number) => (
           <ListItemContainer key={index}>
             <InfoDiv>
-              <LabelValue label={item.name.label} value={item.name.value} />
-              {item.dob && (
-                <LabelValue label={item.dob.label} value={item.dob.value} />
-              )}
-              {item.dod && (
-                <LabelValue label={item.dod.label} value={item.dod.value} />
-              )}
-              {item.dom && (
-                <LabelValue label={item.dom.label} value={item.dom.value} />
-              )}
-              {item.doa && (
-                <LabelValue label={item.doa.label} value={item.doa.value} />
-              )}
-              {item.doc && (
-                <LabelValue label={item.doc.label} value={item.doc.value} />
-              )}
-              {item.trackingID && (
-                <LabelValue
-                  label={item.trackingID.label}
-                  value={item.trackingID.value}
-                />
-              )}
-              {item.regNo && (
-                <LabelValue label={item.regNo.label} value={item.regNo.value} />
-              )}
+              {item.info.map((data: IProp) => (
+                <LabelValue label={data.label} value={data.value} />
+              ))}
             </InfoDiv>
             <StatusDiv>
               {item.status.map((sts: IStatus) => (
@@ -138,6 +115,7 @@ export class ResultList extends React.Component<IList> {
                   {sts.type === 'orange' && <StatusOrange />}
                   {sts.type === 'gray' && <StatusGray />}
                   {sts.type === 'green' && <StatusGreen />}
+                  {sts.type === 'collected' && <StatusCollected />}
                   <span>{sts.label}</span>
                 </StyledStatus>
               ))}

@@ -1,86 +1,122 @@
 ```js
 const list = [
   {
-    name: {
-      label: 'Name',
-      value: 'John Doe'
-    },
-    dob: {
-      label: 'D.o.B',
-      value: '10.10.2018'
-    },
-    doa: {
-      label: 'Date of application',
-      value: '10.10.2018'
-    },
-    trackingID: {
-      label: 'Tracking ID',
-      value: '1234567'
-    },
+    info: [
+      {
+        label: 'Name',
+        value: 'John Doe'
+      },
+      {
+        label: 'D.o.B',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Date of application',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Tracking ID',
+        value: '1234567'
+      }
+    ],
     status: [
       {
-        label: 'BIRTH',
+        label: 'Birth',
         type: 'gray'
       },
       {
-        label: 'APPLICATION',
+        label: 'Application',
         type: 'orange'
       }
     ]
   },
   {
-    name: {
-      label: 'Name',
-      value: 'Jane Doe'
-    },
-    dod: {
-      label: 'D.o.D',
-      value: '10.10.2018'
-    },
-    doa: {
-      label: 'Date of application',
-      value: '10.10.2018'
-    },
-    trackingID: {
-      label: 'Tracking ID',
-      value: '1234567'
-    },
+    info: [
+      {
+        label: 'Name',
+        value: 'Jane Doe'
+      },
+      {
+        label: 'D.o.D',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Date of application',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Tracking ID',
+        value: '1234567'
+      }
+    ],
     status: [
       {
-        label: 'DEATH',
+        label: 'Death',
         type: 'gray'
       },
       {
-        label: 'APPLICATION',
+        label: 'Application',
         type: 'orange'
       }
     ]
   },
   {
-    name: {
-      label: 'Name',
-      value: 'Jackson Strong'
-    },
-    dod: {
-      label: 'D.o.M',
-      value: '10.10.2018'
-    },
-    doa: {
-      label: 'Date of registration',
-      value: '10.10.2018'
-    },
-    regNo: {
-      label: 'Registration number',
-      value: '1234567'
-    },
+    info: [
+      {
+        label: 'Name',
+        value: 'Jackson Strong'
+      },
+      {
+        label: 'D.o.M',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Date of registration',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Registration number',
+        value: '1234567'
+      }
+    ],
     status: [
       {
-        label: 'MARRIAGE',
+        label: 'Marriage',
         type: 'gray'
       },
       {
-        label: 'REGISTERED',
+        label: 'Registered',
         type: 'green'
+      }
+    ]
+  },
+  {
+    info: [
+      {
+        label: 'Name',
+        value: 'Moon Walker'
+      },
+      {
+        label: 'D.o.B',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Date of collection',
+        value: '10.10.2018'
+      },
+      {
+        label: 'Registration number',
+        value: '1234567'
+      }
+    ],
+    status: [
+      {
+        label: 'Birth',
+        type: 'gray'
+      },
+      {
+        label: 'Collected',
+        type: 'collected'
       }
     ]
   }
