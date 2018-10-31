@@ -71,7 +71,8 @@ function getSelectedOption(
   return null
 }
 
-interface ISelectProps extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
+export interface ISelectProps
+  extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
   onChange: (value: string) => void
   value: string
 }

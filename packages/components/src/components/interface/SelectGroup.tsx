@@ -1,13 +1,13 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { IStyledSelectProps, Select } from '../forms/Select'
+import { ISelectProps, Select } from '../forms/Select'
 
 export interface ISelectGroupProps {
   name: string
   value: string
   onChange: (value: string) => void
-  options: IStyledSelectProps[]
+  options: ISelectProps[]
 }
 
 const Wrapper = styled.div`
