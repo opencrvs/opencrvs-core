@@ -44,7 +44,7 @@ const DeleteLink = styled(Link)`
 
 const FileContainer = styled.div`
   height: 75px;
-  border: 1px solid ${({ theme }) => theme.colors.cardGradientEnd};
+  border: 1px solid ${({ theme }) => theme.colors.accentLight};
   border-radius: 1px;
   background-color: ${({ theme }) => theme.colors.inputBackground};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);

@@ -12,7 +12,7 @@ const StyledBanner = styled.div`
   width: 940px;
   border-radius: 1px;
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  background-color: ${({ theme }) => theme.colors.accentBlue};
+  background-color: ${({ theme }) => theme.colors.accentLight};
 `
 
 const StatusOrange = () => (
@@ -34,7 +34,7 @@ const StyledStatus = styled.div`
   padding: 5px 10px 5px 7px;
   margin: 13px 5px 2px 0;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.bannerStatusBackground};
+  background-color: ${({ theme }) => theme.colors.blackAlpha20};
   height: 32px;
 `
 const StyledText = styled.div`
