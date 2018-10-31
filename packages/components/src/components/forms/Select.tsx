@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 import { Omit } from '../omit'
 import { ArrowDownBlue } from '../icons'
+import { IndicatorProps } from 'react-select/lib/components/indicators'
 
 export interface ISelectOption {
   value: string
@@ -17,7 +18,7 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   options: ISelectOption[]
 }
 
-const DropdownIndicator = (props: any) => {
+const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
@@ -26,8 +27,6 @@ const DropdownIndicator = (props: any) => {
     )
   )
 }
-
-const IndicatorSeparator = () => null
 
 const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   width: 100%;
@@ -48,6 +47,10 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   .react-select__option {
     color: ${({ theme }) => theme.colors.copy};
     font-size: 14px;
+  }
+
+  .react-select__indicator-separator {
+    display: none;
   }
 
   .react-select__control--is-focused {
@@ -83,7 +86,7 @@ export class Select extends React.Component<ISelectProps> {
     return (
       <StyledSelect
         classNamePrefix="react-select"
-        components={{ DropdownIndicator, IndicatorSeparator }}
+        components={{ DropdownIndicator }}
         {...this.props}
         onChange={this.change}
         value={getSelectedOption(this.props.value, this.props.options)}
