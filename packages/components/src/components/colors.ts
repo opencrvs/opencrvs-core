@@ -1,6 +1,6 @@
 export const colors = {
   accent: '#4C68C1',
-  accentBlue: '#5E93ED',
+  accentLight: '#5E93ED',
   accentGradientDark: '#629FCC',
   accentGradientLight: '#7DC1EA',
   background: '#F4F4F4',
@@ -20,7 +20,5 @@ export const colors = {
   white: '#FFFFFF',
   black: '#000000',
   blackAlpha20: '#00000020',
-  danger: '#D53F3F',
-  cardGradientEnd: '#5E93ED',
-  bannerStatusBackground: '#0000001a'
+  danger: '#D53F3F'
 }
