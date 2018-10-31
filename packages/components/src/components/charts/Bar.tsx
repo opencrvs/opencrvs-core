@@ -49,7 +49,7 @@ const Section = styled.div.attrs<{ size: number; colour: string }>({})`
   background: ${({ colour }) => colour};
 `
 
-const colours = ['#a7b0cf', '#6575AA', '#233A86']
+const colours = ['#a7b0cf', '#233A86', '#6575AA']
 
 const calculateSum = (points: IDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
