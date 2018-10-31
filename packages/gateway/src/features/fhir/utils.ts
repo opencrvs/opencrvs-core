@@ -192,7 +192,7 @@ export function selectOrCreateTaskRefResource(
     fhirBundle.entry.find(
       (entry: any) =>
         entry.resource.resourceType === 'Task' &&
-        entry.resource.focus.reference === `urn:tackingid:${compTrackingId}`
+        entry.resource.focus.reference === `urn:trackingid:${compTrackingId}`
     )
   if (!taskResource) {
     taskResource = createTaskRefTemplate(uuid(), compTrackingId)

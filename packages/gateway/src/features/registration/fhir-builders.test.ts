@@ -248,7 +248,7 @@ test('should build a minimal FHIR registration document without error', async ()
     ]
   })
   expect(fhir.entry[4].resource.focus.reference).toEqual(
-    `urn:tackingid:${fhir.entry[0].resource.identifier.value}`
+    `urn:trackingid:${fhir.entry[0].resource.identifier.value}`
   )
   expect(fhir.entry[4].resource.identifier[0]).toEqual({
     system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,

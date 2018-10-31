@@ -203,7 +203,7 @@ export function createTaskRefTemplate(refUuid: string, refComposition: string) {
         ]
       },
       focus: {
-        reference: `urn:tackingid:${refComposition}`
+        reference: `urn:trackingid:${refComposition}`
       }
     }
   }

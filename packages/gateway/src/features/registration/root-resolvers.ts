@@ -32,10 +32,7 @@ export const resolvers: GQLResolver = {
     async createBirthRegistration(_, { details }) {
       const birthTrackingId = await generateBirthTrackingId()
       const doc = await buildFHIRBundle(
-        Object.assign(
-          { registration: { trackingId: birthTrackingId } },
-          details
-        ),
+        { ...details, registration: { trackingId: birthTrackingId } },
         birthTrackingId
       )
 
