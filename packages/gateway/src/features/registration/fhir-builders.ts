@@ -386,7 +386,10 @@ function createEducationalAttainmentBuilder(
   })
 }
 
-function createBirthTrackingIdentifier(resource: any, fieldValue: string) {
+function createBirthTrackingIdentifier(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
   if (!resource.identifier) {
     resource.identifier = []
   }
