@@ -22,7 +22,6 @@ const PaginationContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.fonts.boldFont};
 `
 const Icon = styled(Button)`
   cursor: pointer;
@@ -36,12 +35,12 @@ const PaginationLabel = styled.div`
   }
 `
 const PageNumber = styled.span`
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.heavyFontStyle};
   color: ${({ theme }) => theme.colors.primary};
 `
 const PaginationText = styled.span`
   margin: 0 5px;
-  text-transform: uppercase;
+  ${({ theme }) => theme.fonts.capsFontStyle};
 `
 interface IState {
   canPrevious: boolean

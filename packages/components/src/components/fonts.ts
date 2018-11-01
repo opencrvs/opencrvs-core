@@ -8,6 +8,7 @@ export interface IFonts {
   lightFontStyle: string
   infoFontStyle: string
   capsFontStyle: string
+  heavyFontStyle: string
   h1FontStyle: string
   h2FontStyle: string
   h3FontStyle: string
@@ -66,6 +67,14 @@ export const fonts = (country: string): IFonts => ({
     }
     letter-spacing: 2.5px;
     text-transform: uppercase;`,
+  heavyFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
+      font-weight: 600;
+      font-size: 16px;
+      @media (max-width: ${grid.breakpoints.lg}px) {
+        font-size: 18px;
+      }
+      letter-spacing: 2.5px;
+      text-transform: uppercase;`,
   h1FontStyle: `font-family: ${countryFonts[country].lightFontFamily};
     font-weight: 300;
     font-size: 30px;
