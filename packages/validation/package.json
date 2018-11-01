@@ -4,8 +4,9 @@
   "description": "OpenCRVS validation utilities",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest --coverage",
-    "test:watch": "jest --watch --coverage"
+    "test": "jest --coverage && yarn test:compilation",
+    "test:watch": "jest --watch --coverage",
+    "test:compilation": "tsc --noEmit"
   },
   "license": "NONE",
   "private": true,
