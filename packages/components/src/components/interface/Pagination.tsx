@@ -88,7 +88,7 @@ export class Pagination extends React.Component<
         </Icon>
         <PaginationLabel>
           <PageNumber>{currentPage}</PageNumber>
-          <PaginationText>of</PaginationText>
+          <PaginationText>/</PaginationText>
           <PageNumber>{totalPages}</PageNumber>
         </PaginationLabel>
         <Icon
