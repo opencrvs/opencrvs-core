@@ -22,7 +22,8 @@ import {
   setObjectPropInResourceArray,
   getMaritalStatusCode,
   createObservationResource,
-  setArrayPropInResourceObject
+  setArrayPropInResourceObject,
+  selectOrCreateTaskRefResource
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -332,7 +333,7 @@ function createDateOfMarriageBuilder(
     resource.extension = []
   }
   resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
     valueDateTime: fieldValue
   })
 }
@@ -380,8 +381,21 @@ function createEducationalAttainmentBuilder(
   !resource.extension && (resource.extension = [])
 
   resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
     valueString: fieldValue
+  })
+}
+
+function createBirthTrackingIdentifier(
+  resource: fhir.Resource,
+  fieldValue: string
+) {
+  if (!resource.identifier) {
+    resource.identifier = []
+  }
+  resource.identifier.push({
+    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
+    value: fieldValue
   })
 }
 
@@ -480,7 +494,7 @@ function createBirthRegTypeBuilder(
 ) {
   const coding = [
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: `${OPENCRVS_SPECIFICATION_URL}obs-type`,
       code: BIRTH_REG_TYPE_CODE,
       display: 'Birth registration type'
     }
@@ -495,7 +509,7 @@ function createPresentAtBirthBuilder(
 ) {
   const coding = [
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: `${OPENCRVS_SPECIFICATION_URL}obs-type`,
       code: BIRTH_REG_PRESENT_CODE,
       display: 'Present at birth registration'
     }
@@ -510,7 +524,7 @@ function createChildrenBornAliveToMotherBuilder(
 ) {
   const coding = [
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: `${OPENCRVS_SPECIFICATION_URL}obs-type`,
       code: NUMBER_BORN_ALIVE_CODE,
       display: 'Number born alive to mother'
     }
@@ -525,7 +539,7 @@ function createNumberFoetalDeathsToMotherBuilder(
 ) {
   const coding = [
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: `${OPENCRVS_SPECIFICATION_URL}obs-type`,
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
@@ -809,6 +823,14 @@ const builders: IFieldBuilders = {
     }
   },
   registration: {
+    trackingId: (fhirBundle: fhir.Bundle, fieldValue: string, context: any) => {
+      const taskResource = selectOrCreateTaskRefResource(
+        fhirBundle,
+        fieldValue,
+        context
+      )
+      return createBirthTrackingIdentifier(taskResource, fieldValue)
+    },
     attachments: {
       originalFileName: (
         fhirBundle: fhir.Bundle,
@@ -823,7 +845,7 @@ const builders: IFieldBuilders = {
         !docRef.identifier && (docRef.identifier = [])
 
         docRef.identifier.push({
-          system: 'http://opencrvs.org/specs/id/original-file-name',
+          system: `${OPENCRVS_SPECIFICATION_URL}id/original-file-name`,
           value: fieldValue
         })
       },
@@ -840,7 +862,7 @@ const builders: IFieldBuilders = {
         !docRef.identifier && (docRef.identifier = [])
 
         docRef.identifier.push({
-          system: 'http://opencrvs.org/specs/id/system-file-name',
+          system: `${OPENCRVS_SPECIFICATION_URL}id/system-file-name`,
           value: fieldValue
         })
       },
@@ -861,7 +883,7 @@ const builders: IFieldBuilders = {
         docRef.type = {
           coding: [
             {
-              system: 'http://opencrvs.org/specs/supporting-doc-type',
+              system: `${OPENCRVS_SPECIFICATION_URL}supporting-doc-type`,
               code: fieldValue
             }
           ]
@@ -1040,11 +1062,11 @@ const builders: IFieldBuilders = {
   }
 }
 
-export async function buildFHIRBundle(reg: any) {
+export async function buildFHIRBundle(reg: any, trackingId?: string) {
   const fhirBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate()]
+    entry: [createCompositionTemplate(trackingId)]
   }
 
   await transformObj(reg, fhirBundle, builders)

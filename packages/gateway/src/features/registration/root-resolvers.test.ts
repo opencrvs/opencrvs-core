@@ -1,5 +1,6 @@
 import { resolvers } from 'src/features/registration/root-resolvers'
 import * as fetch from 'jest-fetch-mock'
+import TrackingId from './model/trackingId'
 
 describe('Registration root resolvers', () => {
   describe('listBirthRegistrations()', () => {
@@ -16,8 +17,17 @@ describe('Registration root resolvers', () => {
       expect(compositions).toHaveLength(2)
     })
   })
-
+  let findSpy: jest.Mock
+  let saveSpy: jest.Mock
   describe('createBirthRegistration()', () => {
+    beforeEach(() => {
+      findSpy = jest.spyOn(TrackingId, 'findOne').mockResolvedValueOnce(null)
+      saveSpy = jest
+        .spyOn(TrackingId.prototype, 'save')
+        .mockImplementationOnce(() => {
+          return { trackingId: 'B123456' }
+        })
+    })
     it('posts a fhir bundle', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -41,6 +51,8 @@ describe('Registration root resolvers', () => {
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
+      expect(findSpy).toBeCalled()
+      expect(saveSpy).toBeCalled()
     })
 
     it('throws an error when the request returns an error code', async () => {
@@ -52,6 +64,8 @@ describe('Registration root resolvers', () => {
           { createdAt: new Date() }
         )
       ).rejects.toThrowError('FHIR post to /fhir failed with [401] body: Boom!')
+      expect(findSpy).toBeCalled()
+      expect(saveSpy).toBeCalled()
     })
 
     it("throws an error when the response isn't what we expect", async () => {
@@ -63,6 +77,8 @@ describe('Registration root resolvers', () => {
           { createdAt: new Date() }
         )
       ).rejects.toThrowError('FHIR response did not send a valid response')
+      expect(findSpy).toBeCalled()
+      expect(saveSpy).toBeCalled()
     })
   })
 })
