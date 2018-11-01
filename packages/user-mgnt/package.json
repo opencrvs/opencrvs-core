@@ -8,10 +8,11 @@
   "scripts": {
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
     "start:prod": "ts-node src/index.ts",
-    "test": "jest --coverage",
+    "test": "jest --coverage && yarn test:compilation",
     "test:watch": "jest --watch --coverage",
     "precommit": "lint-staged",
-    "populate": "ts-node resources/populate.ts"
+    "populate": "ts-node resources/populate.ts",
+    "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
     "@types/boom": "^7.2.0",

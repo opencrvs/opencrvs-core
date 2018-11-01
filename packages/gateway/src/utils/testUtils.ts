@@ -45,10 +45,12 @@ export const mockPatient = {
     }
   ],
   maritalStatus: {
-    coding: {
-      system: 'http://hl7.org/fhir/ValueSet/marital-status',
-      code: 'M'
-    },
+    coding: [
+      {
+        system: 'http://hl7.org/fhir/ValueSet/marital-status',
+        code: 'M'
+      }
+    ],
     text: 'Married'
   },
   multipleBirthInteger: 1, // the number is the birth number in the sequence. E.g. The middle birth in tripplets would be valueInteger=2 and the third born would have valueInteger=3
@@ -80,7 +82,7 @@ export const mockPatient = {
         {
           url: 'code',
           valueCodeableConcept: {
-            coding: { system: 'urn:iso:std:iso:3166', code: 'BN' }
+            coding: [{ system: 'urn:iso:std:iso:3166', code: 'BN' }]
           }
         },
         {
@@ -221,17 +223,21 @@ export const mockComposition = {
   resourceType: 'Composition',
   status: 'final', // 'final' when submitted | 'preliminary' when still a draft
   type: {
-    coding: {
-      system: 'http://opencrvs.org/specs/types',
-      code: 'birth-registration'
-    },
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'birth-registration'
+      }
+    ],
     text: 'Birth Registration'
   },
   class: {
-    coding: {
-      system: 'http://opencrvs.org/specs/classes',
-      code: 'crvs-document'
-    },
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/classes',
+        code: 'crvs-document'
+      }
+    ],
     text: 'CRVS Document'
   },
   subject: {
@@ -248,10 +254,12 @@ export const mockComposition = {
     {
       title: 'Child details',
       code: {
-        coding: {
-          system: 'http://opencrvs.org/specs/sections',
-          code: 'child-details'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'child-details'
+          }
+        ],
         text: 'Child details'
       },
       text: '',
@@ -268,10 +276,12 @@ export const mockComposition = {
     {
       title: "Mother's details",
       code: {
-        coding: {
-          system: 'http://opencrvs.org/specs/sections',
-          code: 'mother-details'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'mother-details'
+          }
+        ],
         text: "Mother's details"
       },
       text: '',
@@ -285,10 +295,12 @@ export const mockComposition = {
     {
       title: "Father's details",
       code: {
-        coding: {
-          system: 'http://opencrvs.org/specs/sections',
-          code: 'father-details'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'father-details'
+          }
+        ],
         text: "Father's details"
       },
       text: '',
@@ -302,10 +314,12 @@ export const mockComposition = {
     {
       title: "Informant's details",
       code: {
-        coding: {
-          system: 'http://opencrvs.org/specs/sections',
-          code: 'informant-details'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'informant-details'
+          }
+        ],
         text: "Informant's details"
       },
       text: '',
@@ -319,10 +333,12 @@ export const mockComposition = {
     {
       title: 'Birth Encounter',
       code: {
-        coding: {
-          system: 'http://opencrvs.org/specs/sections',
-          code: 'birth-encounter'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'birth-encounter'
+          }
+        ],
         text: 'Birth encounter'
       },
       text: '',
@@ -336,10 +352,12 @@ export const mockComposition = {
     {
       title: 'Supporting documents',
       code: {
-        coding: {
-          system: 'http://opencrvs.org/specs/sections',
-          code: 'supporting-documents'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'supporting-documents'
+          }
+        ],
         text: 'Supporting documents'
       },
       text: '',
@@ -366,10 +384,12 @@ export const mockLocation = {
     mode: 'instance',
     name: '{{villageName}}',
     physicalType: {
-      coding: {
-        system: 'http://hl7.org/fhir/ValueSet/location-physical-type',
-        code: 'area'
-      },
+      coding: [
+        {
+          system: 'http://hl7.org/fhir/ValueSet/location-physical-type',
+          code: 'area'
+        }
+      ],
       text: 'Area'
     },
     position: {
