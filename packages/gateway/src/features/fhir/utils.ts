@@ -9,7 +9,8 @@ import {
   createLocationResource,
   createObservationEntryTemplate,
   createSupportingDocumentsSection,
-  createDocRefTemplate
+  createDocRefTemplate,
+  createTaskRefTemplate
 } from 'src/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -231,6 +232,25 @@ export function selectOrCreateDocRefResource(
   }
 
   return docRef.resource as fhir.DocumentReference
+}
+
+export function selectOrCreateTaskRefResource(
+  fhirBundle: ITemplatedBundle,
+  compTrackingId: string,
+  context: any
+): fhir.Task {
+  let taskResource =
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      (entry: any) =>
+        entry.resource.resourceType === 'Task' &&
+        entry.resource.focus.reference === `urn:trackingid:${compTrackingId}`
+    )
+  if (!taskResource) {
+    taskResource = createTaskRefTemplate(uuid(), compTrackingId)
+    fhirBundle.entry.push(taskResource)
+  }
+  return taskResource.resource as fhir.Task
 }
 
 export function setObjectPropInResourceArray(

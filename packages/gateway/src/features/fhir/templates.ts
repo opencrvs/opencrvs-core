@@ -115,12 +115,12 @@ export function createEncounter(refUuid: string) {
   }
 }
 
-export function createCompositionTemplate() {
+export function createCompositionTemplate(trackingId?: string) {
   return {
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
-        value: uuid()
+        value: trackingId ? trackingId : uuid()
       },
       resourceType: 'Composition',
       status: 'preliminary',
@@ -198,5 +198,26 @@ export function createObservationEntryTemplate(refUuid: string) {
       resourceType: 'Observation',
       status: 'final'
     } as fhir.Observation
+  }
+}
+
+export function createTaskRefTemplate(refUuid: string, refComposition: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Task',
+      status: 'requested',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/types',
+            code: 'birth-registration'
+          }
+        ]
+      },
+      focus: {
+        reference: `urn:trackingid:${refComposition}`
+      }
+    }
   }
 }
