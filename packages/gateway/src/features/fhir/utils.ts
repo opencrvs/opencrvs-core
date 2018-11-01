@@ -21,18 +21,19 @@ export function findCompositionSectionInBundle(
   code: string,
   fhirBundle: ITemplatedBundle
 ) {
-  return fhirBundle.entry[0].resource.section.find(
-    (section: any) => section.code.coding.code === code
-  )
+  return findCompositionSection(code, fhirBundle.entry[0].resource)
 }
 
 export function findCompositionSection(
   code: string,
   composition: ITemplatedComposition
 ) {
-  return composition.section.find(
-    (section: any) => section.code.coding.code === code
-  )
+  return composition.section.find((section: fhir.CompositionSection) => {
+    if (!section.code || !section.code.coding) {
+      return false
+    }
+    return section.code.coding.some(coding => coding.code === code)
+  })
 }
 
 export function selectOrCreatePersonResource(
@@ -124,8 +125,8 @@ export function createObservationResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.Observation {
-  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
   const encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle)
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   const ref = uuid()
   const observationEntry = createObservationEntryTemplate(ref)
@@ -208,15 +209,24 @@ export function selectOrCreateDocRefResource(
       )
     }
     const docSectionEntry = section.entry[context._index.attachments]
-    docRef = fhirBundle.entry.find(
-      entry => entry.fullUrl === docSectionEntry.reference
-    )
-    if (!docRef) {
+    if (!docSectionEntry) {
       const ref = uuid()
-      docRef = createDocRefTemplate(ref)
-      fhirBundle.entry.push(docRef)
       section.entry[context._index.attachments] = {
         reference: `urn:uuid:${ref}`
+      }
+      docRef = createDocRefTemplate(ref)
+      fhirBundle.entry.push(docRef)
+    } else {
+      docRef = fhirBundle.entry.find(
+        entry => entry.fullUrl === docSectionEntry.reference
+      )
+      if (!docRef) {
+        const ref = uuid()
+        docRef = createDocRefTemplate(ref)
+        fhirBundle.entry.push(docRef)
+        section.entry[context._index.attachments] = {
+          reference: `urn:uuid:${ref}`
+        }
       }
     }
   }

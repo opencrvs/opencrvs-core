@@ -142,9 +142,9 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.maritalStatus.text).toBe('MARRIED')
   expect(fhir.entry[1].resource.maritalStatus.text).toBe('MARRIED')
   expect(fhir.entry[3].resource.maritalStatus.text).toBe('NOT_STATED')
-  expect(fhir.entry[2].resource.maritalStatus.coding.code).toBe('M')
-  expect(fhir.entry[1].resource.maritalStatus.coding.code).toBe('M')
-  expect(fhir.entry[3].resource.maritalStatus.coding.code).toBe('UNK')
+  expect(fhir.entry[2].resource.maritalStatus.coding[0].code).toBe('M')
+  expect(fhir.entry[1].resource.maritalStatus.coding[0].code).toBe('M')
+  expect(fhir.entry[3].resource.maritalStatus.coding[0].code).toBe('UNK')
   expect(fhir.entry[1].resource.multipleBirthInteger).toBe(1)
   expect(fhir.entry[2].resource.multipleBirthInteger).toBe(2)
   expect(fhir.entry[3].resource.multipleBirthInteger).toBe(3)
@@ -163,7 +163,7 @@ test('should build a minimal FHIR registration document without error', async ()
       {
         url: 'code',
         valueCodeableConcept: {
-          coding: { system: 'urn:iso:std:iso:3166', code: 'BGD' }
+          coding: [{ system: 'urn:iso:std:iso:3166', code: 'BGD' }]
         }
       },
       {
@@ -188,7 +188,7 @@ test('should build a minimal FHIR registration document without error', async ()
       {
         url: 'code',
         valueCodeableConcept: {
-          coding: { system: 'urn:iso:std:iso:3166', code: 'BGD' }
+          coding: [{ system: 'urn:iso:std:iso:3166', code: 'BGD' }]
         }
       },
       {
@@ -213,7 +213,7 @@ test('should build a minimal FHIR registration document without error', async ()
       {
         url: 'code',
         valueCodeableConcept: {
-          coding: { system: 'urn:iso:std:iso:3166', code: 'BGD' }
+          coding: [{ system: 'urn:iso:std:iso:3166', code: 'BGD' }]
         }
       },
       {
@@ -230,6 +230,7 @@ test('should build a minimal FHIR registration document without error', async ()
     `${OPENCRVS_SPECIFICATION_URL}educational-attainment`
   )
 
+  console.log(JSON.stringify(fhir.entry[8], null, 2))
   // Attachment Test cases
   expect(fhir.entry[4].resource.docStatus).toBe('final')
   expect(fhir.entry[4].resource.created).toBe('2018-10-21')
@@ -241,12 +242,14 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[4].resource.content).toEqual({
-    attachment: {
-      contentType: 'image/jpeg',
-      data: 'SampleData'
+  expect(fhir.entry[4].resource.content).toEqual([
+    {
+      attachment: {
+        contentType: 'image/jpeg',
+        data: 'SampleData'
+      }
     }
-  })
+  ])
   expect(fhir.entry[4].resource.identifier).toEqual([
     {
       system: 'http://opencrvs.org/specs/id/original-file-name',
@@ -277,12 +280,14 @@ test('should build a minimal FHIR registration document without error', async ()
       value: 'system.png'
     }
   ])
-  expect(fhir.entry[5].resource.content).toEqual({
-    attachment: {
-      contentType: 'image/png',
-      data: 'ExampleData'
+  expect(fhir.entry[5].resource.content).toEqual([
+    {
+      attachment: {
+        contentType: 'image/png',
+        data: 'ExampleData'
+      }
     }
-  })
+  ])
   // Encounter
   expect(fhir.entry[6].resource.resourceType).toBe('Encounter')
   expect(fhir.entry[6].resource.location[0].location.reference).toEqual(
@@ -295,7 +300,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[7].resource.position.longitude).toBe(90.399452)
 
   // Observation
-  expect(fhir.entry[8].resource.valueInteger).toBe(2)
+  expect(fhir.entry[8].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[8].resource.context.reference).toEqual(
     fhir.entry[6].fullUrl
   )
@@ -383,7 +388,7 @@ test('should build a minimal FHIR registration document without error', async ()
       display: 'Present at birth registration'
     }
   ])
-  expect(fhir.entry[13].resource.valueInteger).toBe(2)
+  expect(fhir.entry[13].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[13].resource.context.reference).toEqual(
     fhir.entry[6].fullUrl
   )
@@ -394,7 +399,7 @@ test('should build a minimal FHIR registration document without error', async ()
       display: 'Number born alive to mother'
     }
   ])
-  expect(fhir.entry[14].resource.valueInteger).toBe(0)
+  expect(fhir.entry[14].resource.valueQuantity.value).toBe(0)
   expect(fhir.entry[14].resource.context.reference).toEqual(
     fhir.entry[6].fullUrl
   )
