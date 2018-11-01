@@ -9,8 +9,9 @@
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
-    "test:watch": "jest --watch --coverage",
-    "precommit": "lint-staged"
+    "test:watch": "jest --watch --coverage && yarn test:compilation",
+    "precommit": "lint-staged",
+    "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
     "@types/hapi": "^17.0.12",

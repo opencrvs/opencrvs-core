@@ -1,6 +1,6 @@
 export type IFieldBuilderFunction = (
   accumulatedObj: any,
-  fieldValue: string | number,
+  fieldValue: string | number | boolean,
   context: any
 ) => void
 
