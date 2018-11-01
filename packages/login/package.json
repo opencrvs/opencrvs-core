@@ -9,6 +9,7 @@
     "@types/react-redux": "^6.0.0",
     "axios": "^0.18.0",
     "history": "^4.7.2",
+    "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
     "react": "^16.3.2",
@@ -24,12 +25,17 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3020 react-scripts-ts start",
-    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
-    "build": "yarn verify-build-config && react-scripts-ts build && yarn gen:sw",
+    "verify-build-config":
+      "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "build":
+      "yarn verify-build-config && react-scripts-ts build && yarn gen:sw",
     "gen:sw": "workbox generateSW --config workbox-config.js",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
-    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
+    "test":
+      "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
@@ -48,6 +54,7 @@
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/jest": "^22.2.3",
+    "@types/jwt-decode": "^2.2.1",
     "@types/lodash-es": "^4.17.0",
     "@types/node": "^10.0.8",
     "@types/react": "^16.3.14",
@@ -74,12 +81,7 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ],
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "html"
-    ]
+    "coverageReporters": ["json", "lcov", "text", "html"]
   },
   "description": "The login application for OpenCRVS"
 }

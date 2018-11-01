@@ -4,6 +4,7 @@ import * as actions from './actions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
 import { config } from '../config'
+import { ITokenPayload, getTokenPayload } from '../utils/authUtils'
 
 export type LoginState = {
   submitting: boolean
@@ -107,9 +108,16 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.VERIFY_CODE_FAILED:
       return { ...state, submitting: false, submissionError: true }
     case actions.VERIFY_CODE_COMPLETED:
-      const redirectURL = `${config.REGISTER_APP_URL}?token=${
-        action.payload.token
-      }`
+      const decoded = getTokenPayload(action.payload.token) as ITokenPayload
+      let redirectURL: string
+      if (decoded.claims.indexOf('performance') > -1) {
+        redirectURL = `${config.PERFORMANCE_APP_URL}?token=${
+          action.payload.token
+        }`
+      } else {
+        redirectURL = `${config.REGISTER_APP_URL}?token=${action.payload.token}`
+      }
+
       return loop(
         {
           ...state,
