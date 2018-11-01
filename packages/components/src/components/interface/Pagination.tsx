@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Next, Previous } from '../icons'
+import { Button } from '../buttons/Button'
 
 export interface IPaginationCustomProps {
   pageSize: number
@@ -21,14 +22,15 @@ const PaginationContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  ${({ theme }) => theme.fonts.boldFont};
 `
-const Icon = styled.div`
+const Icon = styled(Button)`
   cursor: pointer;
   opacity: ${(props: IButtonProps) => (props.disabled ? 0.5 : 1)};
+  border: none;
+  outline: none;
 `
 const PaginationLabel = styled.div`
-  margin: 0 10px;
   span:nth-child(1) {
     padding-right: 2px;
   }
@@ -64,12 +66,15 @@ export class Pagination extends React.Component<
     }
   }
 
-  canPrevious = () => this.state.currentPage > 1
+  canGoToPreviousPage = () => this.state.currentPage > 1
 
-  canNext = () => this.state.currentPage + 1 <= this.state.totalPages
+  canGoToNextPage = () => this.state.currentPage + 1 <= this.state.totalPages
 
   changePage = (page: number) =>
-    this.setState({ currentPage: page }, () => this.props.onPageChange(page))
+    this.setState(
+      () => ({ currentPage: page }),
+      () => this.props.onPageChange(page)
+    )
 
   render() {
     const { initialPage, totalItemCount, pageSize, ...props } = this.props
@@ -79,11 +84,9 @@ export class Pagination extends React.Component<
       <PaginationContainer>
         <Icon
           onClick={() => {
-            if (this.canPrevious()) {
-              this.changePage(currentPage - 1)
-            }
+            this.changePage(currentPage - 1)
           }}
-          disabled={!this.canPrevious()}
+          disabled={!this.canGoToPreviousPage()}
         >
           <Previous />
         </Icon>
@@ -94,11 +97,9 @@ export class Pagination extends React.Component<
         </PaginationLabel>
         <Icon
           onClick={() => {
-            if (this.canNext()) {
-              this.changePage(currentPage + 1)
-            }
+            this.changePage(currentPage + 1)
           }}
-          disabled={!this.canNext()}
+          disabled={!this.canGoToNextPage()}
         >
           <Next />
         </Icon>
