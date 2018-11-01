@@ -21,16 +21,24 @@ const PaginationContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.fonts.capsFontStyle};
 `
 const Icon = styled.div`
   cursor: pointer;
   opacity: ${(props: IButtonProps) => (props.disabled ? 0.5 : 1)};
 `
+const PaginationLabel = styled.div`
+  margin: 0 10px;
+  span:nth-child(1) {
+    padding-right: 2px;
+  }
+`
 const PageNumber = styled.span`
   font-weight: bold;
-  margin: 0 5px;
   color: ${({ theme }) => theme.colors.primary};
+`
+const PaginationText = styled.span`
+  margin: 0 5px;
+  text-transform: uppercase;
 `
 interface IState {
   canPrevious: boolean
@@ -43,7 +51,6 @@ export class Pagination extends React.Component<
   IPaginationCustomProps,
   IState
 > {
-  private $element: React.RefObject<HTMLInputElement>
   constructor(props: IPaginationCustomProps, {}) {
     super(props)
 
@@ -79,8 +86,11 @@ export class Pagination extends React.Component<
         >
           <Previous />
         </Icon>
-        <PageNumber>{currentPage}</PageNumber> of{' '}
-        <PageNumber>{totalPages}</PageNumber>
+        <PaginationLabel>
+          <PageNumber>{currentPage}</PageNumber>
+          <PaginationText>of</PaginationText>
+          <PageNumber>{totalPages}</PageNumber>
+        </PaginationLabel>
         <Icon
           onClick={() => {
             if (this.canNext()) {
