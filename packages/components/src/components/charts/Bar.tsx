@@ -1,11 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-
-interface IDataPoint {
-  value: number
-  estimate?: boolean
-  total?: boolean
-}
+import { IDataPoint, colours } from './datapoint'
 
 export interface IBarChartProps {
   data: IDataPoint[]
@@ -14,6 +9,7 @@ export interface IBarChartProps {
 const Container = styled.div`
   position: relative;
   width: 100%;
+  margin-bottom: 24px;
 `
 
 const Estimate = styled.div`
@@ -49,8 +45,6 @@ const Section = styled.div.attrs<{ size: number; colour: string }>({})`
   background: ${({ colour }) => colour};
 `
 
-const colours = ['#a7b0cf', '#233A86', '#6575AA']
-
 const calculateSum = (points: IDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
 
@@ -74,12 +68,12 @@ export function Bar(props: IBarChartProps) {
       <Container>
         <Estimate>
           <SectionContainer>
-            {allOtherPoints.map((item, i) => {
-              if (item.total) {
+            {allOtherPoints.map((dataPoint, i) => {
+              if (dataPoint.total) {
                 return (
                   <Total
                     key={i}
-                    size={item.value / estimatePoint.value}
+                    size={dataPoint.value / estimatePoint.value}
                     colour={colours[i]}
                   />
                 )
@@ -87,7 +81,7 @@ export function Bar(props: IBarChartProps) {
               return (
                 <Section
                   key={i}
-                  size={item.value / totalValue}
+                  size={dataPoint.value / totalValue}
                   colour={colours[i]}
                 />
               )
@@ -101,14 +95,14 @@ export function Bar(props: IBarChartProps) {
   return (
     <Container>
       <SectionContainer>
-        {allOtherPoints.map((item, i) => {
-          if (item.total) {
+        {allOtherPoints.map((dataPoint, i) => {
+          if (dataPoint.total) {
             return <Total key={i} size={1} colour={colours[i]} />
           }
           return (
             <Section
               key={i}
-              size={item.value / totalValue}
+              size={dataPoint.value / totalValue}
               colour={colours[i]}
             />
           )
