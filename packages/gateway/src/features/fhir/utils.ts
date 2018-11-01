@@ -70,7 +70,7 @@ export function selectOrCreatePersonResource(
     }
     const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(
-      (entry: any) => entry.fullUrl === personSectionEntry.reference
+      entry => entry.fullUrl === personSectionEntry.reference
     )
   }
 
@@ -107,7 +107,7 @@ export function selectOrCreateEncounterResource(
     }
     const encounterSectionEntry = section.entry[0]
     encounterEntry = fhirBundle.entry.find(
-      (entry: any) => entry.fullUrl === encounterSectionEntry.reference
+      entry => entry.fullUrl === encounterSectionEntry.reference
     )
   }
 
@@ -136,7 +136,7 @@ export function createObservationResource(
   }
   const encounterSectionEntry = section.entry[0]
   const encounterEntry = fhirBundle.entry.find(
-    (entry: any) => entry.fullUrl === encounterSectionEntry.reference
+    entry => entry.fullUrl === encounterSectionEntry.reference
   )
   if (encounterEntry && encounter) {
     observationEntry.resource.context = {
@@ -172,7 +172,7 @@ export function selectOrCreateLocationRefResource(
     }
     const locationElement = encounter.location[0]
     locationEntry = fhirBundle.entry.find(
-      (entry: any) => entry.fullUrl === locationElement.location.reference
+      entry => entry.fullUrl === locationElement.location.reference
     )
   }
 
@@ -241,11 +241,16 @@ export function selectOrCreateTaskRefResource(
 ): fhir.Task {
   let taskResource =
     fhirBundle.entry &&
-    fhirBundle.entry.find(
-      (entry: any) =>
-        entry.resource.resourceType === 'Task' &&
-        entry.resource.focus.reference === `urn:trackingid:${compTrackingId}`
-    )
+    fhirBundle.entry.find(entry => {
+      if (!entry.resource || entry.resource.resourceType !== 'Task') {
+        return false
+      }
+      const task = entry.resource as fhir.Task
+      return (
+        task.focus !== undefined &&
+        task.focus.reference === `urn:trackingid:${compTrackingId}`
+      )
+    })
   if (!taskResource) {
     taskResource = createTaskRefTemplate(uuid(), compTrackingId)
     fhirBundle.entry.push(taskResource)
