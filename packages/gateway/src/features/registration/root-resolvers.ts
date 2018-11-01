@@ -3,6 +3,7 @@ import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
+import { generateBirthTrackingId } from './trackingid-generator'
 
 const statusMap = {
   declared: 'preliminary',
@@ -29,7 +30,11 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }) {
-      const doc = await buildFHIRBundle(Object.assign({}, details))
+      const birthTrackingId = await generateBirthTrackingId()
+      const doc = await buildFHIRBundle(
+        { ...details, registration: { trackingId: birthTrackingId } },
+        birthTrackingId
+      )
 
       const res = await fetch(fhirUrl, {
         method: 'POST',
