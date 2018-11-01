@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\" \"yarn gen:types:watch\"",
+    "start":
+      "concurrently \"nodemon --exec ts-node -- src/index.ts\" \"yarn gen:types:watch\"",
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
-    "gen:full-schema": "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\"",
-    "gen:types": "yarn -s gen:full-schema > src/graphql/schema.graphql && graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts && rm src/graphql/schema.graphql && yarn prettier --write src/graphql/schema.d.ts && echo Done",
-    "gen:types:watch": "nodemon -e graphql -i src/graphql/schema.graphql -x 'yarn gen:types'"
+    "gen:full-schema":
+      "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\"",
+    "gen:types":
+      "yarn -s gen:full-schema > src/graphql/schema.graphql && graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts && rm src/graphql/schema.graphql && yarn prettier --write src/graphql/schema.d.ts && echo Done",
+    "gen:types:watch":
+      "nodemon -e graphql -i src/graphql/schema.graphql -x 'yarn gen:types'"
   },
   "dependencies": {
     "@types/glob": "^5.0.35",
@@ -76,49 +80,24 @@
     "pretty-quick": "^1.4.1",
     "ts-jest": "^22.4.6",
     "ts-node": "^6.1.1",
-    "tsc": "^1.20150623.0",
     "tslint": "^5.4.3",
     "tslint-config-prettier": "^1.12.0",
     "typescript": "^3.0.1",
     "typestyle": "^1.3.7"
   },
   "lint-staged": {
-    "src/**/*.{ts,graphql}": [
-      "prettier --write",
-      "git add"
-    ]
+    "src/**/*.{ts,graphql}": ["prettier --write", "git add"]
   },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
     "testEnvironment": "node",
-    "setupFiles": [
-      "./test/setupJest.ts"
-    ],
-    "modulePaths": [
-      "<rootDir>"
-    ],
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "html"
-    ]
+    "setupFiles": ["./test/setupJest.ts"],
+    "modulePaths": ["<rootDir>"],
+    "coverageReporters": ["json", "lcov", "text", "html"]
   },
-  "keywords": [
-    "api",
-    "nodejs",
-    "hapi",
-    "typescript"
-  ]
+  "keywords": ["api", "nodejs", "hapi", "typescript"]
 }
