@@ -11669,6 +11669,10 @@ shellwords@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
 
+short-uid@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/short-uid/-/short-uid-0.1.0.tgz#069d94d044fc498afb0ea7bb22c5e634979434c8"
+
 shot@4.x.x:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/shot/-/shot-4.0.5.tgz#c7e7455d11d60f6b6cd3c43e15a3b431c17e5566"
