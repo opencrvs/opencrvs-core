@@ -230,7 +230,6 @@ test('should build a minimal FHIR registration document without error', async ()
     `${OPENCRVS_SPECIFICATION_URL}educational-attainment`
   )
 
-  console.log(JSON.stringify(fhir.entry[8], null, 2))
   // Attachment Test cases
   expect(fhir.entry[4].resource.docStatus).toBe('final')
   expect(fhir.entry[4].resource.created).toBe('2018-10-21')

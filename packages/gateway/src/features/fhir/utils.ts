@@ -11,7 +11,6 @@ import {
   createSupportingDocumentsSection,
   createDocRefTemplate
 } from 'src/features/fhir/templates'
-import { IExtension } from 'src/type/person'
 import {
   ITemplatedBundle,
   ITemplatedComposition
@@ -266,7 +265,7 @@ export function findExtension(
   url: string,
   extensions: fhir.Extension[]
 ): fhir.Extension | undefined {
-  const extension = extensions.find((obj: IExtension) => {
+  const extension = extensions.find((obj: fhir.Extension) => {
     return obj.url === url
   })
   return extension
