@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { IDataPoint, colours, IEstimateDataPoint } from './datapoint'
+import { IDataPoint, colours } from './datapoint'
 
 export interface ILegendProps {
   data: IDataPoint[]
@@ -62,7 +62,13 @@ const DataDescription = styled.span`
 const calculateSum = (points: IDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
 
-function getLegend(dataPoint: IDataPoint, colour: string) {
+function LegendHeader({
+  dataPoint,
+  colour
+}: {
+  dataPoint: IDataPoint
+  colour: string
+}) {
   if (dataPoint.estimate) {
     return <EstimateLegendItem>{dataPoint.label}</EstimateLegendItem>
   }
@@ -70,7 +76,15 @@ function getLegend(dataPoint: IDataPoint, colour: string) {
   return <LegendItem colour={colour}>{dataPoint.label}</LegendItem>
 }
 
-function getDataLabel(dataPoint: IDataPoint, total: number, estimate: number) {
+function LegendBody({
+  dataPoint,
+  total,
+  estimate
+}: {
+  dataPoint: IDataPoint
+  total: number
+  estimate: number
+}) {
   let title = `${Math.round(dataPoint.value / total * 100)}%`
 
   if (dataPoint.total) {
@@ -81,20 +95,10 @@ function getDataLabel(dataPoint: IDataPoint, total: number, estimate: number) {
     title = dataPoint.value.toString()
   }
 
-  let description = `${dataPoint.value} out of ${total} total`
-
-  if (dataPoint.total) {
-    description = `${dataPoint.value} out of estimated ${estimate}`
-  }
-
-  if (dataPoint.estimate) {
-    description = (dataPoint as IEstimateDataPoint).description
-  }
-
   return (
     <DataLabel>
       <DataTitle>{title}</DataTitle>
-      <DataDescription>{description}</DataDescription>
+      <DataDescription>{dataPoint.description}</DataDescription>
     </DataLabel>
   )
 }
@@ -113,12 +117,12 @@ export function Legend(props: ILegendProps) {
         const colour = colours[dataPointsWithoutEstimates.indexOf(dataPoint)]
         return (
           <Column key={i}>
-            {getLegend(dataPoint, colour)}
-            {getDataLabel(
-              dataPoint,
-              calculateSum(allTotalPoints),
-              calculateSum(allEstimatePoints)
-            )}
+            <LegendHeader dataPoint={dataPoint} colour={colour} />
+            <LegendBody
+              dataPoint={dataPoint}
+              total={calculateSum(allTotalPoints)}
+              estimate={calculateSum(allEstimatePoints)}
+            />
           </Column>
         )
       })}
