@@ -13,15 +13,17 @@ import {
   routerMiddleware,
   RouterState
 } from 'react-router-redux'
-
-import { intlReducer, IntlState } from './i18n/reducer'
+import { profileReducer, ProfileState } from 'src/profile/reducer'
+import { intlReducer, IntlState } from 'src/i18n/reducer'
 
 export interface IStoreState {
+  profile: ProfileState
   router: RouterState
   i18n: IntlState
 }
 
 const reducers = combineReducers<IStoreState>({
+  profile: profileReducer,
   router: routerReducer,
   i18n: intlReducer
 })
