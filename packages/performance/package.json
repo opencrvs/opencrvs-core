@@ -5,10 +5,14 @@
   "dependencies": {
     "@opencrvs/components": "^0.1.0",
     "formik": "^1.0.3",
+    "history": "^4.7.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-intl": "^2.4.0",
+    "react-router-redux": "^4.0.8",
     "react-scripts-ts": "2.16.0",
+    "redux": "^4.0.1",
+    "redux-loop": "^4.4.1",
     "serve": "^10.0.2",
     "styled-components": "^3.3.3"
   },
@@ -35,7 +39,7 @@
     ]
   },
   "devDependencies": {
-    "@types/enzyme": "^3.1.13",
+    "@types/enzyme": "^3.1.14",
     "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/history": "^4.6.2",
     "@types/jest": "^23.3.5",
@@ -45,8 +49,8 @@
     "@types/react-intl": "^2.3.8",
     "@types/react-redux": "^6.0.0",
     "@types/react-router-redux": "^5.0.14",
-    "enzyme": "^3.4.4",
-    "enzyme-adapter-react-16": "^1.2.0",
+    "enzyme": "^3.7.0",
+    "enzyme-adapter-react-16": "^1.6.0",
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
     "stylelint": "^9.5.0",
