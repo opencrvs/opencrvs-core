@@ -16,9 +16,12 @@
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3001 react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test": "react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "test":
+      "react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
@@ -27,12 +30,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "prettier --write",
-      "tslint",
-      "stylelint",
-      "git add"
-    ]
+    "src/**/*.{ts,tsx}": ["prettier --write", "tslint", "stylelint", "git add"]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
@@ -54,6 +52,7 @@
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
     "query-string": "^6.2.0",
+    "react-router": "^4.2.0",
     "react-router-redux": "next",
     "redux": "^4.0.1",
     "redux-loop": "^4.4.1",
@@ -68,12 +67,7 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ],
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "html"
-    ],
+    "coverageReporters": ["json", "lcov", "text", "html"],
     "moduleNameMapper": {
       "^src(.*)$": "<rootDir>/src$1"
     }
