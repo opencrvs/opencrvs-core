@@ -14,7 +14,7 @@ const admin2Geo = JSON.parse(
     .toString()
 )
 
-function addGeoData(fhirLocations: any, features: any) {
+function matchAndAssignGeoData(fhirLocations: any, features: any) {
   return fhirLocations.map((location: any) => {
     const matchingFeature = features.find(
       (feature: any) =>
@@ -35,8 +35,8 @@ function addGeoData(fhirLocations: any, features: any) {
 }
 
 const mapGeo = {
-  divisions: addGeoData(locations.divisions, admin1Geo.features),
-  districts: addGeoData(locations.districts, admin2Geo.features)
+  divisions: matchAndAssignGeoData(locations.divisions, admin1Geo.features),
+  districts: matchAndAssignGeoData(locations.districts, admin2Geo.features)
 }
 
 fs.writeFileSync('map-geo.json', JSON.stringify(mapGeo, null, 2))
