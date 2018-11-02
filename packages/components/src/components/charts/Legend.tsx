@@ -7,7 +7,7 @@ export interface ILegendProps {
   data: IDataPoint[]
 }
 
-const Container = styled.div`
+const Row = styled.div`
   display: flex;
 `
 const Column = styled.div`
@@ -49,7 +49,6 @@ const EstimateLegendItem = styled(LegendItemBase)`
 const DataLabel = styled.label`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
-  height: 70px;
   margin-top: 1em;
 `
 const DataTitle = styled.h3`
@@ -120,21 +119,32 @@ export const Legend = withTheme(
     ]
 
     return (
-      <Container>
-        {fromSmallest.map((dataPoint, i) => {
-          const colour = colours[dataPointsWithoutEstimates.indexOf(dataPoint)]
-          return (
-            <Column key={i}>
-              <LegendHeader dataPoint={dataPoint} colour={colour} />
-              <LegendBody
-                dataPoint={dataPoint}
-                total={calculateSum(allTotalPoints)}
-                estimate={calculateSum(allEstimatePoints)}
-              />
-            </Column>
-          )
-        })}
-      </Container>
+      <div>
+        <Row>
+          {fromSmallest.map((dataPoint, i) => {
+            const colour =
+              colours[dataPointsWithoutEstimates.indexOf(dataPoint)]
+            return (
+              <Column key={i}>
+                <LegendHeader dataPoint={dataPoint} colour={colour} />
+              </Column>
+            )
+          })}
+        </Row>
+        <Row>
+          {fromSmallest.map((dataPoint, i) => {
+            return (
+              <Column key={i}>
+                <LegendBody
+                  dataPoint={dataPoint}
+                  total={calculateSum(allTotalPoints)}
+                  estimate={calculateSum(allEstimatePoints)}
+                />
+              </Column>
+            )
+          })}
+        </Row>
+      </div>
     )
   }
 )
