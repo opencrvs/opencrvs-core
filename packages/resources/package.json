@@ -8,7 +8,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
     "open:cov": "yarn test && opener coverage/index.html",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "assign:geo-data": "ts-node scripts/assign-geodata-to-locations.ts"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",
