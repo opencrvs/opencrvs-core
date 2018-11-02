@@ -1,14 +1,24 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { ISelectProps, Select } from '../forms/Select'
+import { Select, ISelectOption } from '../forms/Select'
+import { Omit } from '../omit'
+import _ = require('lodash')
+
+export interface ISelectGroupOption {
+  name: string
+  options: ISelectOption[]
+  value: string
+}
 
 export interface ISelectGroupProps {
   name: string
-  value: string
-  onChange: (value: string) => void
-  options: ISelectProps[]
+  value: ISelectGroupValue[]
+  onChange: (value: ISelectGroupValue[]) => void
+  options: ISelectGroupOption[]
 }
+
+interface ISelectGroupValue extends Omit<ISelectGroupOption, 'options'> {}
 
 const Wrapper = styled.div`
   width: 100%;
@@ -27,14 +37,13 @@ const StyledSelect = styled(Select)`
 `
 
 export class SelectGroup extends React.Component<ISelectGroupProps> {
-  change = (value: string) => {
-    if (this.props.onChange) {
-      this.props.onChange(value)
-    }
+  change = ({ name, value }: ISelectGroupValue) => {
+    const newValue: ISelectGroupValue[] = [{ name, value }]
+    this.props.onChange(_.unionBy(this.props.value, newValue, 'name'))
   }
 
   render() {
-    const { options, value, name, ...otherProps } = this.props
+    const { options, value, name, onChange, ...otherProps } = this.props
 
     return (
       <Wrapper>
@@ -43,9 +52,11 @@ export class SelectGroup extends React.Component<ISelectGroupProps> {
             <StyledSelect
               id={`${name}_${option.value}`}
               key={option.name}
-              value={value as string}
+              value={option.value}
               options={option.options}
-              onChange={this.change}
+              onChange={(selectedValue: string) =>
+                this.change({ name: option.name, value: selectedValue })
+              }
               {...otherProps}
             />
           )
