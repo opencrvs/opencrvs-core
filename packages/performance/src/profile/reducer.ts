@@ -32,7 +32,7 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
         })
       )
     case actions.CHECK_AUTH:
-      const token = getToken()
+      const token = getToken() as string
       const payload = getTokenPayload(token)
 
       if (!payload) {
