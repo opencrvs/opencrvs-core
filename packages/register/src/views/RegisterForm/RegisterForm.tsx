@@ -438,8 +438,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   <PrimaryButton
                     key="submit"
                     id="submit_confirm"
-                    onClick={() => history.push('/saved')}
-                    // onClick={() => submitBirthRegistration()}
+                    onClick={() => submitBirthRegistration()}
                   >
                     {intl.formatMessage(messages.submitButton)}
                   </PrimaryButton>,
