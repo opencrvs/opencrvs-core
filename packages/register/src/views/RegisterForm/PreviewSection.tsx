@@ -337,6 +337,7 @@ class PreviewSectionForm extends React.Component<
                   <FormPrimaryButton
                     onClick={this.props.onSubmit}
                     id="submit_form"
+                    disabled={numberOfErrors > 0}
                   >
                     {intl.formatMessage(messages.submit)}
                   </FormPrimaryButton>

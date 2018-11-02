@@ -113,12 +113,21 @@ describe('when user is in the register form preview section', () => {
   )
   component = testComponent.component
 
-  it('displays submit confirm modal when submit button clicked', () => {
+  it('submit button will be disabled when form is not fully filled-up', () => {
+    expect(
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .prop('disabled')
+    ).toBe(true)
+  })
+
+  it('Do not displays submit confirm modal when disabled submit button is clicked', () => {
     component
       .find('#submit_form')
       .hostNodes()
       .simulate('click')
 
-    expect(component.find('#submit_confirm').hostNodes()).toHaveLength(1)
+    expect(component.find('#submit_confirm').hostNodes()).toHaveLength(0)
   })
 })

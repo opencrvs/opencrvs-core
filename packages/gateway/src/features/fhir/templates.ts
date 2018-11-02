@@ -109,3 +109,32 @@ export function createPersonEntryTemplate(refUuid: string) {
     }
   }
 }
+
+export function createSupportingDocumentsSection() {
+  return {
+    title: 'Supporting documents',
+    code: {
+      coding: {
+        system: 'http://opencrvs.org/specs/sections',
+        code: 'supporting-documents'
+      },
+      text: 'Supporting documents'
+    },
+    text: '',
+    entry: []
+  }
+}
+
+export function createDocRefTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'DocumentReference',
+      masterIdentifier: {
+        system: 'urn:ietf:rfc:3986',
+        value: refUuid
+      },
+      status: 'current'
+    }
+  }
+}
