@@ -1,4 +1,4 @@
-import { createServerWithEnvironment } from 'src/tests/util'
+import { createServerWithEnvironment } from '../../tests/util'
 
 describe('authenticate handler receives a request', () => {
   let server: any
@@ -14,7 +14,7 @@ describe('authenticate handler receives a request', () => {
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        claims: ['admin'],
+        scope: ['admin'],
         mobile: '+345345343'
       })
 
@@ -50,7 +50,7 @@ describe('authenticate handler receives a request', () => {
 
       const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.claims).toEqual(['admin'])
+      expect(body.scope).toEqual(['admin'])
       expect(body.sub).toBe('1')
     })
     it('refreshError returns a 401 to the client if the token is bad', async () => {
@@ -59,7 +59,7 @@ describe('authenticate handler receives a request', () => {
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        claims: ['admin'],
+        scope: ['admin'],
         mobile: '+345345343'
       })
 
