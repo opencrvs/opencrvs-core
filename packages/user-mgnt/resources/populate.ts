@@ -7,78 +7,73 @@ mongoose.connect(MONGO_URL)
 
 const pass = generateSaltedHash('test')
 
-const zaUserChw = new User({
+const fieldAgent = new User({
+  name: 'Shakib Al Hasan',
   email: 'test@test.org',
-  mobile: '+27811111111', // 10 digits long, starts with 08 locally
+  mobile: '+8801711111111',
   passwordHash: pass.hash,
   salt: pass.salt,
-  roles: ['chw', 'demo']
+  role: 'Field Agent',
+  claims: ['declare', 'demo']
 })
 
-const gbUserChw = new User({
+const registrationClerk = new User({
+  name: 'Mohammad Ashraful',
   email: 'test@test.org',
-  mobile: '+447111111111', // 11 digits long, starts with 07 locally
+  mobile: '+8801722222222',
   passwordHash: pass.hash,
   salt: pass.salt,
-  roles: ['chw', 'demo']
+  role: 'Registration Clerk',
+  claims: ['declare', 'performance', 'certify', 'demo']
 })
 
-const bdUserChw = new User({
+const localRegistrar = new User({
+  name: 'Mohammad Ashraful',
   email: 'test@test.org',
-  mobile: '+8801711111111', // 11 digits long, starts with 017 locally
+  mobile: '+8801733333333',
   passwordHash: pass.hash,
   salt: pass.salt,
-  roles: ['chw', 'demo']
+  role: 'Local Registrar',
+  claims: ['register', 'performance', 'certify', 'demo']
 })
 
-const fiUserChw = new User({
+const districtRegistrar = new User({
+  name: 'Muhammad Abdul Muid Khan',
   email: 'test@test.org',
-  mobile: '+358411111111', // 10 or 11 digits long, starts with 04x, 0457 or 050 locally
+  mobile: '+8801744444444',
   passwordHash: pass.hash,
   salt: pass.salt,
-  roles: ['chw', 'demo']
+  role: 'District Registrar',
+  claims: ['register', 'performance', 'certify', 'demo']
 })
 
-const zaUserRegistrar = new User({
+const stateRegistrar = new User({
+  name: 'Nasreen Pervin Huq',
   email: 'test@test.org',
-  mobile: '+27822222222', // 10 digits long, starts with 08 locally
+  mobile: '+8801755555555',
   passwordHash: pass.hash,
   salt: pass.salt,
-  roles: ['registrar', 'demo']
+  role: 'State Registrar',
+  claims: ['register', 'performance', 'certify', 'demo']
 })
 
-const gbUserRegistrar = new User({
+const nationalRegistrar = new User({
+  name: 'Mohamed Abu Abdullah',
   email: 'test@test.org',
-  mobile: '+447222222222', // 11 digits long, starts with 07 locally
+  mobile: '+8801766666666',
   passwordHash: pass.hash,
   salt: pass.salt,
-  roles: ['registrar', 'demo']
+  role: 'National Registrar',
+  claims: ['register', 'performance', 'certify', 'config', 'teams', 'demo']
 })
 
-const bdUserRegistrar = new User({
-  email: 'test@test.org',
-  mobile: '+8801722222222', // 11 digits long, starts with 017 locally
-  passwordHash: pass.hash,
-  salt: pass.salt,
-  roles: ['registrar', 'demo']
-})
-
-const fiUserRegistrar = new User({
-  email: 'test@test.org',
-  mobile: '+358422222222', // 10 or 11 digits long, starts with 04x, 0457 or 050 locally
-  passwordHash: pass.hash,
-  salt: pass.salt,
-  roles: ['registrar', 'demo']
-})
 const testUsers = [
-  zaUserChw,
-  gbUserChw,
-  bdUserChw,
-  fiUserChw,
-  zaUserRegistrar,
-  gbUserRegistrar,
-  bdUserRegistrar,
-  fiUserRegistrar
+  fieldAgent,
+  registrationClerk,
+  localRegistrar,
+  districtRegistrar,
+  stateRegistrar,
+  nationalRegistrar
 ]
 
 function onInsert(err: any, values: any) {

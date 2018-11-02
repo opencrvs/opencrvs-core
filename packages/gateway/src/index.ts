@@ -7,6 +7,7 @@ import { getServer } from 'src/config/server'
 import { getLogger } from 'src/utils/logger'
 import { getRoutes } from 'src/config/routes'
 import { CERT_PUBLIC_KEY_PATH } from 'src/constants'
+import * as database from './database'
 import { readFileSync } from 'fs'
 
 DotEnv.config({
@@ -45,13 +46,13 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-
+    await database.start()
     server.log('info', `server started on port ${process.env.PORT}`)
   }
 
   async function stop() {
     await server.stop()
-
+    await database.stop()
     server.log('info', 'server stopped')
   }
 

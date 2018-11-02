@@ -4,7 +4,11 @@ import { FormFieldGenerator } from './FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft } from 'src/drafts'
 import { createStore } from '../../store'
-import { SELECT_WITH_OPTIONS, SELECT_WITH_DYNAMIC_OPTIONS } from 'src/forms'
+import {
+  SELECT_WITH_OPTIONS,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  TEL
+} from 'src/forms'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -66,6 +70,14 @@ describe('form component', () => {
             dependency: 'state',
             options: stateDistrictMap
           }
+        },
+        {
+          name: 'phone',
+          type: TEL,
+          label: addressMessages.district,
+          required: true,
+          initialValue: '',
+          validate: []
         }
       ]}
     />,
@@ -107,6 +119,47 @@ describe('form component', () => {
             .text()
         ).toEqual('Bangladesh')
       })
+    })
+  })
+})
+
+describe('form component registration section', () => {
+  const { store } = createStore()
+  const draft = createDraft()
+  store.dispatch(storeDraft(draft))
+  const modifyDraft = jest.fn()
+  let component: ReactWrapper<{}, {}>
+  const testComponent = createTestComponent(
+    <FormFieldGenerator
+      id="registration"
+      onChange={modifyDraft}
+      setAllFieldsDirty={false}
+      fields={[
+        {
+          name: 'registrationPhone',
+          type: TEL,
+          label: {
+            defaultMessage: 'Phone number',
+            id: 'formFields.registration.phone',
+            description: 'Input label for phone input'
+          },
+          required: true,
+          initialValue: '',
+          validate: []
+        }
+      ]}
+    />,
+    store
+  )
+  component = testComponent.component
+  describe('when user is in the register section', () => {
+    it('renders registration phone type as tel', () => {
+      expect(
+        component
+          .find('#registrationPhone')
+          .hostNodes()
+          .prop('type')
+      ).toEqual('tel')
     })
   })
 })

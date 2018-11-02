@@ -7,6 +7,7 @@ import {
 } from '@opencrvs/components/lib/forms'
 
 export const TEXT = 'TEXT'
+export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
@@ -77,6 +78,10 @@ export interface IRadioGroupFormField extends IFormFieldBase {
 export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
 }
+
+export interface ITelFormField extends IFormFieldBase {
+  type: typeof TEL
+}
 export interface INumberFormField extends IFormFieldBase {
   type: typeof NUMBER
   step?: number
@@ -111,6 +116,7 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
 
 export type IFormField =
   | ITextFormField
+  | ITelFormField
   | INumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
@@ -191,6 +197,9 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
 export interface Ii18nTextFormField extends Ii18nFormFieldBase {
   type: typeof TEXT
 }
+export interface Ii18nTelFormField extends Ii18nFormFieldBase {
+  type: typeof TEL
+}
 export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
@@ -226,6 +235,7 @@ export interface Ii18nImageUploaderWithOptionsFormField
 
 export type Ii18nFormField =
   | Ii18nTextFormField
+  | Ii18nTelFormField
   | Ii18nNumberFormField
   | Ii18nSelectFormField
   | Ii18nRadioGroupFormField

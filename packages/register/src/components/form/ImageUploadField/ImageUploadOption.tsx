@@ -10,7 +10,7 @@ import { hasFormError } from 'src/forms/utils'
 const FormContainer = styled.div`
   padding: 35px 25px;
 `
-const OverlayContainer = styled.div`
+export const OverlayContainer = styled.div`
   position: fixed;
   top: 0;
   bottom: 0;

@@ -1,4 +1,4 @@
-version: "3.3"
+version: '3.3'
 
 services:
   register:
@@ -6,6 +6,15 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile-register
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+
+  performance:
+    image: jembi/ocrvs-performance:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile-performance
     restart: unless-stopped
     deploy:
       replicas: 2
@@ -26,6 +35,7 @@ services:
     environment:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://openhim-core:5001/fhir
+      - MONGO_URL=mongodb://mongo/gateway
     deploy:
       replicas: 2
 
