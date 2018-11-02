@@ -7,5 +7,3 @@ export interface IDataPoint {
   total?: boolean
   description: string
 }
-
-export const colours = ['#a7b0cf', '#233A86', '#6575AA']

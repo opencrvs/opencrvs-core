@@ -1,6 +1,7 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { IDataPoint, colours } from './datapoint'
+import styled, { withTheme } from 'styled-components'
+import { IDataPoint } from './datapoint'
+import { ITheme } from '../theme'
 
 export interface IBarChartProps {
   data: IDataPoint[]
@@ -43,25 +44,32 @@ const Section = styled.div.attrs<{ size: number; colour: string }>({})`
   position: relative;
   margin-top: -12px;
   background: ${({ colour }) => colour};
+  z-index: 1;
 `
 
 const calculateSum = (points: IDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
 
-export function Bar(props: IBarChartProps) {
-  const { data } = props
-  const fromLargest = [...data].sort((a, b) => b.value - a.value)
+export const Bar = withTheme((props: IBarChartProps & { theme: ITheme }) => {
+  const { data, theme } = props
+  const fromSmallest = [...data].sort((a, b) => a.value - b.value)
 
-  const estimatePoint = fromLargest.find(({ estimate }) => Boolean(estimate))
+  const estimatePoint = fromSmallest.find(({ estimate }) => Boolean(estimate))
 
-  const allTotalPoints = fromLargest.filter(({ total }) => !total)
-  const allOtherPoints = fromLargest.filter(({ estimate }) => !estimate)
+  const allTotalPoints = fromSmallest.filter(({ total }) => !total)
+  const allOtherPoints = fromSmallest.filter(({ estimate }) => !estimate)
 
   const otherPointsValue = calculateSum(allOtherPoints)
   const sumOfTotalPoints = calculateSum(allTotalPoints)
 
   const totalValue =
     allTotalPoints.length > 0 ? sumOfTotalPoints : otherPointsValue
+
+  const colours = [
+    theme.colors.chartPrimary,
+    theme.colors.chartSecondary,
+    theme.colors.chartTertiary
+  ]
 
   if (estimatePoint) {
     return (
@@ -110,4 +118,4 @@ export function Bar(props: IBarChartProps) {
       </SectionContainer>
     </Container>
   )
-}
+})
