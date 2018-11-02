@@ -36,7 +36,7 @@ describe('resend handler receives a request', () => {
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
         userId: '1',
-        roles: ['admin'],
+        claims: ['admin'],
         mobile: '+345345343'
       })
       const spy = jest.spyOn(codeService, 'sendVerificationCode')
@@ -58,7 +58,7 @@ describe('resend handler receives a request', () => {
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
         userId: '2',
-        roles: ['demo'],
+        claims: ['demo'],
         mobile: '+8801712323234'
       })
       const spy = jest.spyOn(codeService, 'sendVerificationCode')

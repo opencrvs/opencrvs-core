@@ -27,10 +27,12 @@ describe('Registration type resolvers', () => {
       section: [
         {
           code: {
-            coding: {
-              system: 'http://opencrvs.org/specs/sections',
-              code: MOTHER_CODE
-            }
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/sections',
+                code: MOTHER_CODE
+              }
+            ]
           },
           entry: [{ reference: 'Patient/123' }]
         }
@@ -48,10 +50,12 @@ describe('Registration type resolvers', () => {
       section: [
         {
           code: {
-            coding: {
-              system: 'http://opencrvs.org/specs/sections',
-              code: FATHER_CODE
-            }
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/sections',
+                code: FATHER_CODE
+              }
+            ]
           },
           entry: [{ reference: 'Patient/123' }]
         }
@@ -69,10 +73,12 @@ describe('Registration type resolvers', () => {
       section: [
         {
           code: {
-            coding: {
-              system: 'http://opencrvs.org/specs/sections',
-              code: CHILD_CODE
-            }
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/sections',
+                code: CHILD_CODE
+              }
+            ]
           },
           entry: [{ reference: 'Patient/123' }]
         }

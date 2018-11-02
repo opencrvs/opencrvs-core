@@ -23,6 +23,7 @@ import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL
 } from 'src/features/fhir/constants'
+import { ITemplatedComposition } from './fhir-builders'
 
 export const typeResolvers: GQLResolver = {
   HumanName: {
@@ -38,10 +39,10 @@ export const typeResolvers: GQLResolver = {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
     dateOfMarriage: person => {
       const marriageExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}date-of-marriage`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
         person.extension
       )
-      return marriageExtension.valueDateTime
+      return (marriageExtension && marriageExtension.valueDateTime) || null
     },
     multipleBirth: person => {
       return person.multipleBirthInteger
@@ -54,19 +55,32 @@ export const typeResolvers: GQLResolver = {
         `${FHIR_SPECIFICATION_URL}patient-nationality`,
         person.extension
       )
+      if (!nationalityExtension || !nationalityExtension.extension) {
+        return null
+      }
       const countryCodeExtension = findExtension(
         'code',
         nationalityExtension.extension
       )
 
-      return countryCodeExtension.valueCodeableConcept.coding.code
+      return (
+        (countryCodeExtension &&
+          countryCodeExtension.valueCodeableConcept &&
+          countryCodeExtension.valueCodeableConcept.coding &&
+          countryCodeExtension.valueCodeableConcept.coding[0].code) ||
+        null
+      )
     },
     educationalAttainment: person => {
       const educationalAttainmentExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}educational-attainment`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
         person.extension
       )
-      return educationalAttainmentExtension.valueString
+      return (
+        (educationalAttainmentExtension &&
+          educationalAttainmentExtension.valueString) ||
+        null
+      )
     }
   },
 
@@ -80,10 +94,13 @@ export const typeResolvers: GQLResolver = {
 
       const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
       const composition = await res.json()
-      const docRefReferences = findCompositionSection(
-        DOCS_CODE,
-        composition
-      ).entry.map((docRefEntry: fhir.Reference) => docRefEntry.reference)
+      const docSection = findCompositionSection(DOCS_CODE, composition)
+      if (!docSection || !docSection.entry) {
+        return null
+      }
+      const docRefReferences = docSection.entry.map(
+        (docRefEntry: fhir.Reference) => docRefEntry.reference
+      )
       return docRefReferences.map(async (docRefReference: string) => {
         const docRefRes = await fetch(`${fhirUrl}/${docRefReference}`)
         return docRefRes.json()
@@ -144,43 +161,43 @@ export const typeResolvers: GQLResolver = {
   },
 
   BirthRegistration: {
-    createdAt(composition: fhir.Composition) {
+    createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
-    async mother(composition: fhir.Composition) {
+    async mother(composition: ITemplatedComposition) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
-      if (!patientSection) {
+      if (!patientSection || !patientSection.entry) {
         return null
       }
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async father(composition: fhir.Composition) {
+    async father(composition: ITemplatedComposition) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
-      if (!patientSection) {
+      if (!patientSection || !patientSection.entry) {
         return null
       }
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async child(composition: fhir.Composition) {
+    async child(composition: ITemplatedComposition) {
       const patientSection = findCompositionSection(CHILD_CODE, composition)
-      if (!patientSection) {
+      if (!patientSection || !patientSection.entry) {
         return null
       }
       const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
       return res.json()
     },
-    async registration(composition: fhir.Composition) {
+    async registration(composition: ITemplatedComposition) {
       const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`)
       return res.json()
     },
-    async weightAtBirth(composition: fhir.Composition) {
+    async weightAtBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -191,12 +208,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueQuantity.value
     },
-    async birthType(composition: fhir.Composition) {
+    async birthType(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -207,12 +224,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueInteger
     },
-    async attendantAtBirth(composition: fhir.Composition) {
+    async attendantAtBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -223,12 +240,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueString
     },
-    async birthRegistrationType(composition: fhir.Composition) {
+    async birthRegistrationType(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -239,12 +256,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueString
     },
-    async presentAtBirthRegistration(composition: fhir.Composition) {
+    async presentAtBirthRegistration(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -255,12 +272,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueString
     },
-    async childrenBornAliveToMother(composition: fhir.Composition) {
+    async childrenBornAliveToMother(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -271,12 +288,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueInteger
     },
-    async foetalDeathsToMother(composition: fhir.Composition) {
+    async foetalDeathsToMother(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -287,12 +304,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueInteger
     },
-    async lastPreviousLiveBirth(composition: fhir.Composition) {
+    async lastPreviousLiveBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(
@@ -303,12 +320,12 @@ export const typeResolvers: GQLResolver = {
       const data = await res.json()
       return data.resource.valueDateTime
     },
-    async birthLocation(composition: fhir.Composition) {
+    async birthLocation(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      if (!encounterSection) {
+      if (!encounterSection || !encounterSection.entry) {
         return null
       }
       const res = await fetch(

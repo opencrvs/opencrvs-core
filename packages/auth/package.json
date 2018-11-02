@@ -8,11 +8,12 @@
   "scripts": {
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
     "start:prod": "ts-node src/index.ts",
-    "test": "jest --coverage",
+    "test": "jest --coverage && yarn test:compilation",
     "test:watch": "jest --watch",
     "precommit": "lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
-    "request-token": "NODE_PATH=. ts-node resources/request-token"
+    "request-token": "NODE_PATH=. ts-node resources/request-token",
+    "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
     "@types/dotenv": "^4.0.3",

@@ -25,7 +25,7 @@ const sign = promisify(jwt.sign) as (
 export interface IAuthentication {
   mobile: string
   userId: string
-  roles: string[]
+  claims: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -52,18 +52,18 @@ export async function authenticate(
   const body = await res.json()
   return {
     userId: body.id,
-    roles: body.roles,
+    claims: body.claims,
     mobile
   }
 }
 
 export async function createToken(
   userId: string,
-  roles: string[],
+  claims: string[],
   audience: string[],
   issuer: string
 ): Promise<string> {
-  return sign({ roles }, cert, {
+  return sign({ claims }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS,
@@ -75,12 +75,12 @@ export async function createToken(
 export async function storeUserInformation(
   nonce: string,
   userId: string,
-  roles: string[],
+  claims: string[],
   mobile: string
 ) {
   return set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, roles, mobile })
+    JSON.stringify({ userId, claims, mobile })
   )
 }
 
@@ -94,7 +94,7 @@ export async function getStoredUserInformation(nonce: string) {
 
 const TokenPayload = t.type({
   sub: t.string,
-  roles: t.array(t.string),
+  claims: t.array(t.string),
   iat: t.number,
   exp: t.number,
   aud: t.array(t.string)

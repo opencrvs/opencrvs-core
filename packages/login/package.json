@@ -29,12 +29,13 @@
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
-    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "start:prod": "yarn build && yarn serve -s -l 3020 build"
+    "start:prod": "yarn build && yarn serve -s -l 3020 build",
+    "test:compilation": "tsc --noEmit"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
