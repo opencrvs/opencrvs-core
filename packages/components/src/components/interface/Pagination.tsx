@@ -7,6 +7,7 @@ export interface IPaginationCustomProps {
   pageSize: number
   initialPage: number
   totalItemCount: number
+  totalPages: number
   onPageChange: (page: number) => void
 }
 
@@ -46,7 +47,6 @@ interface IState {
   canPrevious: boolean
   canNext: boolean
   currentPage: number
-  totalPages: number
 }
 
 export class Pagination extends React.Component<
@@ -60,14 +60,13 @@ export class Pagination extends React.Component<
     this.state = {
       canPrevious: false,
       canNext: false,
-      currentPage: initialPage && initialPage > 0 ? initialPage : 1,
-      totalPages: Math.floor(totalItemCount / pageSize)
+      currentPage: initialPage && initialPage > 0 ? initialPage : 1
     }
   }
 
   canGoToPreviousPage = () => this.state.currentPage > 1
 
-  canGoToNextPage = () => this.state.currentPage + 1 <= this.state.totalPages
+  canGoToNextPage = () => this.state.currentPage + 1 <= this.props.totalPages
 
   changePage = (page: number) =>
     this.setState(
@@ -76,8 +75,14 @@ export class Pagination extends React.Component<
     )
 
   render() {
-    const { initialPage, totalItemCount, pageSize, ...props } = this.props
-    const { currentPage, totalPages } = this.state
+    const {
+      initialPage,
+      totalPages,
+      totalItemCount,
+      pageSize,
+      ...props
+    } = this.props
+    const { currentPage } = this.state
 
     return (
       <PaginationContainer>
