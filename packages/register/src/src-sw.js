@@ -15,3 +15,10 @@ self.addEventListener('fetch', event => {
   }
 })
 workbox.precaching.precacheAndRoute([])
+
+/*
+*   Alternate for navigateFallback & navigateFallbackBlacklist
+*/
+workbox.routing.registerNavigationRoute('/index.html', {
+  blacklist: [/^\/__.*$/]
+})
