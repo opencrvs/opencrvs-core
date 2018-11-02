@@ -1,14 +1,16 @@
 import * as Hapi from 'hapi'
-import * as Joi from 'joi'
 import { internal } from 'boom'
 import { sendSMS } from './service'
 
-export interface IAuthPayload {
+export interface ISMSPayload {
   msisdn: string
+}
+
+interface IAuthPayload extends ISMSPayload {
   message: string
 }
 
-export default async function smsHandler(
+export async function smsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -22,7 +24,27 @@ export default async function smsHandler(
   return h.response().code(200)
 }
 
-export const requestSchema = Joi.object({
-  msisdn: Joi.string().required(),
-  message: Joi.string().required()
-})
+interface IDeclarationPayload extends ISMSPayload {
+  trackingid: string
+  recipientName: string
+}
+
+export async function sendBirthDeclarationConfirmation(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IDeclarationPayload
+  // TODO: need to change it
+  const message = `Birth registration tracking ID for ${
+    payload.recipientName
+  } is ${
+    payload.trackingid
+  }. You will get an SMS within 2 days with progress and next steps.`
+  try {
+    await sendSMS(payload.msisdn, message)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
