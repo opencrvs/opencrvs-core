@@ -20,5 +20,8 @@ export const colors = {
   black: '#000000',
   blackAlpha20: '#00000020',
   danger: '#D53F3F',
-  cardGradientEnd: '#5E93ED'
+  cardGradientEnd: '#5E93ED',
+  chartPrimary: '#233A86',
+  chartSecondary: '#6575AA',
+  chartTertiary: '#a7b0cf'
 }
