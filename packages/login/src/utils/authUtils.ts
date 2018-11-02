@@ -11,7 +11,7 @@ export interface ITokenPayload {
   claims: string[]
 }
 
-const getTokenPayload = (token: string) => {
+export const getTokenPayload = (token: string) => {
   if (!token) {
     return null
   }
