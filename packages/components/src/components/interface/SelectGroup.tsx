@@ -14,7 +14,10 @@ export interface ISelectGroupOption {
 export interface ISelectGroupProps {
   name: string
   value: ISelectGroupValue[]
-  onChange: (value: ISelectGroupValue[]) => void
+  onChange: (
+    value: ISelectGroupValue[],
+    changedValue: ISelectGroupValue
+  ) => void
   options: ISelectGroupOption[]
 }
 
@@ -38,8 +41,13 @@ const StyledSelect = styled(Select)`
 
 export class SelectGroup extends React.Component<ISelectGroupProps> {
   change = ({ name, value }: ISelectGroupValue) => {
-    const newValue: ISelectGroupValue[] = [{ name, value }]
-    this.props.onChange(_.unionBy(this.props.value, newValue, 'name'))
+    const change: ISelectGroupValue[] = [{ name, value }]
+    const newValue: ISelectGroupValue[] = _.unionBy(
+      this.props.value,
+      change,
+      'name'
+    )
+    this.props.onChange(newValue, change[0])
   }
 
   render() {

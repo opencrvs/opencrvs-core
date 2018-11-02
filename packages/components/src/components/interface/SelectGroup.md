@@ -2,6 +2,7 @@
 <SelectGroup
   options={[
     {
+      name: 'Filter 1',
       options: [
         { value: 'chocolate', label: 'Chocolate' },
         { value: 'strawberry', label: 'Strawberry' },
@@ -9,6 +10,7 @@
       ]
     },
     {
+      name: 'Filter 2',
       options: [
         { value: 'chocolate', label: 'Chocolate' },
         { value: 'strawberry', label: 'Strawberry' },
@@ -16,6 +18,7 @@
       ]
     },
     {
+      name: 'Filter 3',
       options: [
         { value: 'chocolate', label: 'Chocolate' },
         { value: 'strawberry', label: 'Strawberry' },
@@ -34,6 +37,7 @@ const Inputfield = require('../forms/InputField/InputField').InputField
   <SelectGroup
     options={[
       {
+        name: 'Filter 1',
         options: [
           { value: 'chocolate', label: 'Chocolate' },
           { value: 'strawberry', label: 'Strawberry' },
@@ -41,6 +45,7 @@ const Inputfield = require('../forms/InputField/InputField').InputField
         ]
       },
       {
+        name: 'Filter 2',
         options: [
           { value: 'chocolate', label: 'Chocolate' },
           { value: 'strawberry', label: 'Strawberry' },
@@ -48,6 +53,7 @@ const Inputfield = require('../forms/InputField/InputField').InputField
         ]
       },
       {
+        name: 'Filter 3',
         options: [
           { value: 'chocolate', label: 'Chocolate' },
           { value: 'strawberry', label: 'Strawberry' },
