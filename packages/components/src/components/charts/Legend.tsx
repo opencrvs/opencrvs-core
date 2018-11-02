@@ -16,6 +16,7 @@ const Column = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding-right: 1em;
 `
 
 const LegendItemBase = styled.div`
