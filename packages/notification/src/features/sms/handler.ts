@@ -2,7 +2,12 @@ import * as Hapi from 'hapi'
 import { internal } from 'boom'
 import { sendSMS } from './service'
 
-export interface ISMSPayload {
+export type HapiRequest = Hapi.Request & {
+  i18n: {
+    __: (messageKey: string, values?: object) => string
+  }
+}
+interface ISMSPayload {
   msisdn: string
 }
 
@@ -11,7 +16,7 @@ interface IAuthPayload extends ISMSPayload {
 }
 
 export async function smsHandler(
-  request: Hapi.Request,
+  request: HapiRequest,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IAuthPayload
@@ -26,22 +31,22 @@ export async function smsHandler(
 
 interface IDeclarationPayload extends ISMSPayload {
   trackingid: string
-  recipientName: string
+  name: string
 }
 
 export async function sendBirthDeclarationConfirmation(
-  request: Hapi.Request,
+  request: HapiRequest,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IDeclarationPayload
-  // TODO: need to change it
-  const message = `Birth registration tracking ID for ${
-    payload.recipientName
-  } is ${
-    payload.trackingid
-  }. You will get an SMS within 2 days with progress and next steps.`
   try {
-    await sendSMS(payload.msisdn, message)
+    await sendSMS(
+      payload.msisdn,
+      request.i18n.__('birthDeclarationNotification', {
+        name: payload.name,
+        trackingid: payload.trackingid
+      })
+    )
   } catch (err) {
     return internal(err)
   }

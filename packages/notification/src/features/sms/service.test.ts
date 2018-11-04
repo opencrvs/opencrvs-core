@@ -1,5 +1,5 @@
 import * as fetch from 'jest-fetch-mock'
-import { logger } from 'src/logger'
+import { logger } from '../../logger'
 import { sendSMS } from './service'
 
 describe('.sendSMS()', () => {

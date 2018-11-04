@@ -10,5 +10,5 @@ export const declarationNotificationSchema = Joi.object({
   trackingid: Joi.string()
     .length(7)
     .required(),
-  recipientName: Joi.string().required()
+  name: Joi.string().required()
 })
