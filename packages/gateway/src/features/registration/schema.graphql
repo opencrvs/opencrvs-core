@@ -13,6 +13,11 @@ enum BirthRegType {
   FATHER_ONLY
 }
 
+enum RegistrationContactType {
+  MOTHER
+  FATHER
+}
+
 enum BirthRegPresence {
   BOTH_PARENTS
   INFORMANT_ONLY
@@ -198,6 +203,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  contact: RegistrationContactType
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
@@ -212,6 +218,7 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
+  contact: RegistrationContactType
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
