@@ -466,9 +466,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         >
           {(submitBirthRegistration, { data }) => {
             if (data && data.createBirthRegistration) {
-              if (data.createBirthRegistration) {
-                history.push('/saved')
-              }
+              history.push('/saved')
             }
 
             return (
