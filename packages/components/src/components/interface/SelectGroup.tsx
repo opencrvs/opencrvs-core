@@ -2,8 +2,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import { Select, ISelectOption } from '../forms/Select'
-import { Omit } from '../omit'
-import _ = require('lodash')
 
 export interface ISelectGroupOption {
   name: string
@@ -13,45 +11,38 @@ export interface ISelectGroupOption {
 
 export interface ISelectGroupProps {
   name: string
-  value: ISelectGroupValue[]
-  onChange: (
-    value: ISelectGroupValue[],
-    changedValue: ISelectGroupValue
-  ) => void
+  values: ISelectGroupValue
+  onChange: (value: ISelectGroupValue, changedValue: ISelectGroupValue) => void
   options: ISelectGroupOption[]
 }
 
-interface ISelectGroupValue extends Omit<ISelectGroupOption, 'options'> {}
+export interface ISelectGroupValue {
+  [key: string]: string
+}
 
 const Wrapper = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 `
 
 const StyledSelect = styled(Select)`
-  max-width: 200px;
+  width: 200px;
   margin: 10px;
   margin-left: 0;
-  &:last-child {
-    margin-right: 0;
-  }
 `
-
 export class SelectGroup extends React.Component<ISelectGroupProps> {
   change = ({ name, value }: ISelectGroupValue) => {
-    const change: ISelectGroupValue[] = [{ name, value }]
-    const newValue: ISelectGroupValue[] = _.unionBy(
-      this.props.value,
-      change,
-      'name'
-    )
-    this.props.onChange(newValue, change[0])
+    const change: ISelectGroupValue = {}
+    change[name] = value
+    const newValue: ISelectGroupValue = { ...this.props.values, ...change }
+    if (this.props.onChange) {
+      this.props.onChange(newValue, change)
+    }
   }
 
   render() {
-    const { options, value, name, onChange, ...otherProps } = this.props
+    const { options, values, name, onChange, ...otherProps } = this.props
 
     return (
       <Wrapper>
@@ -60,7 +51,7 @@ export class SelectGroup extends React.Component<ISelectGroupProps> {
             <StyledSelect
               id={`${name}_${option.value}`}
               key={option.name}
-              value={option.value}
+              value={values[option.name]}
               options={option.options}
               onChange={(selectedValue: string) =>
                 this.change({ name: option.name, value: selectedValue })
