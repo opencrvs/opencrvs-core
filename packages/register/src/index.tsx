@@ -29,7 +29,8 @@ function onNewConentAvailable() {
 function onBackGroundSync() {
   const channel = new BroadcastChannel(config.BACKGROUND_SYNC_BROADCAST_CHANNEL)
   channel.onmessage = e => {
-    const action = actions.showBackgroundSyncedNotification(e.data)
+    const syncCount = typeof e.data === 'number' ? e.data : 0
+    const action = actions.showBackgroundSyncedNotification(syncCount)
     store.dispatch(action)
   }
 }
