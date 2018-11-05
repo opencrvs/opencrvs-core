@@ -203,7 +203,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
