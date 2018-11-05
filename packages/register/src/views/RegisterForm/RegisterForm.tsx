@@ -142,9 +142,7 @@ type State = {
 
 const postMutation = gql`
   mutation submitBirthRegistration($details: BirthRegistrationInput!) {
-    createBirthRegistration(details: $details) {
-      id
-    }
+    createBirthRegistration(details: $details)
   }
 `
 
@@ -188,151 +186,191 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
+  getCookie = (cname: string) => {
+    const name = cname + '='
+    const decodedCookie = decodeURIComponent(document.cookie)
+    const ca = decodedCookie.split(';')
+
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i]
+
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1)
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length)
+      }
+    }
+
+    return ''
+  }
+
   processSubmitData = () => {
-    const { child, father, mother, registration } = this.props.draft.data
+    const data = this.props.draft.data
+    const { child, father, mother, registration } = data
+    if (!data || !child || !father || !mother || !registration) {
+      return {}
+    }
+
+    let user
+    const userCookie = this.getCookie('user')
+    if (userCookie) {
+      user = JSON.parse(userCookie)
+    }
+
     const fatherPermanentAddress = father.permanentAddressSameAsMother
       ? mother
       : father
     const fatherCurrentAddress = father.addressSameAsMother ? mother : father
 
+    const motherDetails = {
+      name: [
+        {
+          firstNames: mother.firstNames,
+          familyName: mother.familyName
+        },
+        {
+          firstNames: mother.firstNamesEng,
+          familyName: mother.familyNameEng
+        }
+      ],
+      identifier: [{ id: mother.iD, type: mother.iDType }],
+      nationality: [mother.nationality],
+      birthDate: mother.birthDate,
+      maritalStatus: mother.maritalStatus,
+      dateOfMarriage: mother.dateOfMarriage,
+      educationalAttainment: mother.educationalAttainment,
+      address: [
+        {
+          use: 'English',
+          type: 'PERMANENT',
+          country: mother.countryPermanent,
+          state: mother.statePermanent,
+          district: mother.districtPermanent,
+          postalCode: mother.postCodePermanent,
+          line: [
+            mother.addressLine1Permanent,
+            mother.addressLine2Permanent,
+            mother.addressLine3Options1Permanent,
+            mother.addressLine4Permanent
+          ]
+        },
+        {
+          use: 'English',
+          type: 'CURRENT',
+          country: mother.country,
+          state: mother.state,
+          district: mother.district,
+          postalCode: mother.postCode,
+          line: [
+            mother.addressLine1,
+            mother.addressLine2,
+            mother.addressLine3Options1,
+            mother.addressLine4
+          ]
+        }
+      ]
+    }
+
+    const fatherDetails = {
+      name: [
+        {
+          firstNames: father.firstNames,
+          familyName: father.familyName
+        },
+        {
+          firstNames: father.firstNamesEng,
+          familyName: father.familyNameEng
+        }
+      ],
+      identifier: [{ id: father.iD, type: father.iDType }],
+      nationality: [father.nationality],
+      birthDate: father.birthDate,
+      maritalStatus: father.maritalStatus,
+      dateOfMarriage: father.dateOfMarriage,
+      educationalAttainment: mother.educationalAttainment,
+      address: [
+        {
+          use: 'English',
+          type: 'PERMANENT',
+          country: fatherPermanentAddress.countryPermanent,
+          state: fatherPermanentAddress.statePermanent,
+          district: fatherPermanentAddress.districtPermanent,
+          postalCode: fatherPermanentAddress.postCodePermanent,
+          line: [
+            fatherPermanentAddress.addressLine1Permanent,
+            fatherPermanentAddress.addressLine2Permanent,
+            fatherPermanentAddress.addressLine3Options1Permanent,
+            fatherPermanentAddress.addressLine4Permanent
+          ]
+        },
+        {
+          use: 'English',
+          type: 'CURRENT',
+          country: fatherCurrentAddress.country,
+          state: fatherCurrentAddress.state,
+          district: fatherCurrentAddress.district,
+          postalCode: fatherCurrentAddress.postCode,
+          line: [
+            fatherCurrentAddress.addressLine1,
+            fatherCurrentAddress.addressLine2,
+            fatherCurrentAddress.addressLine3Options1,
+            fatherCurrentAddress.addressLine4
+          ]
+        }
+      ]
+    }
+
+    if (registration.whoseContactDetails === 'MOTHER') {
+      motherDetails['telecom'] = [
+        { system: 'phone', value: registration.registrationPhone },
+        { system: 'email', value: registration.registrationEmail }
+      ]
+    } else if (registration.whoseContactDetails === 'FATHER') {
+      fatherDetails['telecom'] = [
+        { system: 'phone', value: registration.registrationPhone },
+        { system: 'email', value: registration.registrationEmail }
+      ]
+    }
+
     const draftDetails = {
       child: {
+        gender: child.gender,
         name: [
           {
-            use: 'Bangla',
             firstNames: child.firstNames,
             familyName: child.familyName
           },
           {
-            use: 'English',
             firstNames: child.firstNamesEng,
             familyName: child.familyNameEng
           }
         ],
-        gender: child.gender,
         birthDate: child.birthDate
       },
-      father: {
-        identifier: [
-          {
-            id: father.iD,
-            type: father.iDType
-          }
-        ],
-        name: [
-          {
-            use: 'Bangla',
-            firstNames: father.firstNames,
-            familyName: father.familyName
-          },
-          {
-            use: 'English',
-            firstNames: father.firstNamesEng,
-            familyName: father.familyNameEng
-          }
-        ],
-        birthDate: father.birthDate,
-        dateOfMarriage: father.dateOfMarriage,
-        maritalStatus: father.maritalStatus,
-        nationality: [father.nationality],
-        educationalAttainment: father.educationalAttainment,
-        address: [
-          {
-            use: 'English',
-            type: 'PERMANENT',
-            country: fatherPermanentAddress.countryPermanent,
-            state: fatherPermanentAddress.statePermanent,
-            district: fatherPermanentAddress.districtPermanent,
-            postalCode: fatherPermanentAddress.postCodePermanent,
-            line: [
-              fatherPermanentAddress.addressLine1Permanent,
-              fatherPermanentAddress.addressLine2Permanent,
-              fatherPermanentAddress.addressLine3Options1Permanent,
-              fatherPermanentAddress.addressLine4Permanent
-            ]
-          },
-          {
-            use: 'English',
-            type: 'CURRENT',
-            country: fatherCurrentAddress.country,
-            state: fatherCurrentAddress.state,
-            district: fatherCurrentAddress.district,
-            postalCode: fatherCurrentAddress.postCode,
-            line: [
-              fatherCurrentAddress.addressLine1,
-              fatherCurrentAddress.addressLine2,
-              fatherCurrentAddress.addressLine3Options1,
-              fatherCurrentAddress.addressLine4
-            ]
-          }
-        ]
-      },
-      mother: {
-        identifier: [
-          {
-            id: mother.iD,
-            type: mother.iDType
-          }
-        ],
-        name: [
-          {
-            use: 'Bangla',
-            firstNames: mother.firstNames,
-            familyName: mother.familyName
-          },
-          {
-            use: 'English',
-            firstNames: mother.firstNamesEng,
-            familyName: mother.familyNameEng
-          }
-        ],
-        birthDate: mother.birthDate,
-        dateOfMarriage: mother.dateOfMarriage,
-        maritalStatus: mother.maritalStatus,
-        nationality: [mother.nationality],
-        educationalAttainment: mother.educationalAttainment,
-        address: [
-          {
-            use: 'English',
-            type: 'PERMANENT',
-            country: mother.countryPermanent,
-            state: mother.statePermanent,
-            district: mother.districtPermanent,
-            postalCode: mother.postCodePermanent,
-            line: [
-              mother.addressLine1Permanent,
-              mother.addressLine2Permanent,
-              mother.addressLine3Options1Permanent,
-              mother.addressLine4Permanent
-            ]
-          },
-          {
-            use: 'English',
-            type: 'CURRENT',
-            country: mother.country,
-            state: mother.state,
-            district: mother.district,
-            postalCode: mother.postCode,
-            line: [
-              mother.addressLine1,
-              mother.addressLine2,
-              mother.addressLine3Options1,
-              mother.addressLine4
-            ]
-          }
-        ]
-      },
+      mother: motherDetails,
+      father: fatherDetails,
       registration: {
+        status: [
+          {
+            type: 'DECLARED',
+            user: { userName: user.username, role: [{ type: 'admin' }] },
+            comments: [
+              {
+                comment: registration.commentsOrNotes,
+                id: user.id,
+                user: { userName: user.username, role: [{ type: 'admin' }] }
+              }
+            ]
+          }
+        ],
         paperFormID: registration.paperFormNumber
       },
-      birthLocation: {
-        type: child.placeOfDelivery
-      },
-      birthOrder: child.orderOfBirth,
       attendantAtBirth: child.attendantAtBirth,
       birthType: child.typeOfBirth,
       weightAtBirth: child.weightAtBirth,
-      presentAtBirthRegistration: registration.presentAtBirthRegistration
+      presentAtBirthRegistration: registration.presentAtBirthRegistration,
+      createdAt: new Date()
     }
 
     return draftDetails
@@ -424,11 +462,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
         </ViewFooter>
         <Mutation
           mutation={postMutation}
-          variables={{ details: this.processSubmitData }}
+          variables={{ details: this.processSubmitData() }}
         >
           {(submitBirthRegistration, { data }) => {
-            if (data && data.id) {
-              history.push('/saved')
+            if (data && data.createBirthRegistration) {
+              if (data.createBirthRegistration) {
+                history.push('/saved')
+              }
             }
 
             return (
