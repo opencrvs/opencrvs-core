@@ -4,28 +4,42 @@ import {
   createFatherSection,
   createChildSection,
   createPersonEntryTemplate,
+  createEncounterSection,
+  createEncounter,
+  createLocationResource,
+  createObservationEntryTemplate,
   createSupportingDocumentsSection,
-  createDocRefTemplate
+  createDocRefTemplate,
+  createTaskRefTemplate
 } from 'src/features/fhir/templates'
-import { IExtension } from 'src/type/person'
+import {
+  ITemplatedBundle,
+  ITemplatedComposition
+} from '../registration/fhir-builders'
 
-export function findCompositionSectionInBundle(code: string, fhirBundle: any) {
-  return fhirBundle.entry[0].resource.section.find(
-    (section: any) => section.code.coding.code === code
-  )
+export function findCompositionSectionInBundle(
+  code: string,
+  fhirBundle: ITemplatedBundle
+) {
+  return findCompositionSection(code, fhirBundle.entry[0].resource)
 }
 
-export function findCompositionSection(code: string, composition: any) {
-  return composition.section.find(
-    (section: any) => section.code.coding.code === code
-  )
+export function findCompositionSection(
+  code: string,
+  composition: ITemplatedComposition
+) {
+  return composition.section.find((section: fhir.CompositionSection) => {
+    if (!section.code || !section.code.coding) {
+      return false
+    }
+    return section.code.coding.some(coding => coding.code === code)
+  })
 }
 
 export function selectOrCreatePersonResource(
   sectionCode: string,
-  fhirBundle: fhir.Bundle,
-  context: any
-) {
+  fhirBundle: ITemplatedBundle
+): fhir.Patient {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   let personEntry
@@ -46,23 +60,136 @@ export function selectOrCreatePersonResource(
       default:
         throw new Error(`Unknown section code ${sectionCode}`)
     }
-    fhirBundle.entry[0].resource.section.push(personSection)
+    const composition = fhirBundle.entry[0].resource
+    composition.section.push(personSection)
     personEntry = createPersonEntryTemplate(ref)
     fhirBundle.entry.push(personEntry)
   } else {
+    if (!section.entry || !section.entry[0]) {
+      throw new Error('Expected person section ot have an entry')
+    }
+    const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(
-      (entry: any) => entry.fullUrl === section.entry[0].reference
+      entry => entry.fullUrl === personSectionEntry.reference
     )
   }
 
-  return personEntry.resource
+  if (!personEntry) {
+    throw new Error(
+      'Patient referenced from composition section not found in FHIR bundle'
+    )
+  }
+
+  return personEntry.resource as fhir.Patient
+}
+
+export function selectOrCreateEncounterResource(
+  sectionCode: string,
+  fhirBundle: ITemplatedBundle
+): fhir.Encounter {
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+  let encounterEntry
+
+  if (!section) {
+    const ref = uuid()
+    let encounterSection
+    if (sectionCode === 'birth-encounter') {
+      encounterSection = createEncounterSection(ref)
+    } else {
+      throw new Error(`Unknown section code ${sectionCode}`)
+    }
+    fhirBundle.entry[0].resource.section.push(encounterSection)
+    encounterEntry = createEncounter(ref)
+    fhirBundle.entry.push(encounterEntry)
+  } else {
+    if (!section.entry || !section.entry[0]) {
+      throw new Error('Expected encounter section to have an entry')
+    }
+    const encounterSectionEntry = section.entry[0]
+    encounterEntry = fhirBundle.entry.find(
+      entry => entry.fullUrl === encounterSectionEntry.reference
+    )
+  }
+
+  if (!encounterEntry) {
+    throw new Error(
+      'Encounter referenced from composition section not found in FHIR bundle'
+    )
+  }
+
+  return encounterEntry.resource as fhir.Encounter
+}
+
+export function createObservationResource(
+  sectionCode: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Observation {
+  const encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle)
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+
+  const ref = uuid()
+  const observationEntry = createObservationEntryTemplate(ref)
+
+  if (!section || !section.entry || !section.entry[0]) {
+    throw new Error('Expected encounter section to exist and have an entry')
+  }
+  const encounterSectionEntry = section.entry[0]
+  const encounterEntry = fhirBundle.entry.find(
+    entry => entry.fullUrl === encounterSectionEntry.reference
+  )
+  if (encounterEntry && encounter) {
+    observationEntry.resource.context = {
+      reference: `${encounterEntry.fullUrl}`
+    }
+  }
+  fhirBundle.entry.push(observationEntry)
+
+  return observationEntry.resource
+}
+
+export function selectOrCreateLocationRefResource(
+  sectionCode: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Location {
+  let locationEntry
+
+  const encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle)
+
+  if (!encounter.location) {
+    // create location
+    const locationRef = uuid()
+    locationEntry = createLocationResource(locationRef)
+    fhirBundle.entry.push(locationEntry)
+    encounter.location = []
+    encounter.location.push({
+      location: { reference: `urn:uuid:${locationRef}` }
+    })
+  } else {
+    if (!encounter.location || !encounter.location[0]) {
+      throw new Error('Encounter is expected to have a location property')
+    }
+    const locationElement = encounter.location[0]
+    locationEntry = fhirBundle.entry.find(
+      entry => entry.fullUrl === locationElement.location.reference
+    )
+  }
+
+  if (!locationEntry) {
+    throw new Error(
+      'Location referenced from encounter section not found in FHIR bundle'
+    )
+  }
+
+  return locationEntry.resource as fhir.Location
 }
 
 export function selectOrCreateDocRefResource(
   sectionCode: string,
-  fhirBundle: fhir.Bundle,
+  fhirBundle: ITemplatedBundle,
   context: any
-) {
+): fhir.DocumentReference {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   let docRef
@@ -76,26 +203,63 @@ export function selectOrCreateDocRefResource(
     docRef = createDocRefTemplate(ref)
     fhirBundle.entry.push(docRef)
   } else {
-    docRef = fhirBundle.entry.find(
-      (entry: any) =>
-        section.entry[context._index.attachments] &&
-        entry.fullUrl === section.entry[context._index.attachments].reference
-    )
-    if (!docRef) {
+    if (!section.entry) {
+      throw new Error(
+        'Expected supporting documents section to have an entry property'
+      )
+    }
+    const docSectionEntry = section.entry[context._index.attachments]
+    if (!docSectionEntry) {
       const ref = uuid()
-      docRef = createDocRefTemplate(ref)
-      fhirBundle.entry.push(docRef)
       section.entry[context._index.attachments] = {
         reference: `urn:uuid:${ref}`
+      }
+      docRef = createDocRefTemplate(ref)
+      fhirBundle.entry.push(docRef)
+    } else {
+      docRef = fhirBundle.entry.find(
+        entry => entry.fullUrl === docSectionEntry.reference
+      )
+      if (!docRef) {
+        const ref = uuid()
+        docRef = createDocRefTemplate(ref)
+        fhirBundle.entry.push(docRef)
+        section.entry[context._index.attachments] = {
+          reference: `urn:uuid:${ref}`
+        }
       }
     }
   }
 
-  return docRef.resource
+  return docRef.resource as fhir.DocumentReference
+}
+
+export function selectOrCreateTaskRefResource(
+  fhirBundle: ITemplatedBundle,
+  compTrackingId: string,
+  context: any
+): fhir.Task {
+  let taskResource =
+    fhirBundle.entry &&
+    fhirBundle.entry.find(entry => {
+      if (!entry.resource || entry.resource.resourceType !== 'Task') {
+        return false
+      }
+      const task = entry.resource as fhir.Task
+      return (
+        task.focus !== undefined &&
+        task.focus.reference === `urn:trackingid:${compTrackingId}`
+      )
+    })
+  if (!taskResource) {
+    taskResource = createTaskRefTemplate(uuid(), compTrackingId)
+    fhirBundle.entry.push(taskResource)
+  }
+  return taskResource.resource as fhir.Task
 }
 
 export function setObjectPropInResourceArray(
-  resource: any,
+  resource: fhir.Resource,
   label: string,
   value: string | string[],
   propName: string,
@@ -110,8 +274,23 @@ export function setObjectPropInResourceArray(
   resource[label][context._index[label]][propName] = value
 }
 
-export function findExtension(url: string, composition: any): IExtension {
-  const extension = composition.find((obj: IExtension) => {
+export function setArrayPropInResourceObject(
+  resource: fhir.Resource,
+  label: string,
+  value: Array<{}>,
+  propName: string
+) {
+  if (!resource[label]) {
+    resource[label] = {}
+  }
+  resource[label][propName] = value
+}
+
+export function findExtension(
+  url: string,
+  extensions: fhir.Extension[]
+): fhir.Extension | undefined {
+  const extension = extensions.find((obj: fhir.Extension) => {
     return obj.url === url
   })
   return extension

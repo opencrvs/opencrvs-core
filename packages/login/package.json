@@ -29,12 +29,13 @@
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
-    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
+    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "start:prod": "yarn build && yarn serve -s -l 3020 build"
+    "start:prod": "yarn build && yarn serve -s -l 3020 build",
+    "test:compilation": "tsc --noEmit"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
@@ -48,6 +49,7 @@
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/jest": "^22.2.3",
+    "@types/jwt-decode": "^2.2.1",
     "@types/lodash-es": "^4.17.0",
     "@types/node": "^10.0.8",
     "@types/react": "^16.3.14",
@@ -56,6 +58,7 @@
     "@types/redux-mock-store": "^1.0.0",
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
+    "jwt-decode": "^2.2.0",
     "moxios": "^0.4.0",
     "opener": "^1.5.1",
     "prettier": "^1.12.1",

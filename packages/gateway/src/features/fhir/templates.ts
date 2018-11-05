@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid'
+import { ITemplatedComposition } from '../registration/fhir-builders'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -18,13 +19,14 @@ export function createMotherSection(refUuid: string) {
   return {
     title: "Mother's details",
     code: {
-      coding: {
-        system: 'http://opencrvs.org/doc-sections',
-        code: 'mother-details'
-      },
+      coding: [
+        {
+          system: 'http://opencrvs.org/doc-sections',
+          code: 'mother-details'
+        }
+      ],
       text: "Mother's details"
     },
-    text: '',
     entry: [
       {
         reference: `urn:uuid:${refUuid}`
@@ -37,13 +39,14 @@ export function createFatherSection(refUuid: string) {
   return {
     title: "Father's details",
     code: {
-      coding: {
-        system: 'http://opencrvs.org/doc-sections',
-        code: 'father-details'
-      },
+      coding: [
+        {
+          system: 'http://opencrvs.org/doc-sections',
+          code: 'father-details'
+        }
+      ],
       text: "Father's details"
     },
-    text: '',
     entry: [
       {
         reference: `urn:uuid:${refUuid}`
@@ -56,13 +59,14 @@ export function createChildSection(refUuid: string) {
   return {
     title: 'Child details',
     code: {
-      coding: {
-        system: 'http://opencrvs.org/doc-sections',
-        code: 'child-details'
-      },
+      coding: [
+        {
+          system: 'http://opencrvs.org/doc-sections',
+          code: 'child-details'
+        }
+      ],
       text: 'Child details'
     },
-    text: '',
     entry: [
       {
         reference: `urn:uuid:${refUuid}`
@@ -71,32 +75,79 @@ export function createChildSection(refUuid: string) {
   }
 }
 
-export function createCompositionTemplate() {
+export function createLocationResource(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Location',
+      mode: 'instance'
+    }
+  }
+}
+
+export function createEncounterSection(refUuid: string) {
+  return {
+    title: 'Birth Encounter',
+    code: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/sections',
+          code: 'birth-encounter'
+        }
+      ],
+      text: 'Birth encounter'
+    },
+    entry: [
+      {
+        reference: `urn:uuid:${refUuid}`
+      }
+    ]
+  }
+}
+
+export function createEncounter(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Encounter',
+      status: 'finished'
+    } as fhir.Encounter
+  }
+}
+
+export function createCompositionTemplate(trackingId?: string) {
   return {
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
-        value: uuid()
+        value: trackingId ? trackingId : uuid()
       },
       resourceType: 'Composition',
       status: 'preliminary',
       type: {
-        coding: {
-          system: 'http://opencrvs.org/doc-types',
-          code: 'birth-declaration'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-types',
+            code: 'birth-declaration'
+          }
+        ],
         text: 'Birth Declaration'
       },
       class: {
-        coding: {
-          system: 'http://opencrvs.org/doc-classes',
-          code: 'crvs-document'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-classes',
+            code: 'crvs-document'
+          }
+        ],
         text: 'CRVS Document'
       },
       title: 'Birth Declaration',
-      section: []
-    }
+      section: [],
+      subject: {},
+      date: '',
+      author: []
+    } as ITemplatedComposition
   }
 }
 
@@ -106,7 +157,7 @@ export function createPersonEntryTemplate(refUuid: string) {
     resource: {
       resourceType: 'Patient',
       active: true
-    }
+    } as fhir.Patient
   }
 }
 
@@ -114,14 +165,15 @@ export function createSupportingDocumentsSection() {
   return {
     title: 'Supporting documents',
     code: {
-      coding: {
-        system: 'http://opencrvs.org/specs/sections',
-        code: 'supporting-documents'
-      },
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/sections',
+          code: 'supporting-documents'
+        }
+      ],
       text: 'Supporting documents'
     },
-    text: '',
-    entry: []
+    entry: [] as fhir.Reference[]
   }
 }
 
@@ -135,6 +187,37 @@ export function createDocRefTemplate(refUuid: string) {
         value: refUuid
       },
       status: 'current'
+    } as fhir.DocumentReference
+  }
+}
+
+export function createObservationEntryTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Observation',
+      status: 'final'
+    } as fhir.Observation
+  }
+}
+
+export function createTaskRefTemplate(refUuid: string, refComposition: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Task',
+      status: 'requested',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/types',
+            code: 'birth-registration'
+          }
+        ]
+      },
+      focus: {
+        reference: `urn:trackingid:${refComposition}`
+      }
     }
   }
 }
