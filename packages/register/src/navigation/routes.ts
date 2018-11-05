@@ -7,3 +7,4 @@ export const DRAFT_BIRTH_PARENT_FORM_TAB =
   '/drafts/:draftId/events/birth/parent/:tabId'
 
 export const SAVED_REGISTRATION = '/saved'
+export const DECLARATIONS = '/declarations'
