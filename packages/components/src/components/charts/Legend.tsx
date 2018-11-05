@@ -16,6 +16,7 @@ const Column = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding-right: 1em;
 `
 
 const LegendItemBase = styled.div`
@@ -25,6 +26,7 @@ const LegendItemBase = styled.div`
     content: ':';
   }
   &::before {
+    box-sizing: border-box;
     width: 25px;
     height: 8px;
     display: block;
@@ -40,7 +42,7 @@ const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
 
 const EstimateLegendItem = styled(LegendItemBase)`
   &::before {
-    height: 4px;
+    height: 8px;
     border: 2px dotted ${({ theme }) => theme.colors.accent};
     background: transparent;
   }
@@ -53,6 +55,7 @@ const DataLabel = styled.label`
 `
 const DataTitle = styled.h3`
   font-size: 20px;
+  margin: 0;
   color: ${({ theme }) => theme.colors.accent};
 `
 const DataDescription = styled.span`

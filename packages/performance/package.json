@@ -5,10 +5,11 @@
   "dependencies": {
     "@opencrvs/components": "^0.1.0",
     "formik": "^1.0.3",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
     "react-intl": "^2.4.0",
     "react-scripts-ts": "2.16.0",
+    "redux-loop": "^4.3.3",
     "serve": "^10.0.2",
     "styled-components": "^3.3.3"
   },
@@ -16,9 +17,12 @@
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3001 react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test": "react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "test":
+      "react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
@@ -27,28 +31,32 @@
     "test:compilation": "tsc --noEmit"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "prettier --write",
-      "tslint",
-      "stylelint",
-      "git add"
-    ]
+    "src/**/*.{ts,tsx}": ["prettier --write", "tslint", "stylelint", "git add"]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/history": "^4.6.2",
     "@types/jest": "^23.3.5",
+    "@types/react": "^16.3.14",
+    "@types/react-dom": "^16.0.5",
+    "@types/jwt-decode": "^2.2.1",
     "@types/node": "^10.12.0",
-    "@types/react": "^16.4.18",
-    "@types/react-dom": "^16.0.9",
+    "@types/query-string": "^6.1.1",
     "@types/react-intl": "^2.3.8",
-    "@types/react-redux": "^6.0.0",
+    "@types/react-redux": "^6.0.9",
     "@types/react-router-redux": "^5.0.14",
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
+    "history": "^4.7.2",
+    "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
+    "query-string": "^6.2.0",
+    "react-router": "^4.2.0",
+    "react-router-redux": "next",
+    "redux": "^4.0.1",
+    "redux-loop": "^4.4.1",
     "stylelint": "^9.5.0",
     "stylelint-config-recommended": "^2.1.0",
     "stylelint-config-styled-components": "^0.1.1",
@@ -60,12 +68,7 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ],
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "html"
-    ],
+    "coverageReporters": ["json", "lcov", "text", "html"],
     "moduleNameMapper": {
       "^src(.*)$": "<rootDir>/src$1"
     }

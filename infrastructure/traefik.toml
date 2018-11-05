@@ -31,6 +31,6 @@ entryPoint = "http"
 
 [[acme.domains]]
   main = "opencrvs-staging.jembi.org"
-  sans = ["register.opencrvs-staging.jembi.org", "login.opencrvs-staging.jembi.org", "auth.opencrvs-staging.jembi.org", "gateway.opencrvs-staging.jembi.org"]
+  sans = ["register.opencrvs-staging.jembi.org", "login.opencrvs-staging.jembi.org", "auth.opencrvs-staging.jembi.org", "gateway.opencrvs-staging.jembi.org", "performance.opencrvs-staging.jembi.org"]
 
 [retry]
