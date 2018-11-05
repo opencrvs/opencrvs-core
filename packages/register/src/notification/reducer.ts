@@ -3,15 +3,21 @@ import * as actions from './actions'
 
 export type NotificationState = {
   newContentAvailable: boolean
+  backgroundSyncShow: boolean
+  syncCount: number
 }
 
 export const initialState: NotificationState = {
-  newContentAvailable: false
+  newContentAvailable: false,
+  backgroundSyncShow: false,
+  syncCount: 0
 }
 
 type Action =
   | actions.ShowNewContentAvailableAction
   | actions.HideNewContentAvailableAction
+  | actions.ShowBackgroundSyncedAction
+  | actions.HideBackgroundSyncedAction
 
 export const notificationReducer: LoopReducer<NotificationState, Action> = (
   state: NotificationState = initialState,
@@ -27,6 +33,17 @@ export const notificationReducer: LoopReducer<NotificationState, Action> = (
       return {
         ...state,
         newContentAvailable: false
+      }
+    case actions.SHOW_BACKGROUND_SYNC_TRIGGERED:
+      return {
+        ...state,
+        backgroundSyncShow: true,
+        syncCount: action.payload.syncCount
+      }
+    case actions.HIDE_BACKGROUND_SYNC_TRIGGERED:
+      return {
+        ...state,
+        backgroundSyncShow: false
       }
     default:
       return state
