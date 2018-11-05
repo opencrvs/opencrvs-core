@@ -203,7 +203,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
@@ -218,7 +218,7 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
-  contact: RegistrationContactType
+  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
