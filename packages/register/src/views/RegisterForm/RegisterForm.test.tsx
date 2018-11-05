@@ -44,6 +44,49 @@ describe('when user is in the register form', async () => {
   const intlProvider = new IntlProvider({ locale: 'en' }, {})
   const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
+
+  describe('when user is in the child section', () => {
+    beforeEach(async () => {
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          intl={intl}
+          history={history}
+          staticContext={mock}
+          match={{
+            params: { draftId: draft.id, tabId: 'child' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+    })
+    it('renders the page', () => {
+      expect(
+        component.find('#form_section_title_child').hostNodes()
+      ).toHaveLength(1)
+    })
+    it('changes the gender select', async () => {
+      const select = selectOption(component, '#gender', 'Male')
+      expect(component.find(select).text()).toEqual('Male')
+    })
+    it('changes the attendant at birth select', async () => {
+      const select = selectOption(component, '#attendantAtBirth', 'Nurse')
+      expect(component.find(select).text()).toEqual('Nurse')
+    })
+    it('changes type of birth select', async () => {
+      const select = selectOption(component, '#typeOfBirth', 'Twin')
+      expect(component.find(select).text()).toEqual('Twin')
+    })
+    it('changes place of delivery select', async () => {
+      const select = selectOption(component, '#placeOfDelivery', 'Hospital')
+      expect(component.find(select).text()).toEqual('Hospital')
+    })
+  })
+
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
