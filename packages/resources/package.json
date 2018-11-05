@@ -8,7 +8,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
     "open:cov": "yarn test && opener coverage/index.html",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "test:compilation": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",
@@ -38,6 +39,7 @@
     "@types/uuid": "^3.4.4",
     "@types/winston": "^2.4.4",
     "app-module-path": "^2.2.0",
+    "boom": "^7.2.2",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",

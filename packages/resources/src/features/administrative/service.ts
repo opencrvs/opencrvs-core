@@ -1,7 +1,9 @@
 import fetch from 'node-fetch'
 import { ADMINISTRATIVE_STRUCTURE_URL } from 'src/constants'
-// import { logger } from 'src/logger'
+import { logger } from 'src/logger'
 import { v4 as uuid } from 'uuid'
+import { replaceParamsInRoute } from 'src/util/routeUtils'
+import { appendDivisions } from 'src/util/divisionsUtils'
 interface IIdentifier {
   system: string
   value: number
@@ -73,11 +75,12 @@ const composeFhir = (
   }
 }
 
-export async function getLocationData(
+export async function requestLocations(
   route: string,
   adminLevel: number
 ): Promise<ILocation[]> {
   const url = `${ADMINISTRATIVE_STRUCTURE_URL}/${route}`
+  logger.info(`url: ${url}`)
   const res = await fetch(url, {
     method: 'GET'
   })
@@ -95,19 +98,57 @@ export async function getLocationData(
   return locations
 }
 
-export async function getDistrictData(
-  divisions: ILocation[]
+export async function getDivisionsByLevel(
+  route: string,
+  firstLevelDivisions: ILocation[],
+  secondLevelDivisions?: ILocation[],
+  thirdLevelDivisions?: ILocation[]
 ): Promise<ILocation[]> {
-  let districts: ILocation[] = []
-  for (const division of divisions) {
-    const districtsInDivision = await getLocationData(
-      `district?division=${division.identifier[0].value}`,
-      division.identifier[0].value
-    )
-    districts = districtsInDivision.reduce((total, item) => {
-      total.push(item)
-      return total
-    }, districts)
+  let divisions: ILocation[] = []
+  let queryRoute: string
+  let queryResult: ILocation[] = []
+  for (const firstLevelDivision of firstLevelDivisions) {
+    const routeParams: string[] = []
+    routeParams.push(String(firstLevelDivision.identifier[0].value))
+    if (secondLevelDivisions) {
+      // 2nd level
+      for (const secondLevelDivision of secondLevelDivisions) {
+        const secondLevelDivisionID = secondLevelDivision.identifier[0].value
+        routeParams.push(String(secondLevelDivisionID))
+        if (thirdLevelDivisions) {
+          // 3rd level
+          for (const thirdLevelDivision of thirdLevelDivisions) {
+            const thirdLevelDivisionID = thirdLevelDivision.identifier[0].value
+            routeParams.push(String(thirdLevelDivisionID))
+            queryRoute = replaceParamsInRoute(route, routeParams)
+            // logger.info(`queryRoute: ${queryRoute}`)
+            queryResult = await requestLocations(
+              queryRoute,
+              thirdLevelDivisionID
+            )
+            divisions = appendDivisions(divisions, queryResult)
+            routeParams.pop()
+          }
+        } else {
+          queryRoute = replaceParamsInRoute(route, routeParams)
+          // logger.info(`queryRoute: ${queryRoute}`)
+          queryResult = await requestLocations(
+            queryRoute,
+            secondLevelDivisionID
+          )
+          divisions = appendDivisions(divisions, queryResult)
+          routeParams.pop()
+        }
+      }
+    } else {
+      // 1st Level
+      queryRoute = replaceParamsInRoute(route, routeParams)
+      queryResult = await requestLocations(
+        queryRoute,
+        firstLevelDivision.identifier[0].value
+      )
+      divisions = appendDivisions(divisions, queryResult)
+    }
   }
-  return districts
+  return divisions
 }

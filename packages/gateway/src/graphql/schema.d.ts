@@ -191,9 +191,15 @@ export interface GQLRegistration {
   paperFormID?: string
   page?: string
   book?: string
+  contact?: GQLRegistrationContactType
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachment | null>
+}
+
+export enum GQLRegistrationContactType {
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER'
 }
 
 export interface GQLRegWorkflow {
@@ -405,6 +411,7 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
+  contact?: GQLRegistrationContactType
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachmentInput | null>
@@ -1079,6 +1086,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
+  contact?: RegistrationToContactResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
@@ -1110,6 +1118,10 @@ export interface RegistrationToPageResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToBookResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToContactResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
