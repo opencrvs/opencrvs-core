@@ -11,7 +11,7 @@ describe('authenticate handler receives a request', () => {
     it('returns a 200 response to client', async () => {
       const res = await server.server.inject({
         method: 'GET',
-        url: '/administrative_structure'
+        url: '/administrative_structure/division'
       })
 
       expect(res.statusCode).toBe(200)

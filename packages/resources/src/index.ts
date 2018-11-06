@@ -8,7 +8,9 @@ require('dotenv').config({
 import * as Hapi from 'hapi'
 
 import { AUTH_HOST, AUTH_PORT } from './constants'
-import administrativeStructureHandler from './features/administrative/handler'
+import administrativeStructureHandler, {
+  requestSchema as administrativeStructureRequestSchema
+} from './features/administrative/handler'
 import getPlugins from './config/plugins'
 
 export async function createServer() {
@@ -19,22 +21,22 @@ export async function createServer() {
       cors: { origin: ['*'] }
     }
   })
-
-  // curl -H 'Content-Type: application/json' -d '{"nonce": "", "token": ""}' http://localhost:4040/refreshToken
   server.route({
     method: 'GET',
-    path: '/administrative_structure',
+    path: '/administrative_structure/{divisionType}',
     handler: administrativeStructureHandler,
     options: {
       tags: ['api'],
-      description: 'Import the administrative structure',
-      notes:
-        'Connects to the 3rd party API to retrieve and format administrative structure into FHIR',
+      description: 'Load the administrative structure',
+      notes: 'Loads the administrative structure JSON',
+      validate: {
+        payload: administrativeStructureRequestSchema
+      },
       plugins: {
         'hapi-swagger': {
           responses: {
-            200: { description: 'Successfully imported' },
-            400: { description: 'Cannot import' }
+            200: { description: 'Successfully loaded' },
+            400: { description: 'Cannot load' }
           }
         }
       }

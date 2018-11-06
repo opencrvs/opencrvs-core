@@ -10,12 +10,13 @@
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
-    "request:locations": "ts-node src/features/administrative/handler.ts",
-    "assign:geo-data": "ts-node scripts/assign-geodata-to-locations.ts"
+    "assign:locations": "ts-node src/features/administrative/scripts/assign-admin-structure-to-locations.ts",
+    "assign:geo-data": "ts-node src/features/administrative/scripts/assign-geodata-to-locations.ts"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",
     "@types/dotenv": "^4.0.2",
+    "@types/fhir": "^0.0.30",
     "@types/jest": "^22.2.3",
     "@types/node": "^8.0.6",
     "concurrently": "^4.0.1",
@@ -37,6 +38,7 @@
   },
   "dependencies": {
     "@types/hapi": "^17.0.12",
+    "@types/joi": "^14.0.0",
     "@types/lodash": "^4.14.117",
     "@types/uuid": "^3.4.4",
     "@types/winston": "^2.4.4",
@@ -46,6 +48,7 @@
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.4.0",
+    "joi": "^14.0.4",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2",
     "winston": "^3.1.0"
