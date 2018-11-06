@@ -1,9 +1,9 @@
 import fetch from 'node-fetch'
-import { ADMINISTRATIVE_STRUCTURE_URL } from 'src/constants'
-import { logger } from 'src/logger'
+import { ADMINISTRATIVE_STRUCTURE_URL } from '../../constants'
+import { logger } from '../../logger'
 import { v4 as uuid } from 'uuid'
-import { replaceParamsInRoute } from 'src/util/routeUtils'
-import { appendDivisions } from 'src/util/divisionsUtils'
+import { replaceParamsInRoute } from '../../util/routeUtils'
+import { appendDivisions } from '../../util/divisionsUtils'
 interface IIdentifier {
   system: string
   value: number

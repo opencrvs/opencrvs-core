@@ -9,7 +9,8 @@
     "test:watch": "jest --watch --coverage",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit",
+    "request:locations": "ts-node src/features/administrative/handler.ts"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",
