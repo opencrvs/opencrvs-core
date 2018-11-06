@@ -10,7 +10,8 @@
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
-    "request:locations": "ts-node src/features/administrative/handler.ts"
+    "request:locations": "ts-node src/features/administrative/handler.ts",
+    "assign:geo-data": "ts-node scripts/assign-geodata-to-locations.ts"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",
