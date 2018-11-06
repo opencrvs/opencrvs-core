@@ -173,4 +173,127 @@ describe('when user is in the register form preview section', () => {
 
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(0)
   })
+
+  describe('Do not displays submit confirm modal when disabled submit button is clicked', () => {
+    const data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '1999-10-10',
+        deliveryAddress: '',
+        deliveryInstitution: '',
+        familyName: 'পারিবারিক নাম',
+        familyNameEng: 'family name',
+        firstNames: 'নামের প্রথমাংশ',
+        firstNamesEng: 'first name',
+        gender: 'male',
+        orderOfBirth: '2',
+        placeOfDelivery: 'HOSPITAL',
+        typeOfBirth: 'SINGLE',
+        weightAtBirth: '10'
+      },
+      father: {
+        addressLine1: '',
+        addressLine1Permanent: '',
+        addressLine2: '',
+        addressLine2Permanent: '',
+        addressLine3Options1: '',
+        addressLine3Options1Permanent: '',
+        addressLine4: '',
+        addressLine4Permanent: '',
+        addressSameAsMother: true,
+        fatherBirthDate: '1999-10-10',
+        country: 'BGD',
+        countryPermanent: 'BGD',
+        currentAddress: '',
+        dateOfMarriage: '2010-10-10',
+        district: '',
+        districtPermanent: '',
+        educationalAttainment: 'PRIMARY_ISCED_1',
+        familyName: 'পারিবারিক নাম',
+        familyNameEng: 'family name',
+        fathersDetailsExist: true,
+        firstNames: 'নামের প্রথমাংশ',
+        firstNamesEng: 'first name',
+        iD: '234234423424234244',
+        iDType: 'NATIONAL_ID',
+        maritalStatus: 'WIDOWED',
+        nationality: 'BGD',
+        permanentAddress: '',
+        permanentAddressSameAsMother: true,
+        postCode: '',
+        postCodePermanent: '',
+        state: '',
+        statePermanent: ''
+      },
+      mother: {
+        addressLine1: 'Rd #10',
+        addressLine1Permanent: 'Rd#10',
+        addressLine2: 'vil',
+        addressLine2Permanent: 'Vil',
+        addressLine3Options1: 'union1',
+        addressLine3Options1Permanent: 'union1',
+        addressLine4: 'upazila10',
+        addressLine4Permanent: 'upazila10',
+        motherBirthDate: '1999-10-10',
+        country: 'BGD',
+        countryPermanent: 'BGD',
+        currentAddress: '',
+        dateOfMarriage: '2010-10-10',
+        district: 'district2',
+        districtPermanent: 'district2',
+        educationalAttainment: 'PRIMARY_ISCED_1',
+        familyName: 'পারিবারিক নাম',
+        familyNameEng: 'family name',
+        firstNames: 'নামের প্রথমাংশ',
+        firstNamesEng: 'first name',
+        iD: '234243453455',
+        iDType: 'NATIONAL_ID',
+        maritalStatus: 'MARRIED',
+        nationality: 'BGD',
+        permanentAddress: '',
+        postCode: '1020',
+        postCodePermanent: '1010',
+        state: 'state4',
+        statePermanent: 'state4'
+      },
+      registration: {
+        commentsOrNotes: 'comments',
+        paperFormNumber: '423424245455',
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationCertificateLanguage: ['en'],
+        registrationEmail: 'gmail@gmail.com',
+        registrationPhone: '01736478884',
+        whoseContactDetails: 'MOTHER'
+      }
+    }
+
+    const customDraft = { id: Date.now(), data }
+    store.dispatch(storeDraft(customDraft))
+
+    const testComponent2 = createTestComponent(
+      <RegisterForm
+        location={mock}
+        intl={intl}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: { draftId: customDraft.id, tabId: 'preview' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    component = testComponent2.component
+  })
+
+  it('Enable submit button after filli-up the whole form', () => {
+    expect(
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .prop('disabled')
+    ).toBe(true)
+  })
 })

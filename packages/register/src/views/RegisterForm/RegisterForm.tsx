@@ -216,6 +216,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const userCookie = this.getCookie('user')
     if (userCookie) {
       user = JSON.parse(userCookie)
+    } else {
+      user = {
+        id: '',
+        username: ''
+      }
     }
 
     const fatherPermanentAddress = father.permanentAddressSameAsMother
@@ -236,7 +241,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ],
       identifier: [{ id: mother.iD, type: mother.iDType }],
       nationality: [mother.nationality],
-      birthDate: mother.birthDate,
+      birthDate: mother.motherBirthDate,
       maritalStatus: mother.maritalStatus,
       dateOfMarriage: mother.dateOfMarriage,
       educationalAttainment: mother.educationalAttainment,
@@ -285,7 +290,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ],
       identifier: [{ id: father.iD, type: father.iDType }],
       nationality: [father.nationality],
-      birthDate: father.birthDate,
+      birthDate: father.fatherBirthDate,
       maritalStatus: father.maritalStatus,
       dateOfMarriage: father.dateOfMarriage,
       educationalAttainment: mother.educationalAttainment,
@@ -321,13 +326,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ]
     }
 
-    if (registration.whoseContactDetails === 'MOTHER') {
-      motherDetails['telecom'] = [
-        { system: 'phone', value: registration.registrationPhone },
-        { system: 'email', value: registration.registrationEmail }
-      ]
-    } else if (registration.whoseContactDetails === 'FATHER') {
-      fatherDetails['telecom'] = [
+    const parentDetails =
+      registration.whoseContactDetails === 'MOTHER'
+        ? motherDetails
+        : registration.whoseContactDetails === 'FATHER'
+          ? fatherDetails
+          : null
+
+    if (parentDetails) {
+      parentDetails['telecom'] = [
         { system: 'phone', value: registration.registrationPhone },
         { system: 'email', value: registration.registrationEmail }
       ]
@@ -346,7 +353,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             familyName: child.familyNameEng
           }
         ],
-        birthDate: child.birthDate
+        birthDate: child.childBirthDate
       },
       mother: motherDetails,
       father: fatherDetails,
