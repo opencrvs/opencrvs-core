@@ -155,6 +155,7 @@ export interface GQLLocation {
   longitude?: number
   latitude?: number
   altitude?: number
+  geoData?: string
 }
 
 export enum GQLLocationType {
@@ -377,6 +378,7 @@ export interface GQLLocationInput {
   longitude?: number
   latitude?: number
   altitude?: number
+  geoData?: string
 }
 
 export interface GQLBirthRegistrationInput {
@@ -869,6 +871,7 @@ export interface GQLLocationTypeResolver<TParent = any> {
   longitude?: LocationToLongitudeResolver<TParent>
   latitude?: LocationToLatitudeResolver<TParent>
   altitude?: LocationToAltitudeResolver<TParent>
+  geoData?: LocationToGeoDataResolver<TParent>
 }
 
 export interface LocationToIdResolver<TParent = any, TResult = any> {
@@ -916,6 +919,10 @@ export interface LocationToLatitudeResolver<TParent = any, TResult = any> {
 }
 
 export interface LocationToAltitudeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
