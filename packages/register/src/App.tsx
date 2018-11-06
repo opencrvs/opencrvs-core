@@ -25,7 +25,7 @@ import { SelectInformant } from './views/SelectInformant/SelectInformant'
 
 import { RegisterForm } from './views/RegisterForm/RegisterForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
-import { DeclarationsPage } from './views/DeclarationsList/DeclarationsList'
+import { DeclarationsPage } from './views/DeclarationsPage/DeclarationsPage'
 import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
 import { storage } from 'src/storage'
