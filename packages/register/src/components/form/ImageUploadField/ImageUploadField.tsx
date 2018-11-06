@@ -20,11 +20,11 @@ const StyledIcon = styled(Camera)`
   box-shadow: 0 0 4px 3px rgba(0, 0, 0, 0.1);
   height: 50px;
   width: 50px;
-  background-color: ${({ theme }) => theme.colors.cardGradientEnd};
+  background-color: ${({ theme }) => theme.colors.accentLight};
 `
 const PhotoIconAction = styled(IconAction)`
   outline-style: dashed;
-  outline-color: ${({ theme }) => theme.colors.cardGradientEnd};
+  outline-color: ${({ theme }) => theme.colors.accentLight};
   outline-width: 1px;
   min-height: 90px;
   /* stylelint-disable */
