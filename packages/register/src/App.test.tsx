@@ -155,10 +155,6 @@ describe('when user has a valid token in local storage', () => {
 
   describe('When background Sync is triggered', () => {
     beforeEach(() => {
-      // // BroadcastChannel is not found while running on test
-      // new BroadcastChannel(
-      //   config.BACKGROUND_SYNC_BROADCAST_CHANNEL
-      // ).postMessage(7)
       const action = actions.showBackgroundSyncedNotification(7)
       store.dispatch(action)
       app.update()
