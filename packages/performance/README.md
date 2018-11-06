@@ -17,7 +17,7 @@ query getData {
 }
 ```
 
-The data will eventually come from our metrics service through gateway.
+The data will eventually come from our metrics service through gateway and the queries themselves can be stored in the chart component / container modules.
 The metrics service (backed by InfluxDB or similar) will contain data that has already been aggregated from received events (new declaration, registration...).
 An example response to the query above could look something like this:
 
@@ -38,6 +38,8 @@ An example response to the query above could look something like this:
   ]
 }
 ```
+
+
 
 ---
 
