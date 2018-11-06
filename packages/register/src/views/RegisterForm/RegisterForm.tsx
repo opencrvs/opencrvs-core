@@ -373,6 +373,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             ]
           }
         ],
+        contact: registration.whoseContactDetails,
         paperFormID: registration.paperFormNumber
       },
       attendantAtBirth: child.attendantAtBirth,
