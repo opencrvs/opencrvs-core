@@ -4,7 +4,11 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled from 'styled-components'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
-import { Banner } from '@opencrvs/components/lib/interface'
+import {
+  Banner,
+  SearchInput,
+  ISearchInputProps
+} from '@opencrvs/components/lib/interface'
 
 const messages = defineMessages({
   searchInputPlaceholder: {
@@ -116,7 +120,7 @@ const Container = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
 class Declarations extends React.Component<
-  InjectedIntlProps & IViewHeadingProps
+  InjectedIntlProps & IViewHeadingProps & ISearchInputProps
 > {
   render() {
     const { intl } = this.props
@@ -131,6 +135,11 @@ class Declarations extends React.Component<
         </HomeViewHeader>
         <Container>
           <Banner text={intl.formatMessage(messages.bannerTitle)} count={15} />
+          <SearchInput
+            placeholder={intl.formatMessage(messages.searchInputPlaceholder)}
+            buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
+            {...this.props}
+          />
         </Container>
       </>
     )
