@@ -15,7 +15,7 @@ import {
 type NotificationProps = {
   language?: string
   newContentAvailable: boolean
-  backgroundSyncShow: boolean
+  backgroundSyncMessageVisible: boolean
   syncCount: number
 }
 
@@ -31,8 +31,8 @@ export const messages = defineMessages({
     description:
       'The message that appears in notification when new content available.'
   },
-  backgroundSyncShow: {
-    id: 'register.notification.backgroundSyncShow',
+  declarationsSynced: {
+    id: 'register.notification.declarationsSynced',
     defaultMessage:
       'As you have connectivity, we have synced {syncCount} new birth declarations.',
     description:
@@ -51,7 +51,7 @@ class Component extends React.Component<
     location.reload()
   }
 
-  onBackgroundSyncTriggeredNotificationClick = () => {
+  hideBackgroundSyncedNotification = () => {
     this.props.hideBackgroundSyncedNotification()
   }
 
@@ -59,7 +59,7 @@ class Component extends React.Component<
     const {
       children,
       newContentAvailable,
-      backgroundSyncShow,
+      backgroundSyncMessageVisible,
       syncCount,
       intl
     } = this.props
@@ -76,13 +76,13 @@ class Component extends React.Component<
             {intl.formatMessage(messages.newContentAvailable)}
           </Notification>
         )}
-        {backgroundSyncShow && (
+        {backgroundSyncMessageVisible && (
           <Notification
             id="backgroundSyncShowNotification"
-            show={backgroundSyncShow}
-            callback={this.onBackgroundSyncTriggeredNotificationClick}
+            show={backgroundSyncMessageVisible}
+            callback={this.hideBackgroundSyncedNotification}
           >
-            {intl.formatMessage(messages.backgroundSyncShow, {
+            {intl.formatMessage(messages.declarationsSynced, {
               syncCount
             })}
           </Notification>
@@ -97,7 +97,8 @@ const mapStateToProps = (store: IStoreState) => {
   return {
     language: getLanguage(store),
     newContentAvailable: store.notification.newContentAvailable,
-    backgroundSyncShow: store.notification.backgroundSyncShow,
+    backgroundSyncMessageVisible:
+      store.notification.backgroundSyncMessageVisible,
     syncCount: store.notification.syncCount
   }
 }

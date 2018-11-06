@@ -3,13 +3,13 @@ import * as actions from './actions'
 
 export type NotificationState = {
   newContentAvailable: boolean
-  backgroundSyncShow: boolean
+  backgroundSyncMessageVisible: boolean
   syncCount: number
 }
 
 export const initialState: NotificationState = {
   newContentAvailable: false,
-  backgroundSyncShow: false,
+  backgroundSyncMessageVisible: false,
   syncCount: 0
 }
 
@@ -37,13 +37,13 @@ export const notificationReducer: LoopReducer<NotificationState, Action> = (
     case actions.SHOW_BACKGROUND_SYNC_TRIGGERED:
       return {
         ...state,
-        backgroundSyncShow: true,
+        backgroundSyncMessageVisible: true,
         syncCount: action.payload.syncCount
       }
     case actions.HIDE_BACKGROUND_SYNC_TRIGGERED:
       return {
         ...state,
-        backgroundSyncShow: false
+        backgroundSyncMessageVisible: false
       }
     default:
       return state

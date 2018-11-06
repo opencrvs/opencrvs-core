@@ -4,15 +4,15 @@ importScripts(
 
 const queue = new workbox.backgroundSync.Queue('registerQueue', {
   callbacks: {
-    queueDidReplay: function(a) {
-      var requestSynced = 0
-      a.forEach(item => {
+    queueDidReplay: function(requestArray) {
+      let requestSynced = 0
+      requestArray.forEach(item => {
         if (!item.error) {
           requestSynced++
         }
       })
 
-      if (requestSynced) {
+      if (requestSynced > 0) {
         new BroadcastChannel('backgroundSynBroadCastChannel').postMessage(
           requestSynced
         )
@@ -31,6 +31,7 @@ self.addEventListener('fetch', event => {
     event.waitUntil(promiseChain)
   }
 })
+
 workbox.precaching.precacheAndRoute([])
 
 /*

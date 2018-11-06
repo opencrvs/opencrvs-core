@@ -503,7 +503,7 @@ export const BENGALI_STATE = {
     'register.form.modal.submitButton': 'জমা দিন',
     'register.notification.newContentAvailable':
       'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
-    'register.notification.backgroundSyncShow':
+    'register.notification.declarationsSynced':
       'ইন্টারনেট সংযোগ ফিরে আসায় আমরা {syncCount} টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি',
     'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
     'register.savedRegistration.online.desc':
