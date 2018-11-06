@@ -193,7 +193,9 @@ describe('when user has a valid token in local storage', () => {
       })
 
       it('Should hide the notification', () => {
-        expect(store.getState().notification.backgroundSyncShow).toEqual(false)
+        expect(
+          store.getState().notification.backgroundSyncMessageVisible
+        ).toEqual(false)
       })
     })
   })
