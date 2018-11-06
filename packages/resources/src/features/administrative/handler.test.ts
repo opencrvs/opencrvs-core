@@ -1,6 +1,6 @@
 import { createServer } from '../..'
 
-describe('authenticate handler receives a request', () => {
+describe('administrative handler receives a request', () => {
   let server: any
 
   beforeEach(async () => {
