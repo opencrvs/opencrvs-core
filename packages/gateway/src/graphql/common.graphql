@@ -234,6 +234,6 @@ type UserRole {
 type Query {
   user(id: Int!): User
 
-  locationsByParent(parentId: String, type: String): [Location] # if partentId is not provided, return level 1 locations
+  locationsByParent(parentId: String, type: String): [Location] # if parentId is not provided, return level 1 locations
   locationsByName(name: String!, type: String): [Location]
 }
