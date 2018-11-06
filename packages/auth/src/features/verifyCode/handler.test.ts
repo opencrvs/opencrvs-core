@@ -1,4 +1,4 @@
-import { createServerWithEnvironment } from '../../tests/util'
+import { createServerWithEnvironment } from 'src/tests/util'
 
 describe('authenticate handler receives a request', () => {
   let server: any

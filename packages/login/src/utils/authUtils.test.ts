@@ -2,10 +2,10 @@ import { getTokenPayload, getRedirectURL } from './authUtils'
 import { config } from '../config'
 
 const performanceJWT =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDExNjU0NjEsImV4cCI6MTU3MjcwMTQ2MSwiYXVkIjoiIiwic3ViIjoiMSIsImNsYWltcyI6IlsncGVyZm9ybWFuY2UnXSJ9.B9n01MM8ZZyvXsE0AmdWNzYjcTsEJK-bM2DiRLJEi58'
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDExNjU0NjEsImV4cCI6MTU0MTUyNDY5NywiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydwZXJmb3JtYW5jZSddIiwianRpIjoiMGQ3NzVhMTQtNDdjNS00OWQzLWIxNTQtNDhlYzM4YjUxNDg2In0.9k5QtB4D-6b-xZLjrOwaPDC0aNhmpwonaQrkMVdjDW4'
 
 const declareJWT =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDExNjU0NjEsImV4cCI6MTU3MjcwMTQ2MSwiYXVkIjoiIiwic3ViIjoiMSIsImNsYWltcyI6IlsnZGVjbGFyZSddIn0.y692mz7WDYc-UrO0oIxX_aji68lUtBJO4UyKUSntoVg'
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDExNjU0NjEsImV4cCI6MTU0MTUyNDc2NCwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydkZWNsYXJlJ10iLCJqdGkiOiI0ZjVmZTliYS04NTQ3LTRjOTgtOTY4Ni0zOGQyN2U4MTgwMjUifQ.Uc_2ynPEcJAB9aNEEhydj4l2wYSF_ClAggtLd2lmvF4'
 
 describe('authUtils', () => {
   describe('getTokenPayload. Returns the correct payload from a token', () => {
@@ -13,9 +13,10 @@ describe('authUtils', () => {
       const response = {
         iss: '',
         iat: 1541165461,
-        exp: 1572701461,
+        exp: 1541524697,
         aud: '',
         sub: '1',
+        jti: '0d775a14-47c5-49d3-b154-48ec38b51486', // NEED TO REMOVE THIS
         scope: "['performance']"
       }
       expect(getTokenPayload(performanceJWT)).toEqual(response)

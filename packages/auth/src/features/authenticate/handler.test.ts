@@ -1,7 +1,7 @@
 import * as fetch from 'jest-fetch-mock'
-import { createServerWithEnvironment } from '../../tests/util'
+import { createServerWithEnvironment } from 'src/tests/util'
 import { createServer } from '../..'
-import * as codeService from '../verifyCode/service'
+import * as codeService from 'src/features/verifyCode/service'
 
 describe('authenticate handler receives a request', () => {
   let server: any
