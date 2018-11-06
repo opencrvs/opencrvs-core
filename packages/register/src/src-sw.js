@@ -32,6 +32,8 @@ self.addEventListener('fetch', event => {
   }
 })
 
+workbox.skipWaiting()
+workbox.clientsClaim()
 workbox.precaching.precacheAndRoute([])
 
 /*
