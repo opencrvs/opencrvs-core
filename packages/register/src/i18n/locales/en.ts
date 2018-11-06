@@ -510,6 +510,8 @@ export const ENGLISH_STATE = {
     'register.form.modal.submitButton': 'Submit',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
+    'register.notification.declarationsSynced':
+      'As you have connectivity, we have synced {syncCount} new birth declarations.',
     'register.savedRegistration.online.title': 'Declaration submitted',
     'register.savedRegistration.online.desc':
       'The declaration is now on its way for validation.',

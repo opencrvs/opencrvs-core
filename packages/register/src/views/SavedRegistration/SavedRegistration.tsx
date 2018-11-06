@@ -143,7 +143,7 @@ const TrackingBox = styled(Box)`
   background: linear-gradient(
     137.89deg,
     ${({ theme }) => theme.colors.primary} 0%,
-    ${({ theme }) => theme.colors.cardGradientEnd} 100%
+    ${({ theme }) => theme.colors.accentLight} 100%
   );
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
