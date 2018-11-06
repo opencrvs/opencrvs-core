@@ -45,6 +45,19 @@ The metrics service (backed by InfluxDB or similar) will contain data that has a
 Some parts (how event service receives and emits events) of this dataflow is documented in the [Integrations API/mediator design document](https://docs.google.com/document/d/1GUmWs7ZBOH9enKMtr9hLj5WKqb1P7HzdX8RfGNrotMs/edit#)
 
 
+For the example query above, we might store something like this:
+
+| age  | count |
+| ---- | ----- |
+| 45d  | 12312 |
+| 1    | 13506 |
+| 2    | 12000 |
+| 3    | 12000 |
+
+### Adding new metrics later on
+
+Collecting live events like this has a downside: we cannot predict what kind of metrics we want to show in the future and once we add a new metric, we have no data for it.
+In these cases we will write migrations that fetch already stored data from heart and push it to our metric service.
 
 ---
 
