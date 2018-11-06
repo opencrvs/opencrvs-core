@@ -9,13 +9,17 @@ export interface ILegendProps {
 
 const Row = styled.div`
   display: flex;
+  flex-wrap: wrap;
 `
 const Column = styled.div`
   flex-grow: 1;
   flex-basis: 0;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding-right: 1em;
+  margin-top: 30px;
 `
 
 const LegendItemBase = styled.div`
@@ -25,6 +29,7 @@ const LegendItemBase = styled.div`
     content: ':';
   }
   &::before {
+    box-sizing: border-box;
     width: 25px;
     height: 8px;
     display: block;
@@ -40,7 +45,7 @@ const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
 
 const EstimateLegendItem = styled(LegendItemBase)`
   &::before {
-    height: 4px;
+    height: 8px;
     border: 2px dotted ${({ theme }) => theme.colors.accent};
     background: transparent;
   }
@@ -53,6 +58,7 @@ const DataLabel = styled.label`
 `
 const DataTitle = styled.h3`
   font-size: 20px;
+  margin: 0;
   color: ${({ theme }) => theme.colors.accent};
 `
 const DataDescription = styled.span`
@@ -127,14 +133,6 @@ export const Legend = withTheme(
             return (
               <Column key={i}>
                 <LegendHeader dataPoint={dataPoint} colour={colour} />
-              </Column>
-            )
-          })}
-        </Row>
-        <Row>
-          {fromSmallest.map((dataPoint, i) => {
-            return (
-              <Column key={i}>
                 <LegendBody
                   dataPoint={dataPoint}
                   total={calculateSum(allTotalPoints)}

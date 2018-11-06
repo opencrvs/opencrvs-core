@@ -19,9 +19,9 @@ interface IDispatchProps {
   checkAuth: (urlValues: IURLParams) => void
 }
 
-class ProtectedRouteWrapper extends Route<
-  IProps & IDispatchProps & RouteProps & RouteComponentProps<{}>
-> {
+type Props = RouteProps & RouteComponentProps<{}>
+
+class ProtectedRouteWrapper extends Route<IProps & IDispatchProps & Props> {
   public componentDidMount() {
     const values = parse(this.props.location.search)
     this.props.checkAuth(values)
@@ -39,7 +39,7 @@ const mapStateToProps = (store: IStoreState): IProps => {
     authenticated: getAuthenticated(store)
   }
 }
-export const ProtectedRoute = withRouter(
+export const ProtectedRoute = withRouter<Props>(
   connect<IProps, IDispatchProps>(mapStateToProps, {
     checkAuth
   })(ProtectedRouteWrapper)
