@@ -575,6 +575,28 @@ export const BENGALI_STATE = {
       'সমর্থনকারী কাগজপত্রর একটি ছবি আপলোড করুন',
     'formFields.imageUpload.uploadedList': 'আপলোড করা:',
     'formFields.imageUpload.delete': 'মুছে ফেলা',
-    'formFields.imageUpload.preview': 'প্রিভিউ'
+    'formFields.imageUpload.preview': 'প্রিভিউ',
+    'register.declarations.applications.banner':
+      'আপনার এলাকায় নিবন্ধন অ্যাপ্লিকেশন',
+    'register.declarations.searchInput.placeholder':
+      'একটি রেকর্ডের জন্য সন্ধান করুন',
+    'register.declarations.buttons.search': 'অনুসন্ধান',
+    'register.declarations.selects.sort.item0': 'পুরোনো থেকে নতুন',
+    'register.declarations.selects.sort.item1': 'নতুন থেকে পুরোনো ',
+    'register.declarations.labels.statuses.all': 'সব অবস্থা',
+    'register.declarations.labels.statuses.application': 'আবেদন',
+    'register.declarations.labels.statuses.registered': 'নিবন্ধভুক্ত',
+    'register.declarations.labels.statuses.collected': 'সংগৃহীত',
+    'register.declarations.labels.events.all': 'সব ইভেন্ট',
+    'register.declarations.labels.events.birth': 'জন্ম',
+    'register.declarations.labels.events.death': 'মৃত্যু',
+    'register.declarations.labels.events.marriage': 'বিবাহ',
+    'register.declarations.labels.selects.sort': 'ক্রমানুসার:',
+    'register.declarations.labels.selects.filter': 'ফিল্টার করুন:',
+    'register.declarations.labels.results.name': 'নাম',
+    'register.declarations.labels.results.dob': 'জন্ম তারিখ',
+    'register.declarations.labels.results.dod': 'মৃত্যুর তারিখ',
+    'register.declarations.labels.results.dateOfApplication': 'আবেদন তারিখ',
+    'register.declarations.labels.results.trackingID': 'ট্র্যাকিং আইডি'
   }
 }

@@ -582,6 +582,28 @@ export const ENGLISH_STATE = {
       'Upload a photo of the supporting document',
     'formFields.imageUpload.uploadedList': 'Uploaded:',
     'formFields.imageUpload.delete': 'Delete',
-    'formFields.imageUpload.preview': 'Preview'
+    'formFields.imageUpload.preview': 'Preview',
+    'register.declarations.applications.banner':
+      'Applications to register in your area',
+    'register.declarations.searchInput.placeholder': 'Look for a record',
+    'register.declarations.buttons.search': 'Search',
+    'register.declarations.selects.sort.item0': 'Oldest to newest',
+    'register.declarations.selects.sort.item1': 'Newst to oldest',
+    'register.declarations.labels.statuses.all': 'All statues',
+    'register.declarations.labels.statuses.application': 'Application',
+    'register.declarations.labels.statuses.registered': 'Registered',
+    'register.declarations.labels.statuses.collected': 'Collected',
+    'register.declarations.labels.events.all': 'All life events',
+    'register.declarations.labels.events.birth': 'Birth',
+    'register.declarations.labels.events.death': 'Death',
+    'register.declarations.labels.events.marriage': 'Marriage',
+    'register.declarations.labels.selects.sort': 'Sort by:',
+    'register.declarations.labels.selects.filter': 'Filter by:',
+    'register.declarations.labels.results.name': 'Name',
+    'register.declarations.labels.results.dob': 'D.o.B.',
+    'register.declarations.labels.results.dod': 'D.o.D.',
+    'register.declarations.labels.results.dateOfApplication':
+      'Date of application',
+    'register.declarations.labels.results.trackingID': 'Tracking ID'
   }
 }
