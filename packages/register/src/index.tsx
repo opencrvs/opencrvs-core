@@ -6,6 +6,7 @@ import registerServiceWorker from './registerServiceWorker'
 import { createStore } from './store'
 import * as actions from 'src/notification/actions'
 import { storage } from 'src/storage'
+import { config } from './config'
 
 storage.configStorage('OpenCRVS')
 
@@ -24,6 +25,16 @@ function onNewConentAvailable() {
   const action = actions.showNewContentAvailableNotification()
   store.dispatch(action)
 }
+
+function onBackGroundSync() {
+  const channel = new BroadcastChannel(config.BACKGROUND_SYNC_BROADCAST_CHANNEL)
+  channel.onmessage = e => {
+    const syncCount = typeof e.data === 'number' ? e.data : 0
+    const action = actions.showBackgroundSyncedNotification(syncCount)
+    store.dispatch(action)
+  }
+}
+onBackGroundSync()
 
 ReactDOM.render(
   <App store={store} history={history} />,

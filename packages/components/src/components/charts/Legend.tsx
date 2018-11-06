@@ -9,14 +9,17 @@ export interface ILegendProps {
 
 const Row = styled.div`
   display: flex;
+  flex-wrap: wrap;
 `
 const Column = styled.div`
   flex-grow: 1;
   flex-basis: 0;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding-right: 1em;
+  margin-top: 30px;
 `
 
 const LegendItemBase = styled.div`
@@ -130,14 +133,6 @@ export const Legend = withTheme(
             return (
               <Column key={i}>
                 <LegendHeader dataPoint={dataPoint} colour={colour} />
-              </Column>
-            )
-          })}
-        </Row>
-        <Row>
-          {fromSmallest.map((dataPoint, i) => {
-            return (
-              <Column key={i}>
                 <LegendBody
                   dataPoint={dataPoint}
                   total={calculateSum(allTotalPoints)}

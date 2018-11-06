@@ -10,7 +10,6 @@ export interface IBarChartProps {
 const Container = styled.div`
   position: relative;
   width: 100%;
-  margin-bottom: 24px;
 `
 
 const Estimate = styled.div`
