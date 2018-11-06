@@ -4,6 +4,7 @@ import { Next, Previous } from '../icons'
 import { Button } from '../buttons/Button'
 
 export interface IPaginationCustomProps {
+  className?: string
   pageSize: number
   initialPage: number
   totalItemCount: number
@@ -56,11 +57,12 @@ export class Pagination extends React.Component<
   constructor(props: IPaginationCustomProps, {}) {
     super(props)
 
-    const { initialPage, totalItemCount, pageSize } = props
+    const { initialPage, totalItemCount, pageSize, totalPages } = props
     this.state = {
       canPrevious: false,
       canNext: false,
-      currentPage: initialPage && initialPage > 0 ? initialPage : 1
+      currentPage:
+        totalPages > 0 ? (initialPage && initialPage > 0 ? initialPage : 1) : 0
     }
   }
 
@@ -80,12 +82,13 @@ export class Pagination extends React.Component<
       totalPages,
       totalItemCount,
       pageSize,
+      className,
       ...props
     } = this.props
     const { currentPage } = this.state
 
     return (
-      <PaginationContainer>
+      <PaginationContainer className={className}>
         <Icon
           onClick={() => {
             this.changePage(currentPage - 1)

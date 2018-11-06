@@ -28,7 +28,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-12-10T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'birth',
+    location: 'gazipur'
   },
   {
     info: [
@@ -58,7 +62,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-11-10T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'death',
+    location: 'demra'
   },
   {
     info: [
@@ -88,7 +96,11 @@ const list = [
         label: 'Registered',
         type: 'green'
       }
-    ]
+    ],
+    createdAt: '2017-10-10T18:00:00.000Z',
+    declaration_status: 'registered',
+    event: 'marriage',
+    location: 'dohar'
   },
   {
     info: [
@@ -118,7 +130,11 @@ const list = [
         label: 'Collected',
         type: 'collected'
       }
-    ]
+    ],
+    createdAt: '2017-09-10T18:00:00.000Z',
+    declaration_status: 'marriage',
+    event: 'birth',
+    location: 'badda'
   },
   {
     info: [
@@ -148,7 +164,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-10-10T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'birth',
+    location: 'badda'
   },
   {
     info: [
@@ -178,7 +198,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-10-10T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'death',
+    location: 'savar'
   },
   {
     info: [
@@ -208,7 +232,11 @@ const list = [
         label: 'Registered',
         type: 'green'
       }
-    ]
+    ],
+    createdAt: '2017-10-10T18:00:00.000Z',
+    declaration_status: 'registered',
+    event: 'marriage',
+    location: 'dohar'
   },
   {
     info: [
@@ -238,7 +266,11 @@ const list = [
         label: 'Collected',
         type: 'collected'
       }
-    ]
+    ],
+    createdAt: '2017-10-09T18:00:00.000Z',
+    declaration_status: 'collected',
+    event: 'birth',
+    location: 'dhamrai'
   },
   {
     info: [
@@ -268,7 +300,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-10-08T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'birth',
+    location: 'dhamrai'
   },
   {
     info: [
@@ -298,7 +334,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-10-09T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'death',
+    location: 'badda'
   },
   {
     info: [
@@ -328,7 +368,11 @@ const list = [
         label: 'Registered',
         type: 'green'
       }
-    ]
+    ],
+    createdAt: '2017-10-09T18:00:00.000Z',
+    declaration_status: 'registered',
+    event: 'marriage',
+    location: 'dhamrai'
   },
   {
     info: [
@@ -358,7 +402,11 @@ const list = [
         label: 'Collected',
         type: 'collected'
       }
-    ]
+    ],
+    createdAt: '2017-10-06T18:00:00.000Z',
+    declaration_status: 'collected',
+    event: 'birth',
+    location: 'savar'
   },
   {
     info: [
@@ -388,7 +436,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-10-09T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'birth',
+    location: 'dhamrai'
   },
   {
     info: [
@@ -418,7 +470,11 @@ const list = [
         label: 'Application',
         type: 'orange'
       }
-    ]
+    ],
+    createdAt: '2017-10-09T18:00:00.000Z',
+    declaration_status: 'application',
+    event: 'death',
+    location: 'dhamrai'
   },
   {
     info: [
@@ -448,7 +504,11 @@ const list = [
         label: 'Registered',
         type: 'green'
       }
-    ]
+    ],
+    createdAt: '2017-10-09T18:00:00.000Z',
+    declaration_status: 'registered',
+    event: 'marriage',
+    location: 'dhamrai'
   },
   {
     info: [
@@ -478,15 +538,79 @@ const list = [
         label: 'Collected',
         type: 'collected'
       }
-    ]
+    ],
+    createdAt: '2017-10-09T18:00:00.000Z',
+    declaration_status: 'collected',
+    event: 'birth',
+    location: 'badda'
   }
 ]
+const sortBy = {
+  input: {
+    label: 'Sort By'
+  },
+  selects: {
+    options: [
+      {
+        name: 'createdAt',
+        options: [
+          { value: 'asc', label: 'Oldest to newest' },
+          { value: 'desc', label: 'Newest to oldest' }
+        ]
+      }
+    ]
+  }
+}
+
+const filterBy = {
+  input: {
+    label: 'Filter By'
+  },
+  selects: {
+    options: [
+      {
+        name: 'event',
+        options: [
+          { value: 'birth', label: 'Birth' },
+          { value: 'death', label: 'Death' },
+          { value: 'marriage', label: 'Marriage' }
+        ]
+      },
+      {
+        name: 'declaration_status',
+        options: [
+          { value: 'application', label: 'Application' },
+          { value: 'collected', label: 'Collected' },
+          { value: 'registered', label: 'Registered' }
+        ]
+      },
+      {
+        name: 'location',
+        options: [
+          { value: 'gazipur', label: 'Gazipur Union' },
+          { value: 'badda', label: 'Badda Union' },
+          { value: 'dhamrai', label: 'Dhamrai Union' },
+          { value: 'savar', label: 'Savar Union' },
+          { value: 'dohar', label: 'Dohar Union' }
+        ]
+      }
+    ]
+  }
+}
 class SearchResultExample extends React.Component {
   constructor() {
     super()
   }
   render() {
-    return <SearchResult data={list} />
+    return (
+      <SearchResult
+        data={list}
+        sortBy={sortBy}
+        filterBy={filterBy}
+        resultLabel="Results"
+        noResultText="No result to display"
+      />
+    )
   }
 }
 ;<SearchResultExample />
