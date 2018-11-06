@@ -78,6 +78,10 @@ function registerValidSW(swUrl: string, onNewConentAvailable?: () => void) {
                 // available; please refresh.' message in your web app.
                 if (onNewConentAvailable) {
                   onNewConentAvailable()
+
+                  if (registration.waiting) {
+                    registration.waiting.postMessage('skipWaiting')
+                  }
                 }
                 console.log('New content is available; please refresh.')
               } else {

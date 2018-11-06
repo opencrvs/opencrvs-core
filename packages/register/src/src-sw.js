@@ -32,9 +32,21 @@ self.addEventListener('fetch', event => {
   }
 })
 
-workbox.skipWaiting()
-workbox.clientsClaim()
+self.addEventListener("message", (event) => {  
+  if (!event.data){
+    return;
+  }
+  switch (event.data) {
+    case 'skipWaiting':
+      self.skipWaiting();
+      break;   
+    default:      
+      break;
+  }
+})
+
 workbox.precaching.precacheAndRoute([])
+
 
 /*
 *   Alternate for navigateFallback & navigateFallbackBlacklist
