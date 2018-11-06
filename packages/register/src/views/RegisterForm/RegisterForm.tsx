@@ -231,10 +231,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const motherDetails = {
       name: [
         {
+          use: 'Traditional',
           firstNames: mother.firstNames,
           familyName: mother.familyName
         },
         {
+          use: 'English',
           firstNames: mother.firstNamesEng,
           familyName: mother.familyNameEng
         }
@@ -247,7 +249,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       educationalAttainment: mother.educationalAttainment,
       address: [
         {
-          use: 'English',
           type: 'PERMANENT',
           country: mother.countryPermanent,
           state: mother.statePermanent,
@@ -261,7 +262,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
           ]
         },
         {
-          use: 'English',
           type: 'CURRENT',
           country: mother.country,
           state: mother.state,
@@ -280,10 +280,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const fatherDetails = {
       name: [
         {
+          use: 'Traditional',
           firstNames: father.firstNames,
           familyName: father.familyName
         },
         {
+          use: 'English',
           firstNames: father.firstNamesEng,
           familyName: father.familyNameEng
         }
@@ -296,7 +298,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       educationalAttainment: mother.educationalAttainment,
       address: [
         {
-          use: 'English',
           type: 'PERMANENT',
           country: fatherPermanentAddress.countryPermanent,
           state: fatherPermanentAddress.statePermanent,
@@ -310,7 +311,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
           ]
         },
         {
-          use: 'English',
           type: 'CURRENT',
           country: fatherCurrentAddress.country,
           state: fatherCurrentAddress.state,
@@ -345,10 +345,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
         gender: child.gender,
         name: [
           {
+            use: 'Traditional',
             firstNames: child.firstNames,
             familyName: child.familyName
           },
           {
+            use: 'English',
             firstNames: child.firstNamesEng,
             familyName: child.familyNameEng
           }
