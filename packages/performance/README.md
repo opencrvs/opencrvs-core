@@ -57,7 +57,7 @@ For the example query above, we might store something like this:
 ### Adding new metrics later on
 
 Collecting live events like this has a downside: we cannot predict what kind of metrics we want to show in the future and once we add a new metric, we have no data for it.
-In these cases we will write migrations that fetch already stored data from heart and push it to our metric service.
+In these cases we will write migrations that fetch already stored data from hearth and push it to our metric service.
 
 ---
 
