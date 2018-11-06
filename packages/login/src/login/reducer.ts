@@ -3,7 +3,7 @@ import { push } from 'react-router-redux'
 import * as actions from './actions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
-import { config } from '../config'
+import { getRedirectURL } from '../utils/authUtils'
 
 export type LoginState = {
   submitting: boolean
@@ -107,9 +107,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.VERIFY_CODE_FAILED:
       return { ...state, submitting: false, submissionError: true }
     case actions.VERIFY_CODE_COMPLETED:
-      const redirectURL = `${config.REGISTER_APP_URL}?token=${
-        action.payload.token
-      }`
+      const redirectURL = getRedirectURL(action.payload.token)
       return loop(
         {
           ...state,

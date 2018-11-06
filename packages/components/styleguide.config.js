@@ -49,6 +49,10 @@ module.exports = {
       components: './src/components/files/**/*.tsx'
     },
     {
+      name: 'Charts',
+      components: './src/components/charts/**/*.tsx'
+    },
+    {
       name: 'Other',
       components: './src/components/*.tsx'
     }
