@@ -145,7 +145,7 @@ context('Register', () => {
       'Both Parents',
       'Both Parents'
     )
-    cy.selectOption('#whoseContactDetails', 'Both Parents', 'Both Parents')
+    cy.selectOption('#whoseContactDetails', 'Father', 'Father')
     cy.get('#registrationEmail').type('test@test.com')
     cy.get('#registrationPhone').type('01711111111')
     cy.get('#registrationCertificateLanguageBangla').click()
