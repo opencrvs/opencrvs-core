@@ -1,3 +1,46 @@
+## Planned GraphQL query schema
+
+We've decided to start off by defining a GraphQL query schema that resembles the data we are visualising,
+but is still generic enough to not have any opinions of the visualisation format.
+
+**Example query**:
+
+```graphql
+query getData {
+  aggregation {
+    birthRegistrationAge {
+      label
+      percentage
+      total
+    }
+  }
+}
+```
+
+The data will eventually come from our metrics service through gateway.
+The metrics service (backed by InfluxDB or similar) will contain data that has already been aggregated from received events (new declaration, registration...).
+An example response to the query above could look something like this:
+
+```js
+{
+  birthRegistrationAge: [
+    {
+      label: '45d',
+      percentage: 20,
+      total: 12312
+    },
+    {
+      label: 1,
+      percentage: 25,
+      total: 13506
+    },
+    // ...
+  ]
+}
+```
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
@@ -299,7 +342,7 @@ In the WebStorm menu `Run` select `Edit Configurations...`. Then click `+` and s
 
 Start your app by running `npm start`, then press `^D` on macOS or `F9` on Windows and Linux or click the green debug icon to start debugging in WebStorm.
 
-The same way you can debug your application in IntelliJ IDEA Ultimate, PhpStorm, PyCharm Pro, and RubyMine. 
+The same way you can debug your application in IntelliJ IDEA Ultimate, PhpStorm, PyCharm Pro, and RubyMine.
 
 ## Formatting Code Automatically
 
@@ -1692,7 +1735,7 @@ Use the following [`launch.json`](https://code.visualstudio.com/docs/editor/debu
       "name": "Debug CRA Tests",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",      
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
       "args": [
         "test",
         "--runInBand",
@@ -2002,7 +2045,7 @@ If you’re using [Apache HTTP Server](https://httpd.apache.org/), you need to c
     RewriteRule ^ index.html [QSA,L]
 ```
 
-It will get copied to the `build` folder when you run `npm run build`. 
+It will get copied to the `build` folder when you run `npm run build`.
 
 If you’re using [Apache Tomcat](http://tomcat.apache.org/), you need to follow [this Stack Overflow answer](https://stackoverflow.com/a/41249464/4878474).
 
