@@ -1,6 +1,6 @@
-import { resolvers } from 'src/features/registration/root-resolvers'
+import { resolvers } from './root-resolvers'
 import * as fetch from 'jest-fetch-mock'
-import TrackingId from './model/trackingId'
+import TrackingId from './gateway-plugin/model/trackingId'
 
 describe('Registration root resolvers', () => {
   describe('listBirthRegistrations()', () => {
@@ -42,7 +42,19 @@ describe('Registration root resolvers', () => {
       // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
-        { createAt: new Date() }
+        {
+          child: {
+            name: [{ use: 'Traditional', firstNames: 'অনিক', familyName: 'হক' }]
+          },
+          mother: {
+            name: [
+              { use: 'Traditional', firstNames: 'তাহসিনা', familyName: 'হক' }
+            ],
+            telecom: [{ system: 'phone', value: '+8801622688231' }]
+          },
+          registration: { contact: 'MOTHER' },
+          createAt: new Date()
+        }
       )
 
       expect(result).toBeDefined()

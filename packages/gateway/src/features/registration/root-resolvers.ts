@@ -72,8 +72,7 @@ export const resolvers: GQLResolver = {
       await sendBirthNotification(details, authHeader)
 
       // return the Composition's id
-      // return resBody.entry[0].response.location.split('/')[3]
-      return details.registration && details.registration.trackingId
+      return resBody.entry[0].response.location.split('/')[3]
     }
   }
 }
