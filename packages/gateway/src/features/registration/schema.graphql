@@ -192,7 +192,7 @@ type DeathRegistration { # -> Composition
 
 input RegistrationInput {
   # short uuid easy to remember
-  trackingID: String
+  trackingId: String
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   registrationNumber: String
   paperFormID: String
@@ -206,7 +206,7 @@ input RegistrationInput {
 
 type Registration { # -> Task
   # short uuid easy to remember
-  trackingID: String # -> .identifier
+  trackingId: String # -> .identifier
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   registrationNumber: String # -> .identifier
   paperFormID: String # -> .identifier

@@ -1,5 +1,6 @@
 import fetch from 'node-fetch'
 import { stringify } from 'querystring'
+import { Iconv } from 'iconv'
 
 import {
   SMS_PROVIDER,
@@ -9,15 +10,27 @@ import {
 } from 'src/constants'
 import { logger } from 'src/logger'
 
-async function sendSMSClickatell(msisdn: string, message: string) {
-  const params = {
+async function sendSMSClickatell(
+  msisdn: string,
+  message: string,
+  convertUnicode?: boolean
+) {
+  let params = {
     user: CLICKATELL_USER,
     password: CLICKATELL_PASSWORD,
     api_id: CLICKATELL_API_ID,
     to: msisdn,
-    text: message
+    text: message,
+    unicode: 0
   }
-
+  /* character limit for unicoded sms is 70 otherwise 160 */
+  if (convertUnicode) {
+    params = {
+      ...params,
+      text: new Iconv('UTF-8', 'UCS-2BE').convert(message).toString('hex'),
+      unicode: 1
+    }
+  }
   logger.info('Sending a verification token', params)
 
   const url = `https://api.clickatell.com/http/sendmsg?${stringify(params)}`
@@ -38,10 +51,14 @@ async function sendSMSClickatell(msisdn: string, message: string) {
   logger.info('Received success response from Clickatell: Success')
 }
 
-export async function sendSMS(msisdn: string, message: string) {
+export async function sendSMS(
+  msisdn: string,
+  message: string,
+  convertUnicode?: boolean
+) {
   switch (SMS_PROVIDER) {
     case 'clickatell':
-      return sendSMSClickatell(msisdn, message)
+      return sendSMSClickatell(msisdn, message, convertUnicode)
     default:
       throw new Error(`Unknown sms provider ${SMS_PROVIDER}`)
   }

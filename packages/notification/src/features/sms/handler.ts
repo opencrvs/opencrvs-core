@@ -5,6 +5,7 @@ import { sendSMS } from './service'
 export type HapiRequest = Hapi.Request & {
   i18n: {
     __: (messageKey: string, values?: object) => string
+    getLocale: () => string
   }
 }
 interface ISMSPayload {
@@ -45,7 +46,9 @@ export async function sendBirthDeclarationConfirmation(
       request.i18n.__('birthDeclarationNotification', {
         name: payload.name,
         trackingid: payload.trackingid
-      })
+      }),
+      /* send unicoded sms if default local is not set */
+      request.i18n.getLocale() !== 'en'
     )
   } catch (err) {
     return internal(err)

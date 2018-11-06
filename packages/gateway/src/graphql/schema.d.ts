@@ -186,7 +186,7 @@ export interface GQLBirthRegistration {
 }
 
 export interface GQLRegistration {
-  trackingID?: string
+  trackingId?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -400,7 +400,7 @@ export interface GQLBirthRegistrationInput {
 }
 
 export interface GQLRegistrationInput {
-  trackingID?: string
+  trackingId?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -1074,7 +1074,7 @@ export interface BirthRegistrationToUpdatedAtResolver<
 }
 
 export interface GQLRegistrationTypeResolver<TParent = any> {
-  trackingID?: RegistrationToTrackingIDResolver<TParent>
+  trackingId?: RegistrationToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
@@ -1084,7 +1084,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   attachments?: RegistrationToAttachmentsResolver<TParent>
 }
 
-export interface RegistrationToTrackingIDResolver<
+export interface RegistrationToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {

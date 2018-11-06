@@ -3,7 +3,10 @@ import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
-import { generateBirthTrackingId } from './trackingid-generator'
+import {
+  pushTrackingId,
+  sendBirthNotification
+} from './gateway-plugin/birth-declaration-helper'
 
 const statusMap = {
   declared: 'preliminary',
@@ -29,11 +32,13 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createBirthRegistration(_, { details }) {
-      const birthTrackingId = await generateBirthTrackingId()
+    async createBirthRegistration(_, { details }, authHeader) {
+      /* temporary changes - this needs to be part of gateway-plugin module */
+      details = await pushTrackingId(details)
+
       const doc = await buildFHIRBundle(
-        { ...details, registration: { trackingId: birthTrackingId } },
-        birthTrackingId
+        details,
+        details.registration && details.registration.trackingId
       )
 
       const res = await fetch(fhirUrl, {
@@ -63,8 +68,12 @@ export const resolvers: GQLResolver = {
         throw new Error(`FHIR response did not send a valid response`)
       }
 
+      /* temporary changes - this needs to be part of gateway-ext module */
+      await sendBirthNotification(details, authHeader)
+
       // return the Composition's id
-      return resBody.entry[0].response.location.split('/')[3]
+      // return resBody.entry[0].response.location.split('/')[3]
+      return details.registration && details.registration.trackingId
     }
   }
 }
