@@ -174,7 +174,7 @@ describe('when user is in the register form preview section', () => {
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(0)
   })
 
-  describe('Do not displays submit confirm modal when disabled submit button is clicked', () => {
+  describe('when user is in the preview section', () => {
     const data = {
       child: {
         attendantAtBirth: 'NURSE',
@@ -288,7 +288,7 @@ describe('when user is in the register form preview section', () => {
     component = testComponent2.component
   })
 
-  it('Enable submit button after filli-up the whole form', () => {
+  it('Enable submit button after fillin-up the whole form with dummy data', () => {
     expect(
       component
         .find('#submit_form')
