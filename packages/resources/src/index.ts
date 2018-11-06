@@ -6,11 +6,8 @@ require('dotenv').config({
 // tslint:enable no-var-requires
 
 import * as Hapi from 'hapi'
-
 import { AUTH_HOST, AUTH_PORT } from './constants'
-import administrativeStructureHandler, {
-  requestSchema as administrativeStructureRequestSchema
-} from './features/administrative/handler'
+import administrativeStructureHandler from './features/administrative/handler'
 import getPlugins from './config/plugins'
 
 export async function createServer() {
@@ -23,15 +20,12 @@ export async function createServer() {
   })
   server.route({
     method: 'GET',
-    path: '/administrative_structure/{divisionType}',
+    path: '/administrative_structure',
     handler: administrativeStructureHandler,
     options: {
       tags: ['api'],
       description: 'Load the administrative structure',
       notes: 'Loads the administrative structure JSON',
-      validate: {
-        payload: administrativeStructureRequestSchema
-      },
       plugins: {
         'hapi-swagger': {
           responses: {
