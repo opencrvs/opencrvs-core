@@ -7,15 +7,14 @@ import styled from 'styled-components'
 import {
   ISelectGroupProps,
   ISelectGroupValue,
-  ISelectGroupOption
+  ISelectGroupOption,
+  SelectFieldType
 } from './SelectGroup'
 
-import { IInputFieldProps, ICustomProps } from '../forms'
 import { ISortAndFilterItem, IInputLabel } from './SortAndFilter'
 
 const Wrapper = styled.div`
   width: 100%;
-  display: flex;
 `
 const ResultsText = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
@@ -24,10 +23,6 @@ const ResultsText = styled.div`
   margin: 10px 0;
   line-height: 22px;
 `
-const StyledPagination = styled(Pagination)`
-  margin-top: 20px;
-`
-
 interface ISelectValues {
   [index: string]: string
 }
@@ -47,12 +42,25 @@ export interface ISortAndFilter {
   selects: CustomSelectGroupProp
   input: IInputLabel
 }
+
 interface ISearchResultProps {
   data: CustomResult[]
   sortBy: ISortAndFilter
   filterBy: ISortAndFilter
   resultLabel: string
   noResultText: string
+  onSortChange?: (
+    values: ISelectGroupValue,
+    changedValue: ISelectGroupValue,
+    type?: SelectFieldType
+  ) => void
+  onFilterChange?: (
+    values: ISelectGroupValue,
+    changedValue: ISelectGroupValue,
+    type?: SelectFieldType
+  ) => void
+  onPageChange?: (currentPage: number) => void
+  pageSize?: number
 }
 
 interface ICustomState {
@@ -64,32 +72,39 @@ interface ICustomState {
   totalPages: number
   sortByItemsWithValues: ISortAndFilterItem
   filterByItemsWithValues: ISortAndFilterItem
+  initialPage: number
 }
 
-const configuration = {
+const defaultConfiguration = {
   pageSize: 10,
   initialPage: 1
 }
+
+const sortByDateAsc = (key: string, value: string, data: CustomResult[]) => {
+  return [...data].sort((a, b) => {
+    return (
+      new Date(b.sortFilterFields[key]).valueOf() -
+      new Date(a.sortFilterFields[key]).valueOf()
+    )
+  })
+}
+
+const sortByDateDesc = (key: string, value: string, data: CustomResult[]) => {
+  return [...data].sort((a, b) => {
+    return (
+      new Date(a.sortFilterFields[key]).valueOf() -
+      new Date(b.sortFilterFields[key]).valueOf()
+    )
+  })
+}
+
 const sortByDate = (key: string, value: string, data: CustomResult[]) => {
-  switch (value) {
-    case 'asc':
-      return data.sort((a, b) => {
-        return (
-          +new Date(b.sortFilterFields[key]) -
-          +new Date(a.sortFilterFields[key])
-        )
-      })
-      break
-    case 'desc':
-      return data.sort((a, b) => {
-        return (
-          +new Date(a.sortFilterFields[key]) -
-          +new Date(b.sortFilterFields[key])
-        )
-      })
-      break
-    default:
-      return []
+  if (value === 'asc') {
+    return sortByDateAsc(key, value, data)
+  } else if (value === 'desc') {
+    return sortByDateDesc(key, value, data)
+  } else {
+    return []
   }
 }
 
@@ -109,10 +124,8 @@ const getSortAndFilterByPropsWithValues = (
   return propWithValues
 }
 
-const getTotalPageNumber = (totalItemCount: number) => {
-  return totalItemCount > 0
-    ? Math.ceil(totalItemCount / configuration.pageSize)
-    : 0
+const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
+  return totalItemCount > 0 ? Math.ceil(totalItemCount / pageSize) : 0
 }
 
 const filterItems = (key: string, value: string, items: CustomResult[]) =>
@@ -132,7 +145,8 @@ export class SearchResult extends React.Component<
       filterValues,
       sortValues,
       filterByItemsWithValues,
-      sortByItemsWithValues
+      sortByItemsWithValues,
+      initialPage
     } = this.calculateInitialState(this.props)
 
     this.state = {
@@ -143,37 +157,15 @@ export class SearchResult extends React.Component<
       filterValues,
       sortValues,
       filterByItemsWithValues,
-      sortByItemsWithValues
+      sortByItemsWithValues,
+      initialPage
     }
   }
 
-  componentDidMount() {
-    const {
-      totalPages,
-      displayItems,
-      pageSize,
-      filteredSortedItems,
-      filterValues,
-      sortValues,
-      filterByItemsWithValues,
-      sortByItemsWithValues
-    } = this.calculateInitialState(this.props)
-    this.setState(() => ({
-      totalPages,
-      displayItems,
-      pageSize,
-      filteredSortedItems,
-      filterValues,
-      sortValues,
-      sortByItemsWithValues,
-      filterByItemsWithValues
-    }))
-  }
-
   calculateInitialState = (props: ISearchResultProps): ICustomState => {
-    const { data, sortBy, filterBy } = props
-
-    const initialTotalPage = getTotalPageNumber(data.length)
+    const { data, sortBy, filterBy, pageSize } = props
+    const paginationSize = pageSize ? pageSize : defaultConfiguration.pageSize
+    const initialTotalPage = getTotalPageNumber(data.length, paginationSize)
     const sortValues = this.initializeSelectValues(sortBy)
     const filterValues = this.initializeSelectValues(filterBy)
     const sortByItemsWithValues = getSortAndFilterByPropsWithValues(
@@ -185,33 +177,28 @@ export class SearchResult extends React.Component<
       filterValues
     )
     const displayItems = this.getDisplayItems(
-      configuration.initialPage,
-      configuration.pageSize,
+      defaultConfiguration.initialPage,
+      paginationSize,
       data
     )
     return {
       totalPages: initialTotalPage,
       displayItems,
-      pageSize: configuration.pageSize,
+      pageSize: paginationSize,
       filteredSortedItems: data,
       filterValues,
       sortValues,
       sortByItemsWithValues,
-      filterByItemsWithValues
+      filterByItemsWithValues,
+      initialPage: 1
     }
   }
 
   onFilterChange = (
     values: ISelectGroupValue,
-    changedValue: ISelectGroupValue
+    changedValue: ISelectGroupValue,
+    type?: SelectFieldType
   ) => {
-    let filteredItems = this.props.data
-
-    Object.keys(values).forEach((filterKey: string) => {
-      if (values[filterKey]) {
-        filteredItems = filterItems(filterKey, values[filterKey], filteredItems)
-      }
-    })
     const filterByItemsWithValues = getSortAndFilterByPropsWithValues(
       this.props.filterBy,
       values
@@ -220,20 +207,31 @@ export class SearchResult extends React.Component<
     this.setState(() => {
       return { filterByItemsWithValues }
     })
-    this.resetPagination(filteredItems)
+
+    if (this.props.onFilterChange) {
+      this.props.onFilterChange(values, changedValue, type)
+    } else {
+      let filteredItems = this.props.data
+
+      Object.keys(values).forEach((filterKey: string) => {
+        if (values[filterKey]) {
+          filteredItems = filterItems(
+            filterKey,
+            values[filterKey],
+            filteredItems
+          )
+        }
+      })
+
+      this.resetPagination(filteredItems)
+    }
   }
 
   onSortChange = (
     values: ISelectGroupValue,
-    changedValue: ISelectGroupValue
+    changedValue: ISelectGroupValue,
+    type?: SelectFieldType
   ) => {
-    const key = Object.keys(changedValue)[0]
-    const selectedValue = changedValue[key]
-    const sortedItems = sortByDate(
-      key,
-      selectedValue,
-      this.state.filteredSortedItems
-    )
     const sortByItemsWithValues = getSortAndFilterByPropsWithValues(
       this.props.sortBy,
       values
@@ -242,7 +240,21 @@ export class SearchResult extends React.Component<
     this.setState(() => {
       return { sortByItemsWithValues }
     })
-    this.resetPagination(sortedItems)
+
+    if (this.props.onSortChange) {
+      this.props.onSortChange(values, changedValue, type)
+    } else {
+      if (type === SelectFieldType.Date) {
+        const key = Object.keys(changedValue)[0]
+        const selectedValue = changedValue[key]
+        const sortedItems = sortByDate(
+          key,
+          selectedValue,
+          this.state.filteredSortedItems
+        )
+        this.resetPagination(sortedItems)
+      }
+    }
   }
 
   getDisplayItems = (
@@ -270,28 +282,35 @@ export class SearchResult extends React.Component<
   }
 
   onPageChange = (currentPage: number) => {
-    const { pageSize, filteredSortedItems, totalPages } = this.state
-    const displayItems = this.getDisplayItems(
-      currentPage,
-      pageSize,
-      filteredSortedItems
-    )
-    this.setState(() => {
-      return { displayItems }
-    })
+    if (this.props.onPageChange) {
+      this.props.onPageChange(currentPage)
+    } else {
+      const { pageSize, filteredSortedItems, totalPages } = this.state
+      const displayItems = this.getDisplayItems(
+        currentPage,
+        pageSize,
+        filteredSortedItems
+      )
+      this.setState(() => {
+        return { displayItems }
+      })
+    }
   }
 
   resetPagination = (filteredItems: CustomResult[]) => {
-    const totalPages = getTotalPageNumber(filteredItems.length)
+    const { pageSize } = this.props
+    const paginationSize = pageSize ? pageSize : defaultConfiguration.pageSize
+    const totalPages = getTotalPageNumber(filteredItems.length, paginationSize)
     const displayItems = this.getDisplayItems(
-      configuration.initialPage,
-      configuration.pageSize,
+      defaultConfiguration.initialPage,
+      paginationSize,
       filteredItems
     )
     this.setState(() => ({
       filteredSortedItems: filteredItems,
       displayItems,
-      totalPages
+      totalPages,
+      initialPage: defaultConfiguration.initialPage
     }))
   }
 
@@ -301,32 +320,32 @@ export class SearchResult extends React.Component<
       totalPages,
       sortByItemsWithValues,
       filterByItemsWithValues,
-      filteredSortedItems
+      filteredSortedItems,
+      pageSize,
+      initialPage
     } = this.state
     const { resultLabel, noResultText } = this.props
     return (
       <Wrapper>
-        <div>
-          <SortAndFilter
-            sortBy={sortByItemsWithValues}
-            filterBy={filterByItemsWithValues}
-            onChangeSort={this.onSortChange}
-            onChangeFilter={this.onFilterChange}
+        <SortAndFilter
+          sortBy={sortByItemsWithValues}
+          filterBy={filterByItemsWithValues}
+          onChangeSort={this.onSortChange}
+          onChangeFilter={this.onFilterChange}
+        />
+        <ResultsText>
+          {resultLabel}({filteredSortedItems.length})
+        </ResultsText>
+        <ResultList list={displayItems} />
+        {filteredSortedItems.length > 0 && (
+          <Pagination
+            pageSize={pageSize}
+            initialPage={initialPage}
+            totalItemCount={filteredSortedItems.length}
+            totalPages={totalPages}
+            onPageChange={this.onPageChange}
           />
-          <ResultsText>
-            {resultLabel}({filteredSortedItems.length})
-          </ResultsText>
-          <ResultList list={displayItems} />
-          {filteredSortedItems.length > 0 && (
-            <StyledPagination
-              pageSize={configuration.pageSize}
-              initialPage={configuration.initialPage}
-              totalItemCount={filteredSortedItems.length}
-              totalPages={totalPages}
-              onPageChange={this.onPageChange}
-            />
-          )}
-        </div>
+        )}
       </Wrapper>
     )
   }

@@ -630,9 +630,6 @@ const filterBy = {
   }
 }
 class SearchResultExample extends React.Component {
-  constructor() {
-    super()
-  }
   render() {
     return (
       <SearchResult
