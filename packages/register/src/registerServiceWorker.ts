@@ -20,7 +20,9 @@ const isLocalhost = Boolean(
     )
 )
 
-export default function register(onNewConentAvailable?: () => void) {
+export default function register(
+  onNewConentAvailable?: (waitingSW: ServiceWorker | null) => void
+) {
   if (
     process.env.NODE_ENV === 'production' &&
     'serviceWorker' in navigator &&
@@ -62,7 +64,10 @@ export default function register(onNewConentAvailable?: () => void) {
   }
 }
 
-function registerValidSW(swUrl: string, onNewConentAvailable?: () => void) {
+function registerValidSW(
+  swUrl: string,
+  onNewConentAvailable?: (waitingSW: ServiceWorker | null) => void
+) {
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
@@ -77,7 +82,7 @@ function registerValidSW(swUrl: string, onNewConentAvailable?: () => void) {
                 // It's the perfect time to display a 'New content is
                 // available; please refresh.' message in your web app.
                 if (onNewConentAvailable) {
-                  onNewConentAvailable()
+                  onNewConentAvailable(registration.waiting)
                 }
                 console.log('New content is available; please refresh.')
               } else {
@@ -98,7 +103,7 @@ function registerValidSW(swUrl: string, onNewConentAvailable?: () => void) {
 
 function checkValidServiceWorker(
   swUrl: string,
-  onNewConentAvailable?: () => void
+  onNewConentAvailable?: (waitingSW: ServiceWorker | null) => void
 ) {
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl)
