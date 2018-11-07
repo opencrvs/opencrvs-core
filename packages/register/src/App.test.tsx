@@ -110,6 +110,7 @@ describe('when user has a valid token in local storage', () => {
 
   describe('when appliation has new update', () => {
     beforeEach(() => {
+      // @ts-ignore
       const action = actions.showNewContentAvailableNotification()
       store.dispatch(action)
       app.update()

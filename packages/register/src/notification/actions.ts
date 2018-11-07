@@ -6,14 +6,18 @@ export const HIDE_BACKGROUND_SYNC_TRIGGERED = 'HIDE_BACKGROUND_SYNC_TRIGGERED'
 
 export type ShowNewContentAvailableAction = {
   type: typeof SHOW_NEW_CONTENT_AVAILABLE
+  payload: { waitingSW: ServiceWorker }
 }
 
 export type HideNewContentAvailableAction = {
   type: typeof HIDE_NEW_CONTENT_AVAILABLE
 }
 
-export const showNewContentAvailableNotification = (): ShowNewContentAvailableAction => ({
-  type: SHOW_NEW_CONTENT_AVAILABLE
+export const showNewContentAvailableNotification = (
+  waitingSW: ServiceWorker
+): ShowNewContentAvailableAction => ({
+  type: SHOW_NEW_CONTENT_AVAILABLE,
+  payload: { waitingSW }
 })
 
 export const hideNewContentAvailableNotification = (): HideNewContentAvailableAction => ({
