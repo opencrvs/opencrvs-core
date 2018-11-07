@@ -236,23 +236,18 @@ export function selectOrCreateDocRefResource(
 
 export function selectOrCreateTaskRefResource(
   fhirBundle: ITemplatedBundle,
-  compTrackingId: string,
   context: any
 ): fhir.Task {
   let taskResource =
     fhirBundle.entry &&
     fhirBundle.entry.find(entry => {
-      if (!entry.resource || entry.resource.resourceType !== 'Task') {
-        return false
+      if (entry.resource && entry.resource.resourceType === 'Task') {
+        return true
       }
-      const task = entry.resource as fhir.Task
-      return (
-        task.focus !== undefined &&
-        task.focus.reference === `urn:trackingid:${compTrackingId}`
-      )
+      return false
     })
   if (!taskResource) {
-    taskResource = createTaskRefTemplate(uuid(), compTrackingId)
+    taskResource = createTaskRefTemplate(uuid())
     fhirBundle.entry.push(taskResource)
   }
   return taskResource.resource as fhir.Task

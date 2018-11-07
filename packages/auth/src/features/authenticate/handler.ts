@@ -35,9 +35,9 @@ export default async function authenticateHandler(
   }
 
   const nonce = generateNonce()
-  await storeUserInformation(nonce, result.userId, result.claims, result.mobile)
+  await storeUserInformation(nonce, result.userId, result.scope, result.mobile)
 
-  const isDemoUser = result.claims.indexOf('demo') > -1
+  const isDemoUser = result.scope.indexOf('demo') > -1
 
   let verificationCode
   if (isDemoUser) {

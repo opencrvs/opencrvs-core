@@ -26,9 +26,9 @@ export default async function refreshHandler(
     return unauthorized()
   }
 
-  const { mobile, claims } = userInformation
+  const { mobile, scope } = userInformation
 
-  const isDemoUser = claims.indexOf('demo') > -1
+  const isDemoUser = scope.indexOf('demo') > -1
 
   let verificationCode
   if (isDemoUser) {

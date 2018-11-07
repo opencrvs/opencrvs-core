@@ -88,6 +88,7 @@ test('should build a minimal FHIR registration document without error', async ()
       },
       registration: {
         trackingId: birthTrackingId,
+        contact: 'MOTHER',
         attachments: [
           {
             contentType: 'image/jpeg',
@@ -253,6 +254,11 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[4].resource.identifier[0]).toEqual({
     system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
     value: fhir.entry[0].resource.identifier.value
+  })
+
+  expect(fhir.entry[4].resource.extension[0]).toEqual({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+    valueString: 'MOTHER'
   })
 
   // Attachment Test cases

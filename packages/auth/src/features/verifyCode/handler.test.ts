@@ -14,7 +14,7 @@ describe('authenticate handler receives a request', () => {
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        claims: ['admin'],
+        scope: ['admin'],
         mobile: '+345345343'
       })
 
@@ -39,7 +39,7 @@ describe('authenticate handler receives a request', () => {
       expect(res.result.token.split('.')).toHaveLength(3)
       const [, payload] = res.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.claims).toEqual(['admin'])
+      expect(body.scope).toEqual(['admin'])
       expect(body.sub).toBe('1')
     })
   })
@@ -48,7 +48,7 @@ describe('authenticate handler receives a request', () => {
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        claims: ['admin'],
+        scope: ['admin'],
         mobile: '+345345343'
       })
       const authRes = await server.server.inject({

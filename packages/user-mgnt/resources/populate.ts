@@ -14,7 +14,7 @@ const fieldAgent = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'Field Agent',
-  claims: ['declare', 'demo']
+  scope: ['declare', 'demo']
 })
 
 const registrationClerk = new User({
@@ -24,7 +24,7 @@ const registrationClerk = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'Registration Clerk',
-  claims: ['declare', 'performance', 'certify', 'demo']
+  scope: ['declare', 'performance', 'certify', 'demo']
 })
 
 const localRegistrar = new User({
@@ -34,7 +34,7 @@ const localRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'Local Registrar',
-  claims: ['register', 'performance', 'certify', 'demo']
+  scope: ['register', 'performance', 'certify', 'demo']
 })
 
 const districtRegistrar = new User({
@@ -44,7 +44,7 @@ const districtRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'District Registrar',
-  claims: ['register', 'performance', 'certify', 'demo']
+  scope: ['register', 'performance', 'certify', 'demo']
 })
 
 const stateRegistrar = new User({
@@ -54,7 +54,7 @@ const stateRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'State Registrar',
-  claims: ['register', 'performance', 'certify', 'demo']
+  scope: ['register', 'performance', 'certify', 'demo']
 })
 
 const nationalRegistrar = new User({
@@ -64,7 +64,7 @@ const nationalRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'National Registrar',
-  claims: ['register', 'performance', 'certify', 'config', 'teams', 'demo']
+  scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo']
 })
 
 const testUsers = [

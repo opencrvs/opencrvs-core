@@ -3,6 +3,8 @@ import * as HapiSwagger from 'hapi-swagger'
 import * as Inert from 'inert'
 import * as Vision from 'vision'
 import * as JWT from 'hapi-auth-jwt2'
+import * as HapiI18n from 'hapi-i18n'
+import { logger } from 'src/logger'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -33,6 +35,18 @@ export default function getPlugins() {
             'stdout'
           ]
         }
+      }
+    },
+    {
+      plugin: HapiI18n,
+      options: {
+        locales: ['bn', 'en'],
+        directory: __dirname + '/../i18n/locales',
+        logErrorFn: (error: string) => {
+          logger.error(error)
+        },
+        defaultLocale: 'en',
+        languageHeaderField: 'locale'
       }
     }
   ]
