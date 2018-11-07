@@ -186,41 +186,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  getCookie = (cname: string) => {
-    const name = cname + '='
-    const decodedCookie = decodeURIComponent(document.cookie)
-    const ca = decodedCookie.split(';')
-
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i]
-
-      while (c.charAt(0) === ' ') {
-        c = c.substring(1)
-      }
-      if (c.indexOf(name) === 0) {
-        return c.substring(name.length, c.length)
-      }
-    }
-
-    return ''
-  }
-
   processSubmitData = () => {
     const data = this.props.draft.data
     const { child, father, mother, registration } = data
     if (!data || !child || !father || !mother || !registration) {
       return {}
-    }
-
-    let user
-    const userCookie = this.getCookie('user')
-    if (userCookie) {
-      user = JSON.parse(userCookie)
-    } else {
-      user = {
-        id: '',
-        username: ''
-      }
     }
 
     const fatherPermanentAddress = father.permanentAddressSameAsMother
@@ -363,12 +333,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
         status: [
           {
             type: 'DECLARED',
-            user: { userName: user.username, role: [{ type: 'admin' }] },
+            user: { userName: 'user.username', role: [{ type: 'admin' }] },
             comments: [
               {
                 comment: registration.commentsOrNotes,
-                id: user.id,
-                user: { userName: user.username, role: [{ type: 'admin' }] }
+                id: 'user.id',
+                user: { userName: 'user.username', role: [{ type: 'admin' }] }
               }
             ]
           }
