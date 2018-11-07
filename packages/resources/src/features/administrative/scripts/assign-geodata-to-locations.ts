@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import chalk from 'chalk'
 import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
 
 const divisionsWithoutGeo = JSON.parse(
@@ -11,6 +12,10 @@ const districtsWithoutGeo = JSON.parse(
   fs
     .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/districts.json`)
     .toString()
+)
+
+const upazilasWithoutGeo = JSON.parse(
+  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/upazilas.json`).toString()
 )
 
 const admin1Geo = JSON.parse(
@@ -29,6 +34,14 @@ const admin2Geo = JSON.parse(
     .toString()
 )
 
+const admin3Geo = JSON.parse(
+  fs
+    .readFileSync(
+      `${ADMIN_STRUCTURE_SOURCE}locations/bgd_admbnda_adm3_bbs_20180410_generalized.geojson`
+    )
+    .toString()
+)
+
 function matchAndAssignGeoData(fhirLocations: any, features: any) {
   return fhirLocations.map((location: any) => {
     const matchingFeature = features.find(
@@ -38,7 +51,9 @@ function matchAndAssignGeoData(fhirLocations: any, features: any) {
     )
 
     if (!matchingFeature) {
-      throw new Error(`No match for ${location.name}`)
+      // tslint:disable-next-line:no-console
+      console.log(`${chalk.yellow('Warning:')} No match for ${location.name}`)
+      return location
     }
 
     location.extension[0].valueAttachment.data = Buffer.from(
@@ -57,10 +72,24 @@ const mapGeo = {
   districts: matchAndAssignGeoData(
     districtsWithoutGeo.districts,
     admin2Geo.features
+  ),
+  upazilas: matchAndAssignGeoData(
+    upazilasWithoutGeo.upazilas,
+    admin3Geo.features
   )
 }
 
 fs.writeFileSync(
-  `${ADMIN_STRUCTURE_SOURCE}locations/map-geo.json`,
-  JSON.stringify(mapGeo, null, 2)
+  `${ADMIN_STRUCTURE_SOURCE}locations/divisions-geo.json`,
+  JSON.stringify({ divisions: mapGeo.divisions }, null, 2)
+)
+
+fs.writeFileSync(
+  `${ADMIN_STRUCTURE_SOURCE}locations/districts-geo.json`,
+  JSON.stringify({ districts: mapGeo.districts }, null, 2)
+)
+
+fs.writeFileSync(
+  `${ADMIN_STRUCTURE_SOURCE}locations/upazilas-geo.json`,
+  JSON.stringify({ upazilas: mapGeo.upazilas }, null, 2)
 )
