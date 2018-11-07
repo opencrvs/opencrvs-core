@@ -14,10 +14,23 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  margin-top: 10px;
 `
+const LabelText = styled.div`
+  color: ${({ theme }) => theme.colors.placeholder};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 16px;
+  font-weight: 500;
+`
+const ComponentWrapper = styled.span`
+  flex-direction: column;
+`
+export interface IInputLabel {
+  label: string
+}
 export interface ISortAndFilterItem {
   selects: Omit<ISelectGroupProps, 'onChange'>
-  input: IInputFieldProps
+  input: IInputLabel
 }
 
 interface ISortAndFilterPrpos {
@@ -38,12 +51,14 @@ export class SortAndFilter extends React.Component<ISortAndFilterPrpos> {
     const { sortBy, filterBy, onChangeSort, onChangeFilter } = this.props
     return (
       <Wrapper>
-        <InputField {...sortBy.input}>
+        <ComponentWrapper>
+          <LabelText>{sortBy.input.label}</LabelText>
           <SelectGroup {...sortBy.selects} onChange={onChangeSort} />
-        </InputField>
-        <InputField {...filterBy.input}>
+        </ComponentWrapper>
+        <ComponentWrapper>
+          <LabelText>{filterBy.input.label}</LabelText>
           <SelectGroup {...filterBy.selects} onChange={onChangeFilter} />
-        </InputField>
+        </ComponentWrapper>
       </Wrapper>
     )
   }

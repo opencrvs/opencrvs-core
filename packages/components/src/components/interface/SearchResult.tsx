@@ -11,7 +11,7 @@ import {
 } from './SelectGroup'
 
 import { IInputFieldProps, ICustomProps } from '../forms'
-import { ISortAndFilterItem } from './SortAndFilter'
+import { ISortAndFilterItem, IInputLabel } from './SortAndFilter'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -45,7 +45,7 @@ type CustomSelectGroupProp = Omit<ISelectGroupProps, 'onChange' | 'values'>
 
 export interface ISortAndFilter {
   selects: CustomSelectGroupProp
-  input: IInputFieldProps
+  input: IInputLabel
 }
 interface ISearchResultProps {
   data: CustomResult[]
