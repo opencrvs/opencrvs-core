@@ -31,7 +31,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
-          claims: ['admin']
+          scope: ['admin']
         })
       )
       const res = await server.server.inject({
@@ -55,7 +55,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
-          claims: ['admin']
+          scope: ['admin']
         })
       )
       const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')

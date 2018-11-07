@@ -2,21 +2,21 @@ import { getTokenPayload, getRedirectURL } from './authUtils'
 import { config } from '../config'
 
 const performanceJWT =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDExNjU0NjEsImV4cCI6MTU3MjcwMTQ2MSwiYXVkIjoiIiwic3ViIjoiMSIsImNsYWltcyI6IlsncGVyZm9ybWFuY2UnXSJ9.B9n01MM8ZZyvXsE0AmdWNzYjcTsEJK-bM2DiRLJEi58'
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDE1NzY5NjUsImV4cCI6MTU3MzExMjk2NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydwZXJmb3JtYW5jZSddIn0.huK3iFFi01xkwHvQZQAOnScrz0rJ50EsxpZA3a1Ynao'
 
 const declareJWT =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDExNjU0NjEsImV4cCI6MTU3MjcwMTQ2MSwiYXVkIjoiIiwic3ViIjoiMSIsImNsYWltcyI6IlsnZGVjbGFyZSddIn0.y692mz7WDYc-UrO0oIxX_aji68lUtBJO4UyKUSntoVg'
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDE1NzY5NjUsImV4cCI6MTU3MzExMjk2NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydkZWNsYXJlJ10ifQ.yMSf_4TJaFqgczHg1YgC0ev_bPneLaJwRsrA9eZkmUk'
 
 describe('authUtils', () => {
   describe('getTokenPayload. Returns the correct payload from a token', () => {
     it('should return the right payload', () => {
       const response = {
         iss: '',
-        iat: 1541165461,
-        exp: 1572701461,
+        iat: 1541576965,
+        exp: 1573112965,
         aud: '',
         sub: '1',
-        claims: "['performance']"
+        scope: "['performance']"
       }
       expect(getTokenPayload(performanceJWT)).toEqual(response)
     })

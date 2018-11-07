@@ -6,11 +6,10 @@ require('dotenv').config({
 // tslint:enable no-var-requires
 
 import * as Hapi from 'hapi'
-
 import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from './constants'
-import smsHandler, { requestSchema } from './features/sms/handler'
 import getPlugins from './config/plugins'
 import { readFileSync } from 'fs'
+import getRoutes from './config/routes'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -40,27 +39,8 @@ export async function createServer() {
 
   server.auth.default('jwt')
 
-  // curl -H 'Content-Type: application/json' -d '{"msisdn": "+27855555555", "message": "Test"}' http://localhost:2020/sms
-  server.route({
-    method: 'POST',
-    path: '/sms',
-    handler: smsHandler,
-    options: {
-      tags: ['api'],
-      description: 'Sends an sms to a user',
-      validate: {
-        payload: requestSchema
-      },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'Sms sent' },
-            400: { description: 'Bad request, check your request body' }
-          }
-        }
-      }
-    }
-  })
+  const routes = getRoutes()
+  server.route(routes)
 
   async function stop() {
     await server.stop()

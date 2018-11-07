@@ -1,4 +1,4 @@
-import { resolvers } from 'src/features/notification/root-resolvers'
+import { resolvers } from './root-resolvers'
 import * as fetch from 'jest-fetch-mock'
 
 describe('Notification root resolvers', () => {
@@ -14,6 +14,17 @@ describe('Notification root resolvers', () => {
       expect(compositions).toBeDefined()
       expect(compositions).toBeInstanceOf(Array)
       expect(compositions).toHaveLength(2)
+    })
+  })
+  describe('createNotification', () => {
+    it('posting the mutation', async () => {
+      // @ts-ignore
+      const result = await resolvers.Mutation.createNotification(
+        {},
+        { createAt: new Date() }
+      )
+
+      expect(result).toBeDefined()
     })
   })
 })

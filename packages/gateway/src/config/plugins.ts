@@ -62,7 +62,9 @@ export const getPlugins = (env: string | undefined, schemaPath: string) => {
           pretty: true,
           schema: executableSchema,
           // this is where you add anything you want attached to context in resolvers
-          context: {}
+          context: {
+            Authorization: request.headers['authorization']
+          }
         })
       },
       name: 'graphqlHapi',

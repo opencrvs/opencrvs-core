@@ -138,4 +138,55 @@ describe('Route authorization', () => {
 
     expect(res.statusCode).toBe(401)
   })
+
+  it('accepts requests with a valid token and valid user scope', async () => {
+    const server = await createServer()
+    const token = jwt.sign(
+      { scope: ['declare'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/birthDeclarationSMS',
+      payload: {
+        msisdn: '+447789778865',
+        name: 'test',
+        trackingid: 'B123456'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+  it('blocks requests with a invalid user scope', async () => {
+    const server = await createServer()
+    const token = jwt.sign(
+      { scope: ['demo'] }, // required declare | register | certify
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/birthDeclarationSMS',
+      payload: {
+        msisdn: '+447789778865',
+        name: 'test',
+        trackingid: 'B123456'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(403)
+  })
 })

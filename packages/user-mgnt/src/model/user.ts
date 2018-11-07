@@ -7,7 +7,7 @@ interface IUser {
   passwordHash: string
   salt: string
   role: string
-  claims: string[]
+  scope: string[]
 }
 export interface IUserModel extends IUser, Document {}
 
@@ -18,7 +18,7 @@ const userSchema = new Schema({
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
   role: String,
-  claims: { type: [String], required: true }
+  scope: { type: [String], required: true }
 })
 
 export default model<IUserModel>('User', userSchema)
