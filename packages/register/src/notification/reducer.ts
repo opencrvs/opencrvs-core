@@ -5,12 +5,14 @@ export type NotificationState = {
   newContentAvailable: boolean
   backgroundSyncMessageVisible: boolean
   syncCount: number
+  waitingSW: ServiceWorker | null
 }
 
 export const initialState: NotificationState = {
   newContentAvailable: false,
   backgroundSyncMessageVisible: false,
-  syncCount: 0
+  syncCount: 0,
+  waitingSW: null
 }
 
 type Action =
@@ -27,12 +29,14 @@ export const notificationReducer: LoopReducer<NotificationState, Action> = (
     case actions.SHOW_NEW_CONTENT_AVAILABLE:
       return {
         ...state,
-        newContentAvailable: true
+        newContentAvailable: true,
+        waitingSW: action.payload.waitingSW
       }
     case actions.HIDE_NEW_CONTENT_AVAILABLE:
       return {
         ...state,
-        newContentAvailable: false
+        newContentAvailable: false,
+        waitingSW: null
       }
     case actions.SHOW_BACKGROUND_SYNC_TRIGGERED:
       return {

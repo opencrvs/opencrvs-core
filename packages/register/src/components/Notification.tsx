@@ -17,6 +17,7 @@ type NotificationProps = {
   newContentAvailable: boolean
   backgroundSyncMessageVisible: boolean
   syncCount: number
+  waitingSW: ServiceWorker | null
 }
 
 type DispatchProps = {
@@ -47,6 +48,9 @@ class Component extends React.Component<
     RouteComponentProps<{}>
 > {
   onNewContentAvailableNotificationClick = () => {
+    if (this.props.waitingSW) {
+      this.props.waitingSW.postMessage('skipWaiting')
+    }
     this.props.hideNewContentAvailableNotification()
     location.reload()
   }
@@ -99,7 +103,8 @@ const mapStateToProps = (store: IStoreState) => {
     newContentAvailable: store.notification.newContentAvailable,
     backgroundSyncMessageVisible:
       store.notification.backgroundSyncMessageVisible,
-    syncCount: store.notification.syncCount
+    syncCount: store.notification.syncCount,
+    waitingSW: store.notification.waitingSW
   }
 }
 
