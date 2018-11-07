@@ -29,10 +29,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-12-10T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'birth',
-    location: 'gazipur'
+    sortFilterFields: {
+      createdAt: '2017-12-10T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'birth',
+      location: 'gazipur'
+    }
   },
   {
     info: [
@@ -63,10 +65,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-11-10T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'death',
-    location: 'demra'
+    sortFilterFields: {
+      createdAt: '2017-11-10T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'death',
+      location: 'demra'
+    }
   },
   {
     info: [
@@ -97,10 +101,12 @@ const list = [
         type: 'green'
       }
     ],
-    createdAt: '2017-10-10T18:00:00.000Z',
-    declaration_status: 'registered',
-    event: 'marriage',
-    location: 'dohar'
+    sortFilterFields: {
+      createdAt: '2017-10-10T18:00:00.000Z',
+      declaration_status: 'registered',
+      event: 'marriage',
+      location: 'dohar'
+    }
   },
   {
     info: [
@@ -131,10 +137,12 @@ const list = [
         type: 'collected'
       }
     ],
-    createdAt: '2017-09-10T18:00:00.000Z',
-    declaration_status: 'marriage',
-    event: 'birth',
-    location: 'badda'
+    sortFilterFields: {
+      createdAt: '2017-09-10T18:00:00.000Z',
+      declaration_status: 'marriage',
+      event: 'birth',
+      location: 'badda'
+    }
   },
   {
     info: [
@@ -165,10 +173,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-10-10T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'birth',
-    location: 'badda'
+    sortFilterFields: {
+      createdAt: '2017-10-10T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'birth',
+      location: 'badda'
+    }
   },
   {
     info: [
@@ -199,10 +209,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-10-10T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'death',
-    location: 'savar'
+    sortFilterFields: {
+      createdAt: '2017-10-10T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'death',
+      location: 'savar'
+    }
   },
   {
     info: [
@@ -233,10 +245,12 @@ const list = [
         type: 'green'
       }
     ],
-    createdAt: '2017-10-10T18:00:00.000Z',
-    declaration_status: 'registered',
-    event: 'marriage',
-    location: 'dohar'
+    sortFilterFields: {
+      createdAt: '2017-10-10T18:00:00.000Z',
+      declaration_status: 'registered',
+      event: 'marriage',
+      location: 'dohar'
+    }
   },
   {
     info: [
@@ -267,10 +281,12 @@ const list = [
         type: 'collected'
       }
     ],
-    createdAt: '2017-10-09T18:00:00.000Z',
-    declaration_status: 'collected',
-    event: 'birth',
-    location: 'dhamrai'
+    sortFilterFields: {
+      createdAt: '2017-10-09T18:00:00.000Z',
+      declaration_status: 'collected',
+      event: 'birth',
+      location: 'dhamrai'
+    }
   },
   {
     info: [
@@ -301,10 +317,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-10-08T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'birth',
-    location: 'dhamrai'
+    sortFilterFields: {
+      createdAt: '2017-10-08T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'birth',
+      location: 'dhamrai'
+    }
   },
   {
     info: [
@@ -335,10 +353,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-10-09T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'death',
-    location: 'badda'
+    sortFilterFields: {
+      createdAt: '2017-10-09T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'death',
+      location: 'badda'
+    }
   },
   {
     info: [
@@ -369,10 +389,12 @@ const list = [
         type: 'green'
       }
     ],
-    createdAt: '2017-10-09T18:00:00.000Z',
-    declaration_status: 'registered',
-    event: 'marriage',
-    location: 'dhamrai'
+    sortFilterFields: {
+      createdAt: '2017-10-09T18:00:00.000Z',
+      declaration_status: 'registered',
+      event: 'marriage',
+      location: 'dhamrai'
+    }
   },
   {
     info: [
@@ -403,10 +425,12 @@ const list = [
         type: 'collected'
       }
     ],
-    createdAt: '2017-10-06T18:00:00.000Z',
-    declaration_status: 'collected',
-    event: 'birth',
-    location: 'savar'
+    sortFilterFields: {
+      createdAt: '2017-10-06T18:00:00.000Z',
+      declaration_status: 'collected',
+      event: 'birth',
+      location: 'savar'
+    }
   },
   {
     info: [
@@ -437,10 +461,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-10-09T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'birth',
-    location: 'dhamrai'
+    sortFilterFields: {
+      createdAt: '2017-10-09T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'birth',
+      location: 'dhamrai'
+    }
   },
   {
     info: [
@@ -471,10 +497,12 @@ const list = [
         type: 'orange'
       }
     ],
-    createdAt: '2017-10-09T18:00:00.000Z',
-    declaration_status: 'application',
-    event: 'death',
-    location: 'dhamrai'
+    sortFilterFields: {
+      createdAt: '2017-10-09T18:00:00.000Z',
+      declaration_status: 'application',
+      event: 'death',
+      location: 'dhamrai'
+    }
   },
   {
     info: [
@@ -505,10 +533,12 @@ const list = [
         type: 'green'
       }
     ],
-    createdAt: '2017-10-09T18:00:00.000Z',
-    declaration_status: 'registered',
-    event: 'marriage',
-    location: 'dhamrai'
+    sortFilterFields: {
+      createdAt: '2017-10-09T18:00:00.000Z',
+      declaration_status: 'registered',
+      event: 'marriage',
+      location: 'dhamrai'
+    }
   },
   {
     info: [
@@ -539,10 +569,12 @@ const list = [
         type: 'collected'
       }
     ],
-    createdAt: '2017-10-09T18:00:00.000Z',
-    declaration_status: 'collected',
-    event: 'birth',
-    location: 'badda'
+    sortFilterFields: {
+      createdAt: '2017-10-09T18:00:00.000Z',
+      declaration_status: 'collected',
+      event: 'birth',
+      location: 'badda'
+    }
   }
 ]
 const sortBy = {

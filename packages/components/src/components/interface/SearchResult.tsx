@@ -36,7 +36,11 @@ interface IDynamicValues {
   [key: string]: string
 }
 
-export type CustomResult = IResult & IDynamicValues
+interface ISortAndFilterFields {
+  sortFilterFields: IDynamicValues
+}
+
+export type CustomResult = IResult & ISortAndFilterFields
 type CustomSelectGroupProp = Omit<ISelectGroupProps, 'onChange' | 'values'>
 
 export interface ISortAndFilter {
@@ -70,12 +74,18 @@ const sortByDate = (key: string, value: string, data: CustomResult[]) => {
   switch (value) {
     case 'asc':
       return data.sort((a, b) => {
-        return +new Date(b[key]) - +new Date(a[key])
+        return (
+          +new Date(b.sortFilterFields[key]) -
+          +new Date(a.sortFilterFields[key])
+        )
       })
       break
     case 'desc':
       return data.sort((a, b) => {
-        return +new Date(a[key]) - +new Date(b[key])
+        return (
+          +new Date(a.sortFilterFields[key]) -
+          +new Date(b.sortFilterFields[key])
+        )
       })
       break
     default:
@@ -106,7 +116,7 @@ const getTotalPageNumber = (totalItemCount: number) => {
 }
 
 const filterItems = (key: string, value: string, items: CustomResult[]) =>
-  items.filter((item: IDynamicValues) => item[key] === value)
+  items.filter((item: CustomResult) => item.sortFilterFields[key] === value)
 
 export class SearchResult extends React.Component<
   ISearchResultProps,
