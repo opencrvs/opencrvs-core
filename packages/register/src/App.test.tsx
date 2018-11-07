@@ -551,6 +551,773 @@ describe('when user has a valid token in local storage', () => {
       })
     })
   })
+
+  describe('when user is in the preview section', () => {
+    let customDraft: IDraft
+    const data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '1999-10-10',
+        familyName: 'ইসলাম',
+        familyNameEng: 'Islam',
+        firstNames: 'নাইম',
+        firstNamesEng: 'Naim',
+        gender: 'male',
+        orderOfBirth: '2',
+        placeOfDelivery: 'HOSPITAL',
+        typeOfBirth: 'SINGLE',
+        weightAtBirth: '10'
+      },
+      father: {
+        fathersDetailsExist: true,
+        iD: '234234423424234244',
+        iDType: 'NATIONAL_ID',
+        addressSameAsMother: true,
+        permanentAddressSameAsMother: true,
+        country: 'BGD',
+        countryPermanent: 'BGD',
+        currentAddress: '',
+        fatherBirthDate: '1999-10-10',
+        dateOfMarriage: '2010-10-10',
+        educationalAttainment: 'PRIMARY_ISCED_1',
+        familyName: 'ইসলাম',
+        familyNameEng: 'Islam',
+        firstNames: 'আনোয়ার',
+        firstNamesEng: 'Anwar',
+        maritalStatus: 'MARRIED',
+        nationality: 'BGD'
+      },
+      mother: {
+        iD: '234243453455',
+        iDType: 'NATIONAL_ID',
+        country: 'BGD',
+        nationality: 'BGD',
+        familyName: 'ইসলাম',
+        familyNameEng: 'Islam',
+        firstNames: 'রোকেয়া',
+        firstNamesEng: 'Rokeya',
+        maritalStatus: 'MARRIED',
+        dateOfMarriage: '2010-10-10',
+        motherBirthDate: '1999-10-10',
+        educationalAttainment: 'PRIMARY_ISCED_1',
+        addressLine1: 'Rd #10',
+        addressLine1Permanent: 'Rd#10',
+        addressLine2: 'Akua',
+        addressLine2Permanent: 'Akua',
+        addressLine3Options1: 'union1',
+        addressLine3Options1Permanent: 'union1',
+        addressLine4: 'upazila10',
+        addressLine4Permanent: 'upazila10',
+        countryPermanent: 'BGD',
+        currentAddress: '',
+        district: 'district2',
+        districtPermanent: 'district2',
+        permanentAddress: '',
+        postCode: '1020',
+        postCodePermanent: '1010',
+        state: 'state4',
+        statePermanent: 'state4'
+      },
+      registration: {
+        commentsOrNotes: 'comments',
+        paperFormNumber: '423424245455',
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationCertificateLanguage: ['en'],
+        registrationEmail: 'arman@gmail.com',
+        registrationPhone: '01736478884',
+        whoseContactDetails: 'MOTHER'
+      }
+    }
+
+    beforeEach(() => {
+      customDraft = { id: Date.now(), data }
+      store.dispatch(storeDraft(customDraft))
+      history.replace(
+        DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
+      )
+
+      app.update()
+    })
+
+    describe('when user clicks the "preview" tab', () => {
+      beforeEach(async () => {
+        app
+          .find('#tab_preview')
+          .hostNodes()
+          .simulate('click')
+
+        await flushPromises()
+        app.update()
+      })
+
+      it('renders child first name', () => {
+        expect(
+          app
+            .find('#listItem_value_child_firstNames')
+            .hostNodes()
+            .text()
+        ).toBe('নাইম')
+      })
+
+      it('renders child family name', () => {
+        expect(
+          app
+            .find('#listItem_value_child_familyName')
+            .hostNodes()
+            .text()
+        ).toBe('ইসলাম')
+      })
+
+      it('renders child first name in english', () => {
+        expect(
+          app
+            .find('#listItem_value_child_firstNamesEng')
+            .hostNodes()
+            .text()
+        ).toBe('Naim')
+      })
+
+      it('renders child family name in english', () => {
+        expect(
+          app
+            .find('#listItem_value_child_familyNameEng')
+            .hostNodes()
+            .text()
+        ).toBe('Islam')
+      })
+
+      it('renders child gender', () => {
+        expect(
+          app
+            .find('#listItem_value_child_gender')
+            .hostNodes()
+            .text()
+        ).toBe('Male')
+      })
+
+      it('renders child birth date', () => {
+        expect(
+          app
+            .find('#listItem_value_child_childBirthDate')
+            .hostNodes()
+            .text()
+        ).toBe('1999-10-10')
+      })
+
+      it('renders child attendant at birth', () => {
+        expect(
+          app
+            .find('#listItem_value_child_attendantAtBirth')
+            .hostNodes()
+            .text()
+        ).toBe('Nurse')
+      })
+
+      it('renders child type of birth', () => {
+        expect(
+          app
+            .find('#listItem_value_child_typeOfBirth')
+            .hostNodes()
+            .text()
+        ).toBe('Single')
+      })
+
+      it('renders child order of birth', () => {
+        expect(
+          app
+            .find('#listItem_value_child_orderOfBirth')
+            .hostNodes()
+            .text()
+        ).toBe('2')
+      })
+
+      it('renders child weight at birth', () => {
+        expect(
+          app
+            .find('#listItem_value_child_weightAtBirth')
+            .hostNodes()
+            .text()
+        ).toBe('10')
+      })
+
+      it('renders child place of delivery', () => {
+        expect(
+          app
+            .find('#listItem_value_child_placeOfDelivery')
+            .hostNodes()
+            .text()
+        ).toBe('Hospital')
+      })
+
+      it('renders mother id type ', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_iDType')
+            .hostNodes()
+            .text()
+        ).toBe('National ID')
+      })
+
+      it('renders mother id number', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_iD')
+            .hostNodes()
+            .text()
+        ).toBe('234243453455')
+      })
+
+      it('renders mother nationality', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_nationality')
+            .hostNodes()
+            .text()
+        ).toBe('Bangladesh')
+      })
+
+      it('renders mother first name', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_firstNames')
+            .hostNodes()
+            .text()
+        ).toBe('রোকেয়া')
+      })
+
+      it('renders mother family name', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_familyName')
+            .hostNodes()
+            .text()
+        ).toBe('ইসলাম')
+      })
+
+      it('renders mother first name in english', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_firstNamesEng')
+            .hostNodes()
+            .text()
+        ).toBe('Rokeya')
+      })
+
+      it('renders mother family name in english', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_familyNameEng')
+            .hostNodes()
+            .text()
+        ).toBe('Islam')
+      })
+
+      it('renders mother birth date', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_motherBirthDate')
+            .hostNodes()
+            .text()
+        ).toBe('1999-10-10')
+      })
+
+      it('renders mother marital status', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_maritalStatus')
+            .hostNodes()
+            .text()
+        ).toBe('Married')
+      })
+
+      it('renders mother date of marriage', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_dateOfMarriage')
+            .hostNodes()
+            .text()
+        ).toBe('2010-10-10')
+      })
+
+      it('renders mother educational attainment', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_educationalAttainment')
+            .hostNodes()
+            .text()
+        ).toBe('Primary')
+      })
+
+      it('renders mother country', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_country')
+            .hostNodes()
+            .text()
+        ).toBe('Bangladesh')
+      })
+
+      it('renders mother state', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_state')
+            .hostNodes()
+            .text()
+        ).toBe('Mymensingh Division')
+      })
+
+      it('renders mother district', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_district')
+            .hostNodes()
+            .text()
+        ).toBe('district2')
+      })
+
+      it('renders mother address line4', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine4')
+            .hostNodes()
+            .text()
+        ).toBe('upazila10')
+      })
+
+      it('renders mother addressLine3Options1', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine3Options1')
+            .hostNodes()
+            .text()
+        ).toBe('union1')
+      })
+
+      it('renders mother addressLine2', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine2')
+            .hostNodes()
+            .text()
+        ).toBe('Akua')
+      })
+
+      it('renders mother addressLine1', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine1')
+            .hostNodes()
+            .text()
+        ).toBe('Rd #10')
+      })
+
+      it('renders mother postCode', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_postCode')
+            .hostNodes()
+            .text()
+        ).toBe('1020')
+      })
+
+      it('renders mother countryPermanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_countryPermanent')
+            .hostNodes()
+            .text()
+        ).toBe('Bangladesh')
+      })
+
+      it('renders mother statePermanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_statePermanent')
+            .hostNodes()
+            .text()
+        ).toBe('Mymensingh Division')
+      })
+
+      it('renders mother districtPermanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_districtPermanent')
+            .hostNodes()
+            .text()
+        ).toBe('district2')
+      })
+
+      it('renders mother addressLine4Permanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine4Permanent')
+            .hostNodes()
+            .text()
+        ).toBe('upazila10')
+      })
+
+      it('renders mother addressLine3Options1Permanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine3Options1Permanent')
+            .hostNodes()
+            .text()
+        ).toBe('union1')
+      })
+
+      it('renders mother addressLine2Permanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine2Permanent')
+            .hostNodes()
+            .text()
+        ).toBe('Akua')
+      })
+
+      it('renders mother addressLine1Permanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_addressLine1Permanent')
+            .hostNodes()
+            .text()
+        ).toBe('Rd#10')
+      })
+
+      it('renders mother postCodePermanent', () => {
+        expect(
+          app
+            .find('#listItem_value_mother_postCodePermanent')
+            .hostNodes()
+            .text()
+        ).toBe('1010')
+      })
+
+      it('renders father fathersDetailsExist ', () => {
+        expect(
+          app
+            .find('#listItem_value_father_fathersDetailsExist')
+            .hostNodes()
+            .text()
+        ).toBe('Yes')
+      })
+
+      it('renders father iDType', () => {
+        expect(
+          app
+            .find('#listItem_value_father_iDType')
+            .hostNodes()
+            .text()
+        ).toBe('National ID')
+      })
+
+      it('renders father father_iD', () => {
+        expect(
+          app
+            .find('#listItem_value_father_iD')
+            .hostNodes()
+            .text()
+        ).toBe('234234423424234244')
+      })
+
+      it('renders father nationality', () => {
+        expect(
+          app
+            .find('#listItem_value_father_nationality')
+            .hostNodes()
+            .text()
+        ).toBe('Bangladesh')
+      })
+
+      it('renders father firstNames', () => {
+        expect(
+          app
+            .find('#listItem_value_father_firstNames')
+            .hostNodes()
+            .text()
+        ).toBe('আনোয়ার')
+      })
+
+      it('renders father familyName', () => {
+        expect(
+          app
+            .find('#listItem_value_father_familyName')
+            .hostNodes()
+            .text()
+        ).toBe('ইসলাম')
+      })
+
+      it('renders father firstNamesEng', () => {
+        expect(
+          app
+            .find('#listItem_value_father_firstNamesEng')
+            .hostNodes()
+            .text()
+        ).toBe('Anwar')
+      })
+
+      it('renders father familyNameEng', () => {
+        expect(
+          app
+            .find('#listItem_value_father_familyNameEng')
+            .hostNodes()
+            .text()
+        ).toBe('Islam')
+      })
+
+      it('renders father fatherBirthDate', () => {
+        expect(
+          app
+            .find('#listItem_value_father_fatherBirthDate')
+            .hostNodes()
+            .text()
+        ).toBe('1999-10-10')
+      })
+
+      it('renders father maritalStatus', () => {
+        expect(
+          app
+            .find('#listItem_value_father_maritalStatus')
+            .hostNodes()
+            .text()
+        ).toBe('Married')
+      })
+
+      it('renders father dateOfMarriage', () => {
+        expect(
+          app
+            .find('#listItem_value_father_dateOfMarriage')
+            .hostNodes()
+            .text()
+        ).toBe('2010-10-10')
+      })
+
+      it('renders father educationalAttainment', () => {
+        expect(
+          app
+            .find('#listItem_value_father_educationalAttainment')
+            .hostNodes()
+            .text()
+        ).toBe('Primary')
+      })
+
+      it('renders father addressSameAsMother', () => {
+        expect(
+          app
+            .find('#listItem_value_father_addressSameAsMother')
+            .hostNodes()
+            .text()
+        ).toBe('Yes')
+      })
+
+      it('renders father permanentAddressSameAsMother', () => {
+        expect(
+          app
+            .find('#listItem_value_father_permanentAddressSameAsMother')
+            .hostNodes()
+            .text()
+        ).toBe('Yes')
+      })
+      it('renders father fathersDetailsExist', () => {
+        expect(
+          app
+            .find('#listItem_value_father_fathersDetailsExist')
+            .hostNodes()
+            .text()
+        ).toBe('Yes')
+      })
+
+      it('renders father iDType', () => {
+        expect(
+          app
+            .find('#listItem_value_father_iDType')
+            .hostNodes()
+            .text()
+        ).toBe('National ID')
+      })
+
+      it('renders father iD', () => {
+        expect(
+          app
+            .find('#listItem_value_father_iD')
+            .hostNodes()
+            .text()
+        ).toBe('234234423424234244')
+      })
+
+      it('renders father nationality', () => {
+        expect(
+          app
+            .find('#listItem_value_father_nationality')
+            .hostNodes()
+            .text()
+        ).toBe('Bangladesh')
+      })
+
+      it('renders father firstNames', () => {
+        expect(
+          app
+            .find('#listItem_value_father_firstNames')
+            .hostNodes()
+            .text()
+        ).toBe('আনোয়ার')
+      })
+
+      it('renders father familyName', () => {
+        expect(
+          app
+            .find('#listItem_value_father_familyName')
+            .hostNodes()
+            .text()
+        ).toBe('ইসলাম')
+      })
+
+      it('renders father firstNamesEng', () => {
+        expect(
+          app
+            .find('#listItem_value_father_firstNamesEng')
+            .hostNodes()
+            .text()
+        ).toBe('Anwar')
+      })
+
+      it('renders father familyNameEng', () => {
+        expect(
+          app
+            .find('#listItem_value_father_familyNameEng')
+            .hostNodes()
+            .text()
+        ).toBe('Islam')
+      })
+
+      it('renders father BirthDate', () => {
+        expect(
+          app
+            .find('#listItem_value_father_fatherBirthDate')
+            .hostNodes()
+            .text()
+        ).toBe('1999-10-10')
+      })
+
+      it('renders father maritalStatus', () => {
+        expect(
+          app
+            .find('#listItem_value_father_maritalStatus')
+            .hostNodes()
+            .text()
+        ).toBe('Married')
+      })
+
+      it('renders father dateOfMarriage', () => {
+        expect(
+          app
+            .find('#listItem_value_father_dateOfMarriage')
+            .hostNodes()
+            .text()
+        ).toBe('2010-10-10')
+      })
+
+      it('renders father educationalAttainment', () => {
+        expect(
+          app
+            .find('#listItem_value_father_educationalAttainment')
+            .hostNodes()
+            .text()
+        ).toBe('Primary')
+      })
+
+      it('renders father addressSameAsMother', () => {
+        expect(
+          app
+            .find('#listItem_value_father_addressSameAsMother')
+            .hostNodes()
+            .text()
+        ).toBe('Yes')
+      })
+
+      it('renders father permanentAddressSameAsMother', () => {
+        expect(
+          app
+            .find('#listItem_value_father_permanentAddressSameAsMother')
+            .hostNodes()
+            .text()
+        ).toBe('Yes')
+      })
+
+      it('renders registreation presentAtBirthRegistration', () => {
+        expect(
+          app
+            .find('#listItem_value_registration_presentAtBirthRegistration')
+            .hostNodes()
+            .text()
+        ).toBe('Mother')
+      })
+
+      it('renders registreation whoseContactDetails', () => {
+        expect(
+          app
+            .find('#listItem_value_registration_whoseContactDetails')
+            .hostNodes()
+            .text()
+        ).toBe('Mother')
+      })
+
+      it('renders registreation registrationEmail', () => {
+        expect(
+          app
+            .find('#listItem_value_registration_registrationEmail')
+            .hostNodes()
+            .text()
+        ).toBe('arman@gmail.com')
+      })
+
+      it('renders registreation registrationPhone', () => {
+        expect(
+          app
+            .find('#listItem_value_registration_registrationPhone')
+            .hostNodes()
+            .text()
+        ).toBe('01736478884')
+      })
+
+      it('renders registreation registrationCertificateLanguage', () => {
+        expect(
+          app
+            .find(
+              '#listItem_value_registration_registrationCertificateLanguage'
+            )
+            .hostNodes()
+            .text()
+        ).toBe('en')
+      })
+
+      it('renders registreation paperFormNumber', () => {
+        expect(
+          app
+            .find('#listItem_value_registration_paperFormNumber')
+            .hostNodes()
+            .text()
+        ).toBe('423424245455')
+      })
+
+      it('renders registreation commentsOrNotes', () => {
+        expect(
+          app
+            .find('#listItem_value_registration_commentsOrNotes')
+            .hostNodes()
+            .text()
+        ).toBe('comments')
+      })
+
+      it('check submit button', () => {
+        expect(
+          app
+            .find('#submit_form')
+            .hostNodes()
+            .text()
+        ).toBe('Submit')
+      })
+    })
+  })
 })
 it("doesn't redirect user to SSO if user has a token in their URL", async () => {
   const token =
