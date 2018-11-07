@@ -91,47 +91,47 @@ export default async function importAdminStructure() {
   }
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}divisions.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/divisions.json`,
     JSON.stringify({ divisions }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}districts.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/districts.json`,
     JSON.stringify({ districts }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}upazilas.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/upazilas.json`,
     JSON.stringify({ upazilas }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}thanas.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/thanas.json`,
     JSON.stringify({ thanas }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}cities.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/cities.json`,
     JSON.stringify({ cities }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}cityWards.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/cityWards.json`,
     JSON.stringify({ cityWards }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}unions.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/unions.json`,
     JSON.stringify({ unions }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}municipalities.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/municipalities.json`,
     JSON.stringify({ municipalities }, null, 2)
   )
 
   fs.writeFileSync(
-    `${ADMIN_STRUCTURE_SOURCE}municipalityWards.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations/municipalityWards.json`,
     JSON.stringify({ municipalityWards }, null, 2)
   )
 

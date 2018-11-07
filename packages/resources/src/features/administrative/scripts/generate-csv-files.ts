@@ -122,58 +122,77 @@ function buildLocationStats(
 const json2csvParser = new Parser({ fields })
 
 const divisionsJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}divisions.json`).toString()
+  fs
+    .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/divisions.json`)
+    .toString()
 )
 const divisionsCSV = json2csvParser.parse(
   buildLocationStats(divisionsJSON.divisions, 'Division')
 )
-fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}divisions.csv`, divisionsCSV)
+fs.writeFileSync(
+  `${ADMIN_STRUCTURE_SOURCE}locations/divisions.csv`,
+  divisionsCSV
+)
 
 const districtsJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}districts.json`).toString()
+  fs
+    .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/districts.json`)
+    .toString()
 )
 const districtsCSV = json2csvParser.parse(
   buildLocationStats(districtsJSON.districts, 'District')
 )
-fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}districts.csv`, districtsCSV)
+fs.writeFileSync(
+  `${ADMIN_STRUCTURE_SOURCE}locations/districts.csv`,
+  districtsCSV
+)
 
 const upazilasJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}upazilas.json`).toString()
+  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/upazilas.json`).toString()
 )
 const upazilasCSV = json2csvParser.parse(
   buildLocationStats(upazilasJSON.upazilas, 'Upazila')
 )
-fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}upazilas.csv`, upazilasCSV)
+fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/upazilas.csv`, upazilasCSV)
 
 const citiesJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}cities.json`).toString()
+  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/cities.json`).toString()
 )
 const citiesCSV = json2csvParser.parse(
   buildLocationStats(citiesJSON.cities, 'City Corporation')
 )
-fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}cities.csv`, citiesCSV)
+fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/cities.csv`, citiesCSV)
 
 const cityWardsJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}cityWards.json`).toString()
+  fs
+    .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/cityWards.json`)
+    .toString()
 )
 const cityWardsCSV = json2csvParser.parse(
   buildLocationStats(cityWardsJSON.cityWards, 'City Wards')
 )
-fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}cityWards.csv`, cityWardsCSV)
+fs.writeFileSync(
+  `${ADMIN_STRUCTURE_SOURCE}locations/cityWards.csv`,
+  cityWardsCSV
+)
 
 const municipalitiesJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}municipalities.json`).toString()
+  fs
+    .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/municipalities.json`)
+    .toString()
 )
 const municipalitiesCSV = json2csvParser.parse(
   buildLocationStats(municipalitiesJSON.municipalities, 'Municipality')
 )
 fs.writeFileSync(
-  `${ADMIN_STRUCTURE_SOURCE}municipalities.csv`,
+  `${ADMIN_STRUCTURE_SOURCE}locations/municipalities.csv`,
   municipalitiesCSV
 )
 
 const municipalityWardsJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}municipalityWards.json`).toString()
+  fs
+    .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/municipalityWards.json`)
+    .toString()
 )
 const municipalityWardsCSV = json2csvParser.parse(
   buildLocationStats(
@@ -182,22 +201,22 @@ const municipalityWardsCSV = json2csvParser.parse(
   )
 )
 fs.writeFileSync(
-  `${ADMIN_STRUCTURE_SOURCE}municipalityWards.csv`,
+  `${ADMIN_STRUCTURE_SOURCE}locations/municipalityWards.csv`,
   municipalityWardsCSV
 )
 
 const thanasJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}thanas.json`).toString()
+  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/thanas.json`).toString()
 )
 const thanasCSV = json2csvParser.parse(
   buildLocationStats(thanasJSON.thanas, 'Thana')
 )
-fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}thanas.csv`, thanasCSV)
+fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/thanas.csv`, thanasCSV)
 
 const unionsJSON = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}unions.json`).toString()
+  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/unions.json`).toString()
 )
 const unionsCSV = json2csvParser.parse(
   buildLocationStats(unionsJSON.unions, 'Union')
 )
-fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}unions.csv`, unionsCSV)
+fs.writeFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/unions.csv`, unionsCSV)

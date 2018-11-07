@@ -10,7 +10,10 @@ export default async function administrativeStructureHandler(
   let divisions
   try {
     divisions = await JSON.parse(
-      fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}divisions.json`, 'utf8')
+      fs.readFileSync(
+        `${ADMIN_STRUCTURE_SOURCE}locations/divisions.json`,
+        'utf8'
+      )
     )
   } catch (err) {
     return internal(err)

@@ -2,17 +2,21 @@ import * as fs from 'fs'
 import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
 
 const divisionsWithoutGeo = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}divisions.json`).toString()
+  fs
+    .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/divisions.json`)
+    .toString()
 )
 
 const districtsWithoutGeo = JSON.parse(
-  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}districts.json`).toString()
+  fs
+    .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/districts.json`)
+    .toString()
 )
 
 const admin1Geo = JSON.parse(
   fs
     .readFileSync(
-      `${ADMIN_STRUCTURE_SOURCE}bgd_admbnda_adm1_bbs_20180410_generalized.geojson`
+      `${ADMIN_STRUCTURE_SOURCE}locations/bgd_admbnda_adm1_bbs_20180410_generalized.geojson`
     )
     .toString()
 )
@@ -20,7 +24,7 @@ const admin1Geo = JSON.parse(
 const admin2Geo = JSON.parse(
   fs
     .readFileSync(
-      `${ADMIN_STRUCTURE_SOURCE}bgd_admbnda_adm2_bbs_20180410_generalized.geojson`
+      `${ADMIN_STRUCTURE_SOURCE}locations/bgd_admbnda_adm2_bbs_20180410_generalized.geojson`
     )
     .toString()
 )
@@ -57,6 +61,6 @@ const mapGeo = {
 }
 
 fs.writeFileSync(
-  `${ADMIN_STRUCTURE_SOURCE}map-geo.json`,
+  `${ADMIN_STRUCTURE_SOURCE}locations/map-geo.json`,
   JSON.stringify(mapGeo, null, 2)
 )
