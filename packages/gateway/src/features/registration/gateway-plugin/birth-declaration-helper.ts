@@ -12,7 +12,10 @@ export async function pushTrackingId(
   details: GQLBirthRegistrationInput
 ): Promise<GQLBirthRegistrationInput> {
   const birthTrackingId = await generateBirthTrackingId()
-  details = { ...details, registration: { trackingId: birthTrackingId } }
+  details = {
+    ...details,
+    registration: { ...details.registration, trackingId: birthTrackingId }
+  }
   return details
 }
 
@@ -76,16 +79,16 @@ export function getInformantName(details: GQLBirthRegistrationInput) {
   if (!details.child || !details.child.name) {
     throw new Error("Didn't recieved informant's name information")
   }
-  const traditioanlName = details.child.name.find(
+  const traditionalName = details.child.name.find(
     (humanName: GQLHumanNameInput) => {
       return humanName.use === 'Traditional'
     }
   )
-  if (!traditioanlName || !traditioanlName.familyName) {
+  if (!traditionalName || !traditionalName.familyName) {
     throw new Error("Didn't found informant's traditional name")
   }
   return ''
-    .concat(traditioanlName.firstNames ? traditioanlName.firstNames : '')
+    .concat(traditionalName.firstNames ? traditionalName.firstNames : '')
     .concat(' ')
-    .concat(traditioanlName.familyName)
+    .concat(traditionalName.familyName)
 }

@@ -6,7 +6,7 @@ export const resolvers = {
     }
   },
   Mutation: {
-    async createNotification(_: any, { details }: any) {
+    async createNotification(_: any, { details }: { details: any }) {
       // create bundle of resources - some sort of mapping
       // put resources in a composition
       // save composition
