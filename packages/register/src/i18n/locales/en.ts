@@ -604,8 +604,15 @@ export const ENGLISH_STATE = {
     'register.declarations.labels.results.name': 'Name',
     'register.declarations.labels.results.dob': 'D.o.B.',
     'register.declarations.labels.results.dod': 'D.o.D.',
+    'register.declarations.labels.results.dom': 'D.o.M.',
     'register.declarations.labels.results.dateOfApplication':
       'Date of application',
+    'register.declarations.labels.results.dateOfCollection':
+      'Date of collection',
+    'register.declarations.labels.results.dateOfRegistration':
+      'Date of registration',
+    'register.declarations.labels.results.registrationNumber':
+      'Registration number',
     'register.declarations.labels.results.trackingID': 'Tracking ID'
   }
 }

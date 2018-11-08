@@ -598,7 +598,12 @@ export const BENGALI_STATE = {
     'register.declarations.labels.results.name': 'নাম',
     'register.declarations.labels.results.dob': 'জন্ম তারিখ',
     'register.declarations.labels.results.dod': 'মৃত্যুর তারিখ',
+    'register.declarations.labels.results.dom': 'বিয়ের তারিখ',
     'register.declarations.labels.results.dateOfApplication': 'আবেদন তারিখ',
+    'register.declarations.labels.results.dateOfCollection': 'সংগ্রহ তারিখ',
+    'register.declarations.labels.results.dateOfRegistration':
+      'নিবন্ধনের তারিখ',
+    'register.declarations.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.declarations.labels.results.trackingID': 'ট্র্যাকিং আইডি'
   }
 }
