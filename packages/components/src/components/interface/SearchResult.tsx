@@ -108,6 +108,17 @@ const sortByDate = (key: string, value: string, data: CustomResult[]) => {
   }
 }
 
+const defaulSort = (key: string, value: string, data: CustomResult[]) => {
+  return [...data].sort((a, b) => {
+    if (a[key] < b[key]) {
+      return -1
+    }
+    if (a[key] > b[key]) {
+      return 1
+    }
+    return 0
+  })
+}
 const getSortAndFilterByPropsWithValues = (
   prop: ISortAndFilter,
   values: IDynamicValues
@@ -244,10 +255,17 @@ export class SearchResult extends React.Component<
     if (this.props.onSortChange) {
       this.props.onSortChange(values, changedValue, type)
     } else {
+      const key = Object.keys(changedValue)[0]
+      const selectedValue = changedValue[key]
       if (type === SelectFieldType.Date) {
-        const key = Object.keys(changedValue)[0]
-        const selectedValue = changedValue[key]
         const sortedItems = sortByDate(
+          key,
+          selectedValue,
+          this.state.filteredSortedItems
+        )
+        this.resetPagination(sortedItems)
+      } else {
+        const sortedItems = defaulSort(
           key,
           selectedValue,
           this.state.filteredSortedItems
