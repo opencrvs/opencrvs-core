@@ -1,6 +1,6 @@
-import { resolvers } from 'src/features/registration/root-resolvers'
+import { resolvers } from './root-resolvers'
 import * as fetch from 'jest-fetch-mock'
-import TrackingId from './model/trackingId'
+import TrackingId from './gateway-plugin/model/trackingId'
 
 describe('Registration root resolvers', () => {
   describe('listBirthRegistrations()', () => {
@@ -19,6 +19,16 @@ describe('Registration root resolvers', () => {
   })
   let findSpy: jest.Mock
   let saveSpy: jest.Mock
+  const details = {
+    child: {
+      name: [{ use: 'Traditional', firstNames: 'অনিক', familyName: 'হক' }]
+    },
+    mother: {
+      name: [{ use: 'Traditional', firstNames: 'তাহসিনা', familyName: 'হক' }],
+      telecom: [{ system: 'phone', value: '+8801622688231' }]
+    },
+    registration: { contact: 'MOTHER' }
+  }
   describe('createBirthRegistration()', () => {
     beforeEach(() => {
       findSpy = jest.spyOn(TrackingId, 'findOne').mockResolvedValueOnce(null)
@@ -42,7 +52,7 @@ describe('Registration root resolvers', () => {
       // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
-        { createAt: new Date() }
+        { details }
       )
 
       expect(result).toBeDefined()
@@ -59,10 +69,7 @@ describe('Registration root resolvers', () => {
       fetch.mockResponseOnce('Boom!', { status: 401 })
       await expect(
         // @ts-ignore
-        resolvers.Mutation.createBirthRegistration(
-          {},
-          { createdAt: new Date() }
-        )
+        resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR post to /fhir failed with [401] body: Boom!')
       expect(findSpy).toBeCalled()
       expect(saveSpy).toBeCalled()
@@ -72,10 +79,7 @@ describe('Registration root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
         // @ts-ignore
-        resolvers.Mutation.createBirthRegistration(
-          {},
-          { createdAt: new Date() }
-        )
+        resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR response did not send a valid response')
       expect(findSpy).toBeCalled()
       expect(saveSpy).toBeCalled()

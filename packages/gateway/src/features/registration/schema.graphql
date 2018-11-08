@@ -197,13 +197,13 @@ type DeathRegistration { # -> Composition
 
 input RegistrationInput {
   # short uuid easy to remember
-  trackingID: String
+  trackingId: String
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   registrationNumber: String
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
@@ -212,7 +212,7 @@ input RegistrationInput {
 
 type Registration { # -> Task
   # short uuid easy to remember
-  trackingID: String # -> .identifier
+  trackingId: String # -> .identifier
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   registrationNumber: String # -> .identifier
   paperFormID: String # -> .identifier

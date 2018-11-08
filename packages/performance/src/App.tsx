@@ -1,6 +1,7 @@
 import * as React from 'react'
 import './App.css'
 import { getTheme } from '@opencrvs/components/lib/theme'
+
 import { Provider } from 'react-redux'
 import { Page } from 'src/components/Page'
 import { History } from 'history'

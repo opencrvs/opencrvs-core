@@ -348,12 +348,26 @@ function createBirthTrackingIdentifier(
   resource: fhir.Task,
   fieldValue: string
 ) {
+  if (!resource.focus) {
+    resource.focus = { reference: '' }
+  }
+  resource.focus.reference = `urn:trackingid:${fieldValue}`
   if (!resource.identifier) {
     resource.identifier = []
   }
   resource.identifier.push({
     system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
     value: fieldValue
+  })
+}
+
+function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+    valueString: fieldValue
   })
 }
 
@@ -705,12 +719,16 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const taskResource = selectOrCreateTaskRefResource(
-        fhirBundle,
-        fieldValue,
-        context
-      )
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createBirthTrackingIdentifier(taskResource, fieldValue)
+    },
+    contact: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantShareContact(taskResource, fieldValue)
     },
     attachments: {
       originalFileName: (

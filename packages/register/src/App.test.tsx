@@ -110,6 +110,7 @@ describe('when user has a valid token in local storage', () => {
 
   describe('when appliation has new update', () => {
     beforeEach(() => {
+      // @ts-ignore
       const action = actions.showNewContentAvailableNotification()
       store.dispatch(action)
       app.update()
@@ -149,6 +150,49 @@ describe('when user has a valid token in local storage', () => {
 
       it('reloads the app', () => {
         expect(window.location.reload).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('When background Sync is triggered', () => {
+    beforeEach(() => {
+      const action = actions.showBackgroundSyncedNotification(7)
+      store.dispatch(action)
+      app.update()
+    })
+
+    it('Should display the background synced notification', () => {
+      expect(
+        app.find('#backgroundSyncShowNotification').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('Should internationalizes background sync notification texts', async () => {
+      const action = i18nActions.changeLanguage({ language: 'bn' })
+      store.dispatch(action)
+
+      const label = app
+        .find('#backgroundSyncShowNotification')
+        .hostNodes()
+        .text()
+      expect(label).toBe(
+        'ইন্টারনেট সংযোগ ফিরে আসায় আমরা 7 টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি'
+      )
+    })
+
+    describe('When user clicks the background sync notification', () => {
+      beforeEach(() => {
+        app
+          .find('#backgroundSyncShowNotification')
+          .hostNodes()
+          .simulate('click')
+        app.update()
+      })
+
+      it('Should hide the notification', () => {
+        expect(
+          store.getState().notification.backgroundSyncMessageVisible
+        ).toEqual(false)
       })
     })
   })
