@@ -330,6 +330,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       mother: motherDetails,
       father: fatherDetails,
       registration: {
+        /* 
+        Will bring this back as soon as corresponding fhir builder is in place
         status: [
           {
             type: 'DECLARED',
@@ -342,9 +344,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
               }
             ]
           }
-        ],
-        contact: registration.whoseContactDetails,
-        paperFormID: registration.paperFormNumber
+        ],  
+        paperFormID: registration.paperFormNumber, */
+        contact: registration.whoseContactDetails
       },
       attendantAtBirth: child.attendantAtBirth,
       birthType: child.typeOfBirth,
