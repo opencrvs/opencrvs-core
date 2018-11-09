@@ -9,23 +9,17 @@ const fontFaces = [
     fontFamily: styleGuideCountryFonts[country].lightFontFamily,
     fontStyle: 'normal',
     fontWeight: '300',
-    src: `url('notosans-light-webfont-${
-      process.env.REACT_APP_LANGUAGE
-    }.ttf') format('truetype')`
+    src: `url('notosans-extra-light-webfont-en.ttf') format('truetype')`
   },
   {
     fontFamily: styleGuideCountryFonts[country].regularFontFamily,
     fontStyle: 'normal',
-    src: `url('notosans-regular-webfont-${
-      process.env.REACT_APP_LANGUAGE
-    }.ttf') format('truetype')`
+    src: `url('notosans-light-webfont-en.ttf') format('truetype')`
   },
   {
     fontFamily: styleGuideCountryFonts[country].boldFontFamily,
     fontStyle: 'normal',
-    src: `url('notosans-bold-webfont-${
-      process.env.REACT_APP_LANGUAGE
-    }.ttf') format('truetype')`
+    src: `url('notosans-bold-webfont-en.ttf') format('truetype')`
   }
 ]
 
