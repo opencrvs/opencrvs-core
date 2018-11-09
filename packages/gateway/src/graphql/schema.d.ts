@@ -155,6 +155,7 @@ export interface GQLLocation {
   longitude?: number
   latitude?: number
   altitude?: number
+  geoData?: string
 }
 
 export enum GQLLocationType {
@@ -186,14 +187,20 @@ export interface GQLBirthRegistration {
 }
 
 export interface GQLRegistration {
-  trackingID?: string
+  trackingId?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
   book?: string
+  contact?: GQLRegistrationContactType
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachment | null>
+}
+
+export enum GQLRegistrationContactType {
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER'
 }
 
 export interface GQLRegWorkflow {
@@ -377,6 +384,7 @@ export interface GQLLocationInput {
   longitude?: number
   latitude?: number
   altitude?: number
+  geoData?: string
 }
 
 export interface GQLBirthRegistrationInput {
@@ -400,11 +408,12 @@ export interface GQLBirthRegistrationInput {
 }
 
 export interface GQLRegistrationInput {
-  trackingID?: string
+  trackingId?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
   book?: string
+  contact?: GQLRegistrationContactType
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachmentInput | null>
@@ -869,6 +878,7 @@ export interface GQLLocationTypeResolver<TParent = any> {
   longitude?: LocationToLongitudeResolver<TParent>
   latitude?: LocationToLatitudeResolver<TParent>
   altitude?: LocationToAltitudeResolver<TParent>
+  geoData?: LocationToGeoDataResolver<TParent>
 }
 
 export interface LocationToIdResolver<TParent = any, TResult = any> {
@@ -916,6 +926,10 @@ export interface LocationToLatitudeResolver<TParent = any, TResult = any> {
 }
 
 export interface LocationToAltitudeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1074,17 +1088,18 @@ export interface BirthRegistrationToUpdatedAtResolver<
 }
 
 export interface GQLRegistrationTypeResolver<TParent = any> {
-  trackingID?: RegistrationToTrackingIDResolver<TParent>
+  trackingId?: RegistrationToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
+  contact?: RegistrationToContactResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
 }
 
-export interface RegistrationToTrackingIDResolver<
+export interface RegistrationToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -1110,6 +1125,10 @@ export interface RegistrationToPageResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToBookResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToContactResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

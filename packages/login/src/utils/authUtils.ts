@@ -8,7 +8,7 @@ export interface ITokenPayload {
   subject: string
   exp: string
   algorithm: string
-  claims: string[]
+  scope: string[]
 }
 
 export const getTokenPayload = (token: string) => {
@@ -28,7 +28,7 @@ export const getTokenPayload = (token: string) => {
 export const getRedirectURL = (token: string): string => {
   const decoded: ITokenPayload = getTokenPayload(token) as ITokenPayload
 
-  const isPerformanceUser = decoded.claims.indexOf('performance') > -1
+  const isPerformanceUser = decoded.scope.indexOf('performance') > -1
   if (isPerformanceUser) {
     return `${config.PERFORMANCE_APP_URL}?token=${token}`
   } else {

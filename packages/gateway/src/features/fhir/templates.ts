@@ -201,7 +201,7 @@ export function createObservationEntryTemplate(refUuid: string) {
   }
 }
 
-export function createTaskRefTemplate(refUuid: string, refComposition: string) {
+export function createTaskRefTemplate(refUuid: string) {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
@@ -214,9 +214,6 @@ export function createTaskRefTemplate(refUuid: string, refComposition: string) {
             code: 'birth-registration'
           }
         ]
-      },
-      focus: {
-        reference: `urn:trackingid:${refComposition}`
       }
     }
   }

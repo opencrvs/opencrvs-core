@@ -21,8 +21,8 @@ injectGlobal`
 
 const { store, history } = createStore()
 
-function onNewConentAvailable() {
-  const action = actions.showNewContentAvailableNotification()
+function onNewConentAvailable(waitingSW: ServiceWorker) {
+  const action = actions.showNewContentAvailableNotification(waitingSW)
   store.dispatch(action)
 }
 

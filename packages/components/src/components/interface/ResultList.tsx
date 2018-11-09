@@ -16,7 +16,7 @@ interface IStatus {
   label: string
   type: string
 }
-interface IResult {
+export interface IResult {
   info: IProp[]
   status: IStatus[]
 }
