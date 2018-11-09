@@ -8,7 +8,6 @@ module.exports = {
   styleguideDir: './lib',
   assetsDir: './static',
   skipComponentsWithoutExample: true,
-  webpackConfig: require('react-scripts-ts/config/webpack.config.dev.js'),
   styleguideComponents: {
     Wrapper: path.join(__dirname, 'src/components/styleguide/ThemeWrapper')
   },
