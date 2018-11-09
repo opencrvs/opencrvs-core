@@ -164,9 +164,6 @@ const styles = {
   },
   StyleGuide: {
     '@font-face': fontFaces,
-    '@global *': {
-      boxSizing: 'border-box'
-    },
     content: {
       paddingTop: rhythm(2.5),
       '@media (max-width: 600px)': {

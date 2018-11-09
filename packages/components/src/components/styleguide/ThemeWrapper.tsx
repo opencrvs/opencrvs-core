@@ -7,6 +7,9 @@ const country = process.env.REACT_APP_COUNTRY
   : 'gbr'
 
 const Wrapper = styled.div`
+  * {
+    box-sizing: border-box;
+  }
   /* stylelint-disable */
   background: #ebf1f3;
   /* stylelint-enable */
