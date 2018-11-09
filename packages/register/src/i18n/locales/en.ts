@@ -585,34 +585,33 @@ export const ENGLISH_STATE = {
     'formFields.imageUpload.uploadedList': 'Uploaded:',
     'formFields.imageUpload.delete': 'Delete',
     'formFields.imageUpload.preview': 'Preview',
-    'register.declarations.applications.banner':
+    'register.workQueue.applications.banner':
       'Applications to register in your area',
-    'register.declarations.searchInput.placeholder': 'Look for a record',
-    'register.declarations.buttons.search': 'Search',
-    'register.declarations.selects.sort.item0': 'Oldest to newest',
-    'register.declarations.selects.sort.item1': 'Newst to oldest',
-    'register.declarations.labels.statuses.all': 'All statues',
-    'register.declarations.labels.statuses.application': 'Application',
-    'register.declarations.labels.statuses.registered': 'Registered',
-    'register.declarations.labels.statuses.collected': 'Collected',
-    'register.declarations.labels.events.all': 'All life events',
-    'register.declarations.labels.events.birth': 'Birth',
-    'register.declarations.labels.events.death': 'Death',
-    'register.declarations.labels.events.marriage': 'Marriage',
-    'register.declarations.labels.selects.sort': 'Sort by:',
-    'register.declarations.labels.selects.filter': 'Filter by:',
-    'register.declarations.labels.results.name': 'Name',
-    'register.declarations.labels.results.dob': 'D.o.B.',
-    'register.declarations.labels.results.dod': 'D.o.D.',
-    'register.declarations.labels.results.dom': 'D.o.M.',
-    'register.declarations.labels.results.dateOfApplication':
+    'register.workQueue.searchInput.placeholder': 'Look for a record',
+    'register.workQueue.buttons.search': 'Search',
+    'register.workQueue.selects.sort.item0': 'Oldest to newest',
+    'register.workQueue.selects.sort.item1': 'Newst to oldest',
+    'register.workQueue.labels.statuses.all': 'All statues',
+    'register.workQueue.labels.statuses.application': 'Application',
+    'register.workQueue.labels.statuses.registered': 'Registered',
+    'register.workQueue.labels.statuses.collected': 'Collected',
+    'register.workQueue.labels.events.all': 'All life events',
+    'register.workQueue.labels.events.birth': 'Birth',
+    'register.workQueue.labels.events.death': 'Death',
+    'register.workQueue.labels.events.marriage': 'Marriage',
+    'register.workQueue.labels.selects.sort': 'Sort by:',
+    'register.workQueue.labels.selects.filter': 'Filter by:',
+    'register.workQueue.labels.results.name': 'Name',
+    'register.workQueue.labels.results.dob': 'D.o.B.',
+    'register.workQueue.labels.results.dod': 'D.o.D.',
+    'register.workQueue.labels.results.dom': 'D.o.M.',
+    'register.workQueue.labels.results.dateOfApplication':
       'Date of application',
-    'register.declarations.labels.results.dateOfCollection':
-      'Date of collection',
-    'register.declarations.labels.results.dateOfRegistration':
+    'register.workQueue.labels.results.dateOfCollection': 'Date of collection',
+    'register.workQueue.labels.results.dateOfRegistration':
       'Date of registration',
-    'register.declarations.labels.results.registrationNumber':
+    'register.workQueue.labels.results.registrationNumber':
       'Registration number',
-    'register.declarations.labels.results.trackingID': 'Tracking ID'
+    'register.workQueue.labels.results.trackingID': 'Tracking ID'
   }
 }

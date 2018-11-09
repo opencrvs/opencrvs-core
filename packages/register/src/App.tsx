@@ -25,7 +25,7 @@ import { SelectInformant } from './views/SelectInformant/SelectInformant'
 
 import { RegisterForm } from './views/RegisterForm/RegisterForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
-import { DeclarationsPage } from './views/DeclarationsPage/DeclarationsPage'
+import { WorkQueuePage } from './views/WorkQueuePage/WorkQueuePage'
 import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
 import { storage } from 'src/storage'
@@ -110,8 +110,8 @@ export class App extends React.Component<IAppProps, IState> {
                             component={SavedRegistration}
                           />
                           <ProtectedRoute
-                            path={routes.DECLARATIONS}
-                            component={DeclarationsPage}
+                            path={routes.WORK_QUEUE}
+                            component={WorkQueuePage}
                           />
                         </Switch>
                       </Page>
