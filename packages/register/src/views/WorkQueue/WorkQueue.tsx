@@ -7,11 +7,8 @@ import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   Banner,
   SearchInput,
-  ISearchInputProps,
-  ISearchResultProps,
-  SearchResult
+  ISearchInputProps
 } from '@opencrvs/components/lib/interface'
-import { list, sortBy, filterBy } from './MockListData'
 
 const messages = defineMessages({
   searchInputPlaceholder: {
@@ -28,16 +25,6 @@ const messages = defineMessages({
     id: 'register.workQueue.applications.banner',
     defaultMessage: 'Applications to register in your area',
     description: 'The title of the banner'
-  },
-  resultsTitle: {
-    id: 'register.workQueue.labels.results.title',
-    defaultMessage: 'Results',
-    description: 'The title of results list component'
-  },
-  resultsEmptyText: {
-    id: 'register.workQueue.labels.results.emptyText',
-    defaultMessage: 'No results',
-    description: 'The text appears when result list is empty'
   }
 })
 
@@ -47,12 +34,9 @@ const Container = styled.div`
   margin-top: -70px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
-type IWorkQueueProps = InjectedIntlProps &
-  IViewHeadingProps &
-  ISearchInputProps &
-  ISearchResultProps
+type IWorkQueueProps = InjectedIntlProps & IViewHeadingProps & ISearchInputProps
 
-class WorkQueue extends React.Component<IWorkQueueProps> {
+class WorkQueueView extends React.Component<IWorkQueueProps> {
   render() {
     const { intl } = this.props
     return (
@@ -65,21 +49,11 @@ class WorkQueue extends React.Component<IWorkQueueProps> {
           />
         </HomeViewHeader>
         <Container>
-          <Banner
-            text={intl.formatMessage(messages.bannerTitle)}
-            count={list.length}
-          />
+          <Banner text={intl.formatMessage(messages.bannerTitle)} count={15} />
           <SearchInput
             placeholder={intl.formatMessage(messages.searchInputPlaceholder)}
             buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
             {...this.props}
-          />
-          <SearchResult
-            data={list}
-            sortBy={sortBy}
-            filterBy={filterBy}
-            resultLabel={intl.formatMessage(messages.resultsTitle)}
-            noResultText={intl.formatMessage(messages.resultsEmptyText)}
           />
         </Container>
       </>
@@ -87,4 +61,4 @@ class WorkQueue extends React.Component<IWorkQueueProps> {
   }
 }
 
-export const WorkQueuePage = connect(null)(injectIntl(WorkQueue))
+export const WorkQueue = connect(null)(injectIntl(WorkQueueView))
