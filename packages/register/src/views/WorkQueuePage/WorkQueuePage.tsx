@@ -7,8 +7,11 @@ import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   Banner,
   SearchInput,
-  ISearchInputProps
+  ISearchInputProps,
+  ISearchResultProps,
+  SearchResult
 } from '@opencrvs/components/lib/interface'
+import { list, sortBy, filterBy } from './MockListData'
 
 const messages = defineMessages({
   searchInputPlaceholder: {
@@ -26,90 +29,15 @@ const messages = defineMessages({
     defaultMessage: 'Applications to register in your area',
     description: 'The title of the banner'
   },
-  allEventsLabel: {
-    id: 'register.workQueue.labels.events.all',
-    defaultMessage: 'All life events',
-    description: 'Label for filter option all events'
+  resultsTitle: {
+    id: 'register.workQueue.labels.results.title',
+    defaultMessage: 'Results',
+    description: 'The title of results list component'
   },
-  birthEventLabel: {
-    id: 'register.workQueue.labels.events.birth',
-    defaultMessage: 'Birth',
-    description: 'Label for birth event'
-  },
-  deathEventLabel: {
-    id: 'register.workQueue.labels.events.death',
-    defaultMessage: 'Death',
-    description: 'Label for death event'
-  },
-  marriageEventLabel: {
-    id: 'register.workQueue.labels.events.marriage',
-    defaultMessage: 'Marriage',
-    description: 'Label for marriage event'
-  },
-  sortLabel: {
-    id: 'register.workQueue.labels.selects.sort',
-    defaultMessage: 'Sort by:',
-    description: 'Label for sort select'
-  },
-  filterLabel: {
-    id: 'register.workQueue.labels.selects.filter',
-    defaultMessage: 'Filter by:',
-    description: 'Label for filter select'
-  },
-  name: {
-    id: 'register.workQueue.labels.results.name',
-    defaultMessage: 'Name',
-    description: 'Label for name'
-  },
-  dob: {
-    id: 'register.workQueue.labels.results.dob',
-    defaultMessage: 'D.o.B.',
-    description: 'Label for date of birth'
-  },
-  dod: {
-    id: 'register.workQueue.labels.results.dod',
-    defaultMessage: 'D.o.D.',
-    description: 'Label for date of death'
-  },
-  dateOfApplication: {
-    id: 'register.workQueue.labels.results.dateOfApplication',
-    defaultMessage: 'Date of application',
-    description: 'Label for date of application'
-  },
-  trackingID: {
-    id: 'register.workQueue.labels.results.trackingID',
-    defaultMessage: 'Tracking ID',
-    description: 'Label for tracking ID'
-  },
-  statusAll: {
-    id: 'register.workQueue.labels.statuses.all',
-    defaultMessage: 'All statues',
-    description: 'Label for all statuses select option'
-  },
-  statusApplication: {
-    id: 'register.workQueue.labels.statuses.application',
-    defaultMessage: 'Application',
-    description: 'Label for application status'
-  },
-  statusRegistered: {
-    id: 'register.workQueue.labels.statuses.registered',
-    defaultMessage: 'Registered',
-    description: 'Label for registered status'
-  },
-  statusCollected: {
-    id: 'register.workQueue.labels.statuses.collected',
-    defaultMessage: 'Collected',
-    description: 'Label for collected status'
-  },
-  sortOldestToNewest: {
-    id: 'register.workQueue.selects.sort.item0',
-    defaultMessage: 'Oldest to newest',
-    description: 'Label for newest first sort select option'
-  },
-  sortNewestToOldest: {
-    id: 'register.workQueue.selects.sort.item1',
-    defaultMessage: 'Newst to oldest',
-    description: 'Label for oldest first sort select option'
+  resultsEmptyText: {
+    id: 'register.workQueue.labels.results.emptyText',
+    defaultMessage: 'No results',
+    description: 'The text appears when result list is empty'
   }
 })
 
@@ -119,9 +47,12 @@ const Container = styled.div`
   margin-top: -70px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
-class WorkQueue extends React.Component<
-  InjectedIntlProps & IViewHeadingProps & ISearchInputProps
-> {
+type IWorkQueueProps = InjectedIntlProps &
+  IViewHeadingProps &
+  ISearchInputProps &
+  ISearchResultProps
+
+class WorkQueue extends React.Component<IWorkQueueProps> {
   render() {
     const { intl } = this.props
     return (
@@ -134,11 +65,21 @@ class WorkQueue extends React.Component<
           />
         </HomeViewHeader>
         <Container>
-          <Banner text={intl.formatMessage(messages.bannerTitle)} count={15} />
+          <Banner
+            text={intl.formatMessage(messages.bannerTitle)}
+            count={list.length}
+          />
           <SearchInput
             placeholder={intl.formatMessage(messages.searchInputPlaceholder)}
             buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
             {...this.props}
+          />
+          <SearchResult
+            data={list}
+            sortBy={sortBy}
+            filterBy={filterBy}
+            resultLabel={intl.formatMessage(messages.resultsTitle)}
+            noResultText={intl.formatMessage(messages.resultsEmptyText)}
           />
         </Container>
       </>
