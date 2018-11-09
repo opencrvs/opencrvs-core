@@ -18,6 +18,7 @@ const Wrapper = styled.div`
 `
 const ResultsText = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
   font-weight: 500;
   margin: 10px 0;
@@ -43,7 +44,7 @@ export interface ISortAndFilter {
   input: IInputLabel
 }
 
-interface ISearchResultProps {
+export interface ISearchResultProps {
   data: CustomResult[]
   sortBy: ISortAndFilter
   filterBy: ISortAndFilter

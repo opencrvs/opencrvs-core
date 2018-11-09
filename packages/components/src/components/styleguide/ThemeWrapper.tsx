@@ -11,6 +11,9 @@ const Wrapper = styled.div`
   background: #ebf1f3;
   /* stylelint-enable */
   padding: 2em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: grayscale;
 `
 
 export class ThemeWrapper extends React.Component {
