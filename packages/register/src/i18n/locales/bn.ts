@@ -577,6 +577,32 @@ export const BENGALI_STATE = {
       'সমর্থনকারী কাগজপত্রর একটি ছবি আপলোড করুন',
     'formFields.imageUpload.uploadedList': 'আপলোড করা:',
     'formFields.imageUpload.delete': 'মুছে ফেলা',
-    'formFields.imageUpload.preview': 'প্রিভিউ'
+    'formFields.imageUpload.preview': 'প্রিভিউ',
+    'register.workQueue.applications.banner':
+      'আপনার এলাকায় নিবন্ধন অ্যাপ্লিকেশন',
+    'register.workQueue.searchInput.placeholder':
+      'একটি রেকর্ডের জন্য সন্ধান করুন',
+    'register.workQueue.buttons.search': 'অনুসন্ধান',
+    'register.workQueue.selects.sort.item0': 'পুরোনো থেকে নতুন',
+    'register.workQueue.selects.sort.item1': 'নতুন থেকে পুরোনো ',
+    'register.workQueue.labels.statuses.all': 'সব অবস্থা',
+    'register.workQueue.labels.statuses.application': 'আবেদন',
+    'register.workQueue.labels.statuses.registered': 'নিবন্ধভুক্ত',
+    'register.workQueue.labels.statuses.collected': 'সংগৃহীত',
+    'register.workQueue.labels.events.all': 'সব ইভেন্ট',
+    'register.workQueue.labels.events.birth': 'জন্ম',
+    'register.workQueue.labels.events.death': 'মৃত্যু',
+    'register.workQueue.labels.events.marriage': 'বিবাহ',
+    'register.workQueue.labels.selects.sort': 'ক্রমানুসার:',
+    'register.workQueue.labels.selects.filter': 'ফিল্টার করুন:',
+    'register.workQueue.labels.results.name': 'নাম',
+    'register.workQueue.labels.results.dob': 'জন্ম তারিখ',
+    'register.workQueue.labels.results.dod': 'মৃত্যুর তারিখ',
+    'register.workQueue.labels.results.dom': 'বিয়ের তারিখ',
+    'register.workQueue.labels.results.dateOfApplication': 'আবেদন তারিখ',
+    'register.workQueue.labels.results.dateOfCollection': 'সংগ্রহ তারিখ',
+    'register.workQueue.labels.results.dateOfRegistration': 'নিবন্ধনের তারিখ',
+    'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
+    'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি'
   }
 }
