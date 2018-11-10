@@ -10,6 +10,7 @@
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage && yarn test:compilation",
     "test:watch": "jest --watch --coverage",
+    "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",    
     "test:compilation": "tsc --noEmit"
   },
@@ -53,21 +54,11 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "modulePaths": [
-      "<rootDir>"
-    ],
-    "setupFiles": [
-      "./test/setupJest.ts"
-    ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "testEnvironment": "node"
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "testEnvironment": "node",
+    "setupFiles": ["./test/setupJest.ts"],
+    "modulePaths": ["<rootDir>"],
+    "coverageReporters": ["json", "lcov", "text", "html"]
   }
 }
