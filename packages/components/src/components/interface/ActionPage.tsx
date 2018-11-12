@@ -2,7 +2,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ArrowBack } from '../icons'
 import { ButtonIcon, PrimaryButton, IconAction } from '../buttons'
-import { goBack as goBackAction } from 'react-router-redux'
 
 const ActionContainer = styled.div`
   width: 100%;
