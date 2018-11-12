@@ -143,6 +143,7 @@ input LocationInput {
   longitude: Float
   latitude: Float
   altitude: Float
+  geoData: String
 }
 
 type Location { # -> Location (mostly the same property name except:)
@@ -158,6 +159,7 @@ type Location { # -> Location (mostly the same property name except:)
   longitude: Float # -> position.longitude
   latitude: Float # -> position.latitude
   altitude: Float # -> position.altitude
+  geoData: String # -> extension(url=http://hl7.org/fhir/StructureDefinition/location-boundary-geojson).valueAttachment (as base64)
 }
 
 input AddressInput {
@@ -230,5 +232,8 @@ type UserRole {
 }
 
 type Query {
-  user(id: ID!): User
+  user(id: Int!): User
+
+  locationsByParent(parentId: String, type: String): [Location] # if parentId is not provided, return level 1 locations
+  locationsByName(name: String!, type: String): [Location]
 }

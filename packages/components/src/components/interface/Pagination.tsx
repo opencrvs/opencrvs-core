@@ -7,6 +7,7 @@ export interface IPaginationCustomProps {
   pageSize: number
   initialPage: number
   totalItemCount: number
+  totalPages: number
   onPageChange: (page: number) => void
 }
 
@@ -22,6 +23,7 @@ const PaginationContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 20px;
 `
 const Icon = styled(Button)`
   cursor: pointer;
@@ -46,7 +48,6 @@ interface IState {
   canPrevious: boolean
   canNext: boolean
   currentPage: number
-  totalPages: number
 }
 
 export class Pagination extends React.Component<
@@ -56,18 +57,24 @@ export class Pagination extends React.Component<
   constructor(props: IPaginationCustomProps, {}) {
     super(props)
 
-    const { initialPage, totalItemCount, pageSize } = props
+    const { initialPage, totalItemCount, pageSize, totalPages } = props
     this.state = {
       canPrevious: false,
       canNext: false,
-      currentPage: initialPage && initialPage > 0 ? initialPage : 1,
-      totalPages: Math.floor(totalItemCount / pageSize)
+      currentPage:
+        totalPages > 0 ? (initialPage && initialPage > 0 ? initialPage : 1) : 0
+    }
+  }
+
+  componentDidUpdate(prevProps: IPaginationCustomProps) {
+    if (prevProps.totalItemCount !== this.props.totalItemCount) {
+      this.setState(() => ({ currentPage: this.props.initialPage }))
     }
   }
 
   canGoToPreviousPage = () => this.state.currentPage > 1
 
-  canGoToNextPage = () => this.state.currentPage + 1 <= this.state.totalPages
+  canGoToNextPage = () => this.state.currentPage + 1 <= this.props.totalPages
 
   changePage = (page: number) =>
     this.setState(
@@ -76,8 +83,14 @@ export class Pagination extends React.Component<
     )
 
   render() {
-    const { initialPage, totalItemCount, pageSize, ...props } = this.props
-    const { currentPage, totalPages } = this.state
+    const {
+      initialPage,
+      totalPages,
+      totalItemCount,
+      pageSize,
+      ...props
+    } = this.props
+    const { currentPage } = this.state
 
     return (
       <PaginationContainer>

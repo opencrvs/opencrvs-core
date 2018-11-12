@@ -1,0 +1,70 @@
+{
+  "municipalityWards": [
+    {
+      "id": "e5c7e3e4-64ae-4843-a52d-3e9996be76bf",
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "2"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "12"
+        }
+      ],
+      "name": "testa",
+      "alias": [
+        "টেস্ট ২ "
+      ],
+      "description": "division=4&district=38&upazila=295&municipality=314&municipalityward=2",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/39b28f19-51cd-4761-99eb-38ad2a41d709"
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "6f3428fe-f20d-42c5-8d0e-d79565e7d7f1",
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "1"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "1112"
+        }
+      ],
+      "name": "test",
+      "alias": [
+        "টেস্ট ১ "
+      ],
+      "description": "division=4&district=38&upazila=296&municipality=134&municipalityward=1",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/33488bd5-c270-4b17-879e-41002c8c8c8c"
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ]
+    }
+  ]
+}

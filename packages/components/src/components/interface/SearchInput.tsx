@@ -21,6 +21,7 @@ const SearchContainer = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   display: flex;
   align-items: center;
   justify-content: center;

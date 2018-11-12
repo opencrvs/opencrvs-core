@@ -7,10 +7,16 @@ const country = process.env.REACT_APP_COUNTRY
   : 'gbr'
 
 const Wrapper = styled.div`
+  * {
+    box-sizing: border-box;
+  }
   /* stylelint-disable */
   background: #ebf1f3;
   /* stylelint-enable */
   padding: 2em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: grayscale;
 `
 
 export class ThemeWrapper extends React.Component {
