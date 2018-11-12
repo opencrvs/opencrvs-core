@@ -1,4 +1,4 @@
-import * as queryString from 'query-string'
+import * as queryString from 'querystring'
 import * as decode from 'jwt-decode'
 
 export interface IURLParams {
