@@ -21,8 +21,7 @@
     "postinstall": "yarn build",
     "build": "yarn clean && tsc",
     "docker-build": "docker build -t components .",
-    "docker-run":
-      "docker run -it --rm -p 5000:5000 --name components components",
+    "docker-run": "docker run -it --rm -p 5000:5000 --name components components",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "test": "yarn test:compilation",
     "test:compilation": "tsc --noEmit"
@@ -41,7 +40,7 @@
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "concurrently": "^3.5.1",
-    "dotenv": "^5.0.1",
+    "dotenv": "^6.1.0",
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
     "react-scripts-ts": "^2.16.0",
