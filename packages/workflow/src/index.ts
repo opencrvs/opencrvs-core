@@ -4,7 +4,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as Hapi from 'hapi'
 import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from './constants'
 import getPlugins from './config/plugins'
-import getRoutes from './config/routes'
+import { getRoutes } from './config/routes'
 import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)

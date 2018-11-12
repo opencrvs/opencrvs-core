@@ -7,7 +7,7 @@ describe('Route authorization', () => {
     const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token'
+      url: '/ping'
     })
     expect(res.statusCode).toBe(401)
   })
@@ -16,7 +16,7 @@ describe('Route authorization', () => {
     const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token',
+      url: '/ping',
       headers: {
         Authorization: 'Bearer abc'
       }
@@ -33,7 +33,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token',
+      url: '/ping',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -50,7 +50,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token',
+      url: '/ping',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -73,7 +73,7 @@ describe('Route authorization', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token',
+      url: '/ping',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -90,7 +90,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token',
+      url: '/ping',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -108,7 +108,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token',
+      url: '/ping',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -126,7 +126,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/check-token',
+      url: '/ping',
       headers: {
         Authorization: `Bearer ${token}`
       }
