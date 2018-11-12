@@ -15,10 +15,12 @@ export const isTokenStillValid = (decoded: ITokenPayload) => {
   return Number(decoded.exp) * 1000 > Date.now()
 }
 
-export function getToken() {
+export function getToken(): string {
   return (
-    queryString.parse(window.location.search.replace(/^\?/, '')).token ||
-    localStorage.getItem('opencrvs')
+    (queryString.parse(window.location.search.replace(/^\?/, ''))
+      .token as string) ||
+    localStorage.getItem('opencrvs') ||
+    ''
   )
 }
 
