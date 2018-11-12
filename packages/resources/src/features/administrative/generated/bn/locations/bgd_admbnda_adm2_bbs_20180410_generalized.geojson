@@ -9,14 +9,14 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Brahamanbaria",
+        "Name": "BRAHMANBARIA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Chittagong",
         "ADM2ALT2EN": "",
         "ADM0_EN": "Bangladesh",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "6",
         "validOn": "2018-04-10",
         "ADM2ALT1EN": "",
@@ -30,7 +30,7 @@
         "MaxSimpTol": "0.008993",
         "ADM2_REF": "",
         "ValidTo": "<Null>",
-        "Field_1": "Brahamanbaria"
+        "Field_1": "BRAHMANBARIA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2751,14 +2751,14 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Nawabganj",
+        "Name": "CHAPAI NABABGANJ",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rajshahi",
         "ADM2ALT2EN": "",
         "ADM0_EN": "Bangladesh",
         "ADM2_PCODE": "5070",
-        "ADM2_EN": "Nawabganj",
+        "ADM2_EN": "CHAPAI NABABGANJ",
         "InPoly_FID": "44",
         "validOn": "2018-04-10",
         "ADM2ALT1EN": "",
@@ -2772,7 +2772,7 @@
         "MaxSimpTol": "0.008993",
         "ADM2_REF": "",
         "ValidTo": "<Null>",
-        "Field_1": "Nawabganj"
+        "Field_1": "CHAPAI NABABGANJ"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4840,14 +4840,14 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Kishoreganj",
+        "Name": "KISHOREGONJ",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
         "ADM2ALT2EN": "",
         "ADM0_EN": "Bangladesh",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "27",
         "validOn": "2018-04-10",
         "ADM2ALT1EN": "",
@@ -4861,7 +4861,7 @@
         "MaxSimpTol": "0.008993",
         "ADM2_REF": "",
         "ValidTo": "<Null>",
-        "Field_1": "Kishoreganj"
+        "Field_1": "KISHOREGONJ"
       },
       "geometry": {
         "type": "MultiPolygon",

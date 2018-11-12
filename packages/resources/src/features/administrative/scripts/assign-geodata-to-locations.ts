@@ -42,7 +42,13 @@ const admin3Geo = JSON.parse(
     .toString()
 )
 
-function matchAndAssignGeoData(fhirLocations: any, features: any) {
+function matchAndAssignGeoData(
+  fhirLocations: any,
+  features: any,
+  label: string
+) {
+  // tslint:disable-next-line:no-console
+  console.log(`Parsing Geo Data for ${label}`)
   return fhirLocations.map((location: any) => {
     const matchingFeature = features.find(
       (feature: any) =>
@@ -67,15 +73,18 @@ function matchAndAssignGeoData(fhirLocations: any, features: any) {
 const mapGeo = {
   divisions: matchAndAssignGeoData(
     divisionsWithoutGeo.divisions,
-    admin1Geo.features
+    admin1Geo.features,
+    'divisions'
   ),
   districts: matchAndAssignGeoData(
     districtsWithoutGeo.districts,
-    admin2Geo.features
+    admin2Geo.features,
+    'districts'
   ),
   upazilas: matchAndAssignGeoData(
     upazilasWithoutGeo.upazilas,
-    admin3Geo.features
+    admin3Geo.features,
+    'upazilas'
   )
 }
 
