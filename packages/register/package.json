@@ -74,7 +74,7 @@
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
     "opener": "^1.5.1",
-    "prettier": "^1.12.1",
+    "prettier": "^1.15.2",
     "serve": "^10.0.2",
     "stylelint": "^9.5.0",
     "stylelint-config-recommended": "^2.1.0",
