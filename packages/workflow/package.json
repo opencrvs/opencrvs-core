@@ -11,7 +11,7 @@
     "test": "jest --coverage && yarn test:compilation",
     "test:watch": "jest --watch --coverage",
     "open:cov": "yarn test && opener coverage/index.html",
-    "precommit": "lint-staged",    
+    "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
     "@types/hapi-auth-jwt2": "^8.0.1",
     "@types/inert": "^5.1.1",
     "@types/joi": "^13.3.0",
+    "@types/uuid": "^3.4.4",
     "@types/vision": "^5.3.4",
     "@types/winston": "^2.3.9",
     "app-module-path": "^2.2.0",
@@ -30,7 +31,9 @@
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "^8.1.0",
     "joi": "^13.4.0",
+    "short-uid": "^0.1.0",
     "typescript": "^3.0.1",
+    "uuid": "^3.3.2",
     "winston": "^3.0.0"
   },
   "devDependencies": {
@@ -55,10 +58,26 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
     "testEnvironment": "node",
-    "setupFiles": ["./test/setupJest.ts"],
-    "modulePaths": ["<rootDir>"],
-    "coverageReporters": ["json", "lcov", "text", "html"]
+    "setupFiles": [
+      "./test/setupJest.ts"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ]
   }
 }
