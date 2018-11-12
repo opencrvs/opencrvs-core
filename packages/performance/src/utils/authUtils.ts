@@ -17,7 +17,7 @@ export const isTokenStillValid = (decoded: ITokenPayload) => {
 
 export function getToken() {
   return (
-    queryString.parse(window.location.search).token ||
+    queryString.parse(window.location.search.replace(/^\?/, '')).token ||
     localStorage.getItem('opencrvs')
   )
 }
