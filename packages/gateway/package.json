@@ -41,6 +41,7 @@
     "hapijs-status-monitor": "^0.6.0",
     "inert": "^5.1.0",
     "joi": "^10.6.0",
+    "jsonwebtoken": "^8.3.0",
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
     "mongoose": "^5.1.1",

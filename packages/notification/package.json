@@ -32,6 +32,7 @@
     "hapi-i18n": "^2.0.0",
     "iconv": "^2.3.1",
     "joi": "^13.4.0",
+    "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.1.2",
     "typescript": "^3.0.1",
     "winston": "^3.0.0"

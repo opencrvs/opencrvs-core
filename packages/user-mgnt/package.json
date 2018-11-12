@@ -32,6 +32,7 @@
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "^8.1.0",
     "joi": "^13.4.0",
+    "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.1.5",
     "typescript": "^3.0.1",
     "winston": "^3.0.0"

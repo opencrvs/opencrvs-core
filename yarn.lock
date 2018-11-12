@@ -3609,6 +3609,7 @@ cosmiconfig@^5.0.2:
 country-data@^0.0.31:
   version "0.0.31"
   resolved "https://registry.yarnpkg.com/country-data/-/country-data-0.0.31.tgz#80966b8e1d147fa6d6a589d32933f8793774956d"
+  integrity sha1-gJZrjh0Uf6bWpYnTKTP4eTd0lW0=
   dependencies:
     currency-symbol-map "~2"
     underscore ">1.4.4"
@@ -11588,6 +11589,11 @@ react-redux@^5.0.7:
     lodash-es "^4.17.5"
     loose-envify "^1.1.0"
     prop-types "^15.6.0"
+
+react-router-redux@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/react-router-redux/-/react-router-redux-4.0.8.tgz#227403596b5151e182377dab835b5d45f0f8054e"
+  integrity sha1-InQDWWtRUeGCN32rg1tdRfD4BU4=
 
 react-router-redux@next:
   version "5.0.0-alpha.9"
