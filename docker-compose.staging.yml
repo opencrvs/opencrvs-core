@@ -91,12 +91,6 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-    deploy:
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: workflow.opencrvs-staging.jembi.org'
-        - 'traefik.port=5050'
-        - 'traefik.docker.network=opencrvs_default'
 
   hearth:
     secrets:
