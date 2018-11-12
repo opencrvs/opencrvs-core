@@ -193,12 +193,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
       return {}
     }
 
+    interface IdraftDetails {
+      [key: string]: any
+    }
+
+    interface IParentDetails {
+      [key: string]: any
+    }
+
     const fatherPermanentAddress = father.permanentAddressSameAsMother
       ? mother
       : father
     const fatherCurrentAddress = father.addressSameAsMother ? mother : father
 
-    const motherDetails = {
+    const motherDetails: IParentDetails = {
       name: [
         {
           use: 'Traditional',
@@ -247,7 +255,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ]
     }
 
-    const fatherDetails = {
+    const fatherDetails: IParentDetails = {
       name: [
         {
           use: 'Traditional',
@@ -304,13 +312,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
           : null
 
     if (parentDetails) {
-      parentDetails['telecom'] = [
+      parentDetails.telecom = [
         { system: 'phone', value: registration.registrationPhone },
         { system: 'email', value: registration.registrationEmail }
       ]
     }
 
-    const draftDetails = {
+    const draftDetails: IdraftDetails = {
       child: {
         gender: child.gender,
         name: [
@@ -328,7 +336,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
         birthDate: child.childBirthDate
       },
       mother: motherDetails,
-      father: fatherDetails,
       registration: {
         /* 
         Will bring this back as soon as corresponding fhir builder is in place
@@ -344,8 +351,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               }
             ]
           }
-        ],  
-        paperFormID: registration.paperFormNumber, */
+        ], */
         contact: registration.whoseContactDetails
       },
       attendantAtBirth: child.attendantAtBirth,
@@ -353,6 +359,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
       weightAtBirth: child.weightAtBirth,
       presentAtBirthRegistration: registration.presentAtBirthRegistration,
       createdAt: new Date()
+    }
+
+    if (father.fathersDetailsExist) {
+      draftDetails.father = fatherDetails
     }
 
     return draftDetails

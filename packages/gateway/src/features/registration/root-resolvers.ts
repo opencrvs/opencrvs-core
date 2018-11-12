@@ -69,7 +69,7 @@ export const resolvers: GQLResolver = {
       }
 
       /* temporary changes - this needs to be part of gateway-ext module */
-      await sendBirthNotification(details, authHeader)
+      sendBirthNotification(details, authHeader)
 
       // return the Composition's id
       return details.registration && details.registration.trackingId
