@@ -673,23 +673,6 @@ describe('when user has a valid token in local storage', () => {
         it('confirmation screen should show up', () => {
           expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
         })
-
-        it('form submitted', async () => {
-          app
-            .find('#submit_confirm')
-            .hostNodes()
-            .simulate('click')
-
-          await flushPromises()
-          app.update()
-
-          expect(
-            app
-              .find('#saved_registration_view #view_title')
-              .hostNodes()
-              .text()
-          ).toBe('Declaration submitted')
-        })
       })
     })
   })
