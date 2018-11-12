@@ -1003,11 +1003,11 @@ const builders: IFieldBuilders = {
   }
 }
 
-export async function buildFHIRBundle(reg: object, trackingId?: string) {
+export async function buildFHIRBundle(reg: object) {
   const fhirBundle: ITemplatedBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate(trackingId)]
+    entry: [createCompositionTemplate()]
   }
 
   await transformObj(reg, fhirBundle, builders)
