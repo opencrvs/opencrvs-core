@@ -670,8 +670,39 @@ describe('when user has a valid token in local storage', () => {
           await flushPromises()
           app.update()
         })
+
         it('confirmation screen should show up', () => {
           expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
+        })
+
+        it('Preview button shold show up', () => {
+          expect(
+            app
+              .find('a')
+              .hostNodes()
+              .text()
+          ).toBe('Preview')
+        })
+
+        describe('when user is in the submit confirm view', () => {
+          beforeEach(async () => {
+            app
+              .find('a')
+              .hostNodes()
+              .simulate('click')
+
+            await flushPromises()
+            app.update()
+          })
+
+          it('check whether submit button is there or not', () => {
+            expect(
+              app
+                .find('#submit_form')
+                .hostNodes()
+                .prop('disabled')
+            ).toBe(false)
+          })
         })
       })
     })
