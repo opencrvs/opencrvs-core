@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@types/jest": "^22.2.3",
-    "@types/node": "^10.1.2",
+    "@types/node": "^10.12.5",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "concurrently": "^3.5.1",

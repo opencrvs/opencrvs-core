@@ -38,6 +38,6 @@
     "prettier": "^1.15.2"
   },
   "dependencies": {
-    "opener": "^1.5.0"
+    "opener": "^1.5.1"
   }
 }
