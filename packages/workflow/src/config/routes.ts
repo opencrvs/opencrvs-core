@@ -1,5 +1,5 @@
 import submitBirthDeclarationHandler from '../features/registration/handler'
-// import { fhirBundleSchema } from '../features/registration/handler'
+import { fhirBundleSchema } from '../features/registration/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -28,6 +28,9 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Push trackingid before submitting to FHIR and send notification to the shared contact',
+        validate: {
+          payload: fhirBundleSchema
+        },
         auth: {
           scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
         },

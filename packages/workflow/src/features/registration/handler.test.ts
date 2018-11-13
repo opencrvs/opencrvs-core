@@ -204,6 +204,17 @@ describe('Verify handler', () => {
     expect(res.statusCode).toBe(200)
   })
   it('submitBirthDeclarationHandler throws error if invalid fhir data is provided', async () => {
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        resourceType: 'Bundle',
+        entry: [
+          {
+            response: { location: 'Patient/12423/_history/1' }
+          }
+        ]
+      })
+    )
+
     const token = jwt.sign(
       { scope: ['declare'] },
       readFileSync('../auth/test/cert.key'),
@@ -217,11 +228,11 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/submitBirthDeclaration',
-      payload: {},
+      payload: { data: 'INVALID' },
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.statusCode).toBe(500)
+    expect(res.statusCode).toBe(400)
   })
 })
