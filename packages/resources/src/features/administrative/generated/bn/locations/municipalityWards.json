@@ -1,15 +1,14 @@
 {
   "municipalityWards": [
     {
-      "id": "e5c7e3e4-64ae-4843-a52d-3e9996be76bf",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "2"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "12"
         }
       ],
@@ -21,7 +20,23 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/39b28f19-51cd-4761-99eb-38ad2a41d709"
+        "reference": "Location/40770ae2-0c81-40ac-8d58-291e6c48a499"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
       },
       "extension": [
         {
@@ -31,18 +46,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "24c0a078-9499-4da1-9abe-7aeb979ddfad"
     },
     {
-      "id": "6f3428fe-f20d-42c5-8d0e-d79565e7d7f1",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "1"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "1112"
         }
       ],
@@ -54,7 +69,23 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/33488bd5-c270-4b17-879e-41002c8c8c8c"
+        "reference": "Location/67744503-1c63-4b82-a654-d6617ddea022"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
       },
       "extension": [
         {
@@ -64,7 +95,8 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "7b31887f-4fcd-4737-9730-feb408efdf4e"
     }
   ]
 }

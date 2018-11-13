@@ -2,7 +2,6 @@ import * as Hapi from 'hapi'
 import * as fs from 'fs'
 import { internal } from 'boom'
 import { ADMIN_STRUCTURE_SOURCE } from '../../constants'
-import { sendToFhir, ITemplatedBundle } from './service'
 
 export default async function administrativeStructureHandler(
   request: Hapi.Request,
@@ -20,6 +19,5 @@ export default async function administrativeStructureHandler(
     return internal(err)
   }
 
-  const response = await sendToFhir(divisions.divisions as ITemplatedBundle)
-  return { response }
+  return { divisions }
 }

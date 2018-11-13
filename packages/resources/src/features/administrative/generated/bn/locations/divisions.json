@@ -1,15 +1,14 @@
 {
   "divisions": [
     {
-      "id": "744c4834-11ef-4a72-b3e8-9d5f4c5b0fc3",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "1"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "10"
         }
       ],
@@ -23,6 +22,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -31,18 +46,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "1ce01d07-9041-426c-a78c-0dad3791814b"
     },
     {
-      "id": "02742b82-ec4b-495f-9c13-9efc8a0dd3ee",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "2"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "20"
         }
       ],
@@ -56,6 +71,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -64,18 +95,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
     },
     {
-      "id": "9d8bafc6-e5db-4632-bb45-86c8d5e53d81",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "3"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "30"
         }
       ],
@@ -89,6 +120,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -97,18 +144,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "b953a3b3-bee0-48c3-9031-be9f5e925cfd"
     },
     {
-      "id": "4f43408a-6114-48b8-a3a3-a4049a1ee47b",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "4"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "40"
         }
       ],
@@ -122,6 +169,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -130,18 +193,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "69266506-b443-4710-81f1-4ffde4acec84"
     },
     {
-      "id": "536ee828-2f4e-43fe-8c1a-714750543bd2",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "5"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "50"
         }
       ],
@@ -155,6 +218,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -163,18 +242,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
     },
     {
-      "id": "b7a0328a-a247-4e27-9abf-39fa7431c719",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "6"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "60"
         }
       ],
@@ -188,6 +267,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -196,18 +291,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
     },
     {
-      "id": "277f5e37-00a0-4b0c-86c5-c5e14e478d65",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "7"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "70"
         }
       ],
@@ -221,6 +316,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -229,18 +340,18 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "76bbad37-93fc-444d-9215-17e39573b0fd"
     },
     {
-      "id": "550b0753-c03b-45f1-b013-d41bcdaf5787",
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
           "value": "9"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "system": "http://opencrvs.org/specs/id/bbs§-code",
           "value": "45"
         }
       ],
@@ -254,6 +365,22 @@
       "partOf": {
         "reference": "Location/0"
       },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type§",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
@@ -262,7 +389,8 @@
             "data": "<base64>"
           }
         }
-      ]
+      ],
+      "id": "971a9fe0-d0e7-4cae-8189-3bc8a72642f1"
     }
   ]
 }
