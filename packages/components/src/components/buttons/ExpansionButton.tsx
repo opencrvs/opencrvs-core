@@ -27,8 +27,8 @@ const StyledButton = styled(Button)`
 `
 const StyledIcon = styled(ThreeDots).attrs<{ expanded?: boolean }>({})`
   display: flex;
-  transform: ${({ expanded }) =>
-    expanded ? `rotate(90deg)` : `rotate(-90deg)`};
+  transition: transform 300ms cubic-bezier(0.075, 0.82, 0.165, 1);
+  transform: ${({ expanded }) => (expanded ? `rotate(90deg)` : `rotate(0deg)`)};
 `
 interface IExpansionButtonProps extends IButtonProps {
   expanded?: boolean
@@ -38,7 +38,7 @@ export function ExpansionButton(props: IExpansionButtonProps) {
   return (
     <StyledButton
       align={ICON_ALIGNMENT.LEFT}
-      icon={() => <StyledIcon />}
+      icon={() => <StyledIcon expanded={props.expanded} />}
       {...props}
     />
   )
