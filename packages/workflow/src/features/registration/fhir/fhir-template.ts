@@ -1,22 +1,21 @@
 import { v4 as uuid } from 'uuid'
-import { OPENCRVS_SPECIFICATION_URL } from '../constants'
+import { OPENCRVS_SPECIFICATION_URL } from './constants'
 
-export function selectOrCreateTaskRefResource(
-  fhirBundle: fhir.Bundle
-): fhir.Task {
+export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
   let taskResource = getTaskResource(fhirBundle)
   if (!taskResource) {
-    taskResource = createTaskRefTemplate()
+    const taskEntry = createTaskRefTemplate()
     if (!fhirBundle.entry) {
       fhirBundle.entry = []
     }
-    fhirBundle.entry.push(taskResource)
+    fhirBundle.entry.push(taskEntry)
+    taskResource = taskEntry.resource
   }
-  return taskResource.resource as fhir.Task
+  return taskResource
 }
 
 export function getTaskResource(fhirBundle: fhir.Bundle) {
-  return (
+  const taskEntry =
     fhirBundle.entry &&
     fhirBundle.entry.find(entry => {
       if (entry.resource && entry.resource.resourceType === 'Task') {
@@ -24,7 +23,7 @@ export function getTaskResource(fhirBundle: fhir.Bundle) {
       }
       return false
     })
-  )
+  return taskEntry && taskEntry.resource
 }
 
 function createTaskRefTemplate() {
@@ -66,7 +65,7 @@ export function findPersonEntry(
 
   if (!personSection || !personSection.entry) {
     throw new Error(
-      `Ivalid person section not found for given code: ${sectionCode}`
+      `Invalid person section found for given code: ${sectionCode}`
     )
   }
   const personSectionEntry = personSection.entry[0]

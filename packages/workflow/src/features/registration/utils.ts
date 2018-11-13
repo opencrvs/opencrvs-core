@@ -1,5 +1,5 @@
 import * as ShortUIDGen from 'short-uid'
-import { NOTIFICATION_SERVICE_URL } from './constants'
+import { NOTIFICATION_SERVICE_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { logger } from 'src/logger'
 import {

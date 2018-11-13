@@ -1,9 +1,14 @@
-import { OPENCRVS_SPECIFICATION_URL, CHILD_SECTION_CODE } from '../constants'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  CHILD_SECTION_CODE,
+  MOTHER_SECTION_CODE,
+  FATHER_SECTION_CODE
+} from './constants'
 import { getTaskResource, findPersonEntry } from './fhir-template'
 
-enum CONTACT_SECTIONS {
-  MOTHER = 'mother-details',
-  FATHER = 'father-details'
+enum CONTACT {
+  MOTHER,
+  FATHER
 }
 
 export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
@@ -26,15 +31,13 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (
     !sharedContact ||
     !sharedContact.valueString ||
-    Object.keys(CONTACT_SECTIONS).indexOf(
-      sharedContact.valueString.toUpperCase()
-    ) < 0
+    Object.keys(CONTACT).indexOf(sharedContact.valueString.toUpperCase()) < 0
   ) {
     throw new Error("Informant's shared contact information missing")
   }
 
   const contact = findPersonEntry(
-    CONTACT_SECTIONS[sharedContact.valueString.toUpperCase()].value,
+    getContactSection(CONTACT[sharedContact.valueString.toUpperCase()]),
     fhirBundle
   )
   if (!contact || !contact.telecom) {
@@ -89,4 +92,15 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
     throw new Error('getTrackingId: Invalid FHIR bundle found for declration')
   }
   return composition.identifier.value
+}
+
+function getContactSection(contact: CONTACT) {
+  switch (contact) {
+    case CONTACT.MOTHER:
+      return MOTHER_SECTION_CODE
+    case CONTACT.FATHER:
+      return FATHER_SECTION_CODE
+    default:
+      throw new Error('No valid shared contact found')
+  }
 }

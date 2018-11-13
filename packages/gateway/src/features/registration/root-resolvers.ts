@@ -1,6 +1,5 @@
 import fetch from 'node-fetch'
-
-import { fhirUrl } from 'src/constants'
+import { fhirUrl, WORKFLOW_SERVICE_URL } from 'src/constants'
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
 
@@ -31,35 +30,29 @@ export const resolvers: GQLResolver = {
     async createBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)
 
-      const res = await fetch(fhirUrl, {
+      const res = await fetch(`${WORKFLOW_SERVICE_URL}submitBirthDeclaration`, {
         method: 'POST',
         body: JSON.stringify(doc),
         headers: {
-          'Content-Type': 'application/fhir+json'
+          ...authHeader
         }
       })
 
       if (!res.ok) {
         throw new Error(
-          `FHIR post to /fhir failed with [${
+          `Workflow post to /submitBirthDeclaration failed with [${
             res.status
           }] body: ${await res.text()}`
         )
       }
 
       const resBody = await res.json()
-      if (
-        !resBody ||
-        !resBody.entry ||
-        !resBody.entry[0] ||
-        !resBody.entry[0].response ||
-        !resBody.entry[0].response.location
-      ) {
-        throw new Error(`FHIR response did not send a valid response`)
+      if (!resBody || !resBody.trackingid) {
+        throw new Error(`Workflow response did not send a valid response`)
       }
 
-      // return the Composition's id
-      return resBody.entry[0].response.location.split('/')[3]
+      // return the trackingid
+      return resBody.trackingid
     }
   }
 }

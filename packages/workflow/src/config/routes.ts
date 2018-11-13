@@ -1,4 +1,5 @@
 import submitBirthDeclarationHandler from '../features/registration/handler'
+// import { fhirBundleSchema } from '../features/registration/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -29,13 +30,13 @@ export const getRoutes = () => {
           'Push trackingid before submitting to FHIR and send notification to the shared contact',
         auth: {
           scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
-        }
-      },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'Birth declration is successfully synced' },
-            400: { description: 'Bad request, check your request body' }
+        },
+        plugins: {
+          'hapi-swagger': {
+            responses: {
+              200: { description: 'Birth declration is successfully synced' },
+              400: { description: 'Bad request, check your request body' }
+            }
           }
         }
       }
