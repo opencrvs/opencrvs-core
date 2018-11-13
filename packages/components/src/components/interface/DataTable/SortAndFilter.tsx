@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { InputField, IInputFieldProps } from '../forms'
-import { Omit } from '../omit'
+import { InputField, IInputFieldProps } from '../../forms'
+import { Omit } from '../../omit'
 import styled from 'styled-components'
 import {
   ISelectGroupProps,
   ISelectGroupValue,
   SelectGroup
-} from './SelectGroup'
+} from '../SelectGroup'
 
 const Wrapper = styled.div`
   width: 100%;
