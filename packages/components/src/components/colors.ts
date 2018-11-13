@@ -25,5 +25,7 @@ export const colors = {
   chartPrimary: '#233A86',
   chartSecondary: '#6575AA',
   chartTertiary: '#a7b0cf',
+  expandedIndicator: '#7C93EC',
+  expandedIndicatorSecondary: '#7C93EC',
   imageContainerBackground: '#a8b8c3'
 }
