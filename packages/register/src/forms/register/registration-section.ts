@@ -127,7 +127,7 @@ export const registrationSection: IFormSection = {
   title: messages.registrationTitle,
   fields: [
     {
-      name: 'whoIsPresent',
+      name: 'presentAtBirthRegistration',
       type: SELECT_WITH_OPTIONS,
       label: messages.whoIsPresentLabel,
       required: true,
@@ -135,15 +135,15 @@ export const registrationSection: IFormSection = {
       validate: [],
       options: [
         {
-          value: 'BOTH',
+          value: 'BOTH_PARENTS',
           label: messages.presentBoth
         },
         {
-          value: 'MOTHER',
+          value: 'MOTHER_ONLY',
           label: messages.presentMother
         },
         {
-          value: 'FATHER',
+          value: 'FATHER_ONLY',
           label: messages.presentFather
         },
         {
@@ -171,10 +171,6 @@ export const registrationSection: IFormSection = {
         {
           value: 'FATHER',
           label: messages.contactDetailsFather
-        },
-        {
-          value: 'OTHER',
-          label: messages.contactDetailsOther
         }
       ]
     },
