@@ -22,9 +22,6 @@ const TitleContainer = styled.div`
 const Title = styled.div`
   font-weight: bold;
 `
-const Clear = styled.div`
-  clear: both;
-`
 const ImageContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.imageContainerBackground};
   margin-top: 16px;
@@ -75,12 +72,11 @@ export class DocumentViewer extends React.Component<IProps, IState> {
             <Title>{title}</Title>
             {tagline}
           </TitleContainer>
-          <Clear />
         </Header>
 
         <SelectContainer>
           <Select
-            id="SelectFile"
+            id="selectDocument"
             options={options}
             value={this.state.selectedOption as string}
             onChange={(val: string) => {
