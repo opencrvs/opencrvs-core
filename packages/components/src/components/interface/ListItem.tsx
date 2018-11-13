@@ -6,6 +6,7 @@ import {
   StatusGray,
   StatusCollected
 } from '../icons'
+import { ListItemAction } from '../buttons'
 
 interface IProp {
   label: string
@@ -62,22 +63,26 @@ const ExpandedIndicator = styled.div`
   margin-top: 2px;
 `
 const ListItemContainer = styled.li`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  background-color: ${({ theme }) => theme.colors.white};
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
-  color: ${({ theme }) => theme.colors.copy};
   width: 100%;
   margin-bottom: 1px;
-  padding: 10px;
-  align-items: center;
   cursor: pointer;
   &:last-child {
     margin-bottom: 0;
   }
 `
-
+const ListContentContainer = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  flex: 1;
+  align-items: center;
+  padding: 10px;
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  background-color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.copy};
+`
 const InfoDiv = styled.div`
   flex-grow: 1;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -147,24 +152,31 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
     return (
       <Wrapper key={index} expanded={expanded}>
         {expanded && <ExpandedIndicator />}
-        <ListItemContainer key={index} onClick={this.toggleExpanded}>
-          <InfoDiv>
-            {infoItems.map((data: IProp, infoIndex) => (
-              <LabelValue
-                key={infoIndex}
-                label={data.label}
-                value={data.value}
-              />
-            ))}
-          </InfoDiv>
-          <StatusDiv>
-            {statusItems.map((status: IStatus, infoIndex) => (
-              <StyledStatus key={infoIndex}>
-                {status.icon}
-                <span>{status.label}</span>
-              </StyledStatus>
-            ))}
-          </StatusDiv>
+        <ListItemContainer key={index}>
+          <ListContentContainer onClick={this.toggleExpanded}>
+            <InfoDiv>
+              {infoItems.map((data: IProp, infoIndex) => (
+                <LabelValue
+                  key={infoIndex}
+                  label={data.label}
+                  value={data.value}
+                />
+              ))}
+            </InfoDiv>
+            <StatusDiv>
+              {statusItems.map((status: IStatus, infoIndex) => (
+                <StyledStatus key={infoIndex}>
+                  {status.icon}
+                  <span>{status.label}</span>
+                </StyledStatus>
+              ))}
+            </StatusDiv>
+          </ListContentContainer>
+          <ListItemAction
+            actions={actions}
+            expanded={expanded}
+            onExpand={this.toggleExpanded}
+          />
         </ListItemContainer>
         {expanded && this.props.expandedCellRenderer(itemData, index)}
       </Wrapper>
