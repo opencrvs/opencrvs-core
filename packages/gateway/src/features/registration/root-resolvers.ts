@@ -45,7 +45,8 @@ export const resolvers: GQLResolver = {
         method: 'POST',
         body: JSON.stringify(doc),
         headers: {
-          'Content-Type': 'application/fhir+json'
+          'Content-Type': 'application/fhir+json',
+          ...authHeader
         }
       })
 
