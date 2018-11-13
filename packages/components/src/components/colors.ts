@@ -24,5 +24,6 @@ export const colors = {
   cardGradientEnd: '#5E93ED',
   chartPrimary: '#233A86',
   chartSecondary: '#6575AA',
-  chartTertiary: '#a7b0cf'
+  chartTertiary: '#a7b0cf',
+  imageContainerBackground: '#a8b8c3'
 }
