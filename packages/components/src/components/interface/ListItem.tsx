@@ -17,7 +17,7 @@ interface IStatus {
   label: string
 }
 
-interface IAction {
+export interface IAction {
   label: string
   handler: () => void
 }

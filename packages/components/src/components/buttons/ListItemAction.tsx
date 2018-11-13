@@ -1,7 +1,8 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled from 'styled-components'
 import { Button, IButtonProps } from './Button'
 import { ExpansionButton } from './ExpansionButton'
+import { IAction } from '../interface/ListItem'
 
 const Container = styled.div`
   display: flex;
@@ -27,11 +28,9 @@ const ListItemSingleAction = styled(Button)`
     color: ${({ theme }) => theme.colors.disabled};
   }
 `
-interface IListItemSingleActionProps extends IButtonProps {
-  title: string
-}
+
 interface IListItemActionProps {
-  actions: IListItemSingleActionProps[]
+  actions: IAction[]
   expanded?: boolean
   onExpand?: () => void
 }
@@ -40,14 +39,15 @@ export function ListItemAction(props: IListItemActionProps) {
   const { actions, expanded, onExpand } = props
   return (
     <Container>
-      {actions.map((action: IListItemSingleActionProps) => (
-        <ListItemSingleAction
-          key={action.title as string}
-          onClick={action.onClick}
-        >
-          {action.title}
-        </ListItemSingleAction>
-      ))}
+      {actions &&
+        actions.map((action: IAction) => (
+          <ListItemSingleAction
+            key={action.label as string}
+            onClick={action.handler}
+          >
+            {action.label}
+          </ListItemSingleAction>
+        ))}
       {onExpand && <ExpansionButton expanded={expanded} onClick={onExpand} />}
     </Container>
   )

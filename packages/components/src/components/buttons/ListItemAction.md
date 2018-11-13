@@ -1,5 +1,3 @@
-### List Item Action
-
 Button that is used to handle action for a list item. Renders an array of buttons and conditional expansion button.
 
 ```js
@@ -20,8 +18,8 @@ class ListItemActionExample extends React.Component {
       <ListItemAction
         expanded={this.state.expanded}
         actions={[
-          { title: 'Review', onClick: () => alert('Hello') },
-          { title: 'Delete', onClick: () => alert('Hello') }
+          { label: 'Review', handler: () => alert('Hello') },
+          { label: 'Delete', handler: () => alert('Hello') }
         ]}
         onExpand={this.toggleExpansion}
       />
