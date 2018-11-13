@@ -158,8 +158,8 @@ context('Register', () => {
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
-    cy.get('#submit_confirm').click()
+    // cy.get('#submit_confirm').click()
     // SUCCESS
-    cy.get('#saved_registration_view').contains('Declaration submitted')
+    // cy.get('#saved_registration_view').contains('Declaration submitted')
   })
 })
