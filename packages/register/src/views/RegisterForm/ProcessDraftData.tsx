@@ -1,17 +1,16 @@
 import { IFormData } from '../../forms'
+export interface IdraftDetails {
+  [key: string]: any
+}
+export interface IPersonDetails {
+  [key: string]: any
+}
 
 const processDraftData = (draftData: IFormData) => {
   const { child, father, mother, registration } = draftData
+
   if (!draftData || !child || !father || !mother || !registration) {
-    return {}
-  }
-
-  interface IdraftDetails {
-    [key: string]: any
-  }
-
-  interface IPersonDetails {
-    [key: string]: any
+    return draftData
   }
 
   const fatherPermanentAddress = father.permanentAddressSameAsMother
@@ -150,21 +149,6 @@ const processDraftData = (draftData: IFormData) => {
     },
     mother: motherDetails,
     registration: {
-      /* 
-        Will bring this back as soon as corresponding fhir builder is in place
-        status: [
-          {
-            type: 'DECLARED',
-            user: { userName: 'user.username', role: [{ type: 'admin' }] },
-            comments: [
-              {
-                comment: registration.commentsOrNotes,
-                id: 'user.id',
-                user: { userName: 'user.username', role: [{ type: 'admin' }] }
-              }
-            ]
-          }
-        ], */
       contact: registration.whoseContactDetails
     },
     attendantAtBirth: child.attendantAtBirth,
