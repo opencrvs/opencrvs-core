@@ -40,6 +40,11 @@ const Image = styled.img`
   left: 50%;
   transform: translate(-50%, -50%);
 `
+const SelectContainer = styled.div`
+  padding-left: 14px;
+  width: 70%;
+`
+
 interface IProps {
   title: string
   tagline?: string
@@ -73,14 +78,16 @@ export class DocumentViewer extends React.Component<IProps, IState> {
           <Clear />
         </Header>
 
-        <Select
-          id="SelectFile"
-          options={options}
-          value={this.state.selectedOption as string}
-          onChange={(val: string) => {
-            this.setState({ selectedOption: val })
-          }}
-        />
+        <SelectContainer>
+          <Select
+            id="SelectFile"
+            options={options}
+            value={this.state.selectedOption as string}
+            onChange={(val: string) => {
+              this.setState({ selectedOption: val })
+            }}
+          />
+        </SelectContainer>
 
         <ImageContainer>
           {this.state.selectedOption && (
