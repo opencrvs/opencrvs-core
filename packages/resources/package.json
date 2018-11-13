@@ -13,7 +13,8 @@
     "save:locations": "ts-node src/features/administrative/scripts/assign-admin-structure-to-locations.ts",
     "assign:geo-data": "ts-node src/features/administrative/scripts/assign-geodata-to-locations.ts",
     "generate:csv": "ts-node src/features/administrative/scripts/generate-csv-files.ts",
-    "update:locations": "ts-node src/features/administrative/scripts/update-location-data.ts"
+    "update:locations": "ts-node src/features/administrative/scripts/update-location-data.ts",
+    "populate": "yarn save:locations && yarn assign:geo-data && yarn update:locations"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",

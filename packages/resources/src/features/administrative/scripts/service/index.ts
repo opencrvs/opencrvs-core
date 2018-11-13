@@ -67,10 +67,14 @@ const composeFhirLocation = (
   }
 }
 
-const saveFhirLocation = (location: fhir.Location) => {
-  return fetch(`${FHIR_URL}/Location`, {
-    method: 'POST',
-    body: JSON.stringify(location),
+export const sendToFhir = (
+  doc: fhir.Location,
+  suffix: string,
+  method: string
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
+    body: JSON.stringify(doc),
     headers: {
       'Content-Type': 'application/json+fhir'
     }
@@ -79,7 +83,9 @@ const saveFhirLocation = (location: fhir.Location) => {
       return response
     })
     .catch(error => {
-      return Promise.reject(new Error('FHIR post failed' + error.message))
+      return Promise.reject(
+        new Error(`FHIR ${method} failed: ${error.message}`)
+      )
     })
 }
 
@@ -120,11 +126,13 @@ export async function fetchAndComposeLocations(
       oisfA2IParams
     )
 
-    const savedLocationResponse = (await saveFhirLocation(newLocation).catch(
-      err => {
-        throw Error('Cannot save location to FHIR')
-      }
-    )) as Response
+    const savedLocationResponse = (await sendToFhir(
+      newLocation,
+      '/Location',
+      'POST'
+    ).catch(err => {
+      throw Error('Cannot save location to FHIR')
+    })) as Response
     const locationHeader = savedLocationResponse.headers.get(
       'location'
     ) as string

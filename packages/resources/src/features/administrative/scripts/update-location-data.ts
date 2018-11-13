@@ -37,32 +37,16 @@ export default async function administrativeStructureHandler() {
   } catch (err) {
     return internal(err)
   }
-  let cities
-  try {
-    cities = await JSON.parse(
-      fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/cities.json`, 'utf8')
-    )
-  } catch (err) {
-    return internal(err)
-  }
-  let unions
-  try {
-    unions = await JSON.parse(
-      fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/unions.json`, 'utf8')
-    )
-  } catch (err) {
-    return internal(err)
-  }
 
   const locationData = divisions.divisions.concat(
     districts.districts,
-    upazilas.upazilas,
-    cities.cities,
-    unions.unions
+    upazilas.upazilas
   )
 
   for (const location of locationData) {
-    await sendToFhir(location, '/Location', 'PUT')
+    // tslint:disable-next-line:no-console
+    console.log(`Updating location with map data in FHIR ${location.id}`)
+    await sendToFhir(location, `/Location/${location.id}`, 'PUT')
   }
 
   return true
