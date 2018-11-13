@@ -15,10 +15,8 @@ import {
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
 } from 'src/features/fhir/templates'
-import * as ShortUIDGen from 'short-uid'
 
 test('should build a minimal FHIR registration document without error', async () => {
-  const birthTrackingId = new ShortUIDGen().randomUUID()
   const fhir = await buildFHIRBundle({
     mother: {
       identifier: [{ id: '123456', type: 'PASSPORT' }],
@@ -86,7 +84,6 @@ test('should build a minimal FHIR registration document without error', async ()
       educationalAttainment: 'NO_SCHOOLING'
     },
     registration: {
-      trackingId: birthTrackingId,
       contact: 'MOTHER',
       attachments: [
         {
@@ -244,14 +241,6 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[4].resource.focus.reference).toEqual(
-    `urn:trackingid:${birthTrackingId}`
-  )
-  expect(fhir.entry[4].resource.identifier[0]).toEqual({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-    value: birthTrackingId
-  })
-
   expect(fhir.entry[4].resource.extension[0]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
     valueString: 'MOTHER'
