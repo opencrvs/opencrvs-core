@@ -1,5 +1,5 @@
 import { generateBirthTrackingId } from '../utils'
-import { selectOrCreateTaskRefResource } from './fhir-utils'
+import { selectOrCreateTaskRefResource } from './fhir-template'
 
 export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   const birthTrackingId = generateBirthTrackingId()

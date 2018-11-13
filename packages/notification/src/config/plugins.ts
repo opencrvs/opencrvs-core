@@ -5,6 +5,7 @@ import * as Vision from 'vision'
 import * as JWT from 'hapi-auth-jwt2'
 import * as HapiI18n from 'hapi-i18n'
 import { logger } from 'src/logger'
+import { DEFAULT_LOCALE } from '../constants'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -45,7 +46,7 @@ export default function getPlugins() {
         logErrorFn: (error: string) => {
           logger.error(error)
         },
-        defaultLocale: 'en',
+        defaultLocale: DEFAULT_LOCALE,
         languageHeaderField: 'locale'
       }
     }
