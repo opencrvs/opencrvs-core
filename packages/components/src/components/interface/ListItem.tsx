@@ -42,10 +42,12 @@ export interface IListItemProps {
 interface IListItemState {
   expanded: boolean
 }
-
-const Wrapper = styled.div`
+const Wrapper = styled.div.attrs<{ expanded?: boolean }>({})`
   width: 100%;
   margin-bottom: 1px;
+  box-shadow: ${({ expanded }) =>
+    expanded ? `0 0 22px 0 rgba(0,0,0,0.23)` : ``};
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -143,7 +145,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
     const { infoItems, statusItems, index, actions, itemData } = this.props
     const { expanded } = this.state
     return (
-      <Wrapper key={index}>
+      <Wrapper key={index} expanded={expanded}>
         {expanded && <ExpandedIndicator />}
         <ListItemContainer key={index} onClick={this.toggleExpanded}>
           <InfoDiv>
