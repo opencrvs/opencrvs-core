@@ -1,0 +1,12 @@
+{
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "rules": {
+    "no-duplicate-variable": true,
+    "no-unused-variable": [true],
+    "object-literal-sort-keys": false,
+    "semicolon": [false, "never"],
+    "ordered-imports": false
+  },
+  "rulesDirectory": [],
+  "exclude": ["config/**/*.js", "node_modules/**/*.ts"]
+}
