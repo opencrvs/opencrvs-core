@@ -34,7 +34,7 @@ class ExpansionButtonExample extends React.Component {
           onClick={this.toggleExpansion}
         />
         <br />
-        <h1>{this.state.expanded ? 'Expanded' : 'Not expanded'}</h1>
+        <p>{this.state.expanded ? 'Expanded' : 'Not expanded'}</p>
       </div>
     )
   }
