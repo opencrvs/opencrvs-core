@@ -10,9 +10,8 @@ export default async function submitBirthDeclarationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = pushTrackingId(JSON.parse(
-    request.payload.toString()
-  ) as fhir.Bundle)
+  const payload = pushTrackingId(request.payload as fhir.Bundle)
+
   const res = await fetch(fhirUrl, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -20,7 +19,6 @@ export default async function submitBirthDeclarationHandler(
       'Content-Type': 'application/fhir+json'
     }
   })
-
   if (!res.ok) {
     /* 
         Based res.status we will know whether there is any dup error or not 
@@ -30,7 +28,6 @@ export default async function submitBirthDeclarationHandler(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
   }
-
   const resBody = await res.json()
   if (
     !resBody ||
@@ -41,12 +38,10 @@ export default async function submitBirthDeclarationHandler(
   ) {
     throw new Error(`FHIR response did not send a valid response`)
   }
-
   /* sending notification to the contact */
   sendBirthNotification(payload, {
     Authorization: request.headers['authorization']
   })
-
   /* returning the newly created tracking id */
   return { trackingid: getTrackingId(payload) }
 }
