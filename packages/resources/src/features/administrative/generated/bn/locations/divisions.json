@@ -1,0 +1,396 @@
+{
+  "divisions": [
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "1"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "10"
+        }
+      ],
+      "name": "Barisal",
+      "alias": [
+        "বরিশাল"
+      ],
+      "description": "division=1",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "b36d583e-b55c-4a37-95d2-e32896569993"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "2"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "20"
+        }
+      ],
+      "name": "Chittagong",
+      "alias": [
+        "চট্টগ্রাম"
+      ],
+      "description": "division=2",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "12d5d15e-2596-4601-bbc4-8010ac4eff21"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "3"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "30"
+        }
+      ],
+      "name": "Dhaka",
+      "alias": [
+        "ঢাকা"
+      ],
+      "description": "division=3",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "5cbe26d1-61df-4e33-8a5b-dd5e9a43b35e"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "4"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "40"
+        }
+      ],
+      "name": "Khulna",
+      "alias": [
+        "খুলনা"
+      ],
+      "description": "division=4",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "9e28e85f-e069-48fa-80b9-0dfbf526becd"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "5"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "50"
+        }
+      ],
+      "name": "Rajshahi",
+      "alias": [
+        "রাজশাহী"
+      ],
+      "description": "division=5",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "e5bacae9-61ca-4103-a584-bcf42cd74992"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "6"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "60"
+        }
+      ],
+      "name": "Rangpur",
+      "alias": [
+        "রংপুর"
+      ],
+      "description": "division=6",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "0b87068c-4b96-4488-9581-95527ff414cf"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "7"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "70"
+        }
+      ],
+      "name": "Sylhet",
+      "alias": [
+        "সিলেট"
+      ],
+      "description": "division=7",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "87cbdb9d-adcd-4a59-baa0-e86bea11e40b"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "9"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "45"
+        }
+      ],
+      "name": "Mymensingh",
+      "alias": [
+        "ময়মনসিংহ"
+      ],
+      "description": "division=9",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/0"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "691af17a-7980-4ff0-b4ad-651a68dd1dd2"
+    }
+  ]
+}
