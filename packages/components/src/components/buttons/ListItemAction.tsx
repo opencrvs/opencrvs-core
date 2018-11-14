@@ -17,6 +17,7 @@ const ListItemSingleAction = styled(Button)`
   color: ${({ theme }) => theme.colors.accent};
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.capsFontStyle};
+  font-weight: 600;
   margin-bottom: 1px;
   &:last-child {
     margin-bottom: 0;
