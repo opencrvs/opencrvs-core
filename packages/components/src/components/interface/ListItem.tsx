@@ -184,7 +184,9 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
           <ListItemAction
             actions={actions}
             expanded={expanded}
-            onExpand={this.toggleExpanded}
+            onExpand={
+              this.props.expandedCellRenderer ? this.toggleExpanded : undefined
+            }
           />
         </ListItemContainer>
 
