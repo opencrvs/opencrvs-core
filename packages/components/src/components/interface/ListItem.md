@@ -36,17 +36,34 @@ const statusItems = [
   }
 ]
 
+const style = {
+  width: '100%',
+  height: '100px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+}
+
 class ListItemExample extends React.Component {
   constructor() {
     super()
   }
+
+  renderExpandedCell() {
+    return (
+      <div style={style}>
+        <div>a expanded view</div>
+      </div>
+    )
+  }
+
   render() {
     return (
       <ListItem
         infoItems={infoItems}
         statusItems={statusItems}
         key={1}
-        expandedCellRenderer={() => <div>Dummy expanded view</div>}
+        expandedCellRenderer={this.renderExpandedCell}
       />
     )
   }

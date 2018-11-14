@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import {
   StatusGreen,
   StatusOrange,
@@ -42,6 +42,12 @@ export interface IListItemProps {
 interface IListItemState {
   expanded: boolean
 }
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+
 const Wrapper = styled.div.attrs<{ expanded?: boolean }>({})`
   width: 100%;
   margin-bottom: 1px;
@@ -51,6 +57,9 @@ const Wrapper = styled.div.attrs<{ expanded?: boolean }>({})`
   &:last-child {
     margin-bottom: 0;
   }
+`
+const ExpandedCellContainer = styled.div`
+  animation: ${fadeIn} 500ms;
 `
 const ExpandedIndicator = styled.div`
   height: 4px;
@@ -166,7 +175,12 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
             ))}
           </StatusDiv>
         </ListItemContainer>
-        {expanded && this.props.expandedCellRenderer(itemData, index)}
+
+        {expanded && (
+          <ExpandedCellContainer>
+            {this.props.expandedCellRenderer(itemData, index)}
+          </ExpandedCellContainer>
+        )}
       </Wrapper>
     )
   }
