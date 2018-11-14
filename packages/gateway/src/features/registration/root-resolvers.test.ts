@@ -45,7 +45,8 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result).toBe('1')
+      expect(result.length).toBe(7)
+      expect(result).toMatch(/^B/)
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })

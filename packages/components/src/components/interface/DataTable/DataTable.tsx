@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { Pagination, ResultList, SortAndFilter } from '../interface'
-import { IResult } from '../interface/ResultList'
-import { Omit } from '../omit'
+import { Pagination, SortAndFilter } from '..'
+import { Omit } from '../../omit'
 import styled from 'styled-components'
 
 import {
@@ -9,11 +8,18 @@ import {
   ISelectGroupValue,
   ISelectGroupOption,
   SelectFieldType
-} from './SelectGroup'
+} from '../SelectGroup'
 
 import { ISortAndFilterItem, IInputLabel } from './SortAndFilter'
 
 const Wrapper = styled.div`
+  width: 100%;
+`
+const StyledList = styled.ul`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
   width: 100%;
 `
 const ResultsText = styled.div`
@@ -24,19 +30,11 @@ const ResultsText = styled.div`
   margin: 10px 0;
   line-height: 22px;
 `
-interface ISelectValues {
-  [index: string]: string
-}
 
-interface IDynamicValues {
+export interface IDynamicValues {
   [key: string]: string
 }
 
-interface ISortAndFilterFields {
-  sortFilterFields: IDynamicValues
-}
-
-export type CustomResult = IResult & ISortAndFilterFields
 type CustomSelectGroupProp = Omit<ISelectGroupProps, 'onChange' | 'values'>
 
 export interface ISortAndFilter {
@@ -45,11 +43,12 @@ export interface ISortAndFilter {
 }
 
 export interface ISearchResultProps {
-  data: CustomResult[]
+  data: IDynamicValues[]
   sortBy: ISortAndFilter
   filterBy: ISortAndFilter
   resultLabel: string
   noResultText: string
+  cellRenderer: (cellData: IDynamicValues, key: number) => React.Component<{}>
   onSortChange?: (
     values: ISelectGroupValue,
     changedValue: ISelectGroupValue,
@@ -67,8 +66,8 @@ export interface ISearchResultProps {
 interface ICustomState {
   filterValues: IDynamicValues
   sortValues: IDynamicValues
-  filteredSortedItems: CustomResult[]
-  displayItems: IResult[]
+  filteredSortedItems: IDynamicValues[]
+  displayItems: IDynamicValues[]
   pageSize: number
   totalPages: number
   sortByItemsWithValues: ISortAndFilterItem
@@ -81,25 +80,19 @@ const defaultConfiguration = {
   initialPage: 1
 }
 
-const sortByDateAsc = (key: string, value: string, data: CustomResult[]) => {
+const sortByDateAsc = (key: string, value: string, data: IDynamicValues[]) => {
   return [...data].sort((a, b) => {
-    return (
-      new Date(b.sortFilterFields[key]).valueOf() -
-      new Date(a.sortFilterFields[key]).valueOf()
-    )
+    return new Date(b[key]).valueOf() - new Date(a[key]).valueOf()
   })
 }
 
-const sortByDateDesc = (key: string, value: string, data: CustomResult[]) => {
+const sortByDateDesc = (key: string, value: string, data: IDynamicValues[]) => {
   return [...data].sort((a, b) => {
-    return (
-      new Date(a.sortFilterFields[key]).valueOf() -
-      new Date(b.sortFilterFields[key]).valueOf()
-    )
+    return new Date(a[key]).valueOf() - new Date(b[key]).valueOf()
   })
 }
 
-const sortByDate = (key: string, value: string, data: CustomResult[]) => {
+const sortByDate = (key: string, value: string, data: IDynamicValues[]) => {
   if (value === 'asc') {
     return sortByDateAsc(key, value, data)
   } else if (value === 'desc') {
@@ -109,7 +102,7 @@ const sortByDate = (key: string, value: string, data: CustomResult[]) => {
   }
 }
 
-const defaulSort = (key: string, value: string, data: CustomResult[]) => {
+const defaulSort = (key: string, value: string, data: IDynamicValues[]) => {
   return [...data].sort((a, b) => {
     if (a[key] < b[key]) {
       return -1
@@ -140,10 +133,10 @@ const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
   return totalItemCount > 0 ? Math.ceil(totalItemCount / pageSize) : 0
 }
 
-const filterItems = (key: string, value: string, items: CustomResult[]) =>
-  items.filter((item: CustomResult) => item.sortFilterFields[key] === value)
+const filterItems = (key: string, value: string, items: IDynamicValues[]) =>
+  items.filter(item => item[key] === value)
 
-export class SearchResult extends React.Component<
+export class DataTable extends React.Component<
   ISearchResultProps,
   ICustomState
 > {
@@ -279,20 +272,15 @@ export class SearchResult extends React.Component<
   getDisplayItems = (
     currentPage: number,
     pageSize: number,
-    allItems: CustomResult[]
-  ): IResult[] => {
+    allItems: IDynamicValues[]
+  ) => {
     const offset = (currentPage - 1) * pageSize
     const displayItems = allItems.slice(offset, offset + pageSize)
-    const modifiedDisplayItems: IResult[] = displayItems.map(
-      (item: CustomResult) => {
-        return { info: item.info, status: item.status }
-      }
-    )
-    return modifiedDisplayItems
+    return displayItems
   }
 
   initializeSelectValues = (item: ISortAndFilter): IDynamicValues => {
-    const values: ISelectValues = {}
+    const values: IDynamicValues = {}
 
     item.selects.options.forEach((element: ISelectGroupOption) => {
       values[element.name] = ''
@@ -316,7 +304,7 @@ export class SearchResult extends React.Component<
     }
   }
 
-  resetPagination = (filteredItems: CustomResult[]) => {
+  resetPagination = (filteredItems: IDynamicValues[]) => {
     const { pageSize } = this.props
     const paginationSize = pageSize ? pageSize : defaultConfiguration.pageSize
     const totalPages = getTotalPageNumber(filteredItems.length, paginationSize)
@@ -344,6 +332,7 @@ export class SearchResult extends React.Component<
       initialPage
     } = this.state
     const { resultLabel, noResultText } = this.props
+
     return (
       <Wrapper>
         <SortAndFilter
@@ -355,7 +344,11 @@ export class SearchResult extends React.Component<
         <ResultsText>
           {resultLabel}({filteredSortedItems.length})
         </ResultsText>
-        <ResultList list={displayItems} />
+        <StyledList>
+          {displayItems.map((item, index) =>
+            this.props.cellRenderer(item, index)
+          )}
+        </StyledList>
         {filteredSortedItems.length > 0 && (
           <Pagination
             pageSize={pageSize}

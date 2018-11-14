@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
 
+import { ApolloProvider } from 'react-apollo'
 import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore, AppStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
@@ -79,13 +80,15 @@ export function createTestComponent(
   store: AppStore
 ) {
   const component = mount(
-    <Provider store={store}>
-      <I18nContainer>
-        <ThemeProvider theme={getTheme(config.COUNTRY)}>
-          {nodeWithIntlProp(node)}
-        </ThemeProvider>
-      </I18nContainer>
-    </Provider>,
+    <ApolloProvider client={createGraphQLClient()}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme(config.COUNTRY)}>
+            {nodeWithIntlProp(node)}
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
+    </ApolloProvider>,
     {
       context: { intl },
       childContextTypes: { intl: intlShape }

@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
-import ApolloClient from 'apollo-boost'
+import ApolloClient from 'apollo-client'
 import { ApolloProvider } from 'react-apollo'
+import { setContext } from 'apollo-link-context'
+import { createHttpLink } from 'apollo-link-http'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 import { resolve } from 'url'
 import { History } from 'history'
 import { Switch } from 'react-router'
@@ -36,8 +39,25 @@ const StyledSpinner = styled(Spinner)`
   top: 50%;
   left: 50%;
 `
-const client = new ApolloClient({
+
+const httpLink = createHttpLink({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
+})
+
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('opencrvs')
+
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : ''
+    }
+  }
+})
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache()
 })
 
 interface IAppProps {

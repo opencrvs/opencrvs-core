@@ -51,7 +51,6 @@ export const resolvers: GQLResolver = {
       if (!resBody || !resBody.trackingid) {
         throw new Error(`Workflow response did not send a valid response`)
       }
-
       // return the trackingid
       return resBody.trackingid
     }
