@@ -48,7 +48,7 @@ export interface ISearchResultProps {
   filterBy: ISortAndFilter
   resultLabel: string
   noResultText: string
-  cellRenderer: (cellData: IDynamicValues, key: number) => React.Component<{}>
+  cellRenderer: (cellData: IDynamicValues, key: number) => JSX.Element
   onSortChange?: (
     values: ISelectGroupValue,
     changedValue: ISelectGroupValue,

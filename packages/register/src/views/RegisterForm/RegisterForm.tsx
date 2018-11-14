@@ -299,7 +299,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     key="preview"
                     onClick={() => {
                       this.toggleSubmitModalOpen()
-                      document.documentElement.scrollTop = 0
+                      if (document.documentElement) {
+                        document.documentElement.scrollTop = 0
+                      }
                     }}
                   >
                     {intl.formatMessage(messages.preview)}
