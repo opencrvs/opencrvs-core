@@ -261,7 +261,6 @@ class DataTableExample extends React.Component {
         data={list}
         sortBy={sortBy}
         filterBy={filterBy}
-        expandedCell={<div>Dummy expanded component</div>}
         cellRenderer={this.renderCell}
         resultLabel="Results"
         noResultText="No result to display"
