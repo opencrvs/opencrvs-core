@@ -16,7 +16,9 @@
     "update:locations": "ts-node src/features/administrative/scripts/update-location-data.ts",
     "prep:facilities": "ts-node src/features/facilities/scripts/prepare-source-facilities.ts",
     "save:facilities": "ts-node src/features/facilities/scripts/assign-facilities-to-locations.ts",
-    "populate": "yarn save:locations && yarn assign:geo-data && yarn update:locations && yarn prep:facilities && yarn save:facilities"
+    "prep:employees": "ts-node src/features/employees/scripts/prepare-source-employees.ts",
+    "save:employees": "ts-node src/features/employees/scripts/assign-employees-to-practitioners.ts",
+    "populate": "yarn save:locations && yarn assign:geo-data && yarn update:locations && yarn prep:facilities && yarn save:facilities && yarn prep:employees && yarn save:employees"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",

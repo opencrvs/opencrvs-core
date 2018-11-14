@@ -32,7 +32,7 @@ const composeFhirLocation = (
     type: {
       coding: [
         {
-          system: `${ORG_URL}/specs/location-type§`,
+          system: `${ORG_URL}/specs/location-type`,
           code: location.type
         }
       ]
@@ -74,6 +74,7 @@ const sendToFhir = (doc: fhir.Location, suffix: string, method: string) => {
       )
     })
 }
+// This is a temporary hack because some upazilas share the same name
 
 const kaliganjA2IIdescription = 'division=3&district=20&upazila=165'
 const narsingdiA2IIdescription = 'division=3&district=29&upazila=229'
@@ -93,6 +94,7 @@ export async function composeAndSaveFacilities(
   let description: string
 
   for (const facility of facilities) {
+    // This is a temporary hack because some upazilas share the same name
     if (facility.upazila === 'Kaliganj') {
       description = kaliganjA2IIdescription
     } else if (facility.upazila === 'Narsingdi Sadar') {
