@@ -60,6 +60,7 @@ class ListItemExample extends React.Component {
   render() {
     return (
       <ListItem
+        actions={[{ label: 'review', handler: () => alert('Hello') }]}
         infoItems={infoItems}
         statusItems={statusItems}
         key={1}

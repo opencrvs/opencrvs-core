@@ -238,6 +238,7 @@ class DataTableExample extends React.Component {
     info.push({ label: 'Date of application', value: item.date_of_application })
     info.push({ label: 'Tracking ID', value: item.tracking_id })
 
+    actions.push({ label: 'review', handler: () => alert('Hello') })
     status.push({ icon: <StatusGray />, label: item.event })
     status.push({
       icon: getDeclarationStatusIcon(item.declaration_status),
@@ -245,6 +246,7 @@ class DataTableExample extends React.Component {
     })
     return (
       <ListItem
+        actions={actions}
         infoItems={info}
         statusItems={status}
         key={key}
