@@ -24,7 +24,7 @@ COPY . .
 COPY package.json package.json
 COPY yarn.lock yarn.lock
 COPY lerna.json lerna.json
-RUN yarn install --ignore-engines
+RUN yarn install
 
 # Build for production.
 RUN cd packages/register; yarn build --production
