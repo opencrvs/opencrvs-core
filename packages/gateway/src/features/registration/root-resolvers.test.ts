@@ -30,12 +30,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
+          trackingid: 'B123456'
         })
       )
       // @ts-ignore
@@ -58,7 +53,9 @@ describe('Registration root resolvers', () => {
       await expect(
         // @ts-ignore
         resolvers.Mutation.createBirthRegistration({}, { details })
-      ).rejects.toThrowError('FHIR post to /fhir failed with [401] body: Boom!')
+      ).rejects.toThrowError(
+        'Workflow post to /submitBirthDeclaration failed with [401] body: Boom!'
+      )
     })
 
     it("throws an error when the response isn't what we expect", async () => {
@@ -66,7 +63,7 @@ describe('Registration root resolvers', () => {
       await expect(
         // @ts-ignore
         resolvers.Mutation.createBirthRegistration({}, { details })
-      ).rejects.toThrowError('FHIR response did not send a valid response')
+      ).rejects.toThrowError('Workflow response did not send a valid response')
     })
   })
 })
