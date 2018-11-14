@@ -5,7 +5,7 @@ import { Header, Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
 import Logo from 'src/components/Logo'
 import { Page } from 'src/components/Page'
-import { Bar, Legend } from '@opencrvs/components/lib/charts'
+import { Legend } from '@opencrvs/components/lib/charts'
 
 const data = [
   {
@@ -37,6 +37,26 @@ const StyledHeader = styled(Header)`
   box-shadow: none;
 `
 
+const BoxTitle = styled.div`
+  height: 25px;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 25px;
+  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+`
+
+const FooterText = styled.div`
+  height: 17px;
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 17px;
+  margin-top: 30px;
+  margin-bottom: 25px;
+  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+`
+
 const ChartContainer = styled(Box)`
   max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
   margin: auto;
@@ -45,6 +65,8 @@ const ChartContainer = styled(Box)`
 const Container = styled.div`
   padding: 20px 10px;
 `
+const boxTitle = 'Birth Registration Key Figures'
+const footerText = 'Estimates provided using National Population Census data'
 class HomeView extends React.Component<InjectedIntlProps> {
   render() {
     return (
@@ -54,8 +76,9 @@ class HomeView extends React.Component<InjectedIntlProps> {
         </StyledHeader>
         <Container>
           <ChartContainer>
-            <Bar data={data} />
+            <BoxTitle>{boxTitle}</BoxTitle>
             <Legend data={data} />
+            <FooterText>{footerText}</FooterText>
           </ChartContainer>
         </Container>
       </Page>
