@@ -14,6 +14,10 @@ import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import { storage } from 'src/storage'
 
+import processDraftData, {
+  IPersonDetails
+} from './views/RegisterForm/ProcessDraftData'
+
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 const assign = window.location.assign as jest.Mock
@@ -250,10 +254,10 @@ describe('when user has a valid token in local storage', () => {
     describe('when user types in something', () => {
       beforeEach(() => {
         app
-          .find('#childFirstNames')
+          .find('#firstNames')
           .hostNodes()
           .simulate('change', {
-            target: { id: 'childFirstNames', value: 'hello' }
+            target: { id: 'firstNames', value: 'hello' }
           })
       })
       it('stores the value to a new draft', () => {
@@ -261,7 +265,7 @@ describe('when user has a valid token in local storage', () => {
           (storage.setItem as jest.Mock).mock.calls.length - 1
         ]
         const storedDrafts = JSON.parse(data)
-        expect(storedDrafts[0].data.child.childFirstNames).toEqual('hello')
+        expect(storedDrafts[0].data.child.firstNames).toEqual('hello')
       })
     })
 
@@ -547,6 +551,249 @@ describe('when user has a valid token in local storage', () => {
                 })
               })
             })
+          })
+        })
+      })
+    })
+  })
+
+  describe('when user is in the preview section', () => {
+    let customDraft: IDraft
+
+    const childDetails: IPersonDetails = {
+      attendantAtBirth: 'NURSE',
+      childBirthDate: '1999-10-10',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'নাইম',
+      firstNamesEng: 'Naim',
+      gender: 'male',
+      orderOfBirth: '2',
+      placeOfDelivery: 'HOSPITAL',
+      typeOfBirth: 'SINGLE',
+      weightAtBirth: '10'
+    }
+
+    const fatherDetails: IPersonDetails = {
+      fathersDetailsExist: true,
+      iD: '234234423424234244',
+      iDType: 'NATIONAL_ID',
+      addressSameAsMother: true,
+      permanentAddressSameAsMother: true,
+      country: 'BGD',
+      countryPermanent: 'BGD',
+      currentAddress: '',
+      fatherBirthDate: '1999-10-10',
+      dateOfMarriage: '2010-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'আনোয়ার',
+      firstNamesEng: 'Anwar',
+      maritalStatus: 'MARRIED',
+      nationality: 'BGD'
+    }
+
+    const motherDetails: IPersonDetails = {
+      iD: '234243453455',
+      iDType: 'NATIONAL_ID',
+      country: 'BGD',
+      nationality: 'BGD',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'রোকেয়া',
+      firstNamesEng: 'Rokeya',
+      maritalStatus: 'MARRIED',
+      dateOfMarriage: '2010-10-10',
+      motherBirthDate: '1999-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      addressLine1: 'Rd #10',
+      addressLine1Permanent: 'Rd#10',
+      addressLine2: 'Akua',
+      addressLine2Permanent: 'Akua',
+      addressLine3Options1: 'union1',
+      addressLine3Options1Permanent: 'union1',
+      addressLine4: 'upazila10',
+      addressLine4Permanent: 'upazila10',
+      countryPermanent: 'BGD',
+      currentAddress: '',
+      district: 'district2',
+      districtPermanent: 'district2',
+      permanentAddress: '',
+      postCode: '1020',
+      postCodePermanent: '1010',
+      state: 'state4',
+      statePermanent: 'state4'
+    }
+
+    const registrationDetails = {
+      commentsOrNotes: 'comments',
+      paperFormNumber: '423424245455',
+      presentAtBirthRegistration: 'MOTHER_ONLY',
+      registrationCertificateLanguage: ['en'],
+      registrationEmail: 'arman@gmail.com',
+      registrationPhone: '01736478884',
+      whoseContactDetails: 'MOTHER'
+    }
+
+    beforeEach(() => {
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      customDraft = { id: Date.now(), data }
+      store.dispatch(storeDraft(customDraft))
+      history.replace(
+        DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
+      )
+
+      app.update()
+    })
+
+    it('Checks empty draft', () => {
+      const emptyObj = {}
+      expect(processDraftData(emptyObj)).toBe(emptyObj)
+    })
+
+    it('Check if father addresses are parsed properly', () => {
+      fatherDetails.addressSameAsMother = false
+      fatherDetails.permanentAddressSameAsMother = false
+      fatherDetails.addressLine1 = 'Rd #10'
+      fatherDetails.addressLine1Permanent = 'Rd#10'
+      fatherDetails.addressLine2 = 'Akua'
+      fatherDetails.addressLine2Permanent = 'Akua'
+      fatherDetails.addressLine3Options1 = 'union1'
+      fatherDetails.addressLine3Options1Permanent = 'union1'
+      fatherDetails.addressLine4 = 'upazila10'
+      fatherDetails.addressLine4Permanent = 'upazila10'
+      fatherDetails.countryPermanent = 'BGD'
+      fatherDetails.currentAddress = ''
+      fatherDetails.district = 'district2'
+      fatherDetails.districtPermanent = 'district2'
+      fatherDetails.permanentAddress = ''
+      fatherDetails.postCode = '1020'
+      fatherDetails.postCodePermanent = '1010'
+      fatherDetails.state = 'state4'
+      fatherDetails.statePermanent = 'state4'
+
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(processDraftData(data).father.address[1].line[0]).toBe('Rd #10')
+    })
+
+    it('Pass FATHER as whoseContactDetails value', () => {
+      registrationDetails.whoseContactDetails = 'FATHER'
+
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(processDraftData(data).father.telecom[0].value).toBe('01736478884')
+    })
+
+    it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
+      registrationDetails.whoseContactDetails = 'BOTH_PARENTS'
+
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(processDraftData(data).father.telecom).toBeFalsy()
+    })
+
+    it('Pass false as fathersDetailsExist value', () => {
+      fatherDetails.fathersDetailsExist = false
+
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(processDraftData(data).father).toBeFalsy()
+    })
+
+    describe('when user clicks the "submit" button', () => {
+      beforeEach(async () => {
+        app
+          .find('#tab_preview')
+          .hostNodes()
+          .simulate('click')
+
+        await flushPromises()
+        app.update()
+      })
+
+      it('check whether submit button is enabled or not', () => {
+        expect(
+          app
+            .find('#submit_form')
+            .hostNodes()
+            .prop('disabled')
+        ).toBe(false)
+      })
+      describe('button clicked', () => {
+        beforeEach(async () => {
+          app
+            .find('#submit_form')
+            .hostNodes()
+            .simulate('click')
+
+          await flushPromises()
+          app.update()
+        })
+
+        it('confirmation screen should show up', () => {
+          expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
+        })
+
+        it('Preview button shold show up', () => {
+          expect(
+            app
+              .find('a')
+              .hostNodes()
+              .text()
+          ).toBe('Preview')
+        })
+
+        describe('when user is in the submit confirm view', () => {
+          beforeEach(async () => {
+            app
+              .find('a')
+              .hostNodes()
+              .simulate('click')
+
+            await flushPromises()
+            app.update()
+          })
+
+          it('check whether submit button is there or not', () => {
+            expect(
+              app
+                .find('#submit_form')
+                .hostNodes()
+                .prop('disabled')
+            ).toBe(false)
           })
         })
       })

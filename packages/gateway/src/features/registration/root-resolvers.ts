@@ -45,7 +45,8 @@ export const resolvers: GQLResolver = {
         method: 'POST',
         body: JSON.stringify(doc),
         headers: {
-          'Content-Type': 'application/fhir+json'
+          'Content-Type': 'application/fhir+json',
+          ...authHeader
         }
       })
 
@@ -69,10 +70,10 @@ export const resolvers: GQLResolver = {
       }
 
       /* temporary changes - this needs to be part of gateway-ext module */
-      await sendBirthNotification(details, authHeader)
+      sendBirthNotification(details, authHeader)
 
       // return the Composition's id
-      return resBody.entry[0].response.location.split('/')[3]
+      return details.registration && details.registration.trackingId
     }
   }
 }

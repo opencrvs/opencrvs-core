@@ -20,6 +20,9 @@ import {
 } from 'src/components/interface/footer'
 import { PreviewSection } from './PreviewSection'
 import { StickyFormTabs } from './StickyFormTabs'
+import gql from 'graphql-tag'
+import { Mutation } from 'react-apollo'
+import processDraftData from './ProcessDraftData'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -138,6 +141,12 @@ type State = {
   selectedTabId: string
 }
 
+const postMutation = gql`
+  mutation submitBirthRegistration($details: BirthRegistrationInput!) {
+    createBirthRegistration(details: $details)
+  }
+`
+
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -177,6 +186,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       goToTab(draftId, selectedSection.id)
     }
   }
+
+  processSubmitData = () => processDraftData(this.props.draft.data)
 
   render() {
     const {
@@ -262,31 +273,46 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Modal
-          title="Are you ready to submit?"
-          actions={[
-            <PrimaryButton
-              key="submit"
-              id="submit_confirm"
-              onClick={() => history.push('/saved')}
-            >
-              {intl.formatMessage(messages.submitButton)}
-            </PrimaryButton>,
-            <PreviewButton
-              key="preview"
-              onClick={() => {
-                this.toggleSubmitModalOpen()
-                document.documentElement.scrollTop = 0
-              }}
-            >
-              {intl.formatMessage(messages.preview)}
-            </PreviewButton>
-          ]}
-          show={this.state.showSubmitModal}
-          handleClose={this.toggleSubmitModalOpen}
+        <Mutation
+          mutation={postMutation}
+          variables={{ details: this.processSubmitData() }}
         >
-          {intl.formatMessage(messages.submitDescription)}
-        </Modal>
+          {(submitBirthRegistration, { data }) => {
+            if (data && data.createBirthRegistration) {
+              this.props.history.push('/saved', {
+                trackingId: data.createBirthRegistration
+              })
+            }
+
+            return (
+              <Modal
+                title="Are you ready to submit?"
+                actions={[
+                  <PrimaryButton
+                    key="submit"
+                    id="submit_confirm"
+                    onClick={() => submitBirthRegistration()}
+                  >
+                    {intl.formatMessage(messages.submitButton)}
+                  </PrimaryButton>,
+                  <PreviewButton
+                    key="preview"
+                    onClick={() => {
+                      this.toggleSubmitModalOpen()
+                      document.documentElement.scrollTop = 0
+                    }}
+                  >
+                    {intl.formatMessage(messages.preview)}
+                  </PreviewButton>
+                ]}
+                show={this.state.showSubmitModal}
+                handleClose={this.toggleSubmitModalOpen}
+              >
+                {intl.formatMessage(messages.submitDescription)}
+              </Modal>
+            )
+          }}
+        </Mutation>
       </FormViewContainer>
     )
   }
