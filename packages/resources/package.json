@@ -14,16 +14,20 @@
     "assign:geo-data": "ts-node src/features/administrative/scripts/assign-geodata-to-locations.ts",
     "generate:csv": "ts-node src/features/administrative/scripts/generate-csv-files.ts",
     "update:locations": "ts-node src/features/administrative/scripts/update-location-data.ts",
-    "populate": "yarn save:locations && yarn assign:geo-data && yarn update:locations"
+    "populate": "yarn save:locations && yarn assign:geo-data && yarn update:locations",
+    "prep:facilities": "ts-node src/features/facilities/scripts/prepare-source-facilities.ts",
+    "save:facilities": "ts-node src/features/facilities/scripts/assign-facilities-to-locations.ts"
   },
   "devDependencies": {
     "@types/code": "^4.0.3",
+    "@types/csv2json": "^1.4.0",
     "@types/dotenv": "^4.0.2",
     "@types/fhir": "^0.0.30",
     "@types/jest": "^22.2.3",
     "@types/json2csv": "^4.2.0",
     "@types/node": "^8.0.6",
     "concurrently": "^4.0.1",
+    "csv2json": "^1.4.2",
     "dotenv": "^4.0.0",
     "eslint": "^5.8.0",
     "eslint-config-prettier": "^3.1.0",
