@@ -78,8 +78,7 @@ describe('Verify handlers', () => {
         trackingid: 'B123456'
       },
       headers: {
-        Authorization: `Bearer ${token}`,
-        locale: 'bn' // default is 'en'
+        Authorization: `Bearer ${token}`
       }
     })
 
@@ -109,7 +108,8 @@ describe('Verify handlers', () => {
         trackingid: 'aeUxkeoseSd-afsdasdf-safasfasf'
       },
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        locale: 'en' // default is bn
       }
     })
 
@@ -141,8 +141,7 @@ describe('Verify handlers', () => {
         trackingid: 'B123456'
       },
       headers: {
-        Authorization: `Bearer ${token}`,
-        locale: 'bn' // default is 'en'
+        Authorization: `Bearer ${token}`
       }
     })
 

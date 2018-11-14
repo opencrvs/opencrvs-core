@@ -1,5 +1,4 @@
 import * as Hapi from 'hapi'
-import * as Joi from 'joi'
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
 import { pushTrackingId } from './fhir/fhir-bundle-modifier'
@@ -36,9 +35,3 @@ export default async function submitBirthDeclarationHandler(
   /* returning the newly created tracking id */
   return { trackingid: getTrackingId(payload) }
 }
-
-export const fhirBundleSchema = Joi.object({
-  resourceType: Joi.string().required(),
-  type: Joi.string().optional(),
-  entry: Joi.array().required()
-})
