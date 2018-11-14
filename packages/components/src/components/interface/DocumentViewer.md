@@ -1,5 +1,4 @@
 A generic document viewer with selecting document option.
-If columns are not provided then the default with is 100%:
 
 ```js
 const options = [

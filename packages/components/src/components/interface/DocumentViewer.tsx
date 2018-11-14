@@ -8,16 +8,16 @@ const Header = styled.div`
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
   margin-bottom: 15px;
   display: flex;
+  align-items: center;
 `
 const Icon = styled.div`
   margin-right: 15px;
 `
 const TitleContainer = styled.div`
-  height: 49px;
   width: 276px;
   color: ${({ theme }) => theme.colors.secondary};
   font-size: 18px;
-  line-height: 24px;
+  font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 const Title = styled.div`
   font-weight: bold;
@@ -58,7 +58,10 @@ export class DocumentViewer extends React.Component<IProps, IState> {
     super(props)
 
     this.state = {
-      selectedOption: ''
+      selectedOption:
+        typeof this.props.options[0] !== 'undefined'
+          ? this.props.options[0].value
+          : ''
     }
   }
 
