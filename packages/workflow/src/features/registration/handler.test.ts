@@ -74,6 +74,6 @@ describe('Verify handler', () => {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.statusCode).toBe(400)
+    expect(res.statusCode).toBe(500)
   })
 })
