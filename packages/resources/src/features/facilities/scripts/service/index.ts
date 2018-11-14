@@ -1,5 +1,5 @@
-import fetch, { Response } from 'node-fetch'
-import { FHIR_URL } from '../../../../constants'
+import fetch from 'node-fetch'
+import { ORG_URL, FHIR_URL } from '../../../../constants'
 
 interface IDGHSFacility {
   division: string
@@ -15,11 +15,7 @@ interface IDGHSFacility {
   type: string
 }
 
-interface ISearchParams {
-  description: string
-}
-
-/*const composeFhirLocation = (
+const composeFhirLocation = (
   location: IDGHSFacility,
   partOfReference: string
 ): fhir.Location => {
@@ -59,13 +55,9 @@ interface ISearchParams {
       state: location.division
     }
   }
-}*/
+}
 
-export const sendToFhir = (
-  doc: fhir.Location | ISearchParams,
-  suffix: string,
-  method: string
-) => {
+const sendToFhir = (doc: fhir.Location, suffix: string, method: string) => {
   return fetch(`${FHIR_URL}${suffix}`, {
     method,
     body: JSON.stringify(doc),
@@ -83,64 +75,48 @@ export const sendToFhir = (
     })
 }
 
-const getFromFhir = (suffixAndSearchParams: string) => {
-  return fetch(`${FHIR_URL}${suffixAndSearchParams}`, {
-    headers: {
-      'Content-Type': 'application/json+fhir'
-    }
-  })
-    .then(response => {
-      return response
-    })
-    .catch(error => {
-      return Promise.reject(new Error(`FHIR GETfailed: ${error.message}`))
-    })
-}
-
 const kaliganjA2IIdescription = 'division=3&district=20&upazila=165'
 const narsingdiA2IIdescription = 'division=3&district=29&upazila=229'
 const kurigramA2IIdescription = 'division=6&district=55&upazila=417'
 
+function getUpazilaID(upazilas: fhir.Location[], description: string) {
+  const relevantUpazila = upazilas.find(upazila => {
+    return upazila.description === description
+  }) as fhir.Location
+  return relevantUpazila.id as string
+}
+
 export async function composeAndSaveFacilities(
-  facilities: IDGHSFacility[]
-): Promise<fhir.Location[]> {
-  const locations: fhir.Location[] = []
+  facilities: IDGHSFacility[],
+  upazilas: fhir.Location[]
+): Promise<boolean> {
+  let description: string
+
   for (const facility of facilities) {
-    // let partOfReference: string
-    let parentUpazilaResponse: Response
     if (facility.upazila === 'Kaliganj') {
-      parentUpazilaResponse = await getFromFhir(
-        `/Location?description=${encodeURIComponent(kaliganjA2IIdescription)}`
-      )
+      description = kaliganjA2IIdescription
     } else if (facility.upazila === 'Narsingdi Sadar') {
-      parentUpazilaResponse = await getFromFhir(
-        `/Location?description=${encodeURIComponent(narsingdiA2IIdescription)}`
-      )
+      description = narsingdiA2IIdescription
     } else {
-      parentUpazilaResponse = await getFromFhir(
-        `/Location?description=${encodeURIComponent(kurigramA2IIdescription)}`
-      )
+      description = kurigramA2IIdescription
     }
 
-    console.log(parentUpazilaResponse)
+    const upazilaID = await getUpazilaID(upazilas, description)
 
-    /*const newLocation: fhir.Location = composeFhirLocation(
+    const newLocation: fhir.Location = composeFhirLocation(
       facility,
-      `Location/${partOfReference}`
+      `Location/${upazilaID}`
+    )
+    // tslint:disable-next-line:no-console
+    console.log(
+      `Saving facility ... type: ${facility.type}, name: ${
+        facility.facilityNameEnglish
+      }`
     )
 
-    const savedLocationResponse = (await sendToFhir(
-      newLocation,
-      '/Location',
-      'POST'
-    ).catch(err => {
-      throw Error('Cannot save location to FHIR')
-    })) as Response
-    const locationHeader = savedLocationResponse.headers.get(
-      'location'
-    ) as string
-    newLocation.id = locationHeader.split('/')[3]
-    locations.push(newLocation)*/
+    await sendToFhir(newLocation, '/Location', 'POST').catch(err => {
+      throw Error('Cannot save location to FHIR ')
+    })
   }
-  return locations
+  return true
 }

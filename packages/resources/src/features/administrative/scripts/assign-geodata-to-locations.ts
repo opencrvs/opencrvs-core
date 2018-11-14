@@ -54,6 +54,16 @@ function matchAndAssignGeoData(
       (feature: any) =>
         feature.properties.Name.trim().toLowerCase() ===
         location.name.trim().toLowerCase()
+
+      // TODO:
+      /*
+
+        We will need to rework applying the map to the location.  Currently we just check the name,
+        but there are 3 upazilas called Kaliganj in Bangladesh.
+
+        So, we need to check the location to see if it has a parent, get the name of the parent from FHIR,
+        then check if the name and the name of the parent match
+        */
     )
 
     if (!matchingFeature) {

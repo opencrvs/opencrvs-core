@@ -1,4 +1,4 @@
-Division,District,Upazila,Union,Facility Name - Bengali,Facility Name - English,Facility Type - Bengali,Facility Type - English,Email,Phone / Mobile,Type
+division,district,upazila,union,facilityNameBengali,facilityNameEnglish,facilityTypeBengali,facilityTypeEnglish,email,phone,type
 Dhaka,Gazipur,Kaliganj,,,Kaliganj Union Sub Center (Code:10000143),,Union Sub-center,kaliganj_singra@usc.dghs.gov.bd,/ 01833280000,HEALTH_FACILITY
 Dhaka,Gazipur,Kaliganj,Urban Ward No-05,,Kaliganj Upazila Health Complex (Code:10000144),,Upazila Health Complex,kaliganj@uhfpo.dghs.gov.bd,682351036 / 01769957469,HEALTH_FACILITY
 Dhaka,Gazipur,Kaliganj,Bahadursadi,,Dholashadhukhan Cc - Kaliganj (Code:10005330),,Community Clinic,cc10005330@cc.dghs.gov.bd,/ 01913509954,HEALTH_FACILITY

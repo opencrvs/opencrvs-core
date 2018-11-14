@@ -14,7 +14,7 @@ export default async function importFacilities() {
   const facilities = JSON.parse(fs.readFileSync(sourceJSON).toString())
   try {
     logger.info('saving facilities')
-    await composeAndSaveFacilities(facilities, upazilas)
+    await composeAndSaveFacilities(facilities, upazilas.upazilas)
   } catch (err) {
     return internal(err)
   }
