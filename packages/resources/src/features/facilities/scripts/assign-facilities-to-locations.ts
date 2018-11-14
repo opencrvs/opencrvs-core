@@ -1,7 +1,6 @@
 import * as fs from 'fs'
 import { FACILITIES_SOURCE, ADMIN_STRUCTURE_SOURCE } from '../../../constants'
-
-import { logger } from '../../../logger'
+import chalk from 'chalk'
 import { internal } from 'boom'
 import { composeAndSaveFacilities } from './service'
 
@@ -13,7 +12,12 @@ const upazilas = JSON.parse(
 export default async function importFacilities() {
   const facilities = JSON.parse(fs.readFileSync(sourceJSON).toString())
   try {
-    logger.info('saving facilities')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.blueBright(
+        '/////////////////////////// MAPPING FACILITIES TO LOCATIONS AND SAVING TO FHIR ///////////////////////////'
+      )}`
+    )
     await composeAndSaveFacilities(facilities, upazilas.upazilas)
   } catch (err) {
     return internal(err)

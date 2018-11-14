@@ -1,6 +1,7 @@
 import { Response } from 'node-fetch'
 import { ORG_URL } from '../../../../constants'
 import { getUpazilaID, getFromFhir, sendToFhir } from '../../../utils/bn'
+import chalk from 'chalk'
 
 interface ITestPractitioner {
   division: string
@@ -145,5 +146,11 @@ export async function composeAndSavePractitioners(
     // tslint:disable-next-line:no-console
     console.log(`PractitionerRole saved to fhir: ${practitionerRoleReference}`)
   }
+  // tslint:disable-next-line:no-console
+  console.log(
+    `${chalk.blueBright(
+      '/////////////////////////// FINISHED SAVING RESOURCES - THANK YOU FOR WAITING ///////////////////////////'
+    )}`
+  )
   return true
 }

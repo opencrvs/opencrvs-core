@@ -20,7 +20,7 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ca122420-9834-44fa-a8d9-45bb3090c0cc"
+        "reference": "Location/2225181a-aac2-4b7d-a1b5-ba24c04173de"
       },
       "type": {
         "coding": [
@@ -47,7 +47,7 @@
           }
         }
       ],
-      "id": "c19cc82d-39b2-44d6-aa70-26d707622459"
+      "id": "fde74de9-65b8-4218-8cae-8d517dfc6f57"
     },
     {
       "resourceType": "Location",
@@ -69,7 +69,7 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3c5a47d0-eb26-45d1-b3f8-ce111e22bfe3"
+        "reference": "Location/f1ee6e24-058b-489f-be3c-031ee5d32edd"
       },
       "type": {
         "coding": [
@@ -96,7 +96,7 @@
           }
         }
       ],
-      "id": "626420c2-8643-40e1-a514-9877471b9e92"
+      "id": "1e4afbe5-167a-416a-80ac-af039be70419"
     }
   ]
 }

@@ -50,7 +50,7 @@ export const getFromFhir = (suffix: string) => {
     })
 }
 
-// This is a temporary solution, used to map facilities and employees, and geo-data to upazilas, because some upazilas share the same name
+// This is a temporary solution, used to map facilities and employees to upazilas
 // Currently we are requesting facility and employee information manually from a csv file
 // Until the A2I system is complete and has ORG and Health staff and facilities fully populated and internally mapped,
 // or until we scale out an OpenCRVS team management system, to allow all OpenCRVS employees, facilities, and administrative structures
@@ -90,7 +90,7 @@ export function checkDuplicate(
   propertyName: string,
   inputArray: ISupportedType[]
 ): boolean {
-  const valueArr = inputArray.map((item: IOISFLocation) => {
+  const valueArr = inputArray.map((item: ISupportedType) => {
     return item[propertyName]
   })
   const isDuplicate = valueArr.some((item, index) => {

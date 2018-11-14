@@ -2,8 +2,15 @@ import * as fs from 'fs'
 import { internal } from 'boom'
 import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
 import { sendToFhir } from '../../utils/bn'
+import chalk from 'chalk'
 
 export default async function administrativeStructureHandler() {
+  // tslint:disable-next-line:no-console
+  console.log(
+    `${chalk.blueBright(
+      '/////////////////////////// UPDATING LOCATIONS WITH MAP DATA IN FHIR ///////////////////////////'
+    )}`
+  )
   let divisions
   try {
     divisions = await JSON.parse(
@@ -45,7 +52,7 @@ export default async function administrativeStructureHandler() {
 
   for (const location of locationData) {
     // tslint:disable-next-line:no-console
-    console.log(`Updating location with map data in FHIR ${location.id}`)
+    console.log(`Updating location: ${location.id}`)
     await sendToFhir(location, `/Location/${location.id}`, 'PUT')
   }
 

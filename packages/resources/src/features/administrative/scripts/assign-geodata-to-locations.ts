@@ -4,6 +4,13 @@ import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
 import { checkDuplicate, getFromFhir } from '../../utils/bn'
 import { Feature, GeoJsonProperties } from 'geojson'
 
+// tslint:disable-next-line:no-console
+console.log(
+  `${chalk.blueBright(
+    '/////////////////////////// ASSIGNING MAP DATA TO LOCATIONS ///////////////////////////'
+  )}`
+)
+
 const divisionsWithoutGeo = JSON.parse(
   fs
     .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/divisions.json`)
@@ -114,35 +121,39 @@ async function matchAndAssignGeoData(
   return mappedLocations
 }
 
-const mapGeo = {
-  divisions: matchAndAssignGeoData(
-    divisionsWithoutGeo.divisions,
-    admin1Geo.features,
-    'divisions'
-  ),
-  districts: matchAndAssignGeoData(
-    districtsWithoutGeo.districts,
-    admin2Geo.features,
-    'districts'
-  ),
-  upazilas: matchAndAssignGeoData(
-    upazilasWithoutGeo.upazilas,
-    admin3Geo.features,
-    'upazilas'
+export default async function saveGeoData() {
+  const mapGeo = {
+    divisions: await matchAndAssignGeoData(
+      divisionsWithoutGeo.divisions,
+      admin1Geo.features,
+      'divisions'
+    ),
+    districts: await matchAndAssignGeoData(
+      districtsWithoutGeo.districts,
+      admin2Geo.features,
+      'districts'
+    ),
+    upazilas: await matchAndAssignGeoData(
+      upazilasWithoutGeo.upazilas,
+      admin3Geo.features,
+      'upazilas'
+    )
+  }
+
+  fs.writeFileSync(
+    `${ADMIN_STRUCTURE_SOURCE}locations/divisions-geo.json`,
+    JSON.stringify({ divisions: mapGeo.divisions }, null, 2)
+  )
+
+  fs.writeFileSync(
+    `${ADMIN_STRUCTURE_SOURCE}locations/districts-geo.json`,
+    JSON.stringify({ districts: mapGeo.districts }, null, 2)
+  )
+
+  fs.writeFileSync(
+    `${ADMIN_STRUCTURE_SOURCE}locations/upazilas-geo.json`,
+    JSON.stringify({ upazilas: mapGeo.upazilas }, null, 2)
   )
 }
 
-fs.writeFileSync(
-  `${ADMIN_STRUCTURE_SOURCE}locations/divisions-geo.json`,
-  JSON.stringify({ divisions: mapGeo.divisions }, null, 2)
-)
-
-fs.writeFileSync(
-  `${ADMIN_STRUCTURE_SOURCE}locations/districts-geo.json`,
-  JSON.stringify({ districts: mapGeo.districts }, null, 2)
-)
-
-fs.writeFileSync(
-  `${ADMIN_STRUCTURE_SOURCE}locations/upazilas-geo.json`,
-  JSON.stringify({ upazilas: mapGeo.upazilas }, null, 2)
-)
+saveGeoData()

@@ -19,14 +19,14 @@ export default async function importAdminStructure() {
   let municipalityWards: fhir.Location[]
   // tslint:disable-next-line:no-console
   console.log(
-    `${chalk.yellow(
-      'Fetching locations from the OISF/A2I database, this will take some time, please wait ....'
+    `${chalk.blueBright(
+      '/////////////////////////// IMPORTING LOCATIONS FROM A2I AND SAVING TO FHIR ///////////////////////////'
     )}`
   )
   // tslint:disable-next-line:no-console
   console.log(
-    `${chalk.red(
-      '/////////////////////////// THIS MAY TAKE 10 MINUTES /////////////////////////////'
+    `${chalk.yellow(
+      'Fetching locations from the OISF/A2I database, this will take some time, please wait ....'
     )}`
   )
 

@@ -1,6 +1,7 @@
 import fetch, { Response } from 'node-fetch'
 import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
 import { sendToFhir, IOISFLocation } from '../../../utils/bn'
+import chalk from 'chalk'
 
 const composeFhirLocation = (
   location: IOISFLocation,
@@ -128,10 +129,32 @@ export async function getLocationsByParentDivisions(
   return locations
 }
 
+const chalkColors = [
+  'green',
+  'yellow',
+  'magenta',
+  'cyan',
+  'redBright',
+  'greenBright',
+  'yellowBright',
+  'blueBright',
+  'magentaBright',
+  'cyanBright',
+  'whiteBright'
+]
+
+function getRandomColor(): string {
+  return chalkColors[Math.floor(Math.random() * chalkColors.length)]
+}
+
 export async function getLocationsFromOISF(route: string): Promise<any> {
   const url = `${ADMINISTRATIVE_STRUCTURE_URL}/${route}`
   // tslint:disable-next-line:no-console
-  console.log(`Fetching: ${url}. Please wait ....`)
+  console.log(`Fetching: ${url}.`)
+  // tslint:disable-next-line:no-console
+  console.log(
+    `${chalk[getRandomColor()]('Please wait, will take 10 minutes ....')}`
+  )
   const res = await fetch(url, {
     method: 'GET'
   })

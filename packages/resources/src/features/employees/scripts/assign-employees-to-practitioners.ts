@@ -1,7 +1,6 @@
 import * as fs from 'fs'
 import { EMPLOYEES_SOURCE, ADMIN_STRUCTURE_SOURCE } from '../../../constants'
-
-import { logger } from '../../../logger'
+import chalk from 'chalk'
 import { internal } from 'boom'
 import { composeAndSavePractitioners } from './service'
 
@@ -21,9 +20,14 @@ const upazilas = JSON.parse(
 )
 
 export default async function importFacilities() {
+  // tslint:disable-next-line:no-console
+  console.log(
+    `${chalk.blueBright(
+      '/////////////////////////// MAPPING EMPLOYEES TO LOCATIONS, PRACTITIONERS & ROLES AND SAVING TO FHIR ///////////////////////////'
+    )}`
+  )
   const employees = JSON.parse(fs.readFileSync(sourceJSON).toString())
   try {
-    logger.info('saving employees')
     await composeAndSavePractitioners(
       employees,
       divisions.divisions,
