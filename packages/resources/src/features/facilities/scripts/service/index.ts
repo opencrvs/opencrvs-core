@@ -1,6 +1,5 @@
-import fetch from 'node-fetch'
-import { ORG_URL, FHIR_URL } from '../../../../constants'
-
+import { ORG_URL } from '../../../../constants'
+import { getUpazilaID, sendToFhir } from '../../../utils/bn'
 interface IDGHSFacility {
   division: string
   district: string
@@ -57,54 +56,12 @@ const composeFhirLocation = (
   }
 }
 
-const sendToFhir = (doc: fhir.Location, suffix: string, method: string) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    method,
-    body: JSON.stringify(doc),
-    headers: {
-      'Content-Type': 'application/json+fhir'
-    }
-  })
-    .then(response => {
-      return response
-    })
-    .catch(error => {
-      return Promise.reject(
-        new Error(`FHIR ${method} failed: ${error.message}`)
-      )
-    })
-}
-// This is a temporary hack because some upazilas share the same name
-
-const kaliganjA2IIdescription = 'division=3&district=20&upazila=165'
-const narsingdiA2IIdescription = 'division=3&district=29&upazila=229'
-const kurigramA2IIdescription = 'division=6&district=55&upazila=417'
-
-function getUpazilaID(upazilas: fhir.Location[], description: string) {
-  const relevantUpazila = upazilas.find(upazila => {
-    return upazila.description === description
-  }) as fhir.Location
-  return relevantUpazila.id as string
-}
-
 export async function composeAndSaveFacilities(
   facilities: IDGHSFacility[],
   upazilas: fhir.Location[]
 ): Promise<boolean> {
-  let description: string
-
   for (const facility of facilities) {
-    // This is a temporary hack because some upazilas share the same name
-    if (facility.upazila === 'Kaliganj') {
-      description = kaliganjA2IIdescription
-    } else if (facility.upazila === 'Narsingdi Sadar') {
-      description = narsingdiA2IIdescription
-    } else {
-      description = kurigramA2IIdescription
-    }
-
-    const upazilaID = await getUpazilaID(upazilas, description)
-
+    const upazilaID = await getUpazilaID(upazilas, facility.upazila)
     const newLocation: fhir.Location = composeFhirLocation(
       facility,
       `Location/${upazilaID}`

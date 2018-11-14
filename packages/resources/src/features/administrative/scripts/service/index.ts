@@ -1,17 +1,6 @@
 import fetch, { Response } from 'node-fetch'
-import {
-  ADMINISTRATIVE_STRUCTURE_URL,
-  ORG_URL,
-  FHIR_URL
-} from '../../../../constants'
-import { logger } from '../../../../logger'
-
-interface IOISFLocation {
-  bbsCode: string
-  name: string
-  nameBn: string
-  id: number
-}
+import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
+import { sendToFhir, IOISFLocation } from '../../../utils/bn'
 
 const composeFhirLocation = (
   location: IOISFLocation,
@@ -22,11 +11,11 @@ const composeFhirLocation = (
     resourceType: 'Location',
     identifier: [
       {
-        system: `${ORG_URL}/specs/id/a2i§-internal-id`,
+        system: `${ORG_URL}/specs/id/a2i-internal-id`,
         value: String(location.id)
       },
       {
-        system: `${ORG_URL}/specs/id/bbs§-code`,
+        system: `${ORG_URL}/specs/id/bbs-code`,
         value: location.bbsCode
       }
     ],
@@ -41,7 +30,7 @@ const composeFhirLocation = (
     type: {
       coding: [
         {
-          system: `${ORG_URL}/specs/location-type§`,
+          system: `${ORG_URL}/specs/location-type`,
           code: 'ADMIN_STRUCTURE'
         }
       ]
@@ -67,28 +56,6 @@ const composeFhirLocation = (
   }
 }
 
-export const sendToFhir = (
-  doc: fhir.Location,
-  suffix: string,
-  method: string
-) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    method,
-    body: JSON.stringify(doc),
-    headers: {
-      'Content-Type': 'application/json+fhir'
-    }
-  })
-    .then(response => {
-      return response
-    })
-    .catch(error => {
-      return Promise.reject(
-        new Error(`FHIR ${method} failed: ${error.message}`)
-      )
-    })
-}
-
 export const appendLocations = (
   locations: fhir.Location[],
   newLocations: fhir.Location[]
@@ -111,6 +78,7 @@ export async function fetchAndComposeLocations(
   const body = await getLocationsFromOISF(route).catch(err => {
     throw Error('Cannot retrieve locations from OISF')
   })
+
   const locations: fhir.Location[] = []
   for (const oisfLocation of body) {
     let oisfA2IParams: string
@@ -162,7 +130,8 @@ export async function getLocationsByParentDivisions(
 
 export async function getLocationsFromOISF(route: string): Promise<any> {
   const url = `${ADMINISTRATIVE_STRUCTURE_URL}/${route}`
-  logger.info(`Fetching: ${url}`)
+  // tslint:disable-next-line:no-console
+  console.log(`Fetching: ${url}. Please wait ....`)
   const res = await fetch(url, {
     method: 'GET'
   })

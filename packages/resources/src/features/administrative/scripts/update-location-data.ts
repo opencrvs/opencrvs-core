@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { internal } from 'boom'
 import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
-import { sendToFhir } from './service'
+import { sendToFhir } from '../../utils/bn'
 
 export default async function administrativeStructureHandler() {
   let divisions

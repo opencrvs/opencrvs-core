@@ -4,11 +4,11 @@
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "1"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "04"
         }
       ],
@@ -20,12 +20,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/1ce01d07-9041-426c-a78c-0dad3791814b"
+        "reference": "Location/35752058-fd0a-4387-8c8a-63ab9b1b117c"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -47,17 +47,17 @@
           }
         }
       ],
-      "id": "b4578059-b684-419a-a268-7f4495f41c2e"
+      "id": "ebfabcd9-c3f8-4ca9-b88c-e74fcdba5c87"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "2"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "06"
         }
       ],
@@ -69,12 +69,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/1ce01d07-9041-426c-a78c-0dad3791814b"
+        "reference": "Location/35752058-fd0a-4387-8c8a-63ab9b1b117c"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -96,17 +96,17 @@
           }
         }
       ],
-      "id": "0a51d5b0-7a83-41d3-8aa2-f3f26fa1423e"
+      "id": "3f16b2ce-33fe-425a-a4ee-cb215b312e51"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "3"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "09"
         }
       ],
@@ -118,12 +118,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/1ce01d07-9041-426c-a78c-0dad3791814b"
+        "reference": "Location/35752058-fd0a-4387-8c8a-63ab9b1b117c"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -145,17 +145,17 @@
           }
         }
       ],
-      "id": "adbfcdae-0183-432c-ab68-f09c7f5d0952"
+      "id": "963dd1c8-bc12-47ac-8f98-644a4fdb6827"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "4"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "42"
         }
       ],
@@ -167,12 +167,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/1ce01d07-9041-426c-a78c-0dad3791814b"
+        "reference": "Location/35752058-fd0a-4387-8c8a-63ab9b1b117c"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -194,17 +194,17 @@
           }
         }
       ],
-      "id": "e2934ae6-90b0-4908-ac0e-2e8e76694b8d"
+      "id": "c499500d-066d-464b-bfe7-13bba605719c"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "5"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "78"
         }
       ],
@@ -216,12 +216,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/1ce01d07-9041-426c-a78c-0dad3791814b"
+        "reference": "Location/35752058-fd0a-4387-8c8a-63ab9b1b117c"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -243,17 +243,17 @@
           }
         }
       ],
-      "id": "e914eeea-0a34-481e-9eef-350ed3b8092a"
+      "id": "d594bf1c-25ee-46d0-8c38-05b9b373a273"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "6"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "79"
         }
       ],
@@ -265,12 +265,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/1ce01d07-9041-426c-a78c-0dad3791814b"
+        "reference": "Location/35752058-fd0a-4387-8c8a-63ab9b1b117c"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -292,17 +292,17 @@
           }
         }
       ],
-      "id": "f3443743-e9d4-4386-aae0-4ebb4a0f48c3"
+      "id": "7c280a3c-f026-4657-ac7e-545513a471a9"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "7"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "03"
         }
       ],
@@ -314,12 +314,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -341,17 +341,17 @@
           }
         }
       ],
-      "id": "e7553989-6f67-453d-a79b-571358cdc82c"
+      "id": "d40c2b34-2ec7-4ba1-870a-73385496d45b"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "8"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "12"
         }
       ],
@@ -363,12 +363,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -390,17 +390,17 @@
           }
         }
       ],
-      "id": "9adccdab-ab18-444c-9ea2-15de624a1c32"
+      "id": "e3c8782f-cf13-4c08-9963-0a52669e2aa1"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "9"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "13"
         }
       ],
@@ -412,12 +412,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -439,17 +439,17 @@
           }
         }
       ],
-      "id": "3c5659c7-038d-41a9-9242-3388b28c33e2"
+      "id": "dcc674fd-160b-4546-bdaf-b4f0ded49a60"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "10"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "15"
         }
       ],
@@ -461,12 +461,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -488,17 +488,17 @@
           }
         }
       ],
-      "id": "bacf77ac-fc7c-46c2-a8d6-ec2b648b9d19"
+      "id": "b21fadaf-97b4-4485-bcba-1dcb943b3461"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "11"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "19"
         }
       ],
@@ -510,12 +510,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -537,17 +537,17 @@
           }
         }
       ],
-      "id": "ca8a6ef4-11ca-4d00-9f21-d107a1b7cd5a"
+      "id": "654e219e-fd2c-4460-89cd-1fe98a16c22e"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "12"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "22"
         }
       ],
@@ -559,12 +559,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -586,17 +586,17 @@
           }
         }
       ],
-      "id": "f44668f2-52e1-4e00-ae90-0b6f39364300"
+      "id": "25f8803b-ad91-4c03-a143-d3b9995eed32"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "13"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "30"
         }
       ],
@@ -608,12 +608,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -635,17 +635,17 @@
           }
         }
       ],
-      "id": "adcf28dd-d199-452c-b04c-1d610c0d2c72"
+      "id": "feb13d08-7e22-4e76-8c5d-16868a94cfc4"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "14"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "46"
         }
       ],
@@ -657,12 +657,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -684,17 +684,17 @@
           }
         }
       ],
-      "id": "23c749da-c723-462d-a76d-0549cecdd9dd"
+      "id": "c0b6c442-7a08-4820-bc5f-4bc2600e8105"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "15"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "51"
         }
       ],
@@ -706,12 +706,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -733,17 +733,17 @@
           }
         }
       ],
-      "id": "aa44e7c1-ec02-4af9-a508-a42f4f5f9dde"
+      "id": "8fb16463-1ea9-4662-9596-1f0b9ba00b43"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "16"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "75"
         }
       ],
@@ -755,12 +755,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -782,17 +782,17 @@
           }
         }
       ],
-      "id": "8e308715-0115-4029-8749-6cbd6b76621b"
+      "id": "981d484e-148d-4076-be80-3be6b81dac56"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "17"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "84"
         }
       ],
@@ -804,12 +804,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/a4a9ebca-5e22-4c43-950c-b8b79aa054d6"
+        "reference": "Location/a8a8e6c7-08bb-4d85-9e66-7db60079b83a"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -831,17 +831,17 @@
           }
         }
       ],
-      "id": "e46ef199-07b6-4aa8-81d2-4a3b52052560"
+      "id": "65c9a7d5-217d-46cf-805d-5aed23077473"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "18"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "26"
         }
       ],
@@ -853,12 +853,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -880,17 +880,17 @@
           }
         }
       ],
-      "id": "37c42f9d-b0de-41bb-9a19-c3f71c09e1b6"
+      "id": "790b5a00-0323-4701-83c7-c5fecc593d2a"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "19"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "29"
         }
       ],
@@ -902,12 +902,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -929,17 +929,17 @@
           }
         }
       ],
-      "id": "0bdf6c45-4a8e-41d3-9dcf-f0e63da09f0e"
+      "id": "e3705d9d-91ee-4ec9-a2f5-b2b661c49df7"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "20"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "33"
         }
       ],
@@ -951,12 +951,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -978,17 +978,17 @@
           }
         }
       ],
-      "id": "03a6cd5c-c3ed-44ed-bd72-fadedcd33f97"
+      "id": "cb0ce85a-9e6e-4441-9344-36be28037627"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "21"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "35"
         }
       ],
@@ -1000,12 +1000,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1027,17 +1027,17 @@
           }
         }
       ],
-      "id": "5d21b03f-0b3d-4196-98d1-354e1b89d779"
+      "id": "5d7e5964-fd18-47fc-976a-1850c37ac7f9"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "23"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "48"
         }
       ],
@@ -1049,12 +1049,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1076,17 +1076,17 @@
           }
         }
       ],
-      "id": "4a44b85d-9002-4784-9833-e93a62f14a81"
+      "id": "615bc971-44a4-430b-b931-d44ff968ccee"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "24"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "54"
         }
       ],
@@ -1098,12 +1098,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1125,17 +1125,17 @@
           }
         }
       ],
-      "id": "98f6c992-8264-4d29-a6b4-355f99bc125b"
+      "id": "b89b74eb-80fb-4054-a541-89dbe7481d9a"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "25"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "56"
         }
       ],
@@ -1147,12 +1147,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1174,17 +1174,17 @@
           }
         }
       ],
-      "id": "8d841cc7-ce22-4983-9676-d4eaf01d9041"
+      "id": "55b974bf-b2c6-4562-820a-970f8c53fd70"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "26"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "59"
         }
       ],
@@ -1196,12 +1196,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1223,17 +1223,17 @@
           }
         }
       ],
-      "id": "48954eb1-62bd-4e59-8a83-901a2a5fdcca"
+      "id": "37335bbc-05ec-4a37-9eeb-72fcef13acc5"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "28"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "67"
         }
       ],
@@ -1245,12 +1245,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1272,17 +1272,17 @@
           }
         }
       ],
-      "id": "b566f2dd-d5d0-46ed-b51c-37d3423af62f"
+      "id": "8cb9652e-619a-4791-9e32-75b572a62a86"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "29"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "68"
         }
       ],
@@ -1294,12 +1294,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1321,17 +1321,17 @@
           }
         }
       ],
-      "id": "376a1cd5-e9ae-4ede-84a3-7cac2012ff5c"
+      "id": "07a9928b-a202-4d22-bd15-446791853aee"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "31"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "82"
         }
       ],
@@ -1343,12 +1343,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1370,17 +1370,17 @@
           }
         }
       ],
-      "id": "b48a8fc6-6fec-4d1e-8046-5a663bd77789"
+      "id": "e4151c86-a3c9-4fc3-9c7e-d4e6523578fd"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "32"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "86"
         }
       ],
@@ -1392,12 +1392,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1419,17 +1419,17 @@
           }
         }
       ],
-      "id": "7df95c1e-96c1-4da6-b18e-c51dd7e0372a"
+      "id": "14bedf51-ba35-432f-9575-75551bdb7337"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "34"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "93"
         }
       ],
@@ -1441,12 +1441,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/b953a3b3-bee0-48c3-9031-be9f5e925cfd"
+        "reference": "Location/dd9f1bf1-58f7-4b17-a2e7-85b8e85317d8"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1468,17 +1468,17 @@
           }
         }
       ],
-      "id": "a90db056-baa2-4903-ad77-b9c86e897c01"
+      "id": "a29de117-a9db-49d0-9230-2ab7f0a9401e"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "35"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "01"
         }
       ],
@@ -1490,12 +1490,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1517,17 +1517,17 @@
           }
         }
       ],
-      "id": "44cbab78-6542-4587-8f82-976926cdb58c"
+      "id": "1c80ee7c-c7f2-411b-92b3-24b828db549c"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "36"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "18"
         }
       ],
@@ -1539,12 +1539,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1566,17 +1566,17 @@
           }
         }
       ],
-      "id": "932e5508-2bac-4e31-b751-9823a2c500d6"
+      "id": "c05e5130-890b-40be-b8f3-a5ca02a55be8"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "37"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "41"
         }
       ],
@@ -1588,12 +1588,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1615,17 +1615,17 @@
           }
         }
       ],
-      "id": "c75eb22a-a90c-406c-a527-2a1e3d5d043f"
+      "id": "945f8453-8d36-49af-a768-79c435583365"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "38"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "44"
         }
       ],
@@ -1637,12 +1637,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1664,17 +1664,17 @@
           }
         }
       ],
-      "id": "51bbef87-c689-4d1c-9a29-513472e5926c"
+      "id": "c972f842-16c8-4783-8e7a-d51dce09ee96"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "39"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "47"
         }
       ],
@@ -1686,12 +1686,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1713,17 +1713,17 @@
           }
         }
       ],
-      "id": "d93d5f59-5e63-45f6-9e4a-a13a548946c4"
+      "id": "01eaad1f-4302-46ec-8c12-d2b0beea7b0f"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "40"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "50"
         }
       ],
@@ -1735,12 +1735,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1762,17 +1762,17 @@
           }
         }
       ],
-      "id": "21389467-ad8f-4cd8-95d5-f6ca2fd79e79"
+      "id": "157e1119-4697-422b-a80f-91ab61b4bcb8"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "41"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "55"
         }
       ],
@@ -1784,12 +1784,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1811,17 +1811,17 @@
           }
         }
       ],
-      "id": "c0ee2595-d5ee-40d2-95b2-ecf3e995ea6e"
+      "id": "8e9f3293-ab04-488e-ac90-892d36a6d827"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "42"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "57"
         }
       ],
@@ -1833,12 +1833,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1860,17 +1860,17 @@
           }
         }
       ],
-      "id": "f4e0a439-9d00-448c-a3b0-53e5dc0c4221"
+      "id": "9bb25f46-9a36-43df-9bf5-a34a0efb07c4"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "43"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "65"
         }
       ],
@@ -1882,12 +1882,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1909,17 +1909,17 @@
           }
         }
       ],
-      "id": "b9218aea-4b8e-4d49-8528-7d0439899cb0"
+      "id": "e9d21e9c-f248-4689-8545-d9b23db374d0"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "44"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "87"
         }
       ],
@@ -1931,12 +1931,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/69266506-b443-4710-81f1-4ffde4acec84"
+        "reference": "Location/c985dafd-166e-44df-8445-1b7fc87387be"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -1958,17 +1958,17 @@
           }
         }
       ],
-      "id": "838052fa-bf96-41b5-bb8b-6edee54c7bc3"
+      "id": "d52d4fab-8d6e-4026-8f0e-69dfc095a062"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "45"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "10"
         }
       ],
@@ -1980,12 +1980,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2007,17 +2007,17 @@
           }
         }
       ],
-      "id": "031bb2bb-d6e6-4143-9f96-9d0646a4273c"
+      "id": "597ad56c-6a98-46a8-b021-ce7f242450d8"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "46"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "38"
         }
       ],
@@ -2029,12 +2029,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2056,17 +2056,17 @@
           }
         }
       ],
-      "id": "97b8d796-bcac-4152-8078-5ead1cbaccde"
+      "id": "e13b4c6f-b27c-46eb-ae05-c9405bb33d9c"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "47"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "64"
         }
       ],
@@ -2078,12 +2078,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2105,17 +2105,17 @@
           }
         }
       ],
-      "id": "1eff3215-ada0-4d15-8906-7f887a508118"
+      "id": "c422bb38-aa7b-43fe-8521-74e5194d0883"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "48"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "69"
         }
       ],
@@ -2127,12 +2127,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2154,17 +2154,17 @@
           }
         }
       ],
-      "id": "7465400c-374a-4867-a164-0c3f11972c46"
+      "id": "41742544-4e67-4547-a855-6f4ab746bfca"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "49"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "70"
         }
       ],
@@ -2176,12 +2176,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2203,17 +2203,17 @@
           }
         }
       ],
-      "id": "aeb7c369-8f66-40f1-b7ff-b5c08868288f"
+      "id": "87ea415d-a748-4d09-8576-543b760b7321"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "50"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "76"
         }
       ],
@@ -2225,12 +2225,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2252,17 +2252,17 @@
           }
         }
       ],
-      "id": "57c9f147-56ee-4aea-a1b4-edecc4a41139"
+      "id": "d3190c7d-fa0f-41b3-ac8d-95e23f0c95d9"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "51"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "81"
         }
       ],
@@ -2274,12 +2274,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2301,17 +2301,17 @@
           }
         }
       ],
-      "id": "141f2211-ac6c-4a85-baf8-cdeb60cc8475"
+      "id": "4dfd6f70-ea94-4462-860a-fab02a917d21"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "52"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "88"
         }
       ],
@@ -2323,12 +2323,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/ed88e9ed-5fd5-4118-a541-b43c2130b2c6"
+        "reference": "Location/91e10abb-c6ee-4256-9081-5369898ac200"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2350,17 +2350,17 @@
           }
         }
       ],
-      "id": "ca4bac6d-adab-4f28-932d-ef320c3c274a"
+      "id": "c0bdd7c7-97aa-4e8c-bed9-f9863cfd87a5"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "53"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "27"
         }
       ],
@@ -2372,12 +2372,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2399,17 +2399,17 @@
           }
         }
       ],
-      "id": "0c30c408-1032-450b-ba77-8304f7579576"
+      "id": "11cad1e6-8ff9-41c0-a39a-3e064b3e4381"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "54"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "32"
         }
       ],
@@ -2421,12 +2421,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2448,17 +2448,17 @@
           }
         }
       ],
-      "id": "483c4855-d429-4bf8-a7af-1f61e1879f2a"
+      "id": "d0962965-2ee8-4b2e-8f67-f82e6aad0f6c"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "55"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "49"
         }
       ],
@@ -2470,12 +2470,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2497,17 +2497,17 @@
           }
         }
       ],
-      "id": "3a218d42-0f9b-4cea-9e99-11f86bb7dc4f"
+      "id": "648e8e33-358a-4d8c-bc4d-0df656b28b96"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "56"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "52"
         }
       ],
@@ -2519,12 +2519,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2546,17 +2546,17 @@
           }
         }
       ],
-      "id": "08be0b46-535e-4338-8640-12e027adf6f1"
+      "id": "9fc2f66a-4eaf-4629-b7e2-b3dfa2abcb67"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "57"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "73"
         }
       ],
@@ -2568,12 +2568,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2595,17 +2595,17 @@
           }
         }
       ],
-      "id": "0b68d7f9-8d70-4e3f-8239-fc815e6b9938"
+      "id": "ad948d19-6de0-46dd-9223-9c45e16e2c5a"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "58"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "77"
         }
       ],
@@ -2617,12 +2617,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2644,17 +2644,17 @@
           }
         }
       ],
-      "id": "7fef1029-9644-42ce-bce1-24e13ef3fd24"
+      "id": "a47c65d9-f3ca-42d2-a987-50056f890cf0"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "59"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "85"
         }
       ],
@@ -2666,12 +2666,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2693,17 +2693,17 @@
           }
         }
       ],
-      "id": "fd37a50c-216b-4c10-a18c-9e0c012e2a8b"
+      "id": "21f8f54f-574d-425c-a1a1-c9f8cda7fa11"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "60"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "94"
         }
       ],
@@ -2715,12 +2715,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/3d4f5bf9-a2e0-463b-8034-cd1f51b691fe"
+        "reference": "Location/041cede2-e0a2-449e-896c-348648ae2efa"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2742,17 +2742,17 @@
           }
         }
       ],
-      "id": "ee343033-0901-40a5-9361-2c2e3007ecc0"
+      "id": "ef5061e4-f02e-4e75-a66a-c2112084d6a4"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "61"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "36"
         }
       ],
@@ -2764,12 +2764,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/76bbad37-93fc-444d-9215-17e39573b0fd"
+        "reference": "Location/0aa91212-30a5-4233-a878-11807332620d"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2791,17 +2791,17 @@
           }
         }
       ],
-      "id": "3030f441-3752-43c1-954a-6c6dbd303566"
+      "id": "0e486d6e-5e45-416b-b7b6-4bf2d6831e1c"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "62"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "58"
         }
       ],
@@ -2813,12 +2813,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/76bbad37-93fc-444d-9215-17e39573b0fd"
+        "reference": "Location/0aa91212-30a5-4233-a878-11807332620d"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2840,17 +2840,17 @@
           }
         }
       ],
-      "id": "3e019305-5498-4345-9ecf-2d73aa8f333c"
+      "id": "c1830189-13ca-4c58-929b-13a452f42e9e"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "63"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "90"
         }
       ],
@@ -2862,12 +2862,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/76bbad37-93fc-444d-9215-17e39573b0fd"
+        "reference": "Location/0aa91212-30a5-4233-a878-11807332620d"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2889,17 +2889,17 @@
           }
         }
       ],
-      "id": "0ee2046a-df34-4a4a-a7ff-27dff426de75"
+      "id": "2144dfc6-c5ab-41cd-90b4-5677eb861fdc"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "64"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "91"
         }
       ],
@@ -2911,12 +2911,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/76bbad37-93fc-444d-9215-17e39573b0fd"
+        "reference": "Location/0aa91212-30a5-4233-a878-11807332620d"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2938,17 +2938,17 @@
           }
         }
       ],
-      "id": "e9d89b58-d2ff-4849-876d-eb6e123b994e"
+      "id": "a2b436c2-6f51-4b01-94a3-e279fcbe7e6e"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "22"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "39"
         }
       ],
@@ -2960,12 +2960,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/971a9fe0-d0e7-4cae-8189-3bc8a72642f1"
+        "reference": "Location/39e1640d-bb0b-473b-b222-155a9eb03639"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -2987,17 +2987,17 @@
           }
         }
       ],
-      "id": "2a80bc0e-8b7b-464b-b52d-eeb21ffc1d48"
+      "id": "5cf3a345-30c6-46d9-b1a0-cf142aa6f12e"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "27"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "61"
         }
       ],
@@ -3009,12 +3009,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/971a9fe0-d0e7-4cae-8189-3bc8a72642f1"
+        "reference": "Location/39e1640d-bb0b-473b-b222-155a9eb03639"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -3036,17 +3036,17 @@
           }
         }
       ],
-      "id": "7dedcea2-93d2-4034-94dc-6c94a72a17e5"
+      "id": "80b06e61-aa9e-462f-9cf5-3adae3d463f5"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "30"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "72"
         }
       ],
@@ -3058,12 +3058,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/971a9fe0-d0e7-4cae-8189-3bc8a72642f1"
+        "reference": "Location/39e1640d-bb0b-473b-b222-155a9eb03639"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -3085,17 +3085,17 @@
           }
         }
       ],
-      "id": "b3b44656-8788-400a-a603-6e86ac4996ee"
+      "id": "283d3cc2-1fad-4241-88dc-ca6c7087caaa"
     },
     {
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i§-internal-id",
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
           "value": "33"
         },
         {
-          "system": "http://opencrvs.org/specs/id/bbs§-code",
+          "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "89"
         }
       ],
@@ -3107,12 +3107,12 @@
       "status": "active",
       "mode": "instance",
       "partOf": {
-        "reference": "Location/971a9fe0-d0e7-4cae-8189-3bc8a72642f1"
+        "reference": "Location/39e1640d-bb0b-473b-b222-155a9eb03639"
       },
       "type": {
         "coding": [
           {
-            "system": "http://opencrvs.org/specs/location-type§",
+            "system": "http://opencrvs.org/specs/location-type",
             "code": "ADMIN_STRUCTURE"
           }
         ]
@@ -3134,7 +3134,7 @@
           }
         }
       ],
-      "id": "0fc08bfa-7aff-467f-84a6-ea75fcf2f4f2"
+      "id": "e517cbac-4e59-4375-af8d-996fec2f9504"
     }
   ]
 }

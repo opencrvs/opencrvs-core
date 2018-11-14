@@ -1,5 +1,6 @@
-import fetch, { Response } from 'node-fetch'
-import { ORG_URL, FHIR_URL } from '../../../../constants'
+import { Response } from 'node-fetch'
+import { ORG_URL } from '../../../../constants'
+import { getUpazilaID, getFromFhir, sendToFhir } from '../../../utils/bn'
 
 interface ITestPractitioner {
   division: string
@@ -69,53 +70,6 @@ const composeFhirPractitionerRole = (
   }
 }
 
-type ISupportedTypes = fhir.Practitioner | fhir.PractitionerRole
-
-const sendToFhir = (doc: ISupportedTypes, suffix: string, method: string) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    method,
-    body: JSON.stringify(doc),
-    headers: {
-      'Content-Type': 'application/json+fhir'
-    }
-  })
-    .then(response => {
-      return response
-    })
-    .catch(error => {
-      return Promise.reject(
-        new Error(`FHIR ${method} failed: ${error.message}`)
-      )
-    })
-}
-
-const getFromFhir = (suffix: string) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    headers: {
-      'Content-Type': 'application/json+fhir'
-    }
-  })
-    .then(response => {
-      return response.json()
-    })
-    .catch(error => {
-      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-    })
-}
-
-// This is a temporary hack because some upazilas share the same name
-
-const kaliganjA2IIdescription = 'division=3&district=20&upazila=165'
-const narsingdiA2IIdescription = 'division=3&district=29&upazila=229'
-const kurigramA2IIdescription = 'division=6&district=55&upazila=417'
-
-function getUpazilaID(upazilas: fhir.Location[], description: string) {
-  const relevantUpazila = upazilas.find(upazila => {
-    return upazila.description === description
-  }) as fhir.Location
-  return relevantUpazila.id as string
-}
-
 export async function composeAndSavePractitioners(
   practitioners: ITestPractitioner[],
   divisions: fhir.Location[],
@@ -124,7 +78,6 @@ export async function composeAndSavePractitioners(
 ): Promise<boolean> {
   for (const practitioner of practitioners) {
     // Get Locations
-
     const locations: fhir.Reference[] = []
     if (practitioner.facilityEnglishName) {
       const facility = await getFromFhir(
@@ -145,21 +98,11 @@ export async function composeAndSavePractitioners(
       locations.push({ reference: `Location/${practitionerDistrict.id}` })
     }
     if (practitioner.upazila) {
-      let description: string
-      // This is a temporary hack because some upazilas share the same name
-      if (practitioner.upazila === 'Kaliganj') {
-        description = kaliganjA2IIdescription
-      } else if (practitioner.upazila === 'Narsingdi Sadar') {
-        description = narsingdiA2IIdescription
-      } else {
-        description = kurigramA2IIdescription
-      }
-      const upazilaID = await getUpazilaID(upazilas, description)
+      const upazilaID = await getUpazilaID(upazilas, practitioner.upazila)
       locations.push({ reference: `Location/${upazilaID as string}` })
     }
 
     // Create and save Practitioner
-
     const newPractitioner: fhir.Practitioner = composeFhirPractitioner(
       practitioner
     )
@@ -180,7 +123,6 @@ export async function composeAndSavePractitioners(
     console.log(`Practitioner saved to fhir: ${practitionerReference}`)
 
     // Create and save PractitionerRole
-
     const newPractitionerRole: fhir.PractitionerRole = composeFhirPractitionerRole(
       practitioner.role,
       practitionerReference,
@@ -192,7 +134,7 @@ export async function composeAndSavePractitioners(
       '/PractitionerRole',
       'POST'
     ).catch(err => {
-      throw Error('Cannot save practitioner to FHIR')
+      throw Error('Cannot save practitioner role to FHIR')
     })) as Response
     const practitionerRoleLocationHeader = savedPractitionerRoleResponse.headers.get(
       'location'

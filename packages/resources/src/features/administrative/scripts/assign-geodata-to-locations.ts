@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
 import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { checkDuplicate, getFromFhir } from '../../utils/bn'
+import { Feature, GeoJsonProperties } from 'geojson'
 
 const divisionsWithoutGeo = JSON.parse(
   fs
@@ -42,42 +44,74 @@ const admin3Geo = JSON.parse(
     .toString()
 )
 
-function matchAndAssignGeoData(
-  fhirLocations: any,
-  features: any,
+async function getParentName(location: fhir.Location): Promise<string> {
+  const partOf = location.partOf as fhir.Reference
+  const reference = partOf.reference as string
+  const splitRef = reference.split('/')
+  const parentResponse = await getFromFhir(`/Location/${splitRef[1]}`)
+  return parentResponse.name
+}
+
+async function matchAndAssignGeoData(
+  fhirLocations: fhir.Location[],
+  features: Feature[],
   label: string
 ) {
   // tslint:disable-next-line:no-console
   console.log(`Parsing Geo Data for ${label}`)
-  return fhirLocations.map((location: any) => {
-    const matchingFeature = features.find(
-      (feature: any) =>
-        feature.properties.Name.trim().toLowerCase() ===
-        location.name.trim().toLowerCase()
+  const containsDuplicate = checkDuplicate('name', fhirLocations)
+  const mappedLocations: fhir.Location[] = []
 
-      // TODO:
-      /*
+  for (const location of fhirLocations) {
+    let matchingFeature
+    const locationName = location.name as string
+    if (!containsDuplicate) {
+      matchingFeature = features.find((feature: Feature) => {
+        const geoProps = feature.properties as GeoJsonProperties
+        if (!geoProps) {
+          throw Error('Map contains no geometry')
+        }
+        return (
+          geoProps.Name.trim().toLowerCase() ===
+          locationName.trim().toLowerCase()
+        )
+      })
+    } else {
+      const parentLocationName = await getParentName(location)
 
-        We will need to rework applying the map to the location.  Currently we just check the name,
-        but there are 3 upazilas called Kaliganj in Bangladesh.
-
-        So, we need to check the location to see if it has a parent, get the name of the parent from FHIR,
-        then check if the name and the name of the parent match
-        */
-    )
+      matchingFeature = features.find((feature: Feature) => {
+        const geoProps = feature.properties as GeoJsonProperties
+        if (!geoProps) {
+          throw Error('Map contains no geometry')
+        }
+        return (
+          geoProps.ADM2_EN.trim().toLowerCase() ===
+            parentLocationName.toLowerCase() &&
+          geoProps.Name.trim().toLowerCase() ===
+            locationName.trim().toLowerCase()
+        )
+      })
+    }
 
     if (!matchingFeature) {
       // tslint:disable-next-line:no-console
-      console.log(`${chalk.yellow('Warning:')} No match for ${location.name}`)
-      return location
+      console.log(
+        `${chalk.red(
+          'Warning:'
+        )} No map can be found that confidently matches: ${location.name}`
+      )
+    } else {
+      const extensions = location.extension as fhir.Extension[]
+      const mapDataExtension = extensions[0] as fhir.Extension
+      const valueAttachment = mapDataExtension.valueAttachment as fhir.Attachment
+      valueAttachment.data = Buffer.from(
+        JSON.stringify(matchingFeature)
+      ).toString('base64')
+
+      mappedLocations.push(location)
     }
-
-    location.extension[0].valueAttachment.data = Buffer.from(
-      JSON.stringify(matchingFeature)
-    ).toString('base64')
-
-    return location
-  })
+  }
+  return mappedLocations
 }
 
 const mapGeo = {

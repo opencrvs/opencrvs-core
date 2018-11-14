@@ -2,7 +2,7 @@ import {
   fetchAndComposeLocations,
   getLocationsByParentDivisions
 } from './service'
-import { logger } from '../../../logger'
+import chalk from 'chalk'
 import { internal } from 'boom'
 import * as fs from 'fs'
 import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
@@ -17,44 +17,74 @@ export default async function importAdminStructure() {
   let unions: fhir.Location[]
   let municipalities: fhir.Location[]
   let municipalityWards: fhir.Location[]
+  // tslint:disable-next-line:no-console
+  console.log(
+    `${chalk.yellow(
+      'Fetching locations from the OISF/A2I database, this will take some time, please wait ....'
+    )}`
+  )
+  // tslint:disable-next-line:no-console
+  console.log(
+    `${chalk.red(
+      '/////////////////////////// THIS MAY TAKE 10 MINUTES /////////////////////////////'
+    )}`
+  )
 
   try {
-    logger.info('getting divisions')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} divisions. Please wait ....`
+    )
     divisions = await fetchAndComposeLocations('division', '0')
   } catch (err) {
     return internal(err)
   }
 
   try {
-    logger.info('getting districts')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} districts. Please wait ....`
+    )
     districts = await getLocationsByParentDivisions('district', divisions)
   } catch (err) {
     return internal(err)
   }
 
   try {
-    logger.info('getting upazilas')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} upazilas. Please wait ....`
+    )
     upazilas = await getLocationsByParentDivisions('upazila', districts)
   } catch (err) {
     return internal(err)
   }
 
   try {
-    logger.info('getting thanas')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} thanas. Please wait ....`
+    )
     thanas = await getLocationsByParentDivisions('thana', districts)
   } catch (err) {
     return internal(err)
   }
 
   try {
-    logger.info('getting cities')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} cities. Please wait ....`
+    )
     cities = await getLocationsByParentDivisions('citycorporation', districts)
   } catch (err) {
     return internal(err)
   }
 
   try {
-    logger.info('getting city wards')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} city wards. Please wait ....`
+    )
     cityWards = await getLocationsByParentDivisions(
       'citycorporationward',
       cities
@@ -64,14 +94,20 @@ export default async function importAdminStructure() {
   }
 
   try {
-    logger.info('getting unions')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} unions. Please wait ....`
+    )
     unions = await getLocationsByParentDivisions('union', upazilas)
   } catch (err) {
     return internal(err)
   }
 
   try {
-    logger.info('getting municipalities')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Fetching from A2I:')} municipalities. Please wait ....`
+    )
     municipalities = await getLocationsByParentDivisions(
       'municipality',
       upazilas
@@ -81,7 +117,12 @@ export default async function importAdminStructure() {
   }
 
   try {
-    logger.info('getting municipality wards')
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow(
+        'Fetching from A2I:'
+      )} municipality wards. Please wait ....`
+    )
     municipalityWards = await getLocationsByParentDivisions(
       'municipalityward',
       municipalities
@@ -134,7 +175,6 @@ export default async function importAdminStructure() {
     `${ADMIN_STRUCTURE_SOURCE}locations/municipalityWards.json`,
     JSON.stringify({ municipalityWards }, null, 2)
   )
-
   return true
 }
 
