@@ -4,7 +4,6 @@ import * as Inert from 'inert'
 import * as Vision from 'vision'
 import * as JWT from 'hapi-auth-jwt2'
 import * as HapiI18n from 'hapi-i18n'
-import { logger } from 'src/logger'
 import { DEFAULT_LOCALE } from '../constants'
 
 export default function getPlugins() {
@@ -43,9 +42,6 @@ export default function getPlugins() {
       options: {
         locales: ['bn', 'en'],
         directory: __dirname + '/../i18n/locales',
-        logErrorFn: (error: string) => {
-          logger.error(error)
-        },
         defaultLocale: DEFAULT_LOCALE,
         languageHeaderField: 'locale'
       }

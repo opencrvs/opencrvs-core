@@ -11,7 +11,7 @@ export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
-    throw new Error('Invalid FHIR bundle found for declration')
+    throw new Error('Invalid FHIR bundle found for declaration')
   }
 
   const compositionResource = fhirBundle.entry[0].resource as fhir.Composition

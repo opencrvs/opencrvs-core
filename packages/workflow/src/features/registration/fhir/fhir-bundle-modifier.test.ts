@@ -19,7 +19,7 @@ describe('Verify pushTrackingId function', () => {
   it('Throws error if invalid fhir bundle is provided', () => {
     const invalidData = { ...sampleFhirBundle, entry: [] }
     expect(() => pushTrackingId(invalidData)).toThrowError(
-      'Invalid FHIR bundle found for declration'
+      'Invalid FHIR bundle found for declaration'
     )
   })
 
