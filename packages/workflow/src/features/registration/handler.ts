@@ -2,7 +2,7 @@ import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
-import { pushTrackingId } from './fhir/fhir-doc-modifier'
+import { pushTrackingId } from './fhir/fhir-bundle-modifier'
 import { sendBirthNotification } from './utils'
 import { getTrackingId } from './fhir/fhir-utils'
 
@@ -28,16 +28,7 @@ export default async function submitBirthDeclarationHandler(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
   }
-  const resBody = await res.json()
-  if (
-    !resBody ||
-    !resBody.entry ||
-    !resBody.entry[0] ||
-    !resBody.entry[0].response ||
-    !resBody.entry[0].response.location
-  ) {
-    throw new Error(`FHIR response did not send a valid response`)
-  }
+
   /* sending notification to the contact */
   sendBirthNotification(payload, {
     Authorization: request.headers['authorization']

@@ -33,7 +33,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
     !sharedContact.valueString ||
     Object.keys(CONTACT).indexOf(sharedContact.valueString.toUpperCase()) < 0
   ) {
-    throw new Error("Informant's shared contact information missing")
+    throw new Error("Invalid Informant's shared contact information found")
   }
 
   const contact = findPersonEntry(

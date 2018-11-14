@@ -1,9 +1,16 @@
 import { generateBirthTrackingId } from '../utils'
 import { selectOrCreateTaskRefResource } from './fhir-template'
+import { OPENCRVS_SPECIFICATION_URL } from './constants'
 
 export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   const birthTrackingId = generateBirthTrackingId()
-  if (!fhirBundle || !fhirBundle.entry || !fhirBundle.entry[0].resource) {
+
+  if (
+    !fhirBundle ||
+    !fhirBundle.entry ||
+    !fhirBundle.entry[0] ||
+    !fhirBundle.entry[0].resource
+  ) {
     throw new Error('Invalid FHIR bundle found for declration')
   }
 
@@ -25,7 +32,7 @@ export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
     taskResource.identifier = []
   }
   taskResource.identifier.push({
-    system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
     value: birthTrackingId
   })
 
