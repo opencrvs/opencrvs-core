@@ -54,7 +54,7 @@ describe('Registration root resolvers', () => {
         // @ts-ignore
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError(
-        'Workflow post to /submitBirthDeclaration failed with [401] body: Boom!'
+        'Workflow post to /createBirthRegistration failed with [401] body: Boom!'
       )
     })
 

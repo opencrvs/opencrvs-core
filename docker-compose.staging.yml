@@ -73,7 +73,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - DEFAULT_LOCALE=bn
+      - LANGUANGE=bn
 
   gateway:
     secrets:

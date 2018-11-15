@@ -6,7 +6,7 @@ import {
 import { pushTrackingId } from './fhir/fhir-bundle-modifier'
 import { logger } from '../../logger'
 import * as fetch from 'jest-fetch-mock'
-import { sampleFhirBundle } from './fhir/constants'
+import { testFhirBundle } from 'src/test/utils'
 
 describe('Verify utility functions', () => {
   it('Generates proper birth tracking id successfully', async () => {
@@ -26,7 +26,7 @@ describe('Verify utility functions', () => {
   })
 
   it('send Birth notification successfully', async () => {
-    const fhirBundle = pushTrackingId(sampleFhirBundle)
+    const fhirBundle = pushTrackingId(testFhirBundle)
     expect(
       sendBirthNotification(fhirBundle, { Authorization: 'bearer acd ' })
     ).toBeDefined()
@@ -36,7 +36,7 @@ describe('Verify utility functions', () => {
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
-    sendBirthNotification(sampleFhirBundle, { Authorization: 'bearer acd ' })
+    sendBirthNotification(testFhirBundle, { Authorization: 'bearer acd ' })
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
     )

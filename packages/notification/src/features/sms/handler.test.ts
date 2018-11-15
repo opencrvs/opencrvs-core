@@ -109,7 +109,7 @@ describe('Verify handlers', () => {
       },
       headers: {
         Authorization: `Bearer ${token}`,
-        locale: 'en' // default is bn
+        language: 'en' // default is bn
       }
     })
 

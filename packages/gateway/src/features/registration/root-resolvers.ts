@@ -30,18 +30,21 @@ export const resolvers: GQLResolver = {
     async createBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)
 
-      const res = await fetch(`${WORKFLOW_SERVICE_URL}submitBirthDeclaration`, {
-        method: 'POST',
-        body: JSON.stringify(doc),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
+      const res = await fetch(
+        `${WORKFLOW_SERVICE_URL}createBirthRegistration`,
+        {
+          method: 'POST',
+          body: JSON.stringify(doc),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
         }
-      })
+      )
 
       if (!res.ok) {
         throw new Error(
-          `Workflow post to /submitBirthDeclaration failed with [${
+          `Workflow post to /createBirthRegistration failed with [${
             res.status
           }] body: ${await res.text()}`
         )

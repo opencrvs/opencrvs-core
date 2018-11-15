@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 import { createServer } from '../..'
-import { sampleFhirBundle } from './fhir/constants'
+import { testFhirBundle } from 'src/test/utils'
 
 describe('Verify handler', () => {
   let server: any
@@ -11,7 +11,7 @@ describe('Verify handler', () => {
     fetch.resetMocks()
     server = await createServer()
   })
-  it('submitBirthDeclarationHandler returns OK', async () => {
+  it('createBirthRegistrationHandler returns OK', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
         resourceType: 'Bundle',
@@ -36,15 +36,15 @@ describe('Verify handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/submitBirthDeclaration',
-      payload: sampleFhirBundle,
+      url: '/createBirthRegistration',
+      payload: testFhirBundle,
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
     expect(res.statusCode).toBe(200)
   })
-  it('submitBirthDeclarationHandler throws error if invalid fhir data is provided', async () => {
+  it('createBirthRegistrationHandler throws error if invalid fhir data is provided', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
         resourceType: 'Bundle',
@@ -68,7 +68,7 @@ describe('Verify handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/submitBirthDeclaration',
+      url: '/createBirthRegistration',
       payload: { data: 'INVALID' },
       headers: {
         Authorization: `Bearer ${token}`

@@ -1,4 +1,4 @@
-import { sampleFhirBundle } from './constants'
+import { testFhirBundle } from 'src/test/utils'
 import {
   getSharedContactMsisdn,
   getInformantName,
@@ -9,7 +9,7 @@ import { cloneDeep } from 'lodash'
 
 describe('Verify getSharedContactMsisdn', () => {
   it('Returned shared contact number properly', () => {
-    const phoneNumber = getSharedContactMsisdn(sampleFhirBundle)
+    const phoneNumber = getSharedContactMsisdn(testFhirBundle)
     expect(phoneNumber).toEqual('+8801622688231')
   })
 
@@ -23,7 +23,7 @@ describe('Verify getSharedContactMsisdn', () => {
   })
 
   it('Throws error when invalid shared contact info given', () => {
-    const fhirBundle = cloneDeep(sampleFhirBundle)
+    const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'INVALID'
     expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
       "Invalid Informant's shared contact information found"
@@ -31,7 +31,7 @@ describe('Verify getSharedContactMsisdn', () => {
   })
 
   it('Throws error when telecom is missing for shared contact', () => {
-    const fhirBundle = cloneDeep(sampleFhirBundle)
+    const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'FATHER'
     expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
       "Didn't find any contact point for informant's shared contact"
@@ -39,7 +39,7 @@ describe('Verify getSharedContactMsisdn', () => {
   })
 
   it('Throws error when phonenumber is missing for shared contact', () => {
-    const fhirBundle = cloneDeep(sampleFhirBundle)
+    const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[3].resource.telecom = []
     expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
       "Didn't find any phone number for informant's shared contact"
@@ -49,7 +49,7 @@ describe('Verify getSharedContactMsisdn', () => {
 
 describe('Verify getInformantName', () => {
   it('Returned informant name properly', () => {
-    const informantName = getInformantName(sampleFhirBundle)
+    const informantName = getInformantName(testFhirBundle)
     expect(informantName).toEqual('অনিক অনিক')
   })
 
@@ -63,7 +63,7 @@ describe('Verify getInformantName', () => {
   })
 
   it('Throws error when chlid name section is missing', () => {
-    const fhirBundle = cloneDeep(sampleFhirBundle)
+    const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = undefined
     expect(() => getInformantName(fhirBundle)).toThrowError(
       "Didn't find informant's name information"
@@ -71,7 +71,7 @@ describe('Verify getInformantName', () => {
   })
 
   it("Throws error when chlid's traditional name block is missing", () => {
-    const fhirBundle = cloneDeep(sampleFhirBundle)
+    const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = []
     expect(() => getInformantName(fhirBundle)).toThrowError(
       "Didn't found informant's traditional name"
@@ -81,7 +81,7 @@ describe('Verify getInformantName', () => {
 
 describe('Verify getTrackingId', () => {
   it('Returned tracking id properly', () => {
-    const trackingid = getTrackingId(pushTrackingId(sampleFhirBundle))
+    const trackingid = getTrackingId(pushTrackingId(testFhirBundle))
     expect(trackingid).toMatch(/^B/)
     expect(trackingid.length).toBe(7)
   })

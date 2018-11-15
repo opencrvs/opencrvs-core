@@ -4,7 +4,7 @@ import * as Inert from 'inert'
 import * as Vision from 'vision'
 import * as JWT from 'hapi-auth-jwt2'
 import * as HapiI18n from 'hapi-i18n'
-import { DEFAULT_LOCALE } from '../constants'
+import { LANGUANGE } from '../constants'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -42,8 +42,8 @@ export default function getPlugins() {
       options: {
         locales: ['bn', 'en'],
         directory: __dirname + '/../i18n/locales',
-        defaultLocale: DEFAULT_LOCALE,
-        languageHeaderField: 'locale'
+        defaultLocale: LANGUANGE,
+        languageHeaderField: 'language'
       }
     }
   ]

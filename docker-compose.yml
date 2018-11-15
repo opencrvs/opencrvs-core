@@ -75,6 +75,6 @@ services:
     build: packages/notification
     restart: unless-stopped
      environment:      
-      - DEFAULT_LOCALE=bn
+      - LANGUANGE=bn
     deploy:
       replicas: 2

@@ -1,4 +1,4 @@
-import submitBirthDeclarationHandler from '../features/registration/handler'
+import createBirthRegistrationHandler from '../features/registration/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -21,8 +21,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/submitBirthDeclaration',
-      handler: submitBirthDeclarationHandler,
+      path: '/createBirthRegistration',
+      handler: createBirthRegistrationHandler,
       config: {
         tags: ['api'],
         description:

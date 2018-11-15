@@ -5,7 +5,7 @@ import { pushTrackingId } from './fhir/fhir-bundle-modifier'
 import { sendBirthNotification } from './utils'
 import { getTrackingId } from './fhir/fhir-utils'
 
-export default async function submitBirthDeclarationHandler(
+export default async function createBirthRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
