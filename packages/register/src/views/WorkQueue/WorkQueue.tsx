@@ -35,22 +35,23 @@ const FETCH_REGISTRATION_QUERY = gql`
       id
       registration {
         trackingId
-        status {
-          user {
-            firstName
-            lastName
-            role {
-              type
-            }
-          }
-          location {
-            name
-            alias
-          }
-        }
+        # status {
+        #   user {
+        #     firstName
+        #     lastName
+        #     role {
+        #       type
+        #     }
+        #   }
+        #   location {
+        #     name
+        #     alias
+        #   }
+        # }
       }
       child {
         name {
+          use
           firstNames
           familyName
         }
