@@ -68,6 +68,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       <>
         <HomeViewHeader>
           <ViewHeading
+            id="work_queue_view"
             title="Hello Registrar"
             description="Review | Registration | Certification"
             {...this.props}
@@ -75,6 +76,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         </HomeViewHeader>
         <Container>
           <StyledIconAction
+            id="new_registration"
             icon={() => <StyledPlusIcon />}
             title={intl.formatMessage(messages.newRegistration)}
           />
