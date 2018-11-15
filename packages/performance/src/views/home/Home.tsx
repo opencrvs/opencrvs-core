@@ -40,6 +40,7 @@ const StyledHeader = styled(Header)`
 const BoxTitle = styled.div`
   height: 25px;
   line-height: 25px;
+  text-transform: capitalize !important;
   ${({ theme }) => theme.fonts.h2FontStyle}
   color: ${({ theme }) => theme.colors.primary};
 `
