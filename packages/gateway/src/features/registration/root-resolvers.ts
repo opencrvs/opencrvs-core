@@ -1,12 +1,7 @@
 import fetch from 'node-fetch'
-
-import { fhirUrl } from 'src/constants'
+import { fhirUrl, WORKFLOW_SERVICE_URL } from 'src/constants'
 import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
-import {
-  pushTrackingId,
-  sendBirthNotification
-} from './gateway-plugin/birth-declaration-helper'
 
 const statusMap = {
   declared: 'preliminary',
@@ -33,47 +28,34 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      /* temporary changes - this needs to be part of gateway-plugin module */
-      details = await pushTrackingId(details)
+      const doc = await buildFHIRBundle(details)
 
-      const doc = await buildFHIRBundle(
-        details,
-        details.registration && details.registration.trackingId
-      )
-
-      const res = await fetch(fhirUrl, {
-        method: 'POST',
-        body: JSON.stringify(doc),
-        headers: {
-          'Content-Type': 'application/fhir+json',
-          ...authHeader
+      const res = await fetch(
+        `${WORKFLOW_SERVICE_URL}createBirthRegistration`,
+        {
+          method: 'POST',
+          body: JSON.stringify(doc),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
         }
-      })
+      )
 
       if (!res.ok) {
         throw new Error(
-          `FHIR post to /fhir failed with [${
+          `Workflow post to /createBirthRegistration failed with [${
             res.status
           }] body: ${await res.text()}`
         )
       }
 
       const resBody = await res.json()
-      if (
-        !resBody ||
-        !resBody.entry ||
-        !resBody.entry[0] ||
-        !resBody.entry[0].response ||
-        !resBody.entry[0].response.location
-      ) {
-        throw new Error(`FHIR response did not send a valid response`)
+      if (!resBody || !resBody.trackingid) {
+        throw new Error(`Workflow response did not send a valid response`)
       }
-
-      /* temporary changes - this needs to be part of gateway-ext module */
-      sendBirthNotification(details, authHeader)
-
-      // return the Composition's id
-      return details.registration && details.registration.trackingId
+      // return the trackingid
+      return resBody.trackingid
     }
   }
 }

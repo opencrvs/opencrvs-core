@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import {
   StatusGreen,
   StatusOrange,
@@ -43,25 +43,39 @@ export interface IListItemProps {
 interface IListItemState {
   expanded: boolean
 }
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+
 const Wrapper = styled.div.attrs<{ expanded?: boolean }>({})`
   width: 100%;
   margin-bottom: 1px;
+  transition: border-top 300ms;
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 22px 0 rgba(0,0,0,0.23)` : ``};
 
   &:last-child {
     margin-bottom: 0;
   }
+  border-top: ${({ expanded, theme }) =>
+    expanded ? ` 4px solid ${theme.colors.expandedIndicator}` : `0`};
 `
-const ExpandedIndicator = styled.div`
-  height: 4px;
-  border-radius: 1px 1px 0 0;
-  background: linear-gradient(
-    ${({ theme }) => theme.colors.expandedIndicator},
-    ${({ theme }) => theme.colors.expandedIndicatorSecondary}
-  );
-  margin-top: 2px;
+const ExpandedCellContent = styled.div`
+  animation: ${fadeIn} 500ms;
 `
+const ExpandedCellContainer = styled.div.attrs<{ expanded: boolean }>({})`
+  overflow: hidden;
+  transition: max-height 600ms;
+  max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
+  /* stylelint-disable */
+  ${ExpandedCellContent} {
+    /* stylelint-enable */
+    animation: ${fadeIn} 500ms;
+  }
+`
+
 const ListItemContainer = styled.li`
   display: flex;
   flex-flow: row wrap;
@@ -151,7 +165,6 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
     const { expanded } = this.state
     return (
       <Wrapper key={index} expanded={expanded}>
-        {expanded && <ExpandedIndicator />}
         <ListItemContainer key={index}>
           <ListContentContainer onClick={this.toggleExpanded}>
             <InfoDiv>
@@ -175,10 +188,19 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
           <ListItemAction
             actions={actions}
             expanded={expanded}
-            onExpand={this.toggleExpanded}
+            onExpand={
+              this.props.expandedCellRenderer ? this.toggleExpanded : undefined
+            }
           />
         </ListItemContainer>
-        {expanded && this.props.expandedCellRenderer(itemData, index)}
+
+        <ExpandedCellContainer expanded={expanded}>
+          {expanded && (
+            <ExpandedCellContent>
+              {this.props.expandedCellRenderer(itemData, index)}
+            </ExpandedCellContent>
+          )}
+        </ExpandedCellContainer>
       </Wrapper>
     )
   }

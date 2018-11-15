@@ -17,19 +17,29 @@ export type ISearchInputProps = ISerachInputCustomProps &
 
 const SearchContainer = styled.div`
   width: 100%;
-  height: 60px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  padding: 10px ${({ theme }) => theme.grid.margin}px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.white};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   display: flex;
   align-items: center;
   justify-content: center;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-wrap: wrap;
+  }
 `
+const SearchIconAndInput = styled.div`
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+`
+
 const SearchButton = styled(PrimaryButton)`
-  padding: 12px 20px;
+  align-items: center;
+  justify-content: center;
   background: ${({ theme }) => theme.colors.secondary};
   font-weight: bold;
+  margin: 0 5px;
   &:hover {
     background: linear-gradient(
       ${({ theme }) => theme.colors.headerGradientDark},
@@ -42,12 +52,22 @@ const SearchButton = styled(PrimaryButton)`
 
 const SearchIcon = styled(Search)`
   margin-bottom: 5px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    display: none;
+  }
+`
+const StyledSearchButton = styled(SearchButton)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 5px;
+    flex: 1;
+  }
 `
 const StyledInput = styled.input.attrs<ISearchInputProps>({})`
-  flex-grow: 1;
+  flex: 1;
   padding: 5px 15px 5px 5px;
   margin: 0 20px 0 10px;
   min-height: 30px;
+  min-width: 0px;
   transition: border-color 500ms ease-out;
   border: 0px solid;
   border-bottom: solid 1px ${({ theme }) => theme.colors.secondary};
@@ -87,7 +107,6 @@ const StyledInput = styled.input.attrs<ISearchInputProps>({})`
     text-align: center;
   }
 `
-
 interface IState {
   searchText: string
 }
@@ -134,14 +153,19 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
     const value = this.state.searchText
     return (
       <SearchContainer>
-        <SearchIcon />
-        <StyledInput
-          onChange={this.change}
-          value={value}
-          innerRef={this.$element}
-          {...this.props}
-        />
-        <SearchButton onClick={this.submit}> {buttonLabel}</SearchButton>
+        <SearchIconAndInput>
+          <SearchIcon />
+          <StyledInput
+            onChange={this.change}
+            value={value}
+            innerRef={this.$element}
+            {...this.props}
+          />
+        </SearchIconAndInput>
+        <StyledSearchButton onClick={this.submit}>
+          {' '}
+          {buttonLabel}
+        </StyledSearchButton>
       </SearchContainer>
     )
   }
