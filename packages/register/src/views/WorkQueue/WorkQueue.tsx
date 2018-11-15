@@ -27,6 +27,11 @@ const messages = defineMessages({
     id: 'register.workQueue.applications.banner',
     defaultMessage: 'Applications to register in your area',
     description: 'The title of the banner'
+  },
+  newRegistration: {
+    id: 'register.workQueue.buttons.newRegistration',
+    defaultMessage: 'New registration',
+    description: 'The title of new registration button'
   }
 })
 
@@ -70,7 +75,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         <Container>
           <StyledIconAction
             icon={() => <StyledPlusIcon />}
-            title="New registration"
+            title={intl.formatMessage(messages.newRegistration)}
           />
           <Banner text={intl.formatMessage(messages.bannerTitle)} count={15} />
           <SearchInput
