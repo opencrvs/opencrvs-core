@@ -39,22 +39,17 @@ const StyledHeader = styled(Header)`
 
 const BoxTitle = styled.div`
   height: 25px;
-  font-weight: 300;
-  font-size: 24px;
   line-height: 25px;
+  ${({ theme }) => theme.fonts.h2FontStyle}
   color: ${({ theme }) => theme.colors.primary};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
 `
 
 const FooterText = styled.div`
   height: 17px;
-  font-weight: 300;
-  font-size: 12px;
   line-height: 17px;
-  margin-top: 30px;
-  margin-bottom: 25px;
+  margin-top: 25px;
+  ${({ theme }) => theme.fonts.infoFontStyle}
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
 `
 
 const ChartContainer = styled(Box)`
