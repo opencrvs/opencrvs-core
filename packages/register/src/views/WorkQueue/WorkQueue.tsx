@@ -4,6 +4,8 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled from 'styled-components'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
+import { IconAction, ActionTitle } from '@opencrvs/components/lib/buttons'
+import { Plus } from '@opencrvs/components/lib/icons'
 import {
   Banner,
   SearchInput,
@@ -31,8 +33,25 @@ const messages = defineMessages({
 const Container = styled.div`
   z-index: 1;
   position: relative;
-  margin-top: -70px;
+  margin-top: -30px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
+`
+const StyledPlusIcon = styled(Plus)`
+  display: flex;
+  margin-left: -23px;
+`
+const StyledIconAction = styled(IconAction)`
+  display: flex;
+  min-height: 96px;
+  padding: 0 20px 0 0;
+  box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
+  background-color: ${({ theme }) => theme.colors.accentLight};
+  /* stylelint-disable */
+  ${ActionTitle} {
+    /* stylelint-enable */
+    margin: -2px 0 -2px 130px;
+    color: ${({ theme }) => theme.colors.white};
+  }
 `
 type IWorkQueueProps = InjectedIntlProps & IViewHeadingProps & ISearchInputProps
 
@@ -49,6 +68,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
           />
         </HomeViewHeader>
         <Container>
+          <StyledIconAction
+            icon={() => <StyledPlusIcon />}
+            title="New registration"
+          />
           <Banner text={intl.formatMessage(messages.bannerTitle)} count={15} />
           <SearchInput
             placeholder={intl.formatMessage(messages.searchInputPlaceholder)}

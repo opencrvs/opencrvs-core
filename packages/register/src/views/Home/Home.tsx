@@ -48,20 +48,20 @@ const messages = defineMessages({
 })
 
 const StyledPlusIcon = styled(Plus)`
-  max-width: 120px;
   display: flex;
-  height: 100%;
-  background-color: rgb(94, 147, 237);
+  margin-left: -23px;
 `
 const StyledIconAction = styled(IconAction)`
-  height: 100%;
-  padding: 0px;
-  padding-right: 15px;
-  position: relative;
+  display: flex;
+  min-height: 96px;
+  padding: 0 20px 0 0;
+  margin-bottom: 30px;
+  box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
+
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
-    margin: -2px 0 -2px 130px;
+    margin: -2px 0 -2px 120px;
   }
 `
 
