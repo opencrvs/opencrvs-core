@@ -76,9 +76,9 @@ class HomeView extends React.Component<InjectedIntlProps> {
         </StyledHeader>
         <Container>
           <ChartContainer>
-            <BoxTitle>{boxTitle}</BoxTitle>
+            <BoxTitle id="box_title">{boxTitle}</BoxTitle>
             <Legend data={data} />
-            <FooterText>{footerText}</FooterText>
+            <FooterText id="footer_text">{footerText}</FooterText>
           </ChartContainer>
         </Container>
       </Page>
