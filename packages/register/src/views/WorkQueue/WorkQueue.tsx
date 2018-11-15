@@ -54,7 +54,8 @@ const StyledIconAction = styled(IconAction)`
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
-    margin: -2px 0 -2px 130px;
+    margin: -2px 0 -2px 120px;
+    line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
 `

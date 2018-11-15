@@ -61,6 +61,7 @@ const StyledIconAction = styled(IconAction)`
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
+    line-height: 1.3em;
     margin: -2px 0 -2px 120px;
   }
 `
