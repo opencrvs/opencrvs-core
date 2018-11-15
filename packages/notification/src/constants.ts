@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 export const HOST = process.env.AUTH_HOST || 'localhost'
 export const PORT = process.env.AUTH_PORT || 2020
 
-export const LANGUANGE = process.env.LANGUANGE || 'bn'
+export const LANGUAGE = process.env.LANGUAGE || 'bn'
 /* 
   For these locales sms content will not be sent as unicoded payload 
   In future based on our experience on different countries we can add more locals here
