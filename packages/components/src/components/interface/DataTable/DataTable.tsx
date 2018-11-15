@@ -11,6 +11,7 @@ import {
 } from '../SelectGroup'
 
 import { ISortAndFilterItem, IInputLabel } from './SortAndFilter'
+import { IDynamicValues } from 'src/components/common-types'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -30,10 +31,6 @@ const ResultsText = styled.div`
   margin: 10px 0;
   line-height: 22px;
 `
-
-export interface IDynamicValues {
-  [key: string]: string
-}
 
 type CustomSelectGroupProp = Omit<ISelectGroupProps, 'onChange' | 'values'>
 

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled from 'styled-components'
+import * as moment from 'moment'
 import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   Banner,
@@ -17,7 +18,8 @@ import {
   GQLBirthRegistration,
   GQLRegWorkflow,
   GQLLocation,
-  GQLHumanName
+  GQLHumanName,
+  GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   StatusGray,
@@ -149,45 +151,67 @@ const filterBy = {
 }
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
-  transformData = (data: GQLBirthRegistration[]) => {
-    console.log(data)
-    return data.map((reg: GQLBirthRegistration) => {
-      if (
-        !reg.child ||
-        !reg.child.name ||
-        !reg.registration ||
-        !reg.registration.status ||
-        reg.registration.status[0] !== null ||
-        !(reg.registration.status[0] as GQLRegWorkflow).location
-      ) {
-        throw new Error('Invalid registration')
-      }
+  getDeclarationStatusIcon = (status: string) => {
+    switch (status) {
+      case 'application':
+        return <StatusOrange />
+      case 'registered':
+        return <StatusGreen />
+      case 'collected':
+        return <StatusCollected />
+      default:
+        return <StatusOrange />
+    }
+  }
 
-      const names = reg.child.name as GQLHumanName[]
+  transformData = (data: GQLQuery) => {
+    if (!data.listBirthRegistrations) {
+      return []
+    }
+
+    return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
+      const names = (reg.child && (reg.child.name as GQLHumanName[])) || []
       const namesMap = names.reduce((prevNamesMap, name) => {
-        if (!name || !name.use) {
+        if (!name) {
           return prevNamesMap
         }
+        if (!name.use) {
+          prevNamesMap['default'] = `${name.firstNames} ${
+            name.familyName
+          }`.trim()
+          return prevNamesMap
+        }
+
         prevNamesMap[name.use] = `${name.firstNames} ${name.familyName}`.trim()
         return prevNamesMap
       }, {})
 
       return {
-        name: namesMap['english'] as string,
-        dob: reg.child.birthDate as string,
-        date_of_application: reg.createdAt as string, // ??
-        tracking_id: reg.registration.trackingId as string,
+        name:
+          (namesMap['english'] as string) || // needs to read language in use
+          (namesMap['default'] as string) ||
+          '',
+        dob: (reg.child && reg.child.birthDate) || '',
+        date_of_application: moment(reg.createdAt).fromNow(), // ??
+        tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
-        declaration_status: (reg.registration.status[0] as GQLRegWorkflow)
-          .type as string,
+        declaration_status:
+          (reg.registration &&
+            reg.registration.status &&
+            (reg.registration.status[0] as GQLRegWorkflow).type) ||
+          'application', // TODO
         event: 'birth',
-        location: ((reg.registration.status[0] as GQLRegWorkflow)
-          .location as GQLLocation).name as string
+        location:
+          (reg.registration &&
+            reg.registration.status &&
+            ((reg.registration.status[0] as GQLRegWorkflow)
+              .location as GQLLocation).name) ||
+          ''
       }
     })
   }
 
-  renderCell(item: { [key: string]: string }, key: number): JSX.Element {
+  renderCell = (item: { [key: string]: string }, key: number): JSX.Element => {
     const info = []
     const status = []
 
@@ -215,6 +239,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 
   render() {
     const { intl } = this.props
+
     return (
       <>
         <HomeViewHeader>
@@ -236,11 +261,13 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                 throw new Error(`Error! ${error.message}`)
               }
 
+              const transformedData = this.transformData(data)
+
               return (
                 <>
                   <Banner
                     text={intl.formatMessage(messages.bannerTitle)}
-                    count={15}
+                    count={transformedData.length}
                   />
                   <SearchInput
                     placeholder={intl.formatMessage(
@@ -252,7 +279,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                     {...this.props}
                   />
                   <DataTable
-                    data={this.transformData(data)}
+                    data={transformedData}
                     sortBy={sortBy}
                     filterBy={filterBy}
                     cellRenderer={this.renderCell}
@@ -266,19 +293,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         </Container>
       </>
     )
-  }
-
-  private getDeclarationStatusIcon = (status: string) => {
-    switch (status) {
-      case 'application':
-        return <StatusOrange />
-      case 'registered':
-        return <StatusGreen />
-      case 'collected':
-        return <StatusCollected />
-      default:
-        return <StatusOrange />
-    }
   }
 }
 

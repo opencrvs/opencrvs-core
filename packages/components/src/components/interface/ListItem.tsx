@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
+import { IDynamicValues } from '../common-types'
 
 export interface IInfo {
   label: string
@@ -9,10 +10,6 @@ export interface IInfo {
 export interface IStatus {
   icon: JSX.Element
   label: string
-}
-
-export interface IDynamicValues {
-  [key: string]: string
 }
 
 export interface IListItemProps {
