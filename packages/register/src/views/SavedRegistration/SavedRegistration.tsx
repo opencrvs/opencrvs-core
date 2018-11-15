@@ -229,7 +229,7 @@ class SavedRegistrationView extends React.Component<
             <TrackingHeader>
               {intl.formatMessage(messages.trackingCardTitle)}
             </TrackingHeader>
-            <TrackingNumber>
+            <TrackingNumber id="trackingIdViewer">
               {history &&
                 history.location &&
                 history.location.state &&
