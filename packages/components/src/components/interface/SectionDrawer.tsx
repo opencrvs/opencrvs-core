@@ -7,7 +7,6 @@ const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 12px 0 rgba(0, 0, 0, 0.11)` : ``};
 `
-
 const TitleContainer = styled.div`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
@@ -19,15 +18,11 @@ const Title = styled.div`
   width: 100vw;
   padding: 25px;
 `
-
 const EditLink = styled.a`
   color: ${({ theme }) => theme.colors.accent};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   text-decoration: underline;
   cursor: pointer;
-`
-const ExpandedSection = styled.div`
-  transition: 1s;
 `
 const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
   height: 4px;
@@ -35,7 +30,6 @@ const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
   background: ${({ theme, expanded }) =>
     expanded === true ? theme.colors.expandedIndicator : 'none'};
 `
-
 const Seperator = styled.span`
   color: ${({ theme }) => theme.colors.background};
   margin: 0px 15px;
@@ -43,7 +37,6 @@ const Seperator = styled.span`
     content: '|';
   }
 `
-
 interface IProps {
   title: string
   linkText: string
@@ -108,7 +101,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
             />
           )}
         </TitleContainer>
-        <ExpandedSection>{this.state.isExpanded && children}</ExpandedSection>
+        <div>{this.state.isExpanded && children}</div>
       </SectionDrawerContainer>
     )
   }
