@@ -4,7 +4,8 @@ import {
   HOME,
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
-  DRAFT_BIRTH_PARENT_FORM
+  DRAFT_BIRTH_PARENT_FORM,
+  WORK_QUEUE
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -240,6 +241,19 @@ describe('when user has a valid token in local storage', () => {
     })
   })
 
+  describe('when user is in work queue view', () => {
+    beforeEach(() => {
+      history.replace(WORK_QUEUE)
+      app.update()
+    })
+
+    it('work queue view renders without crashing', () => {
+      expect(app.find('#work_queue_view').hostNodes()).toHaveLength(1)
+    })
+    it('new registration button renders without crashing', () => {
+      expect(app.find('#new_registration').hostNodes()).toHaveLength(1)
+    })
+  })
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
     beforeEach(() => {
