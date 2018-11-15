@@ -122,13 +122,13 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       if (deleteIndex >= 0) {
         state.drafts.splice(deleteIndex, 1)
       }
-      const stateAfterDrafDeletion = {
+      const stateAfterDraftDeletion = {
         ...state,
         drafts: state.drafts
       }
       return loop(
-        stateAfterDrafDeletion,
-        Cmd.action(writeDraft(stateAfterDrafDeletion))
+        stateAfterDraftDeletion,
+        Cmd.action(writeDraft(stateAfterDraftDeletion))
       )
     case MODIFY_DRAFT:
       const stateAfterDraftModification = {
