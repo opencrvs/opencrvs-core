@@ -28,14 +28,6 @@ const LegendItemBase = styled.div`
   &::after {
     content: ':';
   }
-  &::before {
-    box-sizing: border-box;
-    width: 25px;
-    height: 8px;
-    display: block;
-    margin-bottom: 6px;
-    content: '';
-  }
 `
 const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
   &::before {
