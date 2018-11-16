@@ -142,7 +142,7 @@ export const fatherSection: IFormSection = {
       ]
     },
     {
-      name: 'fatherIDType',
+      name: 'iDType',
       type: SELECT_WITH_OPTIONS,
       label: identityMessages.iDType,
       required: true,
@@ -172,7 +172,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherID',
+      name: 'iD',
       type: TEXT,
       label: identityMessages.iD,
       required: true,
@@ -191,7 +191,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherFirstNames',
+      name: 'firstNames',
       type: TEXT,
       label: messages.fatherFirstNames,
       required: false,
@@ -200,7 +200,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherFamilyName',
+      name: 'familyName',
       type: TEXT,
       label: messages.fatherFamilyName,
       required: true,
@@ -209,7 +209,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherFirstNamesEng',
+      name: 'firstNamesEng',
       type: TEXT,
       label: messages.fatherFirstNamesEng,
       required: false,
@@ -218,7 +218,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherFamilyNameEng',
+      name: 'familyNameEng',
       type: TEXT,
       label: messages.fatherFamilyNameEng,
       required: true,
@@ -227,7 +227,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherDateOfBirth',
+      name: 'fatherBirthDate',
       type: DATE,
       label: messages.fatherDateOfBirth,
       required: true,
@@ -258,7 +258,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherDateOfMarriage',
+      name: 'dateOfMarriage',
       type: DATE,
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
@@ -267,7 +267,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherEducationAttainment',
+      name: 'educationalAttainment',
       type: SELECT_WITH_OPTIONS,
       label: messages.fatherEducationAttainment,
       required: true,

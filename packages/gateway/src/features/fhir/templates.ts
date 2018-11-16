@@ -115,12 +115,12 @@ export function createEncounter(refUuid: string) {
   }
 }
 
-export function createCompositionTemplate(trackingId?: string) {
+export function createCompositionTemplate() {
   return {
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
-        value: trackingId ? trackingId : uuid()
+        value: uuid()
       },
       resourceType: 'Composition',
       status: 'preliminary',

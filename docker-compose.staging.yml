@@ -73,6 +73,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - LANGUAGE=bn
 
   gateway:
     secrets:
@@ -85,6 +86,12 @@ services:
         - 'traefik.frontend.rule=Host: gateway.opencrvs-staging.jembi.org'
         - 'traefik.port=7070'
         - 'traefik.docker.network=opencrvs_default'
+
+  workflow:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
 
   hearth:
     secrets:

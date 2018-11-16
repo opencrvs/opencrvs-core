@@ -37,3 +37,7 @@ coverage:
         paths:
           - packages/validation
         threshold: 0.5
+      workflow:
+        paths:
+          - packages/workflow
+        threshold: 0.5
