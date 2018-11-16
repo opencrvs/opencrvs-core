@@ -37,6 +37,11 @@ const Seperator = styled.span`
     content: '|';
   }
 `
+const SectionContainer = styled.div.attrs<{ Expanded: boolean }>({})`
+  max-height: ${({ Expanded }) => (Expanded ? `1000px` : `0px`)};
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.65, 0.05, 0.36, 1);
+`
 interface IProps {
   title: string
   linkText: string
@@ -101,7 +106,9 @@ export class SectionDrawer extends React.Component<IProps, IState> {
             />
           )}
         </TitleContainer>
-        <div>{this.state.isExpanded && children}</div>
+        <SectionContainer Expanded={this.state.isExpanded}>
+          {children}
+        </SectionContainer>
       </SectionDrawerContainer>
     )
   }
