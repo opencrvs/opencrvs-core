@@ -131,37 +131,6 @@ type ContactPoint { # -> ContactPoint
   use: String # -> .use
 }
 
-input LocationInput {
-  identifier: [ID]
-  status: String
-  name: String
-  alias: [String]
-  description: String
-  type: LocationType
-  telecom: [ContactPointInput]
-  address: AddressInput
-  longitude: Float
-  latitude: Float
-  altitude: Float
-  geoData: String
-}
-
-type Location { # -> Location (mostly the same property name except:)
-  id: ID!
-  identifier: [ID]
-  status: String
-  name: String
-  alias: [String]
-  description: String
-  type: LocationType
-  telecom: [ContactPoint]
-  address: Address
-  longitude: Float # -> position.longitude
-  latitude: Float # -> position.latitude
-  altitude: Float # -> position.altitude
-  geoData: String # -> extension(url=http://hl7.org/fhir/StructureDefinition/location-boundary-geojson).valueAttachment (as base64)
-}
-
 input AddressInput {
   use: String
   type: AddressType
@@ -233,7 +202,4 @@ type UserRole {
 
 type Query {
   user(id: Int!): User
-
-  locationsByParent(parentId: String, type: String): [Location] # if parentId is not provided, return level 1 locations
-  locationsByName(name: String!, type: String): [Location]
 }
