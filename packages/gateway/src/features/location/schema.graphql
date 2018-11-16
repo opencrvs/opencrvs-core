@@ -13,6 +13,13 @@ input LocationInput {
   geoData: String
 }
 
+enum LocationType {
+  HEALTH_FACILITY
+  ADMIN_STRUCTURE
+  CRVS_OFFICE
+  OTHER
+}
+
 type Location { # -> Location (mostly the same property name except:)
   id: ID!
   identifier: [ID]
@@ -31,5 +38,5 @@ type Location { # -> Location (mostly the same property name except:)
 
 type Query {
   locationsByParent(parentId: String, type: String): [Location] # if parentId is not provided, return level 1 locations
-  locationsByName(name: String!, type: String): [Location]
+  locationById(locationId: String): [Location]
 }

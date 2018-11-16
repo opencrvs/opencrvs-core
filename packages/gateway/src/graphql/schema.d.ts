@@ -15,7 +15,7 @@ export interface GQLQuery {
   listBirthRegistrations?: Array<GQLBirthRegistration | null>
   listDeathRegistrations?: Array<GQLBirthRegistration | null>
   locationsByParent?: Array<GQLLocation | null>
-  locationsByName?: Array<GQLLocation | null>
+  locationById?: Array<GQLLocation | null>
 }
 
 export type GQLDate = any
@@ -161,9 +161,9 @@ export interface GQLLocation {
 }
 
 export enum GQLLocationType {
-  HOSPITAL = 'HOSPITAL',
-  OTHER_INSTITUTION = 'OTHER_INSTITUTION',
-  PRIVATE_HOME = 'PRIVATE_HOME',
+  HEALTH_FACILITY = 'HEALTH_FACILITY',
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
+  CRVS_OFFICE = 'CRVS_OFFICE',
   OTHER = 'OTHER'
 }
 
@@ -529,7 +529,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
-  locationsByName?: QueryToLocationsByNameResolver<TParent>
+  locationById?: QueryToLocationByIdResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -605,14 +605,13 @@ export interface QueryToLocationsByParentResolver<
   ): TResult
 }
 
-export interface QueryToLocationsByNameArgs {
-  name: string
-  type?: string
+export interface QueryToLocationByIdArgs {
+  locationId?: string
 }
-export interface QueryToLocationsByNameResolver<TParent = any, TResult = any> {
+export interface QueryToLocationByIdResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToLocationsByNameArgs,
+    args: QueryToLocationByIdArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

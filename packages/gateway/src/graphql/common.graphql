@@ -23,13 +23,6 @@ enum Relationship {
   PATERNAL_GRANDFATHER
 }
 
-enum LocationType {
-  HOSPITAL
-  OTHER_INSTITUTION
-  PRIVATE_HOME
-  OTHER
-}
-
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
