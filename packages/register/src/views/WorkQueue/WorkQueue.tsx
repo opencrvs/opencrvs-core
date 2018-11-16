@@ -29,7 +29,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 
-const FETCH_REGISTRATION_QUERY = gql`
+export const FETCH_REGISTRATION_QUERY = gql`
   query list {
     listBirthRegistrations(status: "declared") {
       id
@@ -77,11 +77,23 @@ const messages = defineMessages({
     id: 'register.workQueue.applications.banner',
     defaultMessage: 'Applications to register in your area',
     description: 'The title of the banner'
+  },
+  queryError: {
+    id: 'register.workQueue.queryError',
+    defaultMessage: 'An error occurred while searching',
+    description: 'The error message shown when a search query fails'
   }
 })
 
 const StyledSpinner = styled(Spinner)`
   margin: 50% auto;
+`
+
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
 `
 
 const Container = styled.div`
@@ -259,7 +271,11 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                 )
               }
               if (error) {
-                throw new Error(`Error! ${error.message}`)
+                return (
+                  <ErrorText id="work-queue-error-text">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
               }
 
               const transformedData = this.transformData(data)

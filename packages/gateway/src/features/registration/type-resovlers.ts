@@ -204,6 +204,11 @@ export const typeResolvers: GQLResolver = {
     async registration(composition: ITemplatedComposition) {
       const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`) // TODO this is returning all tasks no matter what
       const taskBundle = await res.json()
+
+      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
+        return null
+      }
+
       return taskBundle.entry[0].resource
     },
     async weightAtBirth(composition: ITemplatedComposition) {
