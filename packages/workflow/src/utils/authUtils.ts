@@ -15,9 +15,6 @@ export interface ITokenPayload {
 }
 
 export const getTokenPayload = (token: string) => {
-  if (!token) {
-    throw new Error('getTokenPayload: Invalid token found')
-  }
   let decoded: ITokenPayload
   try {
     decoded = decode(token)
