@@ -2,7 +2,8 @@ import {
   pushTrackingId,
   setupRegistrationType,
   setupRegistrationWorkflow,
-  setupLastRegUser
+  setupLastRegUser,
+  setupAuthorOnNotes
 } from './fhir-bundle-modifier'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
 import { testFhirBundle } from 'src/test/utils'
@@ -164,5 +165,31 @@ describe('Verify fhir bundle modifier functions', () => {
     expect(fhirBundle.entry[1].resource.extension[1].valueString).toEqual(
       'DUMMY'
     )
+  })
+
+  it('setupAuthorOnNotes will update the author name on notes', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1',
+      scope: ['declare']
+    }
+    let fhirBundle = cloneDeep(testFhirBundle)
+    fhirBundle.entry[1].resource.note = [
+      {
+        text: 'this is a test note',
+        time: '2018-10-31T09:45:05+10:00'
+      }
+    ]
+    fhirBundle = setupAuthorOnNotes(fhirBundle, tokenPayload)
+
+    expect(fhirBundle.entry[1].resource.note.length).toBe(1)
+    expect(fhirBundle.entry[1].resource.note[0]).toEqual({
+      authorString: 'DUMMY',
+      text: 'this is a test note',
+      time: '2018-10-31T09:45:05+10:00'
+    })
   })
 })

@@ -29,12 +29,11 @@ export function modifyBirthRegistrationBundle(
   /* setting registration workflow status here */
   fhirBundle = setupRegistrationWorkflow(fhirBundle, tokenPayload)
 
-  /* setting timestamp here */
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-  taskResource.lastModified = Date.now().toString()
-
   /* setting lastRegUser here */
   fhirBundle = setupLastRegUser(fhirBundle, tokenPayload)
+
+  /* setting author and time on notes here */
+  fhirBundle = setupAuthorOnNotes(fhirBundle, tokenPayload)
 
   return fhirBundle
 }
@@ -153,5 +152,28 @@ export function setupLastRegUser(
       valueString: tokenPayload.subject
     })
   }
+  return fhirBundle
+}
+
+export function setupAuthorOnNotes(
+  fhirBundle: fhir.Bundle,
+  tokenPayload: ITokenPayload
+): fhir.Bundle {
+  // TODO: need to change it as soon as we have decided the approach
+  if (!tokenPayload || !tokenPayload.subject) {
+    tokenPayload.subject = 'DUMMY'
+  }
+
+  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
+
+  if (!taskResource.note) {
+    return fhirBundle
+  }
+  taskResource.note.forEach(note => {
+    if (!note.authorString) {
+      note.authorString = tokenPayload.subject
+    }
+  })
+
   return fhirBundle
 }
