@@ -28,6 +28,7 @@ import {
   StatusCollected
 } from '@opencrvs/components/lib/icons'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { IStoreState } from 'src/store'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list {
@@ -193,7 +194,9 @@ const Container = styled.div`
   margin-top: -70px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
-type IWorkQueueProps = InjectedIntlProps & IViewHeadingProps & ISearchInputProps
+type IWorkQueueProps = InjectedIntlProps &
+  IViewHeadingProps &
+  ISearchInputProps & { language: string }
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
@@ -233,11 +236,11 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 
       return {
         name:
-          (namesMap['english'] as string) || // needs to read language in use
+          (namesMap[this.props.language] as string) ||
           (namesMap['default'] as string) ||
           '',
         dob: (reg.child && reg.child.birthDate) || '',
-        date_of_application: moment(reg.createdAt).fromNow(), // ??
+        date_of_application: moment(reg.createdAt).fromNow(),
         tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
         declaration_status:
@@ -443,4 +446,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
   }
 }
 
-export const WorkQueue = connect(null)(injectIntl(WorkQueueView))
+export const WorkQueue = connect((state: IStoreState) => ({
+  language: state.i18n.language
+}))(injectIntl(WorkQueueView))
