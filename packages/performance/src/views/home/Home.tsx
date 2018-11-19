@@ -1,36 +1,106 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
 import { Header, Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
 import Logo from 'src/components/Logo'
 import { Page } from 'src/components/Page'
 import { Legend } from '@opencrvs/components/lib/charts'
+import { defineMessages } from 'react-intl'
 
-const data = [
-  {
-    value: 500,
-    label: 'Live births registered within 45 days of actual birth',
-    description: '500 out of 3000 total'
+const messages = defineMessages({
+  birthRegistrationBoxTitle: {
+    id: 'performance.graph.birthRegistrationBoxTitle',
+    defaultMessage: 'Birth Registration Key Figures',
+    description: 'Title for the birth registration key figures box.'
   },
-  {
-    value: 1000,
-    label: 'Live births registered within 1 year of actual birth',
-    description: '1000 out of 3000 total'
+  birthRegistrationBoxFooter: {
+    id: 'performance.graph.birthRegistrationBoxFooter',
+    defaultMessage: 'Estimates provided using National Population Census data',
+    description: 'Title for the birth registration key figures box footer.'
   },
-  {
-    value: 3000,
-    label: 'Total Live Births registered',
-    description: '3000 out of estimated 4000',
-    total: true
+  liveBirthsWithin45DaysLabel: {
+    id: 'performance.graph.liveBirthsWithin45DaysLabel',
+    defaultMessage: 'Live births registered within 45 days of actual birth',
+    description:
+      'Live births registered within 45 days of actual birth label on graph'
   },
-  {
-    value: 4000,
-    label: 'Estimated Births in [time period]',
-    estimate: true,
-    description: 'Provided from 2018 population census'
+  liveBirthsWithin45DaysDescription: {
+    id: 'performance.graph.liveBirthsWithin45DaysDescription',
+    defaultMessage: '500 out of 3000 total',
+    description:
+      'Live births registered within 45 days of actual birth description on graph'
+  },
+  liveBirthsWithin1yearLabel: {
+    id: 'performance.graph.liveBirthsWithin1yearLabel',
+    defaultMessage: 'Live births registered within 1 year of actual birth',
+    description:
+      'Live births registered within 1 year of actual birth label on graph'
+  },
+  liveBirthsWithin1yearDescription: {
+    id: 'performance.graph.liveBirthsWithin1yearDescription',
+    defaultMessage: '1000 out of 3000 total',
+    description:
+      'Live births registered within 1 year of actual birth description on graph'
+  },
+  totalLiveBirthsLabel: {
+    id: 'performance.graph.totalLiveBirthsLabel',
+    defaultMessage: 'Total Live Births registered',
+    description: 'Total live births label on graph'
+  },
+  totalLiveBirthsDescription: {
+    id: 'performance.graph.totalLiveBirthsDescription',
+    defaultMessage: '3000 out of estimated 4000',
+    description: 'Total live births description on graph'
+  },
+  estimatedBirthsInTimeLabel: {
+    id: 'performance.graph.estimatedBirthsInTimeLabel',
+    defaultMessage: 'Estimated Births in [time period]',
+    description: 'Estimated births in time period label on graph'
+  },
+  estimatedBirthsInTimeDescription: {
+    id: 'performance.graph.estimatedBirthsInTimeDescription',
+    defaultMessage: 'Provided from 2018 population census',
+    description: 'Estimated births in time period description on graph'
   }
-]
+})
+
+interface IData {
+  value: number
+  label: string
+  description: string
+  total?: boolean
+  estimate?: boolean
+}
+
+const getData = (intl: InjectedIntl): IData[] => {
+  return [
+    {
+      value: 500,
+      label: intl.formatMessage(messages.liveBirthsWithin45DaysLabel),
+      description: intl.formatMessage(
+        messages.liveBirthsWithin45DaysDescription
+      )
+    },
+    {
+      value: 1000,
+      label: intl.formatMessage(messages.liveBirthsWithin1yearLabel),
+      description: intl.formatMessage(messages.liveBirthsWithin1yearDescription)
+    },
+    {
+      value: 3000,
+      label: intl.formatMessage(messages.totalLiveBirthsLabel),
+      description: intl.formatMessage(messages.totalLiveBirthsDescription),
+      total: true
+    },
+    {
+      value: 4000,
+      label: intl.formatMessage(messages.estimatedBirthsInTimeLabel),
+      estimate: true,
+      description: intl.formatMessage(messages.estimatedBirthsInTimeDescription)
+    }
+  ]
+}
 
 const StyledHeader = styled(Header)`
   padding: 0 26px;
@@ -61,10 +131,9 @@ const ChartContainer = styled(Box)`
 const Container = styled.div`
   padding: 20px 10px;
 `
-const boxTitle = 'Birth Registration Key Figures'
-const footerText = 'Estimates provided using National Population Census data'
 class HomeView extends React.Component<InjectedIntlProps> {
   render() {
+    const { intl } = this.props
     return (
       <Page>
         <StyledHeader>
@@ -72,9 +141,13 @@ class HomeView extends React.Component<InjectedIntlProps> {
         </StyledHeader>
         <Container>
           <ChartContainer>
-            <BoxTitle id="box_title">{boxTitle}</BoxTitle>
-            <Legend data={data} />
-            <FooterText id="footer_text">{footerText}</FooterText>
+            <BoxTitle id="box_title">
+              {intl.formatMessage(messages.birthRegistrationBoxTitle)}
+            </BoxTitle>
+            <Legend data={getData(intl)} />
+            <FooterText id="footer_text">
+              {intl.formatMessage(messages.birthRegistrationBoxFooter)}
+            </FooterText>
           </ChartContainer>
         </Container>
       </Page>
