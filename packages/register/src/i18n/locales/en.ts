@@ -590,7 +590,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.searchInput.placeholder': 'Look for a record',
     'register.workQueue.buttons.search': 'Search',
     'register.workQueue.selects.sort.item0': 'Oldest to newest',
-    'register.workQueue.selects.sort.item1': 'Newst to oldest',
+    'register.workQueue.selects.sort.item1': 'Newest to oldest',
     'register.workQueue.labels.statuses.all': 'All statues',
     'register.workQueue.labels.statuses.application': 'Application',
     'register.workQueue.labels.statuses.registered': 'Registered',
@@ -599,6 +599,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.events.birth': 'Birth',
     'register.workQueue.labels.events.death': 'Death',
     'register.workQueue.labels.events.marriage': 'Marriage',
+    'register.workQueue.labels.locations.all': 'All locations',
     'register.workQueue.labels.selects.sort': 'Sort by:',
     'register.workQueue.labels.selects.filter': 'Filter by:',
     'register.workQueue.labels.results.name': 'Name',
@@ -619,19 +620,6 @@ export const ENGLISH_STATE = {
     'register.workQueue.header.title': 'Hello Registrar',
     'register.workQueue.header.description':
       'Review | Registration | Certification',
-    'register.workQueue.filters.sortBy': 'Sort By',
-    'register.workQueue.filters.oldestToNewest': 'Oldest to newest',
-    'register.workQueue.filters.newestToOldest': 'Newest to oldest',
-    'register.workQueue.filters.filterBy': 'Sort By',
-    'register.workQueue.filters.birth': 'Birth',
-    'register.workQueue.filters.death': 'Death',
-    'register.workQueue.filters.marriage': 'Marriage',
-    'register.workQueue.filters.application': 'Application',
-    'register.workQueue.filters.registered': 'Registered',
-    'register.workQueue.filters.collected': 'Collected',
-    'register.workQueue.listItem.name': 'Name',
-    'register.workQueue.listItem.dob': 'D.o.B',
-    'register.workQueue.listItem.dateOfApplication': 'Date of application',
-    'register.workQueue.listItem.trackingId': 'Tracking ID'
+    'register.workQueue.buttons.newRegistraion': 'New registration'
   }
 }

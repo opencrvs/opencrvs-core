@@ -593,6 +593,7 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.events.birth': 'জন্ম',
     'register.workQueue.labels.events.death': 'মৃত্যু',
     'register.workQueue.labels.events.marriage': 'বিবাহ',
+    'register.workQueue.labels.locations.all': 'TODO',
     'register.workQueue.labels.selects.sort': 'ক্রমানুসার:',
     'register.workQueue.labels.selects.filter': 'ফিল্টার করুন:',
     'register.workQueue.labels.results.name': 'নাম',
@@ -609,19 +610,6 @@ export const BENGALI_STATE = {
     'register.workQueue.dataTable.noResults': 'TODO',
     'register.workQueue.header.title': 'TODO',
     'register.workQueue.header.description': 'TODO',
-    'register.workQueue.filters.sortBy': 'TODO',
-    'register.workQueue.filters.oldestToNewest': 'TODO',
-    'register.workQueue.filters.newestToOldest': 'TODO',
-    'register.workQueue.filters.filterBy': 'TODO',
-    'register.workQueue.filters.birth': 'TODO',
-    'register.workQueue.filters.death': 'TODO',
-    'register.workQueue.filters.marriage': 'TODO',
-    'register.workQueue.filters.application': 'TODO',
-    'register.workQueue.filters.registered': 'TODO',
-    'register.workQueue.filters.collected': 'TODO',
-    'register.workQueue.listItem.name': 'TODO',
-    'register.workQueue.listItem.dob': 'TODO',
-    'register.workQueue.listItem.dateOfApplication': 'TODO',
-    'register.workQueue.listItem.trackingId': 'TODO'
+    'register.workQueue.buttons.newRegistration': 'নতুন নিবন্ধন'
   }
 }

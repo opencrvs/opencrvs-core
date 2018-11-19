@@ -11,7 +11,7 @@ import { goToTab as goToTabAction } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
-import { IDraft, modifyDraft } from '../../drafts'
+import { IDraft, modifyDraft, deleteDraft } from '../../drafts'
 import { getRegisterForm } from '../../forms/register/selectors'
 import {
   FooterAction,
@@ -121,6 +121,7 @@ function getPreviousSection(
 type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
+  deleteDraft: typeof deleteDraft
   handleSubmit: (values: unknown) => void
 }
 
@@ -165,6 +166,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
         [activeSection.id]: sectionData
       }
     })
+  }
+
+  successfulSubmission = (response: string) => {
+    const { history, draft } = this.props
+    history.push('/saved', {
+      trackingId: response
+    })
+    this.props.deleteDraft(draft)
   }
 
   submitForm = () => {
@@ -279,9 +288,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         >
           {(submitBirthRegistration, { data }) => {
             if (data && data.createBirthRegistration) {
-              this.props.history.push('/saved', {
-                trackingId: data.createBirthRegistration
-              })
+              this.successfulSubmission(data.createBirthRegistration)
             }
 
             return (
@@ -379,6 +386,7 @@ function mapStateToProps(
 
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
+  deleteDraft,
   goToTab: goToTabAction,
   handleSubmit: values => {
     console.log(values)

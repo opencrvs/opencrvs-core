@@ -1,10 +1,12 @@
+import * as ReactApollo from 'react-apollo'
 import { createTestApp } from './tests/util'
 import { config } from '../src/config'
 import {
   HOME,
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
-  DRAFT_BIRTH_PARENT_FORM
+  DRAFT_BIRTH_PARENT_FORM,
+  WORK_QUEUE
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -240,6 +242,16 @@ describe('when user has a valid token in local storage', () => {
     })
   })
 
+  describe('when user is in work queue view', () => {
+    beforeEach(() => {
+      history.replace(WORK_QUEUE)
+      app.update()
+    })
+
+    it('work queue view renders without crashing', () => {
+      expect(app.find('#work_queue_view').hostNodes()).toHaveLength(1)
+    })
+  })
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
     beforeEach(() => {
@@ -691,20 +703,6 @@ describe('when user has a valid token in local storage', () => {
       expect(processDraftData(data).father.address[1].line[0]).toBe('Rd #10')
     })
 
-    it('Pass FATHER as whoseContactDetails value', () => {
-      registrationDetails.whoseContactDetails = 'FATHER'
-
-      const data = {
-        child: childDetails,
-        father: fatherDetails,
-        mother: motherDetails,
-        registration: registrationDetails,
-        documents: { image_uploader: '' }
-      }
-
-      expect(processDraftData(data).father.telecom[0].value).toBe('01736478884')
-    })
-
     it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
       registrationDetails.whoseContactDetails = 'BOTH_PARENTS'
 
@@ -717,6 +715,20 @@ describe('when user has a valid token in local storage', () => {
       }
 
       expect(processDraftData(data).father.telecom).toBeFalsy()
+    })
+
+    it('Pass FATHER as whoseContactDetails value', () => {
+      registrationDetails.whoseContactDetails = 'FATHER'
+
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(processDraftData(data).father.telecom[0].value).toBe('01736478884')
     })
 
     it('Pass false as fathersDetailsExist value', () => {
@@ -767,34 +779,18 @@ describe('when user has a valid token in local storage', () => {
           expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
         })
 
-        it('Preview button shold show up', () => {
-          expect(
-            app
-              .find('a')
-              .hostNodes()
-              .text()
-          ).toBe('Preview')
-        })
+        it('On successful submission tracking id should be visible', async () => {
+          jest.setMock('react-apollo', { default: ReactApollo })
 
-        describe('when user is in the submit confirm view', () => {
-          beforeEach(async () => {
-            app
-              .find('a')
-              .hostNodes()
-              .simulate('click')
+          app
+            .find('#submit_confirm')
+            .hostNodes()
+            .simulate('click')
 
-            await flushPromises()
-            app.update()
-          })
+          await flushPromises()
+          app.update()
 
-          it('check whether submit button is there or not', () => {
-            expect(
-              app
-                .find('#submit_form')
-                .hostNodes()
-                .prop('disabled')
-            ).toBe(false)
-          })
+          expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
         })
       })
     })

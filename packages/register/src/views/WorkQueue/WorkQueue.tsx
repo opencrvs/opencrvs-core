@@ -4,6 +4,8 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled from 'styled-components'
 import * as moment from 'moment'
 import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
+import { IconAction, ActionTitle } from '@opencrvs/components/lib/buttons'
+import { Plus } from '@opencrvs/components/lib/icons'
 import {
   Banner,
   SearchInput,
@@ -106,74 +108,94 @@ const messages = defineMessages({
     description: 'The displayed description in the Work Queue header'
   },
   filtersSortBy: {
-    id: 'register.workQueue.filters.sortBy',
+    id: 'register.workQueue.labels.selects.sort',
     defaultMessage: 'Sort By',
     description: 'Label for the sort by section of the filters'
   },
   filtersOldestToNewest: {
-    id: 'register.workQueue.filters.oldestToNewest',
+    id: 'register.workQueue.selects.sort.item0',
     defaultMessage: 'Oldest to newest',
     description: 'Label for the sort by oldest to newest option'
   },
   filtersNewestToOldest: {
-    id: 'register.workQueue.filters.newestToOldest',
+    id: 'register.workQueue.selects.sort.item1',
     defaultMessage: 'Newest to oldest',
     description: 'Label for the sort by newest to oldest option'
   },
   filtersFilterBy: {
-    id: 'register.workQueue.filters.filterBy',
+    id: 'register.workQueue.labels.selects.filter',
     defaultMessage: 'Sort By',
     description: 'Label for the sort by section of the filters'
   },
+  filtersAllEvents: {
+    id: 'register.workQueue.labels.events.all',
+    defaultMessage: 'All life events',
+    description: 'Label for the filter by all events option'
+  },
   filtersBirth: {
-    id: 'register.workQueue.filters.birth',
+    id: 'register.workQueue.labels.events.birth',
     defaultMessage: 'Birth',
     description: 'Label for the filter by birth option'
   },
   filtersDeath: {
-    id: 'register.workQueue.filters.death',
+    id: 'register.workQueue.labels.events.death',
     defaultMessage: 'Death',
     description: 'Label for the filter by death option'
   },
   filtersMarriage: {
-    id: 'register.workQueue.filters.marriage',
+    id: 'register.workQueue.labels.events.marriage',
     defaultMessage: 'Marriage',
     description: 'Label for the filter by marriage option'
   },
+  filtersAllStatuses: {
+    id: 'register.workQueue.labels.statuses.all',
+    defaultMessage: 'All statues',
+    description: 'Label for the filter by all statuses option'
+  },
   filtersApplication: {
-    id: 'register.workQueue.filters.application',
+    id: 'register.workQueue.labels.statuses.application',
     defaultMessage: 'Application',
     description: 'Label for the filter by application option'
   },
   filtersRegistered: {
-    id: 'register.workQueue.filters.registered',
+    id: 'register.workQueue.labels.statuses.registered',
     defaultMessage: 'Registered',
     description: 'Label for the filter by registered option'
   },
   filtersCollected: {
-    id: 'register.workQueue.filters.collected',
+    id: 'register.workQueue.labels.statuses.collected',
     defaultMessage: 'Collected',
     description: 'Label for the filter by collected option'
   },
+  filtersAllLocations: {
+    id: 'register.workQueue.labels.locations.all',
+    defaultMessage: 'All locations',
+    description: 'Label for filtering by all locations'
+  },
   listItemName: {
-    id: 'register.workQueue.listItem.name',
+    id: 'register.workQueue.labels.results.name',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   listItemDob: {
-    id: 'register.workQueue.listItem.dob',
+    id: 'register.workQueue.labels.results.dob',
     defaultMessage: 'D.o.B',
     description: 'Label for DoB in work queue list item'
   },
   listItemDateOfApplication: {
-    id: 'register.workQueue.listItem.dateOfApplication',
+    id: 'register.workQueue.labels.results.dateOfApplication',
     defaultMessage: 'Date of application',
     description: 'Label for date of application in work queue list item'
   },
   listItemTrackingNumber: {
-    id: 'register.workQueue.listItem.trackingId',
+    id: 'register.workQueue.labels.results.trackingID',
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
+  },
+  newRegistration: {
+    id: 'register.workQueue.buttons.newRegistration',
+    defaultMessage: 'New registration',
+    description: 'The title of new registration button'
   }
 })
 
@@ -191,9 +213,31 @@ const ErrorText = styled.div`
 const Container = styled.div`
   z-index: 1;
   position: relative;
-  margin-top: -70px;
+  margin-top: -30px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
+const StyledPlusIcon = styled(Plus)`
+  display: flex;
+  margin-left: -23px;
+`
+const StyledIconAction = styled(IconAction)`
+  display: flex;
+  min-height: 96px;
+  padding: 0 20px 0 0;
+  box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
+  background-color: ${({ theme }) => theme.colors.accentLight};
+
+  /* stylelint-disable */
+  ${ActionTitle} {
+    /* stylelint-enable */
+    font-size: 28px;
+    font-weight: 300;
+    margin: -2px 0 -2px 120px;
+    line-height: 1.3em;
+    color: ${({ theme }) => theme.colors.white};
+  }
+`
+
 type IWorkQueueProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps & { language: string }
@@ -240,7 +284,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
           (namesMap['default'] as string) ||
           '',
         dob: (reg.child && reg.child.birthDate) || '',
-        date_of_application: moment(reg.createdAt).fromNow(),
+        date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
         tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
         declaration_status:
@@ -336,6 +380,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
             name: 'event',
             options: [
               {
+                value: '',
+                label: intl.formatMessage(messages.filtersAllEvents)
+              },
+              {
                 value: 'birth',
                 label: intl.formatMessage(messages.filtersBirth)
               },
@@ -354,6 +402,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
             name: 'declaration_status',
             options: [
               {
+                value: '',
+                label: intl.formatMessage(messages.filtersAllStatuses)
+              },
+              {
                 value: 'application',
                 label: intl.formatMessage(messages.filtersApplication)
               },
@@ -371,6 +423,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
           {
             name: 'location',
             options: [
+              {
+                value: '',
+                label: intl.formatMessage(messages.filtersAllLocations)
+              },
               // TODO these need to be translated but those needs to be read from our backend when we have locations setup
               { value: 'gazipur', label: 'Gazipur Union' },
               { value: 'badda', label: 'Badda Union' },
@@ -388,6 +444,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       <>
         <HomeViewHeader>
           <ViewHeading
+            id="work_queue_view"
             title={intl.formatMessage(messages.headerTitle)}
             description={intl.formatMessage(messages.headerDescription)}
             {...this.props}
@@ -413,6 +470,11 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 
               return (
                 <>
+                  <StyledIconAction
+                    id="new_registration"
+                    icon={() => <StyledPlusIcon />}
+                    title={intl.formatMessage(messages.newRegistration)}
+                  />
                   <Banner
                     text={intl.formatMessage(messages.bannerTitle)}
                     count={transformedData.length}

@@ -344,23 +344,6 @@ function createEducationalAttainmentBuilder(
   })
 }
 
-function createBirthTrackingIdentifier(
-  resource: fhir.Task,
-  fieldValue: string
-) {
-  if (!resource.focus) {
-    resource.focus = { reference: '' }
-  }
-  resource.focus.reference = `urn:trackingid:${fieldValue}`
-  if (!resource.identifier) {
-    resource.identifier = []
-  }
-  resource.identifier.push({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-    value: fieldValue
-  })
-}
-
 function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -714,14 +697,6 @@ const builders: IFieldBuilders = {
     }
   },
   registration: {
-    trackingId: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return createBirthTrackingIdentifier(taskResource, fieldValue)
-    },
     contact: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -1003,11 +978,11 @@ const builders: IFieldBuilders = {
   }
 }
 
-export async function buildFHIRBundle(reg: object, trackingId?: string) {
+export async function buildFHIRBundle(reg: object) {
   const fhirBundle: ITemplatedBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate(trackingId)]
+    entry: [createCompositionTemplate()]
   }
 
   await transformObj(reg, fhirBundle, builders)
