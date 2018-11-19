@@ -252,7 +252,6 @@ const StyledIconAction = styled(IconAction)`
   padding: 0 20px 0 0;
   box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
   background-color: ${({ theme }) => theme.colors.accentLight};
-
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
@@ -379,7 +378,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         </PrimaryButton>
       )
     }
-
     return (
       <ListItem
         index={key}
@@ -396,15 +394,12 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       />
     )
   }
-
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
-
   userHasDeclareScope() {
     return this.props.scope && this.props.scope.includes('declare')
   }
-
   getNewEventButtonText() {
     if (this.userHasRegisterScope()) {
       return messages.newRegistration
@@ -414,10 +409,8 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       return messages.newApplication
     }
   }
-
   render() {
     const { intl, theme } = this.props
-
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -443,7 +436,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         ]
       }
     }
-
     const filterBy = {
       input: {
         label: intl.formatMessage(messages.filtersFilterBy)
@@ -514,7 +506,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         ]
       }
     }
-
     return (
       <>
         <HomeViewHeader>
@@ -543,9 +534,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                   </ErrorText>
                 )
               }
-
               const transformedData = this.transformData(data)
-
               return (
                 <>
                   <StyledIconAction
@@ -586,7 +575,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     )
   }
 }
-
 export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,

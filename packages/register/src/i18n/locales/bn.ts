@@ -445,6 +445,7 @@ export const BENGALI_STATE = {
     'register.form.tabs.documentsTab': 'সমর্থনকারী কাগজপত্র',
     'register.form.section.documentsTitle': 'সমর্থনকারী কাগজপত্র',
     'register.form.tabs.previewTab': 'প্রিভিউ',
+    'register.form.tabs.reviewTab': 'পর্যালোচনা',
     'register.form.section.documents.paragraph':
       'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
     'register.form.section.documents.list.informantAttestation':
@@ -458,6 +459,7 @@ export const BENGALI_STATE = {
     'register.form.section.documents.list.otherDocuments':
       'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি',
     'register.form.section.previewTitle': 'প্রিভিউ',
+    'register.form.section.reviewTitle': 'পর্যালোচনা',
     'register.form.tabs.registrationTab': 'নিবন্ধন',
     'register.form.section.registrationTitle': 'নিবন্ধন',
     'formFields.registration.whoIsPresent': 'নিবন্ধন জন্য উপস্থিত ব্যক্তি',
@@ -495,6 +497,8 @@ export const BENGALI_STATE = {
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
+    'register.form.previewBirthRegistration': ' জন্ম ঘোষণাপত্র প্রদর্শন',
+    'register.form.reviewBirthRegistration': ' জন্ম ঘোষণাপত্র পর্যালোচনা',
     'register.form.saveDraft': 'খসড়া সংরক্ষণ',
     'register.form.next': 'পরবর্তী',
     'register.form.modal.preview': 'প্রিভিউ',

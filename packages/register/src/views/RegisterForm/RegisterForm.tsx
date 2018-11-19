@@ -7,12 +7,16 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
-import { goToTab as goToTabAction } from '../../navigation'
+import {
+  goToTab as goToTabAction,
+  goToReviewTab as goToReviewTabAction
+} from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
 import { IDraft, modifyDraft, deleteDraft } from '../../drafts'
 import { getRegisterForm } from '../../forms/register/selectors'
+import { getReviewForm } from '../../forms/review/selectors'
 import {
   FooterAction,
   FooterPrimaryButton,
@@ -41,6 +45,16 @@ export const messages = defineMessages({
   newBirthRegistration: {
     id: 'register.form.newBirthRegistration',
     defaultMessage: 'New birth declaration',
+    description: 'The message that appears for new birth registrations'
+  },
+  previewBirthRegistration: {
+    id: 'register.form.previewBirthRegistration',
+    defaultMessage: 'Birth Application Preview',
+    description: 'The message that appears for new birth registrations'
+  },
+  reviewBirthRegistration: {
+    id: 'register.form.reviewBirthRegistration',
+    defaultMessage: 'Birth Application Review',
     description: 'The message that appears for new birth registrations'
   },
   saveDraft: {
@@ -87,8 +101,16 @@ const PreviewButton = styled.a`
   color: ${({ theme }) => theme.colors.primary};
 `
 
-function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
-  return viewParams.tabId || form.sections[0].id
+function getActiveSectionId(
+  form: IForm,
+  viewParams: { tabId?: string },
+  isReviewForm: boolean
+) {
+  return (
+    viewParams.tabId ||
+    (isReviewForm && form.sections[form.sections.length - 1].id) ||
+    form.sections[0].id
+  )
 }
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
@@ -119,7 +141,8 @@ function getPreviousSection(
 }
 
 type DispatchProps = {
-  goToTab: typeof goToTabAction
+  goToRegistrationTab: typeof goToTabAction
+  goToReviewTab: typeof goToReviewTabAction
   modifyDraft: typeof modifyDraft
   deleteDraft: typeof deleteDraft
   handleSubmit: (values: unknown) => void
@@ -130,6 +153,7 @@ type Props = {
   registerForm: IForm
   activeSection: IFormSection
   setAllFieldsDirty: boolean
+  isReviewForm: boolean | undefined
 }
 
 type FullProps = Props &
@@ -168,6 +192,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
+  modifyReviewDraft = (sectionData: IFormSectionData) => {
+    const { activeSection, draft } = this.props
+    this.props.modifyDraft(
+      {
+        ...draft,
+        data: {
+          ...draft.data,
+          [activeSection.id]: sectionData
+        }
+      },
+      true
+    )
+  }
+
   successfulSubmission = (response: string) => {
     const { history, draft } = this.props
     history.push('/saved', {
@@ -200,24 +238,33 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   render() {
     const {
-      goToTab,
+      goToRegistrationTab,
+      goToReviewTab,
       intl,
       activeSection,
       setAllFieldsDirty,
       draft,
       history,
       registerForm,
-      handleSubmit
+      handleSubmit,
+      isReviewForm
     } = this.props
 
     const nextSection = getNextSection(registerForm.sections, activeSection)
+    const goToTab = isReviewForm ? goToReviewTab : goToRegistrationTab
+    const changeDraft = isReviewForm ? this.modifyReviewDraft : this.modifyDraft
+    const title = isReviewForm
+      ? messages.reviewBirthRegistration
+      : activeSection.viewType === 'preview'
+        ? messages.previewBirthRegistration
+        : messages.newBirthRegistration
 
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
           breadcrumb="Informant: Parent"
           id="informant_parent_view"
-          title={intl.formatMessage(messages.newBirthRegistration)}
+          title={intl.formatMessage(title)}
         >
           <StickyFormTabs
             sections={registerForm.sections}
@@ -241,6 +288,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
             {activeSection.viewType === 'preview' && (
               <PreviewSection draft={draft} onSubmit={this.submitForm} />
             )}
+            {activeSection.viewType === 'review' && (
+              <PreviewSection draft={draft} onSubmit={this.submitForm} />
+            )}
             {activeSection.viewType === 'form' && (
               <Box>
                 <FormSectionTitle id={`form_section_title_${activeSection.id}`}>
@@ -252,7 +302,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 >
                   <FormFieldGenerator
                     id={activeSection.id}
-                    onChange={this.modifyDraft}
+                    onChange={changeDraft}
                     setAllFieldsDirty={setAllFieldsDirty}
                     fields={activeSection.fields}
                   />
@@ -336,11 +386,19 @@ function replaceInitialValues(fields: IFormField[], sectionValues: object) {
 
 function mapStateToProps(
   state: IStoreState,
-  props: Props & RouteComponentProps<{ tabId: string; draftId: string }>
+  props: Props &
+    RouteComponentProps<{ tabId: string; draftId: string; review: string }>
 ) {
   const { match } = props
-  const registerForm = getRegisterForm(state)
-  const activeSectionId = getActiveSectionId(registerForm, match.params)
+  const isReviewForm = match.params.review === 'review'
+  const registerForm = isReviewForm
+    ? getReviewForm(state)
+    : getRegisterForm(state)
+  const activeSectionId = getActiveSectionId(
+    registerForm,
+    match.params,
+    isReviewForm
+  )
 
   const activeSection = registerForm.sections.find(
     ({ id }) => id === activeSectionId
@@ -380,14 +438,16 @@ function mapStateToProps(
       ...activeSection,
       fields
     },
-    draft
+    draft,
+    isReviewForm
   }
 }
 
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
   deleteDraft,
-  goToTab: goToTabAction,
+  goToRegistrationTab: goToTabAction,
+  goToReviewTab: goToReviewTabAction,
   handleSubmit: values => {
     console.log(values)
   }

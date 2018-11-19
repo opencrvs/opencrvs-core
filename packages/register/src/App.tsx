@@ -81,7 +81,12 @@ export class App extends React.Component<IAppProps, IState> {
     this.loadDraftsFromStorage()
   }
   async loadDraftsFromStorage() {
-    const draftsString = await storage.getItem('drafts')
+    const isReviewForm =
+      this.props.history.location.pathname.indexOf('/reviews/review') > -1
+
+    const storageKey = isReviewForm ? 'reviewDrafts' : 'drafts'
+
+    const draftsString = await storage.getItem(storageKey)
     const drafts = JSON.parse(draftsString ? draftsString : '[]')
     this.props.store.dispatch(setInitialDrafts(drafts))
     this.setState({ initialDraftsLoaded: true })
@@ -123,6 +128,16 @@ export class App extends React.Component<IAppProps, IState> {
 
                           <ProtectedRoute
                             path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                            component={RegisterForm}
+                          />
+                          <ProtectedRoute
+                            exact
+                            path={routes.REVIEW_BIRTH_PARENT_FORM}
+                            component={RegisterForm}
+                          />
+
+                          <ProtectedRoute
+                            path={routes.REVIEW_BIRTH_PARENT_FORM_TAB}
                             component={RegisterForm}
                           />
                           <ProtectedRoute
