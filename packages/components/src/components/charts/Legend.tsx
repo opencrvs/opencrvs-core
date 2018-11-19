@@ -53,6 +53,10 @@ const DataTitle = styled.h3.attrs<{ description?: string }>({})`
   font-size: 20px;
   color: ${({ theme }) => theme.colors.accent};
   margin: ${({ description }) => (description ? `0` : `-48px 0px 0px 0px`)};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0;
+  }
 `
 
 const DataDescription = styled.span`
