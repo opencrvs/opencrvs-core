@@ -1,26 +1,28 @@
 # OpenCRVS Resources Module
 
-One of the key dependencies for OpenCRVS is a reference data source. This source is likely to be bespoke for every implementing nation.
+One of the key dependencies for OpenCRVS is a reference data source. This source is likely to be bespoke for every implementing nation. The resources package contains scripts to import all reference data required for OpenCRVS.
 
 The categories of the rerference data are as follows:
 
-- Administrative divisions _(A portion of a country delineated for the purpose of administration, with GeoJSON map data for an interactive map of the country.)_
+- Administrative divisions _(A portion of a country delineated for the purpose of administration, allowing registrations to be coupled to location and staff, with GeoJSON map data that enables an interactive map of the country, in the performance appllication.)_
 - Facilities _(The places where civil registration and vital events such as births/deaths occur)_
 - Employees _(The staff required to undertake the functions of civil registration)_
 
 The feautures in this package are designed to import and convert the reference data above into the FHIR standard, then populate the OpenCRVS [https://github.com/jembi/hearth](Hearth) NoSQL database, via the OpenCRVS [http://openhim.org/](OpenHIM) interoperability layer.
 
-Given the [https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country](variety of administrative divisions globally), and the unique nature of the organisational structure of any given national and local government, ... also given the variety of digital capabilities and stages of digital readiness of any implementing government, ...
+Given the [https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country](variety of administrative divisions between nations), and the unique nature of the organisational, local government operational structure of a nation, ... and given the variety of digital capabilities and stages of digital readiness of a nation, ...
 
-OpenCRVS does not attempt to prescribe the style or nature of it's dependencies, instead it is encouraged that this package be bespokely implementated according to needs during installation.
+... OpenCRVS does not attempt to prescribe the style or nature of it's resource dependencies. Instead it is encouraged that this package be bespokely implementated, according to a nation's needs during installation.
 
 Some governments, _(as in the case of the government of Bangladesh),_ may have a central repository for some reference data accessible via APIs.
 
-Other governments may supply the data in spreadsheet format.
+Other governments may supply the data in a spreadsheet format.
 
-What OpenCRVS does provide is an example approach of how this data can be imported, and additionally it provides a FHIR standard for each of these catgories.
+What OpenCRVS does provide, is an example approach and scripts showing how this data can be imported. Additionally OpenCRVS provides a FHIR standard for each of these categories.
 
 By following the examples in the features of this package, and by converting the reference data into FHIR, OpenCRVS illustrates a scalable approach to digitising and making interoperable, the administrative and operational data of a nation.
+
+**Strategically, OpenCRVS will include in its content management system the capability to manage all of these resources.**
 
 ---
 
@@ -34,7 +36,7 @@ This feature, imports and converts the administrative divisions for a country in
 
 ## Facilities
 
-This feature, imports and converts a civil registration offices and health facility list into [https://www.hl7.org/fhir/location.html](FHIR Location) objects.
+This feature, imports and converts civil registration offices and health facilities into [https://www.hl7.org/fhir/location.html](FHIR Location) objects.
 
 [https://github.com/jembi/opencrvs-fhir-templates/blob/master/offices/offices-resource.jsonc](This FHIR standard is followed.)
 
@@ -42,7 +44,7 @@ This feature, imports and converts a civil registration offices and health facil
 
 ## Employees
 
-This feature, imports and converts an employee list into [https://www.hl7.org/fhir/practitioner.html](FHIR Practitioner) and [https://www.hl7.org/fhir/practitionerrole.html](FHIR PractitionerRole) objects. The list is a test list based on the users and permissions in the [https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts](user-mgnt package.)
+This feature, imports and converts an employee list into [https://www.hl7.org/fhir/practitioner.html](FHIR Practitioner) and [https://www.hl7.org/fhir/practitionerrole.html](FHIR PractitionerRole) objects to manage permissions and map registrations to staff members, so that their performance can be tracked. The list is a test list based on the users and permissions in the [https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts](user-mgnt package.)
 
 [https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc](This FHIR standard is followed.)
 
@@ -50,19 +52,23 @@ This feature, imports and converts an employee list into [https://www.hl7.org/fh
 
 ### Developer commands
 
-Once all data sources have been reviewed then a single command should be able to be run by a developer, in order to populate a local or production environment with necessary reference data.
+Once all data sources have been readied, then a single command should be able to be run by a developer, in order to populate a local or production OpenCRVS environment with the necessary reference data.
 
 **Populate OpenCRVS with reference data**
 
 <!-- prettier-ignore -->
 ```yarn populate```
 
-Running this command runs the following commands sequentially. Each should be individually confirmed to be working as expected during code review, before publishing a countries resources package to master:
+---
+
+**Ensuring readiness of data sources**
+
+Running the populate command runs the following commands sequentially. Each should be individually confirmed to be working as expected during code review, before publishing a countries resources package to master:
 
 <!-- prettier-ignore -->
 ```yarn save:locations```
 
-Imports administrative divisions from a relevant source _(For Bangladesh, this is the A2I API,)_ converts the data into [https://www.hl7.org/fhir/location.html](FHIR Location) objects, using the [https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc](OpenCRVS interpretation), and saves JSON files for applying GeoJSON map data later into the extension array. Some custom fields for the country acn be utilised in the description or identifier fields.
+Imports administrative divisions from a relevant source _(For Bangladesh, this is the A2I API,)_ converts the data into [https://www.hl7.org/fhir/location.html](FHIR Location) objects, using the [https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc](OpenCRVS interpretation), and saves JSON files for applying GeoJSON map data later into the extension array. Some custom fields for the country can be utilised in the description or identifier fields.
 
 <!-- prettier-ignore -->
 ```yarn assign:geo-data```
