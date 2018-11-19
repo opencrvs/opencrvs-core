@@ -43,10 +43,25 @@ function CustomizedAxisTick(props: ICustomizedAxisTick) {
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={16} textAnchor="middle" fill={theme.colors.accent}>
+      <text
+        x={0}
+        y={0}
+        dy={16}
+        fontFamily={theme.fonts.lightFont}
+        textAnchor="middle"
+        fill={theme.colors.accent}
+      >
         {payload && `${Math.round(payload.value / totalValue * 100)}%`}
       </text>
-      <text x={0} y={20} dy={16} textAnchor="middle" fill="#666">
+      <text
+        x={0}
+        y={20}
+        dy={16}
+        fontFamily={theme.fonts.lightFont}
+        fontSize={12}
+        textAnchor="middle"
+        fill={theme.colors.copy}
+      >
         {payload && payload.value}
       </text>
     </g>
