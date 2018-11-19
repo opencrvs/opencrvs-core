@@ -1,12 +1,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
+import {
+  InjectedIntlProps,
+  injectIntl,
+  InjectedIntl,
+  FormattedHTMLMessage,
+  defineMessages
+} from 'react-intl'
 import { Header, Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
 import Logo from 'src/components/Logo'
 import { Page } from 'src/components/Page'
 import { Legend } from '@opencrvs/components/lib/charts'
-import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   birthRegistrationBoxTitle: {
@@ -21,25 +26,25 @@ const messages = defineMessages({
   },
   liveBirthsWithin45DaysLabel: {
     id: 'performance.graph.liveBirthsWithin45DaysLabel',
-    defaultMessage: 'Live births registered within 45 days of actual birth',
+    defaultMessage: 'Registrations<br />45 days of birth',
     description:
       'Live births registered within 45 days of actual birth label on graph'
   },
   liveBirthsWithin45DaysDescription: {
     id: 'performance.graph.liveBirthsWithin45DaysDescription',
-    defaultMessage: '500 out of 3000 total',
+    defaultMessage: '142500 out of 204000',
     description:
       'Live births registered within 45 days of actual birth description on graph'
   },
   liveBirthsWithin1yearLabel: {
     id: 'performance.graph.liveBirthsWithin1yearLabel',
-    defaultMessage: 'Live births registered within 1 year of actual birth',
+    defaultMessage: 'Registrations<br />1 year of actual birth',
     description:
       'Live births registered within 1 year of actual birth label on graph'
   },
   liveBirthsWithin1yearDescription: {
     id: 'performance.graph.liveBirthsWithin1yearDescription',
-    defaultMessage: '1000 out of 3000 total',
+    defaultMessage: '61500 out of 204000 total',
     description:
       'Live births registered within 1 year of actual birth description on graph'
   },
@@ -62,7 +67,7 @@ const messages = defineMessages({
 
 interface IData {
   value: number
-  label: string
+  label: React.ReactNode
   description?: string
   total?: boolean
   estimate?: boolean
@@ -71,21 +76,40 @@ interface IData {
 const getData = (intl: InjectedIntl): IData[] => {
   return [
     {
-      value: 500,
-      label: intl.formatMessage(messages.liveBirthsWithin45DaysLabel),
+      value: 142500,
+      label: (
+        <FormattedHTMLMessage
+          id="graph.label1"
+          defaultMessage={intl.formatHTMLMessage(
+            messages.liveBirthsWithin45DaysLabel
+          )}
+        />
+      ),
       description: intl.formatMessage(
         messages.liveBirthsWithin45DaysDescription
       )
     },
     {
-      value: 1000,
-      label: intl.formatMessage(messages.liveBirthsWithin1yearLabel),
+      value: 61500,
+      label: (
+        <FormattedHTMLMessage
+          id="graph.label2"
+          defaultMessage={intl.formatHTMLMessage(
+            messages.liveBirthsWithin1yearLabel
+          )}
+        />
+      ),
       description: intl.formatMessage(messages.liveBirthsWithin1yearDescription)
     },
     {
       value: 204000,
-      label: intl.formatMessage(messages.totalLiveBirthsLabel),
-      estimate: true
+      label: (
+        <FormattedHTMLMessage
+          id="graph.label3"
+          defaultMessage={intl.formatHTMLMessage(messages.totalLiveBirthsLabel)}
+        />
+      ),
+      total: true
     }
   ]
 }

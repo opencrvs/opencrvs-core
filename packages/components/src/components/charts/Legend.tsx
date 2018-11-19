@@ -48,7 +48,7 @@ const DataLabel = styled.label`
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 1em;
 `
-const DataTitle = styled.h3.attrs<{ description: string }>({})`
+const DataTitle = styled.h3.attrs<{ description?: string }>({})`
   font-size: 20px;
   color: ${({ theme }) => theme.colors.accent};
   margin: ${({ description }) => (description ? `0` : `-48px 0px 0px 0px`)};
@@ -90,7 +90,7 @@ function LegendBody({
     title = `${Math.round(dataPoint.value / estimate * 100)}%`
   }
 
-  if (dataPoint.estimate) {
+  if (dataPoint.total) {
     title = dataPoint.value.toString()
   }
 

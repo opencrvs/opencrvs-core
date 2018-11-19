@@ -9,16 +9,15 @@ export const BENGALI_STATE = {
     'performance.graph.birthRegistrationBoxFooter':
       'Estimates provided using National Population Census data',
     'performance.graph.liveBirthsWithin45DaysLabel':
-      'Live births registered within 45 days of actual birth',
+      'Registrations<br />45 days of birth',
     'performance.graph.liveBirthsWithin45DaysDescription':
-      '500 out of 3000 total',
+      '142500 out of 204000',
     'performance.graph.liveBirthsWithin1yearLabel':
-      'Live births registered within 1 year of actual birth',
+      'Registrations<br />1 year of actual birth',
     'performance.graph.liveBirthsWithin1yearDescription':
-      '1000 out of 3000 total',
-    'performance.graph.totalLiveBirthsLabel': 'Total Live Births registered',
-    'performance.graph.totalLiveBirthsDescription':
-      '3000 out of estimated 4000',
+      '61500 out of 204000 total',
+    'performance.graph.totalLiveBirthsLabel':
+      'Total Live Births<br />registered',
     'performance.graph.estimatedBirthsInTimeLabel':
       'Estimated Births in [time period]',
     'performance.graph.estimatedBirthsInTimeDescription':
