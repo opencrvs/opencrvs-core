@@ -7,6 +7,7 @@ const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
 const WRITE_DRAFT = 'DRAFTS/WRITE_DRAFT'
+const DELETE_DRAFT = 'DRAFTS/DELETE_DRAFT'
 
 export interface IDraft {
   id: number
@@ -39,12 +40,18 @@ interface ISetInitialDraftsAction {
   }
 }
 
+interface IDeleteDraftAction {
+  type: typeof DELETE_DRAFT
+  payload: { draft: IDraft }
+}
+
 type Action =
   | IStoreDraftAction
   | IModifyDraftAction
   | ISetInitialDraftsAction
   | IWriteDraftAction
   | NavigationAction
+  | IDeleteDraftAction
 
 export interface IDraftsState {
   initalDraftsLoaded: boolean
@@ -69,6 +76,10 @@ export function modifyDraft(draft: IDraft): IModifyDraftAction {
 }
 export function setInitialDrafts(drafts: IDraftsState) {
   return { type: SET_INITIAL_DRAFTS, payload: { drafts } }
+}
+
+export function deleteDraft(draft: IDraft): IDeleteDraftAction {
+  return { type: DELETE_DRAFT, payload: { draft } }
 }
 
 function writeDraft(draft: IDraftsState): IWriteDraftAction {
@@ -103,6 +114,21 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       return loop(
         stateAfterDraftStore,
         Cmd.action(writeDraft(stateAfterDraftStore))
+      )
+    case DELETE_DRAFT:
+      const deleteIndex = state.drafts.findIndex(draft => {
+        return draft.id === action.payload.draft.id
+      })
+      if (deleteIndex >= 0) {
+        state.drafts.splice(deleteIndex, 1)
+      }
+      const stateAfterDraftDeletion = {
+        ...state,
+        drafts: state.drafts
+      }
+      return loop(
+        stateAfterDraftDeletion,
+        Cmd.action(writeDraft(stateAfterDraftDeletion))
       )
     case MODIFY_DRAFT:
       const stateAfterDraftModification = {

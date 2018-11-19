@@ -88,7 +88,7 @@ describe('WorkQueue tests', async () => {
       {
         name: 'Baby Doe',
         dob: '',
-        date_of_application: '6 months ago',
+        date_of_application: '2018-05-23',
         tracking_id: 'B111111',
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'application',
@@ -98,7 +98,7 @@ describe('WorkQueue tests', async () => {
       {
         name: 'Baby Smith',
         dob: '',
-        date_of_application: '6 months ago',
+        date_of_application: '2018-05-23',
         tracking_id: 'B222222',
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'application',
