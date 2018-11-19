@@ -70,14 +70,10 @@ export function goToTab(
 ) {
   return { type: GO_TO_TAB, payload: { draftId, tabId, fieldNameHash } }
 }
-export function goToReviewTab(
-  reviewDraftId: number,
-  reviewTabId: string,
-  fieldHash?: string
-) {
+export function goToReviewTab(reviewDraftId: number, reviewTabId: string) {
   return {
     type: GO_TO_REVIEW_TAB,
-    payload: { reviewDraftId, reviewTabId, fieldHash }
+    payload: { reviewDraftId, reviewTabId }
   }
 }
 
@@ -99,7 +95,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
         )
       )
     case GO_TO_REVIEW_TAB:
-      const { fieldHash, reviewDraftId, reviewTabId } = action.payload
+      const { reviewDraftId, reviewTabId } = action.payload
       return loop(
         state,
         Cmd.action(
@@ -108,7 +104,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
               draftId: reviewDraftId.toString(),
               review: 'review',
               tabId: reviewTabId
-            }) + (fieldHash ? `#${fieldHash}` : '')
+            })
           )
         )
       )
