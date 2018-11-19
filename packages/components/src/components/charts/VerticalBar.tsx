@@ -11,7 +11,6 @@ import {
   Cell
 } from 'recharts'
 import { ITheme } from '../theme'
-import { endianness } from 'os'
 
 const Container = styled.div`
   box-sizing: border-box;
