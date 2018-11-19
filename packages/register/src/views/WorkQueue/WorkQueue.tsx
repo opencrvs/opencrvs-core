@@ -31,12 +31,12 @@ import { HomeViewHeader } from 'src/components/HomeViewHeader'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list {
-    listBirthRegistrations(status: "declared") {
+    listBirthRegistrations {
       id
       registration {
         trackingId
-        # status {
-        #   user {
+        # status { # these are disabled until we re actually setting these in the registrations
+        #   user { # they will be used by the expanded component
         #     firstName
         #     lastName
         #     role {
@@ -82,6 +82,97 @@ const messages = defineMessages({
     id: 'register.workQueue.queryError',
     defaultMessage: 'An error occurred while searching',
     description: 'The error message shown when a search query fails'
+  },
+  dataTableResults: {
+    id: 'register.workQueue.dataTable.results',
+    defaultMessage: 'Results',
+    description: 'Results label at the top of the data table component'
+  },
+  dataTableNoResults: {
+    id: 'register.workQueue.dataTable.noResults',
+    defaultMessage: 'No result to display',
+    description:
+      'Text to display if the search return no results for the current filters'
+  },
+  headerTitle: {
+    id: 'register.workQueue.header.title',
+    defaultMessage: 'Hello Registrar',
+    description: 'The displayed title in the Work Queue header'
+  },
+  headerDescription: {
+    id: 'register.workQueue.header.description',
+    defaultMessage: 'Review | Registration | Certification',
+    description: 'The displayed description in the Work Queue header'
+  },
+  filtersSortBy: {
+    id: 'register.workQueue.filters.sortBy',
+    defaultMessage: 'Sort By',
+    description: 'Label for the sort by section of the filters'
+  },
+  filtersOldestToNewest: {
+    id: 'register.workQueue.filters.oldestToNewest',
+    defaultMessage: 'Oldest to newest',
+    description: 'Label for the sort by oldest to newest option'
+  },
+  filtersNewestToOldest: {
+    id: 'register.workQueue.filters.newestToOldest',
+    defaultMessage: 'Newest to oldest',
+    description: 'Label for the sort by newest to oldest option'
+  },
+  filtersFilterBy: {
+    id: 'register.workQueue.filters.filterBy',
+    defaultMessage: 'Sort By',
+    description: 'Label for the sort by section of the filters'
+  },
+  filtersBirth: {
+    id: 'register.workQueue.filters.birth',
+    defaultMessage: 'Birth',
+    description: 'Label for the filter by birth option'
+  },
+  filtersDeath: {
+    id: 'register.workQueue.filters.death',
+    defaultMessage: 'Death',
+    description: 'Label for the filter by death option'
+  },
+  filtersMarriage: {
+    id: 'register.workQueue.filters.marriage',
+    defaultMessage: 'Marriage',
+    description: 'Label for the filter by marriage option'
+  },
+  filtersApplication: {
+    id: 'register.workQueue.filters.application',
+    defaultMessage: 'Application',
+    description: 'Label for the filter by application option'
+  },
+  filtersRegistered: {
+    id: 'register.workQueue.filters.registered',
+    defaultMessage: 'Registered',
+    description: 'Label for the filter by registered option'
+  },
+  filtersCollected: {
+    id: 'register.workQueue.filters.collected',
+    defaultMessage: 'Collected',
+    description: 'Label for the filter by collected option'
+  },
+  listItemName: {
+    id: 'register.workQueue.listItem.name',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
+  },
+  listItemDob: {
+    id: 'register.workQueue.listItem.dob',
+    defaultMessage: 'D.o.B',
+    description: 'Label for DoB in work queue list item'
+  },
+  listItemDateOfApplication: {
+    id: 'register.workQueue.listItem.dateOfApplication',
+    defaultMessage: 'Date of application',
+    description: 'Label for date of application in work queue list item'
+  },
+  listItemTrackingNumber: {
+    id: 'register.workQueue.listItem.trackingId',
+    defaultMessage: 'Tracking ID',
+    description: 'Label for tracking ID in work queue list item'
   }
 })
 
@@ -103,65 +194,6 @@ const Container = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
 type IWorkQueueProps = InjectedIntlProps & IViewHeadingProps & ISearchInputProps
-
-const sortBy = {
-  input: {
-    label: 'Sort By'
-  },
-  selects: {
-    name: '',
-    options: [
-      {
-        name: 'createdAt',
-        options: [
-          { value: 'asc', label: 'Oldest to newest' },
-          { value: 'desc', label: 'Newest to oldest' }
-        ],
-        value: ''
-      }
-    ]
-  }
-}
-
-const filterBy = {
-  input: {
-    label: 'Filter By'
-  },
-  selects: {
-    name: '',
-    options: [
-      {
-        name: 'event',
-        options: [
-          { value: 'birth', label: 'Birth' },
-          { value: 'death', label: 'Death' },
-          { value: 'marriage', label: 'Marriage' }
-        ],
-        value: ''
-      },
-      {
-        name: 'declaration_status',
-        options: [
-          { value: 'application', label: 'Application' },
-          { value: 'collected', label: 'Collected' },
-          { value: 'registered', label: 'Registered' }
-        ],
-        value: ''
-      },
-      {
-        name: 'location',
-        options: [
-          { value: 'gazipur', label: 'Gazipur Union' },
-          { value: 'badda', label: 'Badda Union' },
-          { value: 'dhamrai', label: 'Dhamrai Union' },
-          { value: 'savar', label: 'Savar Union' },
-          { value: 'dohar', label: 'Dohar Union' }
-        ],
-        value: ''
-      }
-    ]
-  }
-}
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
@@ -212,7 +244,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
           (reg.registration &&
             reg.registration.status &&
             (reg.registration.status[0] as GQLRegWorkflow).type) ||
-          'application', // TODO
+          'application', // TODO don't default to application - this is here as we don't have any status information at the moment
         event: 'birth',
         location:
           (reg.registration &&
@@ -228,10 +260,22 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     const info = []
     const status = []
 
-    info.push({ label: 'Name', value: item.name })
-    info.push({ label: 'D.o.B', value: item.dob })
-    info.push({ label: 'Date of application', value: item.date_of_application })
-    info.push({ label: 'Tracking ID', value: item.tracking_id })
+    info.push({
+      label: this.props.intl.formatMessage(messages.listItemName),
+      value: item.name
+    })
+    info.push({
+      label: this.props.intl.formatMessage(messages.listItemDob),
+      value: item.dob
+    })
+    info.push({
+      label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
+      value: item.date_of_application
+    })
+    info.push({
+      label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
+      value: item.tracking_id
+    })
 
     status.push({ icon: <StatusGray />, label: item.event })
     status.push({
@@ -253,12 +297,96 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
   render() {
     const { intl } = this.props
 
+    const sortBy = {
+      input: {
+        label: intl.formatMessage(messages.filtersSortBy)
+      },
+      selects: {
+        name: '',
+        options: [
+          {
+            name: 'createdAt',
+            options: [
+              {
+                value: 'asc',
+                label: intl.formatMessage(messages.filtersOldestToNewest)
+              },
+              {
+                value: 'desc',
+                label: intl.formatMessage(messages.filtersNewestToOldest)
+              }
+            ],
+            value: ''
+          }
+        ]
+      }
+    }
+
+    const filterBy = {
+      input: {
+        label: intl.formatMessage(messages.filtersFilterBy)
+      },
+      selects: {
+        name: '',
+        options: [
+          {
+            name: 'event',
+            options: [
+              {
+                value: 'birth',
+                label: intl.formatMessage(messages.filtersBirth)
+              },
+              {
+                value: 'death',
+                label: intl.formatMessage(messages.filtersDeath)
+              },
+              {
+                value: 'marriage',
+                label: intl.formatMessage(messages.filtersMarriage)
+              }
+            ],
+            value: ''
+          },
+          {
+            name: 'declaration_status',
+            options: [
+              {
+                value: 'application',
+                label: intl.formatMessage(messages.filtersApplication)
+              },
+              {
+                value: 'registered',
+                label: intl.formatMessage(messages.filtersRegistered)
+              },
+              {
+                value: 'collected',
+                label: intl.formatMessage(messages.filtersCollected)
+              }
+            ],
+            value: ''
+          },
+          {
+            name: 'location',
+            options: [
+              // TODO these need to be translated but those needs to be read from our backend when we have locations setup
+              { value: 'gazipur', label: 'Gazipur Union' },
+              { value: 'badda', label: 'Badda Union' },
+              { value: 'dhamrai', label: 'Dhamrai Union' },
+              { value: 'savar', label: 'Savar Union' },
+              { value: 'dohar', label: 'Dohar Union' }
+            ],
+            value: ''
+          }
+        ]
+      }
+    }
+
     return (
       <>
         <HomeViewHeader>
           <ViewHeading
-            title="Hello Registrar"
-            description="Review | Registration | Certification"
+            title={intl.formatMessage(messages.headerTitle)}
+            description={intl.formatMessage(messages.headerDescription)}
             {...this.props}
           />
         </HomeViewHeader>
@@ -300,8 +428,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                     sortBy={sortBy}
                     filterBy={filterBy}
                     cellRenderer={this.renderCell}
-                    resultLabel="Results"
-                    noResultText="No result to display"
+                    resultLabel={intl.formatMessage(messages.dataTableResults)}
+                    noResultText={intl.formatMessage(
+                      messages.dataTableNoResults
+                    )}
                   />
                 </>
               )

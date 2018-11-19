@@ -604,6 +604,24 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.results.dateOfRegistration': 'নিবন্ধনের তারিখ',
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
-    'register.workQueue.queryError': 'TODO'
+    'register.workQueue.queryError': 'TODO',
+    'register.workQueue.dataTable.results': 'TODO',
+    'register.workQueue.dataTable.noResults': 'TODO',
+    'register.workQueue.header.title': 'TODO',
+    'register.workQueue.header.description': 'TODO',
+    'register.workQueue.filters.sortBy': 'TODO',
+    'register.workQueue.filters.oldestToNewest': 'TODO',
+    'register.workQueue.filters.newestToOldest': 'TODO',
+    'register.workQueue.filters.filterBy': 'TODO',
+    'register.workQueue.filters.birth': 'TODO',
+    'register.workQueue.filters.death': 'TODO',
+    'register.workQueue.filters.marriage': 'TODO',
+    'register.workQueue.filters.application': 'TODO',
+    'register.workQueue.filters.registered': 'TODO',
+    'register.workQueue.filters.collected': 'TODO',
+    'register.workQueue.listItem.name': 'TODO',
+    'register.workQueue.listItem.dob': 'TODO',
+    'register.workQueue.listItem.dateOfApplication': 'TODO',
+    'register.workQueue.listItem.trackingId': 'TODO'
   }
 }
