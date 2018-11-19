@@ -1,17 +1,23 @@
 import * as React from 'react'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled from 'styled-components'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
-import { IconAction, ActionTitle } from '@opencrvs/components/lib/buttons'
+import {
+  Action,
+  IconAction,
+  ActionTitle
+} from '@opencrvs/components/lib/buttons'
 import { Plus } from '@opencrvs/components/lib/icons'
 import {
   Banner,
   SearchInput,
   ISearchInputProps
 } from '@opencrvs/components/lib/interface'
-
+import { goToBirthRegistrationForReview } from 'src/navigation'
+import { createDraft, storeDraft } from '../../drafts'
 const messages = defineMessages({
   searchInputPlaceholder: {
     id: 'register.workQueue.searchInput.placeholder',
@@ -62,7 +68,11 @@ const StyledIconAction = styled(IconAction)`
     color: ${({ theme }) => theme.colors.white};
   }
 `
-type IWorkQueueProps = InjectedIntlProps & IViewHeadingProps & ISearchInputProps
+type IWorkQueueProps = InjectedIntlProps &
+  IViewHeadingProps &
+  ISearchInputProps & {
+    goToBirthRegistrationForReview: () => void
+  }
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
   render() {
@@ -90,9 +100,26 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
             {...this.props}
           />
         </Container>
+        <Action
+          id="select_parent_informant"
+          title="Review"
+          description="Review"
+          onClick={this.props.goToBirthRegistrationForReview}
+        />
       </>
     )
   }
 }
 
-export const WorkQueue = connect(null)(injectIntl(WorkQueueView))
+export const WorkQueue = connect(null, function mapDispatchToProps(
+  dispatch: Dispatch
+) {
+  return {
+    goToBirthRegistrationForReview: () => {
+      const draft = createDraft()
+      dispatch(storeDraft(draft, true))
+      dispatch(goToBirthRegistrationForReview(draft.id))
+      // dispatch(goToBirthRegistrationForReview(1542088554908))
+    }
+  }
+})(injectIntl(WorkQueueView))

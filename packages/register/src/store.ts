@@ -17,7 +17,9 @@ import {
 import { profileReducer, ProfileState } from './profile/profileReducer'
 
 import { intlReducer, IntlState } from './i18n/reducer'
-import { draftsReducer, IDraftsState } from './drafts'
+import { draftsReducer, IDraftsState } from 'src/drafts'
+// import { reviewDraftsReducer, IReviewDraftsState } from 'src/drafts/review'
+import { reviewReducer, IReviewFormState } from './forms/review/reviewReducer'
 import {
   registerFormReducer,
   IRegisterFormState
@@ -36,6 +38,7 @@ export interface IStoreState {
   registerForm: IRegisterFormState
   navigation: INavigationState
   notification: NotificationState
+  reviewForm: IReviewFormState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -45,7 +48,8 @@ const reducers = combineReducers<IStoreState>({
   drafts: draftsReducer,
   registerForm: registerFormReducer,
   navigation: navigationReducer,
-  notification: notificationReducer
+  notification: notificationReducer,
+  reviewForm: reviewReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

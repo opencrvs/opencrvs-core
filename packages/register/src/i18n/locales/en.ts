@@ -445,7 +445,9 @@ export const ENGLISH_STATE = {
     'register.form.tabs.documentsTab': 'Documents',
     'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
+    'register.form.tabs.reviewTab': 'Review',
     'register.form.section.previewTitle': 'Preview',
+    'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
       'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
     'register.form.section.documents.list.informantAttestation':
@@ -502,6 +504,8 @@ export const ENGLISH_STATE = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth declaration',
+    'register.form.previewBirthRegistration': 'Birth Application Preview',
+    'register.form.reviewBirthRegistration': 'Birth Application Review',
     'register.form.saveDraft': 'Save draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
@@ -539,7 +543,6 @@ export const ENGLISH_STATE = {
       'Once the declaration is succesfully submited, you and the informant will be notified when the registration is complete.',
     'register.savedRegistration.buttons.back': 'Back to homescreen',
     'register.savedRegistration.buttons.newDeclaration': 'New declaration',
-    'register.selectInformant.newBirthRegistration': 'New birth declaration',
     'register.selectInformant.informantTitle': 'Who is the informant?',
     'register.selectInformant.informantDescription':
       'Tell us who is providing the details, and check what information is needed to submit the form.',

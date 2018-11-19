@@ -3,7 +3,8 @@ import {
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_BIRTH_PARENT_FORM_TAB,
-  SELECT_VITAL_EVENT
+  SELECT_VITAL_EVENT,
+  REVIEW_BIRTH_PARENT_FORM_TAB
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 
@@ -23,8 +24,17 @@ type GoToTabAction = {
     fieldNameHash?: string
   }
 }
+export const GO_TO_REVIEW_TAB = 'navigation/GO_TO_REVIEW_TAB'
+type GoToReviewTabAction = {
+  type: typeof GO_TO_REVIEW_TAB
+  payload: {
+    reviewDraftId: number
+    reviewTabId: string
+    fieldHash?: string
+  }
+}
 
-export type Action = GoToTabAction
+export type Action = GoToTabAction | GoToReviewTabAction
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -43,12 +53,32 @@ export function goToBirthRegistrationAsParent(draftId: number) {
   )
 }
 
+export function goToBirthRegistrationForReview(draftId: number) {
+  return push(
+    formatUrl(REVIEW_BIRTH_PARENT_FORM_TAB, {
+      draftId: draftId.toString(),
+      review: 'review',
+      tabId: 'review'
+    })
+  )
+}
+
 export function goToTab(
   draftId: number,
   tabId: string,
   fieldNameHash?: string
 ) {
   return { type: GO_TO_TAB, payload: { draftId, tabId, fieldNameHash } }
+}
+export function goToReviewTab(
+  reviewDraftId: number,
+  reviewTabId: string,
+  fieldHash?: string
+) {
+  return {
+    type: GO_TO_REVIEW_TAB,
+    payload: { reviewDraftId, reviewTabId, fieldHash }
+  }
 }
 
 export type INavigationState = undefined
@@ -65,6 +95,20 @@ export function navigationReducer(state: INavigationState, action: Action) {
               draftId: draftId.toString(),
               tabId
             }) + (fieldNameHash ? `#${fieldNameHash}` : '')
+          )
+        )
+      )
+    case GO_TO_REVIEW_TAB:
+      const { fieldHash, reviewDraftId, reviewTabId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(REVIEW_BIRTH_PARENT_FORM_TAB, {
+              draftId: reviewDraftId.toString(),
+              review: 'review',
+              tabId: reviewTabId
+            }) + (fieldHash ? `#${fieldHash}` : '')
           )
         )
       )

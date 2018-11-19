@@ -1,4 +1,5 @@
 import createBirthRegistrationHandler from '../features/registration/handler'
+import listBirthRegistrations from '../features/registration/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -23,6 +24,27 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/createBirthRegistration',
       handler: createBirthRegistrationHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Push trackingid before submitting to FHIR and send notification to the shared contact',
+        auth: {
+          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+        },
+        plugins: {
+          'hapi-swagger': {
+            responses: {
+              200: { description: 'Birth declration is successfully synced' },
+              400: { description: 'Bad request, check your request body' }
+            }
+          }
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/listBirthRegistrations',
+      handler: listBirthRegistrations,
       config: {
         tags: ['api'],
         description:
