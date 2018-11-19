@@ -612,6 +612,7 @@ export const ENGLISH_STATE = {
       'Date of registration',
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
-    'register.workQueue.labels.results.trackingID': 'Tracking ID'
+    'register.workQueue.labels.results.trackingID': 'Tracking ID',
+    'register.workQueue.queryError': 'An error occurred while searching'
   }
 }

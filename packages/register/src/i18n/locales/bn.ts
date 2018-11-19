@@ -603,6 +603,7 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.results.dateOfCollection': 'সংগ্রহ তারিখ',
     'register.workQueue.labels.results.dateOfRegistration': 'নিবন্ধনের তারিখ',
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
-    'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি'
+    'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
+    'register.workQueue.queryError': 'TODO'
   }
 }

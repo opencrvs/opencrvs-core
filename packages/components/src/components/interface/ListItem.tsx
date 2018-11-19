@@ -1,42 +1,23 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import {
-  StatusGreen,
-  StatusOrange,
-  StatusGray,
-  StatusCollected
-} from '../icons'
+import { IDynamicValues } from '../common-types'
 
-interface IProp {
+export interface IInfo {
   label: string
   value: string
 }
 
-interface IStatus {
-  icon: string
+export interface IStatus {
+  icon: JSX.Element
   label: string
-}
-
-interface IAction {
-  label: string
-  handler: () => void
-}
-
-interface IDynamicValues {
-  [key: string]: string
 }
 
 export interface IListItemProps {
   index: number
-  infoItems: IProp[]
+  infoItems: IInfo[]
   statusItems: IStatus[]
-  actions: IAction[]
   itemData: IDynamicValues
-  expandedCellRenderer: (
-    itemData: IDynamicValues,
-    key: number
-  ) => React.Component<{}>
-  onClick: () => void
+  expandedCellRenderer: (itemData: IDynamicValues, key: number) => JSX.Element
 }
 
 interface IListItemState {
@@ -118,7 +99,7 @@ const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 
-function LabelValue({ label, value }: IProp) {
+function LabelValue({ label, value }: IInfo) {
   return (
     <div>
       <StyledLabel>{label}:</StyledLabel>
@@ -142,14 +123,14 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
   }
 
   render() {
-    const { infoItems, statusItems, index, actions, itemData } = this.props
+    const { infoItems, statusItems, index, itemData } = this.props
     const { expanded } = this.state
     return (
       <Wrapper key={index} expanded={expanded}>
         {expanded && <ExpandedIndicator />}
         <ListItemContainer key={index} onClick={this.toggleExpanded}>
           <InfoDiv>
-            {infoItems.map((data: IProp, infoIndex) => (
+            {infoItems.map((data: IInfo, infoIndex) => (
               <LabelValue
                 key={infoIndex}
                 label={data.label}
