@@ -73,7 +73,6 @@ enum CauseOfDeath {
 }
 
 input CommentInput {
-  id: ID!
   user: UserInput
   comment: String
   createdAt: Date
