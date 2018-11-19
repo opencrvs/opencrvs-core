@@ -1,6 +1,7 @@
 ```js
 const data = [
-  { name: '45d', value: 2400 },
+  { name: '45d', value: 2100 },
+  { name: '46d - 1yr', value: 2400 },
   { name: '1', value: 1398 },
   { name: '2', value: 6800 },
   { name: '3', value: 3908 },
@@ -13,6 +14,10 @@ const data = [
   { name: '10', value: 2570 }
 ]
 ;<div>
-  <VerticalBar data={data} />
+  <VerticalBar
+    data={data}
+    xAxisLabel="Age(years)"
+    yAxisLabel="Total Births Registered (%)"
+  />
 </div>
 ```

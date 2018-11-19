@@ -4,11 +4,14 @@ import {
   BarChart,
   Bar,
   XAxis,
+  YAxis,
+  Label,
   ResponsiveContainer,
   CartesianGrid,
   Cell
 } from 'recharts'
 import { ITheme } from '../theme'
+import { endianness } from 'os'
 
 const Container = styled.div`
   box-sizing: border-box;
@@ -32,6 +35,8 @@ interface ICustomizedAxisTick {
 
 interface IVerticalBarProps {
   data: IDataPoint[]
+  xAxisLabel: string
+  yAxisLabel: string
 }
 
 function CustomizedAxisTick(props: ICustomizedAxisTick) {
@@ -79,7 +84,7 @@ const sumUpAllValues = (data: IDataPoint[]) =>
 
 export const VerticalBar = withTheme(
   (props: IVerticalBarProps & { theme: ITheme }) => {
-    const { data, theme } = props
+    const { data, theme, xAxisLabel, yAxisLabel } = props
     const colours = [
       theme.colors.chartPrimary,
       theme.colors.chartSecondary,
@@ -89,7 +94,13 @@ export const VerticalBar = withTheme(
     return (
       <Container>
         <ResponsiveContainer>
-          <BarChart width={600} height={300} data={data} barCategoryGap={0}>
+          <BarChart
+            width={600}
+            height={300}
+            data={data}
+            margin={{ top: 0, right: 0, bottom: 40, left: 20 }}
+            barCategoryGap={0}
+          >
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={colours[1]} stopOpacity={0.9} />
@@ -124,8 +135,26 @@ export const VerticalBar = withTheme(
               tickLine={false}
               axisLine={false}
               dataKey="name"
-            />
-
+            >
+              <Label
+                fill={theme.colors.secondary}
+                fontFamily={theme.fonts.lightFont}
+                offset={20}
+                value={xAxisLabel}
+                position="bottom"
+              />
+            </XAxis>
+            <YAxis width={30} tickLine={false} axisLine={false} tick={false}>
+              <Label
+                fill={theme.colors.secondary}
+                fontFamily={theme.fonts.lightFont}
+                transform="rotate(-90)"
+                dy={-40}
+                offset={20}
+                value={yAxisLabel}
+                position="left"
+              />
+            </YAxis>
             <CartesianGrid
               vertical={false}
               horizontal={false}
