@@ -74,7 +74,7 @@ services:
     image: jembi/ocrvs-notification:latest
     build: packages/notification
     restart: unless-stopped
-     environment:      
+    environment:      
       - LANGUAGE=bn
     deploy:
       replicas: 2
