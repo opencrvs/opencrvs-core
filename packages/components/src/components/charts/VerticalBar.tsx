@@ -5,11 +5,7 @@ import {
   Bar,
   XAxis,
   ResponsiveContainer,
-  YAxis,
   CartesianGrid,
-  Label,
-  // Tooltip,
-  // Legend,
   Cell
 } from 'recharts'
 import { ITheme } from '../theme'
