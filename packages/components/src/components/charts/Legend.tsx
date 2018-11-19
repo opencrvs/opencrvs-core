@@ -5,6 +5,7 @@ import { ITheme } from '../theme'
 
 export interface ILegendProps {
   data: IDataPoint[]
+  smallestToLargest: boolean
 }
 
 const Row = styled.div`
@@ -105,13 +106,17 @@ function LegendBody({
 }
 
 export const Legend = withTheme(
-  ({ data, theme }: ILegendProps & { theme: ITheme }) => {
+  ({ data, theme, smallestToLargest }: ILegendProps & { theme: ITheme }) => {
     const dataPointsWithoutEstimates = data.filter(
       dataPoint => !dataPoint.estimate
     )
-    const fromSmallest = [...data].sort((a, b) => a.value - b.value)
-    const allTotalPoints = fromSmallest.filter(({ total }) => total)
-    const allEstimatePoints = fromSmallest.filter(({ estimate }) => estimate)
+
+    let sortedData = data
+    if (smallestToLargest) {
+      sortedData = [...data].sort((a, b) => a.value - b.value)
+    }
+    const allTotalPoints = sortedData.filter(({ total }) => total)
+    const allEstimatePoints = sortedData.filter(({ estimate }) => estimate)
 
     const colours = [
       theme.colors.chartPrimary,
@@ -122,7 +127,7 @@ export const Legend = withTheme(
     return (
       <div>
         <Row>
-          {fromSmallest.map((dataPoint, i) => {
+          {sortedData.map((dataPoint, i) => {
             const colour =
               colours[dataPointsWithoutEstimates.indexOf(dataPoint)]
             return (

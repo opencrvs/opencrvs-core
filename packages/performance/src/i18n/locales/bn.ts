@@ -14,8 +14,7 @@ export const BENGALI_STATE = {
       '142500 out of 204000',
     'performance.graph.liveBirthsWithin1yearLabel':
       'Registrations<br />1 year of actual birth',
-    'performance.graph.liveBirthsWithin1yearDescription':
-      '61500 out of 204000 total',
+    'performance.graph.liveBirthsWithin1yearDescription': '61500 out of 204000',
     'performance.graph.totalLiveBirthsLabel':
       'Total Live Births<br />registered',
     'performance.graph.estimatedBirthsInTimeLabel':

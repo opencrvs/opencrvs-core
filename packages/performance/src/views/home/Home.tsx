@@ -44,7 +44,7 @@ const messages = defineMessages({
   },
   liveBirthsWithin1yearDescription: {
     id: 'performance.graph.liveBirthsWithin1yearDescription',
-    defaultMessage: '61500 out of 204000 total',
+    defaultMessage: '61500 out of 204000',
     description:
       'Live births registered within 1 year of actual birth description on graph'
   },
@@ -156,7 +156,7 @@ class HomeView extends React.Component<InjectedIntlProps> {
             <BoxTitle id="box_title">
               {intl.formatMessage(messages.birthRegistrationBoxTitle)}
             </BoxTitle>
-            <Legend data={getData(intl)} />
+            <Legend data={getData(intl)} smallestToLargest={false} />
             <FooterText id="footer_text">
               {intl.formatMessage(messages.birthRegistrationBoxFooter)}
             </FooterText>
