@@ -26,7 +26,7 @@ const messages = defineMessages({
   },
   liveBirthsWithin45DaysLabel: {
     id: 'performance.graph.liveBirthsWithin45DaysLabel',
-    defaultMessage: 'Registrations<br />45 days of birth',
+    defaultMessage: 'Registrations within<br />45 days of birth',
     description:
       'Live births registered within 45 days of actual birth label on graph'
   },
@@ -38,7 +38,7 @@ const messages = defineMessages({
   },
   liveBirthsWithin1yearLabel: {
     id: 'performance.graph.liveBirthsWithin1yearLabel',
-    defaultMessage: 'Registrations<br />1 year of actual birth',
+    defaultMessage: 'Registrations within<br />1 year of birth',
     description:
       'Live births registered within 1 year of actual birth label on graph'
   },
