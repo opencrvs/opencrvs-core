@@ -8,9 +8,9 @@ The categories of the rerference data are as follows:
 - Facilities _(The places where civil registration and vital events such as births/deaths occur)_
 - Employees _(The staff required to undertake the functions of civil registration)_
 
-The feautures in this package are designed to import and convert the reference data above into the FHIR standard, then populate the OpenCRVS [https://github.com/jembi/hearth](Hearth) NoSQL database, via the OpenCRVS [http://openhim.org/](OpenHIM) interoperability layer.
+The feautures in this package are designed to import and convert the reference data above into the FHIR standard, then populate the OpenCRVS [Hearth](https://github.com/jembi/hearth) NoSQL database, via the OpenCRVS [OpenHIM](http://openhim.org/) interoperability layer.
 
-Given the [https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country](variety of administrative divisions between nations), and the unique nature of the organisational, local government operational structure of a nation, ... and given the variety of digital capabilities and stages of digital readiness of a nation, ...
+Given the [variety of administrative divisions between nations](https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country), and the unique nature of the organisational, local government operational structure of a nation, ... and given the variety of digital capabilities and stages of digital readiness of a nation, ...
 
 ... OpenCRVS does not attempt to prescribe the style or nature of it's resource dependencies. Instead it is encouraged that this package be bespokely implementated, according to a nation's needs during installation.
 
@@ -28,25 +28,25 @@ By following the examples in the features of this package, and by converting the
 
 ## Administrative
 
-This feature, imports and converts the administrative divisions for a country into [https://www.hl7.org/fhir/location.html](FHIR Location) objects, applies a GeoJSON map to each location and then saves the data to FHIR. The process can be interrupted to export a CSV file for manual cross-checking.
+This feature, imports and converts the administrative divisions for a country into [FHIR Location](https://www.hl7.org/fhir/location.html) objects, applies a GeoJSON map to each location and then saves the data to FHIR. The process can be interrupted to export a CSV file for manual cross-checking.
 
-[https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc](This FHIR standard is followed.)
+[This FHIR standard is followed.](https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc)
 
 ---
 
 ## Facilities
 
-This feature, imports and converts civil registration offices and health facilities into [https://www.hl7.org/fhir/location.html](FHIR Location) objects.
+This feature, imports and converts civil registration offices and health facilities into [FHIR Location](https://www.hl7.org/fhir/location.html) objects.
 
-[https://github.com/jembi/opencrvs-fhir-templates/blob/master/offices/offices-resource.jsonc](This FHIR standard is followed.)
+[This FHIR standard is followed.](https://github.com/jembi/opencrvs-fhir-templates/blob/master/offices/offices-resource.jsonc)
 
 ---
 
 ## Employees
 
-This feature, imports and converts an employee list into [https://www.hl7.org/fhir/practitioner.html](FHIR Practitioner) and [https://www.hl7.org/fhir/practitionerrole.html](FHIR PractitionerRole) objects to manage permissions and map registrations to staff members, so that their performance can be tracked. The list is a test list based on the users and permissions in the [https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts](user-mgnt package.)
+This feature, imports and converts an employee list into [FHIR Practitioner](https://www.hl7.org/fhir/practitioner.html) and [FHIR PractitionerRole](https://www.hl7.org/fhir/practitionerrole.html) objects to manage permissions and map registrations to staff members, so that their performance can be tracked. The list is a test list based on the users and permissions in the [user-mgnt package.](https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts)
 
-[https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc](This FHIR standard is followed.)
+[This FHIR standard is followed.](https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc)
 
 ---
 
@@ -68,12 +68,12 @@ Running the populate command runs the following commands sequentially. Each shou
 <!-- prettier-ignore -->
 ```yarn save:locations```
 
-Imports administrative divisions from a relevant source _(For Bangladesh, this is the A2I API,)_ converts the data into [https://www.hl7.org/fhir/location.html](FHIR Location) objects, using the [https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc](OpenCRVS interpretation), and saves JSON files for applying GeoJSON map data later into the extension array. Some custom fields for the country can be utilised in the description or identifier fields.
+Imports administrative divisions from a relevant source _(For Bangladesh, this is the A2I API,)_ converts the data into [FHIR Location](https://www.hl7.org/fhir/location.html) objects, using the [OpenCRVS interpretation](https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc), and saves JSON files for applying GeoJSON map data later into the extension array. Some custom fields for the country can be utilised in the description or identifier fields.
 
 <!-- prettier-ignore -->
 ```yarn assign:geo-data```
 
-Loads the FHIR Location data from the JSON, and compares the names of the individual locations with a source GeoJSON map from [https://data.humdata.org/dataset/administrative-boundaries-of-bangladesh-as-of-2015](humdata.org). If the names match, then the appropriate GeoJSON map is applied to the Location [https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc#L36](extension array). Warnings will be listed for any location which the script has been unable to confidently map GeoJSON data.
+Loads the FHIR Location data from the JSON, and compares the names of the individual locations with a source GeoJSON map from [humdata.org](https://data.humdata.org/dataset/administrative-boundaries-of-bangladesh-as-of-2015). If the names match, then the appropriate GeoJSON map is applied to the Location [extension array](https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc#L36). Warnings will be listed for any location which the script has been unable to confidently map GeoJSON data.
 
 <!-- prettier-ignore -->
 ```yarn update:locations```
@@ -88,17 +88,17 @@ As an example of how to prepare data from a CSV file, this script converts a fac
 <!-- prettier-ignore -->
 ```yarn save:facilities```
 
-Converts the facilities JSON file into [https://www.hl7.org/fhir/location.html](FHIR Location) objects, using the [https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc](OpenCRVS interpretation) for buildings, setting the [https://github.com/jembi/opencrvs-fhir-templates/blob/master/offices/offices-resource.jsonc#L18](type) of building appropriately.
+Converts the facilities JSON file into [FHIR Location](https://www.hl7.org/fhir/location.html) objects, using the [OpenCRVS interpretation](https://github.com/jembi/opencrvs-fhir-templates/blob/master/admin-structure/admin-structure-resource.jsonc) for buildings, setting the [type](https://github.com/jembi/opencrvs-fhir-templates/blob/master/offices/offices-resource.jsonc#L18) of building appropriately.
 
 <!-- prettier-ignore -->
 ```yarn prep:employees```
 
-As an example of how to prepare data from a CSV file, this script converts an employee list CSV file into JSON. The standard is flexible, and in this example satisfies the project management and test requirements for Bangladesh. The list is a test list based on the users and permissions in the [https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts](user-mgnt package.)
+As an example of how to prepare data from a CSV file, this script converts an employee list CSV file into JSON. The standard is flexible, and in this example satisfies the project management and test requirements for Bangladesh. The list is a test list based on the users and permissions in the [user-mgnt package.](https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts)
 
 <!-- prettier-ignore -->
 ```yarn save:employees```
 
-Converts the employees JSON file into [https://www.hl7.org/fhir/practitioner.html](FHIR Practitioner) and [https://www.hl7.org/fhir/practitionerrole.html](FHIR PractitionerRole) objects, using the [https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc](OpenCRVS interpretation) for employees, setting the [https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc#L38](code) of the employee's role appropriately and also critically [https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc#L43](listing the working locations) of the employee. These can be buildins or administrative divisions. Ideally they should include both in the array.
+Converts the employees JSON file into [FHIR Practitioner](https://www.hl7.org/fhir/practitioner.html) and [FHIR PractitionerRole](https://www.hl7.org/fhir/practitionerrole.html) objects, using the [OpenCRVS interpretation](https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc) for employees, setting the [code](https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc#L38) of the employee's role appropriately and also critically [listing the working locations](https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc#L43) of the employee. These can be buildins or administrative divisions. Ideally they should include both in the array.
 
 ---
 

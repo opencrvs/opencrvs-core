@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
-import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { ADMIN_STRUCTURE_SOURCE, GEO_JSON_SOURCE } from '../../../constants'
 import { checkDuplicate, getFromFhir } from '../../utils/bn'
 import { Feature, GeoJsonProperties } from 'geojson'
 
@@ -30,7 +30,7 @@ const upazilasWithoutGeo = JSON.parse(
 const admin1Geo = JSON.parse(
   fs
     .readFileSync(
-      `${ADMIN_STRUCTURE_SOURCE}locations/bgd_admbnda_adm1_bbs_20180410_generalized.geojson`
+      `${GEO_JSON_SOURCE}bgd_admbnda_adm1_bbs_20180410_generalized.geojson`
     )
     .toString()
 )
@@ -38,7 +38,7 @@ const admin1Geo = JSON.parse(
 const admin2Geo = JSON.parse(
   fs
     .readFileSync(
-      `${ADMIN_STRUCTURE_SOURCE}locations/bgd_admbnda_adm2_bbs_20180410_generalized.geojson`
+      `${GEO_JSON_SOURCE}bgd_admbnda_adm2_bbs_20180410_generalized.geojson`
     )
     .toString()
 )
@@ -46,7 +46,7 @@ const admin2Geo = JSON.parse(
 const admin3Geo = JSON.parse(
   fs
     .readFileSync(
-      `${ADMIN_STRUCTURE_SOURCE}locations/bgd_admbnda_adm3_bbs_20180410_generalized.geojson`
+      `${GEO_JSON_SOURCE}bgd_admbnda_adm3_bbs_20180410_generalized.geojson`
     )
     .toString()
 )
