@@ -54,7 +54,7 @@ describe('WorkQueue tests', async () => {
                 child: {
                   name: [
                     {
-                      use: 'english',
+                      use: 'en',
                       firstNames: 'Baby',
                       familyName: 'Smith'
                     }

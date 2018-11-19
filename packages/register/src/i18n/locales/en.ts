@@ -613,6 +613,25 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
-    'register.workQueue.queryError': 'An error occurred while searching'
+    'register.workQueue.queryError': 'An error occurred while searching',
+    'register.workQueue.dataTable.results': 'Results',
+    'register.workQueue.dataTable.noResults': 'No result to display',
+    'register.workQueue.header.title': 'Hello Registrar',
+    'register.workQueue.header.description':
+      'Review | Registration | Certification',
+    'register.workQueue.filters.sortBy': 'Sort By',
+    'register.workQueue.filters.oldestToNewest': 'Oldest to newest',
+    'register.workQueue.filters.newestToOldest': 'Newest to oldest',
+    'register.workQueue.filters.filterBy': 'Sort By',
+    'register.workQueue.filters.birth': 'Birth',
+    'register.workQueue.filters.death': 'Death',
+    'register.workQueue.filters.marriage': 'Marriage',
+    'register.workQueue.filters.application': 'Application',
+    'register.workQueue.filters.registered': 'Registered',
+    'register.workQueue.filters.collected': 'Collected',
+    'register.workQueue.listItem.name': 'Name',
+    'register.workQueue.listItem.dob': 'D.o.B',
+    'register.workQueue.listItem.dateOfApplication': 'Date of application',
+    'register.workQueue.listItem.trackingId': 'Tracking ID'
   }
 }
