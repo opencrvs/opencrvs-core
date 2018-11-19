@@ -5,21 +5,21 @@ export const BENGALI_STATE = {
     'menu.menu': 'তালিকা',
     'performance.hello': 'হ্যালো',
     'performance.graph.birthRegistrationBoxTitle':
-      'Birth Registration Key Figures',
+      'জন্ম নিবন্ধন মূল পরিসংখ্যান',
     'performance.graph.birthRegistrationBoxFooter':
-      'Estimates provided using National Population Census data',
+      'জাতীয় জনসংখ্যার গণনা তথ্য ব্যবহার করে উপলব্ধ অনুমান',
     'performance.graph.liveBirthsWithin45DaysLabel':
-      'Registrations within<br />45 days of birth',
+      '45 দিনের<br />মধ্যে নিবন্ধন',
     'performance.graph.liveBirthsWithin45DaysDescription':
-      '142500 out of 204000',
+      '204000 এর মধ্যে 142500',
     'performance.graph.liveBirthsWithin1yearLabel':
-      'Registrations within<br />1 year of birth',
-    'performance.graph.liveBirthsWithin1yearDescription': '61500 out of 204000',
-    'performance.graph.totalLiveBirthsLabel':
-      'Total Live Births<br />registered',
+      '1 বছরের জন্মের<br />মধ্যে নিবন্ধন',
+    'performance.graph.liveBirthsWithin1yearDescription':
+      '204000 এর মধ্যে 61500',
+    'performance.graph.totalLiveBirthsLabel': 'মোট লাইভ<br />জন্ম নিবন্ধিত',
     'performance.graph.estimatedBirthsInTimeLabel':
-      'Estimated Births in [time period]',
+      '[সময়কাল] মধ্যে আনুমানিক জন্ম',
     'performance.graph.estimatedBirthsInTimeDescription':
-      'Provided from 2018 population census'
+      '2018 সালের জনসংখ্যার জনসংখ্যা থেকে প্রাপ্ত'
   }
 }
