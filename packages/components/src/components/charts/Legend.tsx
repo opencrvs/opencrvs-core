@@ -48,11 +48,12 @@ const DataLabel = styled.label`
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 1em;
 `
-const DataTitle = styled.h3`
+const DataTitle = styled.h3.attrs<{ description: string }>({})`
   font-size: 20px;
-  margin: 0;
   color: ${({ theme }) => theme.colors.accent};
+  margin: ${({ description }) => (description ? `0` : `-48px 0px 0px 0px`)};
 `
+
 const DataDescription = styled.span`
   font-size: 12px;
 `
@@ -95,8 +96,10 @@ function LegendBody({
 
   return (
     <DataLabel>
-      <DataTitle>{title}</DataTitle>
-      <DataDescription>{dataPoint.description}</DataDescription>
+      <DataTitle description={dataPoint.description}>{title}</DataTitle>
+      {dataPoint.description && (
+        <DataDescription>{dataPoint.description}</DataDescription>
+      )}
     </DataLabel>
   )
 }

@@ -48,11 +48,6 @@ const messages = defineMessages({
     defaultMessage: 'Total Live Births registered',
     description: 'Total live births label on graph'
   },
-  totalLiveBirthsDescription: {
-    id: 'performance.graph.totalLiveBirthsDescription',
-    defaultMessage: '3000 out of estimated 4000',
-    description: 'Total live births description on graph'
-  },
   estimatedBirthsInTimeLabel: {
     id: 'performance.graph.estimatedBirthsInTimeLabel',
     defaultMessage: 'Estimated Births in [time period]',
@@ -68,7 +63,7 @@ const messages = defineMessages({
 interface IData {
   value: number
   label: string
-  description: string
+  description?: string
   total?: boolean
   estimate?: boolean
 }
@@ -88,16 +83,9 @@ const getData = (intl: InjectedIntl): IData[] => {
       description: intl.formatMessage(messages.liveBirthsWithin1yearDescription)
     },
     {
-      value: 3000,
+      value: 204000,
       label: intl.formatMessage(messages.totalLiveBirthsLabel),
-      description: intl.formatMessage(messages.totalLiveBirthsDescription),
-      total: true
-    },
-    {
-      value: 4000,
-      label: intl.formatMessage(messages.estimatedBirthsInTimeLabel),
-      estimate: true,
-      description: intl.formatMessage(messages.estimatedBirthsInTimeDescription)
+      estimate: true
     }
   ]
 }
