@@ -13,6 +13,7 @@ const TitleContainer = styled.div`
   display: flex;
   align-items: center;
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
+  cursor: pointer;
 `
 const Title = styled.div`
   width: 100vw;
@@ -22,11 +23,11 @@ const EditLink = styled.a`
   color: ${({ theme }) => theme.colors.accent};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   text-decoration: underline;
-  cursor: pointer;
 `
 const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
   height: 4px;
   border-radius: 1px 1px 0 0;
+  transition: background 300ms;
   background: ${({ theme, expanded }) =>
     expanded === true ? theme.colors.expandedIndicator : 'none'};
 `
@@ -37,10 +38,13 @@ const Seperator = styled.span`
     content: '|';
   }
 `
-const SectionContainer = styled.div.attrs<{ Expanded: boolean }>({})`
-  max-height: ${({ Expanded }) => (Expanded ? `1000px` : `0px`)};
+const SectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
+  max-height: ${({ expanded }) => (expanded ? `1000px` : `0px`)};
   overflow: hidden;
-  transition: max-height 0.5s cubic-bezier(0.65, 0.05, 0.36, 1);
+  transition: ${({ expanded }) =>
+    expanded
+      ? 'max-height 0.6s cubic-bezier(0.65, 0.05, 0.36, 1)'
+      : 'max-height 0ms'};
 `
 interface IProps {
   title: string
@@ -106,7 +110,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
             />
           )}
         </TitleContainer>
-        <SectionContainer Expanded={this.state.isExpanded}>
+        <SectionContainer expanded={this.state.isExpanded}>
           {children}
         </SectionContainer>
       </SectionDrawerContainer>
