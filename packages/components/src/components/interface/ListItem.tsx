@@ -173,7 +173,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
             </StatusDiv>
           </ListContentContainer>
           <ListItemAction
-            actions={actions}
+            actions={actions || []}
             expanded={expanded}
             onExpand={
               this.props.expandedCellRenderer ? this.toggleExpanded : undefined
