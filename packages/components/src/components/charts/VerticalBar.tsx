@@ -20,7 +20,7 @@ const Container = styled.div`
   width: 100%;
   align-items: center;
 `
-interface IPayload {
+interface IDataPoint {
   name: string
   value: number
 }
@@ -29,27 +29,32 @@ interface ICustomizedAxisTick {
   x?: number
   y?: number
   stroke?: number
-  payload?: IPayload
+  payload?: IDataPoint
+  totalValue: number
+  theme: ITheme
 }
 
 interface IVerticalBarProps {
-  data: IPayload[]
+  data: IDataPoint[]
 }
 
 function CustomizedAxisTick(props: ICustomizedAxisTick) {
-  const { x, y, stroke, payload } = props
+  const { x, y, payload, totalValue, theme } = props
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={16} textAnchor="end" fill="#666">
-        {payload && payload.value}
+      <text x={0} y={0} dy={16} textAnchor="middle" fill={theme.colors.accent}>
+        {payload && `${Math.round(payload.value / totalValue * 100)}%`}
       </text>
-      <text x={0} y={20} dy={16} textAnchor="end" fill="#4C68C1">
+      <text x={0} y={20} dy={16} textAnchor="middle" fill="#666">
         {payload && payload.value}
       </text>
     </g>
   )
 }
+
+const sumUpAllValues = (data: IDataPoint[]) =>
+  data.reduce((sum: number, item: IDataPoint) => sum + item.value, 0)
 
 export const VerticalBar = withTheme(
   (props: IVerticalBarProps & { theme: ITheme }) => {
@@ -63,12 +68,7 @@ export const VerticalBar = withTheme(
     return (
       <Container>
         <ResponsiveContainer>
-          <BarChart
-            width={600}
-            height={300}
-            data={props.data}
-            barCategoryGap={0}
-          >
+          <BarChart width={600} height={300} data={data} barCategoryGap={0}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={colours[1]} stopOpacity={0.9} />
@@ -77,10 +77,15 @@ export const VerticalBar = withTheme(
             </defs>
             <XAxis
               height={80}
-              tick={<CustomizedAxisTick />}
+              tick={
+                <CustomizedAxisTick
+                  totalValue={sumUpAllValues(data)}
+                  theme={theme}
+                />
+              }
               tickLine={false}
               axisLine={false}
-              dataKey={({ name, percentage }) => name}
+              dataKey="value"
             />
 
             <CartesianGrid
