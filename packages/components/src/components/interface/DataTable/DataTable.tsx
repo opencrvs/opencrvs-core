@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Pagination, SortAndFilter } from '..'
 import { Omit } from '../../omit'
 import styled from 'styled-components'
+import { isEqual } from 'lodash'
 
 import {
   ISelectGroupProps,
@@ -164,6 +165,34 @@ export class DataTable extends React.Component<
       filterByItemsWithValues,
       sortByItemsWithValues,
       initialPage
+    }
+  }
+
+  componentDidUpdate(prevProps: ISearchResultProps) {
+    if (!isEqual(prevProps, this.props)) {
+      const {
+        totalPages,
+        displayItems,
+        pageSize,
+        filteredSortedItems,
+        filterValues,
+        sortValues,
+        filterByItemsWithValues,
+        sortByItemsWithValues,
+        initialPage
+      } = this.calculateInitialState(this.props)
+
+      this.setState(() => ({
+        totalPages,
+        displayItems,
+        pageSize,
+        filteredSortedItems,
+        filterValues,
+        sortValues,
+        filterByItemsWithValues,
+        sortByItemsWithValues,
+        initialPage
+      }))
     }
   }
 
