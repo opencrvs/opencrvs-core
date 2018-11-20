@@ -610,6 +610,8 @@ export const BENGALI_STATE = {
     'register.workQueue.dataTable.noResults': 'TODO',
     'register.workQueue.header.title': 'TODO',
     'register.workQueue.header.description': 'TODO',
-    'register.workQueue.buttons.newRegistration': 'নতুন নিবন্ধন'
+    'register.workQueue.buttons.newRegistration': 'নতুন নিবন্ধন',
+    'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
+    'review.edit.modal.editButton': 'সম্পাদন'
   }
 }

@@ -23,6 +23,15 @@ describe('when user is in the home page', () => {
     ).toBe('Birth Registration Key Figures')
   })
 
+  it('renders bar chart box title', () => {
+    expect(
+      homeComponent
+        .find('#bar_chart_box_title')
+        .hostNodes()
+        .text()
+    ).toBe('At What Age Are Births Registered In Children Aged 0-10 Years')
+  })
+
   it('renders footer text', () => {
     expect(
       homeComponent
