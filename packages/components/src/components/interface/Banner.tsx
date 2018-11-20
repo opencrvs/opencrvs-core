@@ -13,7 +13,7 @@ const StyledBanner = styled.div`
   display: flex;
   align-items: center;
   font-family: ${({ theme }) => theme.fonts.lightFont};
-  background-color: ${({ theme }) => theme.colors.accentLight};
+  background-color: ${({ theme }) => theme.colors.accent};
   min-height: 109px;
   margin: 20px 0;
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.32);

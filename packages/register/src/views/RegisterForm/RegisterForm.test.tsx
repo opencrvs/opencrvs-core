@@ -44,6 +44,7 @@ describe('when user is in the register form', async () => {
   const intlProvider = new IntlProvider({ locale: 'en' }, {})
   const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
+
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
