@@ -38,6 +38,7 @@ import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
+import { goToEvents as goToEventsAction } from 'src/navigation'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list {
@@ -201,8 +202,13 @@ const messages = defineMessages({
   },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New registration',
+    defaultMessage: 'New birth registration',
     description: 'The title of new registration button'
+  },
+  newApplication: {
+    id: 'register.workQueue.buttons.newApplication',
+    defaultMessage: 'New Birth Application',
+    description: 'The title of new application button'
   },
   reviewAndRegister: {
     id: 'register.workQueue.buttons.reviewAndRegister',
@@ -258,7 +264,11 @@ const StyledIconAction = styled(IconAction)`
 
 type IWorkQueueProps = InjectedIntlProps &
   IViewHeadingProps &
-  ISearchInputProps & { language: string; scope: Scope }
+  ISearchInputProps & {
+    language: string
+    scope: Scope
+    goToEvents: typeof goToEventsAction
+  }
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
@@ -386,6 +396,20 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
+  }
+
+  userHasDeclareScope() {
+    return this.props.scope && this.props.scope.includes('declare')
+  }
+
+  getNewEventButtonText() {
+    if (this.userHasRegisterScope()) {
+      return messages.newRegistration
+    } else if (this.userHasDeclareScope()) {
+      return messages.newApplication
+    } else {
+      return messages.newApplication
+    }
   }
 
   render() {
@@ -520,7 +544,8 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                   <StyledIconAction
                     id="new_registration"
                     icon={() => <StyledPlusIcon />}
-                    title={intl.formatMessage(messages.newRegistration)}
+                    onClick={this.props.goToEvents}
+                    title={intl.formatMessage(this.getNewEventButtonText())}
                   />
                   <Banner
                     text={intl.formatMessage(messages.bannerTitle)}
@@ -555,7 +580,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
   }
 }
 
-export const WorkQueue = connect((state: IStoreState) => ({
-  language: state.i18n.language,
-  scope: getScope(state)
-}))(injectIntl(WorkQueueView))
+export const WorkQueue = connect(
+  (state: IStoreState) => ({
+    language: state.i18n.language,
+    scope: getScope(state)
+  }),
+  { goToEvents: goToEventsAction }
+)(injectIntl(WorkQueueView))
