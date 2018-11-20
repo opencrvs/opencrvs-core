@@ -9,7 +9,7 @@
     "react-dom": "^16.3.2",
     "react-intl": "^2.4.0",
     "react-scripts-ts": "2.16.0",
-    "redux-loop": "^4.3.3",
+    "redux-loop": "^4.4.1",
     "serve": "^10.0.2",
     "styled-components": "^3.3.3"
   },
@@ -17,12 +17,9 @@
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3001 react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "docker:build":
-      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
-    "docker:run":
-      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test":
-      "react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
+    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "test": "react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
@@ -31,7 +28,12 @@
     "test:compilation": "tsc --noEmit"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": ["prettier --write", "tslint", "stylelint", "git add"]
+    "src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "tslint",
+      "stylelint",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
@@ -39,7 +41,7 @@
     "@types/history": "^4.6.2",
     "@types/jest": "^23.3.5",
     "@types/jwt-decode": "^2.2.1",
-    "@types/node": "^10.12.0",
+    "@types/node": "^10.12.5",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "@types/react-intl": "^2.3.8",
@@ -50,7 +52,7 @@
     "history": "^4.7.2",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
-    "prettier": "^1.12.1",
+    "prettier": "^1.15.2",
     "react-router": "^4.2.0",
     "react-router-redux": "next",
     "redux": "^4.0.1",
@@ -66,7 +68,12 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ],
-    "coverageReporters": ["json", "lcov", "text", "html"],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ],
     "moduleNameMapper": {
       "^src(.*)$": "<rootDir>/src$1"
     }
