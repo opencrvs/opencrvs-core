@@ -17,7 +17,7 @@ module.exports = (mongo, fhirResources) => {
             const searchCtx = {
               ...JSON.parse(JSON.stringify(ctx)),
               resourceType,
-              query: {
+              _query: {
                 identifier: resource.identifier[0].value
               }
             }
