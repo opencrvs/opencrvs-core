@@ -38,27 +38,6 @@ An example response to the query above could look something like this:
 }
 ```
 
-### The metrics service
-
-The metrics service (backed by InfluxDB or similar) will contain data that has already been aggregated from received events (new declaration, registration...). The metrics service will get these events from a generic **event service**, that receives events from our workflow mediator, pushing them forward to any service that's subscribed to it.
-
-Some parts (how event service receives and emits events) of this dataflow is documented in the [Integrations API/mediator design document](https://docs.google.com/document/d/1GUmWs7ZBOH9enKMtr9hLj5WKqb1P7HzdX8RfGNrotMs/edit#)
-
-
-For the example query above, we might store something like this:
-
-| age  | count |
-| ---- | ----- |
-| 45d  | 12312 |
-| 1    | 13506 |
-| 2    | 12000 |
-| 3    | 12000 |
-
-### Adding new metrics later on
-
-Collecting live events like this has a downside: we cannot predict what kind of metrics we want to show in the future and once we add a new metric, we have no data for it.
-In these cases we will write migrations that fetch already stored data from hearth and push it to our metric service.
-
 ---
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).

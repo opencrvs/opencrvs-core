@@ -18,7 +18,7 @@ const fieldAgent = new User({
 })
 
 const registrationClerk = new User({
-  name: 'Mohammad Ashraful',
+  name: 'Rabindranath Tagore',
   email: 'test@test.org',
   mobile: '+8801722222222',
   passwordHash: pass.hash,
