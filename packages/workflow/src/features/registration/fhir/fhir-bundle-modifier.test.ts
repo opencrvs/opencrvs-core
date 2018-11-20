@@ -75,7 +75,7 @@ describe('Verify fhir bundle modifier functions', () => {
         iat: 1541576965,
         exp: 1573112965,
         aud: '',
-        sub: '1',
+        subject: '1',
         scope: ['declare']
       }
       const fhirBundle = setupRegistrationWorkflow(testFhirBundle, tokenPayload)
@@ -93,7 +93,7 @@ describe('Verify fhir bundle modifier functions', () => {
         iat: 1541576965,
         exp: 1573112965,
         aud: '',
-        sub: '1',
+        subject: '1',
         scope: ['register']
       }
       let fhirBundle = cloneDeep(testFhirBundle)
@@ -120,8 +120,7 @@ describe('Verify fhir bundle modifier functions', () => {
         iat: 1541576965,
         exp: 1573112965,
         aud: '',
-        sub: '1',
-        id: 'anik',
+        subject: '1',
         scope: ['declare']
       }
       const fhirBundle = setupLastRegUser(testFhirBundle, tokenPayload)
@@ -129,9 +128,7 @@ describe('Verify fhir bundle modifier functions', () => {
       expect(
         fhirBundle.entry[1].resource.extension[1].valueString
       ).toBeDefined()
-      expect(fhirBundle.entry[1].resource.extension[1].valueString).toEqual(
-        'anik'
-      )
+      expect(fhirBundle.entry[1].resource.extension[1].valueString).toEqual('1')
     })
 
     it('Will push the last modified by userinfo even if no extension is defined yet on task resource', () => {
@@ -140,8 +137,7 @@ describe('Verify fhir bundle modifier functions', () => {
         iat: 1541576965,
         exp: 1573112965,
         aud: '',
-        sub: '1',
-        id: 'anik',
+        subject: '1',
         scope: ['declare']
       }
       let fhirBundle = cloneDeep(testFhirBundle)
@@ -151,9 +147,7 @@ describe('Verify fhir bundle modifier functions', () => {
       expect(
         fhirBundle.entry[1].resource.extension[0].valueString
       ).toBeDefined()
-      expect(fhirBundle.entry[1].resource.extension[0].valueString).toEqual(
-        'anik'
-      )
+      expect(fhirBundle.entry[1].resource.extension[0].valueString).toEqual('1')
     })
 
     it('Will update the last modified by userinfo instead of always adding a new extension', () => {
@@ -162,8 +156,7 @@ describe('Verify fhir bundle modifier functions', () => {
         iat: 1541576965,
         exp: 1573112965,
         aud: '',
-        sub: '1',
-        id: 'DUMMY',
+        subject: '1',
         scope: ['declare']
       }
       const lengthOfTaskExtensions =
@@ -173,9 +166,7 @@ describe('Verify fhir bundle modifier functions', () => {
       expect(fhirBundle.entry[1].resource.extension.length).toBe(
         lengthOfTaskExtensions
       )
-      expect(fhirBundle.entry[1].resource.extension[1].valueString).toEqual(
-        'DUMMY'
-      )
+      expect(fhirBundle.entry[1].resource.extension[1].valueString).toEqual('1')
     })
   })
   it('setupAuthorOnNotes will update the author name on notes', () => {
@@ -184,7 +175,7 @@ describe('Verify fhir bundle modifier functions', () => {
       iat: 1541576965,
       exp: 1573112965,
       aud: '',
-      sub: '1',
+      subject: '1',
       scope: ['declare']
     }
     let fhirBundle = cloneDeep(testFhirBundle)
@@ -198,7 +189,7 @@ describe('Verify fhir bundle modifier functions', () => {
 
     expect(fhirBundle.entry[1].resource.note.length).toBe(1)
     expect(fhirBundle.entry[1].resource.note[0]).toEqual({
-      authorString: 'DUMMY',
+      authorString: '1',
       text: 'this is a test note',
       time: '2018-10-31T09:45:05+10:00'
     })
