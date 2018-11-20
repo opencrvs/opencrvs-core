@@ -41,7 +41,7 @@ const EditConfirmationComponent = ({
         <PrimaryButton key="edit" id="edit_confirm" onClick={handleEdit}>
           {intl.formatMessage(messages.submitButton)}
         </PrimaryButton>,
-        <PreviewButton key="preview" onClick={handleClose}>
+        <PreviewButton key="preview" id="preview_back" onClick={handleClose}>
           {intl.formatMessage(messages.preview)}
         </PreviewButton>
       ]}
