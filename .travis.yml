@@ -38,19 +38,19 @@ jobs:
       services:
         - docker
 
-#     - stage: deploy to staging
-#       if: branch = master AND type = push
-#       install: skip
-#       script: yarn deploy:staging
-#       addons:
-#         ssh_known_hosts: opencrvs-staging.jembi.org
+    - stage: deploy to staging
+      if: branch = master AND type = push
+      install: skip
+      script: yarn deploy:staging
+      addons:
+        ssh_known_hosts: opencrvs-staging.jembi.org
 
-#     - stage: integration tests on staging
-#       if: branch = master AND type = push
-#       install: skip
-#       script: cd packages/e2e && yarn && yarn start --record
-#       env:
-#         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
-#         - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
-#         - CYPRESS_PERFORMANCE_URL=https://performance.opencrvs-staging.jembi.org/
-#         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
+    - stage: integration tests on staging
+      if: branch = master AND type = push
+      install: skip
+      script: cd packages/e2e && yarn && yarn start --record
+      env:
+        - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
+        - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
+        - CYPRESS_PERFORMANCE_URL=https://performance.opencrvs-staging.jembi.org/
+        - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
