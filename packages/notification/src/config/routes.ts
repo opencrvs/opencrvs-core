@@ -64,7 +64,7 @@ export default function getRoutes() {
         plugins: {
           'hapi-swagger': {
             responses: {
-              200: { description: 'Birth declration confirmation sms sent' },
+              200: { description: 'Birth declaration confirmation sms sent' },
               400: { description: 'Bad request, check your request body' }
             }
           }
