@@ -20,6 +20,11 @@ export const ENGLISH_STATE = {
     'performance.graph.estimatedBirthsInTimeLabel':
       'Estimated Births in [time period]',
     'performance.graph.estimatedBirthsInTimeDescription':
-      'Provided from 2018 population census'
+      'Provided from 2018 population census',
+    'performance.graph.birthRegistrationBarChartBoxWithin10YearsTitle':
+      'At What Age Are Births Registered In Children Aged 0-10 Years',
+    'performance.graph.birthRegistrationInAgesLabel': 'Age (years)',
+    'performance.graph.birthRegistrationPercentageLabel':
+      'Total Births Registered (%)'
   }
 }

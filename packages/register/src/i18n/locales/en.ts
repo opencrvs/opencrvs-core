@@ -613,6 +613,8 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
-    'register.workQueue.buttons.newRegistraion': 'New registration'
+    'register.workQueue.buttons.newRegistraion': 'New registration',
+    'review.edit.modal.preview': 'Back to Preview',
+    'review.edit.modal.editButton': 'Edit'
   }
 }
