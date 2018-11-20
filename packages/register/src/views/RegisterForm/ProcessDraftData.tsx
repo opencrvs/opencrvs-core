@@ -149,7 +149,18 @@ const processDraftData = (draftData: IFormData) => {
     },
     mother: motherDetails,
     registration: {
-      contact: registration.whoseContactDetails
+      contact: registration.whoseContactDetails,
+      status: [
+        {
+          comments: [
+            {
+              comment: registration.commentsOrNotes,
+              createdAt: new Date()
+            }
+          ],
+          timestamp: new Date()
+        }
+      ]
     },
     attendantAtBirth: child.attendantAtBirth,
     birthType: child.typeOfBirth,

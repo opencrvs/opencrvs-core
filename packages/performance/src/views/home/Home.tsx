@@ -11,7 +11,8 @@ import { Header, Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
 import Logo from 'src/components/Logo'
 import { Page } from 'src/components/Page'
-import { Legend } from '@opencrvs/components/lib/charts'
+
+import { Legend, VerticalBar } from '@opencrvs/components/lib/charts'
 
 const messages = defineMessages({
   birthRegistrationBoxTitle: {
@@ -62,6 +63,22 @@ const messages = defineMessages({
     id: 'performance.graph.estimatedBirthsInTimeDescription',
     defaultMessage: 'Provided from 2018 population census',
     description: 'Estimated births in time period description on graph'
+  },
+  birthRegistrationBarChartBoxTitle: {
+    id: 'performance.graph.birthRegistrationBarChartBoxWithin10YearsTitle',
+    defaultMessage:
+      'At What Age Are Births Registered In Children Aged 0-10 Years',
+    description: 'Title for birth registration bar chart box'
+  },
+  birthRegistrationBarChartInAgesLabel: {
+    id: 'performance.graph.birthRegistrationInAgesLabel',
+    defineMessages: 'Age (years)',
+    description: 'The label for x-axis of birth registration bar chart'
+  },
+  birthRegistrationPercentageLabel: {
+    id: 'performance.graph.birthRegistrationPercentageLabel',
+    defaultMessages: 'Total Births Registered (%)',
+    description: 'The label for y-axis of birth registration bar chart'
   }
 })
 
@@ -114,6 +131,21 @@ const getData = (intl: InjectedIntl): IData[] => {
   ]
 }
 
+const birthRegistrationData = [
+  { name: '45d', value: 2100 },
+  { name: '46d - 1yr', value: 2400 },
+  { name: '1', value: 1398 },
+  { name: '2', value: 6800 },
+  { name: '3', value: 3908 },
+  { name: '4', value: 4800 },
+  { name: '5', value: 3800 },
+  { name: '6', value: 4300 },
+  { name: '7', value: 2500 },
+  { name: '8', value: 5680 },
+  { name: '9', value: 4980 },
+  { name: '10', value: 2570 }
+]
+
 const StyledHeader = styled(Header)`
   padding: 0 26px;
   box-shadow: none;
@@ -138,6 +170,10 @@ const FooterText = styled.div`
 const ChartContainer = styled(Box)`
   max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
   margin: auto;
+  margin-bottom: 20px;
+  &:last-child {
+    margin-bottom: 0;
+  }
 `
 
 const Container = styled.div`
@@ -160,6 +196,20 @@ class HomeView extends React.Component<InjectedIntlProps> {
             <FooterText id="footer_text">
               {intl.formatMessage(messages.birthRegistrationBoxFooter)}
             </FooterText>
+          </ChartContainer>
+          <ChartContainer>
+            <BoxTitle id="bar_chart_box_title">
+              {intl.formatMessage(messages.birthRegistrationBarChartBoxTitle)}
+            </BoxTitle>
+            <VerticalBar
+              data={birthRegistrationData}
+              xAxisLabel={intl.formatMessage(
+                messages.birthRegistrationBarChartInAgesLabel
+              )}
+              yAxisLabel={intl.formatMessage(
+                messages.birthRegistrationPercentageLabel
+              )}
+            />
           </ChartContainer>
         </Container>
       </Page>

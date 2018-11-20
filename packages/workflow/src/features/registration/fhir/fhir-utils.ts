@@ -5,6 +5,7 @@ import {
   FATHER_SECTION_CODE
 } from './constants'
 import { getTaskResource, findPersonEntry } from './fhir-template'
+import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
 
 enum CONTACT {
   MOTHER,
@@ -102,5 +103,20 @@ function getContactSection(contact: CONTACT) {
       return FATHER_SECTION_CODE
     default:
       throw new Error('No valid shared contact found')
+  }
+}
+
+export function getRegStatusCode(tokenPayload: ITokenPayload) {
+  if (!tokenPayload.scope) {
+    throw new Error('No scope found on token')
+  }
+  if (tokenPayload.scope.indexOf(USER_SCOPE.CERTIFY.toString()) > -1) {
+    return 'CERTIFIED'
+  } else if (tokenPayload.scope.indexOf(USER_SCOPE.REGISTER.toString()) > -1) {
+    return 'REGISTERED'
+  } else if (tokenPayload.scope.indexOf(USER_SCOPE.DECLARE.toString()) > -1) {
+    return 'DECLARED'
+  } else {
+    throw new Error('No valid scope found on token')
   }
 }
