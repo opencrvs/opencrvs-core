@@ -93,10 +93,10 @@ export const VerticalBar = withTheme(
 
     return (
       <Container>
-        <ResponsiveContainer>
+        <ResponsiveContainer width="100%" height={250}>
           <BarChart
             width={600}
-            height={300}
+            height={250}
             data={data}
             margin={{ top: 0, right: 0, bottom: 40, left: 20 }}
             barCategoryGap={0}
