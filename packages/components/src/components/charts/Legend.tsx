@@ -5,6 +5,7 @@ import { ITheme } from '../theme'
 
 export interface ILegendProps {
   data: IDataPoint[]
+  smallestToLargest: boolean
 }
 
 const Row = styled.div`
@@ -28,14 +29,6 @@ const LegendItemBase = styled.div`
   &::after {
     content: ':';
   }
-  &::before {
-    box-sizing: border-box;
-    width: 25px;
-    height: 8px;
-    display: block;
-    margin-bottom: 6px;
-    content: '';
-  }
 `
 const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
   &::before {
@@ -56,11 +49,16 @@ const DataLabel = styled.label`
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 1em;
 `
-const DataTitle = styled.h3`
+const DataTitle = styled.h3.attrs<{ description?: string }>({})`
   font-size: 20px;
-  margin: 0;
   color: ${({ theme }) => theme.colors.accent};
+  margin: ${({ description }) => (description ? `0` : `-48px 0px 0px 0px`)};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0;
+  }
 `
+
 const DataDescription = styled.span`
   font-size: 12px;
 `
@@ -97,26 +95,32 @@ function LegendBody({
     title = `${Math.round(dataPoint.value / estimate * 100)}%`
   }
 
-  if (dataPoint.estimate) {
+  if (dataPoint.total) {
     title = dataPoint.value.toString()
   }
 
   return (
     <DataLabel>
-      <DataTitle>{title}</DataTitle>
-      <DataDescription>{dataPoint.description}</DataDescription>
+      <DataTitle description={dataPoint.description}>{title}</DataTitle>
+      {dataPoint.description && (
+        <DataDescription>{dataPoint.description}</DataDescription>
+      )}
     </DataLabel>
   )
 }
 
 export const Legend = withTheme(
-  ({ data, theme }: ILegendProps & { theme: ITheme }) => {
+  ({ data, theme, smallestToLargest }: ILegendProps & { theme: ITheme }) => {
     const dataPointsWithoutEstimates = data.filter(
       dataPoint => !dataPoint.estimate
     )
-    const fromSmallest = [...data].sort((a, b) => a.value - b.value)
-    const allTotalPoints = fromSmallest.filter(({ total }) => total)
-    const allEstimatePoints = fromSmallest.filter(({ estimate }) => estimate)
+
+    let sortedData = data
+    if (smallestToLargest) {
+      sortedData = [...data].sort((a, b) => a.value - b.value)
+    }
+    const allTotalPoints = sortedData.filter(({ total }) => total)
+    const allEstimatePoints = sortedData.filter(({ estimate }) => estimate)
 
     const colours = [
       theme.colors.chartPrimary,
@@ -127,7 +131,7 @@ export const Legend = withTheme(
     return (
       <div>
         <Row>
-          {fromSmallest.map((dataPoint, i) => {
+          {sortedData.map((dataPoint, i) => {
             const colour =
               colours[dataPointsWithoutEstimates.indexOf(dataPoint)]
             return (
