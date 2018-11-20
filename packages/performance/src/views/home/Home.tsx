@@ -63,6 +63,21 @@ const messages = defineMessages({
     id: 'performance.graph.estimatedBirthsInTimeDescription',
     defaultMessage: 'Provided from 2018 population census',
     description: 'Estimated births in time period description on graph'
+  },
+  birthRegistrationBarChartBoxTitle: {
+    id: 'performance.graph.birthRegistrationBarChartBoxWithin10YearsTitle',
+    defaultMessage: 'At What Age Are Births Registered In Children 0-10 Years',
+    description: 'Title for birth registration bar chart box'
+  },
+  birthRegistrationBarChartInAgesLabel: {
+    id: 'performance.graph.birthRegistrationInAgesLabel',
+    defineMessages: 'Age (years)',
+    description: 'The label for x-axis of birth registration bar chart'
+  },
+  birthRegistrationPercentageLabel: {
+    id: 'performance.graph.birthRegistrationPercentageLabel',
+    defaultMessages: 'Total Births Registered (%)',
+    description: 'The label for y-axis of birth registration bar chart'
   }
 })
 
@@ -183,12 +198,16 @@ class HomeView extends React.Component<InjectedIntlProps> {
           </ChartContainer>
           <ChartContainer>
             <BoxTitle id="box_title">
-              At What Age Are Births Registered In Children 0-10 Years
+              {intl.formatMessage(messages.birthRegistrationBarChartBoxTitle)}
             </BoxTitle>
             <VerticalBar
               data={birthRegistrationData}
-              xAxisLabel="Age(years)"
-              yAxisLabel="Total Births Registered (%)"
+              xAxisLabel={intl.formatMessage(
+                messages.birthRegistrationBarChartInAgesLabel
+              )}
+              yAxisLabel={intl.formatMessage(
+                messages.birthRegistrationPercentageLabel
+              )}
             />
           </ChartContainer>
         </Container>
