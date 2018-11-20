@@ -8,7 +8,7 @@ export enum USER_SCOPE {
 }
 
 export interface ITokenPayload {
-  subject: string
+  id: string
   exp: string
   algorithm: string
   scope: string[]

@@ -130,8 +130,8 @@ export function setupLastRegUser(
   tokenPayload: ITokenPayload
 ): fhir.Bundle {
   // TODO: need to change it as soon as we have decided the approach
-  if (!tokenPayload || !tokenPayload.subject) {
-    tokenPayload.subject = 'DUMMY'
+  if (!tokenPayload || !tokenPayload.id) {
+    tokenPayload.id = 'DUMMY'
   }
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
@@ -145,11 +145,11 @@ export function setupLastRegUser(
     )
   })
   if (regUserExtension) {
-    regUserExtension.valueString = tokenPayload.subject
+    regUserExtension.valueString = tokenPayload.id
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-      valueString: tokenPayload.subject
+      valueString: tokenPayload.id
     })
   }
   return fhirBundle
@@ -160,8 +160,8 @@ export function setupAuthorOnNotes(
   tokenPayload: ITokenPayload
 ): fhir.Bundle {
   // TODO: need to change it as soon as we have decided the approach
-  if (!tokenPayload || !tokenPayload.subject) {
-    tokenPayload.subject = 'DUMMY'
+  if (!tokenPayload || !tokenPayload.id) {
+    tokenPayload.id = 'DUMMY'
   }
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
@@ -171,7 +171,7 @@ export function setupAuthorOnNotes(
   }
   taskResource.note.forEach(note => {
     if (!note.authorString) {
-      note.authorString = tokenPayload.subject
+      note.authorString = tokenPayload.id
     }
   })
 
