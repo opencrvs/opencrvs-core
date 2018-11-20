@@ -604,6 +604,8 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.results.dateOfRegistration': 'নিবন্ধনের তারিখ',
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
-    'register.workQueue.buttons.newRegistration': 'নতুন নিবন্ধন'
+    'register.workQueue.buttons.newRegistration': 'নতুন নিবন্ধন',
+    'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
+    'review.edit.modal.editButton': 'সম্পাদন'
   }
 }
