@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import * as moment from 'moment'
 import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
 import {
@@ -38,6 +38,7 @@ import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
+import { ITheme } from '@opencrvs/components/lib/theme'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list {
@@ -258,7 +259,9 @@ const StyledIconAction = styled(IconAction)`
 
 type IWorkQueueProps = InjectedIntlProps &
   IViewHeadingProps &
-  ISearchInputProps & { language: string; scope: Scope }
+  ISearchInputProps & { language: string } & { theme: ITheme } & {
+    scope: Scope
+  }
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
@@ -281,10 +284,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 
     return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
       const names = (reg.child && (reg.child.name as GQLHumanName[])) || []
-      const namesMap = names.reduce((prevNamesMap, name) => {
-        if (!name) {
-          return prevNamesMap
-        }
+      const namesMap = names.filter(Boolean).reduce((prevNamesMap, name) => {
         if (!name.use) {
           prevNamesMap['default'] = `${name.firstNames} ${
             name.familyName
@@ -389,7 +389,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, theme } = this.props
 
     const sortBy = {
       input: {
@@ -502,7 +502,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
             {({ loading, error, data }) => {
               if (loading) {
                 return (
-                  <StyledSpinner id="work-queue-spinner" baseColor="#F4F4F4" />
+                  <StyledSpinner
+                    id="work-queue-spinner"
+                    baseColor={theme.colors.background}
+                  />
                 )
               }
               if (error) {
@@ -558,4 +561,4 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 export const WorkQueue = connect((state: IStoreState) => ({
   language: state.i18n.language,
   scope: getScope(state)
-}))(injectIntl(WorkQueueView))
+}))(injectIntl(withTheme(WorkQueueView)))

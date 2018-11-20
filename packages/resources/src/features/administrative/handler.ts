@@ -18,8 +18,6 @@ export default async function administrativeStructureHandler(
   } catch (err) {
     return internal(err)
   }
-  const response = {
-    divisions: divisions.divisions
-  }
-  return { response }
+
+  return { divisions }
 }

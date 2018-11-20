@@ -117,7 +117,7 @@ export const testFhirBundle = {
           {
             family: ['অনিক'],
             given: ['অনিক'],
-            use: 'Traditional'
+            use: 'bn'
           }
         ],
         gender: 'male'
