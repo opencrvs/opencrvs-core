@@ -66,7 +66,8 @@ const messages = defineMessages({
   },
   birthRegistrationBarChartBoxTitle: {
     id: 'performance.graph.birthRegistrationBarChartBoxWithin10YearsTitle',
-    defaultMessage: 'At What Age Are Births Registered In Children 0-10 Years',
+    defaultMessage:
+      'At What Age Are Births Registered In Children Aged 0-10 Years',
     description: 'Title for birth registration bar chart box'
   },
   birthRegistrationBarChartInAgesLabel: {
@@ -197,7 +198,7 @@ class HomeView extends React.Component<InjectedIntlProps> {
             </FooterText>
           </ChartContainer>
           <ChartContainer>
-            <BoxTitle id="box_title">
+            <BoxTitle id="bar_chart_box_title">
               {intl.formatMessage(messages.birthRegistrationBarChartBoxTitle)}
             </BoxTitle>
             <VerticalBar
