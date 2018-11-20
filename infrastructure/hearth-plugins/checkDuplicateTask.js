@@ -15,9 +15,10 @@ module.exports = (mongo, fhirResources) => {
               `Executing before hooks for [${interaction}] on resource ${resourceType}`
             )
             const searchCtx = {
+              ...JSON.parse(JSON.stringify(ctx)),
               resourceType,
               query: {
-                identifier: resource.identifier.value
+                identifier: resource.identifier[0].value
               }
             }
             fhirCore.search(searchCtx, resourceType, (err, result) => {
@@ -29,15 +30,17 @@ module.exports = (mongo, fhirResources) => {
                   httpStatus: 409,
                   resource: {
                     resourceType: 'Task',
-                    issue: {
-                      severity: 'error',
-                      code: 'duplicate',
-                      details: {
-                        text: `Duplicate Task found for identifier: ${
-                          resource.identifier.value
-                        }`
+                    issue: [
+                      {
+                        severity: 'error',
+                        code: 'duplicate',
+                        details: {
+                          text: `Duplicate Task found for identifier: ${
+                            resource.identifier.value
+                          }`
+                        }
                       }
-                    }
+                    ]
                   }
                 })
               } else {
