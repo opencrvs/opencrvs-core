@@ -76,4 +76,27 @@ describe('Verify handler', () => {
     })
     expect(res.statusCode).toBe(500)
   })
+  it('createBirthRegistrationHandler throws error if fhir returns an error', async () => {
+    fetch.mockImplementationOnce(() => new Error('boom'))
+
+    const token = jwt.sign(
+      { scope: ['declare'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createBirthRegistration',
+      payload: testFhirBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(500)
+  })
 })

@@ -2,8 +2,10 @@ import { testFhirBundle } from 'src/test/utils'
 import {
   getSharedContactMsisdn,
   getInformantName,
-  getTrackingId
+  getTrackingId,
+  getRegStatusCode
 } from './fhir-utils'
+import { FATHER_SECTION_CODE } from './constants'
 import { pushTrackingId } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 
@@ -93,5 +95,48 @@ describe('Verify getTrackingId', () => {
         type: 'document'
       })
     ).toThrowError('getTrackingId: Invalid FHIR bundle found for declration')
+  })
+})
+
+describe('Verify getRegStatusCode', () => {
+  it('Returned right registration status based on token scope', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1',
+      scope: ['certify']
+    }
+    const regStatus = getRegStatusCode(tokenPayload)
+    expect(regStatus).toBeDefined()
+    expect(regStatus).toBe('CERTIFIED')
+  })
+
+  it('Throws error when invalid token has no scope', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1'
+    }
+    expect(() => getRegStatusCode(tokenPayload)).toThrowError(
+      'No scope found on token'
+    )
+  })
+
+  it('Throws error when invalid token scope is provided', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1',
+      scope: ['invalid']
+    }
+    expect(() => getRegStatusCode(tokenPayload)).toThrowError(
+      'No valid scope found on token'
+    )
   })
 })

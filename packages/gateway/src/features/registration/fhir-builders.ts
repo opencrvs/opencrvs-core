@@ -354,6 +354,25 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   })
 }
 
+function createRegStatusComment(resource: fhir.Task, fieldValue: string) {
+  if (!resource.note) {
+    resource.note = []
+  }
+  resource.note.push({
+    text: fieldValue
+  })
+}
+
+function createRegStatusCommentTimeStamp(
+  resource: fhir.Task,
+  fieldValue: string
+) {
+  const incompleteNote = resource.note && resource.note.find(note => !note.time)
+  if (incompleteNote) {
+    incompleteNote.time = fieldValue
+  }
+}
+
 function createBirthTypeBuilder(
   resource: fhir.Observation,
   fieldValue: number
@@ -704,6 +723,41 @@ const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
+    },
+    status: {
+      comments: {
+        comment: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          return createRegStatusComment(taskResource, fieldValue)
+        },
+        createdAt: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          return createRegStatusCommentTimeStamp(taskResource, fieldValue)
+        }
+      },
+      timestamp: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        taskResource.lastModified = fieldValue
+        return
+      }
     },
     attachments: {
       originalFileName: (
