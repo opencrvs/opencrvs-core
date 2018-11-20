@@ -703,7 +703,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "14",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -1075,7 +1075,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "20",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -1187,11 +1187,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Badalgachhi",
+        "Name": "BODOLGACHI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rajshahi",
-        "ADM3_EN": "Badalgachhi",
+        "ADM3_EN": "BODOLGACHI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -1210,7 +1210,7 @@
         "ADM3_PCODE": "506406",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Badalgachhi"
+        "Field_1": "BODOLGACHI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1290,11 +1290,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Bagati Para",
+        "Name": "BAGATIPARA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rajshahi",
-        "ADM3_EN": "Bagati Para",
+        "ADM3_EN": "BAGATIPARA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -1313,7 +1313,7 @@
         "ADM3_PCODE": "506909",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Bagati Para"
+        "Field_1": "BAGATIPARA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1464,11 +1464,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Baghai Chhari",
+        "Name": "BAGHAICHHARI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Chittagong",
-        "ADM3_EN": "Baghai Chhari",
+        "ADM3_EN": "BAGHAICHHARI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -1487,7 +1487,7 @@
         "ADM3_PCODE": "208407",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Baghai Chhari"
+        "Field_1": "BAGHAICHHARI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1685,7 +1685,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "32",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -1974,11 +1974,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Balia Kandi",
+        "Name": "BALIAKANDI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Balia Kandi",
+        "ADM3_EN": "BALIAKANDI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -1997,7 +1997,7 @@
         "ADM3_PCODE": "308207",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Balia Kandi"
+        "Field_1": "BALIAKANDI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3655,11 +3655,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Belai Chhari",
+        "Name": "BILAYCHHARI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Chittagong",
-        "ADM3_EN": "Belai Chhari",
+        "ADM3_EN": "BILAYCHHARI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -3678,7 +3678,7 @@
         "ADM3_PCODE": "208429",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Belai Chhari"
+        "Field_1": "BILAYCHHARI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3856,7 +3856,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "65",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -4248,7 +4248,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "5070",
-        "ADM2_EN": "Nawabganj",
+        "ADM2_EN": "CHAPAI NABABGANJ",
         "InPoly_FID": "73",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -4460,7 +4460,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "76",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -7215,7 +7215,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "90",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -7589,11 +7589,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Daulatkhan",
+        "Name": "DAULAT KHAN",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Barisal",
-        "ADM3_EN": "Daulatkhan",
+        "ADM3_EN": "DAULAT KHAN",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -7612,7 +7612,7 @@
         "ADM3_PCODE": "100929",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Daulatkhan"
+        "Field_1": "DAULAT KHAN"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -8619,11 +8619,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Dighalia",
+        "Name": "DHEGHOLIA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Khulna",
-        "ADM3_EN": "Dighalia",
+        "ADM3_EN": "DHEGHOLIA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -8642,7 +8642,7 @@
         "ADM3_PCODE": "404740",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Dighalia"
+        "Field_1": "DHEGHOLIA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -8909,11 +8909,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Domar",
+        "Name": "DOMAR UPAZILA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rangpur",
-        "ADM3_EN": "Domar",
+        "ADM3_EN": "DOMAR UPAZILA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -8932,7 +8932,7 @@
         "ADM3_PCODE": "557315",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Domar"
+        "Field_1": "DOMAR UPAZILA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -10037,11 +10037,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Gangachara",
+        "Name": "GANGAHORA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rangpur",
-        "ADM3_EN": "Gangachara",
+        "ADM3_EN": "GANGAHORA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -10060,7 +10060,7 @@
         "ADM3_PCODE": "558527",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Gangachara"
+        "Field_1": "GANGAHORA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -10751,11 +10751,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Golabganj",
+        "Name": "GOLAPGANJ",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Sylhet",
-        "ADM3_EN": "Golabganj",
+        "ADM3_EN": "GOLAPGANJ",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -10774,7 +10774,7 @@
         "ADM3_PCODE": "609138",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Golabganj"
+        "Field_1": "GOLAPGANJ"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -10830,7 +10830,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "5070",
-        "ADM2_EN": "Nawabganj",
+        "ADM2_EN": "CHAPAI NABABGANJ",
         "InPoly_FID": "192",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -11984,7 +11984,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "214",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -12224,7 +12224,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "218",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -13394,11 +13394,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Kala Para",
+        "Name": "KALAPARA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Barisal",
-        "ADM3_EN": "Kala Para",
+        "ADM3_EN": "KALAPARA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -13417,7 +13417,7 @@
         "ADM3_PCODE": "107866",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Kala Para"
+        "Field_1": "KALAPARA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -14543,11 +14543,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Kanthalia",
+        "Name": "KATHALIA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Barisal",
-        "ADM3_EN": "Kanthalia",
+        "ADM3_EN": "KATHALIA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -14566,7 +14566,7 @@
         "ADM3_PCODE": "104243",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Kanthalia"
+        "Field_1": "KATHALIA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -14726,7 +14726,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "263",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -14858,7 +14858,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "265",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -15779,7 +15779,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "285",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -15836,11 +15836,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Kotali Para",
+        "Name": "KOTALIPARA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Kotali Para",
+        "ADM3_EN": "KOTALIPARA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -15859,7 +15859,7 @@
         "ADM3_PCODE": "303551",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Kotali Para"
+        "Field_1": "KOTALIPARA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -17697,11 +17697,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Kotwali",
+        "Name": "JESSORE SADAR",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Khulna",
-        "ADM3_EN": "Kotwali",
+        "ADM3_EN": "JESSORE SADAR",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -17720,7 +17720,7 @@
         "ADM3_PCODE": "404147",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Kotwali"
+        "Field_1": "JESSORE SADAR"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -18782,11 +18782,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Maulvi Bazar Sadar",
+        "Name": "MAULVIBAZAR SADAR",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Sylhet",
-        "ADM3_EN": "Maulvi Bazar Sadar",
+        "ADM3_EN": "MAULVIBAZAR SADAR",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -18805,7 +18805,7 @@
         "ADM3_PCODE": "605874",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Maulvi Bazar Sadar"
+        "Field_1": "MAULVIBAZAR SADAR"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -19037,7 +19037,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "6",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -19601,7 +19601,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "345",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -20400,11 +20400,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Noakhali Sadar (Sudharam)",
+        "Name": "NOAKHALI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Chittagong",
-        "ADM3_EN": "Noakhali Sadar (Sudharam)",
+        "ADM3_EN": "NOAKHALI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -20423,7 +20423,7 @@
         "ADM3_PCODE": "207587",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Noakhali Sadar (Sudharam)"
+        "Field_1": "NOAKHALI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -20537,7 +20537,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "362",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -20598,7 +20598,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "5070",
-        "ADM2_EN": "Nawabganj",
+        "ADM2_EN": "CHAPAI NABABGANJ",
         "InPoly_FID": "363",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -21543,11 +21543,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Narsingdi Sadar",
+        "Name": "NARSINGDI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Narsingdi Sadar",
+        "ADM3_EN": "NARSINGDI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -21566,7 +21566,7 @@
         "ADM3_PCODE": "306860",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Narsingdi Sadar"
+        "Field_1": "NARSINGDI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -21621,7 +21621,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "380",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -21855,16 +21855,16 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Nawabganj Sadar",
+        "Name": "CHAPAI NABABGANJ SADAR",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rajshahi",
-        "ADM3_EN": "Nawabganj Sadar",
+        "ADM3_EN": "CHAPAI NABABGANJ SADAR",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "5070",
-        "ADM2_EN": "Nawabganj",
+        "ADM2_EN": "CHAPAI NABABGANJ",
         "InPoly_FID": "384",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -21878,7 +21878,7 @@
         "ADM3_PCODE": "507066",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Nawabganj Sadar"
+        "Field_1": "CHAPAI NABABGANJ SADAR"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -22171,7 +22171,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "390",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -22523,7 +22523,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "397",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -24136,11 +24136,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Rajasthali",
+        "Name": "RAJOSTHOLI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Chittagong",
-        "ADM3_EN": "Rajasthali",
+        "ADM3_EN": "RAJOSTHOLI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -24159,7 +24159,7 @@
         "ADM3_PCODE": "208478",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Rajasthali"
+        "Field_1": "RAJOSTHOLI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -25511,11 +25511,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Saghatta",
+        "Name": "SAGHATA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rangpur",
-        "ADM3_EN": "Saghatta",
+        "ADM3_EN": "SAGHATA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -25534,7 +25534,7 @@
         "ADM3_PCODE": "553288",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Saghatta"
+        "Field_1": "SAGHATA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -25575,11 +25575,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Saidpur",
+        "Name": "SAIDPUR UPAZILA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Rangpur",
-        "ADM3_EN": "Saidpur",
+        "ADM3_EN": "SAIDPUR UPAZILA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -25598,7 +25598,7 @@
         "ADM3_PCODE": "557385",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Saidpur"
+        "Field_1": "SAIDPUR UPAZILA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -26074,7 +26074,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "464",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -27233,11 +27233,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Shib Char",
+        "Name": "SHIBCHAR",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Shib Char",
+        "ADM3_EN": "SHIBCHAR",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -27256,7 +27256,7 @@
         "ADM3_PCODE": "305487",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Shib Char"
+        "Field_1": "SHIBCHAR"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -27436,7 +27436,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "5070",
-        "ADM2_EN": "Nawabganj",
+        "ADM2_EN": "CHAPAI NABABGANJ",
         "InPoly_FID": "490",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -28216,7 +28216,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "2012",
-        "ADM2_EN": "Brahamanbaria",
+        "ADM2_EN": "BRAHMANBARIA",
         "InPoly_FID": "41",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -29249,7 +29249,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "520",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -29471,11 +29471,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Tejgaon",
+        "Name": "TEJGAON UNNON CIRCLE",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Tejgaon",
+        "ADM3_EN": "TEJGAON UNNON CIRCLE",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -29494,7 +29494,7 @@
         "ADM3_PCODE": "302690",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Tejgaon"
+        "Field_1": "TEJGAON UNNON CIRCLE"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -29518,11 +29518,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Tejgaon Ind. Area",
+        "Name": "TEJGAON UNNON CIRCLE Ind. Area",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Tejgaon Ind. Area",
+        "ADM3_EN": "TEJGAON UNNON CIRCLE Ind. Area",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -29541,7 +29541,7 @@
         "ADM3_PCODE": "302692",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Tejgaon Ind. Area"
+        "Field_1": "TEJGAON UNNON CIRCLE Ind. Area"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -29934,11 +29934,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Tungi Para",
+        "Name": "TUNGIPARA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Tungi Para",
+        "ADM3_EN": "TUNGIPARA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -29957,7 +29957,7 @@
         "ADM3_PCODE": "303591",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Tungi Para"
+        "Field_1": "TUNGIPARA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -30920,11 +30920,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Dakshin Sunamganj",
+        "Name": "DAKSHIN  SUNAMGANJ",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Sylhet",
-        "ADM3_EN": "Dakshin Sunamganj",
+        "ADM3_EN": "DAKSHIN  SUNAMGANJ",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -30943,7 +30943,7 @@
         "ADM3_PCODE": "609027",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Dakshin Sunamganj"
+        "Field_1": "DAKSHIN  SUNAMGANJ"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -31174,11 +31174,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Galachipa",
+        "Name": "RANGABALI",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Barisal",
-        "ADM3_EN": "Galachipa",
+        "ADM3_EN": "RANGABALI",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -31197,7 +31197,7 @@
         "ADM3_PCODE": "107857",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Galachipa"
+        "Field_1": "RANGABALI"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -31497,11 +31497,11 @@
     {
       "type": "Feature",
       "properties": {
-        "Name": "Goalandaghat",
+        "Name": "GOALANDA",
         "description": null,
         "altitudeMode": "clampToGround",
         "ADM1_EN": "Dhaka",
-        "ADM3_EN": "Goalandaghat",
+        "ADM3_EN": "GOALANDA",
         "ADM3ALT1EN": "",
         "date": "2015-01-01",
         "ADM3_REF": "",
@@ -31520,7 +31520,7 @@
         "ADM3_PCODE": "308229",
         "MaxSimpTol": "0.008993",
         "ADM3ALT2EN": "",
-        "Field_1": "Goalandaghat"
+        "Field_1": "GOALANDA"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -32528,7 +32528,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "262",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
@@ -33038,7 +33038,7 @@
         "date": "2015-01-01",
         "ADM3_REF": "",
         "ADM2_PCODE": "3048",
-        "ADM2_EN": "Kishoreganj",
+        "ADM2_EN": "KISHOREGONJ",
         "InPoly_FID": "293",
         "validOn": "2018-04-10",
         "ADM0_PCODE": "BD",
