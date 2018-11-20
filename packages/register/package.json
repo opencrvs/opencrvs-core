@@ -39,12 +39,17 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3000 react-scripts-ts start",
-    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
-    "build": "yarn verify-build-config && react-scripts-ts build && yarn gen:sw",
+    "verify-build-config":
+      "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
+    "build":
+      "yarn verify-build-config && react-scripts-ts build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test": "PORT=3000 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage && yarn test:compilation",
+    "docker:build":
+      "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
+    "docker:run":
+      "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
+    "test":
+      "PORT=3000 react-scripts-ts test --env=jsdom --modulePaths=src/ --coverage",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "eject": "react-scripts-ts eject",
@@ -53,12 +58,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "prettier --write",
-      "tslint",
-      "stylelint",
-      "git add"
-    ]
+    "src/**/*.{ts,tsx}": ["prettier --write", "tslint", "stylelint", "git add"]
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
@@ -92,12 +92,7 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ],
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "html"
-    ],
+    "coverageReporters": ["json", "lcov", "text", "html"],
     "moduleNameMapper": {
       "^src(.*)$": "<rootDir>/src$1"
     }

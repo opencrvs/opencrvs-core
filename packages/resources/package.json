@@ -34,7 +34,7 @@
     "dotenv": "^6.1.0",
     "eslint": "^5.8.0",
     "eslint-config-prettier": "^3.1.0",
-    "jest": "^23.6.0",
+    "jest": "23.6.0",
     "json2csv": "^4.3.0",
     "nodemon": "^1.18.5",
     "nyc": "^13.1.0",
