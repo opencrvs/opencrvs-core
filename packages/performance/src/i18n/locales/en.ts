@@ -22,7 +22,7 @@ export const ENGLISH_STATE = {
     'performance.graph.estimatedBirthsInTimeDescription':
       'Provided from 2018 population census',
     'performance.graph.birthRegistrationBarChartBoxWithin10YearsTitle':
-      'At What Age Are Births Registered In Children 0-10 Years',
+      'At What Age Are Births Registered In Children Aged 0-10 Years',
     'performance.graph.birthRegistrationInAgesLabel': 'Age (years)',
     'performance.graph.birthRegistrationPercentageLabel':
       'Total Births Registered (%)'
