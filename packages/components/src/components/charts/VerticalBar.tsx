@@ -13,6 +13,7 @@ import {
 import { ITheme } from '../theme'
 
 const Container = styled.div`
+  margin-top: 30px;
   box-sizing: border-box;
   height: 250px;
   width: 100%;

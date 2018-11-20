@@ -182,6 +182,9 @@ class HomeView extends React.Component<InjectedIntlProps> {
             </FooterText>
           </ChartContainer>
           <ChartContainer>
+            <BoxTitle id="box_title">
+              At What Age Are Births Registered In Children 0-10 Years
+            </BoxTitle>
             <VerticalBar
               data={birthRegistrationData}
               xAxisLabel="Age(years)"
