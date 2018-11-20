@@ -1,30 +1,22 @@
-import fetch from 'node-fetch'
-import { ADMINISTRATIVE_STRUCTURE_URL } from '../../../../constants'
-import { logger } from '../../../../logger'
-import { v4 as uuid } from 'uuid'
+import fetch, { Response } from 'node-fetch'
+import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
+import { sendToFhir, IOISFLocation } from '../../../utils/bn'
+import chalk from 'chalk'
 
-interface IOISFLocation {
-  bbsCode: string
-  name: string
-  nameBn: string
-  id: number
-}
-
-const composeFhir = (
+const composeFhirLocation = (
   location: IOISFLocation,
   partOfReference: string,
   oisfA2IParams?: string
 ): fhir.Location => {
   return {
-    id: uuid(),
     resourceType: 'Location',
     identifier: [
       {
-        system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+        system: `${ORG_URL}/specs/id/a2i-internal-id`,
         value: String(location.id)
       },
       {
-        system: 'http://opencrvs.org/specs/id/bbs-code',
+        system: `${ORG_URL}/specs/id/bbs-code`,
         value: location.bbsCode
       }
     ],
@@ -35,6 +27,22 @@ const composeFhir = (
     mode: 'instance',
     partOf: {
       reference: `Location/${partOfReference}` // Reference to the admin location that is one level up from this one.
+    },
+    type: {
+      coding: [
+        {
+          system: `${ORG_URL}/specs/location-type`,
+          code: 'ADMIN_STRUCTURE'
+        }
+      ]
+    },
+    physicalType: {
+      coding: [
+        {
+          code: 'jdn',
+          display: 'Jurisdiction'
+        }
+      ]
     },
     extension: [
       {
@@ -68,29 +76,38 @@ export async function fetchAndComposeLocations(
   route: string,
   partOfReference: string
 ): Promise<fhir.Location[]> {
-  const url = `${ADMINISTRATIVE_STRUCTURE_URL}/${route}`
-  logger.info(`Fetching: ${url}`)
-  const res = await fetch(url, {
-    method: 'GET'
+  const body = await getLocationsFromOISF(route).catch(err => {
+    throw Error('Cannot retrieve locations from OISF')
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
 
   const locations: fhir.Location[] = []
-  const body = await res.json()
-
-  body.forEach((location: IOISFLocation) => {
+  for (const oisfLocation of body) {
     let oisfA2IParams: string
     if (partOfReference === '0') {
-      oisfA2IParams = `${route}=${location.id}`
+      oisfA2IParams = `${route}=${oisfLocation.id}`
     } else {
-      oisfA2IParams = makeOISFParams(route, location.id)
+      oisfA2IParams = makeOISFParams(route, oisfLocation.id)
     }
 
-    locations.push(composeFhir(location, partOfReference, oisfA2IParams))
-  })
+    const newLocation: fhir.Location = composeFhirLocation(
+      oisfLocation,
+      partOfReference,
+      oisfA2IParams
+    )
+
+    const savedLocationResponse = (await sendToFhir(
+      newLocation,
+      '/Location',
+      'POST'
+    ).catch(err => {
+      throw Error('Cannot save location to FHIR')
+    })) as Response
+    const locationHeader = savedLocationResponse.headers.get(
+      'location'
+    ) as string
+    newLocation.id = locationHeader.split('/')[3]
+    locations.push(newLocation)
+  }
   return locations
 }
 
@@ -110,4 +127,41 @@ export async function getLocationsByParentDivisions(
     locations = appendLocations(locations, queryResult)
   }
   return locations
+}
+
+const chalkColors = [
+  'green',
+  'yellow',
+  'magenta',
+  'cyan',
+  'redBright',
+  'greenBright',
+  'yellowBright',
+  'blueBright',
+  'magentaBright',
+  'cyanBright',
+  'whiteBright'
+]
+
+function getRandomColor(): string {
+  return chalkColors[Math.floor(Math.random() * chalkColors.length)]
+}
+
+export async function getLocationsFromOISF(route: string): Promise<any> {
+  const url = `${ADMINISTRATIVE_STRUCTURE_URL}/${route}`
+  // tslint:disable-next-line:no-console
+  console.log(`Fetching: ${url}.`)
+  // tslint:disable-next-line:no-console
+  console.log(
+    `${chalk[getRandomColor()]('Please wait, will take 10 minutes ....')}`
+  )
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  if (res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  return await res.json()
 }
