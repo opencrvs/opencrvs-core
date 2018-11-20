@@ -75,6 +75,7 @@
     "apollo-link": "^1.2.3",
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
+    "jest": "23.6.0",
     "opener": "^1.5.1",
     "prettier": "^1.15.2",
     "serve": "^10.0.2",
