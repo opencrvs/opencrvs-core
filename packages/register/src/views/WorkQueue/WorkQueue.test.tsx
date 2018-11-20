@@ -9,6 +9,9 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 
+const declareScope =
+  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
+
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 const getItem = window.localStorage.getItem as jest.Mock
@@ -216,6 +219,90 @@ describe('WorkQueue tests', async () => {
           .find('#reviewAndRegisterBtn_B111111')
           .hostNodes().length
       ).toBe(1)
+
+      expect(
+        testComponent.component
+          .find('#new_registration')
+          .hostNodes()
+          .text()
+      ).toContain('New birth registration')
+
+      testComponent.component.unmount()
+    })
+  })
+
+  describe('WorkQueue tests for declare scope', () => {
+    beforeAll(() => {
+      getItem.mockReturnValue(declareScope)
+      store.dispatch(checkAuth({ '?token': declareScope }))
+    })
+    it('does not render review and register button for user with declare scope', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_REGISTRATION_QUERY
+          },
+          result: {
+            data: {
+              listBirthRegistrations: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111'
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: null,
+                        firstNames: 'Baby',
+                        familyName: 'Doe'
+                      }
+                    ],
+                    birthDate: null
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
+          }
+        }
+      ]
+
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <WorkQueue />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      testComponent.component.update()
+
+      const instance = testComponent.component
+        .find(DataTable)
+        .find(ListItem)
+        .instance() as any
+
+      instance.toggleExpanded()
+      testComponent.component.update()
+
+      expect(
+        testComponent.component
+          .find(DataTable)
+          .find('#reviewAndRegisterBtn_B111111')
+          .hostNodes().length
+      ).toBe(0)
+
+      expect(
+        testComponent.component
+          .find('#new_registration')
+          .hostNodes()
+          .text()
+      ).toContain('New birth application')
 
       testComponent.component.unmount()
     })
