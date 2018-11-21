@@ -415,6 +415,13 @@
   resolved "https://registry.yarnpkg.com/@types/command-line-usage/-/command-line-usage-5.0.1.tgz#99424950da567ba67b6b65caee57ff03c4e751ec"
   integrity sha512-/xUgezxxYePeXhg5S04hUjxG9JZi+rJTs1+4NwpYPfSaS7BeDa6tVJkH6lN9Cb6rl8d24Fi2uX0s0Ngg2JT6gg==
 
+"@types/csv2json@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@types/csv2json/-/csv2json-1.4.0.tgz#4ef3403bef2b3cc262779387640e8caaa3084d22"
+  integrity sha512-s20gA3G7LURTGC92IduDTsNNP95MgKH5K5tmajO10RHpnPb83sAUOxXjh4Xn8CcF29G2o4hcs4Xpx3SuGwcUMg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/d3-path@*":
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/@types/d3-path/-/d3-path-1.0.7.tgz#a0736fceed688a695f48265a82ff7a3369414b81"
@@ -426,13 +433,6 @@
   integrity sha512-BdewMqqinhNNV8rrnjr6tIdm6WCl/eVaePDs1dl52Le/c0m1ML/LaZc2S/Sht3VjPbAqeDFXhTgRgeDkrvzt/w==
   dependencies:
     "@types/d3-path" "*"
-
-"@types/csv2json@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@types/csv2json/-/csv2json-1.4.0.tgz#4ef3403bef2b3cc262779387640e8caaa3084d22"
-  integrity sha512-s20gA3G7LURTGC92IduDTsNNP95MgKH5K5tmajO10RHpnPb83sAUOxXjh4Xn8CcF29G2o4hcs4Xpx3SuGwcUMg==
-  dependencies:
-    "@types/node" "*"
 
 "@types/dotenv@^4.0.2", "@types/dotenv@^4.0.3":
   version "4.0.3"

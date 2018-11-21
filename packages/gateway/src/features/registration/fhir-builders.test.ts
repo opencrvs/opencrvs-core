@@ -85,6 +85,13 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     registration: {
       contact: 'MOTHER',
+      status: {
+        comments: {
+          comment: 'This is just a test data',
+          createdAt: '2018-10-31T09:45:05+10:00'
+        },
+        timestamp: '2018-10-31T09:45:05+10:00'
+      },
       attachments: [
         {
           contentType: 'image/jpeg',
@@ -245,7 +252,13 @@ test('should build a minimal FHIR registration document without error', async ()
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
     valueString: 'MOTHER'
   })
-
+  expect(fhir.entry[4].resource.lastModified).toEqual(
+    '2018-10-31T09:45:05+10:00'
+  )
+  expect(fhir.entry[4].resource.note[0]).toEqual({
+    text: 'This is just a test data',
+    time: '2018-10-31T09:45:05+10:00'
+  })
   // Attachment Test cases
   expect(fhir.entry[5].resource.docStatus).toBe('final')
   expect(fhir.entry[5].resource.created).toBe('2018-10-21')
