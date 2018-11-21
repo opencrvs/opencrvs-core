@@ -21,7 +21,7 @@ describe('Verify getSharedContactMsisdn', () => {
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError('Invalid FHIR bundle found for declration')
+    ).toThrowError('Invalid FHIR bundle found for declaration')
   })
 
   it('Throws error when invalid shared contact info given', () => {
@@ -61,10 +61,12 @@ describe('Verify getInformantName', () => {
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError('getInformantName: Invalid FHIR bundle found for declration')
+    ).toThrowError(
+      'getInformantName: Invalid FHIR bundle found for declaration'
+    )
   })
 
-  it('Throws error when chlid name section is missing', () => {
+  it('Throws error when child name section is missing', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = undefined
     expect(() => getInformantName(fhirBundle)).toThrowError(
@@ -72,11 +74,11 @@ describe('Verify getInformantName', () => {
     )
   })
 
-  it("Throws error when chlid's traditional name block is missing", () => {
+  it("Throws error when child's bn name block is missing", () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = []
     expect(() => getInformantName(fhirBundle)).toThrowError(
-      "Didn't found informant's traditional name"
+      "Didn't found informant's bn name"
     )
   })
 })
@@ -94,7 +96,7 @@ describe('Verify getTrackingId', () => {
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError('getTrackingId: Invalid FHIR bundle found for declration')
+    ).toThrowError('getTrackingId: Invalid FHIR bundle found for declaration')
   })
 })
 

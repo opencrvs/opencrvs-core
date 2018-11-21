@@ -18,10 +18,10 @@ describe('Registration root resolvers', () => {
   })
   const details = {
     child: {
-      name: [{ use: 'Traditional', firstNames: 'অনিক', familyName: 'হক' }]
+      name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
     },
     mother: {
-      name: [{ use: 'Traditional', firstNames: 'তাহসিনা', familyName: 'হক' }],
+      name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
       telecom: [{ system: 'phone', value: '+8801622688231' }]
     },
     registration: { contact: 'MOTHER' }
