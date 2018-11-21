@@ -605,12 +605,16 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.results.dateOfRegistration': 'নিবন্ধনের তারিখ',
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
-    'register.workQueue.queryError': 'TODO',
-    'register.workQueue.dataTable.results': 'TODO',
-    'register.workQueue.dataTable.noResults': 'TODO',
-    'register.workQueue.header.title': 'TODO',
-    'register.workQueue.header.description': 'TODO',
-    'register.workQueue.buttons.newRegistration': 'নতুন নিবন্ধন',
+    'register.workQueue.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
+    'register.workQueue.dataTable.results': 'ফলাফল',
+    'register.workQueue.dataTable.noResults': 'প্রদর্শন ফলাফল নেই',
+    'register.workQueue.header.title': 'হ্যালো নিবন্ধক',
+    'register.workQueue.header.description':
+      'পর্যালোচনা | নিবন্ধন | সাক্ষ্যদান',
+    'register.workQueue.buttons.newRegistration': 'নতুন জন্ম নিবন্ধন',
+    'register.workQueue.buttons.reviewAndRegister': 'পর্যালোচনা এবং নিবন্ধন',
+    'register.workQueue.list.buttons.review': 'পর্যালোচনা',
+    'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন'
   }

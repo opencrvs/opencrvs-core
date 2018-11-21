@@ -4,14 +4,19 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import * as moment from 'moment'
 import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
-import { IconAction, ActionTitle } from '@opencrvs/components/lib/buttons'
+import {
+  IconAction,
+  ActionTitle,
+  PrimaryButton
+} from '@opencrvs/components/lib/buttons'
 import { Plus } from '@opencrvs/components/lib/icons'
 import {
   Banner,
   SearchInput,
   ISearchInputProps,
   ListItem,
-  Spinner
+  Spinner,
+  ListItemExpansion
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import gql from 'graphql-tag'
@@ -31,7 +36,10 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { IStoreState } from 'src/store'
+import { getScope } from 'src/profile/profileSelectors'
+import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
+import { goToEvents as goToEventsAction } from 'src/navigation'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list {
@@ -195,8 +203,24 @@ const messages = defineMessages({
   },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New registration',
+    defaultMessage: 'New birth registration',
     description: 'The title of new registration button'
+  },
+  newApplication: {
+    id: 'register.workQueue.buttons.newApplication',
+    defaultMessage: 'New Birth Application',
+    description: 'The title of new application button'
+  },
+  reviewAndRegister: {
+    id: 'register.workQueue.buttons.reviewAndRegister',
+    defaultMessage: 'Review and Register',
+    description:
+      'The title of review and register button in expanded area of list item'
+  },
+  review: {
+    id: 'register.workQueue.list.buttons.review',
+    defaultMessage: 'Review',
+    description: 'The title of review button in list item actions'
   }
 })
 
@@ -239,9 +263,17 @@ const StyledIconAction = styled(IconAction)`
   }
 `
 
+interface IBaseWorkQueueProps {
+  theme: ITheme
+  language: string
+  scope: Scope
+  goToEvents: typeof goToEventsAction
+}
+
 type IWorkQueueProps = InjectedIntlProps &
   IViewHeadingProps &
-  ISearchInputProps & { language: string } & { theme: ITheme }
+  ISearchInputProps &
+  IBaseWorkQueueProps
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
@@ -327,6 +359,26 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       icon: this.getDeclarationStatusIcon(item.declaration_status),
       label: item.declaration_status
     })
+
+    const listItemActions = [
+      {
+        label: this.props.intl.formatMessage(messages.review),
+        handler: () => console.log('TO DO')
+      }
+    ]
+
+    const expansionActions: JSX.Element[] = []
+    if (this.userHasRegisterScope()) {
+      expansionActions.push(
+        <PrimaryButton
+          id={`reviewAndRegisterBtn_${item.tracking_id}`}
+          onClick={() => console.log('TO DO')}
+        >
+          {this.props.intl.formatMessage(messages.reviewAndRegister)}
+        </PrimaryButton>
+      )
+    }
+
     return (
       <ListItem
         index={key}
@@ -334,9 +386,32 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         statusItems={status}
         key={key}
         itemData={{}}
-        expandedCellRenderer={() => <div>Dummy expanded view</div>}
+        actions={listItemActions}
+        expandedCellRenderer={() => (
+          <ListItemExpansion actions={expansionActions}>
+            <p>Expansion content</p>
+          </ListItemExpansion>
+        )}
       />
     )
+  }
+
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
+  userHasDeclareScope() {
+    return this.props.scope && this.props.scope.includes('declare')
+  }
+
+  getNewEventButtonText() {
+    if (this.userHasRegisterScope()) {
+      return messages.newRegistration
+    } else if (this.userHasDeclareScope()) {
+      return messages.newApplication
+    } else {
+      return messages.newApplication
+    }
   }
 
   render() {
@@ -474,7 +549,8 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                   <StyledIconAction
                     id="new_registration"
                     icon={() => <StyledPlusIcon />}
-                    title={intl.formatMessage(messages.newRegistration)}
+                    onClick={this.props.goToEvents}
+                    title={intl.formatMessage(this.getNewEventButtonText())}
                   />
                   <Banner
                     text={intl.formatMessage(messages.bannerTitle)}
@@ -509,6 +585,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
   }
 }
 
-export const WorkQueue = connect((state: IStoreState) => ({
-  language: state.i18n.language
-}))(injectIntl(withTheme(WorkQueueView)))
+export const WorkQueue = connect(
+  (state: IStoreState) => ({
+    language: state.i18n.language,
+    scope: getScope(state)
+  }),
+  { goToEvents: goToEventsAction }
+)(injectIntl(withTheme(WorkQueueView)))
