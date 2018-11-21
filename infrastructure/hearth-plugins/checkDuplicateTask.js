@@ -1,3 +1,4 @@
+// @ts-check
 'use strict'
 const logger = require('winston')
 
@@ -12,13 +13,19 @@ module.exports = (mongo, fhirResources) => {
           userType: '*',
           function: (interaction, ctx, resourceType, resource, callback) => {
             logger.debug(
-              `Executing before hooks for [${interaction}] on resource ${resourceType}`
+              `Executing OpenCRVS trackingId duplicate check for [${interaction}] on resource ${resourceType}`
             )
+
+            const id = resource.identifier.find((identifier) => identifier.system === 'http://opencrvs.org/specs/id/birth-tracking-id')
+            if (!id) {
+              callback(null, null)
+            }
+
             const searchCtx = {
-              ...JSON.parse(JSON.stringify(ctx)),
+              ...Object.assign({}, ctx),
               resourceType,
               _query: {
-                identifier: resource.identifier[0].value
+                identifier: id.value
               }
             }
             fhirCore.search(searchCtx, resourceType, (err, result) => {
