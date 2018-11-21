@@ -263,11 +263,17 @@ const StyledIconAction = styled(IconAction)`
   }
 `
 
+interface IBaseWorkQueueProps {
+  theme: ITheme
+  language: string
+  scope: Scope
+  goToEvents: typeof goToEventsAction
+}
+
 type IWorkQueueProps = InjectedIntlProps &
   IViewHeadingProps &
-  ISearchInputProps & { language: string } & { theme: ITheme } & {
-    scope: Scope
-  } & { goToEvents: typeof goToEventsAction }
+  ISearchInputProps &
+  IBaseWorkQueueProps
 
 class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {

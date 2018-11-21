@@ -620,9 +620,9 @@ export const ENGLISH_STATE = {
     'register.workQueue.header.title': 'Hello Registrar',
     'register.workQueue.header.description':
       'Review | Registration | Certification',
-    'review.edit.modal.preview': 'Back to Preview',
-    'review.edit.modal.editButton': 'Edit',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
-    'register.workQueue.buttons.newApplication': 'New birth application'
+    'register.workQueue.buttons.newApplication': 'New birth application',
+    'review.edit.modal.preview': 'Back to Preview',
+    'review.edit.modal.editButton': 'Edit'
   }
 }
