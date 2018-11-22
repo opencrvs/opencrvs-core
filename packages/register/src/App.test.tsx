@@ -251,9 +251,6 @@ describe('when user has a valid token in local storage', () => {
     it('work queue view renders without crashing', () => {
       expect(app.find('#work_queue_view').hostNodes()).toHaveLength(1)
     })
-    it('new registration button renders without crashing', () => {
-      expect(app.find('#new_registration').hostNodes()).toHaveLength(1)
-    })
   })
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft

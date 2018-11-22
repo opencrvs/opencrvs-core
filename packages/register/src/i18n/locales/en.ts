@@ -590,7 +590,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.searchInput.placeholder': 'Look for a record',
     'register.workQueue.buttons.search': 'Search',
     'register.workQueue.selects.sort.item0': 'Oldest to newest',
-    'register.workQueue.selects.sort.item1': 'Newst to oldest',
+    'register.workQueue.selects.sort.item1': 'Newest to oldest',
     'register.workQueue.labels.statuses.all': 'All statues',
     'register.workQueue.labels.statuses.application': 'Application',
     'register.workQueue.labels.statuses.registered': 'Registered',
@@ -599,6 +599,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.events.birth': 'Birth',
     'register.workQueue.labels.events.death': 'Death',
     'register.workQueue.labels.events.marriage': 'Marriage',
+    'register.workQueue.labels.locations.all': 'All locations',
     'register.workQueue.labels.selects.sort': 'Sort by:',
     'register.workQueue.labels.selects.filter': 'Filter by:',
     'register.workQueue.labels.results.name': 'Name',
@@ -613,7 +614,14 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
-    'register.workQueue.buttons.newRegistraion': 'New registration',
+    'register.workQueue.queryError': 'An error occurred while searching',
+    'register.workQueue.dataTable.results': 'Results',
+    'register.workQueue.dataTable.noResults': 'No result to display',
+    'register.workQueue.header.title': 'Hello Registrar',
+    'register.workQueue.header.description':
+      'Review | Registration | Certification',
+    'register.workQueue.buttons.newRegistraion': 'New birth registration',
+    'register.workQueue.buttons.newApplication': 'New birth application',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit'
   }

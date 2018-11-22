@@ -327,7 +327,7 @@ type Query {
 
 type Registration {
   id: ID!
-  trackingID: String
+  trackingId: String
   registrationNumber: String
   paperFormID: String
   bookId: ID
@@ -338,7 +338,7 @@ type Registration {
 }
 
 input RegistrationInput {
-  trackingID: String
+  trackingId: String
   registrationNumber: String
   paperFormID: String
   bookId: ID

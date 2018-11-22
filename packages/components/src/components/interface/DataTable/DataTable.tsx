@@ -11,6 +11,7 @@ import {
 } from '../SelectGroup'
 
 import { ISortAndFilterItem, IInputLabel } from './SortAndFilter'
+import { IDynamicValues } from 'src/components/common-types'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -31,10 +32,6 @@ const ResultsText = styled.div`
   line-height: 22px;
 `
 
-export interface IDynamicValues {
-  [key: string]: string
-}
-
 type CustomSelectGroupProp = Omit<ISelectGroupProps, 'onChange' | 'values'>
 
 export interface ISortAndFilter {
@@ -48,7 +45,7 @@ export interface ISearchResultProps {
   filterBy: ISortAndFilter
   resultLabel: string
   noResultText: string
-  cellRenderer: (cellData: IDynamicValues, key: number) => React.Component<{}>
+  cellRenderer: (cellData: IDynamicValues, key: number) => JSX.Element
   onSortChange?: (
     values: ISelectGroupValue,
     changedValue: ISelectGroupValue,

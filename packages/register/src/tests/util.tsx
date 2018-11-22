@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
 
-import { ApolloProvider } from 'react-apollo'
+import { MockedProvider } from 'react-apollo/test-utils'
 import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore, AppStore } from '../store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
@@ -77,10 +77,11 @@ function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
 
 export function createTestComponent(
   node: React.ReactElement<ITestView>,
-  store: AppStore
+  store: AppStore,
+  graphqlMocks: any = null
 ) {
   const component = mount(
-    <ApolloProvider client={createGraphQLClient()}>
+    <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
           <ThemeProvider theme={getTheme(config.COUNTRY)}>
@@ -88,7 +89,7 @@ export function createTestComponent(
           </ThemeProvider>
         </I18nContainer>
       </Provider>
-    </ApolloProvider>,
+    </MockedProvider>,
     {
       context: { intl },
       childContextTypes: { intl: intlShape }

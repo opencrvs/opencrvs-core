@@ -158,7 +158,14 @@ describe('Registration type resolvers', () => {
   describe('Birth Registration type', () => {
     it('returns a registration object as a task', async () => {
       const mock = fetch.mockResponseOnce(
-        JSON.stringify({ resourceType: 'Task' })
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: { resourceType: 'Task' }
+            }
+          ]
+        })
       )
 
       // @ts-ignore

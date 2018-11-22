@@ -15,16 +15,16 @@ enum CONTACT {
 export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
-      'getSharedContactMsisdn: Invalid FHIR bundle found for declration'
+      'getSharedContactMsisdn: Invalid FHIR bundle found for declaration'
     )
   }
   const taskResource = getTaskResource(fhirBundle) as fhir.Task
   const sharedContact =
     taskResource &&
     taskResource.extension &&
-    taskResource.extension.find(extention => {
+    taskResource.extension.find(extension => {
       return (
-        extention.url ===
+        extension.url ===
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`
       )
     })
@@ -59,10 +59,13 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   return phoneNumber.value
 }
 
-export function getInformantName(fhirBundle: fhir.Bundle) {
+export function getInformantName(
+  fhirBundle: fhir.Bundle,
+  language: string = 'bn'
+) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
-      'getInformantName: Invalid FHIR bundle found for declration'
+      'getInformantName: Invalid FHIR bundle found for declaration'
     )
   }
 
@@ -71,16 +74,16 @@ export function getInformantName(fhirBundle: fhir.Bundle) {
     throw new Error("Didn't find informant's name information")
   }
 
-  const traditionalName = informant.name.find((humanName: fhir.HumanName) => {
-    return humanName.use === 'Traditional'
+  const name = informant.name.find((humanName: fhir.HumanName) => {
+    return humanName.use === language
   })
-  if (!traditionalName || !traditionalName.family) {
-    throw new Error("Didn't found informant's traditional name")
+  if (!name || !name.family) {
+    throw new Error(`Didn't found informant's ${language} name`)
   }
   return ''
-    .concat(traditionalName.given ? traditionalName.given.join(' ') : '')
+    .concat(name.given ? name.given.join(' ') : '')
     .concat(' ')
-    .concat(traditionalName.family)
+    .concat(name.family)
 }
 
 export function getTrackingId(fhirBundle: fhir.Bundle) {
@@ -90,7 +93,7 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
     (fhirBundle.entry[0].resource as fhir.Composition)
 
   if (!composition || !composition.identifier) {
-    throw new Error('getTrackingId: Invalid FHIR bundle found for declration')
+    throw new Error('getTrackingId: Invalid FHIR bundle found for declaration')
   }
   return composition.identifier.value
 }

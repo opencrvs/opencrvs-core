@@ -29,7 +29,7 @@ export function findCompositionSection(
   composition: ITemplatedComposition
 ) {
   return composition.section.find((section: fhir.CompositionSection) => {
-    if (!section.code || !section.code.coding) {
+    if (!section.code || !section.code.coding || !section.code.coding.some) {
       return false
     }
     return section.code.coding.some(coding => coding.code === code)
