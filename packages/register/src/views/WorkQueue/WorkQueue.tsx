@@ -545,7 +545,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
               }
 
               const transformedData = this.transformData(data)
-              console.log(transformedData)
+
               return (
                 <>
                   <StyledIconAction
