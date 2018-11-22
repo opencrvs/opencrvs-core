@@ -1,4 +1,4 @@
-FROM node:carbon
+FROM node:dubnium
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
