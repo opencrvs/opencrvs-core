@@ -16,7 +16,8 @@ import {
   ISearchInputProps,
   ListItem,
   Spinner,
-  ListItemExpansion
+  ListItemExpansion,
+  SelectFieldType
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import gql from 'graphql-tag'
@@ -436,7 +437,8 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                 label: intl.formatMessage(messages.filtersNewestToOldest)
               }
             ],
-            value: ''
+            value: '',
+            type: SelectFieldType.Date
           }
         ]
       }
