@@ -3,6 +3,7 @@
 # import Query.* from '../features/registration/schema.graphql'
 # import Mutation.* from '../features/registration/schema.graphql'
 # import Query.* from '../features/location/schema.graphql'
+# import Query.* from '../features/user/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO

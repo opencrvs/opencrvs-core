@@ -5,14 +5,11 @@ import { GQLResolver } from 'src/graphql/schema'
 export const resolvers: GQLResolver = {
   Query: {
     async locationsByParent(_, { parentId }) {
-      const res = await fetch(
-        `${fhirUrl}/Location?partOf.reference=${parentId}`,
-        {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
+      const res = await fetch(`${fhirUrl}/Location?partof=${parentId}`, {
+        headers: {
+          'Content-Type': 'application/fhir+json'
         }
-      )
+      })
 
       const bundle = await res.json()
 
@@ -27,7 +24,7 @@ export const resolvers: GQLResolver = {
 
       const bundle = await res.json()
 
-      return bundle.entry.map((entry: { resource: {} }) => entry.resource)
+      return bundle
     }
   }
 }
