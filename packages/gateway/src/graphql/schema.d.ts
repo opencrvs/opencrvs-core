@@ -214,7 +214,7 @@ export interface GQLRegWorkflow {
 
 export enum GQLRegStatus {
   DECLARED = 'DECLARED',
-  VERIFIED = 'VERIFIED',
+  UPDATED = 'UPDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED'
 }
@@ -1363,7 +1363,7 @@ export interface MutationToUpdateBirthRegistrationResolver<
 
 export interface MutationToMarkBirthAsVerifiedArgs {
   id: string
-  location?: GQLLocationInput
+  details?: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsVerifiedResolver<
   TParent = any,
@@ -1379,7 +1379,7 @@ export interface MutationToMarkBirthAsVerifiedResolver<
 
 export interface MutationToMarkBirthAsRegisteredArgs {
   id: string
-  location?: GQLLocationInput
+  details?: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsRegisteredResolver<
   TParent = any,
@@ -1395,7 +1395,7 @@ export interface MutationToMarkBirthAsRegisteredResolver<
 
 export interface MutationToMarkBirthAsCertifiedArgs {
   id: string
-  location?: GQLLocationInput
+  details?: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsCertifiedResolver<
   TParent = any,
@@ -1412,7 +1412,7 @@ export interface MutationToMarkBirthAsCertifiedResolver<
 export interface MutationToMarkBirthAsVoidedArgs {
   id: string
   reason: string
-  location?: GQLLocationInput
+  comment?: string
 }
 export interface MutationToMarkBirthAsVoidedResolver<
   TParent = any,

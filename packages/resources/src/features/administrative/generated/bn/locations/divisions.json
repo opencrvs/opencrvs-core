@@ -10,6 +10,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "10"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Barisal",
@@ -47,7 +51,7 @@
           }
         }
       ],
-      "id": "761ee6e4-fc8c-4ec1-80b7-9862e95a38b7"
+      "id": "a0847e86-5e5f-4cd7-934f-7d56e8e80b2b"
     },
     {
       "resourceType": "Location",
@@ -59,6 +63,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "20"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Chittagong",
@@ -96,7 +104,7 @@
           }
         }
       ],
-      "id": "3e09034e-35b3-4bc8-a3f1-8da37278cc26"
+      "id": "e86a8e10-4863-4a1b-ac52-eddc9b4de628"
     },
     {
       "resourceType": "Location",
@@ -108,6 +116,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "30"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Dhaka",
@@ -145,7 +157,7 @@
           }
         }
       ],
-      "id": "52e759e1-dce3-4214-aeaa-f8889c6e3bbc"
+      "id": "c2341d52-94b8-4aea-98e7-5b3594f422db"
     },
     {
       "resourceType": "Location",
@@ -157,6 +169,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "40"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Khulna",
@@ -194,7 +210,7 @@
           }
         }
       ],
-      "id": "5fbc76ac-71c6-438e-a8d6-3ca8f4eee440"
+      "id": "c29fffc9-35af-40dd-9ac6-c6adafbfe176"
     },
     {
       "resourceType": "Location",
@@ -206,6 +222,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "50"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Rajshahi",
@@ -243,7 +263,7 @@
           }
         }
       ],
-      "id": "99a46d36-1873-463d-ab71-fd5284545a2a"
+      "id": "7006ceff-90e6-44be-9937-59e75cd21a9a"
     },
     {
       "resourceType": "Location",
@@ -255,6 +275,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "60"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Rangpur",
@@ -292,7 +316,7 @@
           }
         }
       ],
-      "id": "4dd0f0f8-f0d3-44c3-9124-8a6df860e6e8"
+      "id": "539c2d54-d10b-44f3-9831-e625120eefbf"
     },
     {
       "resourceType": "Location",
@@ -304,6 +328,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "70"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Sylhet",
@@ -341,7 +369,7 @@
           }
         }
       ],
-      "id": "bb1abe2b-b21a-47ba-87f5-ea5192fe5fa8"
+      "id": "5e9ca971-0f6e-4270-ae92-c46d34a277fd"
     },
     {
       "resourceType": "Location",
@@ -353,6 +381,10 @@
         {
           "system": "http://opencrvs.org/specs/id/bbs-code",
           "value": "45"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "DIVISION"
         }
       ],
       "name": "Mymensingh",
@@ -390,7 +422,7 @@
           }
         }
       ],
-      "id": "3be0f608-8fe0-43df-862c-edd847ac1d10"
+      "id": "fdbeee53-7602-4635-97c5-62cbc3060ef5"
     }
   ]
 }

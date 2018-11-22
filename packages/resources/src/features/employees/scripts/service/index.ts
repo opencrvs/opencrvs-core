@@ -75,7 +75,8 @@ export async function composeAndSavePractitioners(
   practitioners: ITestPractitioner[],
   divisions: fhir.Location[],
   districts: fhir.Location[],
-  upazilas: fhir.Location[]
+  upazilas: fhir.Location[],
+  unions: fhir.Location[]
 ): Promise<boolean> {
   for (const practitioner of practitioners) {
     // Get Locations
@@ -101,6 +102,12 @@ export async function composeAndSavePractitioners(
     if (practitioner.upazila) {
       const upazilaID = await getUpazilaID(upazilas, practitioner.upazila)
       locations.push({ reference: `Location/${upazilaID as string}` })
+    }
+    if (practitioner.union) {
+      const practitionerUnion: fhir.Location = unions.find(union => {
+        return union.name === practitioner.union.toUpperCase()
+      }) as fhir.Location
+      locations.push({ reference: `Location/${practitionerUnion.id}` })
     }
 
     // Create and save Practitioner
