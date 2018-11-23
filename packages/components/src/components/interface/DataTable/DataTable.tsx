@@ -77,13 +77,13 @@ const defaultConfiguration = {
   initialPage: 1
 }
 
-const sortByDateAsc = (key: string, value: string, data: IDynamicValues[]) => {
+const sortByDateDesc = (key: string, value: string, data: IDynamicValues[]) => {
   return [...data].sort((a, b) => {
     return new Date(b[key]).valueOf() - new Date(a[key]).valueOf()
   })
 }
 
-const sortByDateDesc = (key: string, value: string, data: IDynamicValues[]) => {
+const sortByDateAsc = (key: string, value: string, data: IDynamicValues[]) => {
   return [...data].sort((a, b) => {
     return new Date(a[key]).valueOf() - new Date(b[key]).valueOf()
   })
@@ -99,7 +99,7 @@ const sortByDate = (key: string, value: string, data: IDynamicValues[]) => {
   }
 }
 
-const defaulSort = (key: string, value: string, data: IDynamicValues[]) => {
+const defaultSort = (key: string, value: string, data: IDynamicValues[]) => {
   return [...data].sort((a, b) => {
     if (a[key] < b[key]) {
       return -1
@@ -256,7 +256,7 @@ export class DataTable extends React.Component<
         )
         this.resetPagination(sortedItems)
       } else {
-        const sortedItems = defaulSort(
+        const sortedItems = defaultSort(
           key,
           selectedValue,
           this.state.filteredSortedItems
