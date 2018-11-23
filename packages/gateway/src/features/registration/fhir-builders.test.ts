@@ -85,13 +85,17 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     registration: {
       contact: 'MOTHER',
-      status: {
-        comments: {
-          comment: 'This is just a test data',
-          createdAt: '2018-10-31T09:45:05+10:00'
-        },
-        timestamp: '2018-10-31T09:45:05+10:00'
-      },
+      status: [
+        {
+          comments: [
+            {
+              comment: 'This is just a test data',
+              createdAt: '2018-10-31T09:45:05+10:00'
+            }
+          ],
+          timestamp: '2018-10-31T09:45:05+10:00'
+        }
+      ],
       attachments: [
         {
           contentType: 'image/jpeg',
