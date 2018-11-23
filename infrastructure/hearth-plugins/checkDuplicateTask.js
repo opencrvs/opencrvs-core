@@ -16,7 +16,11 @@ module.exports = (mongo, fhirResources) => {
               `Executing OpenCRVS trackingId duplicate check for [${interaction}] on resource ${resourceType}`
             )
 
-            const id = resource.identifier.find((identifier) => identifier.system === 'http://opencrvs.org/specs/id/birth-tracking-id')
+            const id = resource.identifier.find(
+              identifier =>
+                identifier.system ===
+                'http://opencrvs.org/specs/id/birth-tracking-id'
+            )
             if (!id) {
               callback(null, null)
             }
@@ -43,7 +47,7 @@ module.exports = (mongo, fhirResources) => {
                         code: 'duplicate',
                         details: {
                           text: `Duplicate Task found for identifier: ${
-                            resource.identifier.value
+                            id.value
                           }`
                         }
                       }
