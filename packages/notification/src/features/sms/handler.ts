@@ -1,6 +1,7 @@
 import * as Hapi from 'hapi'
 import { internal } from 'boom'
 import { sendSMS } from './service'
+import { NON_UNICODED_LANGUAGES } from 'src/constants'
 
 export type HapiRequest = Hapi.Request & {
   i18n: {
@@ -47,8 +48,8 @@ export async function sendBirthDeclarationConfirmation(
         name: payload.name,
         trackingid: payload.trackingid
       }),
-      /* send unicoded sms if default local is not set */
-      request.i18n.getLocale() !== 'en'
+      /* send unicoded sms if provided local is not in non unicoded set */
+      NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
     )
   } catch (err) {
     return internal(err)

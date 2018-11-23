@@ -1,8 +1,21 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from './index'
+import { createServerWithEnvironment } from './tests/util'
 
 describe('Route authorization', () => {
+  it('helth check', async () => {
+    const server = await createServerWithEnvironment({
+      NODE_ENV: 'DEVELOPMENT'
+    })
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping'
+    })
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toBe('pong')
+  })
+
   it('blocks requests without a token', async () => {
     const server = await createServer()
     const res = await server.server.inject({

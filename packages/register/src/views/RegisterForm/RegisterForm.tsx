@@ -11,7 +11,7 @@ import { goToTab as goToTabAction } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from '../../store'
-import { IDraft, modifyDraft } from '../../drafts'
+import { IDraft, modifyDraft, deleteDraft } from '../../drafts'
 import { getRegisterForm } from '../../forms/register/selectors'
 import {
   FooterAction,
@@ -20,6 +20,9 @@ import {
 } from 'src/components/interface/footer'
 import { PreviewSection } from './PreviewSection'
 import { StickyFormTabs } from './StickyFormTabs'
+import gql from 'graphql-tag'
+import { Mutation } from 'react-apollo'
+import processDraftData from './ProcessDraftData'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -118,6 +121,7 @@ function getPreviousSection(
 type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
+  deleteDraft: typeof deleteDraft
   handleSubmit: (values: unknown) => void
 }
 
@@ -137,6 +141,12 @@ type State = {
   showSubmitModal: boolean
   selectedTabId: string
 }
+
+const postMutation = gql`
+  mutation submitBirthRegistration($details: BirthRegistrationInput!) {
+    createBirthRegistration(details: $details)
+  }
+`
 
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
@@ -158,6 +168,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
+  successfulSubmission = (response: string) => {
+    const { history, draft } = this.props
+    history.push('/saved', {
+      trackingId: response
+    })
+    this.props.deleteDraft(draft)
+  }
+
   submitForm = () => {
     this.setState({ showSubmitModal: true })
   }
@@ -177,6 +195,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       goToTab(draftId, selectedSection.id)
     }
   }
+
+  processSubmitData = () => processDraftData(this.props.draft.data)
 
   render() {
     const {
@@ -262,31 +282,46 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Modal
-          title="Are you ready to submit?"
-          actions={[
-            <PrimaryButton
-              key="submit"
-              id="submit_confirm"
-              onClick={() => history.push('/saved')}
-            >
-              {intl.formatMessage(messages.submitButton)}
-            </PrimaryButton>,
-            <PreviewButton
-              key="preview"
-              onClick={() => {
-                this.toggleSubmitModalOpen()
-                document.documentElement.scrollTop = 0
-              }}
-            >
-              {intl.formatMessage(messages.preview)}
-            </PreviewButton>
-          ]}
-          show={this.state.showSubmitModal}
-          handleClose={this.toggleSubmitModalOpen}
+        <Mutation
+          mutation={postMutation}
+          variables={{ details: this.processSubmitData() }}
         >
-          {intl.formatMessage(messages.submitDescription)}
-        </Modal>
+          {(submitBirthRegistration, { data }) => {
+            if (data && data.createBirthRegistration) {
+              this.successfulSubmission(data.createBirthRegistration)
+            }
+
+            return (
+              <Modal
+                title="Are you ready to submit?"
+                actions={[
+                  <PrimaryButton
+                    key="submit"
+                    id="submit_confirm"
+                    onClick={() => submitBirthRegistration()}
+                  >
+                    {intl.formatMessage(messages.submitButton)}
+                  </PrimaryButton>,
+                  <PreviewButton
+                    key="preview"
+                    onClick={() => {
+                      this.toggleSubmitModalOpen()
+                      if (document.documentElement) {
+                        document.documentElement.scrollTop = 0
+                      }
+                    }}
+                  >
+                    {intl.formatMessage(messages.preview)}
+                  </PreviewButton>
+                ]}
+                show={this.state.showSubmitModal}
+                handleClose={this.toggleSubmitModalOpen}
+              >
+                {intl.formatMessage(messages.submitDescription)}
+              </Modal>
+            )
+          }}
+        </Mutation>
       </FormViewContainer>
     )
   }
@@ -351,6 +386,7 @@ function mapStateToProps(
 
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
+  deleteDraft,
   goToTab: goToTabAction,
   handleSubmit: values => {
     console.log(values)

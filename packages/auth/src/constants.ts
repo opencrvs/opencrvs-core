@@ -19,7 +19,7 @@ export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const CONFIG_TOKEN_EXPIRY_SECONDS = process.env
   .CONFIG_TOKEN_EXPIRY_SECONDS
   ? parseInt(process.env.CONFIG_TOKEN_EXPIRY_SECONDS, 10)
-  : 600
+  : 604800 // 1 week
 
 export const CONFIG_SMS_CODE_EXPIRY_SECONDS = process.env
   .CONFIG_SMS_CODE_EXPIRY_SECONDS
@@ -31,6 +31,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:user-mgnt-user',
   'opencrvs:hearth-user',
   'opencrvs:gateway-user',
-  'opencrvs:notification-user'
+  'opencrvs:notification-user',
+  'opencrvs:workflow-user'
 ]
 export const JWT_ISSUER = 'opencrvs:auth-service'

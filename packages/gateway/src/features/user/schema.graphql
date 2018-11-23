@@ -1,0 +1,37 @@
+# TODO: Move to user feature when built out - manage through a user management microservice
+input UserIdentifierInput {
+  use: String # -> .use
+  system: String # -> .system
+  value: String # -> .system
+}
+
+type UserIdentifier { # -> identifier
+  use: String # -> .use
+  system: String # -> .system
+  value: String # -> .system
+}
+
+input UserInput {
+  name: [HumanNameInput]
+  telecom: [ContactPointInput]
+  identifier: [UserIdentifierInput]
+  role: String
+  primaryOffice: LocationInput
+  currentLocation: LocationInput
+  catchmentArea: [LocationInput]
+}
+
+type User {
+  id: ID!
+  name: [HumanName] # -> .name
+  telecom: [ContactPoint]
+  identifier: [UserIdentifier]
+  role: String
+  primaryOffice: Location
+  currentLocation: Location
+  catchmentArea: [Location]
+}
+
+type Query {
+  getUser(userId: String): User
+}

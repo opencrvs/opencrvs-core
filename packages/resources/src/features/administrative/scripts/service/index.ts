@@ -5,6 +5,7 @@ import chalk from 'chalk'
 
 const composeFhirLocation = (
   location: IOISFLocation,
+  jurisdictionType: string,
   partOfReference: string,
   oisfA2IParams?: string
 ): fhir.Location => {
@@ -18,6 +19,10 @@ const composeFhirLocation = (
       {
         system: `${ORG_URL}/specs/id/bbs-code`,
         value: location.bbsCode
+      },
+      {
+        system: `${ORG_URL}/specs/id/jurisdiction-type`,
+        value: jurisdictionType
       }
     ],
     name: location.name, // English name
@@ -74,7 +79,8 @@ const makeOISFParams = (route: string, id: number): string => {
 
 export async function fetchAndComposeLocations(
   route: string,
-  partOfReference: string
+  partOfReference: string,
+  jurisdictionType: string
 ): Promise<fhir.Location[]> {
   const body = await getLocationsFromOISF(route).catch(err => {
     throw Error('Cannot retrieve locations from OISF')
@@ -91,6 +97,7 @@ export async function fetchAndComposeLocations(
 
     const newLocation: fhir.Location = composeFhirLocation(
       oisfLocation,
+      jurisdictionType,
       partOfReference,
       oisfA2IParams
     )
@@ -112,17 +119,18 @@ export async function fetchAndComposeLocations(
 }
 
 export async function getLocationsByParentDivisions(
-  divisionType: string,
+  jurisdictionType: string,
   parentDivisions: fhir.Location[]
 ): Promise<fhir.Location[]> {
   let locations: fhir.Location[] = []
   let queryRoute: string
   let queryResult: fhir.Location[] = []
   for (const parentDivision of parentDivisions) {
-    queryRoute = `${divisionType}?${parentDivision.description}`
+    queryRoute = `${jurisdictionType}?${parentDivision.description}`
     queryResult = await fetchAndComposeLocations(
       queryRoute,
-      parentDivision.id as string
+      parentDivision.id as string,
+      jurisdictionType.toUpperCase()
     )
     locations = appendLocations(locations, queryResult)
   }

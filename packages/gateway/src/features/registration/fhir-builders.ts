@@ -344,23 +344,6 @@ function createEducationalAttainmentBuilder(
   })
 }
 
-function createBirthTrackingIdentifier(
-  resource: fhir.Task,
-  fieldValue: string
-) {
-  if (!resource.focus) {
-    resource.focus = { reference: '' }
-  }
-  resource.focus.reference = `urn:trackingid:${fieldValue}`
-  if (!resource.identifier) {
-    resource.identifier = []
-  }
-  resource.identifier.push({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-    value: fieldValue
-  })
-}
-
 function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -369,6 +352,37 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
     valueString: fieldValue
   })
+}
+
+function createRegStatusComment(
+  resource: fhir.Task,
+  fieldValue: string,
+  context: any
+) {
+  if (!resource.note) {
+    resource.note = []
+  }
+  if (!resource.note[context._index.comments]) {
+    resource.note[context._index.comments] = { text: '' }
+  }
+  resource.note[context._index.comments].text = fieldValue
+}
+
+function createRegStatusCommentTimeStamp(
+  resource: fhir.Task,
+  fieldValue: string,
+  context: any
+) {
+  if (!resource.note) {
+    resource.note = []
+  }
+  if (!resource.note[context._index.comments]) {
+    resource.note[context._index.comments] = {
+      /* as text is a mendatory field for note */
+      text: ''
+    }
+  }
+  resource.note[context._index.comments].time = fieldValue
 }
 
 function createBirthTypeBuilder(
@@ -714,14 +728,6 @@ const builders: IFieldBuilders = {
     }
   },
   registration: {
-    trackingId: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return createBirthTrackingIdentifier(taskResource, fieldValue)
-    },
     contact: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -729,6 +735,45 @@ const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
+    },
+    status: {
+      comments: {
+        comment: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          return createRegStatusComment(taskResource, fieldValue, context)
+        },
+        createdAt: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          return createRegStatusCommentTimeStamp(
+            taskResource,
+            fieldValue,
+            context
+          )
+        }
+      },
+      timestamp: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        taskResource.lastModified = fieldValue
+        return
+      }
     },
     attachments: {
       originalFileName: (
@@ -1003,11 +1048,11 @@ const builders: IFieldBuilders = {
   }
 }
 
-export async function buildFHIRBundle(reg: object, trackingId?: string) {
+export async function buildFHIRBundle(reg: object) {
   const fhirBundle: ITemplatedBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate(trackingId)]
+    entry: [createCompositionTemplate()]
   }
 
   await transformObj(reg, fhirBundle, builders)
