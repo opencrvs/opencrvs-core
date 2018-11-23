@@ -807,12 +807,13 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: Date.now(), data }
-      store.dispatch(storeDraft(customDraft, true))
+      customDraft = { id: Date.now(), data, review: true }
+      store.dispatch(storeDraft(customDraft))
       history.replace(
-        REVIEW_BIRTH_PARENT_FORM_TAB.replace(':review', 'review')
-          .replace(':draftId', customDraft.id.toString())
-          .replace(':tabId', 'review')
+        REVIEW_BIRTH_PARENT_FORM_TAB.replace(
+          ':draftId',
+          customDraft.id.toString()
+        ).replace(':tabId', 'review')
       )
       app.update()
       app

@@ -30,7 +30,7 @@ import {
 import { IDraft } from 'src/drafts'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
-import { getRegisterForm } from 'src/forms/register/selectors'
+import { getRegisterForm } from 'src/forms/register/application-selectors'
 import { IStoreState } from 'src/store'
 import { getConditionalActionsForField } from 'src/forms/utils'
 
@@ -191,7 +191,7 @@ class PreviewSectionForm extends React.Component<
     const formSections = registerForm.sections.filter(
       ({ viewType }) => viewType === 'form'
     )
-
+    console.log(this.props)
     // REFACTOR
     const emptyFieldsBySection = formSections.reduce(
       (sections, section: IFormSection) => {
@@ -267,7 +267,11 @@ class PreviewSectionForm extends React.Component<
                     <InformationMissingLink
                       key={name}
                       onClick={() =>
-                        this.props.goToTab(draft.id, section.id, name)
+                        this.props.goToTab(
+                          this.props.draft.id,
+                          section.id,
+                          name
+                        )
                       }
                     >
                       {intl.formatMessage(label)}

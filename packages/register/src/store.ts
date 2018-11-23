@@ -19,7 +19,10 @@ import { profileReducer, ProfileState } from './profile/profileReducer'
 import { intlReducer, IntlState } from './i18n/reducer'
 import { draftsReducer, IDraftsState } from 'src/drafts'
 // import { reviewDraftsReducer, IReviewDraftsState } from 'src/drafts/review'
-import { reviewReducer, IReviewFormState } from './forms/review/reviewReducer'
+import {
+  reviewReducer,
+  IReviewFormState
+} from '@opencrvs/register/src/forms/register/reviewReducer'
 import {
   registerFormReducer,
   IRegisterFormState

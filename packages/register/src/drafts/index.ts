@@ -12,18 +12,18 @@ const DELETE_DRAFT = 'DRAFTS/DELETE_DRAFT'
 export interface IDraft {
   id: number
   data: IFormData
+  review?: boolean
 }
 
 interface IStoreDraftAction {
   type: typeof STORE_DRAFT
-  payload: { draft: IDraft; isReviewForm: boolean }
+  payload: { draft: IDraft }
 }
 
 interface IModifyDraftAction {
   type: typeof MODIFY_DRAFT
   payload: {
     draft: IDraft
-    isReviewForm: boolean
   }
 }
 
@@ -31,7 +31,6 @@ interface IWriteDraftAction {
   type: typeof WRITE_DRAFT
   payload: {
     draft: IDraftsState
-    isReviewForm: boolean
   }
 }
 
@@ -39,7 +38,6 @@ interface ISetInitialDraftsAction {
   type: typeof SET_INITIAL_DRAFTS
   payload: {
     drafts: IDraft[]
-    isReviewForm: boolean
   }
 }
 
@@ -47,7 +45,6 @@ interface IDeleteDraftAction {
   type: typeof DELETE_DRAFT
   payload: {
     draft: IDraft
-    isReviewForm: boolean
   }
 }
 
@@ -72,39 +69,27 @@ const initialState = {
 export function createDraft() {
   return { id: Date.now(), data: {} }
 }
-
-export function storeDraft(
-  draft: IDraft,
-  isReviewForm: boolean = false
-): IStoreDraftAction {
-  return { type: STORE_DRAFT, payload: { draft, isReviewForm } }
+export function createReviewDraft() {
+  return { id: Date.now(), data: {}, review: true }
 }
 
-export function modifyDraft(
-  draft: IDraft,
-  isReviewForm: boolean = false
-): IModifyDraftAction {
-  return { type: MODIFY_DRAFT, payload: { draft, isReviewForm } }
-}
-export function setInitialDrafts(
-  drafts: IDraftsState,
-  isReviewForm: boolean = false
-) {
-  return { type: SET_INITIAL_DRAFTS, payload: { drafts, isReviewForm } }
+export function storeDraft(draft: IDraft): IStoreDraftAction {
+  return { type: STORE_DRAFT, payload: { draft } }
 }
 
-export function deleteDraft(
-  draft: IDraft,
-  isReviewForm: boolean = false
-): IDeleteDraftAction {
-  return { type: DELETE_DRAFT, payload: { draft, isReviewForm } }
+export function modifyDraft(draft: IDraft): IModifyDraftAction {
+  return { type: MODIFY_DRAFT, payload: { draft } }
+}
+export function setInitialDrafts(drafts: IDraftsState) {
+  return { type: SET_INITIAL_DRAFTS, payload: { drafts } }
 }
 
-function writeDraft(
-  draft: IDraftsState,
-  isReviewForm: boolean = false
-): IWriteDraftAction {
-  return { type: WRITE_DRAFT, payload: { draft, isReviewForm } }
+export function deleteDraft(draft: IDraft): IDeleteDraftAction {
+  return { type: DELETE_DRAFT, payload: { draft } }
+}
+
+function writeDraft(draft: IDraftsState): IWriteDraftAction {
+  return { type: WRITE_DRAFT, payload: { draft } }
 }
 
 export const draftsReducer: LoopReducer<IDraftsState, Action> = (
@@ -134,9 +119,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       }
       return loop(
         stateAfterDraftStore,
-        Cmd.action(
-          writeDraft(stateAfterDraftStore, action.payload.isReviewForm)
-        )
+        Cmd.action(writeDraft(stateAfterDraftStore))
       )
     case DELETE_DRAFT:
       const deleteIndex = state.drafts.findIndex(draft => {
@@ -151,9 +134,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       }
       return loop(
         stateAfterDraftDeletion,
-        Cmd.action(
-          writeDraft(stateAfterDraftDeletion, action.payload.isReviewForm)
-        )
+        Cmd.action(writeDraft(stateAfterDraftDeletion))
       )
     case MODIFY_DRAFT:
       const stateAfterDraftModification = {
@@ -167,21 +148,11 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       }
       return loop(
         stateAfterDraftModification,
-        Cmd.action(
-          writeDraft(stateAfterDraftModification, action.payload.isReviewForm)
-        )
+        Cmd.action(writeDraft(stateAfterDraftModification))
       )
     case WRITE_DRAFT:
       if (state.initalDraftsLoaded && state.drafts) {
-        console.log(action.payload.isReviewForm)
-        if (action.payload.isReviewForm) {
-          storage.setItem(
-            'reviewDrafts',
-            JSON.stringify(action.payload.draft.drafts)
-          )
-        } else {
-          storage.setItem('drafts', JSON.stringify(action.payload.draft.drafts))
-        }
+        storage.setItem('drafts', JSON.stringify(state.drafts))
       }
       return state
     case SET_INITIAL_DRAFTS:

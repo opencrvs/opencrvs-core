@@ -13,10 +13,10 @@ import {
 } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
-import { IStoreState } from '../../store'
-import { IDraft, modifyDraft, deleteDraft } from '../../drafts'
-import { getRegisterForm } from '../../forms/register/selectors'
-import { getReviewForm } from '../../forms/review/selectors'
+import { IStoreState } from 'src/store'
+import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
+import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
+import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import {
   FooterAction,
   FooterPrimaryButton,
@@ -101,16 +101,8 @@ const PreviewButton = styled.a`
   color: ${({ theme }) => theme.colors.primary};
 `
 
-function getActiveSectionId(
-  form: IForm,
-  viewParams: { tabId?: string },
-  isReviewForm: boolean
-) {
-  return (
-    viewParams.tabId ||
-    (isReviewForm && form.sections[form.sections.length - 1].id) ||
-    form.sections[0].id
-  )
+function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
+  return viewParams.tabId || form.sections[0].id
 }
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
@@ -153,7 +145,6 @@ type Props = {
   registerForm: IForm
   activeSection: IFormSection
   setAllFieldsDirty: boolean
-  isReviewForm: boolean | undefined
 }
 
 type FullProps = Props &
@@ -190,20 +181,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
         [activeSection.id]: sectionData
       }
     })
-  }
-
-  modifyReviewDraft = (sectionData: IFormSectionData) => {
-    const { activeSection, draft } = this.props
-    this.props.modifyDraft(
-      {
-        ...draft,
-        data: {
-          ...draft.data,
-          [activeSection.id]: sectionData
-        }
-      },
-      true
-    )
   }
 
   successfulSubmission = (response: string) => {
@@ -246,19 +223,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       history,
       registerForm,
-      handleSubmit,
-      isReviewForm
+      handleSubmit
     } = this.props
-
+    const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const goToTab = isReviewForm ? goToReviewTab : goToRegistrationTab
-    const changeDraft = isReviewForm ? this.modifyReviewDraft : this.modifyDraft
     const title = isReviewForm
       ? messages.reviewBirthRegistration
       : activeSection.viewType === 'preview'
         ? messages.previewBirthRegistration
         : messages.newBirthRegistration
-
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
@@ -302,7 +276,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 >
                   <FormFieldGenerator
                     id={activeSection.id}
-                    onChange={changeDraft}
+                    onChange={this.modifyDraft}
                     setAllFieldsDirty={setAllFieldsDirty}
                     fields={activeSection.fields}
                   />
@@ -386,23 +360,9 @@ function replaceInitialValues(fields: IFormField[], sectionValues: object) {
 
 function mapStateToProps(
   state: IStoreState,
-  props: Props &
-    RouteComponentProps<{ tabId: string; draftId: string; review: string }>
+  props: Props & RouteComponentProps<{ tabId: string; draftId: string }>
 ) {
   const { match } = props
-  const isReviewForm = match.params.review === 'review'
-  const registerForm = isReviewForm
-    ? getReviewForm(state)
-    : getRegisterForm(state)
-  const activeSectionId = getActiveSectionId(
-    registerForm,
-    match.params,
-    isReviewForm
-  )
-
-  const activeSection = registerForm.sections.find(
-    ({ id }) => id === activeSectionId
-  )
   const draft = state.drafts.drafts.find(
     ({ id }) => id === parseInt(match.params.draftId, 10)
   )
@@ -410,6 +370,17 @@ function mapStateToProps(
   if (!draft) {
     throw new Error(`Draft "${match.params.draftId}" missing!`)
   }
+
+  const isReviewForm = draft.review
+
+  const registerForm = isReviewForm
+    ? getReviewForm(state)
+    : getRegisterForm(state)
+  const activeSectionId = getActiveSectionId(registerForm, match.params)
+
+  const activeSection = registerForm.sections.find(
+    ({ id }) => id === activeSectionId
+  )
 
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
@@ -438,8 +409,7 @@ function mapStateToProps(
       ...activeSection,
       fields
     },
-    draft,
-    isReviewForm
+    draft
   }
 }
 

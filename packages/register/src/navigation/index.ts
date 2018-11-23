@@ -53,16 +53,6 @@ export function goToBirthRegistrationAsParent(draftId: number) {
   )
 }
 
-export function goToBirthRegistrationForReview(draftId: number) {
-  return push(
-    formatUrl(REVIEW_BIRTH_PARENT_FORM_TAB, {
-      draftId: draftId.toString(),
-      review: 'review',
-      tabId: 'review'
-    })
-  )
-}
-
 export function goToTab(
   draftId: number,
   tabId: string,
@@ -102,7 +92,6 @@ export function navigationReducer(state: INavigationState, action: Action) {
           push(
             formatUrl(REVIEW_BIRTH_PARENT_FORM_TAB, {
               draftId: reviewDraftId.toString(),
-              review: 'review',
               tabId: reviewTabId
             })
           )

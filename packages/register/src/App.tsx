@@ -26,7 +26,8 @@ import { Page } from './components/Page'
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
 
-import { RegisterForm } from './views/RegisterForm/RegisterForm'
+import { ApplicationForm } from './views/RegisterForm/ApplicationForm'
+import { ReviewForm } from './views/RegisterForm/ReviewForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import ScrollToTop from 'src/components/ScrollToTop'
@@ -81,12 +82,7 @@ export class App extends React.Component<IAppProps, IState> {
     this.loadDraftsFromStorage()
   }
   async loadDraftsFromStorage() {
-    const isReviewForm =
-      this.props.history.location.pathname.indexOf('/reviews/review') > -1
-
-    const storageKey = isReviewForm ? 'reviewDrafts' : 'drafts'
-
-    const draftsString = await storage.getItem(storageKey)
+    const draftsString = await storage.getItem('drafts')
     const drafts = JSON.parse(draftsString ? draftsString : '[]')
     this.props.store.dispatch(setInitialDrafts(drafts))
     this.setState({ initialDraftsLoaded: true })
@@ -123,22 +119,17 @@ export class App extends React.Component<IAppProps, IState> {
                           <ProtectedRoute
                             exact
                             path={routes.DRAFT_BIRTH_PARENT_FORM}
-                            component={RegisterForm}
+                            component={ApplicationForm}
                           />
 
                           <ProtectedRoute
                             path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
-                            component={RegisterForm}
-                          />
-                          <ProtectedRoute
-                            exact
-                            path={routes.REVIEW_BIRTH_PARENT_FORM}
-                            component={RegisterForm}
+                            component={ApplicationForm}
                           />
 
                           <ProtectedRoute
                             path={routes.REVIEW_BIRTH_PARENT_FORM_TAB}
-                            component={RegisterForm}
+                            component={ReviewForm}
                           />
                           <ProtectedRoute
                             path={routes.SAVED_REGISTRATION}
