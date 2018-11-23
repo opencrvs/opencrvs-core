@@ -444,7 +444,6 @@ export interface GQLUserIdentifierInput {
 }
 
 export interface GQLCommentInput {
-  id: string
   user?: GQLUserInput
   comment?: string
   createdAt?: GQLDate

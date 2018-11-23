@@ -211,7 +211,7 @@ export const childSection: IFormSection = {
   title: messages.childTitle,
   fields: [
     {
-      name: 'childFirstNames',
+      name: 'firstNames',
       type: TEXT,
       label: messages.childFirstNames,
       required: false,
@@ -219,7 +219,7 @@ export const childSection: IFormSection = {
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'childFamilyName',
+      name: 'familyName',
       type: TEXT,
       label: messages.childFamilyName,
       required: true,
@@ -227,7 +227,7 @@ export const childSection: IFormSection = {
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'childFirstNamesEng',
+      name: 'firstNamesEng',
       type: TEXT,
       label: messages.childFirstNamesEng,
       required: false,
@@ -235,7 +235,7 @@ export const childSection: IFormSection = {
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'childFamilyNameEng',
+      name: 'familyNameEng',
       type: TEXT,
       label: messages.childFamilyNameEng,
       required: true,
@@ -243,7 +243,7 @@ export const childSection: IFormSection = {
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'childSex',
+      name: 'gender',
       type: SELECT_WITH_OPTIONS,
       label: messages.childSex,
       required: true,
@@ -257,7 +257,7 @@ export const childSection: IFormSection = {
       ]
     },
     {
-      name: 'dateOfBirth',
+      name: 'childBirthDate',
       type: DATE,
       label: messages.childDateOfBirth,
       required: true,

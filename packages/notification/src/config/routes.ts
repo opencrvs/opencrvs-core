@@ -23,7 +23,8 @@ export default function getRoutes() {
         return 'pong'
       },
       config: {
-        tags: ['api']
+        tags: ['api'],
+        auth: false
       }
     },
     /* curl -H 'Content-Type: application/json' -d '{"msisdn": "+27855555555", "message": "Test"}' http://localhost:2020/sms */
@@ -63,7 +64,7 @@ export default function getRoutes() {
         plugins: {
           'hapi-swagger': {
             responses: {
-              200: { description: 'Birth declration confirmation sms sent' },
+              200: { description: 'Birth declaration confirmation sms sent' },
               400: { description: 'Bad request, check your request body' }
             }
           }

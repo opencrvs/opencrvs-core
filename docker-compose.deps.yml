@@ -21,6 +21,7 @@ services:
   hearth:
     image: jembi/hearth:latest
     environment:
+      - server__fhirVersion=stu3
       - mongodb__url=mongodb://mongo/hearth-dev
       - logger__level=error
       - authentication__type=disabled

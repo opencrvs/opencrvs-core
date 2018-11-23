@@ -65,6 +65,10 @@ input BirthRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
+  birthType: BirthType # Not in BDRIS2
+  weightAtBirth: Float
+  attendantAtBirth: AttendantType
+  presentAtBirthRegistration: BirthRegPresence
   birthLocation: LocationInput
   birthRegistrationType: BirthRegType
   createdAt: Date
@@ -78,6 +82,57 @@ enum BirthRegType {
   INFORMANT_ONLY
   SINGLE_PARENT
   TEST
+}
+
+enum BirthRegPresence {
+  BOTH_PARENTS
+  INFORMANT_ONLY
+  MOTHER_ONLY
+  FATHER_ONLY
+  OTHER
+}
+
+enum RegistrationContactType {
+  MOTHER
+  FATHER
+}
+
+enum MaritalStatusType {
+  SINGLE
+  MARRIED
+  WIDOWED
+  DIVORCED
+  NOT_STATED
+}
+
+enum EducationType {
+  NO_SCHOOLING
+  PRIMARY_ISCED_1
+  LOWER_SECONDARY_ISCED_2
+  UPPER_SECONDARY_ISCED_3
+  POST_SECONDARY_ISCED_4
+  FIRST_STAGE_TERTIARY_ISCED_5
+  SECOND_STAGE_TERTIARY_ISCED_6
+  NOT_STATED
+}
+
+enum AttendantType {
+  PHYSICIAN
+  NURSE
+  NURSE_MIDWIFE
+  MIDWIFE
+  OTHER_PARAMEDICAL_PERSONNEL
+  LAYPERSON
+  NONE
+  OTHER
+}
+
+enum BirthType {
+  SINGLE
+  TWIN
+  TRIPLET
+  QUADRUPLET
+  HIGHER_MULTIPLE_DELIVERY
 }
 
 enum CauseOfDeath {
@@ -230,7 +285,6 @@ type Person {
   birthDate: String
   address: [Address]
   photo: Attachment
-  nationality: String
 }
 
 input PersonInput {
@@ -241,6 +295,10 @@ input PersonInput {
   birthDate: String
   address: [AddressInput]
   photo: AttachmentInput
+  nationality: [String]
+  maritalStatus: MaritalStatusType
+  dateOfMarriage: Date
+  educationalAttainment: EducationType
 }
 
 type Query {
@@ -269,7 +327,7 @@ type Query {
 
 type Registration {
   id: ID!
-  trackingID: String
+  trackingId: String
   registrationNumber: String
   paperFormID: String
   bookId: ID
@@ -280,7 +338,7 @@ type Registration {
 }
 
 input RegistrationInput {
-  trackingID: String
+  trackingId: String
   registrationNumber: String
   paperFormID: String
   bookId: ID
@@ -288,6 +346,7 @@ input RegistrationInput {
   type: RegistrationType
   attachments: [AttachmentInput]
   location: LocationInput
+  contact: RegistrationContactType
 }
 
 enum RegistrationType {
@@ -302,11 +361,25 @@ enum RegStatus {
   CERTIFIED
 }
 
+input CommentInput {
+  user: UserInput
+  comment: String
+  createdAt: Date
+}
+
+type Comment { # Annotation
+  id: ID!
+  user: User # -> .authorString
+  comment: String # -> .text
+  createdAt: Date # -> .time
+}
+
 type RegWorkflow {
   id: ID!
   type: RegStatus
   user: User
   timestamp: Date
+  comments: [Comment]
   location: Location
 }
 
@@ -314,6 +387,7 @@ input RegWorkflowInput {
   type: RegStatus
   user: UserInput
   timestamp: Date
+  comments: [CommentInput]
   location: LocationInput
 }
 
