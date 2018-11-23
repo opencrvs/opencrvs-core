@@ -4,8 +4,6 @@ services:
   mongo:
     image: mongo:3.4
     restart: unless-stopped
-    logging:
-      driver: none
     volumes:
       - '/data/mongo:/data/db'
     deploy:
