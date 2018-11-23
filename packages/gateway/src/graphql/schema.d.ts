@@ -217,7 +217,6 @@ export interface GQLRegWorkflow {
 
 export enum GQLRegStatus {
   DECLARED = 'DECLARED',
-  UPDATED = 'UPDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED'
 }
