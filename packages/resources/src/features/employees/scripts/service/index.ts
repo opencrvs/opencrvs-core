@@ -19,9 +19,7 @@ interface ITestPractitioner {
   email: string
 }
 
-const composeFhirPractitioner = (
-  practitioner: ITestPractitioner
-): fhir.Practitioner => {
+const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
   return {
     resourceType: 'Practitioner',
     identifier: [
@@ -34,12 +32,12 @@ const composeFhirPractitioner = (
     name: [
       {
         use: 'en',
-        family: practitioner.familyNameEnglish,
+        family: [practitioner.familyNameEnglish],
         given: practitioner.givenNamesEnglish.split(' ')
       },
       {
         use: 'bn',
-        family: practitioner.familyNameBengali,
+        family: [practitioner.familyNameBengali],
         given: practitioner.givenNamesBengali.split(' ')
       }
     ],

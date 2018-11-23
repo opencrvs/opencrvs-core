@@ -14,8 +14,8 @@ export const resolvers: GQLResolver = {
           }
         }
       )
-
-      const roleEntry = await practitionerRoleResponse.json()
+      const roleResponse = await practitionerRoleResponse.json()
+      const roleEntry = roleResponse.entry[0].resource
       if (
         !roleEntry ||
         !roleEntry.code ||
@@ -43,9 +43,8 @@ export const resolvers: GQLResolver = {
       const practitionerEntry = await practitionerResponse.json()
       practitionerEntry.catchmentArea = []
       practitionerEntry.role = role
-
       for (const location of locations) {
-        const splitRef = location.split('/')
+        const splitRef = location.reference.split('/')
         const locationResponse: fhir.Location = await getFromFhir(
           `/Location/${splitRef[1]}`
         )
@@ -56,7 +55,7 @@ export const resolvers: GQLResolver = {
           !locationResponse.physicalType.coding[0] ||
           !locationResponse.physicalType.coding[0].display
         ) {
-          throw new Error('PractitionerRole has no role code')
+          throw new Error('PractitionerRole has no location')
         }
         if (locationResponse.physicalType.coding[0].display === 'Building') {
           practitionerEntry.primaryOffice = location
@@ -64,8 +63,6 @@ export const resolvers: GQLResolver = {
           practitionerEntry.catchmentArea.push(location)
         }
       }
-
-      console.log(practitionerEntry)
 
       return practitionerEntry
     }
