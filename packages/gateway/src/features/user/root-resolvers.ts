@@ -30,7 +30,9 @@ export const resolvers: GQLResolver = {
       if (!roleEntry.location) {
         throw new Error('PractitionerRole has no locations associated')
       }
+
       const locations = roleEntry.location
+      console.log(locations)
 
       const practitionerResponse = await fetch(
         `${fhirUrl}/Practitioner/${userId}`,
@@ -45,9 +47,11 @@ export const resolvers: GQLResolver = {
       practitionerEntry.role = role
       for (const location of locations) {
         const splitRef = location.reference.split('/')
+        console.log(splitRef)
         const locationResponse: fhir.Location = await getFromFhir(
           `/Location/${splitRef[1]}`
         )
+        console.log(locationResponse)
         if (
           !locationResponse ||
           !locationResponse.physicalType ||

@@ -83,7 +83,8 @@ export async function composeAndSavePractitioners(
       const facility = await getFromFhir(
         `/Location?name=${encodeURIComponent(practitioner.facilityEnglishName)}`
       )
-      locations.push({ reference: `Location/${facility.id}` })
+      const facilityResource = facility.entry[0].resource
+      locations.push({ reference: `Location/${facilityResource.id}` })
     }
     if (practitioner.division) {
       const practitionerDivision: fhir.Location = divisions.find(division => {
@@ -107,6 +108,10 @@ export async function composeAndSavePractitioners(
       }) as fhir.Location
       locations.push({ reference: `Location/${practitionerUnion.id}` })
     }
+    // tslint:disable-next-line:no-console
+    console.log(
+      'Attaching the following locations: ' + JSON.stringify(locations)
+    )
 
     // Create and save Practitioner
     const newPractitioner: fhir.Practitioner = composeFhirPractitioner(
