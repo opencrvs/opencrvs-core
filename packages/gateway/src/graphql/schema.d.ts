@@ -224,18 +224,10 @@ export enum GQLRegStatus {
 export interface GQLUser {
   id: string
   name?: Array<GQLHumanName | null>
-  telecom?: Array<GQLContactPoint | null>
-  identifier?: Array<GQLUserIdentifier | null>
   role?: string
   primaryOffice?: GQLLocation
   currentLocation?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
-}
-
-export interface GQLUserIdentifier {
-  use?: string
-  system?: string
-  value?: string
 }
 
 export interface GQLComment {
@@ -428,18 +420,10 @@ export interface GQLRegWorkflowInput {
 
 export interface GQLUserInput {
   name?: Array<GQLHumanNameInput | null>
-  telecom?: Array<GQLContactPointInput | null>
-  identifier?: Array<GQLUserIdentifierInput | null>
   role?: string
   primaryOffice?: GQLLocationInput
   currentLocation?: GQLLocationInput
   catchmentArea?: Array<GQLLocationInput | null>
-}
-
-export interface GQLUserIdentifierInput {
-  use?: string
-  system?: string
-  value?: string
 }
 
 export interface GQLCommentInput {
@@ -510,7 +494,6 @@ export interface GQLResolver {
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
-  UserIdentifier?: GQLUserIdentifierTypeResolver
   Comment?: GQLCommentTypeResolver
   Mutation?: GQLMutationTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
@@ -1220,8 +1203,6 @@ export interface RegWorkflowToLocationResolver<TParent = any, TResult = any> {
 export interface GQLUserTypeResolver<TParent = any> {
   id?: UserToIdResolver<TParent>
   name?: UserToNameResolver<TParent>
-  telecom?: UserToTelecomResolver<TParent>
-  identifier?: UserToIdentifierResolver<TParent>
   role?: UserToRoleResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   currentLocation?: UserToCurrentLocationResolver<TParent>
@@ -1233,14 +1214,6 @@ export interface UserToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToTelecomResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToIdentifierResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1257,24 +1230,6 @@ export interface UserToCurrentLocationResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLUserIdentifierTypeResolver<TParent = any> {
-  use?: UserIdentifierToUseResolver<TParent>
-  system?: UserIdentifierToSystemResolver<TParent>
-  value?: UserIdentifierToValueResolver<TParent>
-}
-
-export interface UserIdentifierToUseResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserIdentifierToSystemResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserIdentifierToValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

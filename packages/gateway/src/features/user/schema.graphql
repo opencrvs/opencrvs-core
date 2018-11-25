@@ -13,8 +13,6 @@ type UserIdentifier { # -> identifier
 
 input UserInput {
   name: [HumanNameInput]
-  telecom: [ContactPointInput]
-  identifier: [UserIdentifierInput]
   role: String
   primaryOffice: LocationInput
   currentLocation: LocationInput
@@ -24,8 +22,6 @@ input UserInput {
 type User {
   id: ID!
   name: [HumanName] # -> .name
-  telecom: [ContactPoint]
-  identifier: [UserIdentifier]
   role: String
   primaryOffice: Location
   currentLocation: Location

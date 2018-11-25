@@ -32,7 +32,6 @@ export const resolvers: GQLResolver = {
       }
 
       const locations = roleEntry.location
-      console.log(locations)
 
       const practitionerResponse = await fetch(
         `${fhirUrl}/Practitioner/${userId}`,
@@ -47,11 +46,9 @@ export const resolvers: GQLResolver = {
       practitionerEntry.role = role
       for (const location of locations) {
         const splitRef = location.reference.split('/')
-        console.log(splitRef)
         const locationResponse: fhir.Location = await getFromFhir(
           `/Location/${splitRef[1]}`
         )
-        console.log(locationResponse)
         if (
           !locationResponse ||
           !locationResponse.physicalType ||
@@ -62,9 +59,9 @@ export const resolvers: GQLResolver = {
           throw new Error('PractitionerRole has no location')
         }
         if (locationResponse.physicalType.coding[0].display === 'Building') {
-          practitionerEntry.primaryOffice = location
+          practitionerEntry.primaryOffice = locationResponse
         } else {
-          practitionerEntry.catchmentArea.push(location)
+          practitionerEntry.catchmentArea.push(locationResponse)
         }
       }
 
