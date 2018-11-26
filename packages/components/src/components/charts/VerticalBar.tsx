@@ -62,7 +62,7 @@ function CustomizedAxisTick(props: ICustomizedAxisTick) {
         textAnchor="middle"
         fill={theme.colors.accent}
       >
-        {payload && `${Math.round(payload.value / totalValue * 100)}%`}
+        {payload && `${Math.round((payload.value / totalValue) * 100)}%`}
       </text>
       <text
         x={0}

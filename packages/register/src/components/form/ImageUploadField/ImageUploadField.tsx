@@ -195,6 +195,6 @@ class ImageUploadComponent extends React.Component<
     )
   }
 }
-export const ImageUploadField = injectIntl<IActionProps & IProps>(
+export const ImageUploadField = injectIntl<IFullProps>(
   ImageUploadComponent
 )

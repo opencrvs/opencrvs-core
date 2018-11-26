@@ -1,4 +1,4 @@
-import * as queryString from 'query-string'
+import * as queryString from 'querystring'
 import * as decode from 'jwt-decode'
 
 export interface IURLParams {
@@ -16,10 +16,12 @@ export const isTokenStillValid = (decoded: ITokenPayload) => {
   return Number(decoded.exp) * 1000 > Date.now()
 }
 
-export function getToken() {
+export function getToken(): string {
   return (
-    queryString.parse(window.location.search).token ||
-    localStorage.getItem('opencrvs')
+    (queryString.parse(window.location.search.replace(/^\?/, ''))
+      .token as string) ||
+    localStorage.getItem('opencrvs') ||
+    ''
   )
 }
 

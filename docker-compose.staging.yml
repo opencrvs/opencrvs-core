@@ -96,6 +96,9 @@ services:
   hearth:
     secrets:
       - jwt-public-key.{{ts}}
+    configs:
+      - source: hearth-check-dupe-plugin.{{ts}}
+        target: /src/hearth/lib/plugins/checkDuplicateTask.js
 
   openhim-console:
     configs:
@@ -119,3 +122,5 @@ configs:
     file: ./infrastructure/openhim-console-config.staging.json
   traefik.{{ts}}:
     file: ./infrastructure/traefik.toml
+  hearth-check-dupe-plugin.{{ts}}:
+    file: ./infrastructure/hearth-plugins/checkDuplicateTask.js

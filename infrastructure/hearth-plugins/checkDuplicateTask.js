@@ -28,7 +28,7 @@ module.exports = (mongo, fhirResources) => {
             const searchCtx = {
               ...Object.assign({}, ctx),
               resourceType,
-              _query: {
+              query: {
                 identifier: id.value
               }
             }
@@ -36,7 +36,12 @@ module.exports = (mongo, fhirResources) => {
               if (err) {
                 return logger.debug(`search Task error: ${err}`)
               }
-              if (result) {
+
+              if (result && result.resource && result.resource.total !== 0) {
+                logger.warn(`OCRVS-plugin: Duplicate Task found for identifier: ${
+                  id.value
+                }`)
+
                 callback(null, {
                   httpStatus: 409,
                   resource: {

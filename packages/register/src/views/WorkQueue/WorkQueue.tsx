@@ -299,7 +299,9 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       const names = (reg.child && (reg.child.name as GQLHumanName[])) || []
       const namesMap = names.filter(Boolean).reduce((prevNamesMap, name) => {
         if (!name.use) {
+          /* tslint:disable:no-string-literal */
           prevNamesMap['default'] = `${name.firstNames} ${
+            /* tslint:enable:no-string-literal */
             name.familyName
           }`.trim()
           return prevNamesMap
@@ -312,7 +314,9 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       return {
         name:
           (namesMap[this.props.language] as string) ||
+          /* tslint:disable:no-string-literal */
           (namesMap['default'] as string) ||
+          /* tslint:enable:no-string-literal */
           '',
         dob: (reg.child && reg.child.birthDate) || '',
         date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
