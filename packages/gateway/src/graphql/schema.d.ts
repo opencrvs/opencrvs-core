@@ -14,6 +14,9 @@ export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
   listBirthRegistrations?: Array<GQLBirthRegistration | null>
   listDeathRegistrations?: Array<GQLBirthRegistration | null>
+  locationsByParent?: Array<GQLLocation | null>
+  locationById?: GQLLocation
+  getUser?: GQLUser
 }
 
 export type GQLDate = any
@@ -159,9 +162,9 @@ export interface GQLLocation {
 }
 
 export enum GQLLocationType {
-  HOSPITAL = 'HOSPITAL',
-  OTHER_INSTITUTION = 'OTHER_INSTITUTION',
-  PRIVATE_HOME = 'PRIVATE_HOME',
+  HEALTH_FACILITY = 'HEALTH_FACILITY',
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
+  CRVS_OFFICE = 'CRVS_OFFICE',
   OTHER = 'OTHER'
 }
 
@@ -214,30 +217,17 @@ export interface GQLRegWorkflow {
 
 export enum GQLRegStatus {
   DECLARED = 'DECLARED',
-  VERIFIED = 'VERIFIED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED'
 }
 
 export interface GQLUser {
   id: string
-  userName?: string
-  created?: GQLDate
-  lastLoggedIn?: GQLDate
-  firstName?: string
-  lastName?: string
-  telecom?: Array<GQLContactPoint | null>
-  identifier?: Array<GQLIdentityType | null>
-  role: Array<GQLUserRole | null>
-  address?: GQLAddress
+  name?: Array<GQLHumanName | null>
+  role?: string
   primaryOffice?: GQLLocation
   currentLocation?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
-}
-
-export interface GQLUserRole {
-  id: string
-  type?: string
 }
 
 export interface GQLComment {
@@ -429,26 +419,14 @@ export interface GQLRegWorkflowInput {
 }
 
 export interface GQLUserInput {
-  userName?: string
-  created?: GQLDate
-  lastLoggedIn?: GQLDate
-  firstName?: string
-  lastName?: string
-  telecom?: Array<GQLContactPointInput | null>
-  identifier?: Array<GQLIdentityInput | null>
-  role: Array<GQLUserRoleInput | null>
-  address?: GQLAddressInput
+  name?: Array<GQLHumanNameInput | null>
+  role?: string
   primaryOffice?: GQLLocationInput
   currentLocation?: GQLLocationInput
   catchmentArea?: Array<GQLLocationInput | null>
 }
 
-export interface GQLUserRoleInput {
-  type?: string
-}
-
 export interface GQLCommentInput {
-  id: string
   user?: GQLUserInput
   comment?: string
   createdAt?: GQLDate
@@ -516,7 +494,6 @@ export interface GQLResolver {
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
-  UserRole?: GQLUserRoleTypeResolver
   Comment?: GQLCommentTypeResolver
   Mutation?: GQLMutationTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
@@ -526,6 +503,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
+  locationsByParent?: QueryToLocationsByParentResolver<TParent>
+  locationById?: QueryToLocationByIdResolver<TParent>
+  getUser?: QueryToGetUserResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -580,6 +560,46 @@ export interface QueryToListDeathRegistrationsResolver<
   (
     parent: TParent,
     args: QueryToListDeathRegistrationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToLocationsByParentArgs {
+  parentId?: string
+  type?: string
+}
+export interface QueryToLocationsByParentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToLocationsByParentArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToLocationByIdArgs {
+  locationId?: string
+}
+export interface QueryToLocationByIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToLocationByIdArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetUserArgs {
+  userId?: string
+}
+export interface QueryToGetUserResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetUserArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -1182,15 +1202,8 @@ export interface RegWorkflowToLocationResolver<TParent = any, TResult = any> {
 
 export interface GQLUserTypeResolver<TParent = any> {
   id?: UserToIdResolver<TParent>
-  userName?: UserToUserNameResolver<TParent>
-  created?: UserToCreatedResolver<TParent>
-  lastLoggedIn?: UserToLastLoggedInResolver<TParent>
-  firstName?: UserToFirstNameResolver<TParent>
-  lastName?: UserToLastNameResolver<TParent>
-  telecom?: UserToTelecomResolver<TParent>
-  identifier?: UserToIdentifierResolver<TParent>
+  name?: UserToNameResolver<TParent>
   role?: UserToRoleResolver<TParent>
-  address?: UserToAddressResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   currentLocation?: UserToCurrentLocationResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
@@ -1200,39 +1213,11 @@ export interface UserToIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToUserNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToCreatedResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToLastLoggedInResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToFirstNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToLastNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToTelecomResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToIdentifierResolver<TParent = any, TResult = any> {
+export interface UserToNameResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface UserToRoleResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserToAddressResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1245,19 +1230,6 @@ export interface UserToCurrentLocationResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLUserRoleTypeResolver<TParent = any> {
-  id?: UserRoleToIdResolver<TParent>
-  type?: UserRoleToTypeResolver<TParent>
-}
-
-export interface UserRoleToIdResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserRoleToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1364,7 +1336,7 @@ export interface MutationToUpdateBirthRegistrationResolver<
 
 export interface MutationToMarkBirthAsVerifiedArgs {
   id: string
-  location?: GQLLocationInput
+  details?: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsVerifiedResolver<
   TParent = any,
@@ -1380,7 +1352,7 @@ export interface MutationToMarkBirthAsVerifiedResolver<
 
 export interface MutationToMarkBirthAsRegisteredArgs {
   id: string
-  location?: GQLLocationInput
+  details?: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsRegisteredResolver<
   TParent = any,
@@ -1396,7 +1368,7 @@ export interface MutationToMarkBirthAsRegisteredResolver<
 
 export interface MutationToMarkBirthAsCertifiedArgs {
   id: string
-  location?: GQLLocationInput
+  details?: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsCertifiedResolver<
   TParent = any,
@@ -1413,7 +1385,7 @@ export interface MutationToMarkBirthAsCertifiedResolver<
 export interface MutationToMarkBirthAsVoidedArgs {
   id: string
   reason: string
-  location?: GQLLocationInput
+  comment?: string
 }
 export interface MutationToMarkBirthAsVoidedResolver<
   TParent = any,

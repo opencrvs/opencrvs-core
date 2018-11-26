@@ -306,7 +306,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     key="preview"
                     onClick={() => {
                       this.toggleSubmitModalOpen()
-                      if(document.documentElement) {
+                      if (document.documentElement) {
                         document.documentElement.scrollTop = 0
                       }
                     }}
@@ -384,11 +384,14 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
-  modifyDraft,
-  deleteDraft,
-  goToTab: goToTabAction,
-  handleSubmit: values => {
-    console.log(values)
+export const RegisterForm = connect<Props, DispatchProps>(
+  mapStateToProps,
+  {
+    modifyDraft,
+    deleteDraft,
+    goToTab: goToTabAction,
+    handleSubmit: values => {
+      console.log(values)
+    }
   }
-})(injectIntl<FullProps>(RegisterFormView))
+)(injectIntl<FullProps>(RegisterFormView))

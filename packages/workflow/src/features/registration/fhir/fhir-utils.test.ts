@@ -2,8 +2,10 @@ import { testFhirBundle } from 'src/test/utils'
 import {
   getSharedContactMsisdn,
   getInformantName,
-  getTrackingId
+  getTrackingId,
+  getRegStatusCode
 } from './fhir-utils'
+import { FATHER_SECTION_CODE } from './constants'
 import { pushTrackingId } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 
@@ -19,7 +21,7 @@ describe('Verify getSharedContactMsisdn', () => {
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError('Invalid FHIR bundle found for declration')
+    ).toThrowError('Invalid FHIR bundle found for declaration')
   })
 
   it('Throws error when invalid shared contact info given', () => {
@@ -59,10 +61,12 @@ describe('Verify getInformantName', () => {
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError('getInformantName: Invalid FHIR bundle found for declration')
+    ).toThrowError(
+      'getInformantName: Invalid FHIR bundle found for declaration'
+    )
   })
 
-  it('Throws error when chlid name section is missing', () => {
+  it('Throws error when child name section is missing', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = undefined
     expect(() => getInformantName(fhirBundle)).toThrowError(
@@ -70,11 +74,11 @@ describe('Verify getInformantName', () => {
     )
   })
 
-  it("Throws error when chlid's traditional name block is missing", () => {
+  it("Throws error when child's bn name block is missing", () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = []
     expect(() => getInformantName(fhirBundle)).toThrowError(
-      "Didn't found informant's traditional name"
+      "Didn't found informant's bn name"
     )
   })
 })
@@ -92,6 +96,49 @@ describe('Verify getTrackingId', () => {
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError('getTrackingId: Invalid FHIR bundle found for declration')
+    ).toThrowError('getTrackingId: Invalid FHIR bundle found for declaration')
+  })
+})
+
+describe('Verify getRegStatusCode', () => {
+  it('Returned right registration status based on token scope', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1',
+      scope: ['certify']
+    }
+    const regStatus = getRegStatusCode(tokenPayload)
+    expect(regStatus).toBeDefined()
+    expect(regStatus).toBe('CERTIFIED')
+  })
+
+  it('Throws error when invalid token has no scope', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1'
+    }
+    expect(() => getRegStatusCode(tokenPayload)).toThrowError(
+      'No scope found on token'
+    )
+  })
+
+  it('Throws error when invalid token scope is provided', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1',
+      scope: ['invalid']
+    }
+    expect(() => getRegStatusCode(tokenPayload)).toThrowError(
+      'No valid scope found on token'
+    )
   })
 })

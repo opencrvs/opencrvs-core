@@ -33,7 +33,7 @@ export const getRoutes = () => {
         plugins: {
           'hapi-swagger': {
             responses: {
-              200: { description: 'Birth declration is successfully synced' },
+              200: { description: 'Birth declaration is successfully synced' },
               400: { description: 'Bad request, check your request body' }
             }
           }

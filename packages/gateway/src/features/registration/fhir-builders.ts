@@ -354,6 +354,37 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   })
 }
 
+function createRegStatusComment(
+  resource: fhir.Task,
+  fieldValue: string,
+  context: any
+) {
+  if (!resource.note) {
+    resource.note = []
+  }
+  if (!resource.note[context._index.comments]) {
+    resource.note[context._index.comments] = { text: '' }
+  }
+  resource.note[context._index.comments].text = fieldValue
+}
+
+function createRegStatusCommentTimeStamp(
+  resource: fhir.Task,
+  fieldValue: string,
+  context: any
+) {
+  if (!resource.note) {
+    resource.note = []
+  }
+  if (!resource.note[context._index.comments]) {
+    resource.note[context._index.comments] = {
+      /* as text is a mendatory field for note */
+      text: ''
+    }
+  }
+  resource.note[context._index.comments].time = fieldValue
+}
+
 function createBirthTypeBuilder(
   resource: fhir.Observation,
   fieldValue: number
@@ -704,6 +735,45 @@ const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
+    },
+    status: {
+      comments: {
+        comment: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          return createRegStatusComment(taskResource, fieldValue, context)
+        },
+        createdAt: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          return createRegStatusCommentTimeStamp(
+            taskResource,
+            fieldValue,
+            context
+          )
+        }
+      },
+      timestamp: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        taskResource.lastModified = fieldValue
+        return
+      }
     },
     attachments: {
       originalFileName: (

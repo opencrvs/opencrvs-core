@@ -33,7 +33,7 @@ export function ListItemExpansion(props: IListItemExpansionProps) {
   return (
     <div>
       <ExpansionContent>{children}</ExpansionContent>
-      {actions && (
+      {actions && actions.length > 0 && (
         <ActionContainer>
           {actions.map((action: JSX.Element, index: number) => (
             <ActionItem key={index}>{action}</ActionItem>

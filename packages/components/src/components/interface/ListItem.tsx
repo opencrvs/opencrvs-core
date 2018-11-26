@@ -1,20 +1,15 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
-import {
-  StatusGreen,
-  StatusOrange,
-  StatusGray,
-  StatusCollected
-} from '../icons'
+import { IDynamicValues } from '../common-types'
 import { ListItemAction } from '../buttons'
 
-interface IProp {
+export interface IInfo {
   label: string
   value: string
 }
 
-interface IStatus {
-  icon: string
+export interface IStatus {
+  icon: JSX.Element
   label: string
 }
 
@@ -23,21 +18,13 @@ export interface IAction {
   handler: () => void
 }
 
-interface IDynamicValues {
-  [key: string]: string
-}
-
 export interface IListItemProps {
   index: number
-  infoItems: IProp[]
+  infoItems: IInfo[]
   statusItems: IStatus[]
-  actions: IAction[]
+  actions?: IAction[]
   itemData: IDynamicValues
-  expandedCellRenderer: (
-    itemData: IDynamicValues,
-    key: number
-  ) => React.Component<{}>
-  onClick: () => void
+  expandedCellRenderer: (itemData: IDynamicValues, key: number) => JSX.Element
 }
 
 interface IListItemState {
@@ -137,7 +124,7 @@ const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 
-function LabelValue({ label, value }: IProp) {
+function LabelValue({ label, value }: IInfo) {
   return (
     <div>
       <StyledLabel>{label}:</StyledLabel>
@@ -168,7 +155,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
         <ListItemContainer key={index}>
           <ListContentContainer onClick={this.toggleExpanded}>
             <InfoDiv>
-              {infoItems.map((data: IProp, infoIndex) => (
+              {infoItems.map((data: IInfo, infoIndex) => (
                 <LabelValue
                   key={infoIndex}
                   label={data.label}
@@ -186,7 +173,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
             </StatusDiv>
           </ListContentContainer>
           <ListItemAction
-            actions={actions}
+            actions={actions || []}
             expanded={expanded}
             onExpand={
               this.props.expandedCellRenderer ? this.toggleExpanded : undefined

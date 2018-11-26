@@ -21,12 +21,12 @@ const processDraftData = (draftData: IFormData) => {
   const motherDetails: IPersonDetails = {
     name: [
       {
-        use: 'Traditional',
+        use: 'bn',
         firstNames: mother.firstNames,
         familyName: mother.familyName
       },
       {
-        use: 'English',
+        use: 'en',
         firstNames: mother.firstNamesEng,
         familyName: mother.familyNameEng
       }
@@ -70,12 +70,12 @@ const processDraftData = (draftData: IFormData) => {
   const fatherDetails: IPersonDetails = {
     name: [
       {
-        use: 'Traditional',
+        use: 'bn',
         firstNames: father.firstNames,
         familyName: father.familyName
       },
       {
-        use: 'English',
+        use: 'en',
         firstNames: father.firstNamesEng,
         familyName: father.familyNameEng
       }
@@ -120,8 +120,8 @@ const processDraftData = (draftData: IFormData) => {
     registration.whoseContactDetails === 'MOTHER'
       ? motherDetails
       : registration.whoseContactDetails === 'FATHER'
-        ? fatherDetails
-        : null
+      ? fatherDetails
+      : null
 
   if (parentDetails) {
     parentDetails.telecom = [
@@ -135,12 +135,12 @@ const processDraftData = (draftData: IFormData) => {
       gender: child.gender,
       name: [
         {
-          use: 'Traditional',
+          use: 'bn',
           firstNames: child.firstNames,
           familyName: child.familyName
         },
         {
-          use: 'English',
+          use: 'en',
           firstNames: child.firstNamesEng,
           familyName: child.familyNameEng
         }
@@ -149,7 +149,18 @@ const processDraftData = (draftData: IFormData) => {
     },
     mother: motherDetails,
     registration: {
-      contact: registration.whoseContactDetails
+      contact: registration.whoseContactDetails,
+      status: [
+        {
+          comments: [
+            {
+              comment: registration.commentsOrNotes,
+              createdAt: new Date()
+            }
+          ],
+          timestamp: new Date()
+        }
+      ]
     },
     attendantAtBirth: child.attendantAtBirth,
     birthType: child.typeOfBirth,

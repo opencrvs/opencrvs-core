@@ -85,6 +85,19 @@ export const typeResolvers: GQLResolver = {
   },
 
   Registration: {
+    async trackingId(task: fhir.Task) {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
+    },
     async attachments(task: fhir.Task) {
       if (!task.focus) {
         throw new Error(
@@ -189,8 +202,14 @@ export const typeResolvers: GQLResolver = {
       return res.json()
     },
     async registration(composition: ITemplatedComposition) {
-      const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`)
-      return res.json()
+      const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`) // TODO this is returning all tasks no matter what
+      const taskBundle = await res.json()
+
+      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
+        return null
+      }
+
+      return taskBundle.entry[0].resource
     },
     async weightAtBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(

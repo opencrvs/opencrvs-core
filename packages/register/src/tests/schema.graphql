@@ -327,7 +327,7 @@ type Query {
 
 type Registration {
   id: ID!
-  trackingID: String
+  trackingId: String
   registrationNumber: String
   paperFormID: String
   bookId: ID
@@ -338,7 +338,7 @@ type Registration {
 }
 
 input RegistrationInput {
-  trackingID: String
+  trackingId: String
   registrationNumber: String
   paperFormID: String
   bookId: ID
@@ -361,11 +361,25 @@ enum RegStatus {
   CERTIFIED
 }
 
+input CommentInput {
+  user: UserInput
+  comment: String
+  createdAt: Date
+}
+
+type Comment { # Annotation
+  id: ID!
+  user: User # -> .authorString
+  comment: String # -> .text
+  createdAt: Date # -> .time
+}
+
 type RegWorkflow {
   id: ID!
   type: RegStatus
   user: User
   timestamp: Date
+  comments: [Comment]
   location: Location
 }
 
@@ -373,6 +387,7 @@ input RegWorkflowInput {
   type: RegStatus
   user: UserInput
   timestamp: Date
+  comments: [CommentInput]
   location: LocationInput
 }
 

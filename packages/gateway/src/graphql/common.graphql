@@ -3,13 +3,13 @@
 scalar Date
 
 input HumanNameInput {
-  use: String # traditional (Bangla) or English
+  use: String # bn | en - the language the name text is written in
   firstNames: String
   familyName: String
 }
 
 type HumanName { # -> HumanName
-  use: String # traditional (Bangla) or English
+  use: String # bn | en - the language the name text is written in
   firstNames: String # -> .given
   familyName: String # -> .family
 }
@@ -21,13 +21,6 @@ enum Relationship {
   MATERNAL_GRANDFATHER
   PATERNAL_GRANDMOTHER
   PATERNAL_GRANDFATHER
-}
-
-enum LocationType {
-  HOSPITAL
-  OTHER_INSTITUTION
-  PRIVATE_HOME
-  OTHER
 }
 
 enum IdentityIDType {
@@ -131,37 +124,6 @@ type ContactPoint { # -> ContactPoint
   use: String # -> .use
 }
 
-input LocationInput {
-  identifier: [ID]
-  status: String
-  name: String
-  alias: [String]
-  description: String
-  type: LocationType
-  telecom: [ContactPointInput]
-  address: AddressInput
-  longitude: Float
-  latitude: Float
-  altitude: Float
-  geoData: String
-}
-
-type Location { # -> Location (mostly the same property name except:)
-  id: ID!
-  identifier: [ID]
-  status: String
-  name: String
-  alias: [String]
-  description: String
-  type: LocationType
-  telecom: [ContactPoint]
-  address: Address
-  longitude: Float # -> position.longitude
-  latitude: Float # -> position.latitude
-  altitude: Float # -> position.altitude
-  geoData: String # -> extension(url=http://hl7.org/fhir/StructureDefinition/location-boundary-geojson).valueAttachment (as base64)
-}
-
 input AddressInput {
   use: String
   type: AddressType
@@ -188,52 +150,4 @@ type Address { # -> Address (mostly the same property name except:)
   country: String
   from: Date # -> .period.start
   to: Date # -> .period.end
-}
-
-# TODO: Move to user feature when built out - manage through a user management microservice
-input UserInput {
-  userName: String
-  created: Date
-  lastLoggedIn: Date
-  firstName: String
-  lastName: String
-  telecom: [ContactPointInput]
-  identifier: [IdentityInput]
-  role: [UserRoleInput]!
-  address: AddressInput
-  primaryOffice: LocationInput
-  currentLocation: LocationInput
-  catchmentArea: [LocationInput]
-}
-
-type User {
-  id: ID!
-  userName: String
-  created: Date
-  lastLoggedIn: Date
-  firstName: String
-  lastName: String
-  telecom: [ContactPoint]
-  identifier: [IdentityType]
-  role: [UserRole]!
-  address: Address
-  primaryOffice: Location
-  currentLocation: Location
-  catchmentArea: [Location]
-}
-
-input UserRoleInput {
-  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
-}
-
-type UserRole {
-  id: ID!
-  type: String #declaration-clerk, registrar, certification-clerk, manager, admin
-}
-
-type Query {
-  user(id: Int!): User
-
-  locationsByParent(parentId: String, type: String): [Location] # if parentId is not provided, return level 1 locations
-  locationsByName(name: String!, type: String): [Location]
 }

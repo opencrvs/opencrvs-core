@@ -1,6 +1,4 @@
-# You should always specify a full version here to ensure all of your developers
-# are running the same version of Node.
-FROM node:9.2.1
+FROM node:dubnium
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
