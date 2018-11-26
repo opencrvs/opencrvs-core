@@ -44,6 +44,9 @@ export const OverlayContainer = styled.div`
   height: 100%;
   overflow-y: scroll;
 `
+const StyledPrimaryButton = styled(PrimaryButton)`
+  box-shadow: 0 0 22px 0 rgba(0, 0, 0, 0.23);
+`
 interface IState {
   data: IFormSectionData
   enableUploadButton: boolean
@@ -104,13 +107,13 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
                 setAllFieldsDirty={false}
               />
 
-              <PrimaryButton
+              <StyledPrimaryButton
                 id="submit_reject_form"
                 onClick={this.submitData}
                 disabled={!this.state.enableUploadButton}
               >
                 {intl.formatMessage(messages.rejectionReasonSubmit)}
-              </PrimaryButton>
+              </StyledPrimaryButton>
             </Box>
           </FormContainer>
         </ActionPage>
