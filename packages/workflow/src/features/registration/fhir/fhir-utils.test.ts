@@ -5,7 +5,6 @@ import {
   getTrackingId,
   getRegStatusCode
 } from './fhir-utils'
-import { FATHER_SECTION_CODE } from './constants'
 import { pushTrackingId } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 
@@ -108,11 +107,11 @@ describe('Verify getRegStatusCode', () => {
       exp: 1573112965,
       aud: '',
       sub: '1',
-      scope: ['certify']
+      scope: ['register']
     }
     const regStatus = getRegStatusCode(tokenPayload)
     expect(regStatus).toBeDefined()
-    expect(regStatus).toBe('CERTIFIED')
+    expect(regStatus).toBe('REGISTERED')
   })
 
   it('Throws error when invalid token has no scope', () => {
