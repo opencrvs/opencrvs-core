@@ -2,7 +2,9 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   CHILD_SECTION_CODE,
   MOTHER_SECTION_CODE,
-  FATHER_SECTION_CODE
+  FATHER_SECTION_CODE,
+  REG_STATUS_DECLARED,
+  REG_STATUS_REGISTERED
 } from './constants'
 import { getTaskResource, findPersonEntry } from './fhir-template'
 import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
@@ -98,6 +100,23 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
   return composition.identifier.value
 }
 
+export function getBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
+  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+  const brnIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+      )
+    })
+  if (!brnIdentifier || !brnIdentifier.value) {
+    throw new Error("Didn't find any identifier for birth registration number")
+  }
+  return brnIdentifier.value
+}
+
 function getContactSection(contact: CONTACT) {
   switch (contact) {
     case CONTACT.MOTHER:
@@ -113,12 +132,10 @@ export function getRegStatusCode(tokenPayload: ITokenPayload) {
   if (!tokenPayload.scope) {
     throw new Error('No scope found on token')
   }
-  if (tokenPayload.scope.indexOf(USER_SCOPE.CERTIFY.toString()) > -1) {
-    return 'CERTIFIED'
-  } else if (tokenPayload.scope.indexOf(USER_SCOPE.REGISTER.toString()) > -1) {
-    return 'REGISTERED'
+  if (tokenPayload.scope.indexOf(USER_SCOPE.REGISTER.toString()) > -1) {
+    return REG_STATUS_REGISTERED
   } else if (tokenPayload.scope.indexOf(USER_SCOPE.DECLARE.toString()) > -1) {
-    return 'DECLARED'
+    return REG_STATUS_DECLARED
   } else {
     throw new Error('No valid scope found on token')
   }
