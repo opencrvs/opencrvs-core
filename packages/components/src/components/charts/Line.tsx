@@ -65,7 +65,7 @@ function CustomizedAxisTick(props: ICustomizedAxisTick) {
         textAnchor="middle"
         fill={theme.colors.accent}
       >
-        {payload && `${Math.round(payload.value / totalValue * 100)}%`}
+        {payload && `${Math.round((payload.value / totalValue) * 100)}%`}
       </text>
       <text
         x={0}
@@ -170,8 +170,8 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           </XAxis>
           <YAxis
             width={30}
-            domain={[0, 30]}
             tickCount={2}
+            domain={[0, dataMax => (dataMax < 90 ? dataMax + 10 : dataMax)]}
             tick={(tickProps: ICustomizedAxisTick) => (
               <CustomizedYAxisTick {...tickProps} theme={theme} />
             )}
@@ -199,7 +199,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
             dot={(dotProps: ICustomDot) => <CustomDot {...dotProps} />}
             type="linear"
             dataKey={(dataPoint: IDataPoint) =>
-              Math.round(dataPoint.value / sumUpAllValues(data) * 100)
+              Math.round((dataPoint.value / sumUpAllValues(data)) * 100)
             }
             stroke={chartStroke}
             strokeWidth={1}
