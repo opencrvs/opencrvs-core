@@ -1,4 +1,3 @@
-# TODO: Move to user feature when built out - manage through a user management microservice
 input UserIdentifierInput {
   use: String # -> .use
   system: String # -> .system
