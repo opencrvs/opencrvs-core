@@ -18,6 +18,9 @@ const districts = JSON.parse(
 const upazilas = JSON.parse(
   fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/upazilas.json`).toString()
 )
+const unions = JSON.parse(
+  fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/unions.json`).toString()
+)
 
 export default async function importFacilities() {
   // tslint:disable-next-line:no-console
@@ -32,7 +35,8 @@ export default async function importFacilities() {
       employees,
       divisions.divisions,
       districts.districts,
-      upazilas.upazilas
+      upazilas.upazilas,
+      unions.unions
     )
   } catch (err) {
     return internal(err)

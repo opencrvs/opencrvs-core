@@ -354,23 +354,35 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   })
 }
 
-function createRegStatusComment(resource: fhir.Task, fieldValue: string) {
+function createRegStatusComment(
+  resource: fhir.Task,
+  fieldValue: string,
+  context: any
+) {
   if (!resource.note) {
     resource.note = []
   }
-  resource.note.push({
-    text: fieldValue
-  })
+  if (!resource.note[context._index.comments]) {
+    resource.note[context._index.comments] = { text: '' }
+  }
+  resource.note[context._index.comments].text = fieldValue
 }
 
 function createRegStatusCommentTimeStamp(
   resource: fhir.Task,
-  fieldValue: string
+  fieldValue: string,
+  context: any
 ) {
-  const incompleteNote = resource.note && resource.note.find(note => !note.time)
-  if (incompleteNote) {
-    incompleteNote.time = fieldValue
+  if (!resource.note) {
+    resource.note = []
   }
+  if (!resource.note[context._index.comments]) {
+    resource.note[context._index.comments] = {
+      /* as text is a mendatory field for note */
+      text: ''
+    }
+  }
+  resource.note[context._index.comments].time = fieldValue
 }
 
 function createBirthTypeBuilder(
@@ -735,7 +747,7 @@ const builders: IFieldBuilders = {
             fhirBundle,
             context
           )
-          return createRegStatusComment(taskResource, fieldValue)
+          return createRegStatusComment(taskResource, fieldValue, context)
         },
         createdAt: (
           fhirBundle: ITemplatedBundle,
@@ -746,7 +758,11 @@ const builders: IFieldBuilders = {
             fhirBundle,
             context
           )
-          return createRegStatusCommentTimeStamp(taskResource, fieldValue)
+          return createRegStatusCommentTimeStamp(
+            taskResource,
+            fieldValue,
+            context
+          )
         }
       },
       timestamp: (

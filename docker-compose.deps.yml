@@ -1,4 +1,4 @@
-version: "3.3"
+version: '3.3'
 
 services:
   mongo:
@@ -25,6 +25,7 @@ services:
       - logger__level=error
       - authentication__type=disabled
       - idGenerator=uuidv4
+      - server__fhirVersion=stu3
     restart: unless-stopped
     deploy:
       replicas: 2
@@ -36,9 +37,9 @@ services:
       - mongo_atnaUrl=mongodb://mongo/openhim-dev
       - logger_level=error
     ports:
-      - "8080:8080"
-      - "5000:5000"
-      - "5001:5001"
+      - '8080:8080'
+      - '5000:5000'
+      - '5001:5001'
     depends_on:
       - mongo
     restart: unless-stopped
@@ -48,7 +49,7 @@ services:
   openhim-console:
     image: jembi/openhim-console
     ports:
-      - "8888:80"
+      - '8888:80'
     restart: unless-stopped
     deploy:
       replicas: 2

@@ -16,6 +16,8 @@ import {
   ITemplatedBundle,
   ITemplatedComposition
 } from '../registration/fhir-builders'
+import fetch from 'node-fetch'
+import { fhirUrl } from 'src/constants'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -306,4 +308,18 @@ export function getMaritalStatusCode(fieldValue: string) {
     default:
       return 'UNK'
   }
+}
+
+export const getFromFhir = (suffix: string) => {
+  return fetch(`${fhirUrl}${suffix}`, {
+    headers: {
+      'Content-Type': 'application/json+fhir'
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
 }
