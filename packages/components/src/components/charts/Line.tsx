@@ -38,7 +38,7 @@ interface ICustomDot {
   cx: number
   cy: number
 }
-interface IVerticalBarProps {
+interface ILineProps {
   data: IDataPoint[]
   xAxisLabel: string
   yAxisLabel: string
@@ -112,107 +112,103 @@ function CustomDot(props: ICustomDot) {
 const sumUpAllValues = (data: IDataPoint[]) =>
   data.reduce((sum: number, item: IDataPoint) => sum + item.value, 0)
 
-export const Line = withTheme(
-  (props: IVerticalBarProps & { theme: ITheme }) => {
-    const { data, theme, xAxisLabel, yAxisLabel } = props
-    const colours = [
-      theme.colors.chartPrimary,
-      theme.colors.chartSecondary,
-      theme.colors.chartTertiary
-    ]
+export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
+  const { data, theme, xAxisLabel, yAxisLabel } = props
+  const colours = [
+    theme.colors.chartPrimary,
+    theme.colors.chartSecondary,
+    theme.colors.chartTertiary
+  ]
 
-    return (
-      <Container>
-        <ResponsiveContainer width="100%" height={250}>
-          <AreaChart
-            width={600}
-            height={250}
-            data={data}
-            margin={{ top: 40, right: 30, bottom: 40, left: 30 }}
+  return (
+    <Container>
+      <ResponsiveContainer width="100%" height={250}>
+        <AreaChart
+          width={600}
+          height={250}
+          data={data}
+          margin={{ top: 40, right: 30, bottom: 40, left: 30 }}
+        >
+          <defs>
+            <linearGradient id="colorLineArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#D8E5FD" />
+              <stop offset="95%" stopColor="#F7F9FE" />
+            </linearGradient>
+          </defs>
+          <XAxis
+            height={80}
+            tick={(tickProps: {
+              stroke: number
+              x: number
+              y: number
+              payload: { value: string }
+            }) => {
+              const { payload } = tickProps
+              const dataPoint = data.find(({ name }) => name === payload.value)
+
+              return (
+                <CustomizedAxisTick
+                  {...tickProps}
+                  theme={theme}
+                  totalValue={sumUpAllValues(data)}
+                  payload={{
+                    name: payload.value,
+                    value: dataPoint ? dataPoint.value : 0
+                  }}
+                />
+              )
+            }}
+            tickLine={false}
+            axisLine={false}
+            dataKey="name"
           >
-            <defs>
-              <linearGradient id="colorLineArea" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={'#D8E5FD'} stopOpacity={0.9} />
-                <stop offset="95%" stopColor={'#F7F9FE'} stopOpacity={0.5} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              height={80}
-              tick={(tickProps: {
-                stroke: number
-                x: number
-                y: number
-                payload: { value: string }
-              }) => {
-                const { payload } = tickProps
-                const dataPoint = data.find(
-                  ({ name }) => name === payload.value
-                )
-
-                return (
-                  <CustomizedAxisTick
-                    {...tickProps}
-                    theme={theme}
-                    totalValue={sumUpAllValues(data)}
-                    payload={{
-                      name: payload.value,
-                      value: dataPoint ? dataPoint.value : 0
-                    }}
-                  />
-                )
-              }}
-              tickLine={false}
-              axisLine={false}
-              dataKey="name"
-            >
-              <Label
-                fill={theme.colors.secondary}
-                fontFamily={theme.fonts.lightFont}
-                offset={20}
-                value={xAxisLabel}
-                position="bottom"
-              />
-            </XAxis>
-            <YAxis
-              width={30}
-              domain={[0, 30]}
-              tickCount={3}
-              tick={(tickProps: ICustomizedAxisTick) => (
-                <CustomizedYAxisTick {...tickProps} theme={theme} />
-              )}
-              tickLine={false}
-              axisLine={false}
-            >
-              <Label
-                fill={theme.colors.secondary}
-                fontFamily={theme.fonts.lightFont}
-                transform="rotate(-90)"
-                dy={-75}
-                offset={30}
-                value={yAxisLabel}
-                position="left"
-              />
-            </YAxis>
-            <CartesianGrid
-              vertical={false}
-              horizontal={false}
-              fillOpacity="0.05"
-              fill={theme.colors.accentLight}
+            <Label
+              fill={theme.colors.secondary}
+              fontFamily={theme.fonts.lightFont}
+              offset={20}
+              value={xAxisLabel}
+              position="bottom"
             />
-
-            <Area
-              dot={(dotProps: ICustomDot) => <CustomDot {...dotProps} />}
-              type="linear"
-              dataKey={(dataPoint: IDataPoint) =>
-                Math.round(dataPoint.value / sumUpAllValues(data) * 100)
-              }
-              stroke="#8884d8"
-              strokeWidth={1}
-              fill="url(#colorLineArea)"
+          </XAxis>
+          <YAxis
+            width={30}
+            domain={[0, 30]}
+            tickCount={2}
+            tick={(tickProps: ICustomizedAxisTick) => (
+              <CustomizedYAxisTick {...tickProps} theme={theme} />
+            )}
+            tickLine={false}
+            axisLine={false}
+          >
+            <Label
+              fill={theme.colors.secondary}
+              fontFamily={theme.fonts.lightFont}
+              transform="rotate(-90)"
+              dy={-75}
+              offset={30}
+              value={yAxisLabel}
+              position="left"
             />
-          </AreaChart>
-        </ResponsiveContainer>
-      </Container>
-    )
-  }
-)
+          </YAxis>
+          <CartesianGrid
+            vertical={false}
+            horizontal={false}
+            fillOpacity="0.05"
+            fill={theme.colors.accentLight}
+          />
+
+          <Area
+            dot={(dotProps: ICustomDot) => <CustomDot {...dotProps} />}
+            type="linear"
+            dataKey={(dataPoint: IDataPoint) =>
+              Math.round(dataPoint.value / sumUpAllValues(data) * 100)
+            }
+            stroke="#8884d8"
+            strokeWidth={1}
+            fill="url(#colorLineArea)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </Container>
+  )
+})
