@@ -20,7 +20,7 @@ const messages = defineMessages({
   }
 })
 
-export type IReviewFormState = {
+export interface IReviewFormState {
   reviewForm: IForm
 }
 
@@ -43,11 +43,11 @@ export const initialState: IReviewFormState = {
   }
 }
 
-const GET_REGISTER_FORM = 'REGISTER_FORM/GET_REGISTER_FORM'
-type GetRegisterFormAction = {
-  type: typeof GET_REGISTER_FORM
+const GET_REVIEW_FORM = 'REGISTER_FORM/GET_REGISTER_FORM'
+type GetReviewFormAction = {
+  type: typeof GET_REVIEW_FORM
 }
-type Action = GetRegisterFormAction
+type Action = GetReviewFormAction
 
 export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
   state: IReviewFormState = initialState,

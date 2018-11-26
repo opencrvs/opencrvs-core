@@ -33,6 +33,7 @@ import { goToTab } from 'src/navigation'
 import { getRegisterForm } from 'src/forms/register/application-selectors'
 import { IStoreState } from 'src/store'
 import { getConditionalActionsForField } from 'src/forms/utils'
+import { DRAFT_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 
 const FormAction = styled.div`
   display: flex;
@@ -157,7 +158,7 @@ function renderSelectLabel(
 }
 
 function renderFileSubject(files: IFileValue[]) {
-  return files.map(file => file.optionValues.join(' ')).join(', ')
+  return files && files.map(file => file.optionValues.join(' ')).join(', ')
 }
 
 function renderValue(
@@ -268,6 +269,7 @@ class PreviewSectionForm extends React.Component<
                       key={name}
                       onClick={() =>
                         this.props.goToTab(
+                          DRAFT_BIRTH_PARENT_FORM_TAB,
                           this.props.draft.id,
                           section.id,
                           name
@@ -315,6 +317,7 @@ class PreviewSectionForm extends React.Component<
                             <InformationMissingLink
                               onClick={() =>
                                 this.props.goToTab(
+                                  DRAFT_BIRTH_PARENT_FORM_TAB,
                                   draft.id,
                                   section.id,
                                   field.name

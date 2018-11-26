@@ -2,9 +2,7 @@ import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_BIRTH_PARENT_FORM_TAB,
-  SELECT_VITAL_EVENT,
-  REVIEW_BIRTH_PARENT_FORM_TAB
+  SELECT_VITAL_EVENT
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 
@@ -19,22 +17,14 @@ export const GO_TO_TAB = 'navigation/GO_TO_TAB'
 type GoToTabAction = {
   type: typeof GO_TO_TAB
   payload: {
+    tabRoute: string
     draftId: number
     tabId: string
     fieldNameHash?: string
   }
 }
-export const GO_TO_REVIEW_TAB = 'navigation/GO_TO_REVIEW_TAB'
-type GoToReviewTabAction = {
-  type: typeof GO_TO_REVIEW_TAB
-  payload: {
-    reviewDraftId: number
-    reviewTabId: string
-    fieldHash?: string
-  }
-}
 
-export type Action = GoToTabAction | GoToReviewTabAction
+export type Action = GoToTabAction
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -54,16 +44,14 @@ export function goToBirthRegistrationAsParent(draftId: number) {
 }
 
 export function goToTab(
+  tabRoute: string,
   draftId: number,
   tabId: string,
   fieldNameHash?: string
 ) {
-  return { type: GO_TO_TAB, payload: { draftId, tabId, fieldNameHash } }
-}
-export function goToReviewTab(reviewDraftId: number, reviewTabId: string) {
   return {
-    type: GO_TO_REVIEW_TAB,
-    payload: { reviewDraftId, reviewTabId }
+    type: GO_TO_TAB,
+    payload: { draftId, tabId, fieldNameHash, tabRoute }
   }
 }
 
@@ -72,28 +60,15 @@ export type INavigationState = undefined
 export function navigationReducer(state: INavigationState, action: Action) {
   switch (action.type) {
     case GO_TO_TAB:
-      const { fieldNameHash, draftId, tabId } = action.payload
+      const { fieldNameHash, draftId, tabId, tabRoute } = action.payload
       return loop(
         state,
         Cmd.action(
           push(
-            formatUrl(DRAFT_BIRTH_PARENT_FORM_TAB, {
+            formatUrl(tabRoute, {
               draftId: draftId.toString(),
               tabId
             }) + (fieldNameHash ? `#${fieldNameHash}` : '')
-          )
-        )
-      )
-    case GO_TO_REVIEW_TAB:
-      const { reviewDraftId, reviewTabId } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(
-            formatUrl(REVIEW_BIRTH_PARENT_FORM_TAB, {
-              draftId: reviewDraftId.toString(),
-              tabId: reviewTabId
-            })
           )
         )
       )

@@ -7,16 +7,11 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
-import {
-  goToTab as goToTabAction,
-  goToReviewTab as goToReviewTabAction
-} from '../../navigation'
+import { goToTab as goToTabAction } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from 'src/store'
 import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
-import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
-import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import {
   FooterAction,
   FooterPrimaryButton,
@@ -27,6 +22,7 @@ import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 import processDraftData from './ProcessDraftData'
+// import { getForm } from '@opencrvs/register/src/forms/register/selectors'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -132,22 +128,26 @@ function getPreviousSection(
   return sections[currentIndex - 1]
 }
 
+export interface IFormProps {
+  draft: IDraft
+  registerForm: IForm
+  tabRoute: string
+}
+
 type DispatchProps = {
-  goToRegistrationTab: typeof goToTabAction
-  goToReviewTab: typeof goToReviewTabAction
+  goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
   deleteDraft: typeof deleteDraft
   handleSubmit: (values: unknown) => void
 }
 
 type Props = {
-  draft: IDraft
-  registerForm: IForm
   activeSection: IFormSection
   setAllFieldsDirty: boolean
 }
 
-type FullProps = Props &
+type FullProps = IFormProps &
+  Props &
   DispatchProps &
   InjectedIntlProps &
   RouteComponentProps<{}>
@@ -204,10 +204,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
   onSwiped = (
     draftId: number,
     selectedSection: IFormSection | null,
-    goToTab: (draftId: number, tabId: string) => void
+    tabRoute: string,
+    goToTab: (tabRoute: string, draftId: number, tabId: string) => void
   ): void => {
     if (selectedSection) {
-      goToTab(draftId, selectedSection.id)
+      goToTab(tabRoute, draftId, selectedSection.id)
     }
   }
 
@@ -215,8 +216,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   render() {
     const {
-      goToRegistrationTab,
-      goToReviewTab,
+      goToTab,
       intl,
       activeSection,
       setAllFieldsDirty,
@@ -227,7 +227,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     } = this.props
     const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
-    const goToTab = isReviewForm ? goToReviewTab : goToRegistrationTab
     const title = isReviewForm
       ? messages.reviewBirthRegistration
       : activeSection.viewType === 'preview'
@@ -243,18 +242,23 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <StickyFormTabs
             sections={registerForm.sections}
             activeTabId={activeSection.id}
-            onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
+            onTabClick={(tabId: string) =>
+              goToTab(this.props.tabRoute, draft.id, tabId)
+            }
           />
         </ViewHeaderWithTabs>
         <FormContainer>
           <Swipeable
             id="swipeable_block"
             trackMouse
-            onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
+            onSwipedLeft={() =>
+              this.onSwiped(draft.id, nextSection, this.props.tabRoute, goToTab)
+            }
             onSwipedRight={() =>
               this.onSwiped(
                 draft.id,
                 getPreviousSection(registerForm.sections, activeSection),
+                this.props.tabRoute,
                 goToTab
               )
             }
@@ -284,7 +288,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 <FormAction>
                   {nextSection && (
                     <FormPrimaryButton
-                      onClick={() => goToTab(draft.id, nextSection.id)}
+                      onClick={() =>
+                        goToTab(this.props.tabRoute, draft.id, nextSection.id)
+                      }
                       id="next_section"
                       icon={() => <ArrowForward />}
                     >
@@ -360,22 +366,12 @@ function replaceInitialValues(fields: IFormField[], sectionValues: object) {
 
 function mapStateToProps(
   state: IStoreState,
-  props: Props & RouteComponentProps<{ tabId: string; draftId: string }>
+  props: IFormProps &
+    Props &
+    RouteComponentProps<{ tabId: string; draftId: string }>
 ) {
-  const { match } = props
-  const draft = state.drafts.drafts.find(
-    ({ id }) => id === parseInt(match.params.draftId, 10)
-  )
+  const { match, registerForm, draft } = props
 
-  if (!draft) {
-    throw new Error(`Draft "${match.params.draftId}" missing!`)
-  }
-
-  const isReviewForm = draft.review
-
-  const registerForm = isReviewForm
-    ? getReviewForm(state)
-    : getRegisterForm(state)
   const activeSectionId = getActiveSectionId(registerForm, match.params)
 
   const activeSection = registerForm.sections.find(
@@ -384,6 +380,10 @@ function mapStateToProps(
 
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
+  }
+
+  if (!draft) {
+    throw new Error(`Draft "${match.params.draftId}" missing!`)
   }
 
   const visitedSections = registerForm.sections.filter(({ id }) =>
@@ -416,8 +416,7 @@ function mapStateToProps(
 export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
   modifyDraft,
   deleteDraft,
-  goToRegistrationTab: goToTabAction,
-  goToReviewTab: goToReviewTabAction,
+  goToTab: goToTabAction,
   handleSubmit: values => {
     console.log(values)
   }

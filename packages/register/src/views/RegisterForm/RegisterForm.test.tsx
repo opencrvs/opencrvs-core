@@ -5,12 +5,16 @@ import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft, setInitialDrafts } from 'src/drafts'
 import { IntlProvider } from 'react-intl'
 import { createStore } from '../../store'
+import { DRAFT_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
   const intlProvider = new IntlProvider({ locale: 'en' }, {})
   const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())
+  const draft = createDraft()
   it('throws error when draft not found after initial drafts load', () => {
     try {
       createTestComponent(
@@ -19,6 +23,9 @@ describe('when user is in the register form before initial draft load', () => {
           intl={intl}
           history={history}
           staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
             params: { draftId: '', tabId: '' },
             isExact: true,
@@ -44,6 +51,7 @@ describe('when user is in the register form', async () => {
   const intlProvider = new IntlProvider({ locale: 'en' }, {})
   const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
@@ -53,6 +61,9 @@ describe('when user is in the register form', async () => {
           intl={intl}
           history={history}
           staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'mother' },
             isExact: true,
@@ -97,12 +108,16 @@ describe('when user is in the register form preview section', () => {
   const intlProvider = new IntlProvider({ locale: 'en' }, {})
   const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())
   const testComponent = createTestComponent(
     <RegisterForm
       location={mock}
       intl={intl}
       history={history}
       staticContext={mock}
+      registerForm={form}
+      draft={draft}
+      tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
       match={{
         params: { draftId: draft.id, tabId: 'preview' },
         isExact: true,
