@@ -120,8 +120,8 @@ const processDraftData = (draftData: IFormData) => {
     registration.whoseContactDetails === 'MOTHER'
       ? motherDetails
       : registration.whoseContactDetails === 'FATHER'
-        ? fatherDetails
-        : null
+      ? fatherDetails
+      : null
 
   if (parentDetails) {
     parentDetails.telecom = [

@@ -217,4 +217,7 @@ class HomeView extends React.Component<InjectedIntlProps> {
   }
 }
 
-export const Home = connect(null, null)(injectIntl(HomeView))
+export const Home = connect(
+  null,
+  null
+)(injectIntl(HomeView))
