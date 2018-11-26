@@ -67,11 +67,10 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   storeData = (rejectionFormData: IFormSectionData) => {
     this.setState(
       () => ({ data: rejectionFormData }),
-      () => {
-        if (this.shouldEnableUploadButton(rejectionFormData)) {
-          this.setState(() => ({ enableUploadButton: true }))
-        }
-      }
+      () =>
+        this.setState(() => ({
+          enableUploadButton: this.shouldEnableUploadButton(rejectionFormData)
+        }))
     )
   }
 
