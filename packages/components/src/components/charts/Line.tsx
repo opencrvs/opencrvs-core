@@ -2,13 +2,11 @@ import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import {
   AreaChart,
-  Bar,
   XAxis,
   YAxis,
   Label,
   ResponsiveContainer,
   CartesianGrid,
-  Cell,
   Area
 } from 'recharts'
 import { ITheme } from '../theme'
@@ -85,7 +83,7 @@ function CustomizedAxisTick(props: ICustomizedAxisTick) {
 }
 
 function CustomizedYAxisTick(props: ICustomizedAxisTick) {
-  const { x, y, payload, totalValue, theme } = props
+  const { x, y, payload, theme } = props
   return (
     <g transform={`translate(${x},${y})`}>
       <text
@@ -114,11 +112,11 @@ const sumUpAllValues = (data: IDataPoint[]) =>
 
 export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
   const { data, theme, xAxisLabel, yAxisLabel } = props
-  const colours = [
-    theme.colors.chartPrimary,
-    theme.colors.chartSecondary,
-    theme.colors.chartTertiary
-  ]
+  const {
+    chartStroke,
+    chartAreaGradientStart,
+    chartAreaGradientEnd
+  } = theme.colors
 
   return (
     <Container>
@@ -131,8 +129,8 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
         >
           <defs>
             <linearGradient id="colorLineArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#D8E5FD" />
-              <stop offset="95%" stopColor="#F7F9FE" />
+              <stop offset="5%" stopColor={chartAreaGradientStart} />
+              <stop offset="95%" stopColor={chartAreaGradientEnd} />
             </linearGradient>
           </defs>
           <XAxis
@@ -203,7 +201,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
             dataKey={(dataPoint: IDataPoint) =>
               Math.round(dataPoint.value / sumUpAllValues(data) * 100)
             }
-            stroke="#8884d8"
+            stroke={chartStroke}
             strokeWidth={1}
             fill="url(#colorLineArea)"
           />
