@@ -25,8 +25,8 @@ const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
     identifier: [
       {
         use: 'official',
-        system: '',
-        value: ''
+        system: 'mobile',
+        value: practitioner.mobile
       }
     ],
     telecom: [{ system: 'phone', value: practitioner.mobile }],

@@ -11,7 +11,7 @@ import verifyPassHandler, {
 import getUserMobile, {
   requestSchema as userIdSchema,
   responseSchema as resMobileSchema
-} from './features/getMobile/handler'
+} from './features/getUserMobile/handler'
 import getPlugins from './config/plugins'
 import * as database from './database'
 import { readFileSync } from 'fs'
@@ -106,7 +106,7 @@ export async function createServer() {
       plugins: {
         'hapi-swagger': {
           responses: {
-            200: { description: 'Birth declaration confirmation sms sent' },
+            200: { description: 'User mobile found' },
             400: { description: 'Bad request, check your request body' }
           }
         }

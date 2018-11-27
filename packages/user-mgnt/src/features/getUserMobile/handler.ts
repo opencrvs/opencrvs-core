@@ -17,8 +17,7 @@ export default async function getUserMobile(
   h: Hapi.ResponseToolkit
 ) {
   const { userId } = request.payload as IVerifyPayload
-
-  const user: IUserModel | null = await User.findOne({ userId })
+  const user: IUserModel | null = await User.findById(userId)
 
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
