@@ -14,7 +14,7 @@ import { ITheme } from '../theme'
 const Container = styled.div`
   margin-top: 30px;
   box-sizing: border-box;
-  height: 250px;
+  height: 300px;
   width: 100%;
   align-items: center;
 `
@@ -120,12 +120,12 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
 
   return (
     <Container>
-      <ResponsiveContainer width="100%" height={250}>
+      <ResponsiveContainer width="100%" height={300}>
         <AreaChart
           width={600}
-          height={250}
+          height={300}
           data={data}
-          margin={{ top: 40, right: 30, bottom: 40, left: 30 }}
+          margin={{ top: 40, right: 50, bottom: 40, left: 50 }}
         >
           <defs>
             <linearGradient id="colorLineArea" x1="0" y1="0" x2="0" y2="1">
@@ -182,8 +182,8 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
               fill={theme.colors.secondary}
               fontFamily={theme.fonts.lightFont}
               transform="rotate(-90)"
-              dy={-75}
-              offset={30}
+              dy={-85}
+              dx={-85}
               value={yAxisLabel}
               position="left"
             />
