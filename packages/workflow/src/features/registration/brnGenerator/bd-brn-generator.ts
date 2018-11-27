@@ -19,7 +19,7 @@ export function generateBdBRN(
   brn = brn.concat(getTrackingId(fhirBundle) as string)
 
   /* appending single verhoeff checksum digit */
-  brn = brn.concat(Verhoeff.generate([brn]) as string)
+  brn = brn.concat(Verhoeff.generate([4]) as string)
 
   return brn
 }

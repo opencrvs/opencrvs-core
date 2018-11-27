@@ -3,9 +3,10 @@ import {
   getSharedContactMsisdn,
   getInformantName,
   getTrackingId,
+  getBirthRegistrationNumber,
   getRegStatusCode
 } from './fhir-utils'
-import { pushTrackingId } from './fhir-bundle-modifier'
+import { pushTrackingId, pushBRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 
 describe('Verify getSharedContactMsisdn', () => {
@@ -96,6 +97,34 @@ describe('Verify getTrackingId', () => {
         type: 'document'
       })
     ).toThrowError('getTrackingId: Invalid FHIR bundle found for declaration')
+  })
+})
+
+describe('Verify getBirthRegistrationNumber', () => {
+  it('Returned birth registration number properly', () => {
+    const tokenPayload = {
+      iss: '',
+      iat: 1541576965,
+      exp: 1573112965,
+      aud: '',
+      sub: '1',
+      scope: ['register']
+    }
+    const brn = getBirthRegistrationNumber(
+      pushBRN(testFhirBundle, tokenPayload)
+    )
+
+    expect(brn).toBeDefined()
+    expect(brn.length).toBe(12) // TODO: need change the length
+  })
+
+  it('Throws error when invalid fhir bundle is sent', () => {
+    expect(() =>
+      getBirthRegistrationNumber({
+        resourceType: 'Bundle',
+        type: 'document'
+      })
+    ).toThrowError("Didn't find any identifier for birth registration number")
   })
 })
 
