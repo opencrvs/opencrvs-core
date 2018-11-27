@@ -74,8 +74,6 @@ export function pushBRN(
   fhirBundle: fhir.Bundle,
   tokenPayload: ITokenPayload
 ): fhir.Bundle {
-  const brn = generateBirthRegistrationNumber(fhirBundle, tokenPayload)
-
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -84,6 +82,8 @@ export function pushBRN(
   ) {
     throw new Error('Invalid FHIR bundle found for registration')
   }
+  const brn = generateBirthRegistrationNumber(fhirBundle, tokenPayload)
+
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
   if (!taskResource.identifier) {
     taskResource.identifier = []

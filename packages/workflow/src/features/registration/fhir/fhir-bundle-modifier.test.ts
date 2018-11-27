@@ -1,5 +1,6 @@
 import {
   pushTrackingId,
+  pushBRN,
   setupRegistrationType,
   setupRegistrationWorkflow,
   setupLastRegUser,
@@ -192,6 +193,60 @@ describe('Verify fhir bundle modifier functions', () => {
       authorString: '1',
       text: 'this is a test note',
       time: '2018-10-31T09:45:05+10:00'
+    })
+  })
+  describe('pushBRN', () => {
+    it('Successfully modified the provided fhirBundle with brn', () => {
+      const tokenPayload = {
+        iss: '',
+        iat: 1541576965,
+        exp: 1573112965,
+        aud: '',
+        subject: '1',
+        scope: ['register']
+      }
+      const fhirBundle = pushBRN(testFhirBundle, tokenPayload)
+      const task = fhirBundle.entry[1].resource as fhir.Task
+
+      expect(task.identifier[1].system).toEqual(
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+      )
+      expect(task.identifier[1].value).toBeDefined()
+      expect(task.identifier[1].value.length).toBe(12)
+    })
+
+    it('Throws error if invalid fhir bundle is provided', () => {
+      const tokenPayload = {
+        iss: '',
+        iat: 1541576965,
+        exp: 1573112965,
+        aud: '',
+        subject: '1',
+        scope: ['register']
+      }
+
+      const invalidData = { ...testFhirBundle, entry: [] }
+      expect(() => pushBRN(invalidData, tokenPayload)).toThrowError(
+        'Invalid FHIR bundle found for registration'
+      )
+    })
+    it('If fhirBundle already have a brn then it will update the exiting one instead of creating a new one', () => {
+      const tokenPayload = {
+        iss: '',
+        iat: 1541576965,
+        exp: 1573112965,
+        aud: '',
+        subject: '1',
+        scope: ['register']
+      }
+      const fhirBundle = pushBRN(testFhirBundle, tokenPayload)
+      const task = fhirBundle.entry[1].resource as fhir.Task
+
+      expect(task.identifier[1].system).toEqual(
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+      )
+      expect(task.identifier[1].value).toBeDefined()
+      expect(task.identifier[1].value.length).toBe(12)
     })
   })
 })
