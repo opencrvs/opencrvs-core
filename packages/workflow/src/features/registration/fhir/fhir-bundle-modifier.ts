@@ -133,7 +133,7 @@ export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   if (!taskResource.focus) {
     taskResource.focus = { reference: '' }
   }
-  taskResource.focus.reference = `Composition/${birthTrackingId}`
+  taskResource.focus.reference = `Composition/${compositionResource.id}`
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
