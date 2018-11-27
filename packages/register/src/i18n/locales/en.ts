@@ -513,6 +513,7 @@ export const ENGLISH_STATE = {
     'register.notification.declarationsSynced':
       'As you have connectivity, we have synced {syncCount} new birth declarations.',
     'register.savedRegistration.online.title': 'Declaration submitted',
+    'register.completeRegistration.online.title': 'Registration complete',
     'register.savedRegistration.online.desc':
       'The declaration is now on its way for validation.',
     'register.savedRegistration.offline.title':
@@ -525,7 +526,11 @@ export const ENGLISH_STATE = {
       'The birth declaration of First Last Name has been successfully submitted to the registration office.',
     'register.savedRegistration.offline.noticeCard.text':
       'The birth declaration of First Last Name is pending due to no internet connection. ',
+    'register.completeRegistration.noticeCard.text':
+      'The birth of First Middle Last Name has been registered.',
     'register.savedRegistration.trackingCard.title': 'Tracking ID number:',
+    'register.completeRegistration.trackingCard.title':
+      'Birth Registration Number:',
     'register.savedRegistration.trackingCard.text':
       'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',
     'register.savedRegistration.nextCard.title': 'What next?',
@@ -537,8 +542,13 @@ export const ENGLISH_STATE = {
       'The informant has given their contact details and will also be informed when the registration is complete.',
     'register.savedRegistration.offline.nextCard.text2':
       'Once the declaration is succesfully submited, you and the informant will be notified when the registration is complete.',
+    'register.completeRegistration.nextCard.text1':
+      'The registration process is complete.',
+    'register.completeRegistration.nextCard.text2':
+      'The certificate should only be printed once the informant goes to collect it.',
     'register.savedRegistration.buttons.back': 'Back to homescreen',
     'register.savedRegistration.buttons.newDeclaration': 'New declaration',
+    'register.savedRegistration.buttons.back.duplicate': 'Back to duplicate',
     'register.selectInformant.newBirthRegistration': 'New birth declaration',
     'register.selectInformant.informantTitle': 'Who is the informant?',
     'register.selectInformant.informantDescription':

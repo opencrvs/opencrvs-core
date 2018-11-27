@@ -4,6 +4,7 @@ import { Header } from '@opencrvs/components/lib/interface'
 import { ActionList } from '@opencrvs/components/lib/buttons'
 import styled from '../styled-components'
 import { TopMenu } from '../components/TopMenu'
+import Logo from '../components/Logo'
 import { ViewHeading, IViewHeadingProps } from '../components/ViewHeading'
 
 const StretchedHeader = styled(Header)`
@@ -19,11 +20,19 @@ const StretchedHeader = styled(Header)`
 
 export class ViewHeader extends React.Component<IViewHeadingProps> {
   render() {
-    const { title, description, breadcrumb, id, ...otherProps } = this.props
+    const {
+      title,
+      description,
+      breadcrumb,
+      hideBackButton,
+      id,
+      ...otherProps
+    } = this.props
 
     return (
       <StretchedHeader {...otherProps}>
-        <TopMenu />
+        {hideBackButton && <Logo />}
+        <TopMenu hideBackButton={hideBackButton} />
         <ViewHeading {...{ title, description, breadcrumb, id }} />
         {this.props.children}
       </StretchedHeader>

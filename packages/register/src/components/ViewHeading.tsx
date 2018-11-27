@@ -6,6 +6,7 @@ export interface IViewHeadingProps {
   title: string
   description?: string
   breadcrumb?: string
+  hideBackButton?: boolean
 }
 
 const ViewHeadingContainer = styled.div`

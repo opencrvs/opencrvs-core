@@ -171,7 +171,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
   successfulSubmission = (response: string) => {
     const { history, draft } = this.props
     history.push('/saved', {
-      trackingId: response
+      trackingId: response,
+      declaration: true
     })
     this.props.deleteDraft(draft)
   }

@@ -11,6 +11,10 @@ describe('when user is in the saved registration page', () => {
   const { intl } = intlProvider.getChildContext()
   const mock: any = jest.fn()
   let savedRegistrationComponent: ReactWrapper<{}, {}>
+  history.push('/saved', {
+    trackingId: '1245lsajd',
+    declaration: true
+  })
   describe('when the application is online', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
@@ -127,5 +131,45 @@ describe('when user is in the saved registration page', () => {
         'Once the declaration is succesfully submited, you and the informant will be notified when the registration is complete.'
       )
     })
+  })
+})
+
+describe('when user is in complete registration page', () => {
+  const { store, history } = createStore()
+  const intlProvider = new IntlProvider({ locale: 'en' }, {})
+  const { intl } = intlProvider.getChildContext()
+  const mock: any = jest.fn()
+  let savedRegistrationComponent: ReactWrapper<{}, {}>
+  history.push('/saved', {
+    registrationId: '123456789',
+    declaration: false
+  })
+
+  beforeEach(async () => {
+    const testComponent = createTestComponent(
+      <SavedRegistration
+        intl={intl}
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    savedRegistrationComponent = testComponent.component
+  })
+
+  it('should show the notice card text', () => {
+    expect(
+      savedRegistrationComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual('The birth of First Middle Last Name has been registered.')
   })
 })

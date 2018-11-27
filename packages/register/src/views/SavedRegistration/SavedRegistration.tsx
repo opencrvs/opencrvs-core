@@ -14,6 +14,12 @@ import {
 import { RouteComponentProps } from 'react-router'
 
 const messages = defineMessages({
+  registrationCompleteTitle: {
+    id: 'register.completeRegistration.online.title',
+    defaultMessage: 'Registration complete',
+    description:
+      'The title that appears on the complete registration page when client is online'
+  },
   onlineTitle: {
     id: 'register.savedRegistration.online.title',
     defaultMessage: 'Declaration submitted',
@@ -65,9 +71,21 @@ const messages = defineMessages({
     description:
       'The text of the notice card that appears on the saved registration page when the client is offline'
   },
+  registrationNoticeCardText: {
+    id: 'register.completeRegistration.noticeCard.text',
+    defaultMessage: 'The birth of First Middle Last Name has been registered.',
+    description:
+      'The text of the notice card that appears on the complete registration page'
+  },
   trackingCardTitle: {
     id: 'register.savedRegistration.trackingCard.title',
     defaultMessage: 'Tracking ID number:',
+    description:
+      'The title of the tracking card that appears on the saved registration page'
+  },
+  registrationCardTitle: {
+    id: 'register.completeRegistration.trackingCard.title',
+    defaultMessage: 'Birth Registration Number:',
     description:
       'The title of the tracking card that appears on the saved registration page'
   },
@@ -112,6 +130,19 @@ const messages = defineMessages({
     description:
       'The text of the what next card that appears on the saved registration page when the client is offline'
   },
+  registrationNextCardText1: {
+    id: 'register.completeRegistration.nextCard.text1',
+    defaultMessage: 'The registration process is complete.',
+    description:
+      'The text of the what next card that appears on the complete registration page'
+  },
+  registrationNextCardText2: {
+    id: 'register.completeRegistration.nextCard.text2',
+    defaultMessage:
+      'The certificate should only be printed once the informant goes to collect it.',
+    description:
+      'The text of the what next card that appears on the complete registration page'
+  },
   backButton: {
     id: 'register.savedRegistration.buttons.back',
     defaultMessage: 'Back to homescreen',
@@ -122,23 +153,36 @@ const messages = defineMessages({
     defaultMessage: 'New declaration',
     description:
       'The button to start a new declaration now that they are finished with this one'
+  },
+  duplicationButton: {
+    id: 'register.savedRegistration.buttons.back.duplicate',
+    defaultMessage: 'Back to duplicate',
+    description:
+      'The button to start a new declaration now that they are finished with this one'
   }
 })
 
 const Container = styled.div`
-  padding: 35px 25px;
-  padding-bottom: 0;
   z-index: 1;
+  width: 80%;
+  margin: 0 auto;
+  margin-top: -55px;
 `
-
 const StyledP = styled.p`
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
+  width: 450px;
+  margin: 0 auto;
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
 `
-
+const SubmissionText = styled(StyledP)`
+  margin-top: 15px;
+`
 const TrackingBox = styled(Box)`
   background: linear-gradient(
     137.89deg,
@@ -155,7 +199,6 @@ const TrackingBox = styled(Box)`
     color: ${({ theme }) => theme.colors.white};
   }
 `
-
 const NextBox = styled(Box)`
   text-align: center;
 `
@@ -169,6 +212,8 @@ const BoxHeader = styled.h2`
 `
 
 const ImgHeaderContainer = styled.div`
+  width: 200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
 `
@@ -187,6 +232,25 @@ const TrackingNumber = styled.h1`
   font-size: 30px;
 `
 
+const Footer = styled(ViewFooter)`
+  z-index: 0;
+`
+
+const Header = styled(ViewHeader)`
+  width: 80%;
+  margin: 0 auto;
+  box-shadow: none;
+  background: none;
+`
+
+const HeaderWrapper = styled.div`
+  background: linear-gradient(
+    270deg,
+    ${({ theme }) => theme.colors.headerGradientLight} 0%,
+    ${({ theme }) => theme.colors.headerGradientDark} 100%
+  );
+`
+
 class SavedRegistrationView extends React.Component<
   InjectedIntlProps & RouteComponentProps<{}>
 > {
@@ -194,17 +258,54 @@ class SavedRegistrationView extends React.Component<
     const { intl, history } = this.props
     const online = navigator.onLine
 
+    let headerTitle: string
+    let headerDesc: string
+    let noticeCardText: string
+    let trackingCardTitle: string
+    let trackingNumber: string
+    let nextCardText1: string
+    let nextCardText2: string
+    let isDeclaration: boolean
+    if (history.location.state.declaration) {
+      headerTitle = intl.formatMessage(
+        online ? messages.onlineTitle : messages.offlineTitle
+      )
+      headerDesc = intl.formatMessage(
+        online ? messages.onlineDesc : messages.offlineDesc
+      )
+      noticeCardText = intl.formatMessage(
+        online ? messages.onlineNoticeCardText : messages.offlineNoticeCardText
+      )
+      trackingCardTitle = intl.formatMessage(messages.trackingCardTitle)
+      trackingNumber = history.location.state.trackingId || ''
+      nextCardText1 = intl.formatMessage(
+        online ? messages.onlineNextCardText1 : messages.offlineNextCardText1
+      )
+      nextCardText2 = intl.formatMessage(
+        online ? messages.onlineNextCardText2 : messages.offlineNextCardText2
+      )
+      isDeclaration = true
+    } else {
+      headerTitle = intl.formatMessage(messages.registrationCompleteTitle)
+      headerDesc = ''
+      noticeCardText = intl.formatMessage(messages.registrationNoticeCardText)
+      trackingCardTitle = intl.formatMessage(messages.registrationCardTitle)
+      trackingNumber = history.location.state.registrationId || ''
+      nextCardText1 = intl.formatMessage(messages.registrationNextCardText1)
+      nextCardText2 = intl.formatMessage(messages.registrationNextCardText2)
+      isDeclaration = false
+    }
+
     return (
       <>
-        <ViewHeader
-          title={intl.formatMessage(
-            online ? messages.onlineTitle : messages.offlineTitle
-          )}
-          description={intl.formatMessage(
-            online ? messages.onlineDesc : messages.offlineDesc
-          )}
-          id="saved_registration_view"
-        />
+        <HeaderWrapper>
+          <Header
+            title={headerTitle}
+            description={headerDesc}
+            hideBackButton={!isDeclaration}
+            id="saved_registration_view"
+          />
+        </HeaderWrapper>
         <Container>
           <Box>
             <ImgHeaderContainer>
@@ -217,56 +318,44 @@ class SavedRegistrationView extends React.Component<
                 )}
               </BoxHeader>
             </ImgHeaderContainer>
-            <StyledP id="submission_text">
-              {intl.formatMessage(
-                online
-                  ? messages.onlineNoticeCardText
-                  : messages.offlineNoticeCardText
-              )}
-            </StyledP>
+            <SubmissionText id="submission_text">
+              {noticeCardText}
+            </SubmissionText>
           </Box>
           <TrackingBox>
-            <TrackingHeader>
-              {intl.formatMessage(messages.trackingCardTitle)}
-            </TrackingHeader>
+            <TrackingHeader>{trackingCardTitle}</TrackingHeader>
             <TrackingNumber id="trackingIdViewer">
-              {history &&
-                history.location &&
-                history.location.state &&
-                history.location.state.trackingId}
+              {trackingNumber}
             </TrackingNumber>
             <StyledP>{intl.formatMessage(messages.trackingCardText)}</StyledP>
           </TrackingBox>
           <NextBox>
             <BoxHeader>{intl.formatMessage(messages.nextCardTitle)}</BoxHeader>
-            <StyledP id="whats_next_title">
-              {intl.formatMessage(
-                online
-                  ? messages.onlineNextCardText1
-                  : messages.offlineNextCardText1
-              )}
-            </StyledP>
-            <StyledP id="whats_next_text">
-              {intl.formatMessage(
-                online
-                  ? messages.onlineNextCardText2
-                  : messages.offlineNextCardText2
-              )}
-            </StyledP>
+            <StyledP id="whats_next_title">{nextCardText1}</StyledP>
+            <StyledP id="whats_next_text">{nextCardText2}</StyledP>
           </NextBox>
         </Container>
-        <ViewFooter>
+        <Footer>
+          {isDeclaration ? (
+            <FooterAction>
+              <FooterPrimaryButton onClick={() => history.push('/')}>
+                {intl.formatMessage(messages.newButton)}
+              </FooterPrimaryButton>
+            </FooterAction>
+          ) : (
+            <FooterAction>
+              <FooterPrimaryButton onClick={() => history.push('/')}>
+                {intl.formatMessage(messages.duplicationButton)}
+              </FooterPrimaryButton>
+            </FooterAction>
+          )}
+
           <FooterAction>
             <FooterPrimaryButton onClick={() => history.push('/')}>
               {intl.formatMessage(messages.backButton)}
             </FooterPrimaryButton>
           </FooterAction>
-          <FooterAction>
-            <FooterPrimaryButton onClick={() => history.push('/')}>
-              {intl.formatMessage(messages.newButton)}
-            </FooterPrimaryButton>
-          </FooterAction>
-        </ViewFooter>
+        </Footer>
       </>
     )
   }
