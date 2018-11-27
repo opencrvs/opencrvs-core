@@ -239,14 +239,23 @@ describe('Verify fhir bundle modifier functions', () => {
         subject: '1',
         scope: ['register']
       }
-      const fhirBundle = pushBRN(testFhirBundle, tokenPayload)
-      const task = fhirBundle.entry[1].resource as fhir.Task
+      const oldTask = testFhirBundle.entry[1].resource as fhir.Task
+      oldTask.identifier[1].value = 'DUMMYBRN'
+      const indentifierLength = oldTask.identifier.length
 
-      expect(task.identifier[1].system).toEqual(
+      let fhirBundle = cloneDeep(testFhirBundle)
+      fhirBundle = pushBRN(fhirBundle, tokenPayload)
+      const newTask = fhirBundle.entry[1].resource as fhir.Task
+
+      expect(newTask.identifier.length).toBe(indentifierLength)
+      expect(newTask.identifier[1].system).toEqual(
         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
       )
-      expect(task.identifier[1].value).toBeDefined()
-      expect(task.identifier[1].value.length).toBe(12)
+      expect(newTask.identifier[1].value).toBeDefined()
+      expect(newTask.identifier[1].value.length).toBe(12)
+      expect(newTask.identifier[1].value).not.toEqual(
+        oldTask.identifier[1].value
+      )
     })
   })
 })

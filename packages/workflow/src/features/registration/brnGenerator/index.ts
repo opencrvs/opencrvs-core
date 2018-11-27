@@ -9,9 +9,12 @@ enum GENERATOR_CODE {
 
 export function generateBirthRegistrationNumber(
   fhirBundle: fhir.Bundle,
-  tokenPayload: ITokenPayload
+  tokenPayload: ITokenPayload,
+  generatorCode?: string
 ): string {
-  switch (BRN_GENERATOR_CODE) {
+  generatorCode = generatorCode ? generatorCode : BRN_GENERATOR_CODE
+
+  switch (generatorCode) {
     case GENERATOR_CODE.BD.toString():
       return generateBdBRN(fhirBundle, tokenPayload)
     default:
