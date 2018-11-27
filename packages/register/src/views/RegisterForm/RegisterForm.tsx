@@ -385,11 +385,14 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
-  modifyDraft,
-  deleteDraft,
-  goToTab: goToTabAction,
-  handleSubmit: values => {
-    console.log(values)
+export const RegisterForm = connect<Props, DispatchProps>(
+  mapStateToProps,
+  {
+    modifyDraft,
+    deleteDraft,
+    goToTab: goToTabAction,
+    handleSubmit: values => {
+      console.log(values)
+    }
   }
-})(injectIntl<FullProps>(RegisterFormView))
+)(injectIntl<FullProps>(RegisterFormView))

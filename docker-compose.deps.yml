@@ -4,8 +4,6 @@ services:
   mongo:
     image: mongo:3.4
     restart: unless-stopped
-    logging:
-      driver: none
     volumes:
       - '/data/mongo:/data/db'
     deploy:
@@ -21,11 +19,11 @@ services:
   hearth:
     image: jembi/hearth:latest
     environment:
-      - server__fhirVersion=stu3
       - mongodb__url=mongodb://mongo/hearth-dev
       - logger__level=error
       - authentication__type=disabled
       - idGenerator=uuidv4
+      - server__fhirVersion=stu3
     restart: unless-stopped
     deploy:
       replicas: 2

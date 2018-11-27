@@ -35,7 +35,7 @@ export default async function importAdminStructure() {
     console.log(
       `${chalk.yellow('Fetching from A2I:')} divisions. Please wait ....`
     )
-    divisions = await fetchAndComposeLocations('division', '0')
+    divisions = await fetchAndComposeLocations('division', '0', 'DIVISION')
   } catch (err) {
     return internal(err)
   }

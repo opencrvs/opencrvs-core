@@ -3,12 +3,11 @@ import { createTestComponent } from '../../tests/util'
 import { SavedRegistration } from './SavedRegistration'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '../../store'
-import { IntlProvider } from 'react-intl'
+
 
 describe('when user is in the saved registration page', () => {
   const { store, history } = createStore()
-  const intlProvider = new IntlProvider({ locale: 'en' }, {})
-  const { intl } = intlProvider.getChildContext()
+
   const mock: any = jest.fn()
   let savedRegistrationComponent: ReactWrapper<{}, {}>
   history.push('/saved', {
@@ -19,7 +18,6 @@ describe('when user is in the saved registration page', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
         <SavedRegistration
-          intl={intl}
           location={mock}
           history={history}
           staticContext={mock}
@@ -78,7 +76,6 @@ describe('when user is in the saved registration page', () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
       const testComponent = createTestComponent(
         <SavedRegistration
-          intl={intl}
           location={mock}
           history={history}
           staticContext={mock}
