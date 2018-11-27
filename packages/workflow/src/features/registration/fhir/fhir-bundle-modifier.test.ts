@@ -19,7 +19,7 @@ describe('Verify fhir bundle modifier functions', () => {
 
       expect(composition.identifier.value).toMatch(/^B/)
       expect(composition.identifier.value.length).toBe(7)
-      expect(task.identifier[0]).toEqual({
+      expect(task.identifier[1]).toEqual({
         system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
         value: composition.identifier.value
       })
@@ -208,11 +208,13 @@ describe('Verify fhir bundle modifier functions', () => {
       const fhirBundle = pushBRN(testFhirBundle, tokenPayload)
       const task = fhirBundle.entry[1].resource as fhir.Task
 
-      expect(task.identifier[1].system).toEqual(
+      expect(task.identifier[2].system).toEqual(
         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
       )
-      expect(task.identifier[1].value).toBeDefined()
-      expect(task.identifier[1].value.length).toBe(12)
+      expect(task.identifier[2].value).toBeDefined()
+      expect(task.identifier[2].value).toMatch(
+        new RegExp(`^${new Date().getFullYear()}12345678`)
+      )
     })
 
     it('Throws error if invalid fhir bundle is provided', () => {
@@ -240,7 +242,7 @@ describe('Verify fhir bundle modifier functions', () => {
         scope: ['register']
       }
       const oldTask = testFhirBundle.entry[1].resource as fhir.Task
-      oldTask.identifier[1].value = 'DUMMYBRN'
+      oldTask.identifier[2].value = 'DUMMYBRN'
       const indentifierLength = oldTask.identifier.length
 
       let fhirBundle = cloneDeep(testFhirBundle)
@@ -248,13 +250,15 @@ describe('Verify fhir bundle modifier functions', () => {
       const newTask = fhirBundle.entry[1].resource as fhir.Task
 
       expect(newTask.identifier.length).toBe(indentifierLength)
-      expect(newTask.identifier[1].system).toEqual(
+      expect(newTask.identifier[2].system).toEqual(
         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
       )
-      expect(newTask.identifier[1].value).toBeDefined()
-      expect(newTask.identifier[1].value.length).toBe(12)
-      expect(newTask.identifier[1].value).not.toEqual(
-        oldTask.identifier[1].value
+      expect(newTask.identifier[2].value).toBeDefined()
+      expect(newTask.identifier[2].value).toMatch(
+        new RegExp(`^${new Date().getFullYear()}12345678`)
+      )
+      expect(newTask.identifier[2].value).not.toEqual(
+        oldTask.identifier[2].value
       )
     })
   })

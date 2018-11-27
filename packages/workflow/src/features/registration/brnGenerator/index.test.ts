@@ -1,5 +1,4 @@
 import { generateBirthRegistrationNumber } from './index'
-import { pushTrackingId } from '../fhir/fhir-bundle-modifier'
 import { testFhirBundle } from 'src/test/utils'
 
 describe('Verify generateBirthRegistrationNumber', () => {
@@ -12,12 +11,9 @@ describe('Verify generateBirthRegistrationNumber', () => {
     scope: ['register']
   }
   it('Generate BD BRN properly', () => {
-    const brn = generateBirthRegistrationNumber(
-      pushTrackingId(testFhirBundle),
-      tokenPayload
-    )
+    const brn = generateBirthRegistrationNumber(testFhirBundle, tokenPayload)
     expect(brn).toBeDefined()
-    expect(brn.length).toBe(12)
+    expect(brn).toMatch(new RegExp(`^${new Date().getFullYear()}12345678`))
   })
   it('Throws error for default BRN generator', () => {
     expect(() =>

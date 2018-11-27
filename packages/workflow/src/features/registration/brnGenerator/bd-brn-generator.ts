@@ -1,5 +1,5 @@
 import { ITokenPayload } from 'src/utils/authUtils.ts'
-import { getTrackingId } from '../fhir/fhir-utils'
+import { getPaperFormID } from '../fhir/fhir-utils'
 import * as Verhoeff from 'node-verhoeff'
 
 export function generateBdBRN(
@@ -15,11 +15,11 @@ export function generateBdBRN(
 
   /* appending BBS code for union */
 
-  /* appending application tracking id */
-  brn = brn.concat(getTrackingId(fhirBundle) as string)
+  /* appending paper form id */
+  brn = brn.concat(getPaperFormID(fhirBundle) as string)
 
   /* appending single verhoeff checksum digit */
-  brn = brn.concat(Verhoeff.generate([4]) as string)
+  brn = brn.concat(Verhoeff.generate(brn) as string)
 
   return brn
 }

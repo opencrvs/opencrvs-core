@@ -117,6 +117,22 @@ export function getBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
   return brnIdentifier.value
 }
 
+export function getPaperFormID(fhirBundle: fhir.Bundle) {
+  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+  const paperFormIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`
+      )
+    })
+  if (!paperFormIdentifier || !paperFormIdentifier.value) {
+    throw new Error("Didn't find any identifier for paper form id")
+  }
+  return paperFormIdentifier.value
+}
+
 function getContactSection(contact: CONTACT) {
   switch (contact) {
     case CONTACT.MOTHER:

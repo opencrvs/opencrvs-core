@@ -100,6 +100,12 @@ export const testFhirBundle = {
             }
           ]
         },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/paper-form-id',
+            value: '12345678'
+          }
+        ],
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/contact-person',

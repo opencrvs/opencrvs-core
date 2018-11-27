@@ -115,7 +115,7 @@ describe('Verify getBirthRegistrationNumber', () => {
     )
 
     expect(brn).toBeDefined()
-    expect(brn.length).toBe(12) // TODO: need change the length
+    expect(brn).toMatch(new RegExp(`^${new Date().getFullYear()}12345678`))
   })
 
   it('Throws error when invalid fhir bundle is sent', () => {
