@@ -4,7 +4,6 @@ import { SavedRegistration } from './SavedRegistration'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '../../store'
 
-
 describe('when user is in the saved registration page', () => {
   const { store, history } = createStore()
 
@@ -133,19 +132,17 @@ describe('when user is in the saved registration page', () => {
 
 describe('when user is in complete registration page', () => {
   const { store, history } = createStore()
-  const intlProvider = new IntlProvider({ locale: 'en' }, {})
-  const { intl } = intlProvider.getChildContext()
+
   const mock: any = jest.fn()
   let savedRegistrationComponent: ReactWrapper<{}, {}>
   history.push('/saved', {
-    registrationId: '123456789',
+    trackingId: '123456789',
     declaration: false
   })
 
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <SavedRegistration
-        intl={intl}
         location={mock}
         history={history}
         staticContext={mock}
