@@ -21,6 +21,7 @@ const Container = styled.div`
 interface IDataPoint {
   name: string
   value: number
+  total: number
 }
 
 interface ICustomizedAxisTick {
@@ -108,9 +109,6 @@ function CustomDot(props: ICustomDot) {
   )
 }
 
-const sumUpAllValues = (data: IDataPoint[]) =>
-  data.reduce((sum: number, item: IDataPoint) => sum + item.value, 0)
-
 export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
   const { data, theme, xAxisLabel, yAxisLabel } = props
   const {
@@ -149,10 +147,11 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
                 <CustomizedAxisTick
                   {...tickProps}
                   theme={theme}
-                  totalValue={sumUpAllValues(data)}
+                  totalValue={dataPoint ? dataPoint.total : 0}
                   payload={{
                     name: payload.value,
-                    value: dataPoint ? dataPoint.value : 0
+                    value: dataPoint ? dataPoint.value : 0,
+                    total: dataPoint ? dataPoint.total : 0
                   }}
                 />
               )
@@ -172,7 +171,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           <YAxis
             width={30}
             tickCount={2}
-            domain={[0, dataMax => (dataMax < 90 ? dataMax + 10 : dataMax)]}
+            domain={[0, 100]}
             tick={(tickProps: ICustomizedAxisTick) => (
               <CustomizedYAxisTick {...tickProps} theme={theme} />
             )}
@@ -200,7 +199,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
             dot={(dotProps: ICustomDot) => <CustomDot {...dotProps} />}
             type="linear"
             dataKey={(dataPoint: IDataPoint) =>
-              Math.round((dataPoint.value / sumUpAllValues(data)) * 100)
+              Math.round((dataPoint.value / dataPoint.total) * 100)
             }
             stroke={chartStroke}
             strokeWidth={1}
