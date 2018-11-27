@@ -36,6 +36,7 @@ interface ICustomizedAxisTick {
 interface ICustomDot {
   cx: number
   cy: number
+  theme: ITheme
 }
 interface ILineProps {
   data: IDataPoint[]
@@ -101,10 +102,13 @@ function CustomizedYAxisTick(props: ICustomizedAxisTick) {
 }
 
 function CustomDot(props: ICustomDot) {
-  const { cx, cy } = props
+  const { cx, cy, theme } = props
   return (
     <svg x={cx - 5.5} y={cy - 6} width={11} height={12}>
-      <path d="M0 5.657L5.525 0l5.525 5.657-5.525 5.657z" fill="#233A86" />
+      <path
+        d="M0 5.657L5.525 0l5.525 5.657-5.525 5.657z"
+        fill={theme.colors.chartPrimary}
+      />
     </svg>
   )
 }
@@ -112,7 +116,7 @@ function CustomDot(props: ICustomDot) {
 export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
   const { data, theme, xAxisLabel, yAxisLabel } = props
   const {
-    chartStroke,
+    chartPrimary,
     chartAreaGradientStart,
     chartAreaGradientEnd
   } = theme.colors
@@ -196,12 +200,14 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           />
 
           <Area
-            dot={(dotProps: ICustomDot) => <CustomDot {...dotProps} />}
+            dot={(dotProps: ICustomDot) => (
+              <CustomDot {...dotProps} theme={theme} />
+            )}
             type="linear"
             dataKey={(dataPoint: IDataPoint) =>
               Math.round((dataPoint.value / dataPoint.total) * 100)
             }
-            stroke={chartStroke}
+            stroke={chartPrimary}
             strokeWidth={1}
             fill="url(#colorLineArea)"
           />
