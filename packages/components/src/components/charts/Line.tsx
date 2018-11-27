@@ -49,7 +49,7 @@ function CustomizedAxisTick(props: ICustomizedAxisTick) {
     <g transform={`translate(${x},${y})`}>
       <text
         x={0}
-        y={0}
+        y={10}
         dy={16}
         fontFamily={theme.fonts.lightFont}
         textAnchor="middle"
@@ -59,7 +59,7 @@ function CustomizedAxisTick(props: ICustomizedAxisTick) {
       </text>
       <text
         x={0}
-        y={21}
+        y={31}
         dy={16}
         fontFamily={theme.fonts.lightFont}
         textAnchor="middle"
@@ -69,7 +69,7 @@ function CustomizedAxisTick(props: ICustomizedAxisTick) {
       </text>
       <text
         x={0}
-        y={42}
+        y={52}
         dy={16}
         fontFamily={theme.fonts.lightFont}
         fontSize={12}
@@ -87,6 +87,7 @@ function CustomizedYAxisTick(props: ICustomizedAxisTick) {
   return (
     <g transform={`translate(${x},${y})`}>
       <text
+        dy={8}
         fontFamily={theme.fonts.lightFont}
         textAnchor="end"
         height={22}
