@@ -623,6 +623,8 @@ export const ENGLISH_STATE = {
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
     'register.workQueue.buttons.newApplication': 'New birth application',
     'review.edit.modal.preview': 'Back to Preview',
-    'review.edit.modal.editButton': 'Edit'
+    'review.edit.modal.editButton': 'Edit',
+    'review.button.register': 'REGISTER',
+    'review.button.reject': 'Reject Application'
   }
 }

@@ -616,6 +616,8 @@ export const BENGALI_STATE = {
     'register.workQueue.list.buttons.review': 'পর্যালোচনা',
     'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
-    'review.edit.modal.editButton': 'সম্পাদন'
+    'review.edit.modal.editButton': 'সম্পাদন',
+    'review.button.register': 'নিবন্ধন',
+    'review.button.reject': 'বাতিল'
   }
 }

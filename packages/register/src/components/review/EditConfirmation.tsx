@@ -7,6 +7,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 const PreviewButton = styled.a`
   text-decoration: underline;
   color: ${({ theme }) => theme.colors.primary};
+  cursor: pointer;
 `
 
 export const messages = defineMessages({
