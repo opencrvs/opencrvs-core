@@ -29,6 +29,7 @@ const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
         value: ''
       }
     ],
+    telecom: [{ system: 'phone', value: practitioner.mobile }],
     name: [
       {
         use: 'en',
