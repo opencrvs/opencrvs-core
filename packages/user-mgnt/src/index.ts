@@ -8,9 +8,20 @@ import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from './features/verifyPassword/handler'
+import getUserMobile, {
+  requestSchema as userIdSchema,
+  responseSchema as resMobileSchema
+} from './features/getMobile/handler'
 import getPlugins from './config/plugins'
 import * as database from './database'
 import { readFileSync } from 'fs'
+
+const enum RouteScope {
+  DECLARE = 'declare',
+  REGISTER = 'register',
+  CERTIFY = 'certify',
+  PERFORMANCE = 'performance'
+}
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -72,6 +83,38 @@ export async function createServer() {
     method: 'GET',
     path: '/check-token',
     handler: (request: Hapi.Request) => request.auth.credentials
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/getUserMobile',
+    handler: getUserMobile,
+    options: {
+      tags: ['api'],
+      description: 'Retrieves a user mobile number',
+      auth: {
+        scope: [
+          RouteScope.DECLARE,
+          RouteScope.REGISTER,
+          RouteScope.CERTIFY,
+          RouteScope.PERFORMANCE
+        ]
+      },
+      validate: {
+        payload: userIdSchema
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            200: { description: 'Birth declaration confirmation sms sent' },
+            400: { description: 'Bad request, check your request body' }
+          }
+        }
+      },
+      response: {
+        schema: resMobileSchema
+      }
+    }
   })
 
   async function start() {
