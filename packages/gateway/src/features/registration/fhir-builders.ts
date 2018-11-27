@@ -354,6 +354,16 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   })
 }
 
+function createPaperFormID(resource: fhir.Task, fieldValue: string) {
+  if (!resource.identifier) {
+    resource.identifier = []
+  }
+  resource.identifier.push({
+    system: `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`,
+    value: fieldValue
+  })
+}
+
 function createRegStatusComment(
   resource: fhir.Task,
   fieldValue: string,
@@ -735,6 +745,14 @@ const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
+    },
+    paperFormID: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createPaperFormID(taskResource, fieldValue)
     },
     status: {
       comments: {
