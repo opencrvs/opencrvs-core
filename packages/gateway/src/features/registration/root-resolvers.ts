@@ -68,11 +68,7 @@ export const resolvers: GQLResolver = {
           }
         }
       )
-      const newNote: fhir.Annotation = {
-        text: `reason=${reason}&comment=${comment}`,
-        time: new Date().toUTCString(),
-        authorString: ''
-      }
+
       const taskBundle = await taskResponse.json()
       const newTaskResource = taskBundle.entry[0].resource as fhir.Task
       if (
@@ -86,16 +82,37 @@ export const resolvers: GQLResolver = {
         throw new Error('Task has no businessStatus code')
       }
       newTaskResource.businessStatus.coding[0].code = 'REJECTED'
-      newTaskResource.note.push(newNote)
-
-      const workflowResponse = {
-        id: newTaskResource.id,
-        type: 'REJECTED',
-        user: null,
-        timestamp: new Date().toUTCString(),
-        comments: newTaskResource.note
+      const newNote: fhir.Annotation = {
+        text: `reason=${reason}&comment=${comment}`,
+        time: new Date().toUTCString(),
+        authorString: ''
       }
-      return workflowResponse
+      newTaskResource.note.push(newNote)
+      taskBundle.entry[0].resource = newTaskResource
+
+      const res = await fetch(`${WORKFLOW_SERVICE_URL}updateTask`, {
+        method: 'POST',
+        body: JSON.stringify(taskBundle),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (!res.ok) {
+        throw new Error(
+          `Workflow post to updateTask failed with [${
+            res.status
+          }] body: ${await res.text()}`
+        )
+      }
+
+      const resBody = await res.json()
+      if (!resBody || !resBody.trackingid) {
+        throw new Error(`Workflow response did not send a valid response`)
+      }
+      // return the taskId
+      return resBody.taskId
     }
   }
 }
