@@ -121,7 +121,7 @@ export function createCompositionTemplate(refUuid: string) {
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
-        value: uuid()
+        value: refUuid
       },
       resourceType: 'Composition',
       status: 'preliminary',
