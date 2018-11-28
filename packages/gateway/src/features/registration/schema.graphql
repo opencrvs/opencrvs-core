@@ -287,7 +287,7 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markBirthAsVoided(
-    id: ID!
+    id: String!
     reason: String!
     comment: String
   ): BirthRegistration # updated status to 'voided' - the registration was captured in error

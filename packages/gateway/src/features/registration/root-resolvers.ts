@@ -58,6 +58,44 @@ export const resolvers: GQLResolver = {
       }
       // return the trackingid
       return resBody.trackingid
+    },
+    async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
+      const taskResponse = await fetch(
+        `${fhirUrl}/Task?focus=Composition/${id}`,
+        {
+          headers: {
+            'Content-Type': 'application/fhir+json'
+          }
+        }
+      )
+      const newNote: fhir.Annotation = {
+        text: `reason=${reason}&comment=${comment}`,
+        time: new Date().toUTCString(),
+        authorString: ''
+      }
+      const taskBundle = await taskResponse.json()
+      const newTaskResource = taskBundle.entry[0].resource as fhir.Task
+      if (
+        !newTaskResource ||
+        !newTaskResource.note ||
+        !newTaskResource.businessStatus ||
+        !newTaskResource.businessStatus.coding ||
+        !newTaskResource.businessStatus.coding[0] ||
+        !newTaskResource.businessStatus.coding[0].code
+      ) {
+        throw new Error('Task has no businessStatus code')
+      }
+      newTaskResource.businessStatus.coding[0].code = 'REJECTED'
+      newTaskResource.note.push(newNote)
+
+      const workflowResponse = {
+        id: newTaskResource.id,
+        type: 'REJECTED',
+        user: null,
+        timestamp: new Date().toUTCString(),
+        comments: newTaskResource.note
+      }
+      return workflowResponse
     }
   }
 }
