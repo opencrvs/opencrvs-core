@@ -499,6 +499,7 @@ export const ENGLISH_STATE = {
     'validations.requiredSymbol': '',
     'register.form.submit': 'Submit',
     'register.form.informationMissing': 'Information missing',
+    'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth declaration',

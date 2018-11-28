@@ -7,13 +7,13 @@ const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 12px 0 rgba(0, 0, 0, 0.11)` : ``};
 `
-const TitleContainer = styled.div`
+const TitleContainer = styled.div.attrs<{ expandable: boolean }>({})`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
   display: flex;
   align-items: center;
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
-  cursor: pointer;
+  cursor: ${({ expandable }) => (expandable ? 'pointer' : 'auto')};
 `
 const Title = styled.div`
   width: 100vw;
@@ -74,6 +74,7 @@ export class SectionDrawer extends React.Component<IProps> {
       <SectionDrawerContainer expanded={isExpanded}>
         {<ExpandedIndicator expanded={isExpanded} />}
         <TitleContainer
+          expandable={expandable}
           onClick={() => {
             if (expandable === true) {
               expansionButtonHandler()
@@ -96,6 +97,7 @@ export class SectionDrawer extends React.Component<IProps> {
           </Title>
           {expandable && (
             <ExpansionButton
+              className="_expansionBtn"
               expanded={isExpanded}
               onClick={e => {
                 e.stopPropagation()
@@ -104,7 +106,9 @@ export class SectionDrawer extends React.Component<IProps> {
             />
           )}
         </TitleContainer>
-        <SectionContainer expanded={isExpanded}>{children}</SectionContainer>
+        <SectionContainer className="_sectionContainer" expanded={isExpanded}>
+          {children}
+        </SectionContainer>
       </SectionDrawerContainer>
     )
   }

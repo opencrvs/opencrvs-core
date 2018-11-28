@@ -492,6 +492,7 @@ export const BENGALI_STATE = {
     'validations.requiredSymbol': '',
     'register.form.submit': 'জমা দিন',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
+    'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',

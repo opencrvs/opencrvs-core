@@ -3,15 +3,23 @@ import { SectionDrawer } from '@opencrvs/components/lib/interface'
 import styled from 'styled-components'
 import { IDraft } from 'src/drafts'
 import { connect } from 'react-redux'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { IStoreState } from 'src/store'
 import { getRegisterForm } from 'src/forms/register/selectors'
 import { EditConfirmation } from './EditConfirmation'
 import { getConditionalActionsForField } from 'src/forms/utils'
 import { TickLarge, CrossLarge } from '@opencrvs/components/lib/icons'
 import { findIndex, filter } from 'lodash'
+import { getValidationErrorsForForm } from 'src/forms/validation'
+import { goToTab } from 'src/navigation'
+import {
+  defineMessages,
+  InjectedIntlProps,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
 import {
   PrimaryButton,
+  Button,
   IconAction,
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
@@ -54,6 +62,11 @@ const messages = defineMessages({
     id: 'review.button.reject',
     defaultMessage: 'Reject Application',
     description: 'Reject application button text'
+  },
+  requiredField: {
+    id: 'register.form.required',
+    defaultMessage: 'This field is required',
+    description: 'Message when a field doesnt have a value'
   }
 })
 
@@ -105,16 +118,17 @@ const RejectApplication = styled(IconAction)`
     div:first-of-type {
       background: ${({ theme }) => theme.colors.disabledButton};
     }
-    path {
-      stroke: ${({ theme }) => theme.colors.black};
+    g {
+      fill: ${({ theme }) => theme.colors.disabled};
     }
     h3 {
-      color: ${({ theme }) => theme.colors.disabledButtonText};
+      color: ${({ theme }) => theme.colors.disabled};
     }
   }
 `
 const RegisterApplication = styled(PrimaryButton)`
   font-weight: bold;
+  padding: 15px 35px 15px 20px;
   div {
     position: relative !important;
     margin-right: 20px;
@@ -122,15 +136,25 @@ const RegisterApplication = styled(PrimaryButton)`
   }
   &:disabled {
     background: ${({ theme }) => theme.colors.disabledButton};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
   }
 `
-
+const RequiredFieldLink = styled(Button)`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.danger};
+  text-decoration: underline;
+  padding: 0;
+  text-align: left;
+`
 interface IProps {
   draft: IDraft
   registerForm: IForm
   RegisterClickEvent?: () => void
   RejectApplicationClickEvent?: () => void
   SubmitClickEvent?: () => void
+  goToTab: typeof goToTab
 }
 
 interface ISectionExpansion {
@@ -143,6 +167,7 @@ type State = {
   displayEditDialog: boolean
   allSectionVisited: boolean
   sectionExpansionConfig: ISectionExpansion[]
+  editClickedSectionId: string
 }
 
 type FullProps = IProps & InjectedIntlProps
@@ -161,11 +186,59 @@ const getSectionExpansionConfig = (
   sections.map((section: IFormSection, index: number) => {
     sectionExpansionConfig.push({
       id: section.id,
-      expanded: index === 0 ? true : false,
-      visited: index === 0 ? true : false
+      expanded: index === 0,
+      visited: index === 0
     })
   })
   return sectionExpansionConfig
+}
+
+const renderValue = (
+  draft: IDraft,
+  section: IFormSection,
+  field: IFormField,
+  intl: InjectedIntl
+) => {
+  const value: IFormFieldValue = draft.data[section.id]
+    ? draft.data[section.id][field.name]
+    : ''
+  if (typeof value === 'string') {
+    return value
+  }
+  if (typeof value === 'boolean') {
+    return value
+      ? intl.formatMessage(messages.valueYes)
+      : intl.formatMessage(messages.valueNo)
+  }
+  return value
+}
+
+const getEmptyFieldBySection = (
+  formSections: IFormSection[],
+  draft: IDraft
+) => {
+  return formSections.reduce((sections, section: IFormSection) => {
+    const errors = getValidationErrorsForForm(
+      section.fields,
+      draft.data[section.id] || {}
+    )
+
+    return {
+      ...sections,
+      [section.id]: section.fields.reduce((fields, field) => {
+        // REFACTOR
+        const validationErrors = errors[field.name]
+
+        const value = draft.data[section.id]
+          ? draft.data[section.id][field.name]
+          : null
+
+        const informationMissing = validationErrors.length > 0 || value === null
+
+        return { ...fields, [field.name]: informationMissing }
+      }, {})
+    }
+  }, {})
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
@@ -175,14 +248,22 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.state = {
       displayEditDialog: false,
       allSectionVisited: false,
+      editClickedSectionId: '',
       sectionExpansionConfig: getSectionExpansionConfig(props.registerForm)
     }
   }
 
-  linkClickHandler = () => {
+  toggleDisplayDialog = () => {
     this.setState(prevState => ({
       displayEditDialog: !prevState.displayEditDialog
     }))
+  }
+
+  editLinkClickHandler = (sectionId: string) => {
+    this.setState(() => ({
+      editClickedSectionId: sectionId
+    }))
+    this.toggleDisplayDialog()
   }
 
   nextClickHandler = () => {
@@ -204,8 +285,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         visited: false
       }).length
 
-      tempState.allSectionVisited = unVisitedSection === 0 ? true : false
-      console.log(tempState)
+      tempState.allSectionVisited = unVisitedSection === 0
       return tempState
     })
   }
@@ -238,6 +318,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const formSections = getViewableSection(registerForm)
 
+    const emptyFieldsBySection = getEmptyFieldBySection(formSections, draft)
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
@@ -245,21 +326,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       )
       return !conditionalActions.includes('hide')
     }
-
     const isViewOnly = (field: IFormField) => {
       return [LIST, PARAGRAPH].find(type => type === field.type)
-    }
-
-    const renderValue = (value: IFormFieldValue) => {
-      if (typeof value === 'string') {
-        return value
-      }
-      if (typeof value === 'boolean') {
-        return value
-          ? intl.formatMessage(messages.valueYes)
-          : intl.formatMessage(messages.valueNo)
-      }
-      return value
     }
 
     return (
@@ -267,12 +335,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         {formSections.map((section: IFormSection, index: number) => {
           const isLastItem = index === formSections.length - 1
           return (
-            <DrawerContainer key={section.id}>
+            <DrawerContainer
+              key={section.id}
+              id={`SectionDrawer_${section.id}`}
+            >
               <SectionDrawer
                 title={intl.formatMessage(section.title)}
                 expandable={this.state.sectionExpansionConfig[index].visited}
                 linkText={intl.formatMessage(messages.EditLink)}
-                linkClickHandler={this.linkClickHandler}
+                linkClickHandler={() => {
+                  this.editLinkClickHandler(section.id)
+                }}
                 expansionButtonHandler={() => {
                   this.expansionButtonHandler(index)
                 }}
@@ -284,21 +357,38 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       isVisibleField(field, section) && !isViewOnly(field)
                   )
                   .map((field: IFormField, key: number) => {
+                    const informationMissing =
+                      emptyFieldsBySection[section.id][field.name]
                     return (
                       <SectionRow key={key}>
                         <SectionLabel>
                           {intl.formatMessage(field.label)}
                         </SectionLabel>
                         <SectionValue>
-                          {draft.data[section.id]
-                            ? renderValue(draft.data[section.id][field.name])
-                            : ''}
+                          {informationMissing ? (
+                            <RequiredFieldLink
+                              onClick={() => {
+                                this.props.goToTab(
+                                  draft.id,
+                                  section.id,
+                                  field.name
+                                )
+                              }}
+                            >
+                              {intl.formatMessage(messages.requiredField)}
+                            </RequiredFieldLink>
+                          ) : (
+                            renderValue(draft, section, field, intl)
+                          )}
                         </SectionValue>
                       </SectionRow>
                     )
                   })}
                 {!isLastItem && (
-                  <NextButton onClick={this.nextClickHandler}>
+                  <NextButton
+                    id={`next_button_${section.id}`}
+                    onClick={this.nextClickHandler}
+                  >
                     {intl.formatMessage(messages.ValueNext)}
                   </NextButton>
                 )}
@@ -309,6 +399,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
         <ButtonContainer>
           <RegisterApplication
+            id="registerApplicationBtn"
             icon={() => <TickLarge />}
             align={ICON_ALIGNMENT.LEFT}
             onClick={RegisterClickEvent}
@@ -320,6 +411,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
         <ButtonContainer>
           <RejectApplication
+            id="rejectApplicationBtn"
             title={intl.formatMessage(messages.ValueReject)}
             icon={() => <CrossLarge />}
             onClick={RejectApplicationClickEvent}
@@ -329,8 +421,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
         <EditConfirmation
           show={this.state.displayEditDialog}
-          handleClose={this.linkClickHandler}
-          handleEdit={this.linkClickHandler}
+          handleClose={this.toggleDisplayDialog}
+          handleEdit={() => {
+            this.props.goToTab(draft.id, this.state.editClickedSectionId)
+          }}
         />
       </>
     )
@@ -341,5 +435,5 @@ export const ReviewSection = connect(
   (state: IStoreState) => ({
     registerForm: getRegisterForm(state)
   }),
-  {}
+  { goToTab }
 )(injectIntl(ReviewSectionComp))
