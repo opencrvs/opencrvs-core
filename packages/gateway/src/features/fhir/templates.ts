@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid'
 import { ITemplatedComposition } from '../registration/fhir-builders'
 
 export const MOTHER_CODE = 'mother-details'
@@ -121,7 +120,7 @@ export function createCompositionTemplate(refUuid: string) {
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
-        value: refUuid
+        value: `${refUuid}`
       },
       resourceType: 'Composition',
       status: 'preliminary',
