@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@types/boom": "^7.2.0",
-    "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "^8.0.1",
     "@types/inert": "^5.1.1",
