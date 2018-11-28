@@ -1,13 +1,27 @@
 import fetch from 'node-fetch'
-import { fhirUrl } from 'src/constants'
+import { fhirUrl, COUNTRY } from 'src/constants'
 import { GQLResolver } from 'src/graphql/schema'
 import { getFromFhir } from 'src/features/fhir/utils'
+import { getUserMobile, convertToLocal } from './utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getUser(_, { userId }) {
+    async getUser(_, { userId }, authHeader) {
+      const userMgntUserID = userId as string
+      const userMobileResponse = await getUserMobile(userMgntUserID, authHeader)
+      const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
+      const practitionerResponse = await fetch(
+        `${fhirUrl}/Practitioner?telecom=phone|${localMobile}`,
+        {
+          headers: {
+            'Content-Type': 'application/fhir+json'
+          }
+        }
+      )
+      const practitionerBundle = await practitionerResponse.json()
+      const practitionerResource = practitionerBundle.entry[0].resource
       const practitionerRoleResponse = await fetch(
-        `${fhirUrl}/PractitionerRole?practitioner=${userId}`,
+        `${fhirUrl}/PractitionerRole?practitioner=${practitionerResource.id}`,
         {
           headers: {
             'Content-Type': 'application/fhir+json'
@@ -33,17 +47,8 @@ export const resolvers: GQLResolver = {
 
       const locations = roleEntry.location
 
-      const practitionerResponse = await fetch(
-        `${fhirUrl}/Practitioner/${userId}`,
-        {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        }
-      )
-      const practitionerEntry = await practitionerResponse.json()
-      practitionerEntry.catchmentArea = []
-      practitionerEntry.role = role
+      practitionerResource.catchmentArea = []
+      practitionerResource.role = role
       for (const location of locations) {
         const splitRef = location.reference.split('/')
         const locationResponse: fhir.Location = await getFromFhir(
@@ -59,13 +64,13 @@ export const resolvers: GQLResolver = {
           throw new Error('PractitionerRole has no location')
         }
         if (locationResponse.physicalType.coding[0].display === 'Building') {
-          practitionerEntry.primaryOffice = locationResponse
+          practitionerResource.primaryOffice = locationResponse
         } else {
-          practitionerEntry.catchmentArea.push(locationResponse)
+          practitionerResource.catchmentArea.push(locationResponse)
         }
       }
 
-      return practitionerEntry
+      return practitionerResource
     }
   }
 }
