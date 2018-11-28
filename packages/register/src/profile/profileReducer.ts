@@ -8,15 +8,25 @@ import {
   isTokenStillValid
 } from '../utils/authUtils'
 import { config } from '../config'
+import {
+  IUserDetails,
+  getUserDetails,
+  storeUserDetails
+} from '@opencrvs/register/src/utils/userUtils'
+import { GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 
 export type ProfileState = {
   authenticated: boolean
   tokenPayload: ITokenPayload | null
+  userDetailsFetched: boolean
+  userDetails: IUserDetails | null
 }
 
 export const initialState: ProfileState = {
   authenticated: false,
-  tokenPayload: null
+  userDetailsFetched: false,
+  tokenPayload: null,
+  userDetails: null
 }
 
 export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
@@ -57,7 +67,17 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
           }
         })
       )
-
+    case actions.SET_USER_DETAILS:
+      const user: GQLUser = action.payload
+      const userDetails = getUserDetails(user)
+      return loop(
+        {
+          ...state,
+          userDetailsFetched: true,
+          userDetails
+        },
+        Cmd.run(() => storeUserDetails(userDetails))
+      )
     default:
       return state
   }

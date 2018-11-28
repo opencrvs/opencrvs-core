@@ -1,21 +1,19 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
+import { Provider, connect } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-client'
 import { ApolloProvider } from 'react-apollo'
-import { setContext } from 'apollo-link-context'
-import { createHttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { resolve } from 'url'
 import { History } from 'history'
 import { Switch } from 'react-router'
 import styled, { ThemeProvider } from 'styled-components'
+import gql from 'graphql-tag'
+
 import { I18nContainer } from './i18n/components/I18nContainer'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { Spinner } from '@opencrvs/components/lib/interface'
 
-import { createStore, AppStore } from './store'
+import { createStore, AppStore, IStoreState } from './store'
 import { config } from './config'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import * as routes from './navigation/routes'
@@ -33,6 +31,11 @@ import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
 import { storage } from 'src/storage'
 import { setInitialDrafts } from 'src/drafts'
+import { ITokenPayload } from '@opencrvs/register/src/utils/authUtils'
+import { getTokenPayload } from 'src/profile/profileSelectors'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import { setUserDetails } from '@opencrvs/register/src/profile/profileActions'
+import { client } from 'src/utils/apolloClient'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -40,55 +43,63 @@ const StyledSpinner = styled(Spinner)`
   left: 50%;
 `
 
-const httpLink = createHttpLink({
-  uri: resolve(config.API_GATEWAY_URL, 'graphql')
-})
-
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('opencrvs')
-
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : ''
+const FETCH_USER = gql`
+  query($userId: String!) {
+    getUser(userId: $userId) {
+      catchmentArea {
+        id
+        name
+        status
+      }
+      primaryOffice {
+        id
+        name
+        status
+      }
     }
   }
-})
-
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache()
-})
+`
 
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore
   history: History
-}
-interface IState {
   initialDraftsLoaded: boolean
+  userDetailsFetched: boolean
+  tokenPayload: ITokenPayload
 }
 export const store = createStore()
 
-export class App extends React.Component<IAppProps, IState> {
-  constructor(props: IAppProps) {
-    super(props)
-    this.state = {
-      initialDraftsLoaded: false
-    }
-  }
+class AppComponent extends React.Component<IAppProps> {
   componentWillMount() {
     this.loadDraftsFromStorage()
+  }
+
+  componentDidUpdate(prevProps: IAppProps) {
+    if (prevProps.tokenPayload !== this.props.tokenPayload) {
+      this.fetchUserDetails(this.props.tokenPayload.sub)
+    }
   }
   async loadDraftsFromStorage() {
     const draftsString = await storage.getItem('drafts')
     const drafts = JSON.parse(draftsString ? draftsString : '[]')
     this.props.store.dispatch(setInitialDrafts(drafts))
-    this.setState({ initialDraftsLoaded: true })
+  }
+
+  async fetchUserDetails(userId: string) {
+    const response = await (this.props.client || client).query({
+      query: FETCH_USER,
+      variables: { userId }
+    })
+    const data: GQLQuery = response.data
+    if (data && data.getUser) {
+      this.props.store.dispatch(setUserDetails(data.getUser))
+    }
   }
 
   public render() {
-    const { initialDraftsLoaded } = this.state
+    const { initialDraftsLoaded } = this.props
+
     if (initialDraftsLoaded) {
       return (
         <ApolloProvider client={this.props.client || client}>
@@ -152,3 +163,8 @@ export class App extends React.Component<IAppProps, IState> {
     }
   }
 }
+export const App = connect((state: IStoreState) => ({
+  initialDraftsLoaded: state.drafts.initialDraftsLoaded,
+  tokenPayload: getTokenPayload(state),
+  userDetailsFetched: state.profile.userDetailsFetched
+}))(AppComponent)
