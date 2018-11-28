@@ -115,8 +115,9 @@ export function createEncounter(refUuid: string) {
   }
 }
 
-export function createCompositionTemplate() {
+export function createCompositionTemplate(refUuid: string) {
   return {
+    fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
