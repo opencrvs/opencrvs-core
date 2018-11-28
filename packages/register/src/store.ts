@@ -32,6 +32,10 @@ import {
   notificationReducer,
   NotificationState
 } from 'src/notification/reducer'
+import {
+  IReviewState,
+  reviewReducer
+} from '@opencrvs/register/src/review/reducer'
 
 export interface IStoreState {
   profile: ProfileState

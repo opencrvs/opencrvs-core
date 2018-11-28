@@ -5,6 +5,7 @@ import { IFormFieldValue } from '@opencrvs/register/src/forms'
 
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
+import { isArray } from 'util'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
@@ -127,9 +128,12 @@ export const isAValidDateFormat = (value: string): boolean => {
 export const requiredSymbol: Validation = (value: string) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: string | boolean) => {
+export const required: Validation = (value: string | boolean | string[]) => {
   if (typeof value === 'string') {
     return value !== '' ? undefined : { message: messages.required }
+  }
+  if (isArray(value)) {
+    return value.length > 0 ? undefined : { message: messages.required }
   }
   return value !== undefined ? undefined : { message: messages.required }
 }

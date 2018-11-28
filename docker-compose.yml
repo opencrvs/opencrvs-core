@@ -35,6 +35,9 @@ services:
     environment:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://openhim-core:5001/fhir
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - WORKFLOW_SERVICE_URL=http://workflow:5050/
+      - COUNTRY=bgd
     deploy:
       replicas: 2
 
@@ -74,7 +77,7 @@ services:
     image: jembi/ocrvs-notification:latest
     build: packages/notification
     restart: unless-stopped
-    environment:      
+    environment:
       - LANGUAGE=bn
     deploy:
       replicas: 2

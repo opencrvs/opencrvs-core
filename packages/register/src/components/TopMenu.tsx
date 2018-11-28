@@ -106,7 +106,9 @@ type Props = {
   languages: IntlState['languages']
 }
 
-class TopMenuComponent extends React.Component<Props & InjectedIntlProps> {
+type IFullProps = Props & InjectedIntlProps
+
+class TopMenuComponent extends React.Component<IFullProps> {
   render() {
     const { intl, goBack, hideBackButton } = this.props
 
@@ -173,4 +175,4 @@ export const TopMenu = connect(
     language: state.i18n.language
   }),
   { goBack: goBackAction, changeLanguage: changeLanguageAction }
-)(injectIntl<Props>(TopMenuComponent))
+)(injectIntl<IFullProps>(TopMenuComponent))

@@ -1,0 +1,32 @@
+input UserIdentifierInput {
+  use: String # -> .use
+  system: String # -> .system
+  value: String # -> .system
+}
+
+type UserIdentifier { # -> identifier
+  use: String # -> .use
+  system: String # -> .system
+  value: String # -> .system
+}
+
+input UserInput {
+  name: [HumanNameInput]
+  role: String
+  primaryOffice: LocationInput
+  currentLocation: LocationInput
+  catchmentArea: [LocationInput]
+}
+
+type User {
+  id: ID!
+  name: [HumanName] # -> .name
+  role: String
+  primaryOffice: Location
+  currentLocation: Location
+  catchmentArea: [Location]
+}
+
+type Query {
+  getUser(userId: String): User
+}

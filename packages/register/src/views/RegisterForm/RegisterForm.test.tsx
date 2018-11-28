@@ -3,15 +3,14 @@ import { createTestComponent, selectOption } from 'src/tests/util'
 import { RegisterForm } from './RegisterForm'
 import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft, setInitialDrafts } from 'src/drafts'
-import { IntlProvider } from 'react-intl'
+
 import { createStore } from '../../store'
 import { DRAFT_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
-  const intlProvider = new IntlProvider({ locale: 'en' }, {})
-  const { intl } = intlProvider.getChildContext()
+
   const mock: any = jest.fn()
   const form = getRegisterForm(store.getState())
   const draft = createDraft()
@@ -20,7 +19,6 @@ describe('when user is in the register form before initial draft load', () => {
       createTestComponent(
         <RegisterForm
           location={mock}
-          intl={intl}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -48,8 +46,7 @@ describe('when user is in the register form', async () => {
   store.dispatch(setInitialDrafts(initalDrafts))
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
-  const intlProvider = new IntlProvider({ locale: 'en' }, {})
-  const { intl } = intlProvider.getChildContext()
+
   const mock: any = jest.fn()
   const form = getRegisterForm(store.getState())
 
@@ -58,7 +55,6 @@ describe('when user is in the register form', async () => {
       const testComponent = createTestComponent(
         <RegisterForm
           location={mock}
-          intl={intl}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -105,14 +101,12 @@ describe('when user is in the register form preview section', () => {
   store.dispatch(setInitialDrafts(initalDrafts))
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
-  const intlProvider = new IntlProvider({ locale: 'en' }, {})
-  const { intl } = intlProvider.getChildContext()
+
   const mock: any = jest.fn()
   const form = getRegisterForm(store.getState())
   const testComponent = createTestComponent(
     <RegisterForm
       location={mock}
-      intl={intl}
       history={history}
       staticContext={mock}
       registerForm={form}
