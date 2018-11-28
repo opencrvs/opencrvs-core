@@ -4,6 +4,9 @@ import { SavedRegistration } from './SavedRegistration'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '../../store'
 
+const fullNameInBn = 'টম ব্র্যাডি'
+const fullNameInEng = 'Tom Brady'
+
 describe('when user is in the saved registration page', () => {
   const { store, history } = createStore()
 
@@ -11,7 +14,9 @@ describe('when user is in the saved registration page', () => {
   let savedRegistrationComponent: ReactWrapper<{}, {}>
   history.push('/saved', {
     trackingId: '1245lsajd',
-    declaration: true
+    declaration: true,
+    fullNameInBn,
+    fullNameInEng
   })
   describe('when the application is online', () => {
     beforeEach(async () => {
@@ -46,7 +51,7 @@ describe('when user is in the saved registration page', () => {
           .first()
           .text()
       ).toEqual(
-        'The birth declaration of First Last Name has been successfully submitted to the registration office.'
+        `The birth declaration of ${fullNameInEng} has been successfully submitted to the registration office.`
       )
     })
     it('should show the online whats next title', () => {
@@ -104,7 +109,7 @@ describe('when user is in the saved registration page', () => {
           .first()
           .text()
       ).toEqual(
-        'The birth declaration of First Last Name is pending due to no internet connection. '
+        `The birth declaration of ${fullNameInEng} is pending due to no internet connection.`
       )
     })
     it('should show the offline whats next title', () => {
@@ -137,7 +142,9 @@ describe('when user is in complete registration page', () => {
   let savedRegistrationComponent: ReactWrapper<{}, {}>
   history.push('/saved', {
     trackingId: '123456789',
-    declaration: false
+    declaration: false,
+    fullNameInBn,
+    fullNameInEng
   })
 
   beforeEach(async () => {
@@ -164,6 +171,6 @@ describe('when user is in complete registration page', () => {
         .find('#submission_text')
         .first()
         .text()
-    ).toEqual('The birth of First Middle Last Name has been registered.')
+    ).toEqual(`The birth of ${fullNameInEng} has been registered.`)
   })
 })

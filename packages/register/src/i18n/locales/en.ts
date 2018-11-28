@@ -522,17 +522,23 @@ export const ENGLISH_STATE = {
       'The declaration will automatically be sent out for validation once your device has internet connectivity.',
     'register.savedRegistration.online.noticeCard.title': 'All done!',
     'register.savedRegistration.offline.noticeCard.title': 'Almost there',
-    'register.savedRegistration.online.noticeCard.text':
-      'The birth declaration of First Last Name has been successfully submitted to the registration office.',
-    'register.savedRegistration.offline.noticeCard.text':
-      'The birth declaration of First Last Name is pending due to no internet connection. ',
-    'register.completeRegistration.noticeCard.text':
-      'The birth of First Middle Last Name has been registered.',
+    'register.savedRegistration.online.noticeCard.text1':
+      'The birth declaration of',
+    'register.savedRegistration.online.noticeCard.text2':
+      'has been successfully submitted to the registration office.',
+    'register.savedRegistration.offline.noticeCard.text1':
+      'The birth declaration of',
+    'register.savedRegistration.offline.noticeCard.text2':
+      'is pending due to no internet connection.',
+    'register.completeRegistration.noticeCard.text1': 'The birth of',
+    'register.completeRegistration.noticeCard.text2': 'has been registered.',
     'register.savedRegistration.trackingCard.title': 'Tracking ID number:',
     'register.completeRegistration.trackingCard.title':
       'Birth Registration Number:',
     'register.savedRegistration.trackingCard.text':
       'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',
+    'register.savedRegistration.registrationNumber.text':
+      'The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.',
     'register.savedRegistration.nextCard.title': 'What next?',
     'register.savedRegistration.online.nextCard.text1':
       'You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.',

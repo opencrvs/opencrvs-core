@@ -12,6 +12,8 @@ import {
   FooterPrimaryButton
 } from '@opencrvs/register/src/components/interface/footer'
 import { RouteComponentProps } from 'react-router'
+import { IStoreState } from 'src/store'
+import { IntlState } from 'src/i18n/reducer'
 
 const messages = defineMessages({
   registrationCompleteTitle: {
@@ -57,23 +59,40 @@ const messages = defineMessages({
     description:
       'The title of the notice card that appears on the saved registration page when the client is offline'
   },
-  onlineNoticeCardText: {
-    id: 'register.savedRegistration.online.noticeCard.text',
-    defaultMessage:
-      'The birth declaration of First Last Name has been successfully submitted to the registration office.',
+  onlineNoticeCardText1: {
+    id: 'register.savedRegistration.online.noticeCard.text1',
+    defaultMessage: 'The birth declaration of',
     description:
       'The text of the notice card that appears on the saved registration page when the client is online'
   },
-  offlineNoticeCardText: {
-    id: 'register.savedRegistration.offline.noticeCard.text',
+  onlineNoticeCardText2: {
+    id: 'register.savedRegistration.online.noticeCard.text2',
     defaultMessage:
-      'The birth declaration of First Last Name is pending due to no internet connection. ',
+      'has been successfully submitted to the registration office.',
+    description:
+      'The text of the notice card that appears on the saved registration page when the client is online'
+  },
+  offlineNoticeCardText1: {
+    id: 'register.savedRegistration.offline.noticeCard.text1',
+    defaultMessage: 'The birth declaration of',
     description:
       'The text of the notice card that appears on the saved registration page when the client is offline'
   },
-  registrationNoticeCardText: {
-    id: 'register.completeRegistration.noticeCard.text',
-    defaultMessage: 'The birth of First Middle Last Name has been registered.',
+  offlineNoticeCardText2: {
+    id: 'register.savedRegistration.offline.noticeCard.text2',
+    defaultMessage: 'is pending due to no internet connection.',
+    description:
+      'The text of the notice card that appears on the saved registration page when the client is offline'
+  },
+  registrationNoticeCardText1: {
+    id: 'register.completeRegistration.noticeCard.text1',
+    defaultMessage: 'The birth of',
+    description:
+      'The text of the notice card that appears on the complete registration page'
+  },
+  registrationNoticeCardText2: {
+    id: 'register.completeRegistration.noticeCard.text2',
+    defaultMessage: 'has been registered.',
     description:
       'The text of the notice card that appears on the complete registration page'
   },
@@ -95,6 +114,13 @@ const messages = defineMessages({
       'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',
     description:
       'The text of the tracking card that appears on the saved registration page'
+  },
+  registrationCardText: {
+    id: 'register.savedRegistration.registrationNumber.text',
+    defaultMessage:
+      'The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.',
+    description:
+      'The text of the registration number card that appears on the saved registration page'
   },
   nextCardTitle: {
     id: 'register.savedRegistration.nextCard.title',
@@ -181,6 +207,7 @@ const StyledP = styled.p`
   }
 `
 const SubmissionText = styled(StyledP)`
+  text-align: center;
   margin-top: 15px;
 `
 const TrackingBox = styled(Box)`
@@ -201,6 +228,7 @@ const TrackingBox = styled(Box)`
 `
 const NextBox = styled(Box)`
   text-align: center;
+  padding-bottom: 40px;
 `
 
 const BoxHeader = styled.h2`
@@ -212,7 +240,7 @@ const BoxHeader = styled.h2`
 `
 
 const ImgHeaderContainer = styled.div`
-  width: 200px;
+  width: 175px;
   margin: 0 auto;
   display: flex;
   flex-direction: row;
@@ -241,6 +269,9 @@ const Header = styled(ViewHeader)`
   margin: 0 auto;
   box-shadow: none;
   background: none;
+  #view_title {
+    margin-bottom: 30px;
+  }
 `
 
 const HeaderWrapper = styled.div`
@@ -251,20 +282,29 @@ const HeaderWrapper = styled.div`
   );
 `
 
+type Props = {
+  language: IntlState['language']
+}
+
 class SavedRegistrationView extends React.Component<
-  InjectedIntlProps & RouteComponentProps<{}>
+  Props & InjectedIntlProps & RouteComponentProps<{}>
 > {
   render() {
     const { intl, history } = this.props
     const online = navigator.onLine
+    const language = this.props.language
+    const fullNameInBn = history.location.state.fullNameInBn
+    const fullNameInEng = history.location.state.fullNameInEng
 
     let headerTitle: string
     let headerDesc: string
-    let noticeCardText: string
+    let noticeCardText1: string
+    let noticeCardText2: string
     let trackingCardTitle: string
     let trackingNumber: string
     let nextCardText1: string
     let nextCardText2: string
+    let trackingCardText: string
     let isDeclaration: boolean
     if (history.location.state.declaration) {
       headerTitle = intl.formatMessage(
@@ -273,8 +313,15 @@ class SavedRegistrationView extends React.Component<
       headerDesc = intl.formatMessage(
         online ? messages.onlineDesc : messages.offlineDesc
       )
-      noticeCardText = intl.formatMessage(
-        online ? messages.onlineNoticeCardText : messages.offlineNoticeCardText
+      noticeCardText1 = intl.formatMessage(
+        online
+          ? messages.onlineNoticeCardText1
+          : messages.offlineNoticeCardText1
+      )
+      noticeCardText2 = intl.formatMessage(
+        online
+          ? messages.onlineNoticeCardText2
+          : messages.offlineNoticeCardText2
       )
       trackingCardTitle = intl.formatMessage(messages.trackingCardTitle)
       trackingNumber = history.location.state.trackingId || ''
@@ -284,15 +331,18 @@ class SavedRegistrationView extends React.Component<
       nextCardText2 = intl.formatMessage(
         online ? messages.onlineNextCardText2 : messages.offlineNextCardText2
       )
+      trackingCardText = intl.formatMessage(messages.trackingCardText)
       isDeclaration = true
     } else {
       headerTitle = intl.formatMessage(messages.registrationCompleteTitle)
       headerDesc = ''
-      noticeCardText = intl.formatMessage(messages.registrationNoticeCardText)
+      noticeCardText1 = intl.formatMessage(messages.registrationNoticeCardText1)
+      noticeCardText2 = intl.formatMessage(messages.registrationNoticeCardText2)
       trackingCardTitle = intl.formatMessage(messages.registrationCardTitle)
       trackingNumber = history.location.state.registrationId || ''
       nextCardText1 = intl.formatMessage(messages.registrationNextCardText1)
       nextCardText2 = intl.formatMessage(messages.registrationNextCardText2)
+      trackingCardText = intl.formatMessage(messages.registrationCardText)
       isDeclaration = false
     }
 
@@ -309,7 +359,7 @@ class SavedRegistrationView extends React.Component<
         <Container>
           <Box>
             <ImgHeaderContainer>
-              <Img src={online ? CompleteTick : NoConnectivity} />
+              <Img src={!online ? CompleteTick : NoConnectivity} />
               <BoxHeader id="submission_title">
                 {intl.formatMessage(
                   online
@@ -319,7 +369,16 @@ class SavedRegistrationView extends React.Component<
               </BoxHeader>
             </ImgHeaderContainer>
             <SubmissionText id="submission_text">
-              {noticeCardText}
+              {language === 'en' ? (
+                <span>
+                  {noticeCardText1} <strong>{fullNameInEng}</strong>{' '}
+                  {noticeCardText2}
+                </span>
+              ) : (
+                <span>
+                  <strong>{fullNameInBn}</strong> {noticeCardText2}
+                </span>
+              )}
             </SubmissionText>
           </Box>
           <TrackingBox>
@@ -327,7 +386,7 @@ class SavedRegistrationView extends React.Component<
             <TrackingNumber id="trackingIdViewer">
               {trackingNumber}
             </TrackingNumber>
-            <StyledP>{intl.formatMessage(messages.trackingCardText)}</StyledP>
+            <StyledP>{trackingCardText}</StyledP>
           </TrackingBox>
           <NextBox>
             <BoxHeader>{intl.formatMessage(messages.nextCardTitle)}</BoxHeader>
@@ -361,4 +420,8 @@ class SavedRegistrationView extends React.Component<
   }
 }
 
-export const SavedRegistration = injectIntl(connect()(SavedRegistrationView))
+export const SavedRegistration = injectIntl(
+  connect((state: IStoreState) => ({
+    language: state.i18n.language
+  }))(SavedRegistrationView)
+)

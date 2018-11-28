@@ -514,16 +514,23 @@ export const BENGALI_STATE = {
       'ডিভাইসে ইন্টারনেট সংযোগ কালীন  ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
     'register.savedRegistration.online.noticeCard.title': 'সমাপ্ত !',
     'register.savedRegistration.offline.noticeCard.title': 'সম্পূর্ণ হচ্ছে',
-    'register.savedRegistration.online.noticeCard.text':
-      'নবজাতের "নাম" সফলভাবে রেজিস্ট্রেশন অফিসে জমা দেওয়া হয়েছে।',
-    'register.savedRegistration.offline.noticeCard.text':
+    'register.savedRegistration.online.noticeCard.text1':
+      'এই বার্তা কখনই ব্যবহার করা হবে না কিন্তু এটা এখানে থাকা প্রয়োজন',
+    'register.savedRegistration.online.noticeCard.text2':
+      'এর "নাম" সফলভাবে রেজিস্ট্রেশন অফিসে জমা দেওয়া হয়েছে।',
+    'register.savedRegistration.offline.noticeCard.text1':
       'ডিভাইসে ইন্টারনেট সংযোগ কালীন ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
-    'register.completeRegistration.noticeCard.text':
-      'প্রথম মধ্যবর্তী শেষ নাম নিবন্ধন করা হয়েছে',
+    'register.savedRegistration.offline.noticeCard.text2': '',
+    'register.completeRegistration.noticeCard.text1':
+      'এই বার্তা কখনই ব্যবহার করা হবে না কিন্তু এটা এখানে থাকা প্রয়োজন',
+    'register.completeRegistration.noticeCard.text2':
+      'এর নাম নিবন্ধন করা হয়েছে',
     'register.savedRegistration.trackingCard.title': 'ট্র্যাকিং আইডি নম্বর:',
     'register.completeRegistration.trackingCard.title': 'জন্ম নিবন্ধন সংখ্যা',
     'register.savedRegistration.trackingCard.text':
       'এসএমএসের মাধ্যমে সংবাদদাতা নম্বরটি পাবেন, তবে নিশ্চিত করুন যে নম্বরটি লিখে রেখে পরবর্তী রেজিস্ট্রেশনের ধাপ এর জন্য সংরক্ষন করতে হবে।',
+    'register.savedRegistration.registrationNumber.text':
+      'শংসাপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে ইনফরম্যান্ট এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।',
     'register.savedRegistration.nextCard.title': 'পরবর্তী',
     'register.savedRegistration.online.nextCard.text1':
       'রেজিস্ট্রেশন সম্পূর্ণ হলে অথবা প্রক্রিয়ায় কোন বিলম্ব থাকলে আপনাকে OpenCRVS এর মাধ্যমে জানানো হবে।',
