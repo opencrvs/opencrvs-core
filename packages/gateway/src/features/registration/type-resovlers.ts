@@ -169,8 +169,8 @@ export const typeResolvers: GQLResolver = {
   Location: {
     name: location => location.name,
     status: location => location.status,
-    longitude: location => location.resource.position.longitude,
-    latitude: location => location.resource.position.latitude
+    longitude: location => location.position.longitude,
+    latitude: location => location.position.latitude
   },
 
   BirthRegistration: {
