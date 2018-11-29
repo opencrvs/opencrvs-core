@@ -359,7 +359,7 @@ class SavedRegistrationView extends React.Component<
         <Container>
           <Box>
             <ImgHeaderContainer>
-              <Img src={!online ? CompleteTick : NoConnectivity} />
+              <Img src={online ? CompleteTick : NoConnectivity} />
               <BoxHeader id="submission_title">
                 {intl.formatMessage(
                   online
