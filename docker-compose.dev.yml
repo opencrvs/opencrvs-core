@@ -18,6 +18,7 @@ services:
   hearth:
     volumes:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - "./infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js"
 
   # Expose config as a plain volume - these will use docker config in staging and prod
   openhim-console:

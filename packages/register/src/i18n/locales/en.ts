@@ -625,6 +625,19 @@ export const ENGLISH_STATE = {
     'register.workQueue.buttons.newApplication': 'New birth application',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
+    'review.rejection.form': 'Rejection form',
+    'review.rejection.form.title': 'Reasons for rejection',
+    'review.rejection.form.reasons': 'Reason(s) for rejection:',
+    'review.rejection.form.reasons.duplicate': 'Duplicate application',
+    'review.rejection.form.reasons.misspelling': 'Misspelling',
+    'review.rejection.form.reasons.missingSupportingDoc':
+      'Missing supporting documents',
+    'review.rejection.form.reasons.other': 'Other',
+    'review.rejection.form.commentLabel':
+      'Comments or instructions for health worker to rectify application',
+    'review.rejection.form.commentInstruction':
+      'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
+    'review.rejection.form.submitButton': 'Submit rejection',
     'review.button.register': 'REGISTER',
     'review.button.reject': 'Reject Application'
   }

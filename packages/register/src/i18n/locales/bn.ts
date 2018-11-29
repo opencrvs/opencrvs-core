@@ -618,6 +618,19 @@ export const BENGALI_STATE = {
     'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
+    'review.rejection.form': 'প্রত্যাখ্যান ফর্ম',
+    'review.rejection.form.title': 'প্রত্যাখ্যানের কারণ',
+    'review.rejection.form.reasons': 'প্রত্যাখ্যানের কারণসমূহ:',
+    'review.rejection.form.reasons.duplicate': 'নকল আবেদন',
+    'review.rejection.form.reasons.misspelling': 'বর্ণাশুদ্ধি',
+    'review.rejection.form.reasons.missingSupportingDoc':
+      'সমর্থিত নথি অনুপস্থিত',
+    'review.rejection.form.reasons.other': 'অন্যান্য',
+    'review.rejection.form.commentLabel':
+      'স্বাস্থ্য কর্মীর জন্য আবেদন বা নির্দেশাবলী সংশোধন করতে নির্দেশাবলী',
+    'review.rejection.form.commentInstruction':
+      'স্বাস্থ্য কর্মী সঠিকভাবে অ্যাপ্লিকেশন আপডেট করার জন্য কি আপডেট করা প্রয়োজন তার নির্দিষ্ট নির্দেশাবলী প্রদান করুন',
+    'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
     'review.button.register': 'নিবন্ধন',
     'review.button.reject': 'বাতিল'
   }

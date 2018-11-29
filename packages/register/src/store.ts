@@ -27,6 +27,10 @@ import {
   notificationReducer,
   NotificationState
 } from 'src/notification/reducer'
+import {
+  IReviewState,
+  reviewReducer
+} from '@opencrvs/register/src/review/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -36,6 +40,7 @@ export interface IStoreState {
   registerForm: IRegisterFormState
   navigation: INavigationState
   notification: NotificationState
+  review: IReviewState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -45,7 +50,8 @@ const reducers = combineReducers<IStoreState>({
   drafts: draftsReducer,
   registerForm: registerFormReducer,
   navigation: navigationReducer,
-  notification: notificationReducer
+  notification: notificationReducer,
+  review: reviewReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

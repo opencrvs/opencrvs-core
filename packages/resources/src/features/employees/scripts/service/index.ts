@@ -19,27 +19,26 @@ interface ITestPractitioner {
   email: string
 }
 
-const composeFhirPractitioner = (
-  practitioner: ITestPractitioner
-): fhir.Practitioner => {
+const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
   return {
     resourceType: 'Practitioner',
     identifier: [
       {
         use: 'official',
-        system: '',
-        value: ''
+        system: 'mobile',
+        value: practitioner.mobile
       }
     ],
+    telecom: [{ system: 'phone', value: practitioner.mobile }],
     name: [
       {
         use: 'en',
-        family: practitioner.familyNameEnglish,
+        family: [practitioner.familyNameEnglish],
         given: practitioner.givenNamesEnglish.split(' ')
       },
       {
         use: 'bn',
-        family: practitioner.familyNameBengali,
+        family: [practitioner.familyNameBengali],
         given: practitioner.givenNamesBengali.split(' ')
       }
     ],
@@ -75,7 +74,8 @@ export async function composeAndSavePractitioners(
   practitioners: ITestPractitioner[],
   divisions: fhir.Location[],
   districts: fhir.Location[],
-  upazilas: fhir.Location[]
+  upazilas: fhir.Location[],
+  unions: fhir.Location[]
 ): Promise<boolean> {
   for (const practitioner of practitioners) {
     // Get Locations
@@ -84,7 +84,8 @@ export async function composeAndSavePractitioners(
       const facility = await getFromFhir(
         `/Location?name=${encodeURIComponent(practitioner.facilityEnglishName)}`
       )
-      locations.push({ reference: `Location/${facility.id}` })
+      const facilityResource = facility.entry[0].resource
+      locations.push({ reference: `Location/${facilityResource.id}` })
     }
     if (practitioner.division) {
       const practitionerDivision: fhir.Location = divisions.find(division => {
@@ -102,6 +103,16 @@ export async function composeAndSavePractitioners(
       const upazilaID = await getUpazilaID(upazilas, practitioner.upazila)
       locations.push({ reference: `Location/${upazilaID as string}` })
     }
+    if (practitioner.union) {
+      const practitionerUnion: fhir.Location = unions.find(union => {
+        return union.name === practitioner.union.toUpperCase()
+      }) as fhir.Location
+      locations.push({ reference: `Location/${practitionerUnion.id}` })
+    }
+    // tslint:disable-next-line:no-console
+    console.log(
+      'Attaching the following locations: ' + JSON.stringify(locations)
+    )
 
     // Create and save Practitioner
     const newPractitioner: fhir.Practitioner = composeFhirPractitioner(

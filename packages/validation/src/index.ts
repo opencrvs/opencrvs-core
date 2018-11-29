@@ -11,7 +11,7 @@ export const msisdnSchema = Joi.string().regex(
   'Not a valid msisdn. Accepted formats: +27112223333'
 )
 
-export const validate = Joi.validate
+export const validate = Joi.validate.bind(Joi)
 
 export function convertToMSISDN(localPhoneNumber: string, countryCode: string) {
   countryCode = countryCode.toUpperCase()
