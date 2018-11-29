@@ -31,6 +31,5 @@ export const colors = {
   expandedIndicatorSecondary: '#7C93EC',
   imageContainerBackground: '#a8b8c3',
   disabledButton: '#F4F4F4',
-  rejecttionColor: '#cc755f',
-  rejectTextColor: '#35495d'
+  rejectionIconColor: '#cc755f'
 }

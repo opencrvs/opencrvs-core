@@ -107,14 +107,14 @@ const RejectApplication = styled(IconAction)`
   padding: 0px;
   width: auto;
   div:first-of-type {
-    background: ${({ theme }) => theme.colors.rejecttionColor};
+    background: ${({ theme }) => theme.colors.rejectionIconColor};
     padding: 15px 15px 10px;
     border-radius: 2px;
   }
   h3 {
     font-family: ${({ theme }) => theme.fonts.boldFont};
     margin-left: 70px;
-    color: ${({ theme }) => theme.colors.rejectTextColor};
+    color: ${({ theme }) => theme.colors.secondary};
     text-decoration: underline;
     font-size: 16px;
   }
