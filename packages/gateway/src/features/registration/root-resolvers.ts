@@ -58,41 +58,6 @@ export const resolvers: GQLResolver = {
       }
       // return the trackingid
       return resBody.trackingid
-    },
-    async markBirthAsRegistered(_, { id, details }, authHeader) {
-      interface Ipayload {
-        [key: string]: any
-      }
-      const payload: Ipayload = {
-        id
-      }
-      if (details) {
-        payload.details = await buildFHIRBundle(details)
-      }
-
-      const res = await fetch(`${WORKFLOW_SERVICE_URL}markBirthAsRegistered`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      if (!res.ok) {
-        throw new Error(
-          `Workflow post to /markBirthAsRegistered failed with [${
-            res.status
-          }] body: ${await res.text()}`
-        )
-      }
-
-      const resBody = await res.json()
-      if (!resBody || !resBody.trackingid) {
-        throw new Error(`Workflow response did not send a valid response`)
-      }
-      // return the trackingid
-      return resBody.trackingid
     }
   }
 }
