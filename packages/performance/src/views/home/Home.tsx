@@ -245,7 +245,7 @@ class HomeView extends React.Component<InjectedIntlProps> {
             />
           </ChartContainer>
           <ChartContainer>
-            <BoxTitle>
+            <BoxTitle id="line_chart_box_title">
               {intl.formatMessage(
                 messages.birthRegistrationRateWithin45DaysBoxTitle
               )}
