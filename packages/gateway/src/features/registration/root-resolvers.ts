@@ -1,7 +1,11 @@
 import fetch from 'node-fetch'
 import { fhirUrl, WORKFLOW_SERVICE_URL } from 'src/constants'
-import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
+import {
+  buildFHIRBundle,
+  updateFHIRTaskBundle
+} from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
+import { getFromFhir } from 'src/features/fhir/utils'
 
 const statusMap = {
   declared: 'preliminary',
@@ -60,39 +64,22 @@ export const resolvers: GQLResolver = {
       return resBody.trackingid
     },
     async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
-      const taskResponse = await fetch(
-        `${fhirUrl}/Task?focus=Composition/${id}`,
-        {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        }
+      const taskBundle = await getFromFhir(`/Task?focus=Composition/${id}`)
+      const taskEntry = taskBundle.entry[0]
+      if (!taskEntry) {
+        throw new Error('Task does not exist')
+      }
+      const status = 'REJECTED'
+
+      const newTaskBundle = await updateFHIRTaskBundle(
+        taskEntry,
+        status,
+        reason,
+        comment
       )
-
-      const taskBundle = await taskResponse.json()
-      const newTaskResource = taskBundle.entry[0].resource as fhir.Task
-      if (
-        !newTaskResource ||
-        !newTaskResource.note ||
-        !newTaskResource.businessStatus ||
-        !newTaskResource.businessStatus.coding ||
-        !newTaskResource.businessStatus.coding[0] ||
-        !newTaskResource.businessStatus.coding[0].code
-      ) {
-        throw new Error('Task has no businessStatus code')
-      }
-      newTaskResource.businessStatus.coding[0].code = 'REJECTED'
-      const newNote: fhir.Annotation = {
-        text: `reason=${reason}&comment=${comment}`,
-        time: new Date().toUTCString(),
-        authorString: ''
-      }
-      newTaskResource.note.push(newNote)
-      taskBundle.entry[0].resource = newTaskResource
-
       const res = await fetch(`${WORKFLOW_SERVICE_URL}updateTask`, {
         method: 'POST',
-        body: JSON.stringify(taskBundle),
+        body: JSON.stringify(newTaskBundle),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
@@ -108,7 +95,7 @@ export const resolvers: GQLResolver = {
       }
 
       const resBody = await res.json()
-      if (!resBody || !resBody.trackingid) {
+      if (!resBody || !resBody.taskId) {
         throw new Error(`Workflow response did not send a valid response`)
       }
       // return the taskId

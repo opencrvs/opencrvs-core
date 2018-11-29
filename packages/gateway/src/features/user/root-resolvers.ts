@@ -1,5 +1,4 @@
-import fetch from 'node-fetch'
-import { fhirUrl, COUNTRY } from 'src/constants'
+import { COUNTRY } from 'src/constants'
 import { GQLResolver } from 'src/graphql/schema'
 import { getFromFhir } from 'src/features/fhir/utils'
 import { getUserMobile, convertToLocal } from './utils'
@@ -10,26 +9,14 @@ export const resolvers: GQLResolver = {
       const userMgntUserID = userId as string
       const userMobileResponse = await getUserMobile(userMgntUserID, authHeader)
       const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
-      const practitionerResponse = await fetch(
-        `${fhirUrl}/Practitioner?telecom=phone|${localMobile}`,
-        {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        }
+      const practitionerBundle = await getFromFhir(
+        `/Practitioner?telecom=phone|${localMobile}`
       )
-      const practitionerBundle = await practitionerResponse.json()
       const practitionerResource = practitionerBundle.entry[0].resource
-      const practitionerRoleResponse = await fetch(
-        `${fhirUrl}/PractitionerRole?practitioner=${practitionerResource.id}`,
-        {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        }
+      const practitionerRoleResponse = await getFromFhir(
+        `/PractitionerRole?practitioner=${practitionerResource.id}`
       )
-      const roleResponse = await practitionerRoleResponse.json()
-      const roleEntry = roleResponse.entry[0].resource
+      const roleEntry = practitionerRoleResponse.entry[0].resource
       if (
         !roleEntry ||
         !roleEntry.code ||

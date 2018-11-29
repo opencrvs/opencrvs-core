@@ -15,23 +15,31 @@ export default async function updateTaskHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-
-    const res = await fetch(fhirUrl, {
-      method: 'POST',
-      body: JSON.stringify(payload),
+    const taskId = getEntryId(payload)
+    if (
+      !payload ||
+      !payload.entry ||
+      !payload.entry[0] ||
+      !payload.entry[0].resource
+    ) {
+      throw new Error('Task has no entry')
+    }
+    const res = await fetch(`${fhirUrl}/Task/${taskId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload.entry[0].resource),
       headers: {
         'Content-Type': 'application/fhir+json'
       }
     })
     if (!res.ok) {
       throw new Error(
-        `FHIR post to /fhir failed with [${
+        `FHIR put to /fhir failed with [${
           res.status
         }] body: ${await res.text()}`
       )
     }
     /* returning the newly created tracking id */
-    return { taskId: getEntryId(payload) }
+    return { taskId }
   } catch (error) {
     logger.error(`Workflow/updateTaskHandler: error: ${error}`)
     throw new Error(error)

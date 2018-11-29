@@ -2,6 +2,7 @@ import transformObj, { IFieldBuilders } from 'src/features/transformation'
 import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
+  updateTaskTemplate,
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
@@ -1061,6 +1062,22 @@ export async function buildFHIRBundle(reg: object) {
   return fhirBundle
 }
 
+export async function updateFHIRTaskBundle(
+  taskEntry: ITaskBundleEntry,
+  status: string,
+  reason?: string,
+  comment?: string
+) {
+  const taskResource = taskEntry.resource as fhir.Task
+  taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
+  const fhirBundle: ITaskBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [taskEntry]
+  }
+  return fhirBundle
+}
+
 export interface ITemplatedComposition extends fhir.Composition {
   section: fhir.CompositionSection[]
 }
@@ -1073,4 +1090,14 @@ export interface ITemplatedBundle extends fhir.Bundle {
   resourceType: fhir.code
   // prettier-ignore
   entry: [ICompositionBundleEntry, ...fhir.BundleEntry[]]
+}
+
+export interface ITaskBundleEntry extends fhir.BundleEntry {
+  resource: fhir.Task
+}
+
+export interface ITaskBundle extends fhir.Bundle {
+  resourceType: fhir.code
+  // prettier-ignore
+  entry: [ITaskBundleEntry, ...fhir.BundleEntry[]]
 }
