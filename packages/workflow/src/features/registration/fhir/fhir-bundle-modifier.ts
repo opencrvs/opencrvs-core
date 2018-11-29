@@ -40,10 +40,10 @@ export function modifyRegistrationBundle(
   return fhirBundle
 }
 
-export function markBundleAsRegistered(
+export async function markBundleAsRegistered(
   fhirBundle: fhir.Bundle,
   token: string
-): fhir.Bundle {
+): Promise<fhir.Bundle> {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -55,7 +55,7 @@ export function markBundleAsRegistered(
   const tokenPayload = getTokenPayload(token)
 
   /* Setting birth registration number here */
-  fhirBundle = pushBRN(fhirBundle, tokenPayload)
+  fhirBundle = await pushBRN(fhirBundle, token)
 
   /* setting registration workflow status here */
   fhirBundle = setupRegistrationWorkflow(
@@ -70,10 +70,10 @@ export function markBundleAsRegistered(
   return fhirBundle
 }
 
-export function pushBRN(
+export async function pushBRN(
   fhirBundle: fhir.Bundle,
-  tokenPayload: ITokenPayload
-): fhir.Bundle {
+  token: string
+): Promise<fhir.Bundle> {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -82,7 +82,7 @@ export function pushBRN(
   ) {
     throw new Error('Invalid FHIR bundle found for registration')
   }
-  const brn = generateBirthRegistrationNumber(fhirBundle, tokenPayload)
+  const brn = await generateBirthRegistrationNumber(fhirBundle, token)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
   if (!taskResource.identifier) {

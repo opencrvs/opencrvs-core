@@ -4,10 +4,18 @@ import {
   MOTHER_SECTION_CODE,
   FATHER_SECTION_CODE,
   REG_STATUS_DECLARED,
-  REG_STATUS_REGISTERED
+  REG_STATUS_REGISTERED,
+  JURISDICTION_TYPE_DISTRICT,
+  JURISDICTION_TYPE_UPAZILA,
+  JURISDICTION_TYPE_UNION
 } from './constants'
+import { fhirUrl } from 'src/constants'
 import { getTaskResource, findPersonEntry } from './fhir-template'
 import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
+import fetch from 'node-fetch'
+import { convertToLocal, getUserMobile } from '../utils'
+import { COUNTRY } from 'src/constants'
+import { getTokenPayload } from 'src/utils/authUtils.ts'
 
 enum CONTACT {
   MOTHER,
@@ -155,4 +163,80 @@ export function getRegStatusCode(tokenPayload: ITokenPayload) {
   } else {
     throw new Error('No valid scope found on token')
   }
+}
+
+export const getFromFhir = (suffix: string) => {
+  return fetch(`${fhirUrl}${suffix}`, {
+    headers: {
+      'Content-Type': 'application/json+fhir'
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
+}
+
+export async function getLoggedInPractitionerResource(
+  token: string
+): Promise<fhir.Practitioner> {
+  const tokenPayload = getTokenPayload(token)
+  const userMobileResponse = await getUserMobile(tokenPayload.sub, {
+    Authorization: `Bearer ${token}`
+  })
+  const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
+  const practitionerBundle = await getFromFhir(
+    `/Practitioner?telecom=phone|${localMobile}`
+  )
+  if (
+    !practitionerBundle ||
+    !practitionerBundle.entry ||
+    !practitionerBundle.entry[0].resource
+  ) {
+    throw new Error('Practitional resource not found')
+  }
+  return practitionerBundle.entry[0].resource
+}
+
+export async function getPractitionerLocations(
+  practitionerId: string
+): Promise<[fhir.Location]> {
+  const roleResponse = await getFromFhir(
+    `/PractitionerRole?practitioner=${practitionerId}`
+  )
+  const roleEntry = roleResponse.entry[0].resource
+  if (!roleEntry || !roleEntry.location) {
+    throw new Error('PractitionerRole has no locations associated')
+  }
+  const locList = []
+  for (const location of roleEntry.location) {
+    const splitRef = location.reference.split('/')
+    const locationResponse: fhir.Location = await getFromFhir(
+      `/Location/${splitRef[1]}`
+    )
+    if (!locationResponse) {
+      throw new Error(`Location not found for ${location}`)
+    }
+    locList.push(locationResponse)
+  }
+  return locList as [fhir.Location]
+}
+
+export function getJurisDictionalLocations() {
+  return [
+    {
+      jurisdictionType: JURISDICTION_TYPE_DISTRICT,
+      bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_UPAZILA,
+      bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_UNION,
+      bbsCode: ''
+    }
+  ]
 }

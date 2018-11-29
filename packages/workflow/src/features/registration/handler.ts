@@ -58,7 +58,7 @@ export async function markBirthAsRegisteredHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = markBundleAsRegistered(
+    const payload = await markBundleAsRegistered(
       request.payload as fhir.Bundle,
       getToken(request)
     )

@@ -29,6 +29,7 @@
     "@types/winston": "^2.3.9",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
+    "country-data": "^0.0.31",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
