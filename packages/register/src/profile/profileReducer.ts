@@ -14,9 +14,8 @@ import {
   storeUserDetails
 } from '@opencrvs/register/src/utils/userUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { client } from 'src/utils/apolloClient'
-import gql from 'graphql-tag'
 import { ApolloQueryResult } from 'apollo-client'
+import { queries } from '@opencrvs/register/src/profile/queries'
 
 export type ProfileState = {
   authenticated: boolean
@@ -32,28 +31,6 @@ export const initialState: ProfileState = {
   userDetails: null
 }
 
-const FETCH_USER = gql`
-  query($userId: String!) {
-    getUser(userId: $userId) {
-      catchmentArea {
-        id
-        name
-        status
-      }
-      primaryOffice {
-        id
-        name
-        status
-      }
-    }
-  }
-`
-function fetchUserDetails(userId: string) {
-  return client.query({
-    query: FETCH_USER,
-    variables: { userId }
-  })
-}
 export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
   state: ProfileState = initialState,
   action: actions.Action
@@ -91,7 +68,7 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
               storeToken(token)
             }
           }),
-          Cmd.run(fetchUserDetails, {
+          Cmd.run(queries.fetchUserDetails, {
             successActionCreator: actions.setUserDetails,
             args: [payload.sub]
           })
