@@ -3,6 +3,7 @@ export const testFhirBundle = {
   type: 'document',
   entry: [
     {
+      fullUrl: `urn:uuid:888`,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
