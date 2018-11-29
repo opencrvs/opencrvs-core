@@ -10,7 +10,10 @@ const mockHandler = jest.fn()
 const draft = createDraft()
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
-  father: { fathersDetailsExist: true, addressSameAsMother: false }
+  father: { fathersDetailsExist: true, addressSameAsMother: false },
+  documents: {
+    image_uploader: [{ title: 'dummy', description: 'dummy', data: '' }]
+  }
 }
 
 describe('when user is in the review page', () => {

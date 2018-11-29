@@ -11,6 +11,9 @@ import { TickLarge, CrossLarge } from '@opencrvs/components/lib/icons'
 import { findIndex, filter } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
+import { DocumentViewer } from '@opencrvs/components/lib/interface'
+import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
+import { documentsSection } from '../../../forms/register/documents-section'
 import {
   defineMessages,
   InjectedIntlProps,
@@ -27,6 +30,7 @@ import {
   IForm,
   IFormSection,
   IFormField,
+  IFileValue,
   IFormFieldValue,
   LIST,
   PARAGRAPH
@@ -148,6 +152,30 @@ const RequiredFieldLink = styled(Button)`
   padding: 0;
   text-align: left;
 `
+const Row = styled.div`
+  display: flex;
+`
+const Column = styled.div`
+  flex: 50%;
+  width: 50%;
+  margin: 0px 15px;
+
+  &:first-child {
+    margin-left: 0px;
+  }
+  &:last-child {
+    margin-right: 0px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    &:first-child {
+      margin: 0px;
+    }
+    &:not(:first-child) {
+      display: none;
+    }
+  }
+`
 interface IProps {
   draft: IDraft
   registerForm: IForm
@@ -241,6 +269,31 @@ const getEmptyFieldBySection = (
   }, {})
 }
 
+type ImageMeta = {
+  title: string
+  description: string
+}
+type FullIFileValue = IFileValue & ImageMeta
+
+const prepDocumentOption = (draft: IDraft): SelectComponentOptions[] => {
+  const draftItemName = documentsSection.id
+  const documentviewerOptions: SelectComponentOptions[] = []
+
+  const uploadedDocuments = draft.data[draftItemName]
+    ? (draft.data[draftItemName].image_uploader as FullIFileValue[])
+    : []
+
+  uploadedDocuments.map(document => {
+    const label = document.title + ' ' + document.description
+    documentviewerOptions.push({
+      value: document.data,
+      label
+    })
+  })
+
+  return documentviewerOptions
+}
+
 class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -331,102 +384,111 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     return (
-      <>
-        {formSections.map((section: IFormSection, index: number) => {
-          const isLastItem = index === formSections.length - 1
-          return (
-            <DrawerContainer
-              key={section.id}
-              id={`SectionDrawer_${section.id}`}
-            >
-              <SectionDrawer
-                title={intl.formatMessage(section.title)}
-                expandable={this.state.sectionExpansionConfig[index].visited}
-                linkText={intl.formatMessage(messages.EditLink)}
-                linkClickHandler={() => {
-                  this.editLinkClickHandler(section.id)
-                }}
-                expansionButtonHandler={() => {
-                  this.expansionButtonHandler(index)
-                }}
-                isExpanded={this.state.sectionExpansionConfig[index].expanded}
+      <Row>
+        <Column>
+          {formSections.map((section: IFormSection, index: number) => {
+            const isLastItem = index === formSections.length - 1
+            return (
+              <DrawerContainer
+                key={section.id}
+                id={`SectionDrawer_${section.id}`}
               >
-                {section.fields
-                  .filter(
-                    field =>
-                      isVisibleField(field, section) && !isViewOnly(field)
-                  )
-                  .map((field: IFormField, key: number) => {
-                    const informationMissing =
-                      emptyFieldsBySection[section.id][field.name]
-                    return (
-                      <SectionRow key={key}>
-                        <SectionLabel>
-                          {intl.formatMessage(field.label)}
-                        </SectionLabel>
-                        <SectionValue>
-                          {informationMissing ? (
-                            <RequiredFieldLink
-                              onClick={() => {
-                                this.props.goToTab(
-                                  draft.id,
-                                  section.id,
-                                  field.name
-                                )
-                              }}
-                            >
-                              {intl.formatMessage(messages.requiredField)}
-                            </RequiredFieldLink>
-                          ) : (
-                            renderValue(draft, section, field, intl)
-                          )}
-                        </SectionValue>
-                      </SectionRow>
+                <SectionDrawer
+                  title={intl.formatMessage(section.title)}
+                  expandable={this.state.sectionExpansionConfig[index].visited}
+                  linkText={intl.formatMessage(messages.EditLink)}
+                  linkClickHandler={() => {
+                    this.editLinkClickHandler(section.id)
+                  }}
+                  expansionButtonHandler={() => {
+                    this.expansionButtonHandler(index)
+                  }}
+                  isExpanded={this.state.sectionExpansionConfig[index].expanded}
+                >
+                  {section.fields
+                    .filter(
+                      field =>
+                        isVisibleField(field, section) && !isViewOnly(field)
                     )
-                  })}
-                {!isLastItem && (
-                  <NextButton
-                    id={`next_button_${section.id}`}
-                    onClick={this.nextClickHandler}
-                  >
-                    {intl.formatMessage(messages.ValueNext)}
-                  </NextButton>
-                )}
-              </SectionDrawer>
-            </DrawerContainer>
-          )
-        })}
+                    .map((field: IFormField, key: number) => {
+                      const informationMissing =
+                        emptyFieldsBySection[section.id][field.name]
+                      return (
+                        <SectionRow key={key}>
+                          <SectionLabel>
+                            {intl.formatMessage(field.label)}
+                          </SectionLabel>
+                          <SectionValue>
+                            {informationMissing ? (
+                              <RequiredFieldLink
+                                onClick={() => {
+                                  this.props.goToTab(
+                                    draft.id,
+                                    section.id,
+                                    field.name
+                                  )
+                                }}
+                              >
+                                {intl.formatMessage(messages.requiredField)}
+                              </RequiredFieldLink>
+                            ) : (
+                              renderValue(draft, section, field, intl)
+                            )}
+                          </SectionValue>
+                        </SectionRow>
+                      )
+                    })}
+                  {!isLastItem && (
+                    <NextButton
+                      id={`next_button_${section.id}`}
+                      onClick={this.nextClickHandler}
+                    >
+                      {intl.formatMessage(messages.ValueNext)}
+                    </NextButton>
+                  )}
+                </SectionDrawer>
+              </DrawerContainer>
+            )
+          })}
 
-        <ButtonContainer>
-          <RegisterApplication
-            id="registerApplicationBtn"
-            icon={() => <TickLarge />}
-            align={ICON_ALIGNMENT.LEFT}
-            onClick={RegisterClickEvent}
-            disabled={!this.state.allSectionVisited}
-          >
-            {intl.formatMessage(messages.ValueRegister)}
-          </RegisterApplication>
-        </ButtonContainer>
+          <ButtonContainer>
+            <RegisterApplication
+              id="registerApplicationBtn"
+              icon={() => <TickLarge />}
+              align={ICON_ALIGNMENT.LEFT}
+              onClick={RegisterClickEvent}
+              disabled={!this.state.allSectionVisited}
+            >
+              {intl.formatMessage(messages.ValueRegister)}
+            </RegisterApplication>
+          </ButtonContainer>
 
-        <ButtonContainer>
-          <RejectApplication
-            id="rejectApplicationBtn"
-            title={intl.formatMessage(messages.ValueReject)}
-            icon={() => <CrossLarge />}
-            onClick={RejectApplicationClickEvent}
-            disabled={!this.state.allSectionVisited}
+          <ButtonContainer>
+            <RejectApplication
+              id="rejectApplicationBtn"
+              title={intl.formatMessage(messages.ValueReject)}
+              icon={() => <CrossLarge />}
+              onClick={RejectApplicationClickEvent}
+              disabled={!this.state.allSectionVisited}
+            />
+          </ButtonContainer>
+
+          <EditConfirmation
+            show={this.state.displayEditDialog}
+            handleClose={this.toggleDisplayDialog}
+            handleEdit={() => {
+              this.props.goToTab(draft.id, this.state.editClickedSectionId)
+            }}
           />
-        </ButtonContainer>
-
-        <EditConfirmation
-          show={this.state.displayEditDialog}
-          handleClose={this.toggleDisplayDialog}
-          handleEdit={() => {
-            this.props.goToTab(draft.id, this.state.editClickedSectionId)
-          }}
-        />
-      </>
+        </Column>
+        <Column>
+          <DocumentViewer
+            title="Supporting Documents"
+            tagline="Select to Preview"
+            options={prepDocumentOption(draft)}
+          />
+        </Column>
+      </Row>
     )
   }
 }
