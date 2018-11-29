@@ -16,7 +16,7 @@ const data = [
 ;<div>
   <VerticalBar
     data={data}
-    xAxisLabel="Age(years)"
+    xAxisLabel="Age (years)"
     yAxisLabel="Total Births Registered (%)"
   />
 </div>
