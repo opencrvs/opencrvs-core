@@ -11,7 +11,6 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem('opencrvs')
-
   return {
     headers: {
       ...headers,

@@ -13,7 +13,10 @@ import {
   getUserDetails,
   storeUserDetails
 } from '@opencrvs/register/src/utils/userUtils'
-import { GQLUser } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import { client } from 'src/utils/apolloClient'
+import gql from 'graphql-tag'
+import { ApolloQueryResult } from 'apollo-client'
 
 export type ProfileState = {
   authenticated: boolean
@@ -29,6 +32,28 @@ export const initialState: ProfileState = {
   userDetails: null
 }
 
+const FETCH_USER = gql`
+  query($userId: String!) {
+    getUser(userId: $userId) {
+      catchmentArea {
+        id
+        name
+        status
+      }
+      primaryOffice {
+        id
+        name
+        status
+      }
+    }
+  }
+`
+async function fetchUserDetails(userId: string) {
+  return await client.query({
+    query: FETCH_USER,
+    variables: { userId }
+  })
+}
 export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
   state: ProfileState = initialState,
   action: actions.Action
@@ -54,22 +79,35 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
           Cmd.action(actions.redirectToAuthentication())
         )
       }
-
       return loop(
         {
           ...state,
           authenticated: true,
           tokenPayload: payload
         },
-        Cmd.run(() => {
-          if (isTokenStillValid(payload)) {
-            storeToken(token)
-          }
-        })
+        Cmd.list([
+          Cmd.run(() => {
+            if (isTokenStillValid(payload)) {
+              storeToken(token)
+            }
+          }),
+          Cmd.run(fetchUserDetails, {
+            successActionCreator: actions.setUserDetails,
+            args: [payload.sub]
+          })
+        ])
       )
     case actions.SET_USER_DETAILS:
-      const user: GQLUser = action.payload
-      const userDetails = getUserDetails(user)
+      const result: ApolloQueryResult<GQLQuery> = action.payload
+      const data: GQLQuery = result.data
+      if (!data.getUser) {
+        return {
+          ...state,
+          userDetailsFetched: false
+        }
+      }
+
+      const userDetails = getUserDetails(data.getUser)
       return loop(
         {
           ...state,
