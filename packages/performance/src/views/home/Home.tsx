@@ -84,7 +84,7 @@ const messages = defineMessages({
     id: 'performance.graph.birthRegistrationRateWithin45DaysTitle',
     defaultMessage: 'Birth Rate For Registrations Within 45 Days',
     description:
-      'The label for birth registration rate within 45 days per month line chart'
+      'The label for birth registration rate within 45 days per month line chart box'
   },
   birthRegistrationRatePerMonthLabel: {
     id: 'performance.graph.birthRegistrationRatePerMonthLabel',
