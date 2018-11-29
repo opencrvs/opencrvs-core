@@ -258,6 +258,7 @@ const TrackingHeader = styled.h3`
 const TrackingNumber = styled.h1`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 30px;
+  margin-top: -15px;
 `
 
 const Footer = styled(ViewFooter)`
