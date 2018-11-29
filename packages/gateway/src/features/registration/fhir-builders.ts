@@ -1,4 +1,5 @@
 import transformObj, { IFieldBuilders } from 'src/features/transformation'
+import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
   MOTHER_CODE,
@@ -1067,10 +1068,11 @@ const builders: IFieldBuilders = {
 }
 
 export async function buildFHIRBundle(reg: object) {
+  const ref = uuid()
   const fhirBundle: ITemplatedBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate()]
+    entry: [createCompositionTemplate(ref)]
   }
 
   await transformObj(reg, fhirBundle, builders)
