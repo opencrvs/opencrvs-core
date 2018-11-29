@@ -12,7 +12,7 @@ import styled from 'src/styled-components'
 import Logo from 'src/components/Logo'
 import { Page } from 'src/components/Page'
 
-import { Legend, VerticalBar } from '@opencrvs/components/lib/charts'
+import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
 
 const messages = defineMessages({
   birthRegistrationBoxTitle: {
@@ -146,6 +146,21 @@ const birthRegistrationData = [
   { name: '10', value: 2570 }
 ]
 
+const birthRegistrationDataPerMonth = [
+  { name: 'Jan', value: 2100, total: 10000 },
+  { name: 'Feb', value: 2400, total: 10000 },
+  { name: 'Mar', value: 1398, total: 10000 },
+  { name: 'Apr', value: 6800, total: 10000 },
+  { name: 'May', value: 3908, total: 10000 },
+  { name: 'Jun', value: 4800, total: 10000 },
+  { name: 'Jul', value: 3800, total: 10000 },
+  { name: 'Aug', value: 4300, total: 10000 },
+  { name: 'Sep', value: 2500, total: 10000 },
+  { name: 'Oct', value: 5680, total: 10000 },
+  { name: 'Nov', value: 4980, total: 10000 },
+  { name: 'Dec', value: 8570, total: 10000 }
+]
+
 const StyledHeader = styled(Header)`
   padding: 0 26px;
   box-shadow: none;
@@ -209,6 +224,14 @@ class HomeView extends React.Component<InjectedIntlProps> {
               yAxisLabel={intl.formatMessage(
                 messages.birthRegistrationPercentageLabel
               )}
+            />
+          </ChartContainer>
+          <ChartContainer>
+            <BoxTitle>Birth Rate For Registrations Within 45 Days</BoxTitle>
+            <Line
+              data={birthRegistrationDataPerMonth}
+              xAxisLabel="Calendar Month"
+              yAxisLabel="Birth Registration % of estimate"
             />
           </ChartContainer>
         </Container>
