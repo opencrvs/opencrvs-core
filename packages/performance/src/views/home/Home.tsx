@@ -72,13 +72,31 @@ const messages = defineMessages({
   },
   birthRegistrationBarChartInAgesLabel: {
     id: 'performance.graph.birthRegistrationInAgesLabel',
-    defineMessages: 'Age (years)',
+    defaultMessage: 'Age (years)',
     description: 'The label for x-axis of birth registration bar chart'
   },
   birthRegistrationPercentageLabel: {
     id: 'performance.graph.birthRegistrationPercentageLabel',
-    defaultMessages: 'Total Births Registered (%)',
+    defaultMessage: 'Total Births Registered (%)',
     description: 'The label for y-axis of birth registration bar chart'
+  },
+  birthRegistrationRateWithin45DaysBoxTitle: {
+    id: 'performance.graph.birthRegistrationRateWithin45DaysTitle',
+    defaultMessage: 'Birth Rate For Registrations Within 45 Days',
+    description:
+      'The label for birth registration rate within 45 days per month line chart'
+  },
+  birthRegistrationRatePerMonthLabel: {
+    id: 'performance.graph.birthRegistrationRatePerMonthLabel',
+    defaultMessage: 'Calendar Month',
+    description:
+      'The x-axis label for birth registration rate within 45 days per month line chart'
+  },
+  birthRegistrationPercentageOfEstimateLabel: {
+    id: 'performance.graph.birthRegistrationPercentageOfEstimateLabel',
+    defaultMessage: 'Birth Registration % of estimate',
+    description:
+      'The y-axis label for birth registration rate within 45 days per month line chart'
   }
 })
 
@@ -227,11 +245,19 @@ class HomeView extends React.Component<InjectedIntlProps> {
             />
           </ChartContainer>
           <ChartContainer>
-            <BoxTitle>Birth Rate For Registrations Within 45 Days</BoxTitle>
+            <BoxTitle>
+              {intl.formatMessage(
+                messages.birthRegistrationRateWithin45DaysBoxTitle
+              )}
+            </BoxTitle>
             <Line
               data={birthRegistrationDataPerMonth}
-              xAxisLabel="Calendar Month"
-              yAxisLabel="Birth Registration % of estimate"
+              xAxisLabel={intl.formatMessage(
+                messages.birthRegistrationRatePerMonthLabel
+              )}
+              yAxisLabel={intl.formatMessage(
+                messages.birthRegistrationPercentageOfEstimateLabel
+              )}
             />
           </ChartContainer>
         </Container>
