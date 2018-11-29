@@ -4,7 +4,10 @@ import {
   getInformantName,
   getTrackingId,
   getBirthRegistrationNumber,
-  getRegStatusCode
+  getRegStatusCode,
+  getPaperFormID,
+  getLoggedInPractitionerResource,
+  getFromFhir
 } from './fhir-utils'
 import { pushTrackingId, pushBRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
@@ -315,5 +318,127 @@ describe('Verify getRegStatusCode', () => {
     expect(() => getRegStatusCode(tokenPayload)).toThrowError(
       'No valid scope found on token'
     )
+  })
+  describe('Verify getPaperFormID', () => {
+    it('Returned paper form id properly', () => {
+      const paperFormID = getPaperFormID(testFhirBundle)
+      expect(paperFormID).toEqual('12345678')
+    })
+    it('Throws error when paper form id not found', () => {
+      const fhirBundle = cloneDeep(testFhirBundle)
+      fhirBundle.entry[1].resource.identifier = []
+      expect(() => getPaperFormID(fhirBundle)).toThrowError(
+        "Didn't find any identifier for paper form id"
+      )
+    })
+  })
+  describe('Verify getLoggedInPractitionerResource', () => {
+    it('Returns Location properly', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            mobile: '+880711111111'
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: 'eacae600-a501-42d6-9d59-b8b94f3e50c1',
+            meta: { lastUpdated: '2018-11-27T17:13:20.662+00:00' },
+            type: 'searchset',
+            total: 1,
+            link: [
+              {
+                relation: 'self',
+                url:
+                  'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
+              }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Practitioner/b1f46aba-075d-431e-8aeb-ebc57a4a0ad0',
+                resource: {
+                  resourceType: 'Practitioner',
+                  identifier: [
+                    { use: 'official', system: 'mobile', value: '01711111111' }
+                  ],
+                  telecom: [{ system: 'phone', value: '01711111111' }],
+                  name: [
+                    { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
+                    { use: 'bn', family: [''], given: [''] }
+                  ],
+                  gender: 'male',
+                  meta: {
+                    lastUpdated: '2018-11-25T17:31:08.062+00:00',
+                    versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+                  },
+                  id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+                }
+              }
+            ]
+          }),
+          { status: 200 }
+        ]
+      )
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: '5bdc55ece42c82de9a529c36',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+      const location = await getLoggedInPractitionerResource(token)
+      expect(location).toEqual({
+        resourceType: 'Practitioner',
+        identifier: [
+          { use: 'official', system: 'mobile', value: '01711111111' }
+        ],
+        telecom: [{ system: 'phone', value: '01711111111' }],
+        name: [
+          { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
+          { use: 'bn', family: [''], given: [''] }
+        ],
+        gender: 'male',
+        meta: {
+          lastUpdated: '2018-11-25T17:31:08.062+00:00',
+          versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+        },
+        id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+      })
+    })
+    it('Throws error when partitioner resource is not there', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            mobile: '+880711111111'
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            data: 'ivalid'
+          }),
+          { status: 200 }
+        ]
+      )
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: '5bdc55ece42c82de9a529c36',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+      expect(getLoggedInPractitionerResource(token)).rejects.toThrowError(
+        'Practitioner resource not found'
+      )
+    })
   })
 })

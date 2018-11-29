@@ -104,7 +104,7 @@ describe('Verify handler', () => {
     })
   })
   describe('markBirthAsRegisteredHandler', () => {
-    it('returns OK', async () => {
+    beforeEach(() => {
       fetch.mockResponses(
         [
           JSON.stringify({
@@ -246,18 +246,10 @@ describe('Verify handler', () => {
             ]
           }),
           { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Patient/12423/_history/1' }
-              }
-            ]
-          })
         ]
       )
+    })
+    it('returns OK', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
         readFileSync('../auth/test/cert.key'),
@@ -266,6 +258,17 @@ describe('Verify handler', () => {
           issuer: 'opencrvs:auth-service',
           audience: 'opencrvs:workflow-user'
         }
+      )
+
+      fetch.mockResponse(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
       )
 
       const res = await server.server.inject({
