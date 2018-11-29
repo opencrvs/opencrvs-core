@@ -1,5 +1,5 @@
 import * as ReactApollo from 'react-apollo'
-import { createTestApp } from './tests/util'
+import { createTestApp, mockUserResponse } from './tests/util'
 import { config } from '../src/config'
 import {
   HOME,
@@ -15,6 +15,7 @@ import { storeDraft, createDraft, IDraft } from './drafts'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import { storage } from 'src/storage'
+import { client } from 'src/utils/apolloClient'
 
 import processDraftData, {
   IPersonDetails
@@ -25,6 +26,9 @@ storage.setItem = jest.fn()
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
+const mockQuery = jest.fn()
+mockQuery.mockReturnValue(mockUserResponse)
+client.query = mockQuery
 
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))

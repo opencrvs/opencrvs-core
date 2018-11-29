@@ -48,8 +48,8 @@ const FETCH_USER = gql`
     }
   }
 `
-async function fetchUserDetails(userId: string) {
-  return await client.query({
+function fetchUserDetails(userId: string) {
+  return client.query({
     query: FETCH_USER,
     variables: { userId }
   })
