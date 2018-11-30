@@ -47,7 +47,10 @@ export async function getLocationBBSCode(
         identifier =>
           identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type` &&
-          identifier.value === jurisDictionalLocation.jurisdictionType
+          isTypeMatched(
+            jurisDictionalLocation.jurisdictionType,
+            identifier.value
+          )
       )
       const bbsCodeIdentifier =
         jurisDictionIdentifier &&
@@ -64,4 +67,12 @@ export async function getLocationBBSCode(
   return jurisDictionalLocations.reduce((locBBSCode, loc) => {
     return locBBSCode.concat(loc.bbsCode)
   }, '')
+}
+
+function isTypeMatched(matchType: string, inputType?: string): boolean {
+  if (!inputType) {
+    return false
+  } else {
+    return inputType.toUpperCase() === matchType.toUpperCase()
+  }
 }
