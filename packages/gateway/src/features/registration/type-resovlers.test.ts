@@ -500,13 +500,11 @@ describe('Registration type resolvers', () => {
 
   describe('Location type', () => {
     const location = {
-      resource: {
-        status: 'active',
-        name: 'village',
-        position: {
-          longitude: 18.4392,
-          latitude: -34.08002
-        }
+      status: 'active',
+      name: 'village',
+      position: {
+        longitude: 18.4392,
+        latitude: -34.08002
       }
     }
     it('returns name', () => {

@@ -58,12 +58,12 @@ type Action =
   | IDeleteDraftAction
 
 export interface IDraftsState {
-  initalDraftsLoaded: boolean
+  initialDraftsLoaded: boolean
   drafts: IDraft[]
 }
 
 const initialState = {
-  initalDraftsLoaded: false,
+  initialDraftsLoaded: false,
   drafts: []
 }
 
@@ -155,14 +155,14 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftModification))
       )
     case WRITE_DRAFT:
-      if (state.initalDraftsLoaded && state.drafts) {
-        storage.setItem('drafts', JSON.stringify(state.drafts))
+      if (state.initialDraftsLoaded && state.drafts) {
+        storage.setItem('drafts', JSON.stringify(action.payload.draft.drafts))
       }
       return state
     case SET_INITIAL_DRAFTS:
       return {
         ...state,
-        initalDraftsLoaded: true,
+        initialDraftsLoaded: true,
         drafts: action.payload.drafts
       }
     default:

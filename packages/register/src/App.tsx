@@ -3,10 +3,6 @@ import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
 import ApolloClient from 'apollo-client'
 import { ApolloProvider } from 'react-apollo'
-import { setContext } from 'apollo-link-context'
-import { createHttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { resolve } from 'url'
 import { History } from 'history'
 import { Switch } from 'react-router'
 import styled, { ThemeProvider } from 'styled-components'
@@ -34,33 +30,13 @@ import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
 import { storage } from 'src/storage'
 import { setInitialDrafts } from 'src/drafts'
+import { client } from 'src/utils/apolloClient'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
   top: 50%;
   left: 50%;
 `
-
-const httpLink = createHttpLink({
-  uri: resolve(config.API_GATEWAY_URL, 'graphql')
-})
-
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('opencrvs')
-
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : ''
-    }
-  }
-})
-
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache()
-})
-
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore
