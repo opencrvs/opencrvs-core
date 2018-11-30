@@ -132,18 +132,18 @@ const getData = (intl: InjectedIntl): IData[] => {
 }
 
 const birthRegistrationData = [
-  { name: '45d', value: 2100 },
-  { name: '46d - 1yr', value: 2400 },
-  { name: '1', value: 1398 },
-  { name: '2', value: 6800 },
-  { name: '3', value: 3908 },
-  { name: '4', value: 4800 },
-  { name: '5', value: 3800 },
-  { name: '6', value: 4300 },
-  { name: '7', value: 2500 },
-  { name: '8', value: 5680 },
-  { name: '9', value: 4980 },
-  { name: '10', value: 2570 }
+  { label: '45d', value: 2100 },
+  { label: '46d - 1yr', value: 2400 },
+  { label: '1', value: 1398 },
+  { label: '2', value: 6800 },
+  { label: '3', value: 3908 },
+  { label: '4', value: 4800 },
+  { label: '5', value: 3800 },
+  { label: '6', value: 4300 },
+  { label: '7', value: 2500 },
+  { label: '8', value: 5680 },
+  { label: '9', value: 4980 },
+  { label: '10', value: 2570 }
 ]
 
 const StyledHeader = styled(Header)`
@@ -217,4 +217,7 @@ class HomeView extends React.Component<InjectedIntlProps> {
   }
 }
 
-export const Home = connect(null, null)(injectIntl(HomeView))
+export const Home = connect(
+  null,
+  null
+)(injectIntl(HomeView))

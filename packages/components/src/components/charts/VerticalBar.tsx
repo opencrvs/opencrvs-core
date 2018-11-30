@@ -11,6 +11,8 @@ import {
   Cell
 } from 'recharts'
 import { ITheme } from '../theme'
+import { IDataPoint } from './datapoint'
+import { CustomizedXAxisTick } from './AxisTick'
 
 const Container = styled.div`
   margin-top: 30px;
@@ -19,64 +21,11 @@ const Container = styled.div`
   width: 100%;
   align-items: center;
 `
-interface IDataPoint {
-  name: string
-  value: number
-}
-
-interface ICustomizedAxisTick {
-  x: number
-  y: number
-  stroke: number
-  payload: IDataPoint
-  totalValue: number
-  theme: ITheme
-}
 
 interface IVerticalBarProps {
   data: IDataPoint[]
   xAxisLabel: string
   yAxisLabel: string
-}
-
-function CustomizedAxisTick(props: ICustomizedAxisTick) {
-  const { x, y, payload, totalValue, theme } = props
-
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={16}
-        fontFamily={theme.fonts.lightFont}
-        textAnchor="middle"
-        fill={theme.colors.secondary}
-      >
-        {payload && payload.name}
-      </text>
-      <text
-        x={0}
-        y={21}
-        dy={16}
-        fontFamily={theme.fonts.lightFont}
-        textAnchor="middle"
-        fill={theme.colors.accent}
-      >
-        {payload && `${Math.round(payload.value / totalValue * 100)}%`}
-      </text>
-      <text
-        x={0}
-        y={42}
-        dy={16}
-        fontFamily={theme.fonts.lightFont}
-        fontSize={12}
-        textAnchor="middle"
-        fill={theme.colors.copy}
-      >
-        {payload && payload.value}
-      </text>
-    </g>
-  )
 }
 
 const sumUpAllValues = (data: IDataPoint[]) =>
@@ -117,16 +66,15 @@ export const VerticalBar = withTheme(
               }) => {
                 const { payload } = tickProps
                 const dataPoint = data.find(
-                  ({ name }) => name === payload.value
+                  ({ label }) => label === payload.value
                 )
 
                 return (
-                  <CustomizedAxisTick
+                  <CustomizedXAxisTick
                     {...tickProps}
-                    theme={theme}
                     totalValue={sumUpAllValues(data)}
                     payload={{
-                      name: payload.value,
+                      label: payload.value,
                       value: dataPoint ? dataPoint.value : 0
                     }}
                   />
@@ -134,7 +82,7 @@ export const VerticalBar = withTheme(
               }}
               tickLine={false}
               axisLine={false}
-              dataKey="name"
+              dataKey="label"
             >
               <Label
                 fill={theme.colors.secondary}
