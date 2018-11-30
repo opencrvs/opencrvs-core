@@ -70,7 +70,6 @@ export const resolvers: GQLResolver = {
         throw new Error('Task does not exist')
       }
       const status = 'REJECTED'
-
       const newTaskBundle = await updateFHIRTaskBundle(
         taskEntry,
         status,

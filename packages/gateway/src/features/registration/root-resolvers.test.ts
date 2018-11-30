@@ -120,18 +120,6 @@ describe('Registration root resolvers', () => {
                         'reason=Misspelling&comment=CHild name was misspelled',
                       time: 'Thu, 29 Nov 2018 10:37:17 GMT',
                       authorString: 'DUMMY'
-                    },
-                    {
-                      text:
-                        'reason=Misspelling&comment=CHild name was misspelled',
-                      time: 'Thu, 29 Nov 2018 10:39:27 GMT',
-                      authorString: 'DUMMY'
-                    },
-                    {
-                      text:
-                        'reason=Misspelling&comment=CHild name was misspelled',
-                      time: 'Thu, 29 Nov 2018 10:40:08 GMT',
-                      authorString: 'DUMMY'
                     }
                   ],
                   focus: {
