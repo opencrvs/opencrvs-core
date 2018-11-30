@@ -192,7 +192,6 @@ class PreviewSectionForm extends React.Component<
     const formSections = registerForm.sections.filter(
       ({ viewType }) => viewType === 'form'
     )
-    console.log(this.props)
     // REFACTOR
     const emptyFieldsBySection = formSections.reduce(
       (sections, section: IFormSection) => {

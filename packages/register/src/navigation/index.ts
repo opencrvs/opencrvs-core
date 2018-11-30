@@ -18,7 +18,7 @@ type GoToTabAction = {
   type: typeof GO_TO_TAB
   payload: {
     tabRoute: string
-    draftId: number
+    draftId: string
     tabId: string
     fieldNameHash?: string
   }
@@ -37,7 +37,7 @@ export function goBack() {
   return back()
 }
 
-export function goToBirthRegistrationAsParent(draftId: number) {
+export function goToBirthRegistrationAsParent(draftId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, { draftId: draftId.toString() })
   )
@@ -45,7 +45,7 @@ export function goToBirthRegistrationAsParent(draftId: number) {
 
 export function goToTab(
   tabRoute: string,
-  draftId: number,
+  draftId: string,
   tabId: string,
   fieldNameHash?: string
 ) {

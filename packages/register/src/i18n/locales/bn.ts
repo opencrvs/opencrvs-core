@@ -445,7 +445,7 @@ export const BENGALI_STATE = {
     'register.form.tabs.documentsTab': 'সমর্থনকারী কাগজপত্র',
     'register.form.section.documentsTitle': 'সমর্থনকারী কাগজপত্র',
     'register.form.tabs.previewTab': 'প্রিভিউ',
-    'register.form.tabs.reviewTab': 'পর্যালোচনা',
+    'review.form.tabs.reviewTab': 'পর্যালোচনা',
     'register.form.section.documents.paragraph':
       'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
     'register.form.section.documents.list.informantAttestation':

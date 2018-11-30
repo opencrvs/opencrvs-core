@@ -1,6 +1,7 @@
 import * as ReactApollo from 'react-apollo'
 import { createTestApp } from './tests/util'
 import { config } from '../src/config'
+import { v4 as uuid } from 'uuid'
 import {
   HOME,
   SELECT_VITAL_EVENT,
@@ -658,7 +659,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: Date.now(), data }
+      customDraft = { id: uuid(), data }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
@@ -807,7 +808,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: Date.now(), data, review: true }
+      customDraft = { id: uuid(), data, review: true }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         REVIEW_BIRTH_PARENT_FORM_TAB.replace(

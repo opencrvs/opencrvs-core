@@ -4,24 +4,24 @@ import {
   IRejectRegistrationForm
 } from 'src/review/reject-registration'
 
-export type IReviewState = {
+export type IRejectState = {
   rejectForm: IRejectRegistrationForm
 }
 
-export const initialState: IReviewState = {
+export const initialState: IRejectState = {
   rejectForm: rejectRegistration
 }
 
-const GET_REJECTION_FORM = 'REVIEW/GET_REJECTION_FORM'
+const GET_REJECTION_FORM = 'REJECT/GET_REJECTION_FORM'
 type GetRejectFormAction = {
   type: typeof GET_REJECTION_FORM
 }
 type Action = GetRejectFormAction
 
-export const reviewReducer: LoopReducer<IReviewState, Action> = (
-  state: IReviewState = initialState,
+export const rejectReducer: LoopReducer<IRejectState, Action> = (
+  state: IRejectState = initialState,
   action: Action
-): IReviewState | Loop<IReviewState, Action> => {
+): IRejectState | Loop<IRejectState, Action> => {
   switch (action.type) {
     default:
       return state

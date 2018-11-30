@@ -9,12 +9,12 @@ import { documentsSection } from 'src/forms/register/documents-section'
 
 const messages = defineMessages({
   reviewTab: {
-    id: 'register.form.tabs.reviewTab',
+    id: 'review.form.tabs.reviewTab',
     defaultMessage: 'Review',
     description: 'Tab title for Review'
   },
   reviewTitle: {
-    id: 'register.form.section.reviewTitle',
+    id: 'review.form.section.reviewTitle',
     defaultMessage: 'Review',
     description: 'Form section title for Review'
   }
@@ -43,7 +43,7 @@ export const initialState: IReviewFormState = {
   }
 }
 
-const GET_REVIEW_FORM = 'REGISTER_FORM/GET_REGISTER_FORM'
+const GET_REVIEW_FORM = 'REVIEW_FORM/GET_REVIEW_FORM'
 type GetReviewFormAction = {
   type: typeof GET_REVIEW_FORM
 }

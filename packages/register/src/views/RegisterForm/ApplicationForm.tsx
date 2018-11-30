@@ -7,7 +7,6 @@ import {
 } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import { DRAFT_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
-// import { store } from '@opencrvs/register/src/App'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 
@@ -25,9 +24,9 @@ function mapStatetoProps(
 ) {
   const { match } = props
   const registerForm = getRegisterForm(state)
-
+  console.log(state.drafts.drafts)
   const draft = state.drafts.drafts.find(
-    ({ id }) => id === parseInt(match.params.draftId, 10)
+    ({ id }) => id === match.params.draftId
   )
 
   if (!draft) {

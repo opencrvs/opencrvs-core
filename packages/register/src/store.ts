@@ -18,7 +18,6 @@ import { profileReducer, ProfileState } from './profile/profileReducer'
 
 import { intlReducer, IntlState } from './i18n/reducer'
 import { draftsReducer, IDraftsState } from 'src/drafts'
-// import { reviewDraftsReducer, IReviewDraftsState } from 'src/drafts/review'
 import {
   reviewReducer,
   IReviewFormState
@@ -33,8 +32,8 @@ import {
   NotificationState
 } from 'src/notification/reducer'
 import {
-  IReviewState,
-  reviewReducer
+  IRejectState,
+  rejectReducer
 } from '@opencrvs/register/src/review/reducer'
 
 export interface IStoreState {
@@ -46,6 +45,7 @@ export interface IStoreState {
   navigation: INavigationState
   notification: NotificationState
   reviewForm: IReviewFormState
+  reject: IRejectState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -56,7 +56,8 @@ const reducers = combineReducers<IStoreState>({
   registerForm: registerFormReducer,
   navigation: navigationReducer,
   notification: notificationReducer,
-  reviewForm: reviewReducer
+  reviewForm: reviewReducer,
+  reject: rejectReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

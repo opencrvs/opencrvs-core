@@ -445,7 +445,7 @@ export const ENGLISH_STATE = {
     'register.form.tabs.documentsTab': 'Documents',
     'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
-    'register.form.tabs.reviewTab': 'Review',
+    'review.form.tabs.reviewTab': 'Review',
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':

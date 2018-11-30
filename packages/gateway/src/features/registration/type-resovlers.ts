@@ -44,6 +44,9 @@ export const typeResolvers: GQLResolver = {
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
+    maritalStatus: person => {
+      return person.maritalStatus.text
+    },
     multipleBirth: person => {
       return person.multipleBirthInteger
     },
@@ -63,13 +66,14 @@ export const typeResolvers: GQLResolver = {
         nationalityExtension.extension
       )
 
-      return (
+      const nationality =
         (countryCodeExtension &&
           countryCodeExtension.valueCodeableConcept &&
           countryCodeExtension.valueCodeableConcept.coding &&
           countryCodeExtension.valueCodeableConcept.coding[0].code) ||
         null
-      )
+
+      return [nationality]
     },
     educationalAttainment: person => {
       const educationalAttainmentExtension = findExtension(
@@ -118,6 +122,13 @@ export const typeResolvers: GQLResolver = {
         const docRefRes = await fetch(`${fhirUrl}/${docRefReference}`)
         return docRefRes.json()
       })
+    },
+    contact: task => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
     }
   },
 
@@ -225,7 +236,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BODY_WEIGHT_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueQuantity.value
+      return data.entry[0].resource.valueQuantity.value
     },
     async birthType(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -241,7 +252,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_TYPE_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueInteger
+      return data.entry[0].resource.valueQuantity.value
     },
     async attendantAtBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -257,7 +268,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_ATTENDANT_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueString
+      return data.entry[0].resource.valueString
     },
     async birthRegistrationType(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -273,7 +284,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_TYPE_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueString
+      return data.entry[0].resource.valueString
     },
     async presentAtBirthRegistration(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -289,7 +300,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_PRESENT_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueString
+      return data.entry[0].resource.valueString
     },
     async childrenBornAliveToMother(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(

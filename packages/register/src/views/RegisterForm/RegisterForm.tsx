@@ -202,10 +202,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onSwiped = (
-    draftId: number,
+    draftId: string,
     selectedSection: IFormSection | null,
     tabRoute: string,
-    goToTab: (tabRoute: string, draftId: number, tabId: string) => void
+    goToTab: (tabRoute: string, draftId: string, tabId: string) => void
   ): void => {
     if (selectedSection) {
       goToTab(tabRoute, draftId, selectedSection.id)
@@ -230,8 +230,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const title = isReviewForm
       ? messages.reviewBirthRegistration
       : activeSection.viewType === 'preview'
-        ? messages.previewBirthRegistration
-        : messages.newBirthRegistration
+      ? messages.previewBirthRegistration
+      : messages.newBirthRegistration
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
@@ -385,7 +385,6 @@ function mapStateToProps(
   if (!draft) {
     throw new Error(`Draft "${match.params.draftId}" missing!`)
   }
-
   const visitedSections = registerForm.sections.filter(({ id }) =>
     Boolean(draft.data[id])
   )
@@ -413,11 +412,14 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
-  modifyDraft,
-  deleteDraft,
-  goToTab: goToTabAction,
-  handleSubmit: values => {
-    console.log(values)
+export const RegisterForm = connect<Props, DispatchProps>(
+  mapStateToProps,
+  {
+    modifyDraft,
+    deleteDraft,
+    goToTab: goToTabAction,
+    handleSubmit: values => {
+      console.log(values)
+    }
   }
-})(injectIntl<FullProps>(RegisterFormView))
+)(injectIntl<FullProps>(RegisterFormView))
