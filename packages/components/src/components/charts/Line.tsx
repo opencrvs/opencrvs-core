@@ -10,6 +10,12 @@ import {
   Area
 } from 'recharts'
 import { ITheme } from '../theme'
+import { IDataPoint } from './datapoint'
+import {
+  CustomizedXAxisTick,
+  CustomizedYAxisTick,
+  ICustomizedAxisTick
+} from './AxisTick'
 
 const Container = styled.div`
   margin-top: 30px;
@@ -18,19 +24,9 @@ const Container = styled.div`
   width: 100%;
   align-items: center;
 `
-interface IDataPoint {
-  name: string
-  value: number
-  total: number
-}
 
-interface ICustomizedAxisTick {
-  x: number
-  y: number
-  stroke: number
-  payload: IDataPoint
-  totalValue: number
-  theme: ITheme
+interface ILineDataPoint extends IDataPoint {
+  totalEstimate: number
 }
 
 interface ICustomDot {
@@ -39,66 +35,9 @@ interface ICustomDot {
   theme: ITheme
 }
 interface ILineProps {
-  data: IDataPoint[]
+  data: ILineDataPoint[]
   xAxisLabel: string
   yAxisLabel: string
-}
-
-function CustomizedAxisTick(props: ICustomizedAxisTick) {
-  const { x, y, payload, totalValue, theme } = props
-
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={10}
-        dy={16}
-        fontFamily={theme.fonts.lightFont}
-        textAnchor="middle"
-        fill={theme.colors.secondary}
-      >
-        {payload && payload.name}
-      </text>
-      <text
-        x={0}
-        y={31}
-        dy={16}
-        fontFamily={theme.fonts.lightFont}
-        textAnchor="middle"
-        fill={theme.colors.accent}
-      >
-        {payload && `${Math.round(payload.value / totalValue * 100)}%`}
-      </text>
-      <text
-        x={0}
-        y={52}
-        dy={16}
-        fontFamily={theme.fonts.lightFont}
-        fontSize={12}
-        textAnchor="middle"
-        fill={theme.colors.copy}
-      >
-        {payload && payload.value}
-      </text>
-    </g>
-  )
-}
-
-function CustomizedYAxisTick(props: ICustomizedAxisTick) {
-  const { x, y, payload, theme } = props
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        dy={8}
-        fontFamily={theme.fonts.lightFont}
-        textAnchor="end"
-        height={22}
-        fill={theme.colors.secondary}
-      >
-        {payload && payload.value}
-      </text>
-    </g>
-  )
 }
 
 function CustomDot(props: ICustomDot) {
@@ -145,24 +84,24 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
               payload: { value: string }
             }) => {
               const { payload } = tickProps
-              const dataPoint = data.find(({ name }) => name === payload.value)
+              const dataPoint = data.find(
+                ({ label }) => label === payload.value
+              )
 
               return (
-                <CustomizedAxisTick
+                <CustomizedXAxisTick
                   {...tickProps}
-                  theme={theme}
-                  totalValue={dataPoint ? dataPoint.total : 0}
+                  totalValue={dataPoint ? dataPoint.totalEstimate : 0}
                   payload={{
-                    name: payload.value,
-                    value: dataPoint ? dataPoint.value : 0,
-                    total: dataPoint ? dataPoint.total : 0
+                    label: payload.value,
+                    value: dataPoint ? dataPoint.value : 0
                   }}
                 />
               )
             }}
             tickLine={false}
             axisLine={false}
-            dataKey="name"
+            dataKey="label"
           >
             <Label
               fill={theme.colors.secondary}
@@ -177,7 +116,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
             tickCount={2}
             domain={[0, 100]}
             tick={(tickProps: ICustomizedAxisTick) => (
-              <CustomizedYAxisTick {...tickProps} theme={theme} />
+              <CustomizedYAxisTick {...tickProps} />
             )}
             tickLine={false}
             axisLine={false}
@@ -204,8 +143,8 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
               <CustomDot {...dotProps} theme={theme} />
             )}
             type="linear"
-            dataKey={(dataPoint: IDataPoint) =>
-              Math.round(dataPoint.value / dataPoint.total * 100)
+            dataKey={(dataPoint: ILineDataPoint) =>
+              Math.round((dataPoint.value / dataPoint.totalEstimate) * 100)
             }
             stroke={chartPrimary}
             strokeWidth={1}
