@@ -114,7 +114,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           <YAxis
             width={30}
             tickCount={2}
-            domain={[0, 100]}
+            domain={[0, dataMax => Math.ceil(dataMax / 10) * 10]}
             tick={(tickProps: ICustomizedAxisTick) => (
               <CustomizedYAxisTick {...tickProps} />
             )}

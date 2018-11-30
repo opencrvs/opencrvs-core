@@ -32,6 +32,15 @@ describe('when user is in the home page', () => {
     ).toBe('At What Age Are Births Registered In Children Aged 0-10 Years')
   })
 
+  it('renders line chart box title', () => {
+    expect(
+      homeComponent
+        .find('#line_chart_box_title')
+        .hostNodes()
+        .text()
+    ).toBe('Birth Rate For Registrations Within 45 Days')
+  })
+
   it('renders footer text', () => {
     expect(
       homeComponent
