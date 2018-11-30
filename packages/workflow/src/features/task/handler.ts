@@ -11,10 +11,12 @@ export default async function updateTaskHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    console.log('before', request.payload)
     const payload = modifyTaskBundle(
       request.payload as fhir.Bundle,
       getToken(request)
     )
+    console.log(payload)
     const taskId = getEntryId(payload)
     if (
       !payload ||

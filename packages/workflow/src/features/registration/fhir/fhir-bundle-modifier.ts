@@ -165,7 +165,6 @@ export function setupAuthorOnNotes(
   }
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-
   if (!taskResource.note) {
     return fhirBundle
   }

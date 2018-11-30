@@ -160,6 +160,7 @@ export const testFhirBundle = {
     }
   ]
 }
+
 export const testFhirTaskBundle = {
   resourceType: 'Bundle',
   type: 'document',
@@ -181,6 +182,13 @@ export const testFhirTaskBundle = {
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueString: 'DUMMY'
+          }
+        ],
+        note: [
+          {
+            text: 'reason=Misspelling&comment=CHild name was misspelled',
+            time: '2018-11-28T15:13:57.492Z',
+            authorString: ''
           }
         ],
         focus: {

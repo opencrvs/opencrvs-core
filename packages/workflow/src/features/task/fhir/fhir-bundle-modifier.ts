@@ -18,6 +18,5 @@ export function modifyTaskBundle(
 
   /* setting author and time on notes here */
   fhirBundle = setupAuthorOnNotes(fhirBundle, tokenPayload)
-
   return fhirBundle
 }
