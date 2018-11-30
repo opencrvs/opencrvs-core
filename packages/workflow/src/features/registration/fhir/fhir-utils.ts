@@ -108,8 +108,7 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
   return composition.identifier.value
 }
 
-export function getBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
-  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   const brnIdentifier =
     taskResource &&
     taskResource.identifier &&
@@ -125,8 +124,7 @@ export function getBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
   return brnIdentifier.value
 }
 
-export function getPaperFormID(fhirBundle: fhir.Bundle) {
-  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+export function getPaperFormID(taskResource: fhir.Task) {
   const paperFormIdentifier =
     taskResource &&
     taskResource.identifier &&
@@ -195,7 +193,7 @@ export async function getLoggedInPractitionerResource(
     !practitionerBundle.entry ||
     !practitionerBundle.entry[0].resource
   ) {
-    throw new Error('Practitional resource not found')
+    throw new Error('Practitioner resource not found')
   }
   return practitionerBundle.entry[0].resource
 }

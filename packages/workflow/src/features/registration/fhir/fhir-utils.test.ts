@@ -260,7 +260,11 @@ describe('Verify getBirthRegistrationNumber', () => {
         { status: 200 }
       ]
     )
-    const brn = getBirthRegistrationNumber(await pushBRN(testFhirBundle, token))
+    const taskResource = await pushBRN(
+      testFhirBundle.entry[1].resource as fhir.Task,
+      token
+    )
+    const brn = getBirthRegistrationNumber(taskResource)
 
     expect(brn).toBeDefined()
     expect(brn).toMatch(
@@ -321,13 +325,13 @@ describe('Verify getRegStatusCode', () => {
   })
   describe('Verify getPaperFormID', () => {
     it('Returned paper form id properly', () => {
-      const paperFormID = getPaperFormID(testFhirBundle)
+      const paperFormID = getPaperFormID(testFhirBundle.entry[1].resource)
       expect(paperFormID).toEqual('12345678')
     })
     it('Throws error when paper form id not found', () => {
       const fhirBundle = cloneDeep(testFhirBundle)
       fhirBundle.entry[1].resource.identifier = []
-      expect(() => getPaperFormID(fhirBundle)).toThrowError(
+      expect(() => getPaperFormID(fhirBundle.entry[1].resource)).toThrowError(
         "Didn't find any identifier for paper form id"
       )
     })

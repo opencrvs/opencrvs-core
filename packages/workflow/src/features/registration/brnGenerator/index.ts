@@ -7,7 +7,7 @@ enum GENERATOR_CODE {
 }
 
 export async function generateBirthRegistrationNumber(
-  fhirBundle: fhir.Bundle,
+  taskResource: fhir.Task,
   token: string,
   generatorCode?: string
 ): Promise<string> {
@@ -15,7 +15,7 @@ export async function generateBirthRegistrationNumber(
 
   switch (generatorCode) {
     case GENERATOR_CODE.BD.toString():
-      return await generateBdBRN(fhirBundle, token)
+      return await generateBdBRN(taskResource, token)
     default:
       return generateDefaultBRN()
   }

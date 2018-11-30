@@ -1,8 +1,21 @@
 import { v4 as uuid } from 'uuid'
 import { OPENCRVS_SPECIFICATION_URL } from './constants'
 
+export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
+  if (!bundle) {
+    throw new Error('Invalid FHIR bundle found')
+  }
+  if (bundle.resourceType === 'Bundle' && bundle.entry) {
+    return selectOrCreateTaskRefResource(bundle as fhir.Bundle)
+  } else if (bundle.resource && bundle.resource.resourceType === 'Task') {
+    return bundle.resource
+  } else {
+    throw new Error('Unable to find Task Bundle from the provided data')
+  }
+}
+
 export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
-  let taskResource = getTaskResource(fhirBundle)
+  let taskResource = getTaskResourceFromFhirBundle(fhirBundle)
   if (!taskResource) {
     const taskEntry = createTaskRefTemplate()
     if (!fhirBundle.entry) {
@@ -14,7 +27,7 @@ export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
   return taskResource
 }
 
-export function getTaskResource(fhirBundle: fhir.Bundle) {
+export function getTaskResourceFromFhirBundle(fhirBundle: fhir.Bundle) {
   const taskEntry =
     fhirBundle.entry &&
     fhirBundle.entry.find(entry => {

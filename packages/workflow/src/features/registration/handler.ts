@@ -8,6 +8,7 @@ import {
 import { sendBirthNotification } from './utils'
 import { getTrackingId, getBirthRegistrationNumber } from './fhir/fhir-utils'
 import { EVENT_TYPE } from './fhir/constants'
+import { getTaskResource } from './fhir/fhir-template'
 import { getToken } from 'src/utils/authUtils'
 import { logger } from 'src/logger'
 
@@ -59,7 +60,7 @@ export async function markBirthAsRegisteredHandler(
 ) {
   try {
     const payload = await markBundleAsRegistered(
-      request.payload as fhir.Bundle,
+      request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
 
@@ -81,7 +82,11 @@ export async function markBirthAsRegisteredHandler(
     // TODO: need to send notification here
 
     /* returning the newly created birth registration number */
-    return { BirthRegistrationNumber: getBirthRegistrationNumber(payload) }
+    return {
+      BirthRegistrationNumber: getBirthRegistrationNumber(getTaskResource(
+        payload
+      ) as fhir.Task)
+    }
   } catch (error) {
     logger.error(`Workflow/markBirthAsRegisteredHandler: error: ${error}`)
     throw new Error(error)

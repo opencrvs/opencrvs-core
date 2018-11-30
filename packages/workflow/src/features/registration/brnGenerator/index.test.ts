@@ -158,7 +158,10 @@ describe('Verify generateBirthRegistrationNumber', () => {
         { status: 200 }
       ]
     )
-    const brn = await generateBirthRegistrationNumber(testFhirBundle, token)
+    const brn = await generateBirthRegistrationNumber(
+      testFhirBundle.entry[1].resource,
+      token
+    )
     expect(brn).toBeDefined()
     expect(brn).toMatch(
       new RegExp(`^${new Date().getFullYear()}10342112345678`)

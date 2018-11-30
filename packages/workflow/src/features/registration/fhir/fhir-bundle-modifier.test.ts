@@ -48,21 +48,27 @@ describe('Verify fhir bundle modifier functions', () => {
   })
   describe('SetupRegistrationType', () => {
     it('Will push the proper event type on fhirDoc', () => {
-      const fhirBundle = setupRegistrationType(testFhirBundle, EVENT_TYPE.BIRTH)
+      const taskResource = setupRegistrationType(
+        testFhirBundle.entry[1].resource,
+        EVENT_TYPE.BIRTH
+      )
 
-      expect(fhirBundle.entry[1].resource.code.coding[0].code).toBeDefined()
-      expect(fhirBundle.entry[1].resource.code.coding[0].code).toEqual(
+      expect(taskResource.code.coding[0].code).toBeDefined()
+      expect(taskResource.code.coding[0].code).toEqual(
         EVENT_TYPE.BIRTH.toString()
       )
     })
 
     it('Will push code section with proper event type on fhirDoc if it is missing', () => {
-      let fhirBundle = cloneDeep(testFhirBundle)
+      const fhirBundle = cloneDeep(testFhirBundle)
       fhirBundle.entry[1].resource.code = undefined
-      fhirBundle = setupRegistrationType(fhirBundle, EVENT_TYPE.BIRTH)
+      const taskResource = setupRegistrationType(
+        fhirBundle.entry[1].resource,
+        EVENT_TYPE.BIRTH
+      )
 
-      expect(fhirBundle.entry[1].resource.code).toBeDefined()
-      expect(fhirBundle.entry[1].resource.code).toEqual({
+      expect(taskResource.code).toBeDefined()
+      expect(taskResource.code).toEqual({
         coding: [
           {
             system: `${OPENCRVS_SPECIFICATION_URL}types`,
@@ -82,14 +88,13 @@ describe('Verify fhir bundle modifier functions', () => {
         subject: '1',
         scope: ['declare']
       }
-      const fhirBundle = setupRegistrationWorkflow(testFhirBundle, tokenPayload)
+      const taskResource = setupRegistrationWorkflow(
+        testFhirBundle.entry[1].resource,
+        tokenPayload
+      )
 
-      expect(
-        fhirBundle.entry[1].resource.businessStatus.coding[0].code
-      ).toBeDefined()
-      expect(
-        fhirBundle.entry[1].resource.businessStatus.coding[0].code
-      ).toEqual('DECLARED')
+      expect(taskResource.businessStatus.coding[0].code).toBeDefined()
+      expect(taskResource.businessStatus.coding[0].code).toEqual('DECLARED')
     })
     it('Will update existing registration status on fhirDoc', () => {
       const tokenPayload = {
@@ -100,7 +105,7 @@ describe('Verify fhir bundle modifier functions', () => {
         subject: '1',
         scope: ['register']
       }
-      let fhirBundle = cloneDeep(testFhirBundle)
+      const fhirBundle = cloneDeep(testFhirBundle)
       fhirBundle.entry[1].resource.businessStatus = {
         coding: [
           {
@@ -109,12 +114,13 @@ describe('Verify fhir bundle modifier functions', () => {
           }
         ]
       }
-      fhirBundle = setupRegistrationWorkflow(fhirBundle, tokenPayload)
+      const taskResource = setupRegistrationWorkflow(
+        fhirBundle.entry[1].resource,
+        tokenPayload
+      )
 
-      expect(fhirBundle.entry[1].resource.businessStatus.coding.length).toBe(1)
-      expect(
-        fhirBundle.entry[1].resource.businessStatus.coding[0].code
-      ).toEqual('REGISTERED')
+      expect(taskResource.businessStatus.coding.length).toBe(1)
+      expect(taskResource.businessStatus.coding[0].code).toEqual('REGISTERED')
     })
   })
   describe('SetupLastRegUser', () => {
@@ -127,12 +133,13 @@ describe('Verify fhir bundle modifier functions', () => {
         subject: '1',
         scope: ['declare']
       }
-      const fhirBundle = setupLastRegUser(testFhirBundle, tokenPayload)
+      const taskResource = setupLastRegUser(
+        testFhirBundle.entry[1].resource,
+        tokenPayload
+      )
 
-      expect(
-        fhirBundle.entry[1].resource.extension[1].valueString
-      ).toBeDefined()
-      expect(fhirBundle.entry[1].resource.extension[1].valueString).toEqual('1')
+      expect(taskResource.extension[1].valueString).toBeDefined()
+      expect(taskResource.extension[1].valueString).toEqual('1')
     })
 
     it('Will push the last modified by userinfo even if no extension is defined yet on task resource', () => {
@@ -144,14 +151,15 @@ describe('Verify fhir bundle modifier functions', () => {
         subject: '1',
         scope: ['declare']
       }
-      let fhirBundle = cloneDeep(testFhirBundle)
+      const fhirBundle = cloneDeep(testFhirBundle)
       fhirBundle.entry[1].resource.extension = undefined
-      fhirBundle = setupLastRegUser(fhirBundle, tokenPayload)
+      const taskResource = setupLastRegUser(
+        fhirBundle.entry[1].resource,
+        tokenPayload
+      )
 
-      expect(
-        fhirBundle.entry[1].resource.extension[0].valueString
-      ).toBeDefined()
-      expect(fhirBundle.entry[1].resource.extension[0].valueString).toEqual('1')
+      expect(taskResource.extension[0].valueString).toBeDefined()
+      expect(taskResource.extension[0].valueString).toEqual('1')
     })
 
     it('Will update the last modified by userinfo instead of always adding a new extension', () => {
@@ -165,12 +173,13 @@ describe('Verify fhir bundle modifier functions', () => {
       }
       const lengthOfTaskExtensions =
         testFhirBundle.entry[1].resource.extension.length
-      const fhirBundle = setupLastRegUser(testFhirBundle, tokenPayload)
-
-      expect(fhirBundle.entry[1].resource.extension.length).toBe(
-        lengthOfTaskExtensions
+      const taskResource = setupLastRegUser(
+        testFhirBundle.entry[1].resource,
+        tokenPayload
       )
-      expect(fhirBundle.entry[1].resource.extension[1].valueString).toEqual('1')
+
+      expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
+      expect(taskResource.extension[1].valueString).toEqual('1')
     })
   })
   it('setupAuthorOnNotes will update the author name on notes', () => {
@@ -182,17 +191,20 @@ describe('Verify fhir bundle modifier functions', () => {
       subject: '1',
       scope: ['declare']
     }
-    let fhirBundle = cloneDeep(testFhirBundle)
+    const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.note = [
       {
         text: 'this is a test note',
         time: '2018-10-31T09:45:05+10:00'
       }
     ]
-    fhirBundle = setupAuthorOnNotes(fhirBundle, tokenPayload)
+    const taskResource = setupAuthorOnNotes(
+      fhirBundle.entry[1].resource,
+      tokenPayload
+    )
 
-    expect(fhirBundle.entry[1].resource.note.length).toBe(1)
-    expect(fhirBundle.entry[1].resource.note[0]).toEqual({
+    expect(taskResource.note.length).toBe(1)
+    expect(taskResource.note[0]).toEqual({
       authorString: '1',
       text: 'this is a test note',
       time: '2018-10-31T09:45:05+10:00'
@@ -355,8 +367,7 @@ describe('Verify fhir bundle modifier functions', () => {
       )
     })
     it('Successfully modified the provided fhirBundle with brn', async () => {
-      const fhirBundle = await pushBRN(testFhirBundle, token)
-      const task = fhirBundle.entry[1].resource as fhir.Task
+      const task = await pushBRN(testFhirBundle.entry[1].resource, token)
 
       expect(task.identifier[2].system).toEqual(
         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
@@ -368,9 +379,9 @@ describe('Verify fhir bundle modifier functions', () => {
     })
 
     it('Throws error if invalid fhir bundle is provided', async () => {
-      const invalidData = { ...testFhirBundle, entry: [] }
+      const invalidData = undefined
       expect(pushBRN(invalidData, token)).rejects.toThrowError(
-        'Invalid FHIR bundle found for registration'
+        'Invalid Task resource found for registration'
       )
     })
     it('If fhirBundle already have a brn then it will update the exiting one instead of creating a new one', async () => {
@@ -378,9 +389,8 @@ describe('Verify fhir bundle modifier functions', () => {
       oldTask.identifier[2].value = 'DUMMYBRN'
       const indentifierLength = oldTask.identifier.length
 
-      let fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle = await pushBRN(fhirBundle, token)
-      const newTask = fhirBundle.entry[1].resource as fhir.Task
+      const fhirBundle = cloneDeep(testFhirBundle)
+      const newTask = await pushBRN(fhirBundle.entry[1].resource, token)
 
       expect(newTask.identifier.length).toBe(indentifierLength)
       expect(newTask.identifier[2].system).toEqual(

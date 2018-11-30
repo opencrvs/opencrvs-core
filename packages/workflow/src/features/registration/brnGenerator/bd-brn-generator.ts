@@ -8,7 +8,7 @@ import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
 import * as Verhoeff from 'node-verhoeff'
 
 export async function generateBdBRN(
-  fhirBundle: fhir.Bundle,
+  taskResource: fhir.Task,
   token: string
 ): Promise<string> {
   /* adding current year */
@@ -18,7 +18,7 @@ export async function generateBdBRN(
   brn = brn.concat((await getLocationBBSCode(token)) as string)
 
   /* appending paper form id */
-  brn = brn.concat(getPaperFormID(fhirBundle) as string)
+  brn = brn.concat(getPaperFormID(taskResource) as string)
 
   /* appending single verhoeff checksum digit */
   brn = brn.concat(Verhoeff.generate(brn) as string)
