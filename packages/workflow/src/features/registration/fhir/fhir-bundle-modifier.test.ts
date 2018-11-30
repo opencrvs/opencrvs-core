@@ -312,7 +312,7 @@ describe('Verify fhir bundle modifier functions', () => {
               { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
               {
                 system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'upazila'
+                value: 'UPAZILA'
               }
             ]
           }),
@@ -329,7 +329,7 @@ describe('Verify fhir bundle modifier functions', () => {
               { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
               {
                 system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'union'
+                value: 'UNION'
               }
             ]
           }),
@@ -346,7 +346,7 @@ describe('Verify fhir bundle modifier functions', () => {
               { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
               {
                 system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'district'
+                value: 'DISTRICT'
               }
             ]
           }),
