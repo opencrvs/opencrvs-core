@@ -1,5 +1,5 @@
 import * as ShortUIDGen from 'short-uid'
-import { NOTIFICATION_SERVICE_URL } from 'src/constants'
+import { NOTIFICATION_SERVICE_URL, USER_MGNT_SERVICE_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { logger } from 'src/logger'
 import {
@@ -7,6 +7,7 @@ import {
   getInformantName,
   getTrackingId
 } from './fhir/fhir-utils'
+import { callingCountries } from 'country-data'
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -39,5 +40,37 @@ export async function sendBirthNotification(
     })
   } catch (err) {
     logger.error(`Unable to send notification for error : ${err}`)
+  }
+}
+
+export const convertToLocal = (
+  mobileWithCountryCode: string,
+  countryCode: string
+) => {
+  countryCode = countryCode.toUpperCase()
+  return mobileWithCountryCode.replace(
+    callingCountries[countryCode].countryCallingCodes[0],
+    '0'
+  )
+}
+
+export async function getUserMobile(
+  userId: string,
+  authHeader: { Authorization: string }
+) {
+  try {
+    const res = await fetch(`${USER_MGNT_SERVICE_URL}getUserMobile`, {
+      method: 'POST',
+      body: JSON.stringify({ userId }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    })
+    const body = await res.json()
+
+    return body
+  } catch (err) {
+    logger.error(`Unable to retrieve mobile for error : ${err}`)
   }
 }

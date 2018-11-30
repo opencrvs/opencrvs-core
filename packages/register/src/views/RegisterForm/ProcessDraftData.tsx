@@ -150,6 +150,7 @@ const processDraftData = (draftData: IFormData) => {
     mother: motherDetails,
     registration: {
       contact: registration.whoseContactDetails,
+      paperFormID: registration.paperFormNumber,
       status: [
         {
           comments: [

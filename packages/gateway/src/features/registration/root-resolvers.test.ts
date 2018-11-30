@@ -167,5 +167,119 @@ describe('Registration root resolvers', () => {
 
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
     })
+    describe('markBirthAsVoided()', () => {
+      it('throws an error if Workflow responds with an error', async () => {
+        fetch.mockImplementationOnce(() => new Error('boom'))
+        const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+        const reason = 'Misspelling'
+        const comment = 'Family name misspelled'
+        // @ts-ignore
+        const result = await resolvers.Mutation.markBirthAsVoided(
+          {},
+          { id, reason, comment }
+        )
+        expect(result.statusCode).toBe(500)
+      })
+    })
+    describe('markBirthAsVoided()', () => {
+      it('throws an error if workflow responds with an error after updating trackingid', async () => {
+        ffetch.mockResponses(
+          [
+            JSON.stringify({
+              resourceType: 'Bundle',
+              id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
+              meta: { lastUpdated: '2018-11-29T10:43:30.286+00:00' },
+              type: 'searchset',
+              total: 1,
+              link: [
+                {
+                  relation: 'self',
+                  url:
+                    'http://localhost:3447/fhir/Task?focus=Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+                }
+              ],
+              entry: [
+                {
+                  fullUrl:
+                    'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+                  resource: {
+                    resourceType: 'Task',
+                    status: 'requested',
+                    code: {
+                      coding: [
+                        {
+                          system: 'http://opencrvs.org/specs/types',
+                          code: 'BIRTH'
+                        }
+                      ]
+                    },
+                    extension: [
+                      {
+                        url:
+                          'http://opencrvs.org/specs/extension/contact-person',
+                        valueString: 'MOTHER'
+                      },
+                      {
+                        url: 'http://opencrvs.org/specs/extension/regLastUser',
+                        valueString: 'DUMMY'
+                      }
+                    ],
+                    lastModified: '2018-11-28T15:13:57.492Z',
+                    note: [
+                      {
+                        text: '',
+                        time: '2018-11-28T15:13:57.492Z',
+                        authorString: 'DUMMY'
+                      },
+                      {
+                        text:
+                          'reason=Misspelling&comment=CHild name was misspelled',
+                        time: 'Thu, 29 Nov 2018 10:37:17 GMT',
+                        authorString: 'DUMMY'
+                      }
+                    ],
+                    focus: {
+                      reference:
+                        'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+                    },
+                    identifier: [
+                      {
+                        system:
+                          'http://opencrvs.org/specs/id/birth-tracking-id',
+                        value: 'B1mW7jA'
+                      }
+                    ],
+                    businessStatus: {
+                      coding: [
+                        {
+                          system: 'http://opencrvs.org/specs/reg-status',
+                          code: 'REJECTED'
+                        }
+                      ]
+                    },
+                    meta: {
+                      lastUpdated: '2018-11-29T10:40:08.913+00:00',
+                      versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
+                    },
+                    id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+                  }
+                }
+              ]
+            })
+          ],
+
+          [JSON.stringify({ message: 'BAD' }), { status: 200 }]
+        )
+        const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+        const reason = 'Misspelling'
+        const comment = 'Family name misspelled'
+        // @ts-ignore
+        const result = await resolvers.Mutation.markBirthAsVoided(
+          {},
+          { id, reason, comment }
+        )
+        expect(result.statusCode).toBe(500)
+      })
+    })
   })
 })

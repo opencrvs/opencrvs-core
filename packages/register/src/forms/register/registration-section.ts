@@ -4,6 +4,7 @@ import {
   SELECT_WITH_OPTIONS,
   TEXT,
   TEL,
+  NUMBER,
   CHECKBOX_GROUP,
   TEXTAREA
 } from 'src/forms'
@@ -214,7 +215,7 @@ export const registrationSection: IFormSection = {
     },
     {
       name: 'paperFormNumber',
-      type: TEXT,
+      type: NUMBER,
       label: messages.paperFormNumberLabel,
       required: true,
       initialValue: '',
