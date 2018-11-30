@@ -6,7 +6,7 @@ export interface IURLParams {
 }
 export type Scope = string[]
 export interface ITokenPayload {
-  subject: string
+  sub: string
   exp: string
   algorithm: string
   scope: Scope
