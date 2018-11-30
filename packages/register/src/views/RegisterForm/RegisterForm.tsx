@@ -18,11 +18,12 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from 'src/components/interface/footer'
-import { PreviewSection } from './PreviewSection'
+// import { PreviewSection } from './PreviewSection'
 import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 import processDraftData from './ProcessDraftData'
+import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -239,7 +240,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
             }
           >
             {activeSection.viewType === 'preview' && (
-              <PreviewSection draft={draft} onSubmit={this.submitForm} />
+              // <PreviewSection draft={draft} onSubmit={this.submitForm} />
+              <ReviewSection
+                draft={draft}
+                SubmitClickEvent={this.submitForm}
+                SaveDraftClickEvent={() => history.push('/')}
+                DeleteApplicationClickEvent={() => {
+                  alert('Delete draft')
+                  // deleteDraft(draft)
+                  // history.push('/')
+                }}
+              />
             )}
             {activeSection.viewType === 'form' && (
               <Box>
@@ -384,11 +395,14 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
-  modifyDraft,
-  deleteDraft,
-  goToTab: goToTabAction,
-  handleSubmit: values => {
-    console.log(values)
+export const RegisterForm = connect<Props, DispatchProps>(
+  mapStateToProps,
+  {
+    modifyDraft,
+    deleteDraft,
+    goToTab: goToTabAction,
+    handleSubmit: values => {
+      console.log(values)
+    }
   }
-})(injectIntl<FullProps>(RegisterFormView))
+)(injectIntl<FullProps>(RegisterFormView))

@@ -490,7 +490,8 @@ export const BENGALI_STATE = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
     'validations.requiredSymbol': '',
-    'register.form.submit': 'জমা দিন',
+    'register.form.submit': 'পর্যালোচনার জন্য পাঠান',
+    'register.form.saveAsDraft': 'Save as draft',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
     'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
     'register.form.missingFieldsDescription':

@@ -7,8 +7,13 @@ import { IStoreState } from 'src/store'
 import { getRegisterForm } from 'src/forms/register/selectors'
 import { EditConfirmation } from './EditConfirmation'
 import { getConditionalActionsForField } from 'src/forms/utils'
-import { TickLarge, CrossLarge } from '@opencrvs/components/lib/icons'
-import { findIndex, filter } from 'lodash'
+import {
+  TickLarge,
+  CrossLarge,
+  Delete,
+  Draft
+} from '@opencrvs/components/lib/icons'
+import { findIndex, filter, flatten, identity } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { DocumentViewer } from '@opencrvs/components/lib/interface'
@@ -83,6 +88,16 @@ const messages = defineMessages({
     id: 'review.documentViewer.tagline',
     defaultMessage: 'Select to Preview',
     description: 'Document Viewer Tagline'
+  },
+  ValueSendForReview: {
+    id: 'register.form.submit',
+    defaultMessage: 'SEND FOR REVIEW',
+    description: 'Submit Button Text'
+  },
+  ValueSaveAsDraft: {
+    id: 'register.form.saveDraft',
+    defaultMessage: 'Save as draft',
+    description: 'Save as draft Button Text'
   }
 })
 
@@ -196,12 +211,27 @@ const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
     margin-bottom: 11px;
   }
 `
+const DButtonContainer = styled(ButtonContainer)`
+  background: transparent;
+`
+const DeleteApplication = styled.a`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.danger};
+  text-decoration: underline;
+  cursor: pointer;
+  svg {
+    margin-right: 15px;
+  }
+`
+
 interface IProps {
   draft: IDraft
   registerForm: IForm
   RegisterClickEvent?: () => void
   RejectApplicationClickEvent?: () => void
   SubmitClickEvent?: () => void
+  SaveDraftClickEvent?: () => void
+  DeleteApplicationClickEvent?: () => void
   goToTab: typeof goToTab
   scope: Scope
 }
@@ -395,7 +425,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       draft,
       registerForm,
       RegisterClickEvent,
-      RejectApplicationClickEvent
+      RejectApplicationClickEvent,
+      SubmitClickEvent,
+      SaveDraftClickEvent,
+      DeleteApplicationClickEvent
     } = this.props
 
     const formSections = getViewableSection(registerForm)
@@ -411,6 +444,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const isViewOnly = (field: IFormField) => {
       return [LIST, PARAGRAPH].find(type => type === field.type)
     }
+
+    const numberOfErrors = flatten(
+      Object.values(emptyFieldsBySection).map(Object.values)
+    ).filter(identity).length
 
     return (
       <>
@@ -500,27 +537,56 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         </Row>
         <Row>
           <Column>
-            <ButtonContainer>
-              <RegisterApplication
-                id="registerApplicationBtn"
-                icon={() => <TickLarge />}
-                align={ICON_ALIGNMENT.LEFT}
-                onClick={RegisterClickEvent}
-                disabled={!this.state.allSectionVisited}
-              >
-                {intl.formatMessage(messages.ValueRegister)}
-              </RegisterApplication>
-            </ButtonContainer>
+            {!!RegisterClickEvent && (
+              <ButtonContainer>
+                <RegisterApplication
+                  id="registerApplicationBtn"
+                  icon={() => <TickLarge />}
+                  align={ICON_ALIGNMENT.LEFT}
+                  onClick={RegisterClickEvent}
+                  disabled={!this.state.allSectionVisited}
+                >
+                  {intl.formatMessage(messages.ValueRegister)}
+                </RegisterApplication>
+              </ButtonContainer>
+            )}
 
-            <ButtonContainer>
-              <RejectApplication
-                id="rejectApplicationBtn"
-                title={intl.formatMessage(messages.ValueReject)}
-                icon={() => <CrossLarge />}
-                onClick={RejectApplicationClickEvent}
-                disabled={!this.state.allSectionVisited}
-              />
-            </ButtonContainer>
+            {!!RejectApplicationClickEvent && (
+              <ButtonContainer>
+                <RejectApplication
+                  id="rejectApplicationBtn"
+                  title={intl.formatMessage(messages.ValueReject)}
+                  icon={() => <CrossLarge />}
+                  onClick={RejectApplicationClickEvent}
+                  disabled={!this.state.allSectionVisited}
+                />
+              </ButtonContainer>
+            )}
+
+            {!!SubmitClickEvent && (
+              <ButtonContainer>
+                <RegisterApplication
+                  id="sendForReviewBtn"
+                  icon={() => <TickLarge />}
+                  align={ICON_ALIGNMENT.LEFT}
+                  onClick={SubmitClickEvent}
+                  disabled={numberOfErrors > 0 || !this.state.allSectionVisited}
+                >
+                  {intl.formatMessage(messages.ValueSendForReview)}
+                </RegisterApplication>
+              </ButtonContainer>
+            )}
+
+            {!!SaveDraftClickEvent && (
+              <ButtonContainer>
+                <RejectApplication
+                  id="saveAsDraftBtn"
+                  title={intl.formatMessage(messages.ValueSaveAsDraft)}
+                  icon={() => <TickLarge />}
+                  onClick={SaveDraftClickEvent}
+                />
+              </ButtonContainer>
+            )}
 
             <EditConfirmation
               show={this.state.displayEditDialog}
@@ -530,7 +596,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }}
             />
           </Column>
+          <Draft />
         </Row>
+        <DButtonContainer>
+          <DeleteApplication onClick={DeleteApplicationClickEvent}>
+            <Delete />
+            Delete Application
+          </DeleteApplication>
+        </DButtonContainer>
       </>
     )
   }

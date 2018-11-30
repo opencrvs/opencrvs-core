@@ -497,13 +497,13 @@ export const ENGLISH_STATE = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
     'validations.requiredSymbol': '',
-    'register.form.submit': 'Submit',
+    'register.form.submit': 'SEND FOR REVIEW',
     'register.form.informationMissing': 'Information missing',
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth declaration',
-    'register.form.saveDraft': 'Save draft',
+    'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
     'register.form.modal.submitDescription':
