@@ -639,6 +639,8 @@ export const ENGLISH_STATE = {
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
     'review.rejection.form.submitButton': 'Submit rejection',
     'review.button.register': 'REGISTER',
-    'review.button.reject': 'Reject Application'
+    'review.button.reject': 'Reject Application',
+    'review.documentViewer.title': 'Supporting Documents',
+    'review.documentViewer.tagline': 'Select to Preview'
   }
 }

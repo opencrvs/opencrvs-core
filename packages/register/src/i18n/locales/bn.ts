@@ -632,6 +632,8 @@ export const BENGALI_STATE = {
       'স্বাস্থ্য কর্মী সঠিকভাবে অ্যাপ্লিকেশন আপডেট করার জন্য কি আপডেট করা প্রয়োজন তার নির্দিষ্ট নির্দেশাবলী প্রদান করুন',
     'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
     'review.button.register': 'নিবন্ধন',
-    'review.button.reject': 'বাতিল'
+    'review.button.reject': 'বাতিল',
+    'review.documentViewer.title': 'সমর্থনকারী কাগজপত্র',
+    'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন'
   }
 }

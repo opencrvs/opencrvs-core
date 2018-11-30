@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from './../buttons'
+import { boolean } from 'joi'
 
 const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
   background: ${({ theme }) => theme.colors.white};
@@ -15,9 +16,11 @@ const TitleContainer = styled.div.attrs<{ expandable: boolean }>({})`
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'auto')};
 `
-const Title = styled.div`
+const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
   width: 100vw;
   padding: 25px;
+  color: ${({ theme, visited, isExpanded }) =>
+    visited && !isExpanded ? theme.colors.primary : theme.colors.secondary};
 `
 const EditLink = styled.a`
   color: ${({ theme }) => theme.colors.accent};
@@ -53,6 +56,7 @@ interface IProps {
   linkClickHandler: () => void
   expansionButtonHandler: () => void
   isExpanded: boolean
+  visited?: boolean
 }
 export class SectionDrawer extends React.Component<IProps> {
   constructor(props: IProps) {
@@ -67,7 +71,8 @@ export class SectionDrawer extends React.Component<IProps> {
       expandable = true,
       linkClickHandler,
       expansionButtonHandler,
-      isExpanded
+      isExpanded,
+      visited = false
     } = this.props
 
     return (
@@ -81,7 +86,7 @@ export class SectionDrawer extends React.Component<IProps> {
             }
           }}
         >
-          <Title>
+          <Title visited={visited} isExpanded={isExpanded}>
             <b>{title}</b>
             {isExpanded && <Seperator />}
             {isExpanded && (
