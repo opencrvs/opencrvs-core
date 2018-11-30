@@ -8,14 +8,14 @@ enum GENERATOR_CODE {
 
 export async function generateBirthRegistrationNumber(
   taskResource: fhir.Task,
-  token: string,
+  practitioner: fhir.Practitioner,
   generatorCode?: string
 ): Promise<string> {
   generatorCode = generatorCode ? generatorCode : BRN_GENERATOR_CODE
 
   switch (generatorCode) {
     case GENERATOR_CODE.BD.toString():
-      return await generateBdBRN(taskResource, token)
+      return await generateBdBRN(taskResource, practitioner)
     default:
       return generateDefaultBRN()
   }

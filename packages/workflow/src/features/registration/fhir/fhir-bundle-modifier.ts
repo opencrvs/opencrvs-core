@@ -1,16 +1,21 @@
 import { generateBirthTrackingId } from '../utils'
 import { getRegStatusCode } from './fhir-utils'
+import {
+  getLoggedInPractitionerResource,
+  getPractitionerPrimaryLocation,
+  getPractitionerName
+} from 'src/features/user/utils'
 import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
 import { ITokenPayload, getTokenPayload } from 'src/utils/authUtils.ts'
 import { REG_STATUS_REGISTERED } from './constants'
 import { generateBirthRegistrationNumber } from '../brnGenerator'
 
-export function modifyRegistrationBundle(
+export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
   eventType: EVENT_TYPE,
   token: string
-): fhir.Bundle {
+): Promise<fhir.Bundle> {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -26,16 +31,18 @@ export function modifyRegistrationBundle(
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
 
-  const tokenPayload = getTokenPayload(token)
-
   /* setting registration workflow status here */
-  setupRegistrationWorkflow(taskResource, tokenPayload)
+  setupRegistrationWorkflow(taskResource, getTokenPayload(token))
 
+  const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */
-  setupLastRegUser(taskResource, tokenPayload)
+  setupLastRegUser(taskResource, practitioner)
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
 
   /* setting author and time on notes here */
-  setupAuthorOnNotes(taskResource, tokenPayload)
+  setupAuthorOnNotes(taskResource, practitioner)
 
   return fhirBundle
 }
@@ -44,30 +51,37 @@ export async function markBundleAsRegistered(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const tokenPayload = getTokenPayload(token)
-
   const taskResource = getTaskResource(bundle) as fhir.Task
+  const practitioner = await getLoggedInPractitionerResource(token)
+
   /* Setting birth registration number here */
-  await pushBRN(taskResource, token)
+  await pushBRN(taskResource, practitioner)
 
   /* setting registration workflow status here */
-  setupRegistrationWorkflow(taskResource, tokenPayload, REG_STATUS_REGISTERED)
+  setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_REGISTERED
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
 
   /* setting lastRegUser here */
-  setupLastRegUser(taskResource, tokenPayload)
+  setupLastRegUser(taskResource, practitioner)
 
   return bundle
 }
 
 export async function pushBRN(
   taskResource: fhir.Task,
-  token: string
+  practitioner: fhir.Practitioner
 ): Promise<fhir.Task> {
   if (!taskResource) {
     throw new Error('Invalid Task resource found for registration')
   }
 
-  const brn = await generateBirthRegistrationNumber(taskResource, token)
+  const brn = await generateBirthRegistrationNumber(taskResource, practitioner)
 
   if (!taskResource.identifier) {
     taskResource.identifier = []
@@ -178,15 +192,38 @@ export function setupRegistrationWorkflow(
   return taskResource
 }
 
+export async function setupLastRegLocation(
+  taskResource: fhir.Task,
+  practitioner: fhir.Practitioner
+): Promise<fhir.Task> {
+  if (!practitioner || !practitioner.id) {
+    throw new Error('Invalid practitioner data found')
+  }
+  const primaryOffice = await getPractitionerPrimaryLocation(practitioner.id)
+
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  const regUserExtension = taskResource.extension.find(extension => {
+    return (
+      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+    )
+  })
+  if (regUserExtension) {
+    regUserExtension.valueString = `Location/${primaryOffice.id}`
+  } else {
+    taskResource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+      valueString: `Location/${primaryOffice.id}`
+    })
+  }
+  return taskResource
+}
+
 export function setupLastRegUser(
   taskResource: fhir.Task,
-  tokenPayload: ITokenPayload
+  practitioner: fhir.Practitioner
 ): fhir.Task {
-  // TODO: need to change it as soon as we have decided the approach
-  if (!tokenPayload || !tokenPayload.subject) {
-    tokenPayload.subject = 'DUMMY'
-  }
-
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -196,11 +233,11 @@ export function setupLastRegUser(
     )
   })
   if (regUserExtension) {
-    regUserExtension.valueString = tokenPayload.subject
+    regUserExtension.valueString = getPractitionerName(practitioner)
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-      valueString: tokenPayload.subject
+      valueString: getPractitionerName(practitioner)
     })
   }
   return taskResource
@@ -208,19 +245,15 @@ export function setupLastRegUser(
 
 export function setupAuthorOnNotes(
   taskResource: fhir.Task,
-  tokenPayload: ITokenPayload
+  practitioner: fhir.Practitioner
 ): fhir.Task {
-  // TODO: need to change it as soon as we have decided the approach
-  if (!tokenPayload || !tokenPayload.subject) {
-    tokenPayload.subject = 'DUMMY'
-  }
-
   if (!taskResource.note) {
     return taskResource
   }
+  const authorName = getPractitionerName(practitioner)
   taskResource.note.forEach(note => {
     if (!note.authorString) {
-      note.authorString = tokenPayload.subject
+      note.authorString = authorName
     }
   })
   return taskResource

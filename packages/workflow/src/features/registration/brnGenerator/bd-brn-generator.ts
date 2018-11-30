@@ -1,21 +1,20 @@
+import { getPaperFormID } from '../fhir/fhir-utils'
 import {
-  getPaperFormID,
-  getLoggedInPractitionerResource,
   getPractitionerLocations,
   getJurisDictionalLocations
-} from '../fhir/fhir-utils'
+} from 'src/features/user/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
 import * as Verhoeff from 'node-verhoeff'
 
 export async function generateBdBRN(
   taskResource: fhir.Task,
-  token: string
+  practitioner: fhir.Practitioner
 ): Promise<string> {
   /* adding current year */
   let brn = new Date().getFullYear().toString()
 
   /* appending BBS code for district & upozila & union */
-  brn = brn.concat((await getLocationBBSCode(token)) as string)
+  brn = brn.concat((await getLocationBBSCode(practitioner)) as string)
 
   /* appending paper form id */
   brn = brn.concat(getPaperFormID(taskResource) as string)
@@ -26,15 +25,14 @@ export async function generateBdBRN(
   return brn
 }
 
-export async function getLocationBBSCode(token: string): Promise<string> {
-  /* getting logged in practitioner */
-  const practitionerResource = await getLoggedInPractitionerResource(token)
-
-  if (!practitionerResource.id) {
-    throw new Error("Practioner's ID not found")
+export async function getLocationBBSCode(
+  practitioner: fhir.Practitioner
+): Promise<string> {
+  /* getting location list for logged in practitioner */
+  if (!practitioner || !practitioner.id) {
+    throw new Error('Invalid practioner data found')
   }
-  /* getting location list for practitioner */
-  const locations = await getPractitionerLocations(practitionerResource.id)
+  const locations = await getPractitionerLocations(practitioner.id)
 
   const jurisDictionalLocations = getJurisDictionalLocations()
   for (const location of locations) {

@@ -17,7 +17,7 @@ export async function createBirthRegistrationHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = modifyRegistrationBundle(
+    const payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
       EVENT_TYPE.BIRTH,
       getToken(request)
