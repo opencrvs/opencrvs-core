@@ -48,7 +48,7 @@ services:
     environment:
       - NODE_ENV=DEVELOPMENT
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
-      - WORKFLOW_SERVICE_URL=http://workflow:5050/
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - COUNTRY=bgd
     deploy:
       replicas: 2
