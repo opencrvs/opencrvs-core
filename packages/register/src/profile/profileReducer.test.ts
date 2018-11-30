@@ -1,7 +1,7 @@
 import * as actions from './profileActions'
 import { initialState } from './profileReducer'
 import { createStore, AppStore } from '../store'
-import { mockUserResponse } from '@opencrvs/register/src/tests/util'
+import { mockUserResponse } from 'src/tests/util'
 
 describe('profileReducer tests', () => {
   let store: AppStore

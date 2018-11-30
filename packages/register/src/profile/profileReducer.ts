@@ -12,10 +12,10 @@ import {
   IUserDetails,
   getUserDetails,
   storeUserDetails
-} from '@opencrvs/register/src/utils/userUtils'
+} from 'src/utils/userUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
-import { queries } from '@opencrvs/register/src/profile/queries'
+import { queries } from 'src/profile/queries'
 
 export type ProfileState = {
   authenticated: boolean
