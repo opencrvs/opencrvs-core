@@ -8,7 +8,6 @@ import {
   IFormProps
 } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { store } from '@opencrvs/register/src/App'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -30,6 +29,7 @@ import {
   IDraft,
   createReviewDraft
 } from '@opencrvs/register/src/drafts'
+import { Dispatch } from 'redux'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
@@ -113,12 +113,13 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
 const messages = defineMessages({
   queryError: {
     id: 'review.birthRegistration.queryError',
-    defaultMessage: 'An error occurred while fetching',
+    defaultMessage: 'An error occurred while fetching birth registration',
     description: 'The error message shown when a query fails'
   }
 })
 interface IReviewProps {
   theme: ITheme
+  dispatch: Dispatch
 }
 interface IDraftProp {
   draft: IDraft | undefined
@@ -204,7 +205,7 @@ export class ReviewFormView extends React.Component<IProps> {
 
     const child = reg.child || {}
 
-    const childNames = (child.name as GQLHumanName[]) || []
+    const childNames = child.name as GQLHumanName[]
     this.transformName(childNames, childDetails)
 
     childDetails.childBirthDate = child.birthDate
@@ -216,39 +217,96 @@ export class ReviewFormView extends React.Component<IProps> {
     return childDetails
   }
 
-  transformPerson = (person: GQLPerson = {}) => {
-    if (!person) {
+  transformMother = (mother: GQLPerson | undefined) => {
+    if (!mother) {
       return {}
     }
-    const personDetails = {} as IReviewSectionDetails
+    const motherDetails = {} as IReviewSectionDetails
 
-    const names = (person.name as GQLHumanName[]) || []
+    const names = mother.name as GQLHumanName[]
 
-    this.transformName(names, personDetails)
+    this.transformName(names, motherDetails)
 
-    const identifier = (person.identifier as GQLIdentityType) || []
-    this.transformIdentifier(identifier, personDetails)
+    const identifier = mother.identifier as GQLIdentityType
 
-    personDetails.gender = person.gender || ''
-    personDetails.motherBirthDate = person.birthDate || ''
-    personDetails.dateOfMarriage = person.dateOfMarriage || ''
-    personDetails.maritalStatus = person.maritalStatus || ''
-    personDetails.educationalAttainment = person.educationalAttainment || ''
+    this.transformIdentifier(identifier, motherDetails)
 
-    const nationality = (person.nationality as string[]) || []
-    personDetails.nationality = nationality[0]
+    motherDetails.gender = mother.gender
+    motherDetails.motherBirthDate = mother.birthDate
+    motherDetails.dateOfMarriage = mother.dateOfMarriage
+    motherDetails.maritalStatus = mother.maritalStatus
+    motherDetails.educationalAttainment = mother.educationalAttainment
 
-    const addresses = (person.address as GQLAddress[]) || []
+    const nationality = mother.nationality as string[]
+    motherDetails.nationality = nationality[0]
 
-    this.tramsformAddress(addresses, personDetails)
+    const addresses = mother.address as GQLAddress[]
 
-    return personDetails
+    this.tramsformAddress(addresses, motherDetails)
+
+    return motherDetails
+  }
+
+  transformFather = (father: GQLPerson | undefined) => {
+    if (!father) {
+      return {}
+    }
+    const fatherDetails = {} as IReviewSectionDetails
+    fatherDetails.fathersDetailsExist = true
+
+    const names = father.name as GQLHumanName[]
+
+    this.transformName(names, fatherDetails)
+
+    const identifier = father.identifier as GQLIdentityType
+    this.transformIdentifier(identifier, fatherDetails)
+
+    fatherDetails.gender = father.gender
+    fatherDetails.fatherBirthDate = father.birthDate
+    fatherDetails.dateOfMarriage = father.dateOfMarriage
+    fatherDetails.maritalStatus = father.maritalStatus
+    fatherDetails.educationalAttainment = father.educationalAttainment
+
+    const nationality = father.nationality as string[]
+    fatherDetails.nationality = nationality[0]
+
+    const addresses = father.address as GQLAddress[]
+
+    this.tramsformAddress(addresses, fatherDetails)
+
+    return fatherDetails
+  }
+
+  setFatherAddressSameAsMother(
+    father: IReviewSectionDetails,
+    mother: IReviewSectionDetails
+  ) {
+    father.permanentAddressSameAsMother =
+      father.countryPermanent === mother.countryPermanent &&
+      father.statePermanent === mother.statePermanent &&
+      father.districtPermanent === mother.districtPermanent &&
+      father.addressLine1Permanent === mother.addressLine1Permanent &&
+      father.addressLine2Permanent === mother.addressLine2Permanent &&
+      father.addressLine3Options1Permanent ===
+        mother.addressLine3Options1Permanent &&
+      father.addressLine4Permanent === mother.addressLine4Permanent &&
+      father.postalCodePermanent === mother.postalCodePermanent
+
+    father.addressSameAsMother =
+      father.country === mother.country &&
+      father.state === mother.state &&
+      father.district === mother.district &&
+      father.addressLine1 === mother.addressLine1 &&
+      father.addressLine2 === mother.addressLine2 &&
+      father.addressLine3Options1 === mother.addressLine3Options1 &&
+      father.addressLine4 === mother.addressLine4 &&
+      father.postalCode === mother.postalCode
   }
 
   transformRegistration = (reg: GQLBirthRegistration) => {
     const registrationDetails = {} as IReviewSectionDetails
 
-    const registration = (reg.registration as GQLRegistration) || {}
+    const registration = reg.registration as GQLRegistration
     registrationDetails.whoseContactDetails = registration.contact
 
     registrationDetails.presentAtBirthRegistration =
@@ -262,7 +320,8 @@ export class ReviewFormView extends React.Component<IProps> {
     telecom.map(tel => {
       if (tel.system === 'email') {
         registrationDetails.registrationEmail = tel.value
-      } else if (tel.system === 'phone') {
+      }
+      if (tel.system === 'phone') {
         registrationDetails.registrationPhone = tel.value
       }
     })
@@ -274,17 +333,23 @@ export class ReviewFormView extends React.Component<IProps> {
       return {}
     }
 
+    const child = this.transformChild(reg)
+    const mother = this.transformMother(reg.mother)
+    const father = this.transformFather(reg.father)
+    this.setFatherAddressSameAsMother(father, mother)
+    const registration = this.transformRegistration(reg)
+
     const reviewData = {
-      child: this.transformChild(reg),
-      mother: this.transformPerson(reg.mother),
-      father: this.transformPerson(reg.father),
-      registration: this.transformRegistration(reg)
+      child,
+      mother,
+      father,
+      registration
     }
 
     return reviewData
   }
   render() {
-    const { intl, theme, draft, draftId } = this.props
+    const { intl, theme, draft, draftId, dispatch } = this.props
     if (!draft) {
       return (
         <Query
@@ -311,7 +376,7 @@ export class ReviewFormView extends React.Component<IProps> {
 
             const transData = this.transformData(data.fetchBirthRegistration)
             const reviewDraft = createReviewDraft(draftId, transData)
-            store.store.dispatch(storeDraft(reviewDraft))
+            dispatch(storeDraft(reviewDraft))
 
             return <RegisterForm {...this.props} draft={reviewDraft} />
           }}

@@ -3,66 +3,74 @@ import { ReviewForm, FETCH_BIRTH_REGISTRATION_QUERY } from './ReviewForm'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { createReviewDraft } from '@opencrvs/register/src/drafts'
+import {
+  createReviewDraft,
+  IDraft,
+  setInitialDrafts,
+  storeDraft
+} from '@opencrvs/register/src/drafts'
 import { v4 as uuid } from 'uuid'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 
 describe('ReviewForm tests', async () => {
   const { store, history } = createStore()
 
   const mock: any = jest.fn()
   const form = getReviewForm(store.getState())
-  const draft = createReviewDraft(uuid(), {})
-  // it('error while fetching', async () => {
-  //   const graphqlMock = [
-  //     {
-  //       request: {
-  //         query: FETCH_BIRTH_REGISTRATION_QUERY
-  //       },
-  //       error: new Error('boom')
-  //     }
-  //   ]
 
-  //   const testComponent = createTestComponent(
-  //     <ReviewForm
-  //       location={mock}
-  //       history={history}
-  //       staticContext={mock}
-  //       registerForm={form}
-  //       tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
-  //       match={{
-  //         params: { draftId: draft.id, tabId: 'review' },
-  //         isExact: true,
-  //         path: '',
-  //         url: ''
-  //       }}
-  //       draftId={draft.id}
-  //     />,
-  //     store,
-  //     graphqlMock
-  //   )
-  //   // wait for mocked data to load mockedProvider
-  //   await new Promise(resolve => {
-  //     setTimeout(resolve, 0)
-  //   })
+  it('error while fetching', async () => {
+    const draft = createReviewDraft(uuid(), {})
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_BIRTH_REGISTRATION_QUERY
+        },
+        error: new Error('boom')
+      }
+    ]
 
-  //   testComponent.component.update()
+    const testComponent = createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={form}
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: draft.id, tabId: 'review' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftId={draft.id}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
 
-  //   expect(
-  //     testComponent.component
-  //       .find('#review-error-text')
-  //       .children()
-  //       .text()
-  //   ).toBe('An error occurred while fetching')
+    testComponent.component.update()
 
-  //   testComponent.component.unmount()
-  // })
+    expect(
+      testComponent.component
+        .find('#review-error-text')
+        .children()
+        .text()
+    ).toBe('An error occurred while fetching birth registration')
+
+    testComponent.component.unmount()
+  })
   it('fetched data', async () => {
+    const draft = createReviewDraft(uuid(), {})
     const graphqlMock = [
       {
         request: {
           query: FETCH_BIRTH_REGISTRATION_QUERY,
-          variables: { id: '1fa9a4ab-e0d2-41d8-b8d0-dbfa3d57728b' }
+          variables: { id: draft.id }
         },
         result: {
           data: {
@@ -127,7 +135,7 @@ describe('ReviewForm tests', async () => {
                   },
                   {
                     system: 'email',
-                    value: 'sa@dfas.asd'
+                    value: 'moyna@ocrvs.com'
                   }
                 ]
               },
@@ -168,13 +176,283 @@ describe('ReviewForm tests', async () => {
     })
 
     testComponent.component.update()
+    const data = testComponent.component
+      .find(RegisterForm)
+      .prop('draft') as IDraft
 
-    expect(
-      testComponent.component
-        .find('#review-error-text')
-        .children()
-        .text()
-    ).toBe('An error occurred while fetching')
+    expect(data.data.child).toEqual({
+      attendantAtBirth: 'NURSE',
+      childBirthDate: '2001-01-01',
+      familyName: 'আকাশ',
+      familyNameEng: 'Akash',
+      firstNames: '',
+      firstNamesEng: '',
+      gender: 'male',
+      typeOfBirth: 'SINGLE',
+      weightAtBirth: 2
+    })
+
+    testComponent.component.unmount()
+  })
+  it('empty data', async () => {
+    const draft = createReviewDraft(uuid(), {})
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          variables: { id: draft.id }
+        },
+        result: {
+          data: {
+            fetchBirthRegistration: {}
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={form}
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: draft.id, tabId: 'review' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftId={draft.id}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
+    testComponent.component.unmount()
+  })
+  it('father data and contact father', async () => {
+    const draft = createReviewDraft(uuid(), {})
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          variables: { id: draft.id }
+        },
+        result: {
+          data: {
+            fetchBirthRegistration: {
+              child: null,
+              mother: null,
+              father: {
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'আজমল'
+                  },
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Azmol'
+                  }
+                ],
+                birthDate: '2001-01-01',
+                maritalStatus: 'MARRIED',
+                dateOfMarriage: '2001-01-01',
+                educationalAttainment: 'PRIMARY_ISCED_1',
+                nationality: ['BGD'],
+                identifier: [{ id: '1233', type: 'PASSPORT' }],
+                address: [
+                  {
+                    type: 'PERMANENT',
+                    line: ['12', '', 'union1', 'upazila10'],
+                    district: 'district2',
+                    state: 'state2',
+                    postalCode: '',
+                    country: 'BGD'
+                  },
+                  {
+                    type: 'CURRENT',
+                    line: ['12', '', 'union1', 'upazila10'],
+                    district: 'district2',
+                    state: 'state2',
+                    postalCode: '',
+                    country: 'BGD'
+                  }
+                ],
+                telecom: [
+                  {
+                    system: 'phone',
+                    value: '01711111111'
+                  },
+                  {
+                    system: 'email',
+                    value: 'ajmol@ocrvs.com'
+                  }
+                ]
+              },
+              registration: {
+                contact: 'FATHER'
+              },
+              attendantAtBirth: 'NURSE',
+              weightAtBirth: 2,
+              birthType: 'SINGLE',
+              presentAtBirthRegistration: 'MOTHER_ONLY'
+            }
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={form}
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: draft.id, tabId: 'review' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftId={draft.id}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
+    testComponent.component.unmount()
+  })
+
+  it('contact null', async () => {
+    const draft = createReviewDraft(uuid(), {})
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          variables: { id: draft.id }
+        },
+        result: {
+          data: {
+            fetchBirthRegistration: {
+              child: null,
+              mother: null,
+              father: null,
+              registration: {
+                contact: 'MOTHER'
+              },
+              attendantAtBirth: 'NURSE',
+              weightAtBirth: 2,
+              birthType: 'SINGLE',
+              presentAtBirthRegistration: 'MOTHER_ONLY'
+            }
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={form}
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: draft.id, tabId: 'review' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftId={draft.id}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
+    testComponent.component.unmount()
+  })
+
+  it('review data from store', async () => {
+    const draft = createReviewDraft(uuid(), {})
+    draft.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        typeOfBirth: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationEmail: 'moyna@ocrvs.com',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER'
+      }
+    }
+    const initalDrafts = JSON.parse('[]')
+    store.dispatch(setInitialDrafts(initalDrafts))
+    store.dispatch(storeDraft(draft))
+
+    const testComponent = createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={form}
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: draft.id, tabId: 'review' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftId={draft.id}
+      />,
+      store
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
+
+    testComponent.component.update()
+    const data = testComponent.component
+      .find(RegisterForm)
+      .prop('draft') as IDraft
+
+    expect(data.data).toEqual({
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        typeOfBirth: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationEmail: 'moyna@ocrvs.com',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER'
+      }
+    })
 
     testComponent.component.unmount()
   })

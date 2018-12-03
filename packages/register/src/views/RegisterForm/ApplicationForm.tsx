@@ -24,7 +24,6 @@ function mapStatetoProps(
 ) {
   const { match } = props
   const registerForm = getRegisterForm(state)
-  console.log(state.drafts.drafts)
   const draft = state.drafts.drafts.find(
     ({ id }) => id === match.params.draftId
   )

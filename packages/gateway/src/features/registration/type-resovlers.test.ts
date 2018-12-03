@@ -174,7 +174,9 @@ describe('Registration type resolvers', () => {
       })
       expect(registration).toBeDefined()
       expect(registration.resourceType).toBe('Task')
-      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Task?focus=123')
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/Task?focus=Composition/123'
+      )
     })
 
     it('returns weightAtBirth', async () => {
@@ -488,6 +490,13 @@ describe('Registration type resolvers', () => {
       expect(mock).toBeCalledWith(
         'http://localhost:5001/fhir/DocumentReference/zzz'
       )
+    })
+
+    it('contact type resolver', async () => {
+      // @ts-ignore
+      const contact = await typeResolvers.Registration.contact(mockTask)
+
+      expect(contact).toEqual('MOTHER')
     })
 
     it('throw when tasks has no focus', async () => {

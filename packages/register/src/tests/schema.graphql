@@ -313,6 +313,7 @@ type Query {
     from: Date
     to: Date
   ): [Notification]
+  fetchBirthRegistration(id: ID): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String
