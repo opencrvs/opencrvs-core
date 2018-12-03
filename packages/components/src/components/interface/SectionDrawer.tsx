@@ -1,23 +1,26 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from './../buttons'
+import { boolean } from 'joi'
 
 const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
   background: ${({ theme }) => theme.colors.white};
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 12px 0 rgba(0, 0, 0, 0.11)` : ``};
 `
-const TitleContainer = styled.div`
+const TitleContainer = styled.div.attrs<{ expandable: boolean }>({})`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
   display: flex;
   align-items: center;
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
-  cursor: pointer;
+  cursor: ${({ expandable }) => (expandable ? 'pointer' : 'auto')};
 `
-const Title = styled.div`
+const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
   width: 100vw;
   padding: 25px;
+  color: ${({ theme, visited, isExpanded }) =>
+    visited && !isExpanded ? theme.colors.primary : theme.colors.secondary};
 `
 const EditLink = styled.a`
   color: ${({ theme }) => theme.colors.accent};
@@ -43,31 +46,21 @@ const SectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   overflow: hidden;
   transition: ${({ expanded }) =>
     expanded
-      ? 'max-height 0.6s cubic-bezier(0.65, 0.05, 0.36, 1)'
-      : 'max-height 0ms'};
+      ? 'max-height 0.2s cubic-bezier(0.65, 0.05, 0.36, 1)'
+      : 'max-height 0.2s'};
 `
 interface IProps {
   title: string
   linkText: string
   expandable?: boolean
   linkClickHandler: () => void
-}
-
-interface IState {
+  expansionButtonHandler: () => void
   isExpanded: boolean
+  visited?: boolean
 }
-
-export class SectionDrawer extends React.Component<IProps, IState> {
+export class SectionDrawer extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props)
-    this.state = {
-      isExpanded: false
-    }
-  }
-  toggleExpand = () => {
-    this.setState({
-      isExpanded: !this.state.isExpanded
-    })
   }
 
   render() {
@@ -76,23 +69,27 @@ export class SectionDrawer extends React.Component<IProps, IState> {
       children,
       linkText,
       expandable = true,
-      linkClickHandler
+      linkClickHandler,
+      expansionButtonHandler,
+      isExpanded,
+      visited = false
     } = this.props
 
     return (
-      <SectionDrawerContainer expanded={this.state.isExpanded}>
-        {<ExpandedIndicator expanded={this.state.isExpanded} />}
+      <SectionDrawerContainer expanded={isExpanded}>
+        {<ExpandedIndicator expanded={isExpanded} />}
         <TitleContainer
+          expandable={expandable}
           onClick={() => {
             if (expandable === true) {
-              this.toggleExpand()
+              expansionButtonHandler()
             }
           }}
         >
-          <Title>
+          <Title visited={visited} isExpanded={isExpanded}>
             <b>{title}</b>
-            {this.state.isExpanded && <Seperator />}
-            {this.state.isExpanded && (
+            {isExpanded && <Seperator />}
+            {isExpanded && (
               <EditLink
                 onClick={e => {
                   e.stopPropagation()
@@ -105,12 +102,16 @@ export class SectionDrawer extends React.Component<IProps, IState> {
           </Title>
           {expandable && (
             <ExpansionButton
-              expanded={this.state.isExpanded}
-              onClick={this.toggleExpand}
+              className="_expansionBtn"
+              expanded={isExpanded}
+              onClick={e => {
+                e.stopPropagation()
+                expansionButtonHandler()
+              }}
             />
           )}
         </TitleContainer>
-        <SectionContainer expanded={this.state.isExpanded}>
+        <SectionContainer className="_sectionContainer" expanded={isExpanded}>
           {children}
         </SectionContainer>
       </SectionDrawerContainer>
