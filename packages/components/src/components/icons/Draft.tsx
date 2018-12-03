@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 export const Draft = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={76} height={76} {...props}>
+  <svg width={50} height={50} {...props}>
     <title>{'B723142B-1F93-469E-8E2A-246EAB3BED54'}</title>
     <defs>
       <rect id="prefix__b" x={0} y={0} width={50} height={50} rx={2.2} />
@@ -25,7 +25,7 @@ export const Draft = (props: React.HTMLAttributes<SVGElement>) => (
         />
       </filter>
     </defs>
-    <g transform="translate(13 13)" fill="none" fillRule="evenodd">
+    <g transform="translate(0 0)" fill="none" fillRule="evenodd">
       <use fill="#000" filter="url(#prefix__a)" xlinkHref="#prefix__b" />
       <use fill="#5E93ED" xlinkHref="#prefix__b" />
       <g fill="#5E93ED" fillRule="nonzero">

@@ -18,7 +18,6 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from 'src/components/interface/footer'
-// import { PreviewSection } from './PreviewSection'
 import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
@@ -263,15 +262,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
             }
           >
             {activeSection.viewType === 'preview' && (
-              // <PreviewSection draft={draft} onSubmit={this.submitForm} />
               <ReviewSection
                 draft={draft}
                 SubmitClickEvent={this.submitForm}
                 SaveDraftClickEvent={() => history.push('/')}
                 DeleteApplicationClickEvent={() => {
-                  alert('Delete draft')
-                  // deleteDraft(draft)
-                  // history.push('/')
+                  this.props.deleteDraft(draft)
+                  history.push('/')
                 }}
               />
             )}

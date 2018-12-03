@@ -13,7 +13,7 @@ import {
   Delete,
   Draft
 } from '@opencrvs/components/lib/icons'
-import { findIndex, filter, flatten, identity } from 'lodash'
+import { findIndex, filter, flatten, identity, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { DocumentViewer } from '@opencrvs/components/lib/interface'
@@ -223,6 +223,13 @@ const DeleteApplication = styled.a`
     margin-right: 15px;
   }
 `
+const SaveDraft = styled(RejectApplication)`
+  div:first-of-type {
+    height: 50px;
+    background-color: ${({ theme }) => theme.colors.saveDraftBtn};
+    padding: 0px;
+  }
+`
 
 interface IProps {
   draft: IDraft
@@ -330,9 +337,11 @@ const prepDocumentOption = (draft: IDraft): SelectComponentOptions[] => {
   const draftItemName = documentsSection.id
   const documentviewerOptions: SelectComponentOptions[] = []
 
-  const uploadedDocuments = draft.data[draftItemName]
-    ? (draft.data[draftItemName].image_uploader as FullIFileValue[])
-    : []
+  const uploadedDocuments =
+    draft.data[draftItemName] &&
+    isArray(draft.data[draftItemName].image_uploader)
+      ? (draft.data[draftItemName].image_uploader as FullIFileValue[])
+      : []
 
   uploadedDocuments.map(document => {
     const label = document.title + ' ' + document.description
@@ -566,7 +575,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             {!!SubmitClickEvent && (
               <ButtonContainer>
                 <RegisterApplication
-                  id="sendForReviewBtn"
+                  id="submit_form"
                   icon={() => <TickLarge />}
                   align={ICON_ALIGNMENT.LEFT}
                   onClick={SubmitClickEvent}
@@ -579,10 +588,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
             {!!SaveDraftClickEvent && (
               <ButtonContainer>
-                <RejectApplication
+                <SaveDraft
                   id="saveAsDraftBtn"
                   title={intl.formatMessage(messages.ValueSaveAsDraft)}
-                  icon={() => <TickLarge />}
+                  icon={() => <Draft />}
                   onClick={SaveDraftClickEvent}
                 />
               </ButtonContainer>
@@ -596,7 +605,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }}
             />
           </Column>
-          <Draft />
         </Row>
         <DButtonContainer>
           <DeleteApplication onClick={DeleteApplicationClickEvent}>
