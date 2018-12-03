@@ -127,8 +127,8 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
               fill={theme.colors.secondary}
               fontFamily={theme.fonts.lightFont}
               angle={-90}
+              dy={20}
               offset={20}
-              width={150}
               value={yAxisLabel}
               position="left"
             />

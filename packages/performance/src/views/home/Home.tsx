@@ -217,7 +217,7 @@ const LabelContainer = styled.div`
   justify-content: center;
   align-items: center;
   flex-flow: row wrap;
-  padding: 15px 0;
+  padding: 20px 0;
   color: ${({ theme }) => theme.colors.copy};
   width: 100%;
 `
@@ -279,7 +279,6 @@ class HomeView extends React.Component<InjectedIntlProps> {
               )}
             </BoxTitle>
             <LabelContainer>
-              <Label>2018 estimate = 10000</Label>
               <Label>2018 estimate = 10000</Label>
             </LabelContainer>
             <Line
