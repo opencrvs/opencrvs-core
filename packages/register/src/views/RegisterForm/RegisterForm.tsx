@@ -170,8 +170,31 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   successfulSubmission = (response: string) => {
     const { history, draft } = this.props
+    const childData = this.props.draft.data.child
+    let fullNameInBn = ''
+    let fullNameInEng = ''
+
+    if (childData.firstNames) {
+      fullNameInBn = `${String(childData.firstNames)} ${String(
+        childData.familyName
+      )}`
+    } else {
+      fullNameInBn = String(childData.familyName)
+    }
+
+    if (childData.firstNamesEng) {
+      fullNameInEng = `${String(childData.firstNamesEng)} ${String(
+        childData.familyNameEng
+      )}`
+    } else {
+      fullNameInEng = String(childData.familyNameEng)
+    }
+
     history.push('/saved', {
-      trackingId: response
+      trackingId: response,
+      declaration: true,
+      fullNameInBn,
+      fullNameInEng
     })
     this.props.deleteDraft(draft)
   }
@@ -384,11 +407,14 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(mapStateToProps, {
-  modifyDraft,
-  deleteDraft,
-  goToTab: goToTabAction,
-  handleSubmit: values => {
-    console.log(values)
+export const RegisterForm = connect<Props, DispatchProps>(
+  mapStateToProps,
+  {
+    modifyDraft,
+    deleteDraft,
+    goToTab: goToTabAction,
+    handleSubmit: values => {
+      console.log(values)
+    }
   }
-})(injectIntl<FullProps>(RegisterFormView))
+)(injectIntl<FullProps>(RegisterFormView))
