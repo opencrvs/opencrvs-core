@@ -145,7 +145,9 @@ describe('Verify fhir bundle modifier functions', () => {
       )
 
       expect(taskResource.extension[1].valueString).toBeDefined()
-      expect(taskResource.extension[1].valueString).toEqual('Shakib Al Hasan')
+      expect(taskResource.extension[1].valueString).toEqual(
+        'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+      )
     })
 
     it('Will push the last modified by userinfo even if no extension is defined yet on task resource', () => {
@@ -157,7 +159,9 @@ describe('Verify fhir bundle modifier functions', () => {
       )
 
       expect(taskResource.extension[0].valueString).toBeDefined()
-      expect(taskResource.extension[0].valueString).toEqual('Shakib Al Hasan')
+      expect(taskResource.extension[0].valueString).toEqual(
+        'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+      )
     })
 
     it('Will update the last modified by userinfo instead of always adding a new extension', () => {
@@ -169,7 +173,9 @@ describe('Verify fhir bundle modifier functions', () => {
       )
 
       expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
-      expect(taskResource.extension[1].valueString).toEqual('Shakib Al Hasan')
+      expect(taskResource.extension[1].valueString).toEqual(
+        'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+      )
     })
   })
   it('setupAuthorOnNotes will update the author name on notes', () => {
@@ -202,7 +208,7 @@ describe('Verify fhir bundle modifier functions', () => {
 
     expect(taskResource.note.length).toBe(1)
     expect(taskResource.note[0]).toEqual({
-      authorString: 'Shakib Al Hasan',
+      authorString: 'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf',
       text: 'this is a test note',
       time: '2018-10-31T09:45:05+10:00'
     })

@@ -11,7 +11,7 @@ export default async function updateTaskHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = modifyTaskBundle(
+    const payload = await modifyTaskBundle(
       request.payload as fhir.Bundle,
       getToken(request)
     )
