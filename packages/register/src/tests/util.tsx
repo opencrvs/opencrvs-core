@@ -148,9 +148,16 @@ export const mockUserResponse = {
           __typename: 'Location'
         },
         {
-          id: '6a87dcd8-d784-4607-808b-50a45e62e405',
+          id: '123456789',
           name: 'BAKTARPUR',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UNION',
+              __typename: 'Identifier'
+            }
+          ],
           __typename: 'Location'
         }
       ],

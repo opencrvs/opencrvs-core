@@ -44,8 +44,8 @@ import { goToEvents as goToEventsAction } from 'src/navigation'
 import { IUserDetails, IIdentifier, ILocation } from 'src/utils/userUtils'
 
 export const FETCH_REGISTRATION_QUERY = gql`
-  query list($locationId: String) {
-    listBirthRegistrations(locationIds: [$locationId]) {
+  query list($locationIds: [String]) {
+    listBirthRegistrations(locationIds: $locationIds) {
       id
       registration {
         trackingId
@@ -278,7 +278,7 @@ type IWorkQueueProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseWorkQueueProps
 
-class WorkQueueView extends React.Component<IWorkQueueProps> {
+export class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'application':
@@ -426,6 +426,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
             })) !== undefined
         )
       })
+
     return identifier && identifier.id
   }
 
@@ -550,9 +551,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
           />
         </HomeViewHeader>
         <Container>
+          (
           <Query
             query={FETCH_REGISTRATION_QUERY}
-            variables={{ locationId: this.getUnionId() }}
+            variables={{ locationIds: [this.getUnionId()] }}
           >
             {({ loading, error, data }) => {
               if (loading) {
@@ -608,6 +610,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
               )
             }}
           </Query>
+          )
         </Container>
       </>
     )
