@@ -30,9 +30,10 @@ import {
 import { IDraft } from 'src/drafts'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
-import { getRegisterForm } from 'src/forms/register/selectors'
+import { getRegisterForm } from 'src/forms/register/application-selectors'
 import { IStoreState } from 'src/store'
 import { getConditionalActionsForField } from 'src/forms/utils'
+import { DRAFT_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 
 const FormAction = styled.div`
   display: flex;
@@ -157,7 +158,7 @@ function renderSelectLabel(
 }
 
 function renderFileSubject(files: IFileValue[]) {
-  return files.map(file => file.optionValues.join(' ')).join(', ')
+  return files && files.map(file => file.optionValues.join(' ')).join(', ')
 }
 
 function renderValue(
@@ -191,7 +192,6 @@ class PreviewSectionForm extends React.Component<
     const formSections = registerForm.sections.filter(
       ({ viewType }) => viewType === 'form'
     )
-
     // REFACTOR
     const emptyFieldsBySection = formSections.reduce(
       (sections, section: IFormSection) => {
@@ -267,7 +267,12 @@ class PreviewSectionForm extends React.Component<
                     <InformationMissingLink
                       key={name}
                       onClick={() =>
-                        this.props.goToTab(draft.id, section.id, name)
+                        this.props.goToTab(
+                          DRAFT_BIRTH_PARENT_FORM_TAB,
+                          this.props.draft.id,
+                          section.id,
+                          name
+                        )
                       }
                     >
                       {intl.formatMessage(label)}
@@ -311,6 +316,7 @@ class PreviewSectionForm extends React.Component<
                             <InformationMissingLink
                               onClick={() =>
                                 this.props.goToTab(
+                                  DRAFT_BIRTH_PARENT_FORM_TAB,
                                   draft.id,
                                   section.id,
                                   field.name

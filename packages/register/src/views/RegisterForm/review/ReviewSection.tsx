@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { IDraft } from 'src/drafts'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
-import { getRegisterForm } from 'src/forms/register/selectors'
+import { getRegisterForm } from 'src/forms/register/application-selectors'
 import { EditConfirmation } from './EditConfirmation'
 import { getConditionalActionsForField } from 'src/forms/utils'
 import { TickLarge, CrossLarge } from '@opencrvs/components/lib/icons'
@@ -37,6 +37,7 @@ import {
   LIST,
   PARAGRAPH
 } from 'src/forms'
+import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 
 const messages = defineMessages({
   valueYes: {
@@ -526,7 +527,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               show={this.state.displayEditDialog}
               handleClose={this.toggleDisplayDialog}
               handleEdit={() => {
-                this.props.goToTab(draft.id, this.state.editClickedSectionId)
+                this.props.goToTab(
+                  REVIEW_BIRTH_PARENT_FORM_TAB,
+                  draft.id,
+                  this.state.editClickedSectionId
+                )
               }}
             />
           </Column>
