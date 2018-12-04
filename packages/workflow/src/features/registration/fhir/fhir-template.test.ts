@@ -110,14 +110,18 @@ describe('Verify fhir templates', () => {
       expect(taskResourse).toEqual(testFhirBundle.entry[1].resource)
     })
     it('returns the task resource properly when Task BundleEntry is sent', () => {
-      const taskResourse = getTaskResource(testFhirBundle.entry[1])
+      const payload = {
+        type: 'document',
+        entry: [{ ...testFhirBundle.entry[1] }]
+      }
+      const taskResourse = getTaskResource(payload)
 
       expect(taskResourse).toBeDefined()
       expect(taskResourse).toEqual(testFhirBundle.entry[1].resource)
     })
     it('throws error if provided document type is not FhirBundle or FhirBundleTaskEntry ', () => {
       const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry = undefined
+      fhirBundle.entry[0].resource.resourceType = undefined
       expect(() => getTaskResource(fhirBundle)).toThrowError(
         'Unable to find Task Bundle from the provided data'
       )
