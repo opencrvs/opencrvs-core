@@ -10492,6 +10492,11 @@ node-releases@^1.0.1:
   dependencies:
     semver "^5.3.0"
 
+node-verhoeff@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/node-verhoeff/-/node-verhoeff-0.0.11.tgz#504459a02822499cce020baaf51fbb2b53be59af"
+  integrity sha1-UERZoCgiSZzOAguq9R+7K1O+Wa8=
+
 nodemon@^1.11.0, nodemon@^1.17.5, nodemon@^1.18.5:
   version "1.18.7"
   resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-1.18.7.tgz#716b66bf3e89ac4fcfb38a9e61887a03fc82efbb"
