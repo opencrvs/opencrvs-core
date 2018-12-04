@@ -1,8 +1,9 @@
-import { testFhirBundle } from 'src/test/utils'
+import { testFhirBundle, testFhirTaskBundle } from 'src/test/utils'
 import {
   getSharedContactMsisdn,
   getInformantName,
   getTrackingId,
+  getEntryId,
   getBirthRegistrationNumber,
   getRegStatusCode,
   getPaperFormID,
@@ -438,5 +439,21 @@ describe('Verify getRegStatusCode', () => {
       )
       expect(getLoggedInPractitionerResource(token)).rejects.toThrowError()
     })
+  })
+})
+
+describe('Verify getEntryId', () => {
+  it('Returned entry id properly', () => {
+    const entryId = getEntryId(testFhirTaskBundle)
+    expect(entryId).toMatch('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+  })
+
+  it('Throws error when invalid fhir bundle is sent', () => {
+    expect(() =>
+      getEntryId({
+        resourceType: 'Bundle',
+        type: 'document'
+      })
+    ).toThrowError('getEntryId: Invalid FHIR bundle found for declaration')
   })
 })
