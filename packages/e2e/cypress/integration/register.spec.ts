@@ -156,6 +156,9 @@ context('Register', () => {
     // DOCUMENTS
     cy.get('#next_section').click()
     // PREVIEW
+    cy.get('#next_button_child').click()
+    cy.get('#next_button_mother').click()
+    cy.get('#next_button_father').click()
     cy.get('#submit_form').click()
     // MODAL
     // cy.get('#submit_confirm').click()
