@@ -17,12 +17,13 @@ function FormTabsComponent({
 }: IFormTabProps & InjectedIntlProps) {
   return (
     <Tabs>
-      {sections.map(({ name, id }) => (
+      {sections.map(({ name, id, disabled }) => (
         <Tab
           id={`tab_${id}`}
           onClick={() => onTabClick(id)}
           key={id}
           active={activeTabId === id}
+          disabled={disabled}
         >
           {intl.formatMessage(name)}
         </Tab>
