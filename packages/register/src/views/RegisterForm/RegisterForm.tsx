@@ -301,6 +301,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         </ViewHeaderWithTabs>
         <FormContainer>
           <Swipeable
+            disabled={isReviewSection}
             id="swipeable_block"
             trackMouse
             onSwipedLeft={() =>
