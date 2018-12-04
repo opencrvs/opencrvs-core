@@ -44,6 +44,9 @@ export const typeResolvers: GQLResolver = {
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
+    maritalStatus: person => {
+      return person.maritalStatus.text
+    },
     multipleBirth: person => {
       return person.multipleBirthInteger
     },
@@ -63,13 +66,19 @@ export const typeResolvers: GQLResolver = {
         nationalityExtension.extension
       )
 
-      return (
+      const coding =
         (countryCodeExtension &&
           countryCodeExtension.valueCodeableConcept &&
           countryCodeExtension.valueCodeableConcept.coding &&
-          countryCodeExtension.valueCodeableConcept.coding[0].code) ||
-        null
-      )
+          countryCodeExtension.valueCodeableConcept.coding) ||
+        []
+
+      // Nationality could be multiple
+      const nationality = coding.map(n => {
+        return n.code
+      })
+
+      return nationality
     },
     educationalAttainment: person => {
       const educationalAttainmentExtension = findExtension(
@@ -118,6 +127,13 @@ export const typeResolvers: GQLResolver = {
         const docRefRes = await fetch(`${fhirUrl}/${docRefReference}`)
         return docRefRes.json()
       })
+    },
+    contact: task => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
     }
   },
 
@@ -208,7 +224,9 @@ export const typeResolvers: GQLResolver = {
       return res.json()
     },
     async registration(composition: ITemplatedComposition) {
-      const res = await fetch(`${fhirUrl}/Task?focus=${composition.id}`) // TODO this is returning all tasks no matter what
+      const res = await fetch(
+        `${fhirUrl}/Task?focus=Composition/${composition.id}`
+      ) // TODO this is returning all tasks no matter what
       const taskBundle = await res.json()
 
       if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
@@ -231,7 +249,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BODY_WEIGHT_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueQuantity.value
+      return data.entry[0].resource.valueQuantity.value
     },
     async birthType(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -247,7 +265,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_TYPE_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueInteger
+      return data.entry[0].resource.valueQuantity.value
     },
     async attendantAtBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -263,7 +281,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_ATTENDANT_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueString
+      return data.entry[0].resource.valueString
     },
     async birthRegistrationType(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -279,7 +297,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_TYPE_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueString
+      return data.entry[0].resource.valueString
     },
     async presentAtBirthRegistration(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
@@ -295,7 +313,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_PRESENT_CODE}`
       )
       const data = await res.json()
-      return data.resource.valueString
+      return data.entry[0].resource.valueString
     },
     async childrenBornAliveToMother(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(

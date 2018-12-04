@@ -2,6 +2,22 @@ import { resolvers } from './root-resolvers'
 import * as fetch from 'jest-fetch-mock'
 
 describe('Registration root resolvers', () => {
+  describe('fetchBirthRegistration()', () => {
+    it('returns object of composition result', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+        })
+      )
+      // @ts-ignore
+      const composition = await resolvers.Query.fetchBirthRegistration(
+        {},
+        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
   describe('listBirthRegistrations()', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))

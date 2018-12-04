@@ -53,6 +53,10 @@ type BirthRegistration {
   mother: Person
   father: Person
   informant: Person
+  birthType: BirthType # Not in BDRIS2
+  weightAtBirth: Float
+  attendantAtBirth: AttendantType
+  presentAtBirthRegistration: BirthRegPresence
   birthLocation: Location
   birthRegistrationType: BirthRegType
   createdAt: Date
@@ -309,6 +313,7 @@ type Query {
     from: Date
     to: Date
   ): [Notification]
+  fetchBirthRegistration(id: ID): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String
@@ -335,6 +340,7 @@ type Registration {
   type: RegistrationType
   attachments: [Attachment]
   location: Location
+  contact: RegistrationContactType
 }
 
 input RegistrationInput {

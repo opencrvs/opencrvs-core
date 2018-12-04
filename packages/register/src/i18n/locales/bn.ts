@@ -384,6 +384,8 @@ export const BENGALI_STATE = {
     'formFields.dateOfMarriage': 'বিয়ের তারিখ',
     'register.form.tabs.childTab': 'শিশু',
     'register.form.section.childTitle': 'শিশু এর বিবরণ',
+    'register.form.valueYes': 'হাঁ',
+    'register.form.valueNo': 'না',
     'formFields.childFirstNames': 'নামের প্রথমাংশ',
     'formFields.childFamilyName': 'পারিবারিক নাম',
     'formFields.childFirstNamesEng': 'নামের প্রথমাংশ (in english)',
@@ -445,6 +447,7 @@ export const BENGALI_STATE = {
     'register.form.tabs.documentsTab': 'সমর্থনকারী কাগজপত্র',
     'register.form.section.documentsTitle': 'সমর্থনকারী কাগজপত্র',
     'register.form.tabs.previewTab': 'প্রিভিউ',
+    'review.form.tabs.reviewTab': 'পর্যালোচনা',
     'register.form.section.documents.paragraph':
       'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
     'register.form.section.documents.list.informantAttestation':
@@ -458,6 +461,7 @@ export const BENGALI_STATE = {
     'register.form.section.documents.list.otherDocuments':
       'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি',
     'register.form.section.previewTitle': 'প্রিভিউ',
+    'register.form.section.reviewTitle': 'পর্যালোচনা',
     'register.form.tabs.registrationTab': 'নিবন্ধন',
     'register.form.section.registrationTitle': 'নিবন্ধন',
     'formFields.registration.whoIsPresent': 'নিবন্ধন জন্য উপস্থিত ব্যক্তি',
@@ -490,12 +494,15 @@ export const BENGALI_STATE = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
     'validations.requiredSymbol': '',
-    'register.form.submit': 'জমা দিন',
+    'register.form.submit': 'পর্যালোচনার জন্য পাঠান',
+    'register.form.saveAsDraft': 'Save as draft',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
     'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
+    'register.form.previewBirthRegistration': ' জন্ম ঘোষণাপত্র প্রদর্শন',
+    'register.form.reviewBirthRegistration': ' জন্ম ঘোষণাপত্র পর্যালোচনা',
     'register.form.saveDraft': 'খসড়া সংরক্ষণ',
     'register.form.next': 'পরবর্তী',
     'register.form.modal.preview': 'প্রিভিউ',
@@ -634,6 +641,8 @@ export const BENGALI_STATE = {
     'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
+    'review.edit.modal.confirmationText':
+      'আপনি কি নিশ্চিত, আপনি অ্যাপ্লিকেশন সম্পাদনা করতে চান?',
     'review.rejection.form': 'প্রত্যাখ্যান ফর্ম',
     'review.rejection.form.title': 'প্রত্যাখ্যানের কারণ',
     'review.rejection.form.reasons': 'প্রত্যাখ্যানের কারণসমূহ:',
@@ -650,6 +659,7 @@ export const BENGALI_STATE = {
     'review.button.register': 'নিবন্ধন',
     'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'সমর্থনকারী কাগজপত্র',
-    'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন'
+    'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন',
+    'review.form.deleteApplication': 'আবেদন মুছে দিন'
   }
 }

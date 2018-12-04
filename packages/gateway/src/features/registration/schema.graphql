@@ -250,6 +250,7 @@ type Attachment { # -> DocumentReference
 }
 
 type Query {
+  fetchBirthRegistration(id: ID!): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String

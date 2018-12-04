@@ -217,7 +217,7 @@ const LabelContainer = styled.div`
   justify-content: center;
   align-items: center;
   flex-flow: row wrap;
-  padding-top: 20px;
+  padding: 20px 0;
   color: ${({ theme }) => theme.colors.copy};
   width: 100%;
 `
@@ -226,7 +226,7 @@ const Label = styled.div`
   background-color: rgba(150, 150, 150, 0.1);
   border-radius: 17px;
   padding: 5px 10px 5px 7px;
-  margin: 2px 5px 2px 0;
+  margin: 2px 10px 2px 0;
   display: flex;
   font-size: 12px;
   font-weight: 600;
