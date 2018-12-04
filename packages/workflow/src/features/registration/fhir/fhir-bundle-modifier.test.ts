@@ -4,13 +4,12 @@ import {
   setupRegistrationType,
   setupRegistrationWorkflow,
   setupLastRegUser,
+  setupLastRegLocation,
   setupAuthorOnNotes
 } from './fhir-bundle-modifier'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
 import { testFhirBundle } from 'src/test/utils'
 import { cloneDeep } from 'lodash'
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 
 describe('Verify fhir bundle modifier functions', () => {
@@ -124,72 +123,70 @@ describe('Verify fhir bundle modifier functions', () => {
     })
   })
   describe('SetupLastRegUser', () => {
+    const practitioner = {
+      resourceType: 'Practitioner',
+      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
+      telecom: [{ system: 'phone', value: '01711111111' }],
+      name: [
+        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
+        { use: 'bn', family: '', given: [''] }
+      ],
+      gender: 'male',
+      meta: {
+        lastUpdated: '2018-11-25T17:31:08.062+00:00',
+        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+      },
+      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+    }
     it('Will push the last modified by userinfo on fhirDoc', () => {
-      const tokenPayload = {
-        iss: '',
-        iat: 1541576965,
-        exp: 1573112965,
-        aud: '',
-        subject: '1',
-        scope: ['declare']
-      }
       const taskResource = setupLastRegUser(
         testFhirBundle.entry[1].resource,
-        tokenPayload
+        practitioner
       )
 
       expect(taskResource.extension[1].valueString).toBeDefined()
-      expect(taskResource.extension[1].valueString).toEqual('1')
+      expect(taskResource.extension[1].valueString).toEqual('Shakib Al Hasan')
     })
 
     it('Will push the last modified by userinfo even if no extension is defined yet on task resource', () => {
-      const tokenPayload = {
-        iss: '',
-        iat: 1541576965,
-        exp: 1573112965,
-        aud: '',
-        subject: '1',
-        scope: ['declare']
-      }
       const fhirBundle = cloneDeep(testFhirBundle)
       fhirBundle.entry[1].resource.extension = undefined
       const taskResource = setupLastRegUser(
         fhirBundle.entry[1].resource,
-        tokenPayload
+        practitioner
       )
 
       expect(taskResource.extension[0].valueString).toBeDefined()
-      expect(taskResource.extension[0].valueString).toEqual('1')
+      expect(taskResource.extension[0].valueString).toEqual('Shakib Al Hasan')
     })
 
     it('Will update the last modified by userinfo instead of always adding a new extension', () => {
-      const tokenPayload = {
-        iss: '',
-        iat: 1541576965,
-        exp: 1573112965,
-        aud: '',
-        subject: '1',
-        scope: ['declare']
-      }
       const lengthOfTaskExtensions =
         testFhirBundle.entry[1].resource.extension.length
       const taskResource = setupLastRegUser(
         testFhirBundle.entry[1].resource,
-        tokenPayload
+        practitioner
       )
 
       expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
-      expect(taskResource.extension[1].valueString).toEqual('1')
+      expect(taskResource.extension[1].valueString).toEqual('Shakib Al Hasan')
     })
   })
   it('setupAuthorOnNotes will update the author name on notes', () => {
-    const tokenPayload = {
-      iss: '',
-      iat: 1541576965,
-      exp: 1573112965,
-      aud: '',
-      subject: '1',
-      scope: ['declare']
+    const practitioner = {
+      resourceType: 'Practitioner',
+      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
+      telecom: [{ system: 'phone', value: '01711111111' }],
+      name: [
+        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
+        { use: 'bn', family: '', given: [''] }
+      ],
+      gender: 'male',
+      meta: {
+        lastUpdated: '2018-11-25T17:31:08.062+00:00',
+        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+      },
+      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
     }
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.note = [
@@ -200,75 +197,34 @@ describe('Verify fhir bundle modifier functions', () => {
     ]
     const taskResource = setupAuthorOnNotes(
       fhirBundle.entry[1].resource,
-      tokenPayload
+      practitioner
     )
 
     expect(taskResource.note.length).toBe(1)
     expect(taskResource.note[0]).toEqual({
-      authorString: '1',
+      authorString: 'Shakib Al Hasan',
       text: 'this is a test note',
       time: '2018-10-31T09:45:05+10:00'
     })
   })
   describe('pushBRN', () => {
-    const token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        subject: '5bdc55ece42c82de9a529c36',
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    const practitioner = {
+      resourceType: 'Practitioner',
+      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
+      telecom: [{ system: 'phone', value: '01711111111' }],
+      name: [
+        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
+        { use: 'bn', family: '', given: [''] }
+      ],
+      gender: 'male',
+      meta: {
+        lastUpdated: '2018-11-25T17:31:08.062+00:00',
+        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+      },
+      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+    }
     beforeEach(() => {
       fetch.mockResponses(
-        [
-          JSON.stringify({
-            mobile: '+880711111111'
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            id: 'eacae600-a501-42d6-9d59-b8b94f3e50c1',
-            meta: { lastUpdated: '2018-11-27T17:13:20.662+00:00' },
-            type: 'searchset',
-            total: 1,
-            link: [
-              {
-                relation: 'self',
-                url:
-                  'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
-              }
-            ],
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/Practitioner/b1f46aba-075d-431e-8aeb-ebc57a4a0ad0',
-                resource: {
-                  resourceType: 'Practitioner',
-                  identifier: [
-                    { use: 'official', system: 'mobile', value: '01711111111' }
-                  ],
-                  telecom: [{ system: 'phone', value: '01711111111' }],
-                  name: [
-                    { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
-                    { use: 'bn', family: [''], given: [''] }
-                  ],
-                  gender: 'male',
-                  meta: {
-                    lastUpdated: '2018-11-25T17:31:08.062+00:00',
-                    versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-                  },
-                  id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
         [
           JSON.stringify({
             entry: [
@@ -316,6 +272,7 @@ describe('Verify fhir bundle modifier functions', () => {
         [
           JSON.stringify({
             resourceType: 'Location',
+            id: 'd33e4cb2-670e-4564-a8ed-c72baacd9173',
             identifier: [
               {
                 system: 'http://opencrvs.org/specs/id/a2i-internal-id',
@@ -333,6 +290,7 @@ describe('Verify fhir bundle modifier functions', () => {
         [
           JSON.stringify({
             resourceType: 'Location',
+            id: 'd33e4cb2-670e-4564-a8ed-c72baacdxxx',
             identifier: [
               {
                 system: 'http://opencrvs.org/specs/id/a2i-internal-id',
@@ -343,13 +301,22 @@ describe('Verify fhir bundle modifier functions', () => {
                 system: 'http://opencrvs.org/specs/id/jurisdiction-type',
                 value: 'UNION'
               }
-            ]
+            ],
+            physicalType: {
+              coding: [
+                {
+                  code: 'bu',
+                  display: 'Building'
+                }
+              ]
+            }
           }),
           { status: 200 }
         ],
         [
           JSON.stringify({
             resourceType: 'Location',
+            id: 'd33e4cb2-670e-4564-a8ed-c72baacdyyyy',
             identifier: [
               {
                 system: 'http://opencrvs.org/specs/id/a2i-internal-id',
@@ -367,7 +334,7 @@ describe('Verify fhir bundle modifier functions', () => {
       )
     })
     it('Successfully modified the provided fhirBundle with brn', async () => {
-      const task = await pushBRN(testFhirBundle.entry[1].resource, token)
+      const task = await pushBRN(testFhirBundle.entry[1].resource, practitioner)
 
       expect(task.identifier[2].system).toEqual(
         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
@@ -380,7 +347,7 @@ describe('Verify fhir bundle modifier functions', () => {
 
     it('Throws error if invalid fhir bundle is provided', async () => {
       const invalidData = undefined
-      expect(pushBRN(invalidData, token)).rejects.toThrowError(
+      expect(pushBRN(invalidData, practitioner)).rejects.toThrowError(
         'Invalid Task resource found for registration'
       )
     })
@@ -390,7 +357,7 @@ describe('Verify fhir bundle modifier functions', () => {
       const indentifierLength = oldTask.identifier.length
 
       const fhirBundle = cloneDeep(testFhirBundle)
-      const newTask = await pushBRN(fhirBundle.entry[1].resource, token)
+      const newTask = await pushBRN(fhirBundle.entry[1].resource, practitioner)
 
       expect(newTask.identifier.length).toBe(indentifierLength)
       expect(newTask.identifier[2].system).toEqual(
@@ -403,6 +370,42 @@ describe('Verify fhir bundle modifier functions', () => {
       expect(newTask.identifier[2].value).not.toEqual(
         oldTask.identifier[2].value
       )
+    })
+  })
+  describe('setupLastRegLocation', () => {
+    const practitioner = {
+      resourceType: 'Practitioner',
+      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
+      telecom: [{ system: 'phone', value: '01711111111' }],
+      name: [
+        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
+        { use: 'bn', family: '', given: [''] }
+      ],
+      gender: 'male',
+      meta: {
+        lastUpdated: '2018-11-25T17:31:08.062+00:00',
+        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+      },
+      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+    }
+    it('set regLastLocation properly', async () => {
+      const taskResource = await setupLastRegLocation(
+        testFhirBundle.entry[1].resource as fhir.Task,
+        practitioner
+      )
+      expect(taskResource.extension[2]).toEqual({
+        url: 'http://opencrvs.org/specs/extension/regLastLocation',
+        valueString: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdxxx'
+      })
+    })
+    it('throws error if invalid practitioner is provided', async () => {
+      practitioner.id = undefined
+      expect(
+        setupLastRegLocation(
+          testFhirBundle.entry[1].resource as fhir.Task,
+          practitioner
+        )
+      ).rejects.toThrowError('Invalid practitioner data found')
     })
   })
 })

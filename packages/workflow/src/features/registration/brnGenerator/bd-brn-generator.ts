@@ -32,6 +32,7 @@ export async function getLocationBBSCode(
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practioner data found')
   }
+
   const locations = await getPractitionerLocations(practitioner.id)
 
   const jurisDictionalLocations = getJurisDictionalLocations()
@@ -63,7 +64,6 @@ export async function getLocationBBSCode(
       }
     })
   }
-
   return jurisDictionalLocations.reduce((locBBSCode, loc) => {
     return locBBSCode.concat(loc.bbsCode)
   }, '')

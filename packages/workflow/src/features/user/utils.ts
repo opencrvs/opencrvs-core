@@ -2,14 +2,12 @@ import { USER_MGNT_SERVICE_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
 import { logger } from 'src/logger'
-import {
-  JURISDICTION_TYPE_DISTRICT,
-  JURISDICTION_TYPE_UNION,
-  JURISDICTION_TYPE_UPAZILA
-} from './constants'
 import { COUNTRY } from 'src/constants'
 import { getTokenPayload } from 'src/utils/authUtils.ts'
 import { getFromFhir } from 'src/features/registration/fhir/fhir-utils'
+const JURISDICTION_TYPE_DISTRICT = 'district'
+const JURISDICTION_TYPE_UPAZILA = 'upazila'
+const JURISDICTION_TYPE_UNION = 'union'
 
 export async function getUserMobile(
   userId: string,
@@ -59,24 +57,25 @@ export async function getPractitionerPrimaryLocation(
   )
 }
 
-function getPrimaryLocationFromLocationList(
+export function getPrimaryLocationFromLocationList(
   locations: [fhir.Location]
 ): fhir.Location {
-  if (!locations) {
-    throw new Error('No location found for loggedin practitioner')
-  }
-  const primaryOffice = locations.find(location => {
-    if (
-      location.physicalType &&
-      location.physicalType.coding &&
-      location.physicalType.coding[0].display
-    ) {
-      return location.physicalType.coding[0].display === 'Building'
-    }
-    return false
-  })
+  const primaryOffice =
+    locations &&
+    locations.find(location => {
+      if (
+        location.physicalType &&
+        location.physicalType.coding &&
+        location.physicalType.coding[0].display
+      ) {
+        return (
+          location.physicalType.coding[0].display.toLowerCase() === 'building'
+        )
+      }
+      return false
+    })
   if (!primaryOffice) {
-    throw new Error('No primary office found for logged in practitioner')
+    throw new Error('No primary office found')
   }
   return primaryOffice
 }
@@ -86,8 +85,8 @@ export async function getLoggedInPractitionerLocations(
 ): Promise<[fhir.Location]> {
   const practitionerResource = await getLoggedInPractitionerResource(token)
 
-  if (!practitionerResource.id) {
-    throw new Error("Practioner's ID not found")
+  if (!practitionerResource || !practitionerResource.id) {
+    throw new Error('Invalid practioner found')
   }
   /* getting location list for practitioner */
   return await getPractitionerLocations(practitionerResource.id)
@@ -155,9 +154,21 @@ export function getJurisDictionalLocations() {
   ]
 }
 
-export function getPractitionerName(practitioner: fhir.Practitioner): string {
+export function getPractitionerName(
+  practitioner: fhir.Practitioner,
+  language: string = 'en'
+): string {
   if (!practitioner || !practitioner.name) {
     throw new Error('Invalid practitioner data found')
   }
+  const name = practitioner.name.find((humanName: fhir.HumanName) => {
+    return humanName.use === language
+  })
+  if (!name || !name.family) {
+    throw new Error(`Didn't found practitioner's ${language} name`)
+  }
   return ''
+    .concat(name.given ? name.given.join(' ') : '')
+    .concat(' ')
+    .concat(name.family)
 }

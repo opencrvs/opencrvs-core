@@ -63,7 +63,6 @@ export async function markBirthAsRegisteredHandler(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
-
     /* hearth will do put calls if it finds id on the bundle */
     const res = await fetch(fhirUrl, {
       method: 'POST',

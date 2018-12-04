@@ -5,6 +5,7 @@ export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
   if (!bundle) {
     throw new Error('Invalid FHIR bundle found')
   }
+
   if (bundle.resourceType === 'Bundle' && bundle.entry) {
     return selectOrCreateTaskRefResource(bundle as fhir.Bundle)
   } else if (bundle.resource && bundle.resource.resourceType === 'Task') {

@@ -52,6 +52,7 @@ export async function markBundleAsRegistered(
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
   const taskResource = getTaskResource(bundle) as fhir.Task
+
   const practitioner = await getLoggedInPractitionerResource(token)
 
   /* Setting birth registration number here */
