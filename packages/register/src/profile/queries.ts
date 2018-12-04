@@ -8,6 +8,10 @@ const FETCH_USER = gql`
         id
         name
         status
+        identifier {
+          system
+          value
+        }
       }
       primaryOffice {
         id

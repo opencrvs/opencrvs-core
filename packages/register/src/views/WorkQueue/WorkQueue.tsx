@@ -41,10 +41,11 @@ import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { goToEvents as goToEventsAction } from 'src/navigation'
+import { IUserDetails, IIdentifier, ILocation } from 'src/utils/userUtils'
 
 export const FETCH_REGISTRATION_QUERY = gql`
-  query list {
-    listBirthRegistrations {
+  query list($locationId: String) {
+    listBirthRegistrations(locationIds: [$locationId]) {
       id
       registration {
         trackingId
@@ -269,6 +270,7 @@ interface IBaseWorkQueueProps {
   language: string
   scope: Scope
   goToEvents: typeof goToEventsAction
+  userDetails: IUserDetails
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -409,6 +411,24 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     return this.props.scope && this.props.scope.includes('declare')
   }
 
+  getUnionId() {
+    const area = this.props.userDetails && this.props.userDetails.catchmentArea
+    const identifier =
+      area &&
+      area.find((location: ILocation) => {
+        return (
+          (location.identifier &&
+            location.identifier.find((areaIdentifier: IIdentifier) => {
+              return (
+                areaIdentifier.system.endsWith('jurisdiction-type') &&
+                areaIdentifier.value === 'UNION'
+              )
+            })) !== undefined
+        )
+      })
+    return identifier && identifier.id
+  }
+
   getNewEventButtonText() {
     if (this.userHasRegisterScope()) {
       return messages.newRegistration
@@ -530,7 +550,10 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
           />
         </HomeViewHeader>
         <Container>
-          <Query query={FETCH_REGISTRATION_QUERY}>
+          <Query
+            query={FETCH_REGISTRATION_QUERY}
+            variables={{ locationId: this.getUnionId() }}
+          >
             {({ loading, error, data }) => {
               if (loading) {
                 return (
@@ -594,7 +617,8 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
-    scope: getScope(state)
+    scope: getScope(state),
+    userDetails: state.profile.userDetails
   }),
   { goToEvents: goToEventsAction }
 )(injectIntl(withTheme(WorkQueueView)))

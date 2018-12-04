@@ -3,8 +3,13 @@ import { storage } from '@opencrvs/register/src/storage'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
+export interface IIdentifier {
+  system: string
+  value: string
+}
 export interface ILocation {
   id: string
+  identifier?: IIdentifier[]
   name?: string
   status?: string
 }
@@ -28,7 +33,19 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   userDetails.catchmentArea =
     catchmentArea &&
     catchmentArea.map((cArea: GQLLocation) => {
-      return { id: cArea.id, name: cArea.name, status: cArea.status }
+      return {
+        id: cArea.id,
+        name: cArea.name,
+        status: cArea.status,
+        identifier:
+          cArea.identifier &&
+          cArea.identifier.map((identifier: IIdentifier) => {
+            return {
+              system: identifier.system,
+              value: identifier.value
+            }
+          })
+      }
     })
   return userDetails
 }
