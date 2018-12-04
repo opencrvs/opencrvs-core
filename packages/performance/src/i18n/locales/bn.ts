@@ -25,6 +25,11 @@ export const BENGALI_STATE = {
       '0-10 বছর বাচ্চাদের মধ্যে বয়স নিবন্ধিত হয়',
     'performance.graph.birthRegistrationInAgesLabel': 'বয়স (বছর)',
     'performance.graph.birthRegistrationPercentageLabel':
-      'মোট জন্ম নিবন্ধিত (%)'
+      'মোট জন্ম নিবন্ধিত (%)',
+    'performance.graph.birthRegistrationRateWithin45DaysTitle':
+      '45 দিনের মধ্যে নিবন্ধনের জন্য জন্মের হার',
+    'performance.graph.birthRegistrationRatePerMonthLabel': 'ক্যালেন্ডার মাস',
+    'performance.graph.birthRegistrationPercentageOfEstimateLabel':
+      'আনুমানিক জন্ম নিবন্ধন%'
   }
 }

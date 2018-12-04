@@ -492,6 +492,7 @@ export const BENGALI_STATE = {
     'validations.requiredSymbol': '',
     'register.form.submit': 'জমা দিন',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
+    'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
@@ -506,6 +507,7 @@ export const BENGALI_STATE = {
     'register.notification.declarationsSynced':
       'ইন্টারনেট সংযোগ ফিরে আসায় আমরা {syncCount} টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি',
     'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
+    'register.completeRegistration.online.title': 'নিবন্ধন সম্পন্ন',
     'register.savedRegistration.online.desc':
       'তথ্য বিবরনী বৈধতা জন্য পর্যালোচিত হচ্ছে',
     'register.savedRegistration.offline.title': 'অসম্পূর্ণ  সংযোগ',
@@ -513,13 +515,23 @@ export const BENGALI_STATE = {
       'ডিভাইসে ইন্টারনেট সংযোগ কালীন  ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
     'register.savedRegistration.online.noticeCard.title': 'সমাপ্ত !',
     'register.savedRegistration.offline.noticeCard.title': 'সম্পূর্ণ হচ্ছে',
-    'register.savedRegistration.online.noticeCard.text':
-      'নবজাতের "নাম" সফলভাবে রেজিস্ট্রেশন অফিসে জমা দেওয়া হয়েছে।',
-    'register.savedRegistration.offline.noticeCard.text':
+    'register.savedRegistration.online.noticeCard.text1':
+      'এই বার্তা কখনই ব্যবহার করা হবে না কিন্তু এটা এখানে থাকা প্রয়োজন',
+    'register.savedRegistration.online.noticeCard.text2':
+      'এর "নাম" সফলভাবে রেজিস্ট্রেশন অফিসে জমা দেওয়া হয়েছে।',
+    'register.savedRegistration.offline.noticeCard.text1':
       'ডিভাইসে ইন্টারনেট সংযোগ কালীন ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
+    'register.savedRegistration.offline.noticeCard.text2': '',
+    'register.completeRegistration.noticeCard.text1':
+      'এই বার্তা কখনই ব্যবহার করা হবে না কিন্তু এটা এখানে থাকা প্রয়োজন',
+    'register.completeRegistration.noticeCard.text2':
+      'এর নাম নিবন্ধন করা হয়েছে',
     'register.savedRegistration.trackingCard.title': 'ট্র্যাকিং আইডি নম্বর:',
+    'register.completeRegistration.trackingCard.title': 'জন্ম নিবন্ধন সংখ্যা',
     'register.savedRegistration.trackingCard.text':
       'এসএমএসের মাধ্যমে সংবাদদাতা নম্বরটি পাবেন, তবে নিশ্চিত করুন যে নম্বরটি লিখে রেখে পরবর্তী রেজিস্ট্রেশনের ধাপ এর জন্য সংরক্ষন করতে হবে।',
+    'register.savedRegistration.registrationNumber.text':
+      'শংসাপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে ইনফরম্যান্ট এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।',
     'register.savedRegistration.nextCard.title': 'পরবর্তী',
     'register.savedRegistration.online.nextCard.text1':
       'রেজিস্ট্রেশন সম্পূর্ণ হলে অথবা প্রক্রিয়ায় কোন বিলম্ব থাকলে আপনাকে OpenCRVS এর মাধ্যমে জানানো হবে।',
@@ -529,8 +541,13 @@ export const BENGALI_STATE = {
       'নিবন্ধন প্রক্রিয়া সম্পুর্ণ হলে সংবাদদাতা নিজ দায়িত্তে পৌছে দেবেন। ',
     'register.savedRegistration.offline.nextCard.text2':
       'ঘোষণাটি সফলভাবে দাখিল করা হলে রেজিস্ট্রেশন শেষ। আপনি এবং সংবাদদাতাকে অবহিত করা হবে।',
+    'register.completeRegistration.nextCard.text1':
+      'নিবন্ধন প্রক্রিয়া সম্পূর্ণ।',
+    'register.completeRegistration.nextCard.text2':
+      'তথ্য সরবরাহকারী একবার সংগ্রহ করার পরে সার্টিফিকেটটি কেবল মুদ্রণ করা উচিত',
     'register.savedRegistration.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.savedRegistration.buttons.newDeclaration': 'নতুন ঘোষণা', // TODO: Check, Google translated
+    'register.savedRegistration.buttons.back.duplicate': 'সদৃশ ফিরে যান',
     'register.selectInformant.newBirthRegistration': ' জন্ম ঘোষণা',
     'register.selectInformant.informantTitle': 'সংবাদদাতা',
     'register.selectInformant.informantDescription':
@@ -629,6 +646,10 @@ export const BENGALI_STATE = {
       'স্বাস্থ্য কর্মীর জন্য আবেদন বা নির্দেশাবলী সংশোধন করতে নির্দেশাবলী',
     'review.rejection.form.commentInstruction':
       'স্বাস্থ্য কর্মী সঠিকভাবে অ্যাপ্লিকেশন আপডেট করার জন্য কি আপডেট করা প্রয়োজন তার নির্দিষ্ট নির্দেশাবলী প্রদান করুন',
-    'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন'
+    'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
+    'review.button.register': 'নিবন্ধন',
+    'review.button.reject': 'বাতিল',
+    'review.documentViewer.title': 'সমর্থনকারী কাগজপত্র',
+    'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন'
   }
 }

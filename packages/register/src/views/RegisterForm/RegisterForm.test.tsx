@@ -95,7 +95,6 @@ describe('when user is in the register form preview section', () => {
   const testComponent = createTestComponent(
     <RegisterForm
       location={mock}
-
       history={history}
       staticContext={mock}
       match={{

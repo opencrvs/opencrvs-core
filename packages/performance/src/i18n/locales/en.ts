@@ -25,6 +25,11 @@ export const ENGLISH_STATE = {
       'At What Age Are Births Registered In Children Aged 0-10 Years',
     'performance.graph.birthRegistrationInAgesLabel': 'Age (years)',
     'performance.graph.birthRegistrationPercentageLabel':
-      'Total Births Registered (%)'
+      'Total Births Registered (%)',
+    'performance.graph.birthRegistrationRateWithin45DaysTitle':
+      'Birth Rate For Registrations Within 45 Days',
+    'performance.graph.birthRegistrationRatePerMonthLabel': 'Calendar Month',
+    'performance.graph.birthRegistrationPercentageOfEstimateLabel':
+      'Birth Registration % of estimate'
   }
 }

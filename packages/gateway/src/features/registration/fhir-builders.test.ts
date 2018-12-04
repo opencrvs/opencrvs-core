@@ -85,6 +85,7 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     registration: {
       contact: 'MOTHER',
+      paperFormID: '12345678',
       status: [
         {
           comments: [
@@ -263,6 +264,12 @@ test('should build a minimal FHIR registration document without error', async ()
     text: 'This is just a test data',
     time: '2018-10-31T09:45:05+10:00'
   })
+  expect(fhir.entry[4].resource.identifier).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/id/paper-form-id',
+      value: '12345678'
+    }
+  ])
   // Attachment Test cases
   expect(fhir.entry[5].resource.docStatus).toBe('final')
   expect(fhir.entry[5].resource.created).toBe('2018-10-21')

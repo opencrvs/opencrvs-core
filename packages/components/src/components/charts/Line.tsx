@@ -18,7 +18,6 @@ import {
 } from './AxisTick'
 
 const Container = styled.div`
-  margin-top: 30px;
   box-sizing: border-box;
   height: 300px;
   width: 100%;
@@ -114,7 +113,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           <YAxis
             width={30}
             tickCount={2}
-            domain={[0, 100]}
+            domain={[0, dataMax => Math.ceil(dataMax / 10) * 10]}
             tick={(tickProps: ICustomizedAxisTick) => (
               <CustomizedYAxisTick {...tickProps} />
             )}

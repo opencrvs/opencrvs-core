@@ -41,6 +41,9 @@ const SelectContainer = styled.div`
   padding-left: 14px;
   width: 70%;
 `
+const WhiteBackground = styled.div`
+  background-color: ${({ theme }) => theme.colors.white};
+`
 
 interface IProps {
   title: string
@@ -68,9 +71,9 @@ export class DocumentViewer extends React.Component<IProps, IState> {
   render() {
     const { title, tagline, options, icon } = this.props
     return (
-      <>
+      <WhiteBackground>
         <Header>
-          <Icon>{icon || (() => <SupportingDocument />)}</Icon>
+          <Icon>{icon || <SupportingDocument />}</Icon>
           <TitleContainer>
             <Title>{title}</Title>
             {tagline}
@@ -93,7 +96,7 @@ export class DocumentViewer extends React.Component<IProps, IState> {
             <Image src={this.state.selectedOption} />
           )}
         </ImageContainer>
-      </>
+      </WhiteBackground>
     )
   }
 }
