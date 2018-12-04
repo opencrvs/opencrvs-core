@@ -768,35 +768,62 @@ describe('when user has a valid token in local storage', () => {
             .find('#submit_form')
             .hostNodes()
             .prop('disabled')
-        ).toBe(false)
+        ).toBe(true)
       })
-      describe('button clicked', () => {
+      describe('All sections visited', () => {
         beforeEach(async () => {
           app
-            .find('#submit_form')
+            .find('#next_button_child')
             .hostNodes()
             .simulate('click')
-
-          await flushPromises()
-          app.update()
-        })
-
-        it('confirmation screen should show up', () => {
-          expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
-        })
-
-        it('On successful submission tracking id should be visible', async () => {
-          jest.setMock('react-apollo', { default: ReactApollo })
-
           app
-            .find('#submit_confirm')
+            .find('#next_button_mother')
             .hostNodes()
             .simulate('click')
-
+          app
+            .find('#next_button_father')
+            .hostNodes()
+            .simulate('click')
           await flushPromises()
           app.update()
+        })
 
-          expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
+        it('Should be able to click SEND FOR REVIEW Button', () => {
+          expect(
+            app
+              .find('#submit_form')
+              .hostNodes()
+              .prop('disabled')
+          ).toBe(false)
+        })
+        describe('button clicked', () => {
+          beforeEach(async () => {
+            app
+              .find('#submit_form')
+              .hostNodes()
+              .simulate('click')
+
+            await flushPromises()
+            app.update()
+          })
+
+          it('confirmation screen should show up', () => {
+            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
+          })
+
+          it('On successful submission tracking id should be visible', async () => {
+            jest.setMock('react-apollo', { default: ReactApollo })
+
+            app
+              .find('#submit_confirm')
+              .hostNodes()
+              .simulate('click')
+
+            await flushPromises()
+            app.update()
+
+            expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
+          })
         })
       })
     })
