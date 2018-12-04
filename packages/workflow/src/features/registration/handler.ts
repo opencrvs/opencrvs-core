@@ -12,7 +12,7 @@ import { EVENT_TYPE } from './fhir/constants'
 import { getToken } from 'src/utils/authUtils'
 import { logger } from 'src/logger'
 
-async function sendBundleTOHearth(payload: fhir.Bundle, count = 1) {
+async function sendBundleToHearth(payload: fhir.Bundle, count = 1) {
   const res = await fetch(fhirUrl, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -23,7 +23,7 @@ async function sendBundleTOHearth(payload: fhir.Bundle, count = 1) {
   if (!res.ok) {
     if (res.status === 409 && count < 5) {
       setTrackingId(payload)
-      await sendBundleTOHearth(payload, count + 1)
+      await sendBundleToHearth(payload, count + 1)
       return
     }
 
@@ -44,7 +44,7 @@ export async function createBirthRegistrationHandler(
       getToken(request)
     )
 
-    await sendBundleTOHearth(payload)
+    await sendBundleToHearth(payload)
 
     /* sending notification to the contact */
     sendBirthNotification(payload, {
