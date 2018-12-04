@@ -641,6 +641,8 @@ export const ENGLISH_STATE = {
     'register.workQueue.buttons.newApplication': 'New birth application',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
+    'review.edit.modal.confirmationText':
+      'Are you sure you want to edit the application?',
     'review.rejection.form': 'Rejection form',
     'review.rejection.form.title': 'Reasons for rejection',
     'review.rejection.form.reasons': 'Reason(s) for rejection:',
@@ -657,6 +659,7 @@ export const ENGLISH_STATE = {
     'review.button.register': 'REGISTER',
     'review.button.reject': 'Reject Application',
     'review.documentViewer.title': 'Supporting Documents',
-    'review.documentViewer.tagline': 'Select to Preview'
+    'review.documentViewer.tagline': 'Select to Preview',
+    'review.form.deleteApplication': 'Delete Application'
   }
 }

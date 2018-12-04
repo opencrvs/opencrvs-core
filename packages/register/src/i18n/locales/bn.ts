@@ -384,6 +384,8 @@ export const BENGALI_STATE = {
     'formFields.dateOfMarriage': 'বিয়ের তারিখ',
     'register.form.tabs.childTab': 'শিশু',
     'register.form.section.childTitle': 'শিশু এর বিবরণ',
+    'register.form.valueYes': 'হাঁ',
+    'register.form.valueNo': 'না',
     'formFields.childFirstNames': 'নামের প্রথমাংশ',
     'formFields.childFamilyName': 'পারিবারিক নাম',
     'formFields.childFirstNamesEng': 'নামের প্রথমাংশ (in english)',
@@ -635,6 +637,8 @@ export const BENGALI_STATE = {
     'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
+    'review.edit.modal.confirmationText':
+      'আপনি কি নিশ্চিত, আপনি অ্যাপ্লিকেশন সম্পাদনা করতে চান?',
     'review.rejection.form': 'প্রত্যাখ্যান ফর্ম',
     'review.rejection.form.title': 'প্রত্যাখ্যানের কারণ',
     'review.rejection.form.reasons': 'প্রত্যাখ্যানের কারণসমূহ:',
@@ -651,6 +655,7 @@ export const BENGALI_STATE = {
     'review.button.register': 'নিবন্ধন',
     'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'সমর্থনকারী কাগজপত্র',
-    'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন'
+    'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন',
+    'review.form.deleteApplication': 'আবেদন মুছে দিন'
   }
 }

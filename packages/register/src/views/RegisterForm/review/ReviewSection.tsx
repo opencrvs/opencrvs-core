@@ -98,6 +98,11 @@ const messages = defineMessages({
     id: 'register.form.saveDraft',
     defaultMessage: 'Save as draft',
     description: 'Save as draft Button Text'
+  },
+  DeleteApplicationBtnTxt: {
+    id: 'review.form.deleteApplication',
+    defaultMessage: 'Delete Application',
+    description: 'Delete application Button Text'
   }
 })
 
@@ -609,7 +614,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         <DButtonContainer>
           <DeleteApplication onClick={DeleteApplicationClickEvent}>
             <Delete />
-            Delete Application
+            {intl.formatMessage(messages.DeleteApplicationBtnTxt)}
           </DeleteApplication>
         </DButtonContainer>
       </>
