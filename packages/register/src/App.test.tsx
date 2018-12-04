@@ -1,12 +1,14 @@
 import * as ReactApollo from 'react-apollo'
 import { createTestApp, mockUserResponse } from './tests/util'
 import { config } from '../src/config'
+import { v4 as uuid } from 'uuid'
 import {
   HOME,
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  WORK_QUEUE
+  WORK_QUEUE,
+  REVIEW_BIRTH_PARENT_FORM_TAB
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -661,7 +663,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: Date.now(), data }
+      customDraft = { id: uuid(), data }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
@@ -824,6 +826,42 @@ describe('when user has a valid token in local storage', () => {
           })
         })
       })
+    })
+  })
+  describe('when user is in the review section', () => {
+    let customDraft: IDraft
+    beforeEach(() => {
+      const data = {
+        child: {},
+        father: {},
+        mother: {},
+        registration: {},
+        documents: { image_uploader: '' }
+      }
+
+      customDraft = { id: uuid(), data, review: true }
+      store.dispatch(storeDraft(customDraft))
+      history.replace(
+        REVIEW_BIRTH_PARENT_FORM_TAB.replace(
+          ':draftId',
+          customDraft.id.toString()
+        ).replace(':tabId', 'review')
+      )
+      app.update()
+      app
+        .find('#tab_child')
+        .hostNodes()
+        .simulate('click')
+      app.update()
+      app
+        .find('#tab_review')
+        .hostNodes()
+        .simulate('click')
+      app.update()
+    })
+
+    it('review tab should show up', () => {
+      expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
     })
   })
 })
