@@ -1,7 +1,11 @@
 import fetch from 'node-fetch'
 import { fhirUrl, WORKFLOW_SERVICE_URL } from 'src/constants'
-import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
+import {
+  buildFHIRBundle,
+  updateFHIRTaskBundle
+} from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
+import { getFromFhir } from 'src/features/fhir/utils'
 
 const statusMap = {
   declared: 'preliminary',
@@ -67,6 +71,43 @@ export const resolvers: GQLResolver = {
       }
       // return the trackingid
       return resBody.trackingid
+    },
+    async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
+      const taskBundle = await getFromFhir(`/Task?focus=Composition/${id}`)
+      const taskEntry = taskBundle.entry[0]
+      if (!taskEntry) {
+        throw new Error('Task does not exist')
+      }
+      const status = 'REJECTED'
+      const newTaskBundle = await updateFHIRTaskBundle(
+        taskEntry,
+        status,
+        reason,
+        comment
+      )
+      const res = await fetch(`${WORKFLOW_SERVICE_URL}updateTask`, {
+        method: 'POST',
+        body: JSON.stringify(newTaskBundle),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (!res.ok) {
+        throw new Error(
+          `Workflow post to updateTask failed with [${
+            res.status
+          }] body: ${await res.text()}`
+        )
+      }
+
+      const resBody = await res.json()
+      if (!resBody || !resBody.taskId) {
+        throw new Error(`Workflow response did not send a valid response`)
+      }
+      // return the taskId
+      return resBody.taskId
     }
   }
 }

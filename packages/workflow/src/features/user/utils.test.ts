@@ -3,7 +3,7 @@ import {
   getUserMobile,
   getLoggedInPractitionerPrimaryLocation,
   getPrimaryLocationFromLocationList,
-  getPractitionerName
+  getPractitionerRef
 } from './utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -582,8 +582,8 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
     ).toThrowError('No primary office found')
   })
 })
-describe('Verify getPractitionerName', () => {
-  it('returns practinioner name properly', () => {
+describe('Verify getPractitionerRef', () => {
+  it('returns practinioner ref properly', () => {
     const practitioner = {
       resourceType: 'Practitioner',
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
@@ -599,7 +599,9 @@ describe('Verify getPractitionerName', () => {
       },
       id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
     }
-    expect(getPractitionerName(practitioner)).toEqual('Shakib Al Hasan')
+    expect(getPractitionerRef(practitioner)).toEqual(
+      'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+    )
   })
   it('throws error if invalid practioner data is provided', () => {
     const practitioner = {
@@ -608,31 +610,10 @@ describe('Verify getPractitionerName', () => {
       meta: {
         lastUpdated: '2018-11-25T17:31:08.062+00:00',
         versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-      },
-      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+      }
     }
-    expect(() => getPractitionerName(practitioner)).toThrowError(
+    expect(() => getPractitionerRef(practitioner)).toThrowError(
       'Invalid practitioner data found'
-    )
-  })
-  it('throws error if name is not found for selected language', () => {
-    const practitioner = {
-      resourceType: 'Practitioner',
-      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
-      telecom: [{ system: 'phone', value: '01711111111' }],
-      name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
-      ],
-      gender: 'male',
-      meta: {
-        lastUpdated: '2018-11-25T17:31:08.062+00:00',
-        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-      },
-      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-    }
-    expect(() => getPractitionerName(practitioner, 'fn')).toThrowError(
-      "Didn't found practitioner's fn name"
     )
   })
 })

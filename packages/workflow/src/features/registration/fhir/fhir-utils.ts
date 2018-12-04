@@ -157,6 +157,17 @@ export function getRegStatusCode(tokenPayload: ITokenPayload) {
   }
 }
 
+export function getEntryId(fhirBundle: fhir.Bundle) {
+  const composition =
+    fhirBundle &&
+    fhirBundle.entry &&
+    (fhirBundle.entry[0].resource as fhir.Composition)
+
+  if (!composition || !composition.id) {
+    throw new Error('getEntryId: Invalid FHIR bundle found for declaration')
+  }
+  return composition.id
+}
 export const getFromFhir = (suffix: string) => {
   return fetch(`${fhirUrl}${suffix}`, {
     headers: {

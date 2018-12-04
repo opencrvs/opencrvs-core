@@ -3,7 +3,7 @@ import { getRegStatusCode } from './fhir-utils'
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
-  getPractitionerName
+  getPractitionerRef
 } from 'src/features/user/utils'
 import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
@@ -234,11 +234,11 @@ export function setupLastRegUser(
     )
   })
   if (regUserExtension) {
-    regUserExtension.valueString = getPractitionerName(practitioner)
+    regUserExtension.valueString = getPractitionerRef(practitioner)
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-      valueString: getPractitionerName(practitioner)
+      valueString: getPractitionerRef(practitioner)
     })
   }
   return taskResource
@@ -251,7 +251,7 @@ export function setupAuthorOnNotes(
   if (!taskResource.note) {
     return taskResource
   }
-  const authorName = getPractitionerName(practitioner)
+  const authorName = getPractitionerRef(practitioner)
   taskResource.note.forEach(note => {
     if (!note.authorString) {
       note.authorString = authorName

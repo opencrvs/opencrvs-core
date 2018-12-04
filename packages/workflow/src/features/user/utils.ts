@@ -154,21 +154,9 @@ export function getJurisDictionalLocations() {
   ]
 }
 
-export function getPractitionerName(
-  practitioner: fhir.Practitioner,
-  language: string = 'en'
-): string {
-  if (!practitioner || !practitioner.name) {
+export function getPractitionerRef(practitioner: fhir.Practitioner): string {
+  if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  const name = practitioner.name.find((humanName: fhir.HumanName) => {
-    return humanName.use === language
-  })
-  if (!name || !name.family) {
-    throw new Error(`Didn't found practitioner's ${language} name`)
-  }
-  return ''
-    .concat(name.given ? name.given.join(' ') : '')
-    .concat(' ')
-    .concat(name.family)
+  return `Practitioner/${practitioner.id}`
 }
