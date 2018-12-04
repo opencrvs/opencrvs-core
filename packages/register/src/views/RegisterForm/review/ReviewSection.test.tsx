@@ -4,6 +4,7 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from 'src/store'
 import { createTestComponent } from 'src/tests/util'
 import { createDraft } from 'src/drafts'
+import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 
 const { store } = createStore()
 const mockHandler = jest.fn()
@@ -21,6 +22,7 @@ describe('when user is in the review page', () => {
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <ReviewSection
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
         draft={draft}
         RegisterClickEvent={mockHandler}
         RejectApplicationClickEvent={mockHandler}

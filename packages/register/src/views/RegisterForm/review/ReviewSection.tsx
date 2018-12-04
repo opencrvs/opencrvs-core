@@ -42,7 +42,6 @@ import {
   LIST,
   PARAGRAPH
 } from 'src/forms'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 
 const messages = defineMessages({
   valueYes: {
@@ -113,6 +112,9 @@ const DrawerContainer = styled.div`
 `
 const SectionRow = styled.p`
   padding: 0 24px;
+  &:last-child {
+    margin-bottom: 25px;
+  }
 `
 const SectionLabel = styled.label`
   color: ${({ theme }) => theme.colors.placeholder};
@@ -240,6 +242,7 @@ const SaveDraft = styled(RejectApplication)`
 interface IProps {
   draft: IDraft
   registerForm: IForm
+  tabRoute: string
   RegisterClickEvent?: () => void
   RejectApplicationClickEvent?: () => void
   SubmitClickEvent?: () => void
@@ -443,7 +446,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       RejectApplicationClickEvent,
       SubmitClickEvent,
       SaveDraftClickEvent,
-      DeleteApplicationClickEvent
+      DeleteApplicationClickEvent,
+      tabRoute
     } = this.props
 
     const formSections = getViewableSection(registerForm)
@@ -510,6 +514,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                 <RequiredFieldLink
                                   onClick={() => {
                                     this.props.goToTab(
+                                      tabRoute,
                                       draft.id,
                                       section.id,
                                       field.name
@@ -608,7 +613,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               handleClose={this.toggleDisplayDialog}
               handleEdit={() => {
                 this.props.goToTab(
-                  REVIEW_BIRTH_PARENT_FORM_TAB,
+                  tabRoute,
                   draft.id,
                   this.state.editClickedSectionId
                 )

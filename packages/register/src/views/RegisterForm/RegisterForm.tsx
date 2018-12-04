@@ -287,6 +287,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           >
             {activeSection.viewType === 'preview' && (
               <ReviewSection
+                tabRoute={this.props.tabRoute}
                 draft={draft}
                 SubmitClickEvent={this.submitForm}
                 SaveDraftClickEvent={() => history.push('/')}
@@ -295,9 +296,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   history.push('/')
                 }}
               />
-            )}
-            {activeSection.viewType === 'review' && (
-              <PreviewSection draft={draft} onSubmit={this.submitForm} />
             )}
             {activeSection.viewType === 'form' && (
               <Box>
