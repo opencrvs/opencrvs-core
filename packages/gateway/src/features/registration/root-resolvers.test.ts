@@ -168,22 +168,8 @@ describe('Registration root resolvers', () => {
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
     })
     describe('markBirthAsVoided()', () => {
-      it('throws an error if Workflow responds with an error', async () => {
-        fetch.mockImplementationOnce(() => new Error('boom'))
-        const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-        const reason = 'Misspelling'
-        const comment = 'Family name misspelled'
-        // @ts-ignore
-        const result = await resolvers.Mutation.markBirthAsVoided(
-          {},
-          { id, reason, comment }
-        )
-        expect(result.statusCode).toBe(500)
-      })
-    })
-    describe('markBirthAsVoided()', () => {
-      it('throws an error if workflow responds with an error after updating trackingid', async () => {
-        ffetch.mockResponses(
+      it('throws an error if fhir responds without a task', async () => {
+        fetch.mockResponses(
           [
             JSON.stringify({
               resourceType: 'Bundle',
@@ -268,17 +254,18 @@ describe('Registration root resolvers', () => {
             })
           ],
 
-          [JSON.stringify({ message: 'BAD' }), { status: 200 }]
+          [JSON.stringify({ unexpected: true })]
         )
         const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
         const reason = 'Misspelling'
         const comment = 'Family name misspelled'
-        // @ts-ignore
-        const result = await resolvers.Mutation.markBirthAsVoided(
-          {},
-          { id, reason, comment }
+
+        await expect(
+          // @ts-ignore
+          resolvers.Mutation.markBirthAsVoided({}, { id, reason, comment })
+        ).rejects.toThrowError(
+          'Workflow response did not send a valid response'
         )
-        expect(result.statusCode).toBe(500)
       })
     })
   })
