@@ -7,8 +7,13 @@ import { IStoreState } from 'src/store'
 import { getRegisterForm } from 'src/forms/register/application-selectors'
 import { EditConfirmation } from './EditConfirmation'
 import { getConditionalActionsForField } from 'src/forms/utils'
-import { TickLarge, CrossLarge } from '@opencrvs/components/lib/icons'
-import { findIndex, filter } from 'lodash'
+import {
+  TickLarge,
+  CrossLarge,
+  Delete,
+  Draft
+} from '@opencrvs/components/lib/icons'
+import { findIndex, filter, flatten, identity, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { DocumentViewer } from '@opencrvs/components/lib/interface'
@@ -37,7 +42,6 @@ import {
   LIST,
   PARAGRAPH
 } from 'src/forms'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 
 const messages = defineMessages({
   valueYes: {
@@ -84,6 +88,21 @@ const messages = defineMessages({
     id: 'review.documentViewer.tagline',
     defaultMessage: 'Select to Preview',
     description: 'Document Viewer Tagline'
+  },
+  ValueSendForReview: {
+    id: 'register.form.submit',
+    defaultMessage: 'SEND FOR REVIEW',
+    description: 'Submit Button Text'
+  },
+  ValueSaveAsDraft: {
+    id: 'register.form.saveDraft',
+    defaultMessage: 'Save as draft',
+    description: 'Save as draft Button Text'
+  },
+  DeleteApplicationBtnTxt: {
+    id: 'review.form.deleteApplication',
+    defaultMessage: 'Delete Application',
+    description: 'Delete application Button Text'
   }
 })
 
@@ -93,6 +112,9 @@ const DrawerContainer = styled.div`
 `
 const SectionRow = styled.p`
   padding: 0 24px;
+  &:last-child {
+    margin-bottom: 25px;
+  }
 `
 const SectionLabel = styled.label`
   color: ${({ theme }) => theme.colors.placeholder};
@@ -197,12 +219,35 @@ const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
     margin-bottom: 11px;
   }
 `
+const DButtonContainer = styled(ButtonContainer)`
+  background: transparent;
+`
+const DeleteApplication = styled.a`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.danger};
+  text-decoration: underline;
+  cursor: pointer;
+  svg {
+    margin-right: 15px;
+  }
+`
+const SaveDraft = styled(RejectApplication)`
+  div:first-of-type {
+    height: 50px;
+    background-color: ${({ theme }) => theme.colors.saveDraftBtn};
+    padding: 0px;
+  }
+`
+
 interface IProps {
   draft: IDraft
   registerForm: IForm
+  tabRoute: string
   RegisterClickEvent?: () => void
   RejectApplicationClickEvent?: () => void
   SubmitClickEvent?: () => void
+  SaveDraftClickEvent?: () => void
+  DeleteApplicationClickEvent?: () => void
   goToTab: typeof goToTab
   scope: Scope
 }
@@ -301,9 +346,11 @@ const prepDocumentOption = (draft: IDraft): SelectComponentOptions[] => {
   const draftItemName = documentsSection.id
   const documentviewerOptions: SelectComponentOptions[] = []
 
-  const uploadedDocuments = draft.data[draftItemName]
-    ? (draft.data[draftItemName].image_uploader as FullIFileValue[])
-    : []
+  const uploadedDocuments =
+    draft.data[draftItemName] &&
+    isArray(draft.data[draftItemName].image_uploader)
+      ? (draft.data[draftItemName].image_uploader as FullIFileValue[])
+      : []
 
   uploadedDocuments.map(document => {
     const label = document.title + ' ' + document.description
@@ -396,7 +443,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       draft,
       registerForm,
       RegisterClickEvent,
-      RejectApplicationClickEvent
+      RejectApplicationClickEvent,
+      SubmitClickEvent,
+      SaveDraftClickEvent,
+      DeleteApplicationClickEvent,
+      tabRoute
     } = this.props
 
     const formSections = getViewableSection(registerForm)
@@ -412,6 +463,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const isViewOnly = (field: IFormField) => {
       return [LIST, PARAGRAPH].find(type => type === field.type)
     }
+
+    const numberOfErrors = flatten(
+      Object.values(emptyFieldsBySection).map(Object.values)
+    ).filter(identity).length
 
     return (
       <>
@@ -459,6 +514,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                 <RequiredFieldLink
                                   onClick={() => {
                                     this.props.goToTab(
+                                      tabRoute,
                                       draft.id,
                                       section.id,
                                       field.name
@@ -501,34 +557,63 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         </Row>
         <Row>
           <Column>
-            <ButtonContainer>
-              <RegisterApplication
-                id="registerApplicationBtn"
-                icon={() => <TickLarge />}
-                align={ICON_ALIGNMENT.LEFT}
-                onClick={RegisterClickEvent}
-                disabled={!this.state.allSectionVisited}
-              >
-                {intl.formatMessage(messages.ValueRegister)}
-              </RegisterApplication>
-            </ButtonContainer>
+            {!!RegisterClickEvent && (
+              <ButtonContainer>
+                <RegisterApplication
+                  id="registerApplicationBtn"
+                  icon={() => <TickLarge />}
+                  align={ICON_ALIGNMENT.LEFT}
+                  onClick={RegisterClickEvent}
+                  disabled={!this.state.allSectionVisited}
+                >
+                  {intl.formatMessage(messages.ValueRegister)}
+                </RegisterApplication>
+              </ButtonContainer>
+            )}
 
-            <ButtonContainer>
-              <RejectApplication
-                id="rejectApplicationBtn"
-                title={intl.formatMessage(messages.ValueReject)}
-                icon={() => <CrossLarge />}
-                onClick={RejectApplicationClickEvent}
-                disabled={!this.state.allSectionVisited}
-              />
-            </ButtonContainer>
+            {!!RejectApplicationClickEvent && (
+              <ButtonContainer>
+                <RejectApplication
+                  id="rejectApplicationBtn"
+                  title={intl.formatMessage(messages.ValueReject)}
+                  icon={() => <CrossLarge />}
+                  onClick={RejectApplicationClickEvent}
+                  disabled={!this.state.allSectionVisited}
+                />
+              </ButtonContainer>
+            )}
+
+            {!!SubmitClickEvent && (
+              <ButtonContainer>
+                <RegisterApplication
+                  id="submit_form"
+                  icon={() => <TickLarge />}
+                  align={ICON_ALIGNMENT.LEFT}
+                  onClick={SubmitClickEvent}
+                  disabled={numberOfErrors > 0 || !this.state.allSectionVisited}
+                >
+                  {intl.formatMessage(messages.ValueSendForReview)}
+                </RegisterApplication>
+              </ButtonContainer>
+            )}
+
+            {!!SaveDraftClickEvent && (
+              <ButtonContainer>
+                <SaveDraft
+                  id="saveAsDraftBtn"
+                  title={intl.formatMessage(messages.ValueSaveAsDraft)}
+                  icon={() => <Draft />}
+                  onClick={SaveDraftClickEvent}
+                />
+              </ButtonContainer>
+            )}
 
             <EditConfirmation
               show={this.state.displayEditDialog}
               handleClose={this.toggleDisplayDialog}
               handleEdit={() => {
                 this.props.goToTab(
-                  REVIEW_BIRTH_PARENT_FORM_TAB,
+                  tabRoute,
                   draft.id,
                   this.state.editClickedSectionId
                 )
@@ -536,6 +621,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
           </Column>
         </Row>
+        <DButtonContainer>
+          <DeleteApplication onClick={DeleteApplicationClickEvent}>
+            <Delete />
+            {intl.formatMessage(messages.DeleteApplicationBtnTxt)}
+          </DeleteApplication>
+        </DButtonContainer>
       </>
     )
   }

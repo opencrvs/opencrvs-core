@@ -31,5 +31,6 @@ export const colors = {
   expandedIndicatorSecondary: '#7C93EC',
   imageContainerBackground: '#a8b8c3',
   disabledButton: '#F4F4F4',
-  rejectionIconColor: '#cc755f'
+  rejectionIconColor: '#cc755f',
+  saveDraftBtn: '#5391E8'
 }

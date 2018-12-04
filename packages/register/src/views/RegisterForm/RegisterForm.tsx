@@ -17,11 +17,11 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from 'src/components/interface/footer'
-import { PreviewSection } from './PreviewSection'
 import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 import processDraftData from './ProcessDraftData'
+import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -286,10 +286,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
             }
           >
             {activeSection.viewType === 'preview' && (
-              <PreviewSection draft={draft} onSubmit={this.submitForm} />
-            )}
-            {activeSection.viewType === 'review' && (
-              <PreviewSection draft={draft} onSubmit={this.submitForm} />
+              <ReviewSection
+                tabRoute={this.props.tabRoute}
+                draft={draft}
+                SubmitClickEvent={this.submitForm}
+                SaveDraftClickEvent={() => history.push('/')}
+                DeleteApplicationClickEvent={() => {
+                  this.props.deleteDraft(draft)
+                  history.push('/')
+                }}
+              />
             )}
             {activeSection.viewType === 'form' && (
               <Box>
