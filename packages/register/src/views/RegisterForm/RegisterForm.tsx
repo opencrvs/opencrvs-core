@@ -22,6 +22,7 @@ import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 import processDraftData from './ProcessDraftData'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
+import { merge } from 'lodash'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -161,6 +162,10 @@ const postMutation = gql`
     createBirthRegistration(details: $details)
   }
 `
+const VIEW_TYPE = {
+  REVIEW: 'review',
+  PREVIEW: 'preview'
+}
 
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
@@ -236,6 +241,24 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   processSubmitData = () => processDraftData(this.props.draft.data)
 
+  generateSectionListForReview = (
+    disabled: boolean,
+    sections: IFormSection[]
+  ) => {
+    const result: IFormSection[] = []
+    sections.map((section: IFormSection) => {
+      result.push(
+        merge(
+          {
+            disabled: section.viewType !== VIEW_TYPE.REVIEW && disabled
+          },
+          section
+        )
+      )
+    })
+    return result
+  }
+
   render() {
     const {
       goToTab,
@@ -251,9 +274,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
       ? messages.reviewBirthRegistration
-      : activeSection.viewType === 'preview'
+      : activeSection.viewType === VIEW_TYPE.PREVIEW
       ? messages.previewBirthRegistration
       : messages.newBirthRegistration
+    const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
+    const sectionForReview = isReviewForm
+      ? this.generateSectionListForReview(
+          isReviewSection,
+          registerForm.sections
+        )
+      : registerForm.sections
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
@@ -262,7 +292,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           title={intl.formatMessage(title)}
         >
           <StickyFormTabs
-            sections={registerForm.sections}
+            sections={sectionForReview}
             activeTabId={activeSection.id}
             onTabClick={(tabId: string) =>
               goToTab(this.props.tabRoute, draft.id, tabId)
@@ -285,7 +315,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               )
             }
           >
-            {activeSection.viewType === 'preview' && (
+            {activeSection.viewType === VIEW_TYPE.PREVIEW && (
               <ReviewSection
                 tabRoute={this.props.tabRoute}
                 draft={draft}
@@ -294,6 +324,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 DeleteApplicationClickEvent={() => {
                   this.props.deleteDraft(draft)
                   history.push('/')
+                }}
+              />
+            )}
+            {activeSection.viewType === VIEW_TYPE.REVIEW && (
+              <ReviewSection
+                tabRoute={this.props.tabRoute}
+                draft={draft}
+                RejectApplicationClickEvent={() => {
+                  alert('Reject Application')
+                }}
+                RegisterClickEvent={() => {
+                  alert('Register')
                 }}
               />
             )}
