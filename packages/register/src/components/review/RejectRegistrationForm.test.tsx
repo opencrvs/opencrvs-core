@@ -11,7 +11,10 @@ describe('reject registration form', () => {
   let rejectFormComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const testComponent = createTestComponent(
-      <RejectRegistrationForm onBack={mockOnBack} />,
+      <RejectRegistrationForm
+        onBack={mockOnBack}
+        resourceID="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
+      />,
       store
     )
     rejectFormComponent = testComponent.component

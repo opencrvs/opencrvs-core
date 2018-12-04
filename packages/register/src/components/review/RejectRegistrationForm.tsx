@@ -6,10 +6,14 @@ import { IFormSectionData } from 'src/forms'
 import { hasFormError } from 'src/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
 import { IStoreState } from '@opencrvs/register/src/store'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
+import { goToWorkQueue } from 'src/navigation'
+import gql from 'graphql-tag'
+import { Mutation } from 'react-apollo'
 
 const messages = defineMessages({
   back: {
@@ -52,8 +56,20 @@ interface IState {
   enableUploadButton: boolean
 }
 
+export const postMutation = gql`
+  mutation rejectRegistration(
+    $id: String!
+    $reason: String!
+    $comment: String!
+  ) {
+    markBirthAsVoided(id: $id, reason: $reason, comment: $comment)
+  }
+`
+
 interface IProps {
+  resourceID: string
   onBack: () => void
+  goToWorkQueue: () => void
 }
 
 type IFullProps = InjectedIntlProps & IProps & { form: IRejectRegistrationForm }
@@ -84,45 +100,78 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
     )
   }
 
-  submitData = () => {
-    /* TODO submit rejection*/
+  processSubmitData = (registrationID: string) => {
+    const reasons = this.state.data.reason as string[]
+    let reason
+    if (reasons) {
+      reason = reasons.join()
+    } else {
+      reason = ''
+    }
+    return {
+      id: registrationID,
+      reason,
+      comment: this.state.data.comment
+    }
   }
 
   render = () => {
-    const { form, intl } = this.props
+    const { form, intl, resourceID } = this.props
     const { fields } = form
     return (
-      <OverlayContainer>
-        <ActionPage
-          title={intl.formatMessage(messages.rejectionFormTitle)}
-          backLabel={intl.formatMessage(messages.back)}
-          goBack={this.props.onBack}
-        >
-          <FormContainer>
-            <Box>
-              <FormFieldGenerator
-                id="reject_form"
-                fields={fields}
-                onChange={this.storeData}
-                setAllFieldsDirty={false}
-              />
+      <Mutation
+        mutation={postMutation}
+        variables={this.processSubmitData(resourceID)}
+      >
+        {(rejectRegistration, { data }) => {
+          if (data && data.markBirthAsVoided) {
+            this.props.goToWorkQueue()
+          }
 
-              <StyledPrimaryButton
-                id="submit_reject_form"
-                onClick={this.submitData}
-                disabled={!this.state.enableUploadButton}
+          return (
+            <OverlayContainer>
+              <ActionPage
+                title={intl.formatMessage(messages.rejectionFormTitle)}
+                backLabel={intl.formatMessage(messages.back)}
+                goBack={this.props.onBack}
               >
-                {intl.formatMessage(messages.rejectionReasonSubmit)}
-              </StyledPrimaryButton>
-            </Box>
-          </FormContainer>
-        </ActionPage>
-      </OverlayContainer>
+                <FormContainer>
+                  <Box>
+                    <FormFieldGenerator
+                      id="reject_form"
+                      fields={fields}
+                      onChange={this.storeData}
+                      setAllFieldsDirty={false}
+                    />
+
+                    <StyledPrimaryButton
+                      id="submit_reject_form"
+                      onClick={() => rejectRegistration()}
+                      disabled={!this.state.enableUploadButton}
+                    >
+                      {intl.formatMessage(messages.rejectionReasonSubmit)}
+                    </StyledPrimaryButton>
+                  </Box>
+                </FormContainer>
+              </ActionPage>
+            </OverlayContainer>
+          )
+        }}
+      </Mutation>
     )
   }
 }
 
-export const RejectRegistrationForm = connect((state: IStoreState) => ({
-  language: state.i18n.language,
-  form: getRejectForm(state)
-}))(injectIntl(RejectRegistrationView))
+export const RejectRegistrationForm = connect(
+  (state: IStoreState) => ({
+    language: state.i18n.language,
+    form: getRejectForm(state)
+  }),
+  function mapDispatchToProps(dispatch: Dispatch) {
+    return {
+      goToWorkQueue: () => {
+        dispatch(goToWorkQueue())
+      }
+    }
+  }
+)(injectIntl(RejectRegistrationView))

@@ -1,6 +1,7 @@
 import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
+  WORK_QUEUE,
   DRAFT_BIRTH_PARENT_FORM,
   SELECT_VITAL_EVENT
 } from 'src/navigation/routes'
@@ -31,6 +32,9 @@ export function goToBirthRegistration() {
 }
 export function goToEvents() {
   return push(SELECT_VITAL_EVENT)
+}
+export function goToWorkQueue() {
+  return push(WORK_QUEUE)
 }
 
 export function goBack() {

@@ -52,7 +52,7 @@ export interface IRejectRegistrationForm {
 export const rejectRegistration: IRejectRegistrationForm = {
   fields: [
     {
-      name: 'rejectionReason',
+      name: 'reason',
       type: CHECKBOX_GROUP,
       label: messages.rejectionReason,
       required: true,
@@ -78,7 +78,7 @@ export const rejectRegistration: IRejectRegistrationForm = {
       ]
     },
     {
-      name: 'rejectionCommentForHealthWorker',
+      name: 'comment',
       type: TEXTAREA,
       label: messages.rejectionCommentForHealthWorkerLabel,
       initialValue: '',

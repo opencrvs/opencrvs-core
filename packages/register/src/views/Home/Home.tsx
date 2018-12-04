@@ -18,7 +18,6 @@ import {
   CompleteDocument
 } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
-import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 
 const messages = defineMessages({
   declareNewEventActionTitle: {
@@ -66,34 +65,12 @@ const StyledIconAction = styled(IconAction)`
     margin: -2px 0 -2px 120px;
   }
 `
-interface IState {
-  formOpen: boolean
-}
 
 class HomeView extends React.Component<
   InjectedIntlProps & {
     goToEvents: typeof goToEventsAction
-  },
-  IState
+  }
 > {
-  constructor(
-    props: InjectedIntlProps &
-      IState & {
-        goToEvents: typeof goToEventsAction
-      }
-  ) {
-    super(props)
-    this.state = {
-      formOpen: false
-    }
-  }
-
-  toggleRejectForm = () => {
-    this.setState(state => ({
-      formOpen: !state.formOpen
-    }))
-  }
-
   render() {
     const { intl } = this.props
     return (
@@ -109,7 +86,6 @@ class HomeView extends React.Component<
           <IconAction
             id="draft_documents"
             icon={() => <DraftDocument />}
-            onClick={this.toggleRejectForm}
             title={intl.formatMessage(messages.myDraftActionTitle)}
           />
           <IconAction
@@ -123,9 +99,6 @@ class HomeView extends React.Component<
             title={intl.formatMessage(messages.completedSubmissionsActionTitle)}
           />
         </ActionList>
-        {this.state.formOpen && (
-          <RejectRegistrationForm onBack={this.toggleRejectForm} />
-        )}
         <ViewFooter>
           <FooterAction>
             <FooterPrimaryButton>
