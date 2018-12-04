@@ -167,10 +167,8 @@ export function updateTaskTemplate(
   ) {
     throw new Error('Task has no businessStatus code')
   }
-  if (reason) {
-    task.businessStatus.coding[0].code = status
-  }
-  if (comment) {
+  task.businessStatus.coding[0].code = status
+  if (comment && reason) {
     const newNote: fhir.Annotation = {
       text: `reason=${reason}&comment=${comment}`,
       time: new Date().toUTCString(),

@@ -465,7 +465,7 @@ test('should build a minimal FHIR registration document without error', async ()
   ])
 })
 
-test('should update a task document with as REJECTED without error', async () => {
+test('should update a task document as rejected', async () => {
   const fhir = await updateFHIRTaskBundle(
     {
       fullUrl:

@@ -1117,5 +1117,5 @@ export interface ITaskBundleEntry extends fhir.BundleEntry {
 export interface ITaskBundle extends fhir.Bundle {
   resourceType: fhir.code
   // prettier-ignore
-  entry: [ITaskBundleEntry, ...fhir.BundleEntry[]]
+  entry: [ITaskBundleEntry]
 }

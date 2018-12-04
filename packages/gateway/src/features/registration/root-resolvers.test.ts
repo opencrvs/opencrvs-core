@@ -1,6 +1,10 @@
 import { resolvers } from './root-resolvers'
 import * as fetch from 'jest-fetch-mock'
 
+beforeEach(() => {
+  fetch.resetMocks()
+})
+
 describe('Registration root resolvers', () => {
   describe('listBirthRegistrations()', () => {
     it('returns an array of composition results', async () => {
@@ -114,12 +118,6 @@ describe('Registration root resolvers', () => {
                       text: '',
                       time: '2018-11-28T15:13:57.492Z',
                       authorString: 'DUMMY'
-                    },
-                    {
-                      text:
-                        'reason=Misspelling&comment=CHild name was misspelled',
-                      time: 'Thu, 29 Nov 2018 10:37:17 GMT',
-                      authorString: 'DUMMY'
                     }
                   ],
                   focus: {
@@ -164,7 +162,10 @@ describe('Registration root resolvers', () => {
         {},
         { id, reason, comment }
       )
-
+      const postData = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(postData.entry[0].resource.note[1].text).toBe(
+        'reason=Misspelling&comment=Family name misspelled'
+      )
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
     })
     describe('markBirthAsVoided()', () => {
