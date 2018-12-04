@@ -1,5 +1,5 @@
 import {
-  pushTrackingId,
+  setTrackingId,
   pushBRN,
   setupRegistrationType,
   setupRegistrationWorkflow,
@@ -14,9 +14,9 @@ import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 
 describe('Verify fhir bundle modifier functions', () => {
-  describe('PushTrackingId', () => {
+  describe('setTrackingId', () => {
     it('Successfully modified the provided fhirBundle with trackingid', () => {
-      const fhirBundle = pushTrackingId(testFhirBundle)
+      const fhirBundle = setTrackingId(testFhirBundle)
       const composition = fhirBundle.entry[0].resource as fhir.Composition
       const task = fhirBundle.entry[1].resource as fhir.Task
 
@@ -30,13 +30,13 @@ describe('Verify fhir bundle modifier functions', () => {
 
     it('Throws error if invalid fhir bundle is provided', () => {
       const invalidData = { ...testFhirBundle, entry: [] }
-      expect(() => pushTrackingId(invalidData)).toThrowError(
+      expect(() => setTrackingId(invalidData)).toThrowError(
         'Invalid FHIR bundle found for declaration'
       )
     })
 
     it('Will push the composite resource identifier if it is missing on fhirDoc', () => {
-      const fhirBundle = pushTrackingId({
+      const fhirBundle = setTrackingId({
         ...testFhirBundle,
         entry: [{ resource: {} }]
       })
