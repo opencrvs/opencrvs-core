@@ -185,7 +185,6 @@ const StyledHeader = styled(Header)`
 `
 
 const BoxTitle = styled.div`
-  height: 25px;
   line-height: 25px;
   text-transform: capitalize !important;
   ${({ theme }) => theme.fonts.h2FontStyle}
@@ -212,6 +211,35 @@ const ChartContainer = styled(Box)`
 const Container = styled.div`
   padding: 20px 10px;
 `
+
+const LabelContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: row wrap;
+  padding-top: 20px;
+  color: ${({ theme }) => theme.colors.copy};
+  width: 100%;
+`
+const Label = styled.div`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  background-color: rgba(150, 150, 150, 0.1);
+  border-radius: 17px;
+  padding: 5px 10px 5px 7px;
+  margin: 2px 5px 2px 0;
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  align-items: center;
+  height: 32px;
+  & span {
+    text-transform: uppercase;
+    margin-left: 5px;
+    font-size: 13px;
+  }
+`
+
 class HomeView extends React.Component<InjectedIntlProps> {
   render() {
     const { intl } = this.props
@@ -250,6 +278,9 @@ class HomeView extends React.Component<InjectedIntlProps> {
                 messages.birthRegistrationRateWithin45DaysBoxTitle
               )}
             </BoxTitle>
+            <LabelContainer>
+              <Label>2018 estimate = 10000</Label>
+            </LabelContainer>
             <Line
               data={birthRegistrationDataPerMonth}
               xAxisLabel={intl.formatMessage(

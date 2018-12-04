@@ -494,6 +494,7 @@ export const BENGALI_STATE = {
     'validations.requiredSymbol': '',
     'register.form.submit': 'জমা দিন',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
+    'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
@@ -649,6 +650,10 @@ export const BENGALI_STATE = {
       'স্বাস্থ্য কর্মীর জন্য আবেদন বা নির্দেশাবলী সংশোধন করতে নির্দেশাবলী',
     'review.rejection.form.commentInstruction':
       'স্বাস্থ্য কর্মী সঠিকভাবে অ্যাপ্লিকেশন আপডেট করার জন্য কি আপডেট করা প্রয়োজন তার নির্দিষ্ট নির্দেশাবলী প্রদান করুন',
-    'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন'
+    'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
+    'review.button.register': 'নিবন্ধন',
+    'review.button.reject': 'বাতিল',
+    'review.documentViewer.title': 'সমর্থনকারী কাগজপত্র',
+    'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন'
   }
 }

@@ -501,6 +501,7 @@ export const ENGLISH_STATE = {
     'validations.requiredSymbol': '',
     'register.form.submit': 'Submit',
     'register.form.informationMissing': 'Information missing',
+    'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth declaration',
@@ -656,6 +657,10 @@ export const ENGLISH_STATE = {
       'Comments or instructions for health worker to rectify application',
     'review.rejection.form.commentInstruction':
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
-    'review.rejection.form.submitButton': 'Submit rejection'
+    'review.rejection.form.submitButton': 'Submit rejection',
+    'review.button.register': 'REGISTER',
+    'review.button.reject': 'Reject Application',
+    'review.documentViewer.title': 'Supporting Documents',
+    'review.documentViewer.tagline': 'Select to Preview'
   }
 }
