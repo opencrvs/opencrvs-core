@@ -48,7 +48,7 @@ export const resolvers: GQLResolver = {
           !locationResponse.physicalType.coding[0] ||
           !locationResponse.physicalType.coding[0].display
         ) {
-          throw new Error('PractitionerRole has no location')
+          throw new Error('PractitionerRole has no physicalType')
         }
         if (locationResponse.physicalType.coding[0].display === 'Building') {
           practitionerResource.primaryOffice = locationResponse
