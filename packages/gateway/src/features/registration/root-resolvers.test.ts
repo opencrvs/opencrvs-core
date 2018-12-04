@@ -15,6 +15,24 @@ describe('Registration root resolvers', () => {
       expect(compositions).toBeInstanceOf(Array)
       expect(compositions).toHaveLength(2)
     })
+
+    it('returns an array of composition results when location ids provided', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
+        })
+      )
+
+      // @ts-ignore
+      const compositions = await resolvers.Query.listBirthRegistrations(
+        {},
+        { locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'] }
+      )
+
+      expect(compositions).toBeDefined()
+      expect(compositions).toBeInstanceOf(Array)
+      expect(compositions).toHaveLength(2)
+    })
   })
   const details = {
     child: {
