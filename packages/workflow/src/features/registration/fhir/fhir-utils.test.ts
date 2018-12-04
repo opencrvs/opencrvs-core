@@ -9,7 +9,7 @@ import {
   getLoggedInPractitionerResource,
   getFromFhir
 } from './fhir-utils'
-import { pushTrackingId, pushBRN } from './fhir-bundle-modifier'
+import { setTrackingId, pushBRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -91,7 +91,7 @@ describe('Verify getInformantName', () => {
 
 describe('Verify getTrackingId', () => {
   it('Returned tracking id properly', () => {
-    const trackingid = getTrackingId(pushTrackingId(testFhirBundle))
+    const trackingid = getTrackingId(setTrackingId(testFhirBundle))
     expect(trackingid).toMatch(/^B/)
     expect(trackingid.length).toBe(7)
   })
