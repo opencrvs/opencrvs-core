@@ -3,13 +3,35 @@ import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
 import {
   modifyRegistrationBundle,
-  markBundleAsRegistered
+  markBundleAsRegistered,
+  setTrackingId
 } from './fhir/fhir-bundle-modifier'
 import { sendBirthNotification } from './utils'
 import { getTrackingId, getBirthRegistrationNumber } from './fhir/fhir-utils'
 import { EVENT_TYPE } from './fhir/constants'
 import { getToken } from 'src/utils/authUtils'
 import { logger } from 'src/logger'
+
+async function sendBundleToHearth(payload: fhir.Bundle, count = 1) {
+  const res = await fetch(fhirUrl, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
+  if (!res.ok) {
+    if (res.status === 409 && count < 5) {
+      setTrackingId(payload)
+      await sendBundleToHearth(payload, count + 1)
+      return
+    }
+
+    throw new Error(
+      `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+}
 
 export async function createBirthRegistrationHandler(
   request: Hapi.Request,
@@ -22,28 +44,11 @@ export async function createBirthRegistrationHandler(
       getToken(request)
     )
 
-    const res = await fetch(fhirUrl, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    })
-    if (!res.ok) {
-      /* 
-        Based res.status we will know whether there is any dup error or not 
-        If any, then we will resubmit the declaration (coming as part of another PR)
-      */
-      throw new Error(
-        `FHIR post to /fhir failed with [${
-          res.status
-        }] body: ${await res.text()}`
-      )
-    }
+    await sendBundleToHearth(payload)
 
     /* sending notification to the contact */
     sendBirthNotification(payload, {
-      Authorization: request.headers['authorization']
+      Authorization: request.headers.authorization
     })
     /* returning the newly created tracking id */
     return { trackingid: getTrackingId(payload) }
