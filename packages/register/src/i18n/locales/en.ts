@@ -445,7 +445,9 @@ export const ENGLISH_STATE = {
     'register.form.tabs.documentsTab': 'Documents',
     'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
+    'review.form.tabs.reviewTab': 'Review',
     'register.form.section.previewTitle': 'Preview',
+    'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
       'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
     'register.form.section.documents.list.informantAttestation':
@@ -497,12 +499,15 @@ export const ENGLISH_STATE = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
     'validations.requiredSymbol': '',
-    'register.form.submit': 'Submit',
+    'register.form.submit': 'SEND FOR REVIEW',
     'register.form.informationMissing': 'Information missing',
+    'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth declaration',
-    'register.form.saveDraft': 'Save draft',
+    'register.form.previewBirthRegistration': 'Birth Application Preview',
+    'register.form.reviewBirthRegistration': 'Birth Application Review',
+    'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
     'register.form.modal.submitDescription':
@@ -640,6 +645,8 @@ export const ENGLISH_STATE = {
     'register.workQueue.buttons.newApplication': 'New birth application',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
+    'review.edit.modal.confirmationText':
+      'Are you sure you want to edit the application?',
     'review.rejection.form': 'Rejection form',
     'review.rejection.form.title': 'Reasons for rejection',
     'review.rejection.form.reasons': 'Reason(s) for rejection:',
@@ -652,6 +659,11 @@ export const ENGLISH_STATE = {
       'Comments or instructions for health worker to rectify application',
     'review.rejection.form.commentInstruction':
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
-    'review.rejection.form.submitButton': 'Submit rejection'
+    'review.rejection.form.submitButton': 'Submit rejection',
+    'review.button.register': 'REGISTER',
+    'review.button.reject': 'Reject Application',
+    'review.documentViewer.title': 'Supporting Documents',
+    'review.documentViewer.tagline': 'Select to Preview',
+    'review.form.deleteApplication': 'Delete Application'
   }
 }

@@ -82,7 +82,10 @@ export const mockPatient = {
         {
           url: 'code',
           valueCodeableConcept: {
-            coding: [{ system: 'urn:iso:std:iso:3166', code: 'BN' }]
+            coding: [
+              { system: 'urn:iso:std:iso:3166', code: 'BN' },
+              { system: 'urn:iso:std:iso:3166', code: 'EN' }
+            ]
           }
         },
         {
@@ -211,6 +214,10 @@ export const mockTask = {
     {
       url: 'http://opencrvs.org/specs/extension/regLastLocation',
       valueReference: 'Location/123'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
     }
   ]
 }
@@ -401,182 +408,208 @@ export const mockLocation = {
 
 export const mockObservations = {
   birthWeight: {
-    fullUrl: 'urn:uuid:<uuid>',
-    resource: {
-      resourceType: 'Observation',
-      status: 'final',
-      context: {
-        reference: 'Encounter/123' // the birth encounter
-      },
-      category: [
-        {
-          coding: [
-            {
-              system: 'http://hl7.org/fhir/observation-category',
-              code: 'vital-signs',
-              display: 'Vital Signs'
-            }
-          ]
-        }
-      ],
-      code: {
-        coding: [
-          {
-            system: 'http://loinc.org',
-            code: '29463-7',
-            display: 'Body Weight'
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
           },
-          {
-            system: 'http://loinc.org',
-            code: '3141-9',
-            display: 'Body weight Measured'
+          category: [
+            {
+              coding: [
+                {
+                  system: 'http://hl7.org/fhir/observation-category',
+                  code: 'vital-signs',
+                  display: 'Vital Signs'
+                }
+              ]
+            }
+          ],
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '29463-7',
+                display: 'Body Weight'
+              },
+              {
+                system: 'http://loinc.org',
+                code: '3141-9',
+                display: 'Body weight Measured'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference child by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as birthdate
+          valueQuantity: {
+            value: 1.25,
+            unit: 'kg',
+            system: 'http://unitsofmeasure.org',
+            code: 'kg'
           }
-        ]
-      },
-      subject: {
-        reference: 'Patient/123' // reference child by fullUrl
-      },
-      effectiveDateTime: '2016-03-28', // same as birthdate
-      valueQuantity: {
-        value: 1.25,
-        unit: 'kg',
-        system: 'http://unitsofmeasure.org',
-        code: 'kg'
+        }
       }
-    }
+    ]
   },
   birthType: {
-    fullUrl: 'urn:uuid:<uuid>',
-    resource: {
-      resourceType: 'Observation',
-      status: 'final',
-      context: {
-        reference: 'Encounter/123' // the birth encounter
-      },
-      category: [
-        {
-          coding: [
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
+          },
+          category: [
             {
-              system: 'http://hl7.org/fhir/observation-category',
-              code: 'procedure',
-              display: 'Procedure'
+              coding: [
+                {
+                  system: 'http://hl7.org/fhir/observation-category',
+                  code: 'procedure',
+                  display: 'Procedure'
+                }
+              ]
             }
-          ]
-        }
-      ],
-      code: {
-        coding: [
-          {
-            system: 'http://loinc.org',
-            code: '57722-1',
-            display: 'Birth plurality of Pregnancy'
+          ],
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '57722-1',
+                display: 'Birth plurality of Pregnancy'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference mother by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as birthdate
+          valueQuantity: {
+            value: 2
           }
-        ]
-      },
-      subject: {
-        reference: 'Patient/123' // reference mother by fullUrl
-      },
-      effectiveDateTime: '2016-03-28', // same as birthdate
-      valueInteger: 2
-    }
+        }
+      }
+    ]
   },
   birthAttendant: {
-    fullUrl: 'urn:uuid:<uuid>',
-    resource: {
-      resourceType: 'Observation',
-      status: 'final',
-      context: {
-        reference: 'Encounter/123' // the birth encounter
-      },
-      category: [
-        {
-          coding: [
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
+          },
+          category: [
             {
-              system: 'http://hl7.org/fhir/observation-category',
-              code: 'procedure',
-              display: 'Procedure'
+              coding: [
+                {
+                  system: 'http://hl7.org/fhir/observation-category',
+                  code: 'procedure',
+                  display: 'Procedure'
+                }
+              ]
             }
-          ]
+          ],
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '73764-3',
+                display: 'Birth attendant title'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference mother by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as birthdate
+          valueString: 'PHYSICIAN'
         }
-      ],
-      code: {
-        coding: [
-          {
-            system: 'http://loinc.org',
-            code: '73764-3',
-            display: 'Birth attendant title'
-          }
-        ]
-      },
-      subject: {
-        reference: 'Patient/123' // reference mother by fullUrl
-      },
-      effectiveDateTime: '2016-03-28', // same as birthdate
-      valueString: 'PHYSICIAN'
-    }
+      }
+    ]
   },
   birthRegistration: {
-    fullUrl: 'urn:uuid:<uuid>',
-    resource: {
-      resourceType: 'Observation',
-      status: 'final',
-      context: {
-        reference: 'Encounter/123' // the birth encounter
-      },
-      code: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/specs/obs-type',
-            code: 'birth-reg-type',
-            display: 'Birth registration type'
-          }
-        ]
-      },
-      effectiveDateTime: '2016-03-28', // same as birthdate
-      valueString: 'BOTH_PARENTS'
-    }
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'birth-reg-type',
+                display: 'Birth registration type'
+              }
+            ]
+          },
+          effectiveDateTime: '2016-03-28', // same as birthdate
+          valueString: 'BOTH_PARENTS'
+        }
+      }
+    ]
   },
   birthRegistrationType: {
-    fullUrl: 'urn:uuid:<uuid>',
-    resource: {
-      resourceType: 'Observation',
-      status: 'final',
-      context: {
-        reference: 'Encounter/123' // the birth encounter
-      },
-      code: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/specs/obs-type',
-            code: 'birth-reg-type',
-            display: 'Birth registration type'
-          }
-        ]
-      },
-      effectiveDateTime: '2016-03-28', // same as birthdate
-      valueString: 'BOTH_PARENTS'
-    }
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'birth-reg-type',
+                display: 'Birth registration type'
+              }
+            ]
+          },
+          effectiveDateTime: '2016-03-28', // same as birthdate
+          valueString: 'BOTH_PARENTS'
+        }
+      }
+    ]
   },
   presentAtBirthRegistration: {
-    fullUrl: 'urn:uuid:<uuid>',
-    resource: {
-      resourceType: 'Observation',
-      status: 'final',
-      context: {
-        reference: 'Encounter/123' // the birth encounter
-      },
-      code: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/specs/obs-type',
-            code: 'present-at-birth-reg',
-            display: 'Present at birth registration'
-          }
-        ]
-      },
-      effectiveDateTime: '2016-03-28', // same as registration date
-      valueString: 'BOTH_PARENTS'
-    }
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'present-at-birth-reg',
+                display: 'Present at birth registration'
+              }
+            ]
+          },
+          effectiveDateTime: '2016-03-28', // same as registration date
+          valueString: 'BOTH_PARENTS'
+        }
+      }
+    ]
   },
   childrenBornAliveToMother: {
     fullUrl: 'urn:uuid:<uuid>',

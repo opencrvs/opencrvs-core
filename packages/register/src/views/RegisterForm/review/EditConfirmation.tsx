@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import styled from '../../styled-components'
+import styled from 'styled-components'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const PreviewButton = styled.a`
   text-decoration: underline;
   color: ${({ theme }) => theme.colors.primary};
+  cursor: pointer;
 `
 
 export const messages = defineMessages({
@@ -19,6 +20,11 @@ export const messages = defineMessages({
     id: 'review.edit.modal.editButton',
     defaultMessage: 'Edit',
     description: 'Edit button on edit modal'
+  },
+  editApplicationConfirmationTxt: {
+    id: 'review.edit.modal.confirmationText',
+    defaultMessage: 'Are you sure you want to edit the application?',
+    description: 'Edit modal confirmation text'
   }
 })
 
@@ -36,7 +42,7 @@ const EditConfirmationComponent = ({
 }: IProps & InjectedIntlProps) => {
   return (
     <Modal
-      title="Are you sure you want to edit the application?"
+      title={intl.formatMessage(messages.editApplicationConfirmationTxt)}
       actions={[
         <PrimaryButton key="edit" id="edit_confirm" onClick={handleEdit}>
           {intl.formatMessage(messages.submitButton)}
