@@ -5,11 +5,15 @@ import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft, setInitialDrafts } from 'src/drafts'
 
 import { createStore } from '../../store'
+import { DRAFT_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
 
   const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())
+  const draft = createDraft()
   it('throws error when draft not found after initial drafts load', () => {
     try {
       createTestComponent(
@@ -17,6 +21,9 @@ describe('when user is in the register form before initial draft load', () => {
           location={mock}
           history={history}
           staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
             params: { draftId: '', tabId: '' },
             isExact: true,
@@ -41,6 +48,7 @@ describe('when user is in the register form', async () => {
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
@@ -49,6 +57,9 @@ describe('when user is in the register form', async () => {
           location={mock}
           history={history}
           staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'mother' },
             isExact: true,
@@ -92,12 +103,15 @@ describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())
   const testComponent = createTestComponent(
     <RegisterForm
       location={mock}
-
       history={history}
       staticContext={mock}
+      registerForm={form}
+      draft={draft}
+      tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
       match={{
         params: { draftId: draft.id, tabId: 'preview' },
         isExact: true,

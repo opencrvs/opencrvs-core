@@ -410,6 +410,7 @@ export const fatherSection: IFormSection = {
         options: upazilaUnionMap
       },
       conditionals: [
+        conditionals.fathersDetailsExist,
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4

@@ -18,11 +18,13 @@ import {
 } from './AxisTick'
 
 const Container = styled.div`
-  margin-top: 30px;
   box-sizing: border-box;
   height: 300px;
   width: 100%;
   align-items: center;
+  .recharts-label {
+    text-anchor: middle;
+  }
 `
 
 interface ILineDataPoint extends IDataPoint {
@@ -67,7 +69,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           width={600}
           height={300}
           data={data}
-          margin={{ top: 40, right: 50, bottom: 40, left: 50 }}
+          margin={{ top: 0, right: 50, bottom: 40, left: 50 }}
         >
           <defs>
             <linearGradient id="colorLineArea" x1="0" y1="0" x2="0" y2="1">
@@ -124,9 +126,9 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
             <Label
               fill={theme.colors.secondary}
               fontFamily={theme.fonts.lightFont}
-              transform="rotate(-90)"
-              dy={-85}
-              dx={-85}
+              angle={-90}
+              dy={20}
+              offset={20}
               value={yAxisLabel}
               position="left"
             />

@@ -152,7 +152,7 @@ export interface IConditionals {
   uploadDocForWhom: IConditional
 }
 
-export type ViewType = 'form' | 'preview'
+export type ViewType = 'form' | 'preview' | 'review'
 
 export interface IFormSection {
   id: string

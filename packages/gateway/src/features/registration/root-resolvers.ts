@@ -10,6 +10,15 @@ const statusMap = {
 
 export const resolvers: GQLResolver = {
   Query: {
+    async fetchBirthRegistration(_, { id }) {
+      const res = await fetch(`${fhirUrl}/Composition/${id}`, {
+        headers: {
+          'Content-Type': 'application/fhir+json'
+        }
+      })
+      const composition = await res.json()
+      return composition
+    },
     async listBirthRegistrations(_, { status }) {
       const res = await fetch(
         `${fhirUrl}/Composition${

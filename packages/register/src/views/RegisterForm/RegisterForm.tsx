@@ -10,9 +10,8 @@ import styled from '../../styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
-import { IStoreState } from '../../store'
-import { IDraft, modifyDraft, deleteDraft } from '../../drafts'
-import { getRegisterForm } from '../../forms/register/selectors'
+import { IStoreState } from 'src/store'
+import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
 import {
   FooterAction,
   FooterPrimaryButton,
@@ -41,6 +40,16 @@ export const messages = defineMessages({
   newBirthRegistration: {
     id: 'register.form.newBirthRegistration',
     defaultMessage: 'New birth declaration',
+    description: 'The message that appears for new birth registrations'
+  },
+  previewBirthRegistration: {
+    id: 'register.form.previewBirthRegistration',
+    defaultMessage: 'Birth Application Preview',
+    description: 'The message that appears for new birth registrations'
+  },
+  reviewBirthRegistration: {
+    id: 'register.form.reviewBirthRegistration',
+    defaultMessage: 'Birth Application Review',
     description: 'The message that appears for new birth registrations'
   },
   saveDraft: {
@@ -118,6 +127,12 @@ function getPreviousSection(
   return sections[currentIndex - 1]
 }
 
+export interface IFormProps {
+  draft: IDraft
+  registerForm: IForm
+  tabRoute: string
+}
+
 type DispatchProps = {
   goToTab: typeof goToTabAction
   modifyDraft: typeof modifyDraft
@@ -126,13 +141,12 @@ type DispatchProps = {
 }
 
 type Props = {
-  draft: IDraft
-  registerForm: IForm
   activeSection: IFormSection
   setAllFieldsDirty: boolean
 }
 
-type FullProps = Props &
+type FullProps = IFormProps &
+  Props &
   DispatchProps &
   InjectedIntlProps &
   RouteComponentProps<{}>
@@ -210,12 +224,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onSwiped = (
-    draftId: number,
+    draftId: string,
     selectedSection: IFormSection | null,
-    goToTab: (draftId: number, tabId: string) => void
+    tabRoute: string,
+    goToTab: (tabRoute: string, draftId: string, tabId: string) => void
   ): void => {
     if (selectedSection) {
-      goToTab(draftId, selectedSection.id)
+      goToTab(tabRoute, draftId, selectedSection.id)
     }
   }
 
@@ -232,36 +247,48 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       handleSubmit
     } = this.props
-
+    const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
-
+    const title = isReviewForm
+      ? messages.reviewBirthRegistration
+      : activeSection.viewType === 'preview'
+      ? messages.previewBirthRegistration
+      : messages.newBirthRegistration
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
           breadcrumb="Informant: Parent"
           id="informant_parent_view"
-          title={intl.formatMessage(messages.newBirthRegistration)}
+          title={intl.formatMessage(title)}
         >
           <StickyFormTabs
             sections={registerForm.sections}
             activeTabId={activeSection.id}
-            onTabClick={(tabId: string) => goToTab(draft.id, tabId)}
+            onTabClick={(tabId: string) =>
+              goToTab(this.props.tabRoute, draft.id, tabId)
+            }
           />
         </ViewHeaderWithTabs>
         <FormContainer>
           <Swipeable
             id="swipeable_block"
             trackMouse
-            onSwipedLeft={() => this.onSwiped(draft.id, nextSection, goToTab)}
+            onSwipedLeft={() =>
+              this.onSwiped(draft.id, nextSection, this.props.tabRoute, goToTab)
+            }
             onSwipedRight={() =>
               this.onSwiped(
                 draft.id,
                 getPreviousSection(registerForm.sections, activeSection),
+                this.props.tabRoute,
                 goToTab
               )
             }
           >
             {activeSection.viewType === 'preview' && (
+              <PreviewSection draft={draft} onSubmit={this.submitForm} />
+            )}
+            {activeSection.viewType === 'review' && (
               <PreviewSection draft={draft} onSubmit={this.submitForm} />
             )}
             {activeSection.viewType === 'form' && (
@@ -283,7 +310,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 <FormAction>
                   {nextSection && (
                     <FormPrimaryButton
-                      onClick={() => goToTab(draft.id, nextSection.id)}
+                      onClick={() =>
+                        goToTab(this.props.tabRoute, draft.id, nextSection.id)
+                      }
                       id="next_section"
                       icon={() => <ArrowForward />}
                     >
@@ -359,27 +388,25 @@ function replaceInitialValues(fields: IFormField[], sectionValues: object) {
 
 function mapStateToProps(
   state: IStoreState,
-  props: Props & RouteComponentProps<{ tabId: string; draftId: string }>
+  props: IFormProps &
+    Props &
+    RouteComponentProps<{ tabId: string; draftId: string }>
 ) {
-  const { match } = props
-  const registerForm = getRegisterForm(state)
+  const { match, registerForm, draft } = props
+
   const activeSectionId = getActiveSectionId(registerForm, match.params)
 
   const activeSection = registerForm.sections.find(
     ({ id }) => id === activeSectionId
   )
-  const draft = state.drafts.drafts.find(
-    ({ id }) => id === parseInt(match.params.draftId, 10)
-  )
-
-  if (!draft) {
-    throw new Error(`Draft "${match.params.draftId}" missing!`)
-  }
 
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
   }
 
+  if (!draft) {
+    throw new Error(`Draft "${match.params.draftId}" missing!`)
+  }
   const visitedSections = registerForm.sections.filter(({ id }) =>
     Boolean(draft.data[id])
   )
