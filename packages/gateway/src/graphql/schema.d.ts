@@ -147,7 +147,7 @@ export enum GQLEducationType {
 
 export interface GQLLocation {
   id: string
-  identifier?: Array<string | null>
+  identifier?: Array<GQLIdentifier | null>
   status?: string
   name?: string
   alias?: Array<string | null>
@@ -159,6 +159,11 @@ export interface GQLLocation {
   latitude?: number
   altitude?: number
   geoData?: string
+}
+
+export interface GQLIdentifier {
+  system?: string
+  value?: string
 }
 
 export enum GQLLocationType {
@@ -490,6 +495,7 @@ export interface GQLResolver {
   Address?: GQLAddressTypeResolver
   Attachment?: GQLAttachmentTypeResolver
   Location?: GQLLocationTypeResolver
+  Identifier?: GQLIdentifierTypeResolver
   BirthRegistration?: GQLBirthRegistrationTypeResolver
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
@@ -950,6 +956,19 @@ export interface LocationToAltitudeResolver<TParent = any, TResult = any> {
 }
 
 export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLIdentifierTypeResolver<TParent = any> {
+  system?: IdentifierToSystemResolver<TParent>
+  value?: IdentifierToValueResolver<TParent>
+}
+
+export interface IdentifierToSystemResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IdentifierToValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
