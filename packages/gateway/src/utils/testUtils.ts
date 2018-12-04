@@ -82,7 +82,10 @@ export const mockPatient = {
         {
           url: 'code',
           valueCodeableConcept: {
-            coding: [{ system: 'urn:iso:std:iso:3166', code: 'BN' }]
+            coding: [
+              { system: 'urn:iso:std:iso:3166', code: 'BN' },
+              { system: 'urn:iso:std:iso:3166', code: 'EN' }
+            ]
           }
         },
         {

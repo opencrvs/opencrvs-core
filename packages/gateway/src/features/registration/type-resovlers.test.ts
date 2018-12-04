@@ -144,7 +144,7 @@ describe('Registration type resolvers', () => {
   it('returns nationality', () => {
     // @ts-ignore
     const nationality = typeResolvers.Person.nationality(mockPatient)
-    expect(nationality[0]).toBe('BN')
+    expect(nationality).toEqual(['BN', 'EN'])
   })
 
   it('returns educationalAttainment', () => {

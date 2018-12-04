@@ -22,7 +22,6 @@ import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 import processDraftData from './ProcessDraftData'
-// import { getForm } from '@opencrvs/register/src/forms/register/selectors'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};

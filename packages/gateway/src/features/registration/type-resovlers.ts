@@ -66,14 +66,19 @@ export const typeResolvers: GQLResolver = {
         nationalityExtension.extension
       )
 
-      const nationality =
+      const coding =
         (countryCodeExtension &&
           countryCodeExtension.valueCodeableConcept &&
           countryCodeExtension.valueCodeableConcept.coding &&
-          countryCodeExtension.valueCodeableConcept.coding[0].code) ||
-        null
+          countryCodeExtension.valueCodeableConcept.coding) ||
+        []
 
-      return [nationality]
+      // Nationality could be multiple
+      const nationality = coding.map(n => {
+        return n.code
+      })
+
+      return nationality
     },
     educationalAttainment: person => {
       const educationalAttainmentExtension = findExtension(

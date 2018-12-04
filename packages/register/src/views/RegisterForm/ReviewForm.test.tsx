@@ -19,7 +19,7 @@ describe('ReviewForm tests', async () => {
   const mock: any = jest.fn()
   const form = getReviewForm(store.getState())
 
-  it('error while fetching', async () => {
+  it('it returns error while fetching', async () => {
     const draft = createReviewDraft(uuid(), {})
     const graphqlMock = [
       {
@@ -64,7 +64,7 @@ describe('ReviewForm tests', async () => {
 
     testComponent.component.unmount()
   })
-  it('fetched data', async () => {
+  it('it returns birth registration', async () => {
     const draft = createReviewDraft(uuid(), {})
     const graphqlMock = [
       {
@@ -194,7 +194,7 @@ describe('ReviewForm tests', async () => {
 
     testComponent.component.unmount()
   })
-  it('empty data', async () => {
+  it('it returns empty data and checks if there is any error', async () => {
     const draft = createReviewDraft(uuid(), {})
     const graphqlMock = [
       {
@@ -233,7 +233,7 @@ describe('ReviewForm tests', async () => {
     })
     testComponent.component.unmount()
   })
-  it('father data and contact father', async () => {
+  it("when registration contact is father, father's should be set", async () => {
     const draft = createReviewDraft(uuid(), {})
     const graphqlMock = [
       {
@@ -328,10 +328,17 @@ describe('ReviewForm tests', async () => {
     await new Promise(resolve => {
       setTimeout(resolve, 0)
     })
+    testComponent.component.update()
+
+    const data = testComponent.component
+      .find(RegisterForm)
+      .prop('draft') as IDraft
+
+    expect(data.data.registration.registrationEmail).toBe('ajmol@ocrvs.com')
     testComponent.component.unmount()
   })
 
-  it('contact null', async () => {
+  it('when registration contact is there but no contact information for father/mother', async () => {
     const draft = createReviewDraft(uuid(), {})
     const graphqlMock = [
       {
@@ -379,10 +386,19 @@ describe('ReviewForm tests', async () => {
     await new Promise(resolve => {
       setTimeout(resolve, 0)
     })
+
+    testComponent.component.update()
+
+    const data = testComponent.component
+      .find(RegisterForm)
+      .prop('draft') as IDraft
+
+    expect(data.data.registration.registrationEmail).toBeUndefined()
+
     testComponent.component.unmount()
   })
 
-  it('review data from store', async () => {
+  it('it checked if review form is already in store and avoid loading from backend', async () => {
     const draft = createReviewDraft(uuid(), {})
     draft.data = {
       child: {

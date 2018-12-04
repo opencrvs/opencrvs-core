@@ -16,8 +16,8 @@ export const resolvers: GQLResolver = {
           'Content-Type': 'application/fhir+json'
         }
       })
-      const bundle = await res.json()
-      return bundle
+      const composition = await res.json()
+      return composition
     },
     async listBirthRegistrations(_, { status }) {
       const res = await fetch(
