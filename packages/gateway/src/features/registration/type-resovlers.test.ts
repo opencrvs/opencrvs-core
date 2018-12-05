@@ -492,11 +492,89 @@ describe('Registration type resolvers', () => {
       )
     })
 
+    it('status type resolver', async () => {
+      // @ts-ignore
+      const status = await typeResolvers.Registration.status(mockTask)
+
+      expect(status).toBeDefined()
+      expect(status).toHaveLength(1)
+    })
+
+    it('tracking ID resolver', async () => {
+      const trackingID = await typeResolvers.Registration.trackingId(mockTask)
+
+      expect(trackingID).toBe('123')
+    })
+
+    it('paper form id resolver', async () => {
+      // @ts-ignore
+      const paperFormId = await typeResolvers.Registration.paperFormID(mockTask)
+
+      expect(paperFormId).toBe('123')
+    })
+
+    it('form page resolver', async () => {
+      // @ts-ignore
+      const formPage = await typeResolvers.Registration.page(mockTask)
+
+      expect(formPage).toBe('123')
+    })
+
+    it('form book resolver', async () => {
+      // @ts-ignore
+      const formBook = await typeResolvers.Registration.book(mockTask)
+
+      expect(formBook).toBe('123')
+    })
+
+    it('registration type resolver', async () => {
+      // @ts-ignore
+      const regType = await typeResolvers.Registration.type(mockTask)
+
+      expect(regType).toBe('birth-registration')
+    })
+
     it('contact type resolver', async () => {
       // @ts-ignore
       const contact = await typeResolvers.Registration.contact(mockTask)
 
       expect(contact).toEqual('MOTHER')
+    })
+
+    it('business status type resolver', async () => {
+      // @ts-ignore
+      const status = await typeResolvers.RegWorkflow.type(mockTask)
+
+      expect(status).toBe('DECLARED | VERIFIED | REGISTERED | CERTIFIED')
+    })
+
+    it('comments type resolver', async () => {
+      // @ts-ignore
+      const comments = await typeResolvers.RegWorkflow.comments(mockTask)
+      // @ts-ignore
+      const comment = await typeResolvers.Comment.comment(mockTask.note[0])
+      // @ts-ignore
+      const user = await typeResolvers.Comment.user(mockTask.note[0])
+
+      expect(comments).toBeDefined()
+
+      expect(comments).toHaveLength(1)
+      expect(comment).toBe('Comment')
+      expect(user).toBe('<username>')
+    })
+
+    it('timestamp resolver', async () => {
+      // @ts-ignore
+      const time = await typeResolvers.RegWorkflow.timestamp(mockTask)
+
+      expect(time).toBe('2016-10-31T09:45:05+10:00')
+    })
+
+    it('user resolver', async () => {
+      // @ts-ignore
+      const user = await typeResolvers.RegWorkflow.user(mockTask)
+
+      expect(user).toBe('<username>')
     })
 
     it('throw when tasks has no focus', async () => {
