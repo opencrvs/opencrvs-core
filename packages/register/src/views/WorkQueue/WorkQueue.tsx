@@ -41,6 +41,8 @@ import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { goToEvents as goToEventsAction } from 'src/navigation'
+import { goToTab as goToTabAction } from '../../navigation'
+import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list {
@@ -268,6 +270,7 @@ interface IBaseWorkQueueProps {
   language: string
   scope: Scope
   goToEvents: typeof goToEventsAction
+  gotoTab: typeof goToTabAction
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -311,6 +314,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       }, {})
 
       return {
+        id: reg.id,
         name:
           (namesMap[this.props.language] as string) ||
           /* tslint:disable:no-string-literal */
@@ -367,7 +371,9 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     const listItemActions = [
       {
         label: this.props.intl.formatMessage(messages.review),
-        handler: () => console.log('TO DO')
+        handler: () => {
+          this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+        }
       }
     ]
 
@@ -376,7 +382,9 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       expansionActions.push(
         <PrimaryButton
           id={`reviewAndRegisterBtn_${item.tracking_id}`}
-          onClick={() => console.log('TO DO')}
+          onClick={() =>
+            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+          }
         >
           {this.props.intl.formatMessage(messages.reviewAndRegister)}
         </PrimaryButton>
@@ -584,5 +592,5 @@ export const WorkQueue = connect(
     language: state.i18n.language,
     scope: getScope(state)
   }),
-  { goToEvents: goToEventsAction }
+  { goToEvents: goToEventsAction, gotoTab: goToTabAction }
 )(injectIntl(withTheme(WorkQueueView)))
