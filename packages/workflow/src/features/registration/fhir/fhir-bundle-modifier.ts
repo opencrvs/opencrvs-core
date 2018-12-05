@@ -25,7 +25,7 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  fhirBundle = pushTrackingId(fhirBundle)
+  fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
   /* setting registration type here */
@@ -107,7 +107,7 @@ export async function pushBRN(
   return taskResource
 }
 
-export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
+export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   const birthTrackingId = generateBirthTrackingId()
 
   if (
@@ -136,10 +136,19 @@ export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
-  taskResource.identifier.push({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-    value: birthTrackingId
-  })
+  const existingTrackingId = taskResource.identifier.find(
+    identifier =>
+      identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+  )
+
+  if (existingTrackingId) {
+    existingTrackingId.value = birthTrackingId
+  } else {
+    taskResource.identifier.push({
+      system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
+      value: birthTrackingId
+    })
+  }
 
   return fhirBundle
 }

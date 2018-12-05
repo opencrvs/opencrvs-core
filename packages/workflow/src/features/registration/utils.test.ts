@@ -3,7 +3,7 @@ import {
   generateDeathTrackingId,
   sendBirthNotification
 } from './utils'
-import { pushTrackingId } from './fhir/fhir-bundle-modifier'
+import { setTrackingId } from './fhir/fhir-bundle-modifier'
 import { logger } from '../../logger'
 import * as fetch from 'jest-fetch-mock'
 import { testFhirBundle } from 'src/test/utils'
@@ -26,7 +26,7 @@ describe('Verify utility functions', () => {
   })
 
   it('send Birth notification successfully', async () => {
-    const fhirBundle = pushTrackingId(testFhirBundle)
+    const fhirBundle = setTrackingId(testFhirBundle)
     expect(
       sendBirthNotification(fhirBundle, { Authorization: 'bearer acd ' })
     ).toBeDefined()

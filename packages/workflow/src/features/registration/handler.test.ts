@@ -11,6 +11,7 @@ describe('Verify handler', () => {
     fetch.resetMocks()
     server = await createServer()
   })
+
   describe('createBirthRegistrationHandler', () => {
     beforeEach(() => {
       fetch.mockResponses(
@@ -200,6 +201,7 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(200)
     })
+
     it('throws error if invalid fhir data is provided', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -232,6 +234,7 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(500)
     })
+
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementation(() => new Error('boom'))
 
@@ -255,7 +258,75 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(500)
     })
+
+    it('generates a new tracking id and repeats the request if a 409 is received from hearth', async () => {
+      fetch.mockResponses(
+        ['', { status: 409 }],
+        ['', { status: 409 }],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Patient/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
+
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/createBirthRegistration',
+        payload: testFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('fails after trying to generate a new trackingID and sending to Hearth 5 times', async () => {
+      fetch.mockResponses(
+        ['', { status: 409 }],
+        ['', { status: 409 }],
+        ['', { status: 409 }],
+        ['', { status: 409 }],
+        ['', { status: 409 }]
+      )
+
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/createBirthRegistration',
+        payload: testFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(500)
+    })
   })
+
   describe('markBirthAsRegisteredHandler', () => {
     beforeEach(() => {
       fetch.mockResponses(
@@ -513,6 +584,7 @@ describe('Verify handler', () => {
         ]
       )
     })
+
     it('returns OK', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
@@ -544,6 +616,7 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(200)
     })
+
     it('throws error if invalid fhir data is provided', async () => {
       fetch.mockResponse(
         JSON.stringify({
@@ -576,6 +649,7 @@ describe('Verify handler', () => {
       })
       expect(res.statusCode).toBe(500)
     })
+
     it('throws error if fhir returns an error', async () => {
       fetch.mockImplementation(() => new Error('boom'))
 
