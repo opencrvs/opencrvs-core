@@ -167,7 +167,7 @@ describe('Verify handler', () => {
       )
     })
     it('returns OK', async () => {
-      fetch.mockResponse(
+      fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
           entry: [
@@ -236,7 +236,7 @@ describe('Verify handler', () => {
     })
 
     it('throws error if fhir returns an error', async () => {
-      fetch.mockImplementation(() => new Error('boom'))
+      fetch.mockImplementationOnce(() => new Error('boom'))
 
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -596,7 +596,7 @@ describe('Verify handler', () => {
         }
       )
 
-      fetch.mockResponse(
+      fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
           entry: [
@@ -618,7 +618,7 @@ describe('Verify handler', () => {
     })
 
     it('throws error if invalid fhir data is provided', async () => {
-      fetch.mockResponse(
+      fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
           entry: [
@@ -651,7 +651,7 @@ describe('Verify handler', () => {
     })
 
     it('throws error if fhir returns an error', async () => {
-      fetch.mockImplementation(() => new Error('boom'))
+      fetch.mockImplementationOnce(() => new Error('boom'))
 
       const token = jwt.sign(
         { scope: ['register'] },

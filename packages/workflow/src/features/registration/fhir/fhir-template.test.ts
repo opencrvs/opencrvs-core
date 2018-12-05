@@ -28,7 +28,7 @@ describe('Verify fhir templates', () => {
         }
       })
     })
-    it('returs the existig task resource if it is already part of fhir bundle', () => {
+    it('returns the existig task resource if it is already part of fhir bundle', () => {
       const taskResource = selectOrCreateTaskRefResource(testFhirBundle)
 
       expect(taskResource).toBeDefined()
