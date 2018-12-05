@@ -577,6 +577,15 @@ describe('Registration type resolvers', () => {
       expect(user).toBe('<username>')
     })
 
+    it('task location resolver', async () => {
+      const mock = fetch.mockResponseOnce(JSON.stringify(mockLocation))
+
+      const taskLocation = await typeResolvers.RegWorkflow.location(mockTask)
+      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Location/123')
+
+      expect(taskLocation)
+    })
+
     it('throw when tasks has no focus', async () => {
       // @ts-ignore
       expect(typeResolvers.Registration.attachments({})).rejects.toThrowError(
