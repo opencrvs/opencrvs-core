@@ -1,15 +1,16 @@
-import { testFhirBundle } from 'src/test/utils'
+import { testFhirBundle, testFhirTaskBundle } from 'src/test/utils'
 import {
   getSharedContactMsisdn,
   getInformantName,
   getTrackingId,
+  getEntryId,
   getBirthRegistrationNumber,
   getRegStatusCode,
   getPaperFormID,
   getLoggedInPractitionerResource,
   getFromFhir
 } from './fhir-utils'
-import { pushTrackingId, pushBRN } from './fhir-bundle-modifier'
+import { setTrackingId, pushBRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -91,7 +92,7 @@ describe('Verify getInformantName', () => {
 
 describe('Verify getTrackingId', () => {
   it('Returned tracking id properly', () => {
-    const trackingid = getTrackingId(pushTrackingId(testFhirBundle))
+    const trackingid = getTrackingId(setTrackingId(testFhirBundle))
     expect(trackingid).toMatch(/^B/)
     expect(trackingid.length).toBe(7)
   })
@@ -438,5 +439,21 @@ describe('Verify getRegStatusCode', () => {
       )
       expect(getLoggedInPractitionerResource(token)).rejects.toThrowError()
     })
+  })
+})
+
+describe('Verify getEntryId', () => {
+  it('Returned entry id properly', () => {
+    const entryId = getEntryId(testFhirTaskBundle)
+    expect(entryId).toMatch('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+  })
+
+  it('Throws error when invalid fhir bundle is sent', () => {
+    expect(() =>
+      getEntryId({
+        resourceType: 'Bundle',
+        type: 'document'
+      })
+    ).toThrowError('getEntryId: Invalid FHIR bundle found for declaration')
   })
 })

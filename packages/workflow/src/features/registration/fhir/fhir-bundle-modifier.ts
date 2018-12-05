@@ -21,7 +21,7 @@ export function modifyRegistrationBundle(
   }
 
   /* setting unique trackingid here */
-  fhirBundle = pushTrackingId(fhirBundle)
+  fhirBundle = setTrackingId(fhirBundle)
 
   /* setting registration type here */
   fhirBundle = setupRegistrationType(fhirBundle, eventType)
@@ -108,7 +108,7 @@ export async function pushBRN(
   return fhirBundle
 }
 
-export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
+export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   const birthTrackingId = generateBirthTrackingId()
 
   if (
@@ -137,10 +137,19 @@ export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
-  taskResource.identifier.push({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-    value: birthTrackingId
-  })
+  const existingTrackingId = taskResource.identifier.find(
+    identifier =>
+      identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+  )
+
+  if (existingTrackingId) {
+    existingTrackingId.value = birthTrackingId
+  } else {
+    taskResource.identifier.push({
+      system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
+      value: birthTrackingId
+    })
+  }
 
   return fhirBundle
 }
@@ -238,7 +247,6 @@ export function setupAuthorOnNotes(
   }
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-
   if (!taskResource.note) {
     return fhirBundle
   }
