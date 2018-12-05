@@ -135,10 +135,57 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
+    paperFormID: task => {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
+    },
+    page: task => {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/paper-form-page`
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
+    },
+    book: task => {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/paper-form-book`
+        )
+      if (!foundIdentifier) {
+        return null
+      }
+      return foundIdentifier.value
+    },
     status: async task => {
       const taskArrary = []
       taskArrary.push(task)
       return taskArrary
+    },
+    type: task => {
+      const taskType = task.code
+      const taskCode = taskType.coding.find(
+        (coding: fhir.Coding) =>
+          coding.system === `${OPENCRVS_SPECIFICATION_URL}types`
+      )
+      return (taskCode && taskCode.code) || null
     }
   },
   RegWorkflow: {
