@@ -129,6 +129,12 @@ describe('Registration type resolvers', () => {
     expect(dateOfMarriage).toBe('2014-01-28')
   })
 
+  it('returns marital status', () => {
+    // @ts-ignore
+    const maritalStatus = typeResolvers.Person.maritalStatus(mockPatient)
+    expect(maritalStatus).toBe('Married')
+  })
+
   it('returns multipleBirth', () => {
     // @ts-ignore
     const multipleBirth = typeResolvers.Person.multipleBirth(mockPatient)
@@ -555,12 +561,15 @@ describe('Registration type resolvers', () => {
       const comment = await typeResolvers.Comment.comment(mockTask.note[0])
       // @ts-ignore
       const user = await typeResolvers.Comment.user(mockTask.note[0])
+      // @ts-ignore
+      const time = await typeResolvers.Comment.createdAt(mockTask.note[0])
 
       expect(comments).toBeDefined()
 
       expect(comments).toHaveLength(1)
       expect(comment).toBe('Comment')
       expect(user).toBe('<username>')
+      expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 
     it('timestamp resolver', async () => {
