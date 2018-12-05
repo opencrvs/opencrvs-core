@@ -69,7 +69,7 @@ export const postMutation = gql`
 interface IProps {
   draftId: string
   onBack: () => void
-  goToWorkQueue: () => void
+  confirmRejectionEvent: () => void
 }
 
 type IFullProps = InjectedIntlProps & IProps & { form: IRejectRegistrationForm }
@@ -116,7 +116,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { form, intl, draftId } = this.props
+    const { form, intl, draftId, confirmRejectionEvent } = this.props
     const { fields } = form
     return (
       <Mutation
@@ -125,7 +125,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
       >
         {(rejectRegistration, { data }) => {
           if (data && data.markBirthAsVoided) {
-            this.props.goToWorkQueue()
+            confirmRejectionEvent()
           }
           return (
             <OverlayContainer>

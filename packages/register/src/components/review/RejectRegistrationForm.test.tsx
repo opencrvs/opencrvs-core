@@ -5,14 +5,15 @@ import { createTestComponent } from 'src/tests/util'
 import { RejectRegistrationForm } from '@opencrvs/register/src/components/review/RejectRegistrationForm'
 
 const { store } = createStore()
-const mockOnBack = jest.fn()
+const mockHandler = jest.fn()
 
 describe('reject registration form', () => {
   let rejectFormComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <RejectRegistrationForm
-        onBack={mockOnBack}
+        onBack={mockHandler}
+        confirmRejectionEvent={mockHandler}
         draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
       />,
       store

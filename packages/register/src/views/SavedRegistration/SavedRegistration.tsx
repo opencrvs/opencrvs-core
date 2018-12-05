@@ -22,28 +22,34 @@ const messages = defineMessages({
     description:
       'The title that appears on the complete registration page when client is online'
   },
+  rejectionTitle: {
+    id: 'register.rejectionTitle',
+    defaultMessage: 'Application rejected',
+    description:
+      'The title that appears on the complete registration page when application is rejected'
+  },
   onlineTitle: {
     id: 'register.savedRegistration.online.title',
-    defaultMessage: 'Declaration submitted',
+    defaultMessage: 'Application submitted',
     description:
       'The title that appears on the saved registration page when the client is online'
   },
   onlineDesc: {
     id: 'register.savedRegistration.online.desc',
-    defaultMessage: 'The declaration is now on its way for validation.',
+    defaultMessage: 'The application is now on its way for validation.',
     description:
       'The description that appears on the saved registration page when the client is online'
   },
   offlineTitle: {
     id: 'register.savedRegistration.offline.title',
-    defaultMessage: 'Declaration pending connectivity',
+    defaultMessage: 'Application pending connectivity',
     description:
       'The title that appears on the saved registration page when the client is offline'
   },
   offlineDesc: {
     id: 'register.savedRegistration.offline.desc',
     defaultMessage:
-      'The declaration will automatically be sent out for validation once your device has internet connectivity.',
+      'The application will automatically be sent out for validation once your device has internet connectivity.',
     description:
       'The description that appears on the saved registration page when the client is offline'
   },
@@ -61,7 +67,7 @@ const messages = defineMessages({
   },
   onlineNoticeCardText1: {
     id: 'register.savedRegistration.online.noticeCard.text1',
-    defaultMessage: 'The birth declaration of',
+    defaultMessage: 'The birth application of',
     description:
       'The text of the notice card that appears on the saved registration page when the client is online'
   },
@@ -74,7 +80,7 @@ const messages = defineMessages({
   },
   offlineNoticeCardText1: {
     id: 'register.savedRegistration.offline.noticeCard.text1',
-    defaultMessage: 'The birth declaration of',
+    defaultMessage: 'The birth application of',
     description:
       'The text of the notice card that appears on the saved registration page when the client is offline'
   },
@@ -152,7 +158,7 @@ const messages = defineMessages({
   offlineNextCardText2: {
     id: 'register.savedRegistration.offline.nextCard.text2',
     defaultMessage:
-      'Once the declaration is succesfully submited, you and the informant will be notified when the registration is complete.',
+      'Once the application is succesfully submited, you and the informant will be notified when the registration is complete.',
     description:
       'The text of the what next card that appears on the saved registration page when the client is offline'
   },
@@ -169,6 +175,13 @@ const messages = defineMessages({
     description:
       'The text of the what next card that appears on the complete registration page'
   },
+  rejectedNoticeCardText2: {
+    id: 'register.rejectedNoticeCardText2',
+    defaultMessage:
+      'has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.',
+    description:
+      'The text of the what next card that appears on the rejected registration page'
+  },
   backButton: {
     id: 'register.savedRegistration.buttons.back',
     defaultMessage: 'Back to homescreen',
@@ -176,15 +189,15 @@ const messages = defineMessages({
   },
   newButton: {
     id: 'register.savedRegistration.buttons.newDeclaration',
-    defaultMessage: 'New declaration',
+    defaultMessage: 'New application',
     description:
-      'The button to start a new declaration now that they are finished with this one'
+      'The button to start a new application now that they are finished with this one'
   },
   duplicationButton: {
     id: 'register.savedRegistration.buttons.back.duplicate',
     defaultMessage: 'Back to duplicate',
     description:
-      'The button to start a new declaration now that they are finished with this one'
+      'The button to start a new application now that they are finished with this one'
   }
 })
 
@@ -240,7 +253,7 @@ const BoxHeader = styled.h2`
 `
 
 const ImgHeaderContainer = styled.div`
-  width: 175px;
+  max-width: 300px;
   margin: 0 auto;
   display: flex;
   flex-direction: row;
@@ -296,7 +309,6 @@ class SavedRegistrationView extends React.Component<
     const language = this.props.language
     const fullNameInBn = history.location.state.fullNameInBn
     const fullNameInEng = history.location.state.fullNameInEng
-
     let headerTitle: string
     let headerDesc: string
     let noticeCardText1: string
@@ -307,6 +319,8 @@ class SavedRegistrationView extends React.Component<
     let nextCardText2: string
     let trackingCardText: string
     let isDeclaration: boolean
+    let isRejection: boolean = false
+    let headerIcon: string
     if (history.location.state.declaration) {
       headerTitle = intl.formatMessage(
         online ? messages.onlineTitle : messages.offlineTitle
@@ -334,6 +348,21 @@ class SavedRegistrationView extends React.Component<
       )
       trackingCardText = intl.formatMessage(messages.trackingCardText)
       isDeclaration = true
+      isRejection = false
+      headerIcon = online ? CompleteTick : NoConnectivity
+    } else if (history.location.state.rejection) {
+      isRejection = true
+      isDeclaration = false
+      headerTitle = intl.formatMessage(messages.rejectionTitle)
+      headerDesc = ''
+      headerIcon = CompleteTick // Rejected Icon not available from designer.
+      trackingCardTitle = ''
+      trackingNumber = ''
+      trackingCardText = ''
+      nextCardText1 = ''
+      nextCardText2 = ''
+      noticeCardText1 = intl.formatMessage(messages.onlineNoticeCardText1)
+      noticeCardText2 = intl.formatMessage(messages.rejectedNoticeCardText2)
     } else {
       headerTitle = intl.formatMessage(messages.registrationCompleteTitle)
       headerDesc = ''
@@ -344,6 +373,8 @@ class SavedRegistrationView extends React.Component<
       nextCardText1 = intl.formatMessage(messages.registrationNextCardText1)
       nextCardText2 = intl.formatMessage(messages.registrationNextCardText2)
       trackingCardText = intl.formatMessage(messages.registrationCardText)
+      headerIcon = online ? CompleteTick : NoConnectivity
+      isRejection = false
       isDeclaration = false
     }
 
@@ -360,11 +391,13 @@ class SavedRegistrationView extends React.Component<
         <Container>
           <Box>
             <ImgHeaderContainer>
-              <Img src={online ? CompleteTick : NoConnectivity} />
+              <Img src={headerIcon} />
               <BoxHeader id="submission_title">
                 {intl.formatMessage(
-                  online
+                  online && !isRejection
                     ? messages.onlineNoticeCardTitle
+                    : isRejection
+                    ? messages.rejectionTitle
                     : messages.offlineNoticeCardTitle
                 )}
               </BoxHeader>
@@ -382,33 +415,40 @@ class SavedRegistrationView extends React.Component<
               )}
             </SubmissionText>
           </Box>
-          <TrackingBox>
-            <TrackingHeader>{trackingCardTitle}</TrackingHeader>
-            <TrackingNumber id="trackingIdViewer">
-              {trackingNumber}
-            </TrackingNumber>
-            <StyledP>{trackingCardText}</StyledP>
-          </TrackingBox>
-          <NextBox>
-            <BoxHeader>{intl.formatMessage(messages.nextCardTitle)}</BoxHeader>
-            <StyledP id="whats_next_title">{nextCardText1}</StyledP>
-            <StyledP id="whats_next_text">{nextCardText2}</StyledP>
-          </NextBox>
+          {!isRejection && (
+            <TrackingBox>
+              <TrackingHeader>{trackingCardTitle}</TrackingHeader>
+              <TrackingNumber id="trackingIdViewer">
+                {trackingNumber}
+              </TrackingNumber>
+              <StyledP>{trackingCardText}</StyledP>
+            </TrackingBox>
+          )}
+          {!isRejection && (
+            <NextBox>
+              <BoxHeader>
+                {intl.formatMessage(messages.nextCardTitle)}
+              </BoxHeader>
+              <StyledP id="whats_next_title">{nextCardText1}</StyledP>
+              <StyledP id="whats_next_text">{nextCardText2}</StyledP>
+            </NextBox>
+          )}
         </Container>
         <Footer>
-          {isDeclaration ? (
-            <FooterAction>
-              <FooterPrimaryButton onClick={() => history.push('/')}>
-                {intl.formatMessage(messages.newButton)}
-              </FooterPrimaryButton>
-            </FooterAction>
-          ) : (
-            <FooterAction>
-              <FooterPrimaryButton onClick={() => history.push('/')}>
-                {intl.formatMessage(messages.duplicationButton)}
-              </FooterPrimaryButton>
-            </FooterAction>
-          )}
+          {!isRejection &&
+            (isDeclaration ? (
+              <FooterAction>
+                <FooterPrimaryButton onClick={() => history.push('/')}>
+                  {intl.formatMessage(messages.newButton)}
+                </FooterPrimaryButton>
+              </FooterAction>
+            ) : (
+              <FooterAction>
+                <FooterPrimaryButton onClick={() => history.push('/')}>
+                  {intl.formatMessage(messages.duplicationButton)}
+                </FooterPrimaryButton>
+              </FooterAction>
+            ))}
 
           <FooterAction>
             <FooterPrimaryButton onClick={() => history.push('/')}>
