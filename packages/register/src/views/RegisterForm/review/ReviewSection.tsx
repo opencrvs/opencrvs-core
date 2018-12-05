@@ -621,12 +621,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
           </Column>
         </Row>
-        <DButtonContainer>
-          <DeleteApplication onClick={DeleteApplicationClickEvent}>
-            <Delete />
-            {intl.formatMessage(messages.DeleteApplicationBtnTxt)}
-          </DeleteApplication>
-        </DButtonContainer>
+        {DeleteApplicationClickEvent && (
+          <DButtonContainer>
+            <DeleteApplication onClick={DeleteApplicationClickEvent}>
+              <Delete />
+              {intl.formatMessage(messages.DeleteApplicationBtnTxt)}
+            </DeleteApplication>
+          </DButtonContainer>
+        )}
       </>
     )
   }

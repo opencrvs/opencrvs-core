@@ -30,6 +30,8 @@ import {
   createReviewDraft
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
+import { getScope } from 'src/profile/profileSelectors'
+import { Scope } from '@opencrvs/register/src/utils/authUtils'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
@@ -115,11 +117,18 @@ const messages = defineMessages({
     id: 'review.birthRegistration.queryError',
     defaultMessage: 'An error occurred while fetching birth registration',
     description: 'The error message shown when a query fails'
+  },
+
+  unauthorized: {
+    id: 'review.error.unauthorized',
+    defaultMessage: 'We are unable to display this page to you',
+    description: 'The error message shown when a query fails'
   }
 })
 interface IReviewProps {
   theme: ITheme
   dispatch: Dispatch
+  scope: Scope
 }
 interface IDraftProp {
   draft: IDraft | undefined
@@ -348,8 +357,18 @@ export class ReviewFormView extends React.Component<IProps> {
 
     return reviewData
   }
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
   render() {
     const { intl, theme, draft, draftId, dispatch } = this.props
+    if (!this.userHasRegisterScope()) {
+      return (
+        <ErrorText id="review-unauthorized-error-text">
+          {intl.formatMessage(messages.unauthorized)}
+        </ErrorText>
+      )
+    }
     if (!draft) {
       return (
         <Query
@@ -366,7 +385,6 @@ export class ReviewFormView extends React.Component<IProps> {
               )
             }
             if (error) {
-              console.log(error)
               return (
                 <ErrorText id="review-error-text">
                   {intl.formatMessage(messages.queryError)}
@@ -400,6 +418,7 @@ function mapStatetoProps(
   )
   return {
     draft,
+    scope: getScope(state),
     draftId: match.params.draftId,
     registerForm: form,
     tabRoute: REVIEW_BIRTH_PARENT_FORM_TAB
