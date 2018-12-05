@@ -23,6 +23,7 @@ import { Mutation } from 'react-apollo'
 import processDraftData from './ProcessDraftData'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge } from 'lodash'
+import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -154,6 +155,7 @@ type FullProps = IFormProps &
 
 type State = {
   showSubmitModal: boolean
+  rejectFormOpen: boolean
   selectedTabId: string
 }
 
@@ -172,7 +174,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     super(props)
     this.state = {
       showSubmitModal: false,
-      selectedTabId: ''
+      selectedTabId: '',
+      rejectFormOpen: false
     }
   }
 
@@ -259,6 +262,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return result
   }
 
+  toggleRejectForm = () => {
+    this.setState(state => ({
+      rejectFormOpen: !state.rejectFormOpen
+    }))
+  }
+
   render() {
     const {
       goToTab,
@@ -333,7 +342,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 tabRoute={this.props.tabRoute}
                 draft={draft}
                 RejectApplicationClickEvent={() => {
-                  alert('Reject Application')
+                  this.toggleRejectForm()
                 }}
                 RegisterClickEvent={() => {
                   alert('Register')
@@ -423,6 +432,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
             )
           }}
         </Mutation>
+
+        {this.state.rejectFormOpen && (
+          <RejectRegistrationForm
+            onBack={this.toggleRejectForm}
+            draftId={draft.id}
+          />
+        )}
       </FormViewContainer>
     )
   }

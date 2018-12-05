@@ -13,7 +13,7 @@ describe('reject registration form', () => {
     const testComponent = createTestComponent(
       <RejectRegistrationForm
         onBack={mockOnBack}
-        resourceID="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
+        draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
       />,
       store
     )

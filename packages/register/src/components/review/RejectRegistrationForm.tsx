@@ -67,7 +67,7 @@ export const postMutation = gql`
 `
 
 interface IProps {
-  resourceID: string
+  draftId: string
   onBack: () => void
   goToWorkQueue: () => void
 }
@@ -101,7 +101,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 
   processSubmitData = (registrationID: string) => {
-    const reasons = this.state.data.reason as string[]
+    const reasons = this.state.data.rejectionReason as string[]
     let reason
     if (reasons) {
       reason = reasons.join()
@@ -111,17 +111,17 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
     return {
       id: registrationID,
       reason,
-      comment: this.state.data.comment
+      comment: this.state.data.rejectionCommentForHealthWorker
     }
   }
 
   render = () => {
-    const { form, intl, resourceID } = this.props
+    const { form, intl, draftId } = this.props
     const { fields } = form
     return (
       <Mutation
         mutation={postMutation}
-        variables={this.processSubmitData(resourceID)}
+        variables={this.processSubmitData(draftId)}
       >
         {(rejectRegistration, { data }) => {
           if (data && data.markBirthAsVoided) {
