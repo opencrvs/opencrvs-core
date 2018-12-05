@@ -207,11 +207,10 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension
       )
-      if (!taskLocation) {
-        return null
-      }
-      const res = await fetch(`${fhirUrl}/${taskLocation.valueReference}`)
-      return res.json()
+      const res =
+        taskLocation &&
+        (await fetch(`${fhirUrl}/${taskLocation.valueReference}`))
+      return res ? res.json() : null
     }
   },
   Comment: {
@@ -233,10 +232,7 @@ export const typeResolvers: GQLResolver = {
           (identifier: fhir.Identifier) =>
             identifier.system === ORIGINAL_FILE_NAME_SYSTEM
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     systemFileName(docRef: fhir.DocumentReference) {
       const foundIdentifier =
@@ -245,10 +241,7 @@ export const typeResolvers: GQLResolver = {
           (identifier: fhir.Identifier) =>
             identifier.system === SYSTEM_FILE_NAME_SYSTEM
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     type(docRef: fhir.DocumentReference) {
       return (
@@ -305,11 +298,12 @@ export const typeResolvers: GQLResolver = {
       ) // TODO this is returning all tasks no matter what
       const taskBundle = await res.json()
 
-      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
-        return null
-      }
-
-      return taskBundle.entry[0].resource
+      return (
+        (taskBundle.entry[0] &&
+          taskBundle.entry[0].resource &&
+          taskBundle.entry[0].resource) ||
+        null
+      )
     },
     async weightAtBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(
