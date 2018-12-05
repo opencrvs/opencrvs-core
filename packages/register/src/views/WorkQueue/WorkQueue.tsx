@@ -382,7 +382,9 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       expansionActions.push(
         <PrimaryButton
           id={`reviewAndRegisterBtn_${item.tracking_id}`}
-          onClick={() => console.log('TO DO')}
+          onClick={() =>
+            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+          }
         >
           {this.props.intl.formatMessage(messages.reviewAndRegister)}
         </PrimaryButton>
