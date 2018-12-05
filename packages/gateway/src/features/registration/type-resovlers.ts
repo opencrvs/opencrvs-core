@@ -224,7 +224,11 @@ export const typeResolvers: GQLResolver = {
       return res.json()
     }
   },
-
+  Comment: {
+    user: comment => comment.authorString,
+    comment: comment => comment.text,
+    createdAt: comment => comment.time
+  },
   Attachment: {
     id(docRef: fhir.DocumentReference) {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
