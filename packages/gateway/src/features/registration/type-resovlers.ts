@@ -134,6 +134,47 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       return (contact && contact.valueString) || null
+    },
+    status: async task => {
+      const taskArrary = []
+      taskArrary.push(task)
+      return taskArrary
+    }
+  },
+  RegWorkflow: {
+    type: (task: fhir.Task) => {
+      const taskStatus = task.businessStatus
+      const taskStatusCoding = taskStatus && taskStatus.coding
+      const statusType =
+        taskStatusCoding &&
+        taskStatusCoding.find(
+          (coding: fhir.Coding) =>
+            coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+        )
+      if (!statusType) {
+        return null
+      }
+      return statusType.code
+    },
+    user: task => {
+      const user = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        task.extension
+      )
+      return (user && user.valueString) || null
+    },
+    timestamp: task => task.lastModified,
+    comments: task => task.note,
+    location: async task => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+        task.extension
+      )
+      if (!taskLocation) {
+        return null
+      }
+      const res = await fetch(`${fhirUrl}/${taskLocation.valueReference}`)
+      return res.json()
     }
   },
 
