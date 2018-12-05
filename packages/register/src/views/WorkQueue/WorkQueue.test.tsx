@@ -96,6 +96,7 @@ describe('WorkQueue tests', async () => {
     const data = testComponent.component.find(DataTable).prop('data')
     expect(data).toEqual([
       {
+        id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
         name: 'Baby Doe',
         dob: '',
         date_of_application: '2018-05-23',
@@ -106,6 +107,7 @@ describe('WorkQueue tests', async () => {
         location: ''
       },
       {
+        id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
         name: 'Baby Smith',
         dob: '',
         date_of_application: '2018-05-23',
