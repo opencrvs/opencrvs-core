@@ -102,10 +102,8 @@ export const typeResolvers: GQLResolver = {
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     async attachments(task: fhir.Task) {
       if (!task.focus) {
@@ -143,10 +141,8 @@ export const typeResolvers: GQLResolver = {
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     page: task => {
       const foundIdentifier =
@@ -156,10 +152,8 @@ export const typeResolvers: GQLResolver = {
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/paper-form-page`
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     book: task => {
       const foundIdentifier =
@@ -169,10 +163,8 @@ export const typeResolvers: GQLResolver = {
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/paper-form-book`
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     status: async task => {
       const taskArrary = []
@@ -198,10 +190,8 @@ export const typeResolvers: GQLResolver = {
           (coding: fhir.Coding) =>
             coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
         )
-      if (!statusType) {
-        return null
-      }
-      return statusType.code
+
+      return (statusType && statusType.code) || null
     },
     user: task => {
       const user = findExtension(
