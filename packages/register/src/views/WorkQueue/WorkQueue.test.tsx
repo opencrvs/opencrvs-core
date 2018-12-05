@@ -299,6 +299,12 @@ describe('WorkQueue tests', async () => {
           .hostNodes().length
       ).toBe(0)
 
+      testComponent.component
+        .find(DataTable)
+        .find('button')
+        .at(0)
+        .simulate('click')
+
       expect(
         testComponent.component
           .find('#new_registration')
