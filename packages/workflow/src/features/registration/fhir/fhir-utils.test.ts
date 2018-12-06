@@ -6,14 +6,10 @@ import {
   getEntryId,
   getBirthRegistrationNumber,
   getRegStatusCode,
-  getPaperFormID,
-  getLoggedInPractitionerResource,
-  getFromFhir
+  getPaperFormID
 } from './fhir-utils'
 import { setTrackingId, pushBRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 
 describe('Verify getSharedContactMsisdn', () => {
@@ -109,63 +105,22 @@ describe('Verify getTrackingId', () => {
 
 describe('Verify getBirthRegistrationNumber', () => {
   it('Returned birth registration number properly', async () => {
-    const token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        subject: '5bdc55ece42c82de9a529c36',
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    const practitioner = {
+      resourceType: 'Practitioner',
+      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
+      telecom: [{ system: 'phone', value: '01711111111' }],
+      name: [
+        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
+        { use: 'bn', family: '', given: [''] }
+      ],
+      gender: 'male',
+      meta: {
+        lastUpdated: '2018-11-25T17:31:08.062+00:00',
+        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+      },
+      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+    }
     fetch.mockResponses(
-      [
-        JSON.stringify({
-          mobile: '+880711111111'
-        }),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify({
-          resourceType: 'Bundle',
-          id: 'eacae600-a501-42d6-9d59-b8b94f3e50c1',
-          meta: { lastUpdated: '2018-11-27T17:13:20.662+00:00' },
-          type: 'searchset',
-          total: 1,
-          link: [
-            {
-              relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
-            }
-          ],
-          entry: [
-            {
-              fullUrl:
-                'http://localhost:3447/fhir/Practitioner/b1f46aba-075d-431e-8aeb-ebc57a4a0ad0',
-              resource: {
-                resourceType: 'Practitioner',
-                identifier: [
-                  { use: 'official', system: 'mobile', value: '01711111111' }
-                ],
-                telecom: [{ system: 'phone', value: '01711111111' }],
-                name: [
-                  { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
-                  { use: 'bn', family: [''], given: [''] }
-                ],
-                gender: 'male',
-                meta: {
-                  lastUpdated: '2018-11-25T17:31:08.062+00:00',
-                  versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-                },
-                id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-              }
-            }
-          ]
-        }),
-        { status: 200 }
-      ],
       [
         JSON.stringify({
           entry: [
@@ -261,7 +216,11 @@ describe('Verify getBirthRegistrationNumber', () => {
         { status: 200 }
       ]
     )
-    const brn = getBirthRegistrationNumber(await pushBRN(testFhirBundle, token))
+    const taskResource = await pushBRN(
+      testFhirBundle.entry[1].resource as fhir.Task,
+      practitioner
+    )
+    const brn = getBirthRegistrationNumber(taskResource)
 
     expect(brn).toBeDefined()
     expect(brn).toMatch(
@@ -270,11 +229,10 @@ describe('Verify getBirthRegistrationNumber', () => {
   })
 
   it('Throws error when invalid fhir bundle is sent', () => {
+    const fhirBundle = cloneDeep(testFhirBundle)
+    fhirBundle.entry[1].resource.identifier = []
     expect(() =>
-      getBirthRegistrationNumber({
-        resourceType: 'Bundle',
-        type: 'document'
-      })
+      getBirthRegistrationNumber(fhirBundle.entry[1].resource)
     ).toThrowError("Didn't find any identifier for birth registration number")
   })
 })
@@ -320,125 +278,18 @@ describe('Verify getRegStatusCode', () => {
       'No valid scope found on token'
     )
   })
-  describe('Verify getPaperFormID', () => {
-    it('Returned paper form id properly', () => {
-      const paperFormID = getPaperFormID(testFhirBundle)
-      expect(paperFormID).toEqual('12345678')
-    })
-    it('Throws error when paper form id not found', () => {
-      const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry[1].resource.identifier = []
-      expect(() => getPaperFormID(fhirBundle)).toThrowError(
-        "Didn't find any identifier for paper form id"
-      )
-    })
+})
+describe('Verify getPaperFormID', () => {
+  it('Returned paper form id properly', () => {
+    const paperFormID = getPaperFormID(testFhirBundle.entry[1].resource)
+    expect(paperFormID).toEqual('12345678')
   })
-  describe('Verify getLoggedInPractitionerResource', () => {
-    it('Returns Location properly', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            mobile: '+880711111111'
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            id: 'eacae600-a501-42d6-9d59-b8b94f3e50c1',
-            meta: { lastUpdated: '2018-11-27T17:13:20.662+00:00' },
-            type: 'searchset',
-            total: 1,
-            link: [
-              {
-                relation: 'self',
-                url:
-                  'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
-              }
-            ],
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/Practitioner/b1f46aba-075d-431e-8aeb-ebc57a4a0ad0',
-                resource: {
-                  resourceType: 'Practitioner',
-                  identifier: [
-                    { use: 'official', system: 'mobile', value: '01711111111' }
-                  ],
-                  telecom: [{ system: 'phone', value: '01711111111' }],
-                  name: [
-                    { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
-                    { use: 'bn', family: [''], given: [''] }
-                  ],
-                  gender: 'male',
-                  meta: {
-                    lastUpdated: '2018-11-25T17:31:08.062+00:00',
-                    versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-                  },
-                  id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          subject: '5bdc55ece42c82de9a529c36',
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-      const location = await getLoggedInPractitionerResource(token)
-      expect(location).toEqual({
-        resourceType: 'Practitioner',
-        identifier: [
-          { use: 'official', system: 'mobile', value: '01711111111' }
-        ],
-        telecom: [{ system: 'phone', value: '01711111111' }],
-        name: [
-          { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
-          { use: 'bn', family: [''], given: [''] }
-        ],
-        gender: 'male',
-        meta: {
-          lastUpdated: '2018-11-25T17:31:08.062+00:00',
-          versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-        },
-        id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-      })
-    })
-    it('Throws error when partitioner resource is not there', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            mobile: '+880711111111'
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            data: 'ivalid'
-          }),
-          { status: 200 }
-        ]
-      )
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          subject: '5bdc55ece42c82de9a529c36',
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-      expect(getLoggedInPractitionerResource(token)).rejects.toThrowError()
-    })
+  it('Throws error when paper form id not found', () => {
+    const fhirBundle = cloneDeep(testFhirBundle)
+    fhirBundle.entry[1].resource.identifier = []
+    expect(() => getPaperFormID(fhirBundle.entry[1].resource)).toThrowError(
+      "Didn't find any identifier for paper form id"
+    )
   })
 })
 

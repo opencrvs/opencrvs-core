@@ -1,10 +1,11 @@
-import { getTokenPayload } from 'src/utils/authUtils.ts'
+import { getLoggedInPractitionerResource } from 'src/features/user/utils'
 import { setupAuthorOnNotes } from 'src/features/registration/fhir/fhir-bundle-modifier'
+import { getTaskResource } from 'src/features/registration/fhir/fhir-template'
 
-export function modifyTaskBundle(
+export async function modifyTaskBundle(
   fhirBundle: fhir.Bundle,
   token: string
-): fhir.Bundle {
+): Promise<fhir.Bundle> {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -14,9 +15,9 @@ export function modifyTaskBundle(
     throw new Error('Invalid FHIR bundle found for task')
   }
 
-  const tokenPayload = getTokenPayload(token)
+  const practitioner = await getLoggedInPractitionerResource(token)
 
   /* setting author and time on notes here */
-  fhirBundle = setupAuthorOnNotes(fhirBundle, tokenPayload)
+  setupAuthorOnNotes(getTaskResource(fhirBundle) as fhir.Task, practitioner)
   return fhirBundle
 }
