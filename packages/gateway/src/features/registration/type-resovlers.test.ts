@@ -545,63 +545,64 @@ describe('Registration type resolvers', () => {
       expect(mock).toBeCalledWith('http://localhost:5001/fhir/Composition/123')
     })
 
-    it('status type resolver', async () => {
+    it('returns a correct status from a task object', async () => {
       // @ts-ignore
       const status = await typeResolvers.Registration.status(mockTask)
 
       expect(status).toBeDefined()
       expect(status).toHaveLength(1)
+      expect(status[0].resourceType).toBe('Task')
     })
 
-    it('tracking ID resolver', async () => {
+    it('returns tracking ID from the task object', async () => {
       const trackingID = await typeResolvers.Registration.trackingId(mockTask)
 
       expect(trackingID).toBe('123')
     })
 
-    it('paper form id resolver', async () => {
+    it('returns paper form id from the task', async () => {
       // @ts-ignore
       const paperFormId = await typeResolvers.Registration.paperFormID(mockTask)
 
       expect(paperFormId).toBe('123')
     })
 
-    it('form page resolver', async () => {
+    it('returns form page number from the task', async () => {
       // @ts-ignore
       const formPage = await typeResolvers.Registration.page(mockTask)
 
       expect(formPage).toBe('123')
     })
 
-    it('form book resolver', async () => {
+    it('returns form book from the task', async () => {
       // @ts-ignore
       const formBook = await typeResolvers.Registration.book(mockTask)
 
       expect(formBook).toBe('123')
     })
 
-    it('registration type resolver', async () => {
+    it('returns registration type from the task', async () => {
       // @ts-ignore
       const regType = await typeResolvers.Registration.type(mockTask)
 
       expect(regType).toBe('birth-registration')
     })
 
-    it('contact type resolver', async () => {
+    it('returns contact person from the task', async () => {
       // @ts-ignore
       const contact = await typeResolvers.Registration.contact(mockTask)
 
       expect(contact).toEqual('MOTHER')
     })
 
-    it('business status type resolver', async () => {
+    it('returns business status of the task', async () => {
       // @ts-ignore
       const status = await typeResolvers.RegWorkflow.type(mockTask)
 
       expect(status).toBe('DECLARED | VERIFIED | REGISTERED | CERTIFIED')
     })
 
-    it('comments type resolver', async () => {
+    it('returns comments of the task', async () => {
       // @ts-ignore
       const comments = await typeResolvers.RegWorkflow.comments(mockTask)
       // @ts-ignore
@@ -619,21 +620,21 @@ describe('Registration type resolvers', () => {
       expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 
-    it('timestamp resolver', async () => {
+    it('returns timestamp of the task', async () => {
       // @ts-ignore
       const time = await typeResolvers.RegWorkflow.timestamp(mockTask)
 
       expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 
-    it('user resolver', async () => {
+    it('returns user of the task', async () => {
       // @ts-ignore
       const user = await typeResolvers.RegWorkflow.user(mockTask)
 
       expect(user).toBe('<username>')
     })
 
-    it('task location resolver', async () => {
+    it('returns location of the task', async () => {
       const mock = fetch.mockResponseOnce(JSON.stringify(mockLocation))
 
       const taskLocation = await typeResolvers.RegWorkflow.location(mockTask)
@@ -642,7 +643,7 @@ describe('Registration type resolvers', () => {
       expect(taskLocation.resource.resourceType).toBe('Location')
     })
 
-    it('task location resolver returns null when there is no location ref in task extension', async () => {
+    it('returns null when there is no location ref in task extension', async () => {
       const taskLocation = await typeResolvers.RegWorkflow.location({
         resourceType: 'Task',
         extension: []
