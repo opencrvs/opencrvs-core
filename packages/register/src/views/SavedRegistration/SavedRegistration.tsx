@@ -4,8 +4,11 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { ViewHeader } from '../../components/ViewHeader'
 import { Box } from '@opencrvs/components/lib/interface'
 import styled from 'styled-components'
-import CompleteTick from './CompleteTick.svg'
-import NoConnectivity from './NoConnectivity.svg'
+import {
+  NoConnectivity,
+  Rejected,
+  CompleteTick
+} from '@opencrvs/components/lib/icons'
 import {
   ViewFooter,
   FooterAction,
@@ -257,10 +260,10 @@ const ImgHeaderContainer = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: row;
-`
-
-const Img = styled.img`
-  margin-right: 22px;
+  h2 {
+    padding-left: 10px;
+    margin-top: 13px;
+  }
 `
 
 const TrackingHeader = styled.h3`
@@ -320,7 +323,6 @@ class SavedRegistrationView extends React.Component<
     let trackingCardText: string
     let isDeclaration: boolean
     let isRejection: boolean = false
-    let headerIcon: string
     if (history.location.state.declaration) {
       headerTitle = intl.formatMessage(
         online ? messages.onlineTitle : messages.offlineTitle
@@ -349,13 +351,11 @@ class SavedRegistrationView extends React.Component<
       trackingCardText = intl.formatMessage(messages.trackingCardText)
       isDeclaration = true
       isRejection = false
-      headerIcon = online ? CompleteTick : NoConnectivity
     } else if (history.location.state.rejection) {
       isRejection = true
       isDeclaration = false
       headerTitle = intl.formatMessage(messages.rejectionTitle)
       headerDesc = ''
-      headerIcon = CompleteTick // Rejected Icon not available from designer.
       trackingCardTitle = ''
       trackingNumber = ''
       trackingCardText = ''
@@ -373,7 +373,6 @@ class SavedRegistrationView extends React.Component<
       nextCardText1 = intl.formatMessage(messages.registrationNextCardText1)
       nextCardText2 = intl.formatMessage(messages.registrationNextCardText2)
       trackingCardText = intl.formatMessage(messages.registrationCardText)
-      headerIcon = online ? CompleteTick : NoConnectivity
       isRejection = false
       isDeclaration = false
     }
@@ -391,7 +390,13 @@ class SavedRegistrationView extends React.Component<
         <Container>
           <Box>
             <ImgHeaderContainer>
-              <Img src={headerIcon} />
+              {isRejection ? (
+                <Rejected />
+              ) : !online ? (
+                <NoConnectivity />
+              ) : (
+                <CompleteTick />
+              )}
               <BoxHeader id="submission_title">
                 {intl.formatMessage(
                   online && !isRejection
