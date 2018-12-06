@@ -128,7 +128,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
             confirmRejectionEvent()
           }
           return (
-            <OverlayContainer>
+            <OverlayContainer id="reject-registration-form-container">
               <ActionPage
                 title={intl.formatMessage(messages.rejectionFormTitle)}
                 backLabel={intl.formatMessage(messages.back)}
