@@ -518,23 +518,26 @@ export const ENGLISH_STATE = {
     'register.notification.declarationsSynced':
       'As you have connectivity, we have synced {syncCount} new birth declarations.',
     'register.savedRegistration.online.title': 'Declaration submitted',
+    'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'Registration complete',
     'register.savedRegistration.online.desc':
-      'The declaration is now on its way for validation.',
+      'The application is now on its way for validation.',
     'register.savedRegistration.offline.title':
-      'Declaration pending connectivity',
+      'Application pending connectivity',
     'register.savedRegistration.offline.desc':
-      'The declaration will automatically be sent out for validation once your device has internet connectivity.',
+      'The application will automatically be sent out for validation once your device has internet connectivity.',
     'register.savedRegistration.online.noticeCard.title': 'All done!',
     'register.savedRegistration.offline.noticeCard.title': 'Almost there',
     'register.savedRegistration.online.noticeCard.text1':
-      'The birth declaration of',
+      'The birth application of',
     'register.savedRegistration.online.noticeCard.text2':
       'has been successfully submitted to the registration office.',
     'register.savedRegistration.offline.noticeCard.text1':
-      'The birth declaration of',
+      'The birth application of',
     'register.savedRegistration.offline.noticeCard.text2':
       'is pending due to no internet connection.',
+    'register.rejectedNoticeCardText2':
+      'has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.',
     'register.completeRegistration.noticeCard.text1': 'The birth of',
     'register.completeRegistration.noticeCard.text2': 'has been registered.',
     'register.savedRegistration.trackingCard.title': 'Tracking ID number:',
@@ -552,15 +555,15 @@ export const ENGLISH_STATE = {
     'register.savedRegistration.online.nextCard.text2':
       'The informant has given their contact details and will also be informed when the registration is complete.',
     'register.savedRegistration.offline.nextCard.text2':
-      'Once the declaration is succesfully submited, you and the informant will be notified when the registration is complete.',
+      'Once the application is succesfully submited, you and the informant will be notified when the registration is complete.',
     'register.completeRegistration.nextCard.text1':
       'The registration process is complete.',
     'register.completeRegistration.nextCard.text2':
       'The certificate should only be printed once the informant goes to collect it.',
     'register.savedRegistration.buttons.back': 'Back to homescreen',
-    'register.savedRegistration.buttons.newDeclaration': 'New declaration',
+    'register.savedRegistration.buttons.newDeclaration': 'New application',
     'register.savedRegistration.buttons.back.duplicate': 'Back to duplicate',
-    'register.selectInformant.newBirthRegistration': 'New birth declaration',
+    'register.selectInformant.newBirthRegistration': 'New birth application',
     'register.selectInformant.informantTitle': 'Who is the informant?',
     'register.selectInformant.informantDescription':
       'Tell us who is providing the details, and check what information is needed to submit the form.',
