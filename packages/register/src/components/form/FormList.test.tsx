@@ -60,7 +60,7 @@ describe('when user is in the document upload page', () => {
     store.dispatch(action)
 
     const firstItem = formListComponent.find('ul li').first()
-    expect(firstItem.text()).toBe('সত্যায়িত সংবাদদাতার প্রচয় অথবা,')
+    expect(firstItem.text()).toBe('তথ্যপ্রদানকারীর সত্যায়িত পরিচয় পত্র অথবা,')
   })
   it('renders last list item text in bengali', async () => {
     const action = actions.changeLanguage({ language: 'bn' })

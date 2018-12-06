@@ -82,20 +82,20 @@ export const BENGALI_STATE = {
     'states.state4.district1.upazila4.union13': 'Sreepur',
     'states.state4.district1.upazila4.union14': 'Titpalla',
     'states.state4.district1.upazila4.union15': 'Tulsir Char',
-    'states.state4.district2.upazila10.union1': 'Akua',
-    'states.state4.district2.upazila10.union2': 'Anandipur',
-    'states.state4.district2.upazila10.union3': 'Ashtadhar',
-    'states.state4.district2.upazila10.union4': 'Baira (kewatkhali)',
-    'states.state4.district2.upazila10.union5': 'Bhabkhali',
-    'states.state4.district2.upazila10.union6': 'Borar Char',
-    'states.state4.district2.upazila10.union7': 'Char Ishwardia',
-    'states.state4.district2.upazila10.union8': 'Char Nilakshmia',
-    'states.state4.district2.upazila10.union9': 'Dapunia',
-    'states.state4.district2.upazila10.union10': 'Ghagra',
-    'states.state4.district2.upazila10.union11': 'Khagdahar',
-    'states.state4.district2.upazila10.union12': 'Kushtia',
-    'states.state4.district2.upazila10.union13': 'Paranganj',
-    'states.state4.district2.upazila10.union14': 'Sirta',
+    'states.state4.district2.upazila10.union1': 'আকুয়া',
+    'states.state4.district2.upazila10.union2': 'আনান্দিপুর',
+    'states.state4.district2.upazila10.union3': 'আস্তাধোর',
+    'states.state4.district2.upazila10.union4': 'বাইরা (কেওয়াটখালি)',
+    'states.state4.district2.upazila10.union5': 'ভাবখালি',
+    'states.state4.district2.upazila10.union6': 'বোরার চড়',
+    'states.state4.district2.upazila10.union7': 'চড় ঈশরদী',
+    'states.state4.district2.upazila10.union8': 'চড় নীলাক্সমিয়া',
+    'states.state4.district2.upazila10.union9': 'দাপুনিয়া',
+    'states.state4.district2.upazila10.union10': 'ঘাগরা',
+    'states.state4.district2.upazila10.union11': 'খাগদাহার',
+    'states.state4.district2.upazila10.union12': 'কুষ্টিয়া',
+    'states.state4.district2.upazila10.union13': 'পরানগন্জ',
+    'states.state4.district2.upazila10.union14': 'সিরতা',
     'formFields.country': 'দেশ',
     'formFields.state': 'বিভাগ',
     'formFields.district': 'জেলা',
@@ -108,9 +108,10 @@ export const BENGALI_STATE = {
     'formFields.permanentAddress': 'স্থায়ী বসবাসের ঠিকানা',
     'formFields.confirm': 'হাঁ',
     'formFields.deny': 'না',
-    'formFields.addressSameAsMother': 'তার বর্তমান ঠিকানা মায়ের মত একই?',
+    'formFields.addressSameAsMother':
+      'তার বর্তমান ঠিকানা কি মায়ের বর্তমান ঠিকানা?',
     'formFields.permanentAddressSameAsMother':
-      'তার স্থায়ী ঠিকানা মা এর মত একই?',
+      'তার স্থায়ী ঠিকানা কি মায়ের স্থায়ী ঠিকানা?',
     'countries.AFG': 'আফগানিস্তান',
     'countries.ALA': 'এল্যান্ড দ্বীপপুঞ্জ',
     'countries.ALB': 'আল্বেনিয়া',
@@ -451,11 +452,11 @@ export const BENGALI_STATE = {
     'register.form.section.documents.paragraph':
       'পাঁচ বছরের কম বয়সের শিশুদের জন্মনিবন্ধনের জন্য প্রয়োজনীয় ও বাধ্যতামূলক কাগজপত্র সংযুক্তি নিম্নরুপঃ',
     'register.form.section.documents.list.informantAttestation':
-      'সত্যায়িত সংবাদদাতার প্রচয় অথবা,',
+      'তথ্যপ্রদানকারীর সত্যায়িত পরিচয় পত্র অথবা,',
     'register.form.section.documents.list.attestedVaccination':
-      'সত্যায়িত টিকার কার্ড অনুলিপি (ই পি আই কার্ড) অথবা,',
+      'সত্যায়িত টিকার অনুলিপি (ই পি আই কার্ড) অথবা,',
     'register.form.section.documents.list.attestedBirthRecord':
-      'সত্যায়িত হাসপাতালের ডকুমেন্টের অনুলিপি য়থবা জন্ম রেকর্ড অথবা,',
+      'সত্যায়িত হাসপাতালের ডকুমেন্টের অনুলিপি অথবা জন্ম রেকর্ড অথবা,',
     'register.form.section.documents.list.certification':
       'রেজিস্টারড এনজিও কর্মকর্তা হইতে প্রাপ্ত জন্মতারিখের সার্টিফিকেট অথবা,',
     'register.form.section.documents.list.otherDocuments':
@@ -485,7 +486,7 @@ export const BENGALI_STATE = {
     'formFields.registration.certificateLanguage.other': 'অন্যান্য',
     'formFields.registration.commentsOrNotes': 'মন্তব্য',
     'formFields.registration.commentsOrNotes.description':
-      'প্রাসঙ্গিক মন্তব্য এই বিভাগ যোগ করুন। সকল  তথ্য সংবাদদাতার সংগে আলোচনা করা হবে না ',
+      'প্রাসঙ্গিক মন্তব্য এই বিভাগে যোগ করুন।এই মন্তব্য তথ্যপ্রদানকারীর সংগে আলোচনা করা হবে না।',
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
@@ -525,7 +526,7 @@ export const BENGALI_STATE = {
     'register.savedRegistration.online.noticeCard.text1':
       'এই বার্তা কখনই ব্যবহার করা হবে না কিন্তু এটা এখানে থাকা প্রয়োজন',
     'register.savedRegistration.online.noticeCard.text2':
-      'এর "নাম" সফলভাবে রেজিস্ট্রেশন অফিসে জমা দেওয়া হয়েছে।',
+      'এর জন্ম নিবন্ধন সফলভাবে রেজিস্ট্রেশন অফিসে জমা দেওয়া হয়েছে।',
     'register.savedRegistration.offline.noticeCard.text1':
       'ডিভাইসে ইন্টারনেট সংযোগ কালীন ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
     'register.savedRegistration.offline.noticeCard.text2': '',
@@ -536,7 +537,7 @@ export const BENGALI_STATE = {
     'register.savedRegistration.trackingCard.title': 'ট্র্যাকিং আইডি নম্বর:',
     'register.completeRegistration.trackingCard.title': 'জন্ম নিবন্ধন সংখ্যা',
     'register.savedRegistration.trackingCard.text':
-      'এসএমএসের মাধ্যমে সংবাদদাতা নম্বরটি পাবেন, তবে নিশ্চিত করুন যে নম্বরটি লিখে রেখে পরবর্তী রেজিস্ট্রেশনের ধাপ এর জন্য সংরক্ষন করতে হবে।',
+      'একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।',
     'register.savedRegistration.registrationNumber.text':
       'শংসাপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে ইনফরম্যান্ট এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।',
     'register.savedRegistration.nextCard.title': 'পরবর্তী',
@@ -545,7 +546,7 @@ export const BENGALI_STATE = {
     'register.savedRegistration.offline.nextCard.text1':
       'পরবর্তী 7 দিনের মধ্যে ডিভাইসে ইন্টারনেট সংযোগ স্থাপন করার পরে আপনাকে লগইন করতে হবে। OpenCRVS স্বয়ংক্রিয়ভাবে ফর্ম জমা দেবে, তাই আপনাকে অন্য কিছু করার প্রয়োজন হবে না।',
     'register.savedRegistration.online.nextCard.text2':
-      'নিবন্ধন প্রক্রিয়া সম্পুর্ণ হলে সংবাদদাতা নিজ দায়িত্তে পৌছে দেবেন। ',
+      'নিবন্ধন প্রক্রিয়া সম্পুর্ণ হলে সংবাদদাতাকেও জানানো হবে।',
     'register.savedRegistration.offline.nextCard.text2':
       'ঘোষণাটি সফলভাবে দাখিল করা হলে রেজিস্ট্রেশন শেষ। আপনি এবং সংবাদদাতাকে অবহিত করা হবে।',
     'register.completeRegistration.nextCard.text1':
@@ -556,9 +557,9 @@ export const BENGALI_STATE = {
     'register.savedRegistration.buttons.newDeclaration': 'নতুন ঘোষণা', // TODO: Check, Google translated
     'register.savedRegistration.buttons.back.duplicate': 'সদৃশ ফিরে যান',
     'register.selectInformant.newBirthRegistration': ' জন্ম ঘোষণা',
-    'register.selectInformant.informantTitle': 'সংবাদদাতা',
+    'register.selectInformant.informantTitle': 'কে হবেন তথ্যদাতা ?',
     'register.selectInformant.informantDescription':
-      'কে ঘোষণা ফর্মে বিস্তারিত ও প্রয়োজনীয় তথ্য উপাত্ত পর্যবেক্ষণ ও জমাদান করিবে।',
+      'কে ঘোষণা ফর্মের প্রয়োজনীয় ও বিস্তারিত তথ্য উপাত্ত প্রদান করিবেন',
     'register.selectInformant.parentInformantTitle': 'পিতামাতা',
     'register.selectInformant.parentInformantDescription':
       '<strong>প্রয়োজনীয়</strong>: শিশু এবং মায়ের বিবরণ' +
@@ -570,13 +571,11 @@ export const BENGALI_STATE = {
     'register.selectInformant.selfInformantDescription':
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
-    'register.home.buttons.registerNewEvent':
-      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
-    'register.home.buttons.mydraft': 'আমার খসড়া',
-    'register.home.buttons.pendingSubimissions': 'মুলতবি জমাগুলি',
-    'register.home.buttons.completedSumissions': 'সমাপ্ত জমা',
+    'register.selectVitalEvent.registerNewEventTitle': 'একটি নতুন ইভেন্ট ঘোষণা',
+    'register.home.buttons.registerNewEvent': 'একটি নতুন ইভেন্ট ঘোষণা',
+    'register.home.buttons.mydraft': 'আমার খসড়াগুলি',
+    'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
+    'register.home.buttons.completedSumissions': 'সমাপ্ত জমাগুলি',
     'register.home.logout': 'প্রস্থান',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
