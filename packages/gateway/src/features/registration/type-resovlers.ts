@@ -207,10 +207,11 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension
       )
-      const res =
-        taskLocation &&
-        (await fetch(`${fhirUrl}/${taskLocation.valueReference}`))
-      return res ? res.json() : null
+      if (!taskLocation) {
+        return null
+      }
+      const res = await fetch(`${fhirUrl}/${taskLocation.valueReference}`)
+      return res.json()
     }
   },
   Comment: {
@@ -298,12 +299,10 @@ export const typeResolvers: GQLResolver = {
       ) // TODO this is returning all tasks no matter what
       const taskBundle = await res.json()
 
-      return (
-        (taskBundle.entry[0] &&
-          taskBundle.entry[0].resource &&
-          taskBundle.entry[0].resource) ||
-        null
-      )
+      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
+        return null
+      }
+      return taskBundle.entry[0].resource
     },
     async weightAtBirth(composition: ITemplatedComposition) {
       const encounterSection = findCompositionSection(

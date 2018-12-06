@@ -88,6 +88,17 @@ describe('Registration type resolvers', () => {
     expect(patient).toEqual({ resourceType: 'Patient' })
   })
 
+  it('fetches and returns a null child patient resource from a composition section if not found', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}))
+
+    // @ts-ignore
+    const patient = await typeResolvers.BirthRegistration.child({
+      section: []
+    })
+
+    expect(patient).toBeNull()
+  })
+
   it('returns first names part with one name', () => {
     // @ts-ignore
     const given = typeResolvers.HumanName.firstNames({
@@ -153,6 +164,15 @@ describe('Registration type resolvers', () => {
     expect(nationality).toEqual(['BN', 'EN'])
   })
 
+  it('returns null if nationality not found', () => {
+    // @ts-ignore
+    const nationality = typeResolvers.Person.nationality({
+      resourceType: 'Patient',
+      extension: []
+    })
+    expect(nationality).toBeNull()
+  })
+
   it('returns educationalAttainment', () => {
     // @ts-ignore
     const educationalAttainment = typeResolvers.Person.educationalAttainment(
@@ -180,6 +200,24 @@ describe('Registration type resolvers', () => {
       })
       expect(registration).toBeDefined()
       expect(registration.resourceType).toBe('Task')
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/Task?focus=Composition/123'
+      )
+    })
+
+    it('returns a registration null object task not found', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: []
+        })
+      )
+
+      // @ts-ignore
+      const registration = await typeResolvers.BirthRegistration.registration({
+        id: 123
+      })
+      expect(registration).toBeNull()
       expect(mock).toBeCalledWith(
         'http://localhost:5001/fhir/Task?focus=Composition/123'
       )
@@ -498,6 +536,15 @@ describe('Registration type resolvers', () => {
       )
     })
 
+    it('returns null when the resource has no document section', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({ resourceType: 'Composition', section: [] })
+      )
+      const attachments = await typeResolvers.Registration.attachments(mockTask)
+      expect(attachments).toBeNull()
+      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Composition/123')
+    })
+
     it('status type resolver', async () => {
       // @ts-ignore
       const status = await typeResolvers.Registration.status(mockTask)
@@ -592,7 +639,16 @@ describe('Registration type resolvers', () => {
       const taskLocation = await typeResolvers.RegWorkflow.location(mockTask)
       expect(mock).toBeCalledWith('http://localhost:5001/fhir/Location/123')
 
-      expect(taskLocation)
+      expect(taskLocation.resource.resourceType).toBe('Location')
+    })
+
+    it('task location resolver returns null when there is no location ref in task extension', async () => {
+      const taskLocation = await typeResolvers.RegWorkflow.location({
+        resourceType: 'Task',
+        extension: []
+      })
+
+      expect(taskLocation).toBeNull()
     })
 
     it('throw when tasks has no focus', async () => {
