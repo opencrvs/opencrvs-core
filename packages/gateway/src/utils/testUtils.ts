@@ -203,7 +203,7 @@ export const mockTask = {
     {
       authorString: '<username>',
       text: 'Comment',
-      createdAt: '2016-10-31T09:45:05+10:00'
+      time: '2016-10-31T09:45:05+10:00'
     }
   ],
   extension: [
