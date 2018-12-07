@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   register:
-    image: jembi/ocrvs-register:24126353
+    image: jembi/ocrvs-register:{{shortGitHash}}
     build:
       context: .
       dockerfile: ./Dockerfile-register
@@ -11,7 +11,7 @@ services:
       replicas: 2
 
   performance:
-    image: jembi/ocrvs-performance:24126353
+    image: jembi/ocrvs-performance:{{shortGitHash}}
     build:
       context: .
       dockerfile: ./Dockerfile-performance
@@ -20,7 +20,7 @@ services:
       replicas: 2
 
   login:
-    image: jembi/ocrvs-login:24126353
+    image: jembi/ocrvs-login:{{shortGitHash}}
     build:
       context: .
       dockerfile: ./Dockerfile-login
@@ -29,7 +29,7 @@ services:
       replicas: 2
 
   gateway:
-    image: jembi/ocrvs-gateway:24126353
+    image: jembi/ocrvs-gateway:{{shortGitHash}}
     build: packages/gateway
     restart: unless-stopped
     environment:
@@ -42,7 +42,7 @@ services:
       replicas: 2
 
   workflow:
-    image: jembi/ocrvs-workflow:24126353
+    image: jembi/ocrvs-workflow:{{shortGitHash}}
     build: packages/workflow
     restart: unless-stopped
     environment:
@@ -54,7 +54,7 @@ services:
       replicas: 2
 
   auth:
-    image: jembi/ocrvs-auth:24126353
+    image: jembi/ocrvs-auth:{{shortGitHash}}
     build: packages/auth
     restart: unless-stopped
     environment:
@@ -67,7 +67,7 @@ services:
       replicas: 2
 
   user-mgnt:
-    image: jembi/ocrvs-user-mgnt:24126353
+    image: jembi/ocrvs-user-mgnt:{{shortGitHash}}
     build: packages/user-mgnt
     restart: unless-stopped
     environment:
@@ -76,7 +76,7 @@ services:
       replicas: 2
 
   notification:
-    image: jembi/ocrvs-notification:24126353
+    image: jembi/ocrvs-notification:{{shortGitHash}}
     build: packages/notification
     restart: unless-stopped
     environment:
