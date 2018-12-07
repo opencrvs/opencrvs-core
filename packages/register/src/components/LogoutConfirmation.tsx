@@ -9,9 +9,11 @@ const ConfirmButton = styled.a`
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
 `
-
+const StyledModal = styled(Modal)`
+  z-index: 4;
+`
 export const messages = defineMessages({
-  NoButton: {
+  noButton: {
     id: 'app.logout.modal.no',
     defaultMessage: 'No',
     description: 'No button text on logout modal'
@@ -32,33 +34,30 @@ interface IProps {
   show: boolean
   handleYes: () => void
   handleClose: () => void
-  className?: string
 }
 
 const LogoutConfirmationComponent = ({
   show,
   handleYes,
   handleClose,
-  intl,
-  className
+  intl
 }: IProps & InjectedIntlProps) => {
   return (
-    <Modal
+    <StyledModal
       title={intl.formatMessage(messages.editApplicationConfirmationTxt)}
       actions={[
         <PrimaryButton key="confirm" id="logout_confirm" onClick={handleYes}>
           {intl.formatMessage(messages.yesButton)}
         </PrimaryButton>,
         <ConfirmButton key="close" id="logout_close" onClick={handleClose}>
-          {intl.formatMessage(messages.NoButton)}
+          {intl.formatMessage(messages.noButton)}
         </ConfirmButton>
       ]}
       show={show}
       handleClose={handleClose}
-      className={className}
     >
       <></>
-    </Modal>
+    </StyledModal>
   )
 }
 

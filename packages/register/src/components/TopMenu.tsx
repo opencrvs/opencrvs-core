@@ -101,10 +101,6 @@ const BackButtonText = styled.span`
   margin-left: 14px;
 `
 
-const StyledLogoutConfirmation = styled(LogoutConfirmation)`
-  z-index: 4;
-`
-
 type Props = {
   hideBackButton?: true | false | undefined | null
   goBack: typeof goBackAction
@@ -188,7 +184,7 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
           menuItems={menuItems}
           menuTitle={intl.formatMessage(messages.menu)}
         />
-        <StyledLogoutConfirmation
+        <LogoutConfirmation
           show={this.state.showLogoutModal}
           handleClose={this.toggleLogoutModal}
           handleYes={this.props.redirectToAuthentication}
