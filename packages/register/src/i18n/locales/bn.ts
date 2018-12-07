@@ -662,6 +662,9 @@ export const BENGALI_STATE = {
     'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'সমর্থনকারী কাগজপত্র',
     'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন',
-    'review.form.deleteApplication': 'আবেদন মুছে দিন'
+    'review.form.deleteApplication': 'আবেদন মুছে দিন',
+    'app.logout.modal.no': 'না',
+    'app.logout.modal.yes': 'হাঁ',
+    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?'
   }
 }

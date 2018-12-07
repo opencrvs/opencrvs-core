@@ -667,6 +667,9 @@ export const ENGLISH_STATE = {
     'review.button.reject': 'Reject Application',
     'review.documentViewer.title': 'Supporting Documents',
     'review.documentViewer.tagline': 'Select to Preview',
-    'review.form.deleteApplication': 'Delete Application'
+    'review.form.deleteApplication': 'Delete Application',
+    'app.logout.modal.no': 'No',
+    'app.logout.modal.yes': 'Yes',
+    'app.logout.modal.confirmationText': 'Are you sure you wish to log out?'
   }
 }
