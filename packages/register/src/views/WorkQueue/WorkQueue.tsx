@@ -62,6 +62,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
             name
             alias
           }
+          type
         }
       }
       child {
@@ -283,7 +284,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     switch (status) {
       case 'application':
         return <StatusOrange />
-      case 'registered':
+      case 'REGISTERED':
         return <StatusGreen />
       case 'collected':
         return <StatusCollected />
