@@ -50,19 +50,19 @@ export const FETCH_REGISTRATION_QUERY = gql`
       id
       registration {
         trackingId
-        # status { # these are disabled until we re actually setting these in the registrations
-        #   user { # they will be used by the expanded component
-        #     firstName
-        #     lastName
-        #     role {
-        #       type
-        #     }
-        #   }
-        #   location {
-        #     name
-        #     alias
-        #   }
-        # }
+        status {
+          user {
+            name {
+              firstNames
+              familyName
+            }
+            role
+          }
+          location {
+            name
+            alias
+          }
+        }
       }
       child {
         name {
@@ -334,6 +334,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         location:
           (reg.registration &&
             reg.registration.status &&
+            (reg.registration.status[0] as GQLRegWorkflow).location &&
             ((reg.registration.status[0] as GQLRegWorkflow)
               .location as GQLLocation).name) ||
           ''

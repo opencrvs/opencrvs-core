@@ -193,12 +193,17 @@ export const typeResolvers: GQLResolver = {
 
       return (statusType && statusType.code) || null
     },
-    user: task => {
+    user: async task => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
       )
-      return (user && user.valueString) || null
+      if (!user) {
+        return null
+      }
+
+      const res = await fetch(`${fhirUrl}/${user.valueString}`)
+      return res.json()
     },
     timestamp: task => task.lastModified,
     comments: task => task.note,
@@ -210,7 +215,7 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation) {
         return null
       }
-      const res = await fetch(`${fhirUrl}/${taskLocation.valueReference}`)
+      const res = await fetch(`${fhirUrl}/${taskLocation.valueString}`)
       return res.json()
     }
   },
