@@ -23,10 +23,12 @@
     "compose:down": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.dev.yml down",
     "compose:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build",
     "compose:all": "yarn run compose:all:build && yarn run compose:all:up",
+    "compose:version": "./infrastructure/version.sh docker-compose.yml package.json",
+    "compose:tag": "docker tag jembi/ocrvs-register:24126353 jembi/ocrvs-register:latest && docker tag jembi/ocrvs-performance:24126353 jembi/ocrvs-performance:latest && docker tag jembi/ocrvs-login:24126353 jembi/ocrvs-login:latest && docker tag jembi/ocrvs-gateway:24126353 jembi/ocrvs-gateway:latest && docker tag jembi/ocrvs-workflow:24126353 jembi/ocrvs-workflow:latest && docker tag jembi/ocrvs-auth:24126353 jembi/ocrvs-auth:latest && docker tag jembi/ocrvs-user-mgnt:24126353 jembi/ocrvs-user-mgnt:latest && docker tag jembi/ocrvs-notification:24126353 jembi/ocrvs-notification:latest",
     "compose:all:up": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml up",
     "compose:all:down": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml down",
     "compose:all:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.yml build",
-    "compose:push": "docker-compose build && docker-compose push",
+    "compose:push": "yarn run compose:version && docker-compose build && yarn run compose:tag && docker-compose push",
     "deploy:staging": "rsync -rP docker-compose* infrastructure root@opencrvs-staging.jembi.org:/tmp/compose/ && ssh root@opencrvs-staging.jembi.org '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.staging.yml | tee -a /var/log/rotate-secrets.log' && ssh root@opencrvs-staging.jembi.org 'cd /tmp/compose && docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.staging.yml --with-registry-auth opencrvs'"
   },
   "devDependencies": {
