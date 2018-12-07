@@ -54,22 +54,22 @@ const messages = defineMessages({
     defaultMessage: 'No',
     description: 'Label for "No" answer'
   },
-  EditLink: {
+  editLink: {
     id: 'review.edit.modal.editButton',
     defaultMessage: 'Edit',
     description: 'Edit link text'
   },
-  ValueNext: {
+  valueNext: {
     id: 'register.form.next',
     defaultMessage: 'Next',
     description: 'Next button text'
   },
-  ValueRegister: {
+  valueRegister: {
     id: 'review.button.register',
     defaultMessage: 'REGISTER',
     description: 'Register button text'
   },
-  ValueReject: {
+  valueReject: {
     id: 'review.button.reject',
     defaultMessage: 'Reject Application',
     description: 'Reject application button text'
@@ -89,17 +89,17 @@ const messages = defineMessages({
     defaultMessage: 'Select to Preview',
     description: 'Document Viewer Tagline'
   },
-  ValueSendForReview: {
+  valueSendForReview: {
     id: 'register.form.submit',
     defaultMessage: 'SEND FOR REVIEW',
     description: 'Submit Button Text'
   },
-  ValueSaveAsDraft: {
+  valueSaveAsDraft: {
     id: 'register.form.saveDraft',
     defaultMessage: 'Save as draft',
     description: 'Save as draft Button Text'
   },
-  DeleteApplicationBtnTxt: {
+  deleteApplicationBtnTxt: {
     id: 'review.form.deleteApplication',
     defaultMessage: 'Delete Application',
     description: 'Delete application Button Text'
@@ -243,11 +243,11 @@ interface IProps {
   draft: IDraft
   registerForm: IForm
   tabRoute: string
-  RegisterClickEvent?: () => void
-  RejectApplicationClickEvent?: () => void
-  SubmitClickEvent?: () => void
-  SaveDraftClickEvent?: () => void
-  DeleteApplicationClickEvent?: () => void
+  registerClickEvent?: () => void
+  rejectApplicationClickEvent?: () => void
+  submitClickEvent?: () => void
+  saveDraftClickEvent?: () => void
+  deleteApplicationClickEvent?: () => void
   goToTab: typeof goToTab
   scope: Scope
 }
@@ -442,11 +442,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       intl,
       draft,
       registerForm,
-      RegisterClickEvent,
-      RejectApplicationClickEvent,
-      SubmitClickEvent,
-      SaveDraftClickEvent,
-      DeleteApplicationClickEvent,
+      registerClickEvent,
+      rejectApplicationClickEvent,
+      submitClickEvent,
+      saveDraftClickEvent,
+      deleteApplicationClickEvent,
       tabRoute
     } = this.props
 
@@ -484,7 +484,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     expandable={
                       this.state.sectionExpansionConfig[index].visited
                     }
-                    linkText={intl.formatMessage(messages.EditLink)}
+                    linkText={intl.formatMessage(messages.editLink)}
                     linkClickHandler={() => {
                       this.editLinkClickHandler(section.id)
                     }}
@@ -535,7 +535,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         id={`next_button_${section.id}`}
                         onClick={this.nextClickHandler}
                       >
-                        {intl.formatMessage(messages.ValueNext)}
+                        {intl.formatMessage(messages.valueNext)}
                       </NextButton>
                     )}
                   </SectionDrawer>
@@ -557,53 +557,53 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         </Row>
         <Row>
           <Column>
-            {!!RegisterClickEvent && (
+            {!!registerClickEvent && (
               <ButtonContainer>
                 <RegisterApplication
                   id="registerApplicationBtn"
                   icon={() => <TickLarge />}
                   align={ICON_ALIGNMENT.LEFT}
-                  onClick={RegisterClickEvent}
+                  onClick={registerClickEvent}
                   disabled={!this.state.allSectionVisited}
                 >
-                  {intl.formatMessage(messages.ValueRegister)}
+                  {intl.formatMessage(messages.valueRegister)}
                 </RegisterApplication>
               </ButtonContainer>
             )}
 
-            {!!RejectApplicationClickEvent && (
+            {!!rejectApplicationClickEvent && (
               <ButtonContainer>
                 <RejectApplication
                   id="rejectApplicationBtn"
-                  title={intl.formatMessage(messages.ValueReject)}
+                  title={intl.formatMessage(messages.valueReject)}
                   icon={() => <CrossLarge />}
-                  onClick={RejectApplicationClickEvent}
+                  onClick={rejectApplicationClickEvent}
                   disabled={!this.state.allSectionVisited}
                 />
               </ButtonContainer>
             )}
 
-            {!!SubmitClickEvent && (
+            {!!submitClickEvent && (
               <ButtonContainer>
                 <RegisterApplication
                   id="submit_form"
                   icon={() => <TickLarge />}
                   align={ICON_ALIGNMENT.LEFT}
-                  onClick={SubmitClickEvent}
+                  onClick={submitClickEvent}
                   disabled={numberOfErrors > 0 || !this.state.allSectionVisited}
                 >
-                  {intl.formatMessage(messages.ValueSendForReview)}
+                  {intl.formatMessage(messages.valueSendForReview)}
                 </RegisterApplication>
               </ButtonContainer>
             )}
 
-            {!!SaveDraftClickEvent && (
+            {!!saveDraftClickEvent && (
               <ButtonContainer>
                 <SaveDraft
                   id="saveAsDraftBtn"
-                  title={intl.formatMessage(messages.ValueSaveAsDraft)}
+                  title={intl.formatMessage(messages.valueSaveAsDraft)}
                   icon={() => <Draft />}
-                  onClick={SaveDraftClickEvent}
+                  onClick={saveDraftClickEvent}
                 />
               </ButtonContainer>
             )}
@@ -621,11 +621,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
           </Column>
         </Row>
-        {DeleteApplicationClickEvent && (
+        {deleteApplicationClickEvent && (
           <DButtonContainer>
-            <DeleteApplication onClick={DeleteApplicationClickEvent}>
+            <DeleteApplication onClick={deleteApplicationClickEvent}>
               <Delete />
-              {intl.formatMessage(messages.DeleteApplicationBtnTxt)}
+              {intl.formatMessage(messages.deleteApplicationBtnTxt)}
             </DeleteApplication>
           </DButtonContainer>
         )}

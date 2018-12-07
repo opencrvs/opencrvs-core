@@ -24,9 +24,9 @@ describe('when user is in the review page', () => {
       <ReviewSection
         tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
         draft={draft}
-        RegisterClickEvent={mockHandler}
-        RejectApplicationClickEvent={mockHandler}
-        SubmitClickEvent={mockHandler}
+        registerClickEvent={mockHandler}
+        rejectApplicationClickEvent={mockHandler}
+        submitClickEvent={mockHandler}
       />,
       store
     )

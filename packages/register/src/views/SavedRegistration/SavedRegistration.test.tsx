@@ -51,7 +51,7 @@ describe('when user is in the saved registration page', () => {
           .first()
           .text()
       ).toEqual(
-        `The birth declaration of ${fullNameInEng} has been successfully submitted to the registration office.`
+        `The birth application of ${fullNameInEng} has been successfully submitted to the registration office.`
       )
     })
     it('should show the online whats next title', () => {
@@ -109,7 +109,7 @@ describe('when user is in the saved registration page', () => {
           .first()
           .text()
       ).toEqual(
-        `The birth declaration of ${fullNameInEng} is pending due to no internet connection.`
+        `The birth application of ${fullNameInEng} is pending due to no internet connection.`
       )
     })
     it('should show the offline whats next title', () => {
@@ -129,7 +129,7 @@ describe('when user is in the saved registration page', () => {
           .first()
           .text()
       ).toEqual(
-        'Once the declaration is succesfully submited, you and the informant will be notified when the registration is complete.'
+        'Once the application is succesfully submited, you and the informant will be notified when the registration is complete.'
       )
     })
   })
@@ -172,5 +172,47 @@ describe('when user is in complete registration page', () => {
         .first()
         .text()
     ).toEqual(`The birth of ${fullNameInEng} has been registered.`)
+  })
+})
+
+describe('when user is in reject registration page', () => {
+  const { store, history } = createStore()
+
+  const mock: any = jest.fn()
+  let savedRegistrationComponent: ReactWrapper<{}, {}>
+  history.push('/rejected', {
+    trackingId: '123456789',
+    rejection: true,
+    fullNameInBn,
+    fullNameInEng
+  })
+
+  beforeEach(async () => {
+    const testComponent = createTestComponent(
+      <SavedRegistration
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    savedRegistrationComponent = testComponent.component
+  })
+
+  it('should show the rejection card text', () => {
+    expect(
+      savedRegistrationComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The birth application of Tom Brady has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.`
+    )
   })
 })

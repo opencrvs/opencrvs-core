@@ -23,6 +23,11 @@ import { Mutation } from 'react-apollo'
 import processDraftData from './ProcessDraftData'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge } from 'lodash'
+import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
+import {
+  SAVED_REGISTRATION,
+  REJECTED_REGISTRATION
+} from 'src/navigation/routes'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -154,6 +159,7 @@ type FullProps = IFormProps &
 
 type State = {
   showSubmitModal: boolean
+  rejectFormOpen: boolean
   selectedTabId: string
 }
 
@@ -167,12 +173,43 @@ const VIEW_TYPE = {
   PREVIEW: 'preview'
 }
 
+interface IFullName {
+  fullNameInBn: string
+  fullNameInEng: string
+}
+
+const getFullName = (childData: IFormSectionData): IFullName => {
+  let fullNameInBn = ''
+  let fullNameInEng = ''
+
+  if (childData.firstNames) {
+    fullNameInBn = `${String(childData.firstNames)} ${String(
+      childData.familyName
+    )}`
+  } else {
+    fullNameInBn = String(childData.familyName)
+  }
+
+  if (childData.firstNamesEng) {
+    fullNameInEng = `${String(childData.firstNamesEng)} ${String(
+      childData.familyNameEng
+    )}`
+  } else {
+    fullNameInEng = String(childData.familyNameEng)
+  }
+  return {
+    fullNameInBn,
+    fullNameInEng
+  }
+}
+
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
       showSubmitModal: false,
-      selectedTabId: ''
+      selectedTabId: '',
+      rejectFormOpen: false
     }
   }
 
@@ -187,33 +224,27 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
+  rejectSubmission = () => {
+    const { history, draft } = this.props
+    const childData = this.props.draft.data.child
+    const fullName: IFullName = getFullName(childData)
+    history.push(REJECTED_REGISTRATION, {
+      rejection: true,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
+    })
+    this.props.deleteDraft(draft)
+  }
+
   successfulSubmission = (response: string) => {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
-    let fullNameInBn = ''
-    let fullNameInEng = ''
-
-    if (childData.firstNames) {
-      fullNameInBn = `${String(childData.firstNames)} ${String(
-        childData.familyName
-      )}`
-    } else {
-      fullNameInBn = String(childData.familyName)
-    }
-
-    if (childData.firstNamesEng) {
-      fullNameInEng = `${String(childData.firstNamesEng)} ${String(
-        childData.familyNameEng
-      )}`
-    } else {
-      fullNameInEng = String(childData.familyNameEng)
-    }
-
-    history.push('/saved', {
+    const fullName = getFullName(childData)
+    history.push(SAVED_REGISTRATION, {
       trackingId: response,
       declaration: true,
-      fullNameInBn,
-      fullNameInEng
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
     })
     this.props.deleteDraft(draft)
   }
@@ -257,6 +288,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
       )
     })
     return result
+  }
+
+  toggleRejectForm = () => {
+    this.setState(state => ({
+      rejectFormOpen: !state.rejectFormOpen
+    }))
   }
 
   render() {
@@ -320,9 +357,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
               <ReviewSection
                 tabRoute={this.props.tabRoute}
                 draft={draft}
-                SubmitClickEvent={this.submitForm}
-                SaveDraftClickEvent={() => history.push('/')}
-                DeleteApplicationClickEvent={() => {
+                submitClickEvent={this.submitForm}
+                saveDraftClickEvent={() => history.push('/')}
+                deleteApplicationClickEvent={() => {
                   this.props.deleteDraft(draft)
                   history.push('/')
                 }}
@@ -332,10 +369,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
               <ReviewSection
                 tabRoute={this.props.tabRoute}
                 draft={draft}
-                RejectApplicationClickEvent={() => {
-                  alert('Reject Application')
+                rejectApplicationClickEvent={() => {
+                  this.toggleRejectForm()
                 }}
-                RegisterClickEvent={() => {
+                registerClickEvent={() => {
                   alert('Register')
                 }}
               />
@@ -377,7 +414,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <FooterAction>
             <FooterPrimaryButton
               id="save_draft"
-              onClick={() => history.push('/saved')}
+              onClick={() => history.push(SAVED_REGISTRATION)}
             >
               {intl.formatMessage(messages.saveDraft)}
             </FooterPrimaryButton>
@@ -423,6 +460,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
             )
           }}
         </Mutation>
+
+        {this.state.rejectFormOpen && (
+          <RejectRegistrationForm
+            onBack={this.toggleRejectForm}
+            confirmRejectionEvent={() => {
+              this.rejectSubmission()
+            }}
+            draftId={draft.id}
+          />
+        )}
       </FormViewContainer>
     )
   }
