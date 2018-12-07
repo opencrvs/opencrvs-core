@@ -41,7 +41,9 @@ import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { goToEvents as goToEventsAction } from 'src/navigation'
-import { IUserDetails, IIdentifier, ILocation } from 'src/utils/userUtils'
+import { goToTab as goToTabAction } from '../../navigation'
+import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -270,6 +272,7 @@ interface IBaseWorkQueueProps {
   scope: Scope
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
+  gotoTab: typeof goToTabAction
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -313,6 +316,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       }, {})
 
       return {
+        id: reg.id,
         name:
           (namesMap[this.props.language] as string) ||
           /* tslint:disable:no-string-literal */
@@ -369,7 +373,9 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     const listItemActions = [
       {
         label: this.props.intl.formatMessage(messages.review),
-        handler: () => console.log('TO DO')
+        handler: () => {
+          this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+        }
       }
     ]
 
@@ -378,7 +384,9 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       expansionActions.push(
         <PrimaryButton
           id={`reviewAndRegisterBtn_${item.tracking_id}`}
-          onClick={() => console.log('TO DO')}
+          onClick={() =>
+            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+          }
         >
           {this.props.intl.formatMessage(messages.reviewAndRegister)}
         </PrimaryButton>
@@ -624,5 +632,5 @@ export const WorkQueue = connect(
     scope: getScope(state),
     userDetails: state.profile.userDetails
   }),
-  { goToEvents: goToEventsAction }
+  { goToEvents: goToEventsAction, gotoTab: goToTabAction }
 )(injectIntl(withTheme(WorkQueueView)))

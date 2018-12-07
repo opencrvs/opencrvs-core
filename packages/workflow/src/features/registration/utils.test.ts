@@ -1,10 +1,9 @@
 import {
   generateBirthTrackingId,
   generateDeathTrackingId,
-  sendBirthNotification,
-  getUserMobile
+  sendBirthNotification
 } from './utils'
-import { pushTrackingId } from './fhir/fhir-bundle-modifier'
+import { setTrackingId } from './fhir/fhir-bundle-modifier'
 import { logger } from '../../logger'
 import * as fetch from 'jest-fetch-mock'
 import { testFhirBundle } from 'src/test/utils'
@@ -27,7 +26,7 @@ describe('Verify utility functions', () => {
   })
 
   it('send Birth notification successfully', async () => {
-    const fhirBundle = pushTrackingId(testFhirBundle)
+    const fhirBundle = setTrackingId(testFhirBundle)
     expect(
       sendBirthNotification(fhirBundle, { Authorization: 'bearer acd ' })
     ).toBeDefined()
@@ -40,16 +39,6 @@ describe('Verify utility functions', () => {
     sendBirthNotification(testFhirBundle, { Authorization: 'bearer acd ' })
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
-    )
-  })
-  it('get user mobile logs an error in case of invalid token', async () => {
-    const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockImplementationOnce(() => {
-      throw new Error('Mock Error')
-    })
-    getUserMobile(testFhirBundle, { Authorization: 'bearer acd ' })
-    expect(logSpy).toHaveBeenLastCalledWith(
-      'Unable to retrieve mobile for error : Error: Mock Error'
     )
   })
 })

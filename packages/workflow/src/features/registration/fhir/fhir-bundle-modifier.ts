@@ -1,16 +1,21 @@
 import { generateBirthTrackingId } from '../utils'
 import { getRegStatusCode } from './fhir-utils'
-import { selectOrCreateTaskRefResource } from './fhir-template'
+import {
+  getLoggedInPractitionerResource,
+  getPractitionerPrimaryLocation,
+  getPractitionerRef
+} from 'src/features/user/utils'
+import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
 import { ITokenPayload, getTokenPayload } from 'src/utils/authUtils.ts'
 import { REG_STATUS_REGISTERED } from './constants'
 import { generateBirthRegistrationNumber } from '../brnGenerator'
 
-export function modifyRegistrationBundle(
+export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
   eventType: EVENT_TYPE,
   token: string
-): fhir.Bundle {
+): Promise<fhir.Bundle> {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -19,72 +24,66 @@ export function modifyRegistrationBundle(
   ) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-
   /* setting unique trackingid here */
-  fhirBundle = pushTrackingId(fhirBundle)
+  fhirBundle = setTrackingId(fhirBundle)
 
+  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
   /* setting registration type here */
-  fhirBundle = setupRegistrationType(fhirBundle, eventType)
-
-  const tokenPayload = getTokenPayload(token)
+  setupRegistrationType(taskResource, eventType)
 
   /* setting registration workflow status here */
-  fhirBundle = setupRegistrationWorkflow(fhirBundle, tokenPayload)
+  setupRegistrationWorkflow(taskResource, getTokenPayload(token))
 
+  const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */
-  fhirBundle = setupLastRegUser(fhirBundle, tokenPayload)
+  setupLastRegUser(taskResource, practitioner)
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
 
   /* setting author and time on notes here */
-  fhirBundle = setupAuthorOnNotes(fhirBundle, tokenPayload)
+  setupAuthorOnNotes(taskResource, practitioner)
 
   return fhirBundle
 }
 
 export async function markBundleAsRegistered(
-  fhirBundle: fhir.Bundle,
+  bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
-): Promise<fhir.Bundle> {
-  if (
-    !fhirBundle ||
-    !fhirBundle.entry ||
-    !fhirBundle.entry[0] ||
-    !fhirBundle.entry[0].resource
-  ) {
-    throw new Error('Invalid FHIR bundle found for registration')
-  }
-  const tokenPayload = getTokenPayload(token)
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
 
   /* Setting birth registration number here */
-  fhirBundle = await pushBRN(fhirBundle, token)
+  await pushBRN(taskResource, practitioner)
 
   /* setting registration workflow status here */
-  fhirBundle = setupRegistrationWorkflow(
-    fhirBundle,
-    tokenPayload,
+  setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
     REG_STATUS_REGISTERED
   )
 
-  /* setting lastRegUser here */
-  fhirBundle = setupLastRegUser(fhirBundle, tokenPayload)
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
 
-  return fhirBundle
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
 }
 
 export async function pushBRN(
-  fhirBundle: fhir.Bundle,
-  token: string
-): Promise<fhir.Bundle> {
-  if (
-    !fhirBundle ||
-    !fhirBundle.entry ||
-    !fhirBundle.entry[0] ||
-    !fhirBundle.entry[0].resource
-  ) {
-    throw new Error('Invalid FHIR bundle found for registration')
+  taskResource: fhir.Task,
+  practitioner: fhir.Practitioner
+): Promise<fhir.Task> {
+  if (!taskResource) {
+    throw new Error('Invalid Task resource found for registration')
   }
-  const brn = await generateBirthRegistrationNumber(fhirBundle, token)
 
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
+  const brn = await generateBirthRegistrationNumber(taskResource, practitioner)
+
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
@@ -105,10 +104,10 @@ export async function pushBRN(
   } else {
     brnIdentifier.value = brn
   }
-  return fhirBundle
+  return taskResource
 }
 
-export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
+export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   const birthTrackingId = generateBirthTrackingId()
 
   if (
@@ -137,20 +136,27 @@ export function pushTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
-  taskResource.identifier.push({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-    value: birthTrackingId
-  })
+  const existingTrackingId = taskResource.identifier.find(
+    identifier =>
+      identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+  )
+
+  if (existingTrackingId) {
+    existingTrackingId.value = birthTrackingId
+  } else {
+    taskResource.identifier.push({
+      system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
+      value: birthTrackingId
+    })
+  }
 
   return fhirBundle
 }
 
 export function setupRegistrationType(
-  fhirBundle: fhir.Bundle,
+  taskResource: fhir.Task,
   eventType: EVENT_TYPE
-): fhir.Bundle {
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-
+): fhir.Task {
   if (!taskResource.code || !taskResource.code.coding) {
     taskResource.code = {
       coding: [
@@ -163,16 +169,14 @@ export function setupRegistrationType(
   } else {
     taskResource.code.coding[0].code = eventType.toString()
   }
-  return fhirBundle
+  return taskResource
 }
 
 export function setupRegistrationWorkflow(
-  fhirBundle: fhir.Bundle,
+  taskResource: fhir.Task,
   tokenpayload: ITokenPayload,
   defaultStatus?: string
-): fhir.Bundle {
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-
+): fhir.Task {
   const regStatusCodeString = defaultStatus
     ? defaultStatus
     : getRegStatusCode(tokenpayload)
@@ -195,20 +199,41 @@ export function setupRegistrationWorkflow(
       code: regStatusCodeString
     })
   }
-  return fhirBundle
+  return taskResource
+}
+
+export async function setupLastRegLocation(
+  taskResource: fhir.Task,
+  practitioner: fhir.Practitioner
+): Promise<fhir.Task> {
+  if (!practitioner || !practitioner.id) {
+    throw new Error('Invalid practitioner data found')
+  }
+  const primaryOffice = await getPractitionerPrimaryLocation(practitioner.id)
+
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  const regUserExtension = taskResource.extension.find(extension => {
+    return (
+      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+    )
+  })
+  if (regUserExtension) {
+    regUserExtension.valueString = `Location/${primaryOffice.id}`
+  } else {
+    taskResource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+      valueString: `Location/${primaryOffice.id}`
+    })
+  }
+  return taskResource
 }
 
 export function setupLastRegUser(
-  fhirBundle: fhir.Bundle,
-  tokenPayload: ITokenPayload
-): fhir.Bundle {
-  // TODO: need to change it as soon as we have decided the approach
-  if (!tokenPayload || !tokenPayload.subject) {
-    tokenPayload.subject = 'DUMMY'
-  }
-
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-
+  taskResource: fhir.Task,
+  practitioner: fhir.Practitioner
+): fhir.Task {
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -218,35 +243,28 @@ export function setupLastRegUser(
     )
   })
   if (regUserExtension) {
-    regUserExtension.valueString = tokenPayload.subject
+    regUserExtension.valueString = getPractitionerRef(practitioner)
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-      valueString: tokenPayload.subject
+      valueString: getPractitionerRef(practitioner)
     })
   }
-  return fhirBundle
+  return taskResource
 }
 
 export function setupAuthorOnNotes(
-  fhirBundle: fhir.Bundle,
-  tokenPayload: ITokenPayload
-): fhir.Bundle {
-  // TODO: need to change it as soon as we have decided the approach
-  if (!tokenPayload || !tokenPayload.subject) {
-    tokenPayload.subject = 'DUMMY'
-  }
-
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-
+  taskResource: fhir.Task,
+  practitioner: fhir.Practitioner
+): fhir.Task {
   if (!taskResource.note) {
-    return fhirBundle
+    return taskResource
   }
+  const authorName = getPractitionerRef(practitioner)
   taskResource.note.forEach(note => {
     if (!note.authorString) {
-      note.authorString = tokenPayload.subject
+      note.authorString = authorName
     }
   })
-
-  return fhirBundle
+  return taskResource
 }

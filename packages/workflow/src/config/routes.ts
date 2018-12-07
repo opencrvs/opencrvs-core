@@ -1,3 +1,4 @@
+import updateTaskHandler from '../features/task/handler'
 import {
   createBirthRegistrationHandler,
   markBirthAsRegisteredHandler
@@ -37,6 +38,26 @@ export const getRoutes = () => {
           'hapi-swagger': {
             responses: {
               200: { description: 'Birth declaration is successfully synced' },
+              400: { description: 'Bad request, check your request body' }
+            }
+          }
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateTask',
+      handler: updateTaskHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update Task with the user information and send to fhir',
+        auth: {
+          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+        },
+        plugins: {
+          'hapi-swagger': {
+            responses: {
+              200: { description: 'Task is successfully synced' },
               400: { description: 'Bad request, check your request body' }
             }
           }

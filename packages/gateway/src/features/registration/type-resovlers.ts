@@ -102,10 +102,8 @@ export const typeResolvers: GQLResolver = {
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     async attachments(task: fhir.Task) {
       if (!task.focus) {
@@ -134,9 +132,93 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       return (contact && contact.valueString) || null
+    },
+    paperFormID: task => {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`
+        )
+
+      return (foundIdentifier && foundIdentifier.value) || null
+    },
+    page: task => {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/paper-form-page`
+        )
+
+      return (foundIdentifier && foundIdentifier.value) || null
+    },
+    book: task => {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/paper-form-book`
+        )
+
+      return (foundIdentifier && foundIdentifier.value) || null
+    },
+    status: async task => {
+      const taskArrary = []
+      taskArrary.push(task)
+      return taskArrary
+    },
+    type: task => {
+      const taskType = task.code
+      const taskCode = taskType.coding.find(
+        (coding: fhir.Coding) =>
+          coding.system === `${OPENCRVS_SPECIFICATION_URL}types`
+      )
+      return (taskCode && taskCode.code) || null
     }
   },
+  RegWorkflow: {
+    type: (task: fhir.Task) => {
+      const taskStatus = task.businessStatus
+      const taskStatusCoding = taskStatus && taskStatus.coding
+      const statusType =
+        taskStatusCoding &&
+        taskStatusCoding.find(
+          (coding: fhir.Coding) =>
+            coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+        )
 
+      return (statusType && statusType.code) || null
+    },
+    user: task => {
+      const user = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        task.extension
+      )
+      return (user && user.valueString) || null
+    },
+    timestamp: task => task.lastModified,
+    comments: task => task.note,
+    location: async task => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+        task.extension
+      )
+      if (!taskLocation) {
+        return null
+      }
+      const res = await fetch(`${fhirUrl}/${taskLocation.valueReference}`)
+      return res.json()
+    }
+  },
+  Comment: {
+    user: comment => comment.authorString,
+    comment: comment => comment.text,
+    createdAt: comment => comment.time
+  },
   Attachment: {
     id(docRef: fhir.DocumentReference) {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
@@ -151,10 +233,7 @@ export const typeResolvers: GQLResolver = {
           (identifier: fhir.Identifier) =>
             identifier.system === ORIGINAL_FILE_NAME_SYSTEM
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     systemFileName(docRef: fhir.DocumentReference) {
       const foundIdentifier =
@@ -163,10 +242,7 @@ export const typeResolvers: GQLResolver = {
           (identifier: fhir.Identifier) =>
             identifier.system === SYSTEM_FILE_NAME_SYSTEM
         )
-      if (!foundIdentifier) {
-        return null
-      }
-      return foundIdentifier.value
+      return (foundIdentifier && foundIdentifier.value) || null
     },
     type(docRef: fhir.DocumentReference) {
       return (
@@ -232,7 +308,6 @@ export const typeResolvers: GQLResolver = {
       if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
         return null
       }
-
       return taskBundle.entry[0].resource
     },
     async weightAtBirth(composition: ITemplatedComposition) {
