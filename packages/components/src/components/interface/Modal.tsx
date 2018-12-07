@@ -1,7 +1,6 @@
 import React = require('react')
 import styled from 'styled-components'
 import { Cross } from '../icons'
-import { classNames } from 'react-select/lib/utils'
 
 interface IProps {
   title: string
