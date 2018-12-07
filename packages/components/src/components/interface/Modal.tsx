@@ -1,12 +1,14 @@
 import React = require('react')
 import styled from 'styled-components'
 import { Cross } from '../icons'
+import { classNames } from 'react-select/lib/utils'
 
 interface IProps {
   title: string
   actions: JSX.Element[]
   show: boolean
   handleClose: () => void
+  className?: string
 }
 
 const Backdrop = styled.div`
@@ -69,14 +71,14 @@ const TopRight = styled.span`
 
 export class Modal extends React.Component<IProps> {
   render() {
-    const { title, actions, show, handleClose } = this.props
+    const { title, actions, show, handleClose, className } = this.props
 
     if (!show) {
       return null
     }
 
     return (
-      <Backdrop>
+      <Backdrop className={className}>
         <ModalContent>
           {title && <Heading>{title}</Heading>}
           <TopRight onClick={handleClose}>
