@@ -628,10 +628,25 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns user of the task', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({ resourceType: 'Practitioner' })
+      )
       // @ts-ignore
       const user = await typeResolvers.RegWorkflow.user(mockTask)
 
-      expect(user).toBe('<username>')
+      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Practitioner/123')
+      expect(user.resourceType).toBe('Practitioner')
+    })
+
+    it('returns null when there is no user extension in task', async () => {
+      const mock = fetch.mockResponseOnce(JSON.stringify({}))
+      // @ts-ignore
+      const user = await typeResolvers.RegWorkflow.user({
+        resourceType: 'Task',
+        extension: []
+      })
+
+      expect(user).toBeNull()
     })
 
     it('returns location of the task', async () => {
