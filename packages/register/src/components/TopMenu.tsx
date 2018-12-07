@@ -7,11 +7,13 @@ import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 import styled from '../styled-components'
 import { goBack as goBackAction } from 'src/navigation'
+import { redirectToAuthentication } from 'src/profile/profileActions'
 import { getLanguages } from 'src/i18n/selectors'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
 import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
+import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 
 const messages = defineMessages({
   back: {
@@ -103,12 +105,29 @@ type Props = {
   hideBackButton?: true | false | undefined | null
   goBack: typeof goBackAction
   changeLanguage: typeof changeLanguageAction
+  redirectToAuthentication: typeof redirectToAuthentication
   languages: IntlState['languages']
 }
 
+interface IState {
+  showLogoutModal: boolean
+}
 type IFullProps = Props & InjectedIntlProps
 
-class TopMenuComponent extends React.Component<IFullProps> {
+class TopMenuComponent extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps & IState) {
+    super(props)
+    this.state = {
+      showLogoutModal: false
+    }
+  }
+
+  toggleLogoutModal = () => {
+    this.setState(state => ({
+      showLogoutModal: !state.showLogoutModal
+    }))
+  }
+
   render() {
     const { intl, goBack, hideBackButton } = this.props
 
@@ -148,7 +167,8 @@ class TopMenuComponent extends React.Component<IFullProps> {
       },
       {
         title: intl.formatMessage(messages.logout),
-        key: 'logout'
+        key: 'logout',
+        onClick: this.toggleLogoutModal
       }
     ]
 
@@ -164,6 +184,11 @@ class TopMenuComponent extends React.Component<IFullProps> {
           menuItems={menuItems}
           menuTitle={intl.formatMessage(messages.menu)}
         />
+        <LogoutConfirmation
+          show={this.state.showLogoutModal}
+          handleClose={this.toggleLogoutModal}
+          handleYes={this.props.redirectToAuthentication}
+        />
       </TopMenuContainer>
     )
   }
@@ -174,5 +199,9 @@ export const TopMenu = connect(
     languages: getLanguages(state),
     language: state.i18n.language
   }),
-  { goBack: goBackAction, changeLanguage: changeLanguageAction }
+  {
+    goBack: goBackAction,
+    changeLanguage: changeLanguageAction,
+    redirectToAuthentication
+  }
 )(injectIntl<IFullProps>(TopMenuComponent))

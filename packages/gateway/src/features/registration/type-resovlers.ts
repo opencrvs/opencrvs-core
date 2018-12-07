@@ -263,9 +263,15 @@ export const typeResolvers: GQLResolver = {
     }
   },
 
+  Identifier: {
+    system: identifier => identifier.system,
+    value: identifier => identifier.value
+  },
+
   Location: {
     name: location => location.name,
     status: location => location.status,
+    identifier: location => location.identifier,
     longitude: location => location.position.longitude,
     latitude: location => location.position.latitude
   },

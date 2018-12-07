@@ -114,6 +114,10 @@ export class App extends React.Component<IAppProps, IState> {
                             component={SavedRegistration}
                           />
                           <ProtectedRoute
+                            path={routes.REJECTED_REGISTRATION}
+                            component={SavedRegistration}
+                          />
+                          <ProtectedRoute
                             path={routes.WORK_QUEUE}
                             component={WorkQueue}
                           />

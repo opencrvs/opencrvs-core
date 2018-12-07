@@ -23,7 +23,10 @@ export const resolvers: GQLResolver = {
       const composition = await res.json()
       return composition
     },
-    async listBirthRegistrations(_, { status }) {
+    async listBirthRegistrations(_, { status, locationIds }) {
+      if (locationIds) {
+        return getCompositionsByLocation(locationIds)
+      }
       const res = await fetch(
         `${fhirUrl}/Composition${
           status ? `?status=${statusMap[status]}&` : '?'
@@ -110,4 +113,36 @@ export const resolvers: GQLResolver = {
       return resBody.taskId
     }
   }
+}
+
+async function getCompositionsByLocation(locationIds: Array<string | null>) {
+  const tasksResponses = await Promise.all(
+    locationIds.map(locationId => {
+      return getFromFhir(`/Task?location=${locationId}`)
+    })
+  )
+
+  const compositions = await Promise.all(
+    tasksResponses.map(tasksResponse => {
+      return getComposition(tasksResponse)
+    })
+  )
+
+  const flattened = compositions.reduce((a, b) => a && a.concat(b), [])
+
+  const filteredComposition =
+    flattened && flattened.filter(composition => composition !== undefined)
+  return filteredComposition
+}
+
+async function getComposition(tasksResponse: fhir.Bundle) {
+  return (
+    tasksResponse.entry &&
+    (await Promise.all(
+      tasksResponse.entry.map((task: fhir.BundleEntry) => {
+        const resource = task.resource as fhir.Task
+        return resource.focus && getFromFhir(`/${resource.focus.reference}`)
+      })
+    ))
+  )
 }

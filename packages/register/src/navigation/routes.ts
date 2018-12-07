@@ -10,4 +10,5 @@ export const REVIEW_BIRTH_PARENT_FORM_TAB =
   '/reviews/:draftId/events/birth/parent/:tabId'
 
 export const SAVED_REGISTRATION = '/saved'
+export const REJECTED_REGISTRATION = '/rejected'
 export const WORK_QUEUE = '/work-queue'

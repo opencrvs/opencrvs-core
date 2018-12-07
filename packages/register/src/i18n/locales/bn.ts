@@ -515,6 +515,7 @@ export const BENGALI_STATE = {
     'register.notification.declarationsSynced':
       'ইন্টারনেট সংযোগ ফিরে আসায় আমরা {syncCount} টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি',
     'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
+    'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'নিবন্ধন সম্পন্ন',
     'register.savedRegistration.online.desc':
       'তথ্য বিবরনী বৈধতা জন্য পর্যালোচিত হচ্ছে',
@@ -530,6 +531,8 @@ export const BENGALI_STATE = {
     'register.savedRegistration.offline.noticeCard.text1':
       'ডিভাইসে ইন্টারনেট সংযোগ কালীন ঘোষণাটি স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।',
     'register.savedRegistration.offline.noticeCard.text2': '',
+    'register.rejectedNoticeCardText2':
+      'has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.',
     'register.completeRegistration.noticeCard.text1':
       'এই বার্তা কখনই ব্যবহার করা হবে না কিন্তু এটা এখানে থাকা প্রয়োজন',
     'register.completeRegistration.noticeCard.text2':
@@ -659,6 +662,9 @@ export const BENGALI_STATE = {
     'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'সমর্থনকারী কাগজপত্র',
     'review.documentViewer.tagline': 'দেখতে নির্বাচন করুন',
-    'review.form.deleteApplication': 'আবেদন মুছে দিন'
+    'review.form.deleteApplication': 'আবেদন মুছে দিন',
+    'app.logout.modal.no': 'না',
+    'app.logout.modal.yes': 'হাঁ',
+    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?'
   }
 }

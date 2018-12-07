@@ -29,6 +29,10 @@ export function storeToken(token: string) {
   localStorage.setItem('opencrvs', token)
 }
 
+export function removeToken() {
+  localStorage.removeItem('opencrvs')
+}
+
 export const getTokenPayload = (token: string) => {
   if (!token) {
     return null

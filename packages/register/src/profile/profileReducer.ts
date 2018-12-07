@@ -5,7 +5,8 @@ import {
   ITokenPayload,
   storeToken,
   getToken,
-  isTokenStillValid
+  isTokenStillValid,
+  removeToken
 } from '../utils/authUtils'
 import { config } from '../config'
 import {
@@ -39,9 +40,14 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
     case actions.REDIRECT_TO_AUTHENTICATION:
       return loop(
         state,
-        Cmd.run(() => {
-          window.location.assign(config.LOGIN_URL)
-        })
+        Cmd.list([
+          Cmd.run(() => {
+            removeToken()
+          }),
+          Cmd.run(() => {
+            window.location.assign(config.LOGIN_URL)
+          })
+        ])
       )
     case actions.CHECK_AUTH:
       const token = getToken()

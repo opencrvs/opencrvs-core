@@ -148,9 +148,16 @@ export const mockUserResponse = {
           __typename: 'Location'
         },
         {
-          id: '6a87dcd8-d784-4607-808b-50a45e62e405',
+          id: '123456789',
           name: 'BAKTARPUR',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UNION',
+              __typename: 'Identifier'
+            }
+          ],
           __typename: 'Location'
         }
       ],
@@ -162,5 +169,86 @@ export const mockUserResponse = {
       },
       __typename: 'User'
     }
+  }
+}
+
+export const mockApplicationData = {
+  child: {
+    firstNames: 'গায়ত্রী',
+    familyName: 'স্পিভক',
+    firstNamesEng: 'Mike',
+    familyNameEng: 'Test',
+    childBirthDate: '1977-09-20',
+    gender: 'male',
+    weightAtBirth: '3.5',
+    attendantAtBirth: 'MIDWIFE',
+    typeOfBirth: 'SINGLE'
+  },
+  mother: {
+    firstNames: 'স্পিভক',
+    familyName: 'গায়ত্রী',
+    firstNamesEng: 'Liz',
+    familyNameEng: 'Test',
+    iD: '654651',
+    iDType: 'NATIONAL_ID',
+    motherBirthDate: '1949-05-31',
+    dateOfMarriage: '1972-09-19',
+    maritalStatus: 'MARRIED',
+    educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
+    nationality: 'BGD',
+    countryPermanent: 'BGD',
+    statePermanent: 'state2',
+    districtPermanent: 'district2',
+    addressLine1Permanent: '',
+    addressLine2Permanent: '',
+    addressLine3Options1Permanent: '',
+    addressLine4Permanent: 'upazila1',
+    postalCodePermanent: '',
+    country: 'BGD',
+    state: 'state2',
+    district: 'district2',
+    addressLine1: '',
+    addressLine2: '',
+    addressLine3Options1: '',
+    addressLine4: 'upazila2',
+    postalCode: ''
+  },
+  father: {
+    fathersDetailsExist: true,
+    firstNames: 'গায়ত্রী',
+    familyName: 'স্পিভক',
+    firstNamesEng: 'Jeff',
+    familyNameEng: 'Test',
+    iD: '43468',
+    iDType: 'NATIONAL_ID',
+    fatherBirthDate: '1950-05-19',
+    dateOfMarriage: '1972-09-19',
+    maritalStatus: 'MARRIED',
+    educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
+    nationality: 'BGD',
+    countryPermanent: 'BGD',
+    statePermanent: 'state2',
+    districtPermanent: 'district2',
+    addressLine1Permanent: '',
+    addressLine2Permanent: '',
+    addressLine3Options1Permanent: '',
+    addressLine4Permanent: 'upazila1',
+    postalCodePermanent: '',
+    country: 'BGD',
+    state: 'state2',
+    district: 'district2',
+    addressLine1: '',
+    addressLine2: '',
+    addressLine3Options1: '',
+    addressLine4: 'upazila2',
+    postalCode: '',
+    permanentAddressSameAsMother: true,
+    addressSameAsMother: true
+  },
+  registration: {
+    whoseContactDetails: 'MOTHER',
+    presentAtBirthRegistration: 'BOTH_PARENTS',
+    registrationPhone: '01557394986',
+    registrationEmail: 'test@tester.com'
   }
 }
