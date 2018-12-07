@@ -444,30 +444,6 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     }
   }
 
-  getFormattedLocationOptions() {
-    const { intl, userDetails } = this.props
-    const options = [
-      {
-        value: '',
-        label: intl.formatMessage(messages.filtersAllLocations)
-      }
-    ]
-    const catchmentArea = userDetails && userDetails.catchmentArea
-    if (catchmentArea) {
-      catchmentArea.forEach((location: ILocation) => {
-        if (location.id && location.name) {
-          const option = {
-            value: location.id,
-            label: location.name
-          }
-          options.push(option)
-        }
-      })
-    }
-
-    return options
-  }
-
   render() {
     const { intl, theme } = this.props
     const sortBy = {
@@ -548,7 +524,18 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           },
           {
             name: 'location',
-            options: this.getFormattedLocationOptions(),
+            options: [
+              {
+                value: '',
+                label: intl.formatMessage(messages.filtersAllLocations)
+              },
+              // TODO these need to be translated but those needs to be read from our backend when we have locations setup
+              { value: 'gazipur', label: 'Gazipur Union' },
+              { value: 'badda', label: 'Badda Union' },
+              { value: 'dhamrai', label: 'Dhamrai Union' },
+              { value: 'savar', label: 'Savar Union' },
+              { value: 'dohar', label: 'Dohar Union' }
+            ],
             value: ''
           }
         ]
