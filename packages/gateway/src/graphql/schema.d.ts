@@ -190,6 +190,7 @@ export interface GQLBirthRegistration {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
+  duplicates?: Array<string | null>
   birthOrder?: number
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -1015,6 +1016,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<
     TParent
   >
+  duplicates?: BirthRegistrationToDuplicatesResolver<TParent>
   birthOrder?: BirthRegistrationToBirthOrderResolver<TParent>
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
@@ -1116,6 +1118,13 @@ export interface BirthRegistrationToFoetalDeathsToMotherResolver<
 }
 
 export interface BirthRegistrationToLastPreviousLiveBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationToDuplicatesResolver<
   TParent = any,
   TResult = any
 > {
