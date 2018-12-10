@@ -284,11 +284,11 @@ type IWorkQueueProps = InjectedIntlProps &
 export class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
-      case 'application':
+      case 'DECLARED':
         return <StatusOrange />
       case 'REGISTERED':
         return <StatusGreen />
-      case 'collected':
+      case 'COLLECTED':
         return <StatusCollected />
       default:
         return <StatusOrange />
@@ -556,7 +556,9 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
         <Container>
           <Query
             query={FETCH_REGISTRATION_QUERY}
-            variables={{ locationIds: [this.getUnionId()] }}
+            // variables={{
+            //   locationIds: [this.getUnionId()]
+            // }}
           >
             {({ loading, error, data }) => {
               if (loading) {
