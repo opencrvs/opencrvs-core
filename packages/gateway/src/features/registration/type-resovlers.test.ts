@@ -638,6 +638,72 @@ describe('Registration type resolvers', () => {
       expect(user.resourceType).toBe('Practitioner')
     })
 
+    it('returns role of the user', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: [
+            {
+              resource: {
+                resourceType: 'PractitionerRole',
+                code: [
+                  {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/roles',
+                        code: 'FIELD_REGISTRAR'
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        })
+      )
+
+      const mockUser = {
+        id: 123
+      }
+      // @ts-ignore
+      const role = await typeResolvers.User.role(mockUser)
+
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/PractitionerRole?practitioner=123'
+      )
+      expect(role).toBe('FIELD_REGISTRAR')
+    })
+
+    it('throws error when there is no role entry', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: [
+            {
+              resource: {
+                resourceType: 'PractitionerRole',
+                code: []
+              }
+            }
+          ]
+        })
+      )
+
+      const mockUser = {
+        id: 123
+      }
+      let error
+      // @ts-ignore
+      try {
+        const role = await typeResolvers.User.role(mockUser)
+      } catch (e) {
+        error = e
+      }
+
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/PractitionerRole?practitioner=123'
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+
     it('returns null when there is no user extension in task', async () => {
       const mock = fetch.mockResponseOnce(JSON.stringify({}))
       // @ts-ignore
@@ -678,6 +744,12 @@ describe('Registration type resolvers', () => {
   describe('Location type', () => {
     const location = {
       status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'DIVISION'
+        }
+      ],
       name: 'village',
       position: {
         longitude: 18.4392,
@@ -688,6 +760,16 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const name = typeResolvers.Location.name(location)
       expect(name).toBe('village')
+    })
+    it('returns identenfier having length 1', () => {
+      const identifier = typeResolvers.Location.identifier(location)
+      const identifierSystem = typeResolvers.Identifier.system(identifier[0])
+      const identifierValue = typeResolvers.Identifier.value(identifier[0])
+      expect(identifier).toHaveLength(1)
+      expect(identifierSystem).toBe(
+        'http://opencrvs.org/specs/id/jurisdiction-type'
+      )
+      expect(identifierValue).toBe('DIVISION')
     })
     it('returns status', () => {
       // @ts-ignore
