@@ -54,6 +54,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
         status {
           user {
             name {
+              use
               firstNames
               familyName
             }
@@ -267,6 +268,12 @@ const StyledIconAction = styled(IconAction)`
   }
 `
 
+const ExpansionContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+`
+
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -284,7 +291,7 @@ type IWorkQueueProps = InjectedIntlProps &
 export class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
-      case 'DECLARED':
+      case 'APPLICATION':
         return <StatusOrange />
       case 'REGISTERED':
         return <StatusGreen />
@@ -301,33 +308,58 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     }
 
     return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
-      const names = (reg.child && (reg.child.name as GQLHumanName[])) || []
-      const namesMap = names.filter(Boolean).reduce((prevNamesMap, name) => {
-        if (!name.use) {
-          /* tslint:disable:no-string-literal */
-          prevNamesMap['default'] = `${name.firstNames} ${
-            /* tslint:enable:no-string-literal */
+      const childNames = (reg.child && (reg.child.name as GQLHumanName[])) || []
+      const namesMap = (names: GQLHumanName[]) =>
+        names.filter(Boolean).reduce((prevNamesMap, name) => {
+          if (!name.use) {
+            /* tslint:disable:no-string-literal */
+            prevNamesMap['default'] = `${name.firstNames} ${
+              /* tslint:enable:no-string-literal */
+              name.familyName
+            }`.trim()
+            return prevNamesMap
+          }
+
+          prevNamesMap[name.use] = `${name.firstNames} ${
             name.familyName
           }`.trim()
           return prevNamesMap
-        }
-
-        prevNamesMap[name.use] = `${name.firstNames} ${name.familyName}`.trim()
-        return prevNamesMap
-      }, {})
+        }, {})
 
       return {
         id: reg.id,
         name:
-          (namesMap[this.props.language] as string) ||
+          (namesMap(childNames)[this.props.language] as string) ||
           /* tslint:disable:no-string-literal */
-          (namesMap['default'] as string) ||
+          (namesMap(childNames)['default'] as string) ||
           /* tslint:enable:no-string-literal */
           '',
         dob: (reg.child && reg.child.birthDate) || '',
         date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
         tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
+        status:
+          reg.registration &&
+          reg.registration.status &&
+          reg.registration.status.map(status => {
+            return {
+              type: status && status.type,
+              practitionerName:
+                (status &&
+                  status.user &&
+                  (namesMap(status.user.name as GQLHumanName[])[
+                    this.props.language
+                  ] as string)) ||
+                (status &&
+                  status.user &&
+                  /* tslint:disable:no-string-literal */
+                  (namesMap(status.user.name as GQLHumanName[])[
+                    'default'
+                  ] as string)) ||
+                /* tslint:enable:no-string-literal */
+                ''
+            }
+          }),
         declaration_status:
           (reg.registration &&
             reg.registration.status &&
@@ -344,8 +376,32 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       }
     })
   }
+  renderExpansionContent = (
+    item: {
+      [key: string]: string & Array<{ [key: string]: string }>
+    },
+    key: number
+  ): JSX.Element[] => {
+    return item.status.map(status => {
+      return (
+        <ExpansionContainer key={key}>
+          {this.getDeclarationStatusIcon(status.type)}
 
-  renderCell = (item: { [key: string]: string }, key: number): JSX.Element => {
+          <p>
+            {
+              // @ts-ignore
+              status.practitionerName
+            }
+          </p>
+        </ExpansionContainer>
+      )
+    })
+  }
+
+  renderCell = (
+    item: { [key: string]: string & Array<{ type: string }> },
+    key: number
+  ): JSX.Element => {
     const info = []
     const status = []
 
@@ -404,7 +460,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
         actions={listItemActions}
         expandedCellRenderer={() => (
           <ListItemExpansion actions={expansionActions}>
-            <p>Expansion content</p>
+            {this.renderExpansionContent(item, key)}
           </ListItemExpansion>
         )}
       />
