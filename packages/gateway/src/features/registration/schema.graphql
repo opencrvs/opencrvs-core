@@ -155,6 +155,7 @@ type BirthRegistration { # -> Composition
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
+  duplicates: [ID]
   # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
   birthOrder: Int # -> Patient.multipleBirthInteger
   createdAt: Date # -> .date($first)
