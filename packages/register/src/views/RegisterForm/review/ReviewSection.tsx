@@ -42,7 +42,11 @@ import {
   LIST,
   PARAGRAPH,
   SELECT_WITH_OPTIONS,
-  ISelectOption
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  CHECKBOX_GROUP,
+  ISelectOption,
+  IDynamicOptions,
+  IFormSectionData
 } from 'src/forms'
 
 const messages = defineMessages({
@@ -299,6 +303,39 @@ function renderSelectLabel(
   return selectedOption ? intl.formatMessage(selectedOption.label) : value
 }
 
+function renderSelectDynamicLabel(
+  value: IFormFieldValue,
+  options: IDynamicOptions,
+  draftData: IFormSectionData,
+  intl: InjectedIntl
+) {
+  const dependency = options.dependency ? draftData[options.dependency] : false
+  const selectedOption = dependency
+    ? options.options[dependency.toString()].find(
+        option => option.value === value
+      )
+    : false
+  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+}
+
+function renderCheckboxGroup(
+  values: string[],
+  options: ISelectOption[],
+  intl: InjectedIntl
+) {
+  let result = ''
+  values.forEach((value, key) => {
+    const tempValue = options.find(option => option.value === value)
+
+    if (key > 0) {
+      result += ', '
+    }
+
+    result += tempValue ? intl.formatMessage(tempValue.label) : value
+  })
+  return result
+}
+
 const renderValue = (
   draft: IDraft,
   section: IFormSection,
@@ -310,6 +347,19 @@ const renderValue = (
     : ''
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectLabel(value, field.options, intl)
+  }
+  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
+    const draftData = draft.data[section.id]
+    return renderSelectDynamicLabel(
+      value,
+      field.dynamicOptions,
+      draftData,
+      intl
+    )
+  }
+  if (field.type === CHECKBOX_GROUP && field.options) {
+    const checkBoxValue: string[] = value as string[]
+    return renderCheckboxGroup(checkBoxValue, field.options, intl)
   }
   if (typeof value === 'string') {
     return value
