@@ -737,9 +737,9 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
         <Container>
           <Query
             query={FETCH_REGISTRATION_QUERY}
-            // variables={{
-            //   locationIds: [this.getUnionId()]
-            // }}
+            variables={{
+              locationIds: [this.getUnionId()]
+            }}
           >
             {({ loading, error, data }) => {
               if (loading) {
