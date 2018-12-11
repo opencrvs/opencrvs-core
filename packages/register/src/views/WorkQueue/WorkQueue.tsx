@@ -228,6 +228,28 @@ const messages = defineMessages({
     id: 'register.workQueue.list.buttons.review',
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
+  },
+  workflowStatusDateApplication: {
+    id: 'register.workQueue.listItem.status.dateLabel.application',
+    defaultMessage: 'Application submitted on',
+    description:
+      'Label for the workflow timestamp when the status is application'
+  },
+  workflowStatusDateRegistered: {
+    id: 'register.workQueue.listItem.status.dateLabel.registered',
+    defaultMessage: 'Registrated on',
+    description:
+      'Label for the workflow timestamp when the status is registered'
+  },
+  workflowStatusDateCollected: {
+    id: 'register.workQueue.listItem.status.dateLabel.collected',
+    defaultMessage: 'Collected on',
+    description: 'Label for the workflow timestamp when the status is collected'
+  },
+  workflowPractitionerLabel: {
+    id: 'register.workQueue.listItem.status.label.byPractitioner',
+    defaultMessage: 'By',
+    description: 'Label for the practitioner name in workflow'
   }
 })
 
@@ -284,6 +306,7 @@ const Separator = styled.div`
 const ValueContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
+  line-height: 1.3em;
 `
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
@@ -302,17 +325,29 @@ function ValuesWithSeparator(props: {
     <ValueContainer>
       {props.strings.map((value, index) => {
         return (
-          <>
+          <React.Fragment key={index}>
             {value}
             {index < props.strings.length - 1 && value.length > 0
               ? props.separator
               : null}
-          </>
+          </React.Fragment>
         )
       })}
     </ValueContainer>
   )
 }
+
+function formatRoleCode(str: string) {
+  const sections = str.split('_')
+  const formattedString: string[] = []
+  sections.map(section => {
+    section = section.charAt(0) + section.slice(1).toLowerCase()
+    formattedString.push(section)
+  })
+
+  return formattedString.join(' ')
+}
+
 const ExpansionContainer = styled.div`
   flex: 1;
   display: flex;
@@ -354,6 +389,19 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
         return <StatusCollected />
       default:
         return <StatusOrange />
+    }
+  }
+
+  getWorkflowDateLabel = (status: string) => {
+    switch (status) {
+      case 'APPLICATION':
+        return messages.workflowStatusDateApplication
+      case 'REGISTERED':
+        return messages.workflowStatusDateRegistered
+      case 'COLLECTED':
+        return messages.workflowStatusDateCollected
+      default:
+        return messages.workflowStatusDateApplication
     }
   }
 
@@ -447,11 +495,25 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           {this.getDeclarationStatusIcon(status.type)}
 
           <ExpansionContentContainer>
-            <LabelValue label="Registrated on" value={status.timestamp} />
+            <LabelValue
+              label={this.props.intl.formatMessage(
+                this.getWorkflowDateLabel(status.type)
+              )}
+              value={status.timestamp}
+            />
             <ValueContainer>
-              <StyledLabel>By:</StyledLabel>
+              <StyledLabel>
+                {this.props.intl.formatMessage(
+                  messages.workflowPractitionerLabel
+                )}
+                :
+              </StyledLabel>
               <ValuesWithSeparator
-                strings={[practitionerName, practitionerRole, location]}
+                strings={[
+                  practitionerName,
+                  formatRoleCode(practitionerRole),
+                  location
+                ]}
                 separator={<Separator />}
               />
             </ValueContainer>
