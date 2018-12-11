@@ -658,6 +658,15 @@ describe('Registration type resolvers', () => {
         'Task resource does not have a focus property necessary to lookup the composition'
       )
     })
+
+    it('returns an array of duplicates', async () => {
+      const mock = fetch.mockResponseOnce(JSON.stringify(mockComposition))
+
+      // @ts-ignore
+      const duplicates = await typeResolvers.Registration.duplicates(mockTask)
+      expect(duplicates).toBeDefined()
+      expect(duplicates).toHaveLength(2)
+    })
   })
 
   describe('Location type', () => {

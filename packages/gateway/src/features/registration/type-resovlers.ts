@@ -178,6 +178,20 @@ export const typeResolvers: GQLResolver = {
           coding.system === `${OPENCRVS_SPECIFICATION_URL}types`
       )
       return (taskCode && taskCode.code) || null
+    },
+    duplicates: async task => {
+      if (!task.focus) {
+        throw new Error(
+          'Task resource does not have a focus property necessary to lookup the composition'
+        )
+      }
+
+      const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
+      const composition = await res.json()
+      return composition.relatesTo.map(
+        (duplicate: fhir.CompositionRelatesTo) =>
+          duplicate.targetReference && duplicate.targetReference.reference
+      )
     }
   },
   RegWorkflow: {
