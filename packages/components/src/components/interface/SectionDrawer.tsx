@@ -63,7 +63,7 @@ interface IProps {
 }
 
 interface IState {
-  MaxHeight: string
+  maxHeight: string
 }
 
 interface IElement extends Element {
@@ -75,7 +75,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
     super(props)
 
     this.state = {
-      MaxHeight: '0px'
+      maxHeight: '0px'
     }
   }
 
@@ -91,13 +91,13 @@ export class SectionDrawer extends React.Component<IProps, IState> {
     const extraHeight = 130
     const elem = ReactDOM.findDOMNode(this) as IElement
 
-    const MaxHeight =
+    const maxHeight =
       elem.querySelector('div:nth-child(3) > div').clientHeight +
       extraHeight +
       'px'
 
-    if (this.state.MaxHeight !== MaxHeight) {
-      this.setState(() => ({ MaxHeight }))
+    if (this.state.maxHeight !== maxHeight) {
+      this.setState(() => ({ maxHeight }))
     }
   }
 
@@ -153,7 +153,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
         <SectionContainer
           className="_sectionContainer"
           expanded={isExpanded}
-          maxHeight={this.state.MaxHeight}
+          maxHeight={this.state.maxHeight}
         >
           <div>{children}</div>
         </SectionContainer>
