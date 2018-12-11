@@ -667,6 +667,13 @@ describe('Registration type resolvers', () => {
       expect(duplicates).toBeDefined()
       expect(duplicates).toHaveLength(2)
     })
+
+    it('throws when task has no focus in duplicate resolver', async () => {
+      // @ts-ignore
+      expect(typeResolvers.Registration.duplicates({})).rejects.toThrowError(
+        'Task resource does not have a focus property necessary to lookup the composition'
+      )
+    })
   })
 
   describe('Location type', () => {
