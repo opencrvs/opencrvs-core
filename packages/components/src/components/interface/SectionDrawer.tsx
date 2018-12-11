@@ -43,9 +43,9 @@ const Seperator = styled.span`
 `
 const SectionContainer = styled.div.attrs<{
   expanded: boolean
-  MaxHeight: string
+  maxHeight: string
 }>({})`
-  max-height: ${({ expanded, MaxHeight }) => (expanded ? MaxHeight : `0px`)};
+  max-height: ${({ expanded, maxHeight }) => (expanded ? maxHeight : `0px`)};
   overflow: hidden;
   transition: ${({ expanded }) =>
     expanded
@@ -153,7 +153,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
         <SectionContainer
           className="_sectionContainer"
           expanded={isExpanded}
-          MaxHeight={this.state.MaxHeight}
+          maxHeight={this.state.MaxHeight}
         >
           <div>{children}</div>
         </SectionContainer>
