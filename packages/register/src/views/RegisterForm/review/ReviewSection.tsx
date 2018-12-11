@@ -40,7 +40,9 @@ import {
   IFileValue,
   IFormFieldValue,
   LIST,
-  PARAGRAPH
+  PARAGRAPH,
+  SELECT_WITH_OPTIONS,
+  ISelectOption
 } from 'src/forms'
 
 const messages = defineMessages({
@@ -288,6 +290,15 @@ const getSectionExpansionConfig = (
   return sectionExpansionConfig
 }
 
+function renderSelectLabel(
+  value: IFormFieldValue,
+  options: ISelectOption[],
+  intl: InjectedIntl
+) {
+  const selectedOption = options.find(option => option.value === value)
+  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+}
+
 const renderValue = (
   draft: IDraft,
   section: IFormSection,
@@ -297,6 +308,9 @@ const renderValue = (
   const value: IFormFieldValue = draft.data[section.id]
     ? draft.data[section.id][field.name]
     : ''
+  if (field.type === SELECT_WITH_OPTIONS && field.options) {
+    return renderSelectLabel(value, field.options, intl)
+  }
   if (typeof value === 'string') {
     return value
   }
