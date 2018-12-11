@@ -205,6 +205,7 @@ export interface GQLRegistration {
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachment | null>
+  duplicates?: Array<string | null>
 }
 
 export enum GQLRegistrationContactType {
@@ -1153,6 +1154,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
+  duplicates?: RegistrationToDuplicatesResolver<TParent>
 }
 
 export interface RegistrationToTrackingIdResolver<
@@ -1197,6 +1199,13 @@ export interface RegistrationToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToAttachmentsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToDuplicatesResolver<
   TParent = any,
   TResult = any
 > {
