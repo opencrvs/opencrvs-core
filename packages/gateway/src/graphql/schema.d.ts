@@ -190,7 +190,6 @@ export interface GQLBirthRegistration {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
-  duplicates?: Array<string | null>
   birthOrder?: number
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -206,6 +205,7 @@ export interface GQLRegistration {
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachment | null>
+  duplicates?: Array<string | null>
 }
 
 export enum GQLRegistrationContactType {
@@ -1016,7 +1016,6 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<
     TParent
   >
-  duplicates?: BirthRegistrationToDuplicatesResolver<TParent>
   birthOrder?: BirthRegistrationToBirthOrderResolver<TParent>
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
@@ -1124,13 +1123,6 @@ export interface BirthRegistrationToLastPreviousLiveBirthResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationToDuplicatesResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface BirthRegistrationToBirthOrderResolver<
   TParent = any,
   TResult = any
@@ -1162,6 +1154,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
+  duplicates?: RegistrationToDuplicatesResolver<TParent>
 }
 
 export interface RegistrationToTrackingIdResolver<
@@ -1206,6 +1199,13 @@ export interface RegistrationToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToAttachmentsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToDuplicatesResolver<
   TParent = any,
   TResult = any
 > {
