@@ -71,6 +71,17 @@ enum CauseOfDeath {
   OTHER
 }
 
+enum FhirResourceType {
+  COMPOSITION
+  ENCOUNTER
+  OBSERVATION_BODY_WEIGHT # Body weight Measured
+  OBSERVATION_BIRTH_PLURALITY # Birth plurality of Pregnancy
+  OBSERVATION_BIRTH_ATTENDANT # Birth attendant title
+  OBSERVATION_BIRTH_AT_PRESENT # Present at birth registration
+  OBSERVATION_BIRTH_REG_TYPE # Birth registration type
+  OBSERVATION_BIRTH_SEQUENCE # Number born alive to mother
+}
+
 input CommentInput {
   user: UserInput
   comment: String
@@ -119,6 +130,7 @@ type Certificate { # In manual register system (signature) not in BDRIS2
 }
 
 input BirthRegistrationInput {
+  _fhirIDMap: Map
   registration: RegistrationInput
   child: PersonInput
   mother: PersonInput
@@ -141,6 +153,7 @@ input BirthRegistrationInput {
 
 type BirthRegistration { # -> Composition
   id: ID! # long uuid
+  _fhirIDMap: Map
   registration: Registration
   child: Person # -> .section(code='child-details').entry.reference
   mother: Person # -> .section(code='mother-details').entry.reference
@@ -194,6 +207,7 @@ type DeathRegistration { # -> Composition
 }
 
 input RegistrationInput {
+  _fhirID: ID
   # short uuid easy to remember
   trackingId: String
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -209,6 +223,7 @@ input RegistrationInput {
 }
 
 type Registration { # -> Task
+  _fhirID: ID # -> .id
   # short uuid easy to remember
   trackingId: String # -> .identifier
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -223,6 +238,7 @@ type Registration { # -> Task
 }
 
 input AttachmentInput {
+  _fhirID: ID
   contentType: String
   # base64
   data: String
@@ -237,6 +253,7 @@ input AttachmentInput {
 
 type Attachment { # -> DocumentReference
   id: ID! # uuid
+  _fhirID: ID # -> .id
   contentType: String # -> .content.attachment.contentType
   # base64
   data: String # -> .content.attachment.data base64

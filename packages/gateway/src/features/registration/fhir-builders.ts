@@ -18,6 +18,7 @@ import {
   LAST_LIVE_BIRTH_CODE
 } from 'src/features/fhir/templates'
 import {
+  selectOrCreateEncounterResource,
   selectOrCreatePersonResource,
   selectOrCreateDocRefResource,
   selectOrCreateLocationRefResource,
@@ -577,6 +578,18 @@ function createLastPreviousLiveBirthBuilder(
 }
 
 const builders: IFieldBuilders = {
+  _fhirIDMap: {
+    COMPOSITION: (fhirBundle, fieldValue) => {
+      fhirBundle.entry[0].resource.id = fieldValue as string
+    },
+    ENCOUNTER: (fhirBundle, fieldValue) => {
+      const encounter = selectOrCreateEncounterResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle
+      )
+      encounter.id = fieldValue as string
+    }
+  },
   createdAt: (fhirBundle, fieldValue) => {
     if (!fhirBundle.meta) {
       fhirBundle.meta = {}
@@ -585,6 +598,10 @@ const builders: IFieldBuilders = {
     fhirBundle.entry[0].resource.date = fieldValue
   },
   mother: {
+    _fhirID: (fhirBundle, fieldValue) => {
+      const mother = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      mother.id = fieldValue as string
+    },
     gender: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
       mother.gender = fieldValue as string
@@ -636,6 +653,10 @@ const builders: IFieldBuilders = {
     }
   },
   father: {
+    _fhirID: (fhirBundle, fieldValue, context) => {
+      const father = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      father.id = fieldValue as string
+    },
     gender: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
       father.gender = fieldValue as string
@@ -688,6 +709,10 @@ const builders: IFieldBuilders = {
     }
   },
   child: {
+    _fhirID: (fhirBundle, fieldValue, context) => {
+      const child = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      child.id = fieldValue as string
+    },
     gender: (fhirBundle, fieldValue, context) => {
       const child = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
       child.gender = fieldValue as string
@@ -740,6 +765,10 @@ const builders: IFieldBuilders = {
     }
   },
   registration: {
+    _fhirID: (fhirBundle, fieldValue, context) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      taskResource.id = fieldValue as string
+    },
     contact: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -796,6 +825,18 @@ const builders: IFieldBuilders = {
       }
     },
     attachments: {
+      _fhirID: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        docRef.id = fieldValue as string
+      },
       originalFileName: (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
@@ -919,6 +960,18 @@ const builders: IFieldBuilders = {
     }
   },
   birthLocation: {
+    _fhirID: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const location = selectOrCreateLocationRefResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        fieldValue
+      )
+      location.id = fieldValue as string
+    },
     status: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,

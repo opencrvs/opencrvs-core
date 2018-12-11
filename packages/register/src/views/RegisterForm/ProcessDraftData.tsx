@@ -131,6 +131,7 @@ const processDraftData = (draftData: IFormData) => {
   }
 
   const draftDetails: IdraftDetails = {
+    _fhirIDMap: { COMPOSITION: '123456789' },
     child: {
       gender: child.gender,
       name: [
