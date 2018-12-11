@@ -220,6 +220,7 @@ type Registration { # -> Task
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
+  duplicates: [ID]
 }
 
 input AttachmentInput {
