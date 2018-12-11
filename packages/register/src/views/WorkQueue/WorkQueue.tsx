@@ -65,6 +65,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
             alias
           }
           type
+          timestamp
         }
       }
       child {
@@ -267,11 +268,65 @@ const StyledIconAction = styled(IconAction)`
     color: ${({ theme }) => theme.colors.white};
   }
 `
+const StyledLabel = styled.label`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  margin-right: 3px;
+`
+const StyledValue = styled.span`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+`
+const Separator = styled.div`
+  height: 1.3em;
+  width: 1px;
+  margin: 1px 8px;
+  background: ${({ theme }) => theme.colors.copyAlpha80};
+`
+const ValueContainer = styled.div`
+  display: inline-flex;
+  flex-wrap: wrap;
+`
+function LabelValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <StyledLabel>{label}:</StyledLabel>
+      <StyledValue>{value}</StyledValue>
+    </div>
+  )
+}
 
+function ValuesWithSeparator(props: {
+  strings: string[]
+  separator: React.ReactNode
+}): JSX.Element {
+  return (
+    <ValueContainer>
+      {props.strings.map((value, index) => {
+        return (
+          <>
+            {value}
+            {index < props.strings.length - 1 && value.length > 0
+              ? props.separator
+              : null}
+          </>
+        )
+      })}
+    </ValueContainer>
+  )
+}
 const ExpansionContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: row;
+  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  margin-bottom: 1px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`
+const ExpansionContentContainer = styled.div`
+  flex: 1;
+  margin-left: 10px;
 `
 
 interface IBaseWorkQueueProps {
@@ -357,14 +412,17 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                     'default'
                   ] as string)) ||
                 /* tslint:enable:no-string-literal */
-                ''
+                '',
+              timestamp:
+                status && moment(status.timestamp).format('YYYY-MM-DD'),
+              practitionerRole: status && status.user && status.user.role,
+              location: status && status.location && status.location.name
             }
           }),
         declaration_status:
-          (reg.registration &&
-            reg.registration.status &&
-            (reg.registration.status[0] as GQLRegWorkflow).type) ||
-          'application', // TODO don't default to application - this is here as we don't have any status information at the moment
+          reg.registration &&
+          reg.registration.status &&
+          (reg.registration.status[0] as GQLRegWorkflow).type,
         event: 'birth',
         location:
           (reg.registration &&
@@ -383,16 +441,21 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     key: number
   ): JSX.Element[] => {
     return item.status.map(status => {
+      const { practitionerName, practitionerRole, location } = status
       return (
         <ExpansionContainer key={key}>
           {this.getDeclarationStatusIcon(status.type)}
 
-          <p>
-            {
-              // @ts-ignore
-              status.practitionerName
-            }
-          </p>
+          <ExpansionContentContainer>
+            <LabelValue label="Registrated on" value={status.timestamp} />
+            <ValueContainer>
+              <StyledLabel>By:</StyledLabel>
+              <ValuesWithSeparator
+                strings={[practitionerName, practitionerRole, location]}
+                separator={<Separator />}
+              />
+            </ValueContainer>
+          </ExpansionContentContainer>
         </ExpansionContainer>
       )
     })
