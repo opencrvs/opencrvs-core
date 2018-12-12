@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import styled from 'styled-components'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
@@ -34,6 +34,11 @@ export const messages = defineMessages({
   }
 })
 
+const Wrapper = styled.div`
+  position: relative;
+  top: 218px;
+`
+
 export class ManagerView extends React.Component<
   {
     gotoApp: (appId: string) => void
@@ -42,7 +47,7 @@ export class ManagerView extends React.Component<
   render() {
     const { intl, gotoApp } = this.props
     return (
-      <>
+      <Wrapper>
         <ActionList>
           <Action
             id="register_app_action_button"
@@ -57,7 +62,7 @@ export class ManagerView extends React.Component<
             onClick={() => gotoApp(PERFORMANCE_APP)}
           />
         </ActionList>
-      </>
+      </Wrapper>
     )
   }
 }

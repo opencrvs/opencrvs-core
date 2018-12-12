@@ -3,9 +3,6 @@ import { getTokenPayload } from './authUtils'
 const performanceJWT =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDE1NzY5NjUsImV4cCI6MTU3MzExMjk2NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydwZXJmb3JtYW5jZSddIn0.huK3iFFi01xkwHvQZQAOnScrz0rJ50EsxpZA3a1Ynao'
 
-const declareJWT =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDE1NzY5NjUsImV4cCI6MTU3MzExMjk2NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydkZWNsYXJlJ10ifQ.yMSf_4TJaFqgczHg1YgC0ev_bPneLaJwRsrA9eZkmUk'
-
 describe('authUtils', () => {
   describe('getTokenPayload. Returns the correct payload from a token', () => {
     it('should return the right payload', () => {
