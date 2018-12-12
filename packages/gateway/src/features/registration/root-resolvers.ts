@@ -75,6 +75,79 @@ export const resolvers: GQLResolver = {
       // return the trackingid
       return resBody.trackingid
     },
+    async updateBirthRegistration(_, { details }) {
+      const doc = await buildFHIRBundle(details)
+
+      const res = await fetch(fhirUrl, {
+        method: 'POST',
+        body: JSON.stringify(doc),
+        headers: {
+          'Content-Type': 'application/fhir+json'
+        }
+      })
+
+      if (!res.ok) {
+        throw new Error(
+          `FHIR post to /fhir failed with [${
+            res.status
+          }] body: ${await res.text()}`
+        )
+      }
+
+      const resBody = await res.json()
+      if (
+        !resBody ||
+        !resBody.entry ||
+        !resBody.entry[0] ||
+        !resBody.entry[0].response ||
+        !resBody.entry[0].response.location
+      ) {
+        throw new Error(`FHIR response did not send a valid response`)
+      }
+
+      // return the Composition's id
+      return resBody.entry[0].response.location.split('/')[3]
+    },
+    async markBirthAsRegistered(_, { id, details }, authHeader) {
+      let doc
+      if (!details) {
+        const taskBundle = await getFromFhir(`/Task?focus=Composition/${id}`)
+        if (!taskBundle || !taskBundle.entry) {
+          throw new Error('Task does not exist')
+        }
+        doc = {
+          resourceType: 'Bundle',
+          type: 'document',
+          entry: taskBundle.entry
+        }
+      } else {
+        doc = await buildFHIRBundle(details)
+      }
+
+      const res = await fetch(`${WORKFLOW_SERVICE_URL}markBirthAsRegistered`, {
+        method: 'POST',
+        body: JSON.stringify(doc),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (!res.ok) {
+        throw new Error(
+          `Workflow post to /markBirthAsRegistered failed with [${
+            res.status
+          }] body: ${await res.text()}`
+        )
+      }
+
+      const resBody = await res.json()
+      if (!resBody || !resBody.BirthRegistrationNumber) {
+        throw new Error(`Workflow response did not send a valid response`)
+      }
+      // return the brn
+      return resBody.BirthRegistrationNumber
+    },
     async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
       const taskBundle = await getFromFhir(`/Task?focus=Composition/${id}`)
       const taskEntry = taskBundle.entry[0]

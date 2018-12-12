@@ -294,9 +294,9 @@ export interface GQLMutation {
   createNotification: GQLNotification
   voidNotification?: GQLNotification
   createBirthRegistration: string
-  updateBirthRegistration: GQLBirthRegistration
+  updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
-  markBirthAsRegistered?: GQLBirthRegistration
+  markBirthAsRegistered: string
   markBirthAsCertified?: GQLBirthRegistration
   markBirthAsVoided: string
   createDeathRegistration: string

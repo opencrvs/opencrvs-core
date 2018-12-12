@@ -13,6 +13,10 @@ export const BIRTH_REG_PRESENT_CODE = 'present-at-birth-reg'
 export const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
 export const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
 export const LAST_LIVE_BIRTH_CODE = '68499-3'
+export const OBSERVATION_CATEGORY_PROCEDURE_CODE = 'procedure'
+export const OBSERVATION_CATEGORY_PROCEDURE_DESC = 'Procedure'
+export const OBSERVATION_CATEGORY_VSIGN_CODE = 'vital-signs'
+export const OBSERVATION_CATEGORY_VSIGN_DESC = 'Vital Signs'
 
 export function createMotherSection(refUuid: string) {
   return {

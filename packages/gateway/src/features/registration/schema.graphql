@@ -287,19 +287,13 @@ type Query {
 type Mutation {
   # BIRTH
   createBirthRegistration(details: BirthRegistrationInput!): ID!
-  updateBirthRegistration(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): BirthRegistration!
+  updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(
     id: ID!
     details: BirthRegistrationInput
   ): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration - internally call update if details exists
-  markBirthAsRegistered(
-    id: ID!
-    details: BirthRegistrationInput
-  ): BirthRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(
     id: ID!
     details: BirthRegistrationInput

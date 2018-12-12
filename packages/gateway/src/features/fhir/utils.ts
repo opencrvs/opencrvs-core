@@ -18,6 +18,7 @@ import {
 } from '../registration/fhir-builders'
 import fetch from 'node-fetch'
 import { fhirUrl } from 'src/constants'
+import { FHIR_OBSERVATION_CATEGORY_URL } from './constants'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -120,6 +121,83 @@ export function selectOrCreateEncounterResource(
   }
 
   return encounterEntry.resource as fhir.Encounter
+}
+
+export function selectOrCreateObservationResource(
+  sectionCode: string,
+  categoryCode: string,
+  categoryDescription: string,
+  observationCode: string,
+  observationDescription: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Observation {
+  let observation = fhirBundle.entry.find(entry => {
+    if (
+      !entry ||
+      !entry.resource ||
+      entry.resource.resourceType !== 'Observation'
+    ) {
+      return false
+    }
+    const observationEntry = entry.resource as fhir.Observation
+    const obCoding =
+      observationEntry.code &&
+      observationEntry.code.coding &&
+      observationEntry.code.coding.find(
+        obCode => obCode.code === observationCode
+      )
+    if (obCoding) {
+      return true
+    }
+    return false
+  })
+
+  if (observation) {
+    return observation.resource as fhir.Observation
+  }
+  /* Existing obseration not found for given type */
+  observation = createObservationResource(sectionCode, fhirBundle, context)
+  return updateObservationInfo(
+    observation as fhir.Observation,
+    categoryCode,
+    categoryDescription,
+    observationCode,
+    observationDescription
+  )
+}
+
+export function updateObservationInfo(
+  observation: fhir.Observation,
+  categoryCode: string,
+  categoryDescription: string,
+  observationCode: string,
+  observationDescription: string
+): fhir.Observation {
+  const categoryCoding = {
+    coding: [
+      {
+        system: FHIR_OBSERVATION_CATEGORY_URL,
+        code: categoryCode,
+        display: categoryDescription
+      }
+    ]
+  }
+
+  if (!observation.category) {
+    observation.category = []
+  }
+  observation.category.push(categoryCoding)
+
+  const coding = [
+    {
+      system: 'http://loinc.org',
+      code: observationCode,
+      display: observationDescription
+    }
+  ]
+  setArrayPropInResourceObject(observation, 'code', coding, 'coding')
+  return observation
 }
 
 export function createObservationResource(
