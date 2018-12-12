@@ -380,6 +380,20 @@ export const mockComposition = {
         }
       ]
     }
+  ],
+  relatesTo: [
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composition/xyz'
+      }
+    },
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composition/abc'
+      }
+    }
   ]
 }
 
