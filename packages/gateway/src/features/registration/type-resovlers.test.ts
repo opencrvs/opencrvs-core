@@ -666,6 +666,8 @@ describe('Registration type resolvers', () => {
       const duplicates = await typeResolvers.Registration.duplicates(mockTask)
       expect(duplicates).toBeDefined()
       expect(duplicates).toHaveLength(2)
+      expect(duplicates[0]).toBe('Composition/xyz')
+      expect(duplicates[1]).toBe('Composition/abc')
     })
 
     it('throws when task has no focus in duplicate resolver', async () => {
