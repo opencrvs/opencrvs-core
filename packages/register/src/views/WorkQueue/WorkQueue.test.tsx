@@ -99,7 +99,7 @@ describe('WorkQueue tests', async () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 0)
+      setTimeout(resolve, 10)
     })
     testComponent.component.update()
     const data = testComponent.component.find(DataTable).prop('data')
