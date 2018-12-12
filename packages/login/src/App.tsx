@@ -13,6 +13,7 @@ import { PageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
 import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from './views/StepOne/StepOneContainer'
+import { ManagerViewContainer } from './views/Manager/ManagerView'
 
 export const store = createStore()
 export class App extends React.Component {
@@ -33,6 +34,11 @@ export class App extends React.Component {
                     exact
                     path={routes.STEP_TWO}
                     component={StepTwoContainer}
+                  />
+                  <Route
+                    exact
+                    path={routes.MANAGER}
+                    component={ManagerViewContainer}
                   />
                 </Switch>
               </PageContainer>
