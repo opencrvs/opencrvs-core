@@ -5,7 +5,7 @@ import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import * as actions from '../../login/actions'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
-import { REGISTER_APP, PERFORMANCE_APP } from 'src/navigation/routes'
+import { REGISTER_APP, PERFORMANCE_APP } from '../../navigation/routes'
 
 export const messages = defineMessages({
   registerAppTitle: {
