@@ -99,6 +99,8 @@ services:
     configs:
       - source: hearth-check-dupe-plugin.{{ts}}
         target: /src/hearth/lib/plugins/checkDuplicateTask.js
+      - source: hearth-queryparam-extensions-conf.{{ts}}
+        target: /src/hearth/config/queryparam-extensions.json
 
   openhim-console:
     configs:
@@ -124,3 +126,5 @@ configs:
     file: ./infrastructure/traefik.toml
   hearth-check-dupe-plugin.{{ts}}:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
+  hearth-queryparam-extensions-conf.{{ts}}:
+    file: ./infrastructure/hearth-queryparam-extensions.json
