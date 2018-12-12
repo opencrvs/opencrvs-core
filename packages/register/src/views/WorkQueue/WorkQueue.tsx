@@ -598,7 +598,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     return this.props.scope && this.props.scope.includes('declare')
   }
 
-  getUnionId() {
+  getLocalLocationId() {
     const area = this.props.userDetails && this.props.userDetails.catchmentArea
     const identifier =
       area &&
@@ -738,7 +738,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           <Query
             query={FETCH_REGISTRATION_QUERY}
             variables={{
-              locationIds: [this.getUnionId()]
+              locationIds: [this.getLocalLocationId()]
             }}
           >
             {({ loading, error, data }) => {
