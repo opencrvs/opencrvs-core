@@ -230,6 +230,16 @@ const messages = defineMessages({
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
   },
+  print: {
+    id: 'register.workQueue.list.buttons.print',
+    defaultMessage: 'Print',
+    description: 'The title of print button in list item actions'
+  },
+  printCertificate: {
+    id: 'register.workQueue.list.buttons.printCertificate',
+    defaultMessage: 'Print certificate',
+    description: 'The title of review button in list expansion actions'
+  },
   workflowStatusDateApplication: {
     id: 'register.workQueue.listItem.status.dateLabel.application',
     defaultMessage: 'Application submitted on',
@@ -251,6 +261,11 @@ const messages = defineMessages({
     id: 'register.workQueue.listItem.status.label.byPractitioner',
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
+  },
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
   }
 })
 
@@ -581,7 +596,7 @@ export class WorkQueueView extends React.Component<
     if (this.userHasRegisterScope()) {
       if (registeredButNotCertified) {
         listItemActions.push({
-          label: 'print',
+          label: this.props.intl.formatMessage(messages.print),
           handler: () => this.togglePrintModal(item.id)
         })
 
@@ -590,7 +605,7 @@ export class WorkQueueView extends React.Component<
             id={`printCertificateBtn_${item.tracking_id}`}
             onClick={() => this.togglePrintModal(item.id)}
           >
-            print
+            {this.props.intl.formatMessage(messages.printCertificate)}
           </PrimaryButton>
         )
       } else {
@@ -837,8 +852,8 @@ export class WorkQueueView extends React.Component<
           </Query>
           {this.state.printCertificateModalVisible ? (
             <PrintCertificateAction
-              title="Print Certificate"
-              backLabel="Back"
+              title={this.props.intl.formatMessage(messages.printCertificate)}
+              backLabel={this.props.intl.formatMessage(messages.back)}
               registrationId={(this.state.regId && this.state.regId) || ''}
               togglePrintCertificateSection={this.togglePrintModal}
             />
