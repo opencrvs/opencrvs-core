@@ -23,8 +23,8 @@ import {
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
-import { IUserDetails, USER_DETAILS } from '../../utils/userUtils'
-import { storage } from '@opencrvs/register/src/storage'
+import { IUserDetails } from '../../utils/userUtils'
+import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { NOTIFICATION_STATUS, REJECTED_STATUS } from 'src/utils/constants'
 
@@ -149,33 +149,17 @@ const StyledIconAction = styled(IconAction)`
 `
 interface IHomeProps {
   language: string
+  userDetails: IUserDetails
   goToEvents: typeof goToEventsAction
 }
 
 type FullProps = IHomeProps & InjectedIntlProps & ISearchInputProps
 
-type IHomeState = {
-  userDetails: IUserDetails | null
-}
-class HomeView extends React.Component<FullProps, IHomeState> {
-  constructor(props: FullProps) {
-    super(props)
-    this.state = {
-      userDetails: null
-    }
-  }
-  componentWillMount() {
-    this.loadUserDetailsFromStorage()
-  }
-  async loadUserDetailsFromStorage() {
-    const userDetailsString = await storage.getItem(USER_DETAILS)
-    const userDetails = JSON.parse(userDetailsString ? userDetailsString : '[]')
-    this.setState({ userDetails })
-  }
+class HomeView extends React.Component<FullProps> {
   render() {
-    const { intl, language } = this.props
-    if (this.state.userDetails && this.state.userDetails.name) {
-      const nameObj = this.state.userDetails.name.find(
+    const { intl, language, userDetails } = this.props
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
         (storedName: GQLHumanName) => storedName.use === language
       ) as GQLHumanName
       const fullName = `${String(nameObj.firstNames)} ${String(
@@ -188,7 +172,7 @@ class HomeView extends React.Component<FullProps, IHomeState> {
               fullName
             })}
             description={intl.formatMessage(
-              messages[this.state.userDetails.role as string]
+              messages[userDetails.role as string]
             )}
             id="home_view"
           />
@@ -242,7 +226,8 @@ class HomeView extends React.Component<FullProps, IHomeState> {
 
 const mapStateToProps = (store: IStoreState) => {
   return {
-    language: getLanguage(store)
+    language: getLanguage(store),
+    userDetails: getUserDetails(store)
   }
 }
 export const Home = connect(

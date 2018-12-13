@@ -22,7 +22,10 @@ import { queries } from 'src/profile/queries'
 import processDraftData, {
   IPersonDetails
 } from './views/RegisterForm/ProcessDraftData'
-import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
+import {
+  checkAuth,
+  setInitialUserDetails
+} from '@opencrvs/register/src/profile/profileActions'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -101,7 +104,91 @@ describe('when user has a valid token in local storage', () => {
   })
 
   describe('when user is in home view', () => {
+    const userDetails = {
+      name: [
+        {
+          use: 'en',
+          firstNames: 'Shakib',
+          familyName: 'Al Hasan',
+          __typename: 'HumanName'
+        },
+        { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
+      ],
+      role: 'FIELD_AGENT',
+      primaryOffice: {
+        id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
+        name: 'Kaliganj Union Sub Center',
+        status: 'active'
+      },
+      catchmentArea: [
+        {
+          id: '850f50f3-2ed4-4ae6-b427-2d894d4a3329',
+          name: 'Dhaka',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'DIVISION'
+            }
+          ]
+        },
+        {
+          id: '812ed387-f8d5-4d55-ad05-936292385990',
+          name: 'GAZIPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '20'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'DISTRICT'
+            }
+          ]
+        },
+        {
+          id: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
+          name: 'KALIGANJ',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '165'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UPAZILA'
+            }
+          ]
+        },
+        {
+          id: '43c17986-62cf-4551-877c-be095fb6e5d0',
+          name: 'BAKTARPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3473'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UNION'
+            }
+          ]
+        }
+      ]
+    }
     beforeEach(() => {
+      store.dispatch(setInitialUserDetails(userDetails))
       history.replace(HOME)
       app.update()
     })

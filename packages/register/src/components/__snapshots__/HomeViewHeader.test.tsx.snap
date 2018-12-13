@@ -3,7 +3,11 @@
 exports[`home view header component renders without crashing 1`] = `
 ShallowWrapper {
   Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__unrendered__): <HomeViewHeader />,
+  Symbol(enzyme.__unrendered__): <HomeViewHeader
+    description="Test description"
+    id="test_heaader"
+    title="Test title"
+  />,
   Symbol(enzyme.__renderer__): Object {
     "batchedUpdates": [Function],
     "getNode": [Function],
@@ -22,8 +26,16 @@ ShallowWrapper {
           hideBackButton={true}
         />,
         <Styled(Logo) />,
+        <ViewHeading
+          description="Test description"
+          id="test_heaader"
+          title="Test title"
+        />,
         undefined,
       ],
+      "description": "Test description",
+      "id": "test_heaader",
+      "title": "Test title",
     },
     "ref": null,
     "rendered": Array [
@@ -47,6 +59,19 @@ ShallowWrapper {
         "rendered": null,
         "type": [Function],
       },
+      Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "function",
+        "props": Object {
+          "description": "Test description",
+          "id": "test_heaader",
+          "title": "Test title",
+        },
+        "ref": null,
+        "rendered": null,
+        "type": [Function],
+      },
       undefined,
     ],
     "type": [Function],
@@ -62,8 +87,16 @@ ShallowWrapper {
             hideBackButton={true}
           />,
           <Styled(Logo) />,
+          <ViewHeading
+            description="Test description"
+            id="test_heaader"
+            title="Test title"
+          />,
           undefined,
         ],
+        "description": "Test description",
+        "id": "test_heaader",
+        "title": "Test title",
       },
       "ref": null,
       "rendered": Array [
@@ -83,6 +116,19 @@ ShallowWrapper {
           "key": undefined,
           "nodeType": "class",
           "props": Object {},
+          "ref": null,
+          "rendered": null,
+          "type": [Function],
+        },
+        Object {
+          "instance": null,
+          "key": undefined,
+          "nodeType": "function",
+          "props": Object {
+            "description": "Test description",
+            "id": "test_heaader",
+            "title": "Test title",
+          },
           "ref": null,
           "rendered": null,
           "type": [Function],
