@@ -645,6 +645,8 @@ export const BENGALI_STATE = {
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.collected': 'সংগৃহীত',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
+    'register.workQueue.labels.results.duplicate':
+      'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
     'review.edit.modal.confirmationText':
