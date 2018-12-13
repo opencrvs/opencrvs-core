@@ -48,7 +48,6 @@ input AttachmentInput {
 
 type BirthRegistration {
   id: ID!
-  _fhirIDMap: Map
   registration: Registration
   child: Person
   mother: Person
@@ -65,7 +64,6 @@ type BirthRegistration {
 }
 
 input BirthRegistrationInput {
-  _fhirIDMap: Map
   registration: RegistrationInput
   child: PersonInput
   mother: PersonInput
@@ -159,7 +157,6 @@ input ContactPointInput {
 }
 
 scalar Date
-scalar Map
 
 type DeathRegistration {
   id: ID!
