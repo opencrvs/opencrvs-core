@@ -112,7 +112,7 @@ export const resolvers: GQLResolver = {
       let doc
       if (!details) {
         const taskBundle = await getFromFhir(`/Task?focus=Composition/${id}`)
-        if (!taskBundle || !taskBundle.entry) {
+        if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
           throw new Error('Task does not exist')
         }
         doc = {

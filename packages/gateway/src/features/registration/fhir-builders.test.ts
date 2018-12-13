@@ -145,20 +145,19 @@ test('should build a minimal FHIR registration document without error', async ()
     _fhirIDMap: {
       Composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
       Encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
-      Observation_BirthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
-      Observation_WeightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
-      Observation_AttendantAtBirth:
-        '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
-      Observation_BirthRegistrationType:
-        '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
-      Observation_PresentAtBirthRegistration:
-        '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
-      Observation_ChildrenBornAliveToMother:
-        '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
-      Observation_FoetalDeathsToMother:
-        '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
-      Observation_LastPreviousLiveBirth:
-        '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
+      Observation: {
+        BirthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
+        WeightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
+        AttendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
+        BirthRegistrationType: '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
+        PresentAtBirthRegistration:
+          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
+        ChildrenBornAliveToMother:
+          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
+        FoetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
+        LastPreviousLiveBirth:
+          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
+      }
     }
   })
 
