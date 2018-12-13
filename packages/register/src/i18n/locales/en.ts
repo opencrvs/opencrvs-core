@@ -639,6 +639,8 @@ export const ENGLISH_STATE = {
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
     'register.workQueue.queryError': 'An error occurred while searching',
+    'print.certificate.queryError':
+      'An error occurred while quering for birth registration data',
     'register.workQueue.dataTable.results': 'Results',
     'register.workQueue.dataTable.noResults': 'No result to display',
     'register.workQueue.header.title': 'Hello Registrar',

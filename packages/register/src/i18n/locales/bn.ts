@@ -632,6 +632,7 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
     'register.workQueue.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
+    'print.certificate.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
     'register.workQueue.dataTable.results': 'ফলাফল',
     'register.workQueue.dataTable.noResults': 'প্রদর্শন ফলাফল নেই',
     'register.workQueue.header.title': 'হ্যালো নিবন্ধক',

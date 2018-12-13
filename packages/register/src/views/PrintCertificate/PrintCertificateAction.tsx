@@ -1,6 +1,10 @@
 import * as React from 'react'
+import gql from 'graphql-tag'
+import { Query } from 'react-apollo'
 import styled from 'styled-components'
 import { ActionPage } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -15,30 +19,111 @@ export const ActionPageWrapper = styled.div`
   overflow-y: scroll;
 `
 
+const StyledSpinner = styled(Spinner)`
+  margin: 50% auto;
+`
+
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
+`
+
+export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
+  query data($id: ID!) {
+    fetchBirthRegistration(id: $id) {
+      id
+      mother {
+        gender
+        name {
+          firstNames
+          familyName
+        }
+      }
+      father {
+        gender
+        name {
+          firstNames
+          familyName
+        }
+      }
+      createdAt
+    }
+  }
+`
+
+const messages = defineMessages({
+  queryError: {
+    id: 'print.certificate.queryError',
+    defaultMessage:
+      'An error occurred while quering for birth registration data',
+    description: 'The error message shown when a query fails'
+  }
+})
+
 type State = {}
 
 type IProps = {
   backLabel: string
   title: string
+  registrationId: string
+  togglePrintCertificateSection: () => void
 }
 
-export default class PrintCertificateAction extends React.Component<
-  IProps,
+type IFullProps = InjectedIntlProps & IProps
+
+class PrintCertificateActionComponent extends React.Component<
+  IFullProps,
   State
 > {
-  constructor(props: IProps) {
+  constructor(props: IFullProps) {
     super(props)
     this.state = {}
   }
 
   render = () => {
-    const { title, backLabel } = this.props
+    const {
+      intl,
+      title,
+      backLabel,
+      registrationId,
+      togglePrintCertificateSection
+    } = this.props
     return (
       <ActionPageWrapper>
-        <ActionPage title={title} backLabel={backLabel} goBack={() => ({})}>
-          <></>
+        <ActionPage
+          title={title}
+          backLabel={backLabel}
+          goBack={togglePrintCertificateSection}
+        >
+          <Query
+            query={FETCH_BIRTH_REGISTRATION_QUERY}
+            variables={{
+              id: registrationId
+            }}
+          >
+            {({ loading, error, data }) => {
+              if (loading) {
+                return <StyledSpinner id="print-certificate-spinner" />
+              }
+              if (error) {
+                return (
+                  <ErrorText id="print-certificate-queue-error-text">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
+              }
+
+              return JSON.stringify(data)
+            }}
+          </Query>
         </ActionPage>
       </ActionPageWrapper>
     )
   }
 }
+
+export const PrintCertificateAction = injectIntl<IFullProps>(
+  PrintCertificateActionComponent
+)
