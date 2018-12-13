@@ -1,0 +1,19 @@
+{
+  "Task": {
+    "location": {
+      "extension": true,
+      "url": "http://opencrvs.org/specs/extension/regLastLocation",
+      "path": "valueReference",
+      "type": "reference",
+      "propertyDef": {
+        "min": 0,
+        "max": "1",
+        "types": [
+          {
+            "code": "reference"
+          }
+        ]
+      }
+    }
+  }
+}
