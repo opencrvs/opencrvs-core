@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { IViewHeadingProps, ViewHeading } from './ViewHeading'
 import { Header } from '@opencrvs/components/lib/interface'
 import { ActionList } from '@opencrvs/components/lib/buttons'
 import styled from '../styled-components'
@@ -19,15 +19,17 @@ const StretchedHeader = styled(Header)`
 `
 
 const StyledLogo = styled(Logo)`
-  margin: -40px auto auto 40px;
+  margin: -71px auto auto 17px;
 `
 
-export class HomeViewHeader extends React.Component {
+export class HomeViewHeader extends React.Component<IViewHeadingProps> {
   render() {
+    const { title, description, id } = this.props
     return (
       <StretchedHeader {...this.props}>
         <TopMenu hideBackButton={true} />
         <StyledLogo />
+        <ViewHeading {...{ title, description, id }} />
         {this.props.children}
       </StretchedHeader>
     )

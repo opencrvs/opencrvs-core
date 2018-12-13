@@ -4,6 +4,12 @@ import { client } from 'src/utils/apolloClient'
 const FETCH_USER = gql`
   query($userId: String!) {
     getUser(userId: $userId) {
+      role
+      name {
+        use
+        firstNames
+        familyName
+      }
       catchmentArea {
         id
         name

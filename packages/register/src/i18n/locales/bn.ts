@@ -510,6 +510,13 @@ export const BENGALI_STATE = {
     'register.form.modal.submitDescription':
       '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
+    'register.home.hedaer.hello': 'Hello {fullName}',
+    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
+    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
+    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar',
     'register.notification.newContentAvailable':
       'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':

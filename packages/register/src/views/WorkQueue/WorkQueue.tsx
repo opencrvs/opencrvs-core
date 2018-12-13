@@ -726,7 +726,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     }
     return (
       <>
-        <HomeViewHeader>
+        <HomeViewHeader id="work_queue_header">
           <ViewHeading
             id="work_queue_view"
             title={intl.formatMessage(messages.headerTitle)}

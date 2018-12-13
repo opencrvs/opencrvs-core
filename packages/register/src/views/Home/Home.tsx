@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-
+import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
+import { IStoreState } from '@opencrvs/register/src/store'
 import { goToEvents as goToEventsAction } from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import {
@@ -18,6 +19,9 @@ import {
   CompleteDocument
 } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
+import { IUserDetails, USER_DETAILS } from '../../utils/userUtils'
+import { storage } from '@opencrvs/register/src/storage'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 
 const messages = defineMessages({
   declareNewEventActionTitle: {
@@ -44,6 +48,41 @@ const messages = defineMessages({
     id: 'register.home.logout',
     defaultMessage: 'Log out',
     description: 'The title for log out on an action'
+  },
+  hello: {
+    id: 'register.home.header.hello',
+    defaultMessage: 'Hello {fullName}',
+    description: 'Title for the user'
+  },
+  FIELD_AGENT: {
+    id: 'register.home.hedaer.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
+  },
+  REGISTRATION_CLERK: {
+    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    defaultMessage: 'Registrar',
+    description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.hedaer.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
 
@@ -65,52 +104,97 @@ const StyledIconAction = styled(IconAction)`
     margin: -2px 0 -2px 120px;
   }
 `
+interface IHomeProps {
+  language: string
+  goToEvents: typeof goToEventsAction
+}
 
-class HomeView extends React.Component<
-  InjectedIntlProps & {
-    goToEvents: typeof goToEventsAction
+type FullProps = IHomeProps & InjectedIntlProps
+
+type IHomeState = {
+  userDetails: IUserDetails | null
+}
+class HomeView extends React.Component<FullProps, IHomeState> {
+  constructor(props: FullProps) {
+    super(props)
+    this.state = {
+      userDetails: null
+    }
   }
-> {
+  componentWillMount() {
+    this.loadUserDetailsFromStorage()
+  }
+  async loadUserDetailsFromStorage() {
+    const userDetailsString = await storage.getItem(USER_DETAILS)
+    const userDetails = JSON.parse(userDetailsString ? userDetailsString : '[]')
+    this.setState({ userDetails })
+  }
   render() {
-    const { intl } = this.props
-    return (
-      <>
-        <HomeViewHeader />
-        <ActionList id="home_action_list">
-          <StyledIconAction
-            id="new_event_declaration"
-            icon={() => <StyledPlusIcon />}
-            onClick={this.props.goToEvents}
-            title={intl.formatMessage(messages.declareNewEventActionTitle)}
+    const { intl, language } = this.props
+    if (this.state.userDetails && this.state.userDetails.name) {
+      const nameObj = this.state.userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      const fullName = `${String(nameObj.firstNames)} ${String(
+        nameObj.familyName
+      )}`
+      return (
+        <>
+          <HomeViewHeader
+            title={intl.formatMessage(messages.hello, {
+              fullName
+            })}
+            description={intl.formatMessage(
+              messages[this.state.userDetails.role as string]
+            )}
+            id="home_view"
           />
-          <IconAction
-            id="draft_documents"
-            icon={() => <DraftDocument />}
-            title={intl.formatMessage(messages.myDraftActionTitle)}
-          />
-          <IconAction
-            id="pending_documents"
-            icon={() => <PendingDocument />}
-            title={intl.formatMessage(messages.pendingSubmissionsActionTitle)}
-          />
-          <IconAction
-            id="submitted_documents"
-            icon={() => <CompleteDocument />}
-            title={intl.formatMessage(messages.completedSubmissionsActionTitle)}
-          />
-        </ActionList>
-        <ViewFooter>
-          <FooterAction>
-            <FooterPrimaryButton>
-              {intl.formatMessage(messages.logoutActionTitle)}
-            </FooterPrimaryButton>
-          </FooterAction>
-        </ViewFooter>
-      </>
-    )
+          <ActionList id="home_action_list">
+            <StyledIconAction
+              id="new_event_declaration"
+              icon={() => <StyledPlusIcon />}
+              onClick={this.props.goToEvents}
+              title={intl.formatMessage(messages.declareNewEventActionTitle)}
+            />
+            <IconAction
+              id="draft_documents"
+              icon={() => <DraftDocument />}
+              title={intl.formatMessage(messages.myDraftActionTitle)}
+            />
+            <IconAction
+              id="pending_documents"
+              icon={() => <PendingDocument />}
+              title={intl.formatMessage(messages.pendingSubmissionsActionTitle)}
+            />
+            <IconAction
+              id="submitted_documents"
+              icon={() => <CompleteDocument />}
+              title={intl.formatMessage(
+                messages.completedSubmissionsActionTitle
+              )}
+            />
+          </ActionList>
+          <ViewFooter>
+            <FooterAction>
+              <FooterPrimaryButton>
+                {intl.formatMessage(messages.logoutActionTitle)}
+              </FooterPrimaryButton>
+            </FooterAction>
+          </ViewFooter>
+        </>
+      )
+    } else {
+      return <></>
+    }
   }
 }
 
-export const Home = connect(null, { goToEvents: goToEventsAction })(
-  injectIntl(HomeView)
-)
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    language: getLanguage(store)
+  }
+}
+export const Home = connect(
+  mapStateToProps,
+  { goToEvents: goToEventsAction }
+)(injectIntl(HomeView))
