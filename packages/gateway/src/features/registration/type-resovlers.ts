@@ -188,9 +188,12 @@ export const typeResolvers: GQLResolver = {
 
       const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
       const composition = await res.json()
-      return composition.relatesTo.map(
-        (duplicate: fhir.CompositionRelatesTo) =>
-          duplicate.targetReference && duplicate.targetReference.reference
+      return (
+        composition.relatesTo &&
+        composition.relatesTo.map(
+          (duplicate: fhir.CompositionRelatesTo) =>
+            duplicate.targetReference && duplicate.targetReference.reference
+        )
       )
     }
   },
