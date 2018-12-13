@@ -44,6 +44,7 @@ import { goToEvents as goToEventsAction } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
+import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -378,7 +379,17 @@ type IWorkQueueProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseWorkQueueProps
 
-export class WorkQueueView extends React.Component<IWorkQueueProps> {
+interface IWorkQueueState {
+  printCertificateModalVisible: boolean
+  regId: string | null
+}
+
+export class WorkQueueView extends React.Component<
+  IWorkQueueProps,
+  IWorkQueueState
+> {
+  state = { printCertificateModalVisible: false, regId: null }
+
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'APPLICATION':
@@ -403,6 +414,13 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       default:
         return messages.workflowStatusDateApplication
     }
+  }
+
+  togglePrintModal = (id?: string) => {
+    this.setState(prevState => ({
+      printCertificateModalVisible: !prevState.printCertificateModalVisible,
+      regId: id ? id : ''
+    }))
   }
 
   transformData = (data: GQLQuery) => {
@@ -564,21 +582,13 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       if (registeredButNotCertified) {
         listItemActions.push({
           label: 'print',
-          handler: () => {
-            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
-          }
+          handler: () => this.togglePrintModal(item.id)
         })
 
         expansionActions.push(
           <PrimaryButton
             id={`printCertificateBtn_${item.tracking_id}`}
-            onClick={() =>
-              this.props.gotoTab(
-                REVIEW_BIRTH_PARENT_FORM_TAB,
-                item.id,
-                'review'
-              )
-            }
+            onClick={() => this.togglePrintModal(item.id)}
           >
             print
           </PrimaryButton>
@@ -825,6 +835,14 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
               )
             }}
           </Query>
+          {this.state.printCertificateModalVisible ? (
+            <PrintCertificateAction
+              title="Print Certificate"
+              backLabel="Back"
+              registrationId={(this.state.regId && this.state.regId) || ''}
+              togglePrintCertificateSection={this.togglePrintModal}
+            />
+          ) : null}
         </Container>
       </>
     )
