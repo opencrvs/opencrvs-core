@@ -582,10 +582,16 @@ export const BENGALI_STATE = {
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle': 'একটি নতুন ইভেন্ট ঘোষণা',
-    'register.home.buttons.registerNewEvent': 'একটি নতুন ইভেন্ট ঘোষণা',
+    'register.home.buttons.registerNewEvent': 'New applications',
     'register.home.buttons.mydraft': 'আমার খসড়াগুলি',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
     'register.home.buttons.completedSumissions': 'সমাপ্ত জমাগুলি',
+    'register.home.banner.notificationsToComplete':
+      'Notifications to complete in my area',
+    'register.home.banner.rejectedApplications': 'My rejected applications',
+    'register.home.button.savedDrafts': 'My saved drafts',
+    'register.home.button.records': 'My records',
+    'register.home.buttons.trackingId': 'Tracking ID',
     'register.home.logout': 'প্রস্থান',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',

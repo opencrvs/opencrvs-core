@@ -588,9 +588,15 @@ export const ENGLISH_STATE = {
     'register.selectVitalEvent.registerNewEventTitle':
       'Declare a new vital event',
     'register.home.buttons.mydraft': 'My draft',
-    'register.home.buttons.registerNewEvent': 'Declare a new vital event',
+    'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
     'register.home.buttons.completedSumissions': 'Completed submissions',
+    'register.home.banner.notificationsToComplete':
+      'Notifications to complete in my area',
+    'register.home.banner.rejectedApplications': 'My rejected applications',
+    'register.home.button.savedDrafts': 'My saved drafts',
+    'register.home.button.records': 'My records',
+    'register.home.buttons.trackingId': 'Tracking ID',
     'register.home.logout': 'Log out',
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
