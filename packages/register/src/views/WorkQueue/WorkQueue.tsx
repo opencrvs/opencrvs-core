@@ -553,27 +553,59 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       label: item.declaration_status
     })
 
-    const listItemActions = [
-      {
-        label: this.props.intl.formatMessage(messages.review),
-        handler: () => {
-          this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
-        }
-      }
-    ]
+    const registeredButNotCertified: boolean =
+      item.declaration_status === 'REGISTERED' &&
+      item.declaration_status !== 'CERTIFIED'
+
+    const listItemActions = []
 
     const expansionActions: JSX.Element[] = []
     if (this.userHasRegisterScope()) {
-      expansionActions.push(
-        <PrimaryButton
-          id={`reviewAndRegisterBtn_${item.tracking_id}`}
-          onClick={() =>
+      if (registeredButNotCertified) {
+        listItemActions.push({
+          label: 'print',
+          handler: () => {
             this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
           }
-        >
-          {this.props.intl.formatMessage(messages.reviewAndRegister)}
-        </PrimaryButton>
-      )
+        })
+
+        expansionActions.push(
+          <PrimaryButton
+            id={`printCertificateBtn_${item.tracking_id}`}
+            onClick={() =>
+              this.props.gotoTab(
+                REVIEW_BIRTH_PARENT_FORM_TAB,
+                item.id,
+                'review'
+              )
+            }
+          >
+            print
+          </PrimaryButton>
+        )
+      } else {
+        listItemActions.push({
+          label: this.props.intl.formatMessage(messages.review),
+          handler: () => {
+            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+          }
+        })
+
+        expansionActions.push(
+          <PrimaryButton
+            id={`reviewAndRegisterBtn_${item.tracking_id}`}
+            onClick={() =>
+              this.props.gotoTab(
+                REVIEW_BIRTH_PARENT_FORM_TAB,
+                item.id,
+                'review'
+              )
+            }
+          >
+            {this.props.intl.formatMessage(messages.reviewAndRegister)}
+          </PrimaryButton>
+        )
+      }
     }
     return (
       <ListItem
@@ -737,9 +769,9 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
         <Container>
           <Query
             query={FETCH_REGISTRATION_QUERY}
-            variables={{
-              locationIds: [this.getLocalLocationId()]
-            }}
+            // variables={{
+            //   locationIds: [this.getLocalLocationId()]
+            // }}
           >
             {({ loading, error, data }) => {
               if (loading) {
