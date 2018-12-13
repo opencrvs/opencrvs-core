@@ -231,6 +231,12 @@ const messages = defineMessages({
     description:
       'The title of review and register button in expanded area of list item'
   },
+  reviewDuplicates: {
+    id: 'register.workQueue.buttons.reviewDuplicates',
+    defaultMessage: 'Review Duplicates',
+    description:
+      'The title of review duplicates button in expanded area of list item'
+  },
   review: {
     id: 'register.workQueue.list.buttons.review',
     defaultMessage: 'Review',
@@ -593,17 +599,36 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
 
     const expansionActions: JSX.Element[] = []
     if (this.userHasRegisterScope()) {
-      expansionActions.push(
-        <PrimaryButton
-          id={`reviewAndRegisterBtn_${item.tracking_id}`}
-          onClick={() =>
-            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
-          }
-        >
-          {this.props.intl.formatMessage(messages.reviewAndRegister)}
-        </PrimaryButton>
-      )
+      if (!item.duplicates) {
+        expansionActions.push(
+          <PrimaryButton
+            id={`reviewAndRegisterBtn_${item.tracking_id}`}
+            onClick={() =>
+              this.props.gotoTab(
+                REVIEW_BIRTH_PARENT_FORM_TAB,
+                item.id,
+                'review'
+              )
+            }
+          >
+            {this.props.intl.formatMessage(messages.reviewAndRegister)}
+          </PrimaryButton>
+        )
+      }
+      if (item.duplicates) {
+        expansionActions.push(
+          <PrimaryButton
+            id={`reviewDuplicatesBtn_${item.tracking_id}`}
+            onClick={() => {
+              console.log('TO DO')
+            }}
+          >
+            {this.props.intl.formatMessage(messages.reviewDuplicates)}
+          </PrimaryButton>
+        )
+      }
     }
+
     return (
       <ListItem
         index={key}
