@@ -282,7 +282,7 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'REGISTERED'
+                        type: 'DECLARED'
                       }
                     ]
                   },
