@@ -10,15 +10,14 @@ services:
   redis:
     ports:
       - "6379:6379"
-  hearth:
-    ports:
-      - "3447:3447"
 
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   hearth:
     volumes:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
       - "./infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js"
+    ports:
+      - "3447:3447"
 
   # Expose config as a plain volume - these will use docker config in staging and prod
   openhim-console:

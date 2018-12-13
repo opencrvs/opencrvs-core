@@ -1,6 +1,6 @@
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
-import { fhirUrl } from 'src/constants'
+import { HEARTH_URL } from 'src/constants'
 import { modifyTaskBundle } from './fhir/fhir-bundle-modifier'
 import { getEntryId } from 'src/features/registration/fhir/fhir-utils'
 import { getToken } from 'src/utils/authUtils'
@@ -24,7 +24,7 @@ export default async function updateTaskHandler(
     ) {
       throw new Error('Task has no entry')
     }
-    const res = await fetch(`${fhirUrl}/Task/${taskId}`, {
+    const res = await fetch(`${HEARTH_URL}/Task/${taskId}`, {
       method: 'PUT',
       body: JSON.stringify(payload.entry[0].resource),
       headers: {
