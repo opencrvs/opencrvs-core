@@ -129,10 +129,6 @@ export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
     compositionResource.identifier.value = birthTrackingId
   }
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-  if (!taskResource.focus) {
-    taskResource.focus = { reference: '' }
-  }
-  taskResource.focus.reference = fhirBundle.entry[0].fullUrl
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }

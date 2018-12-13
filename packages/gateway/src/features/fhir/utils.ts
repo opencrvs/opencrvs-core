@@ -318,7 +318,7 @@ export function selectOrCreateTaskRefResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.Task {
-  let taskResource =
+  let taskEntry =
     fhirBundle.entry &&
     fhirBundle.entry.find(entry => {
       if (entry.resource && entry.resource.resourceType === 'Task') {
@@ -326,13 +326,17 @@ export function selectOrCreateTaskRefResource(
       }
       return false
     })
-  if (!taskResource) {
-    taskResource = createTaskRefTemplate(uuid())
-    fhirBundle.entry.push(taskResource)
+  if (!taskEntry) {
+    taskEntry = createTaskRefTemplate(uuid())
+    const taskResource = taskEntry.resource as fhir.Task
+    if (!taskResource.focus) {
+      taskResource.focus = { reference: '' }
+    }
+    taskResource.focus.reference = fhirBundle.entry[0].fullUrl
+    fhirBundle.entry.push(taskEntry)
   }
-  return taskResource.resource as fhir.Task
+  return taskEntry.resource as fhir.Task
 }
-
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,

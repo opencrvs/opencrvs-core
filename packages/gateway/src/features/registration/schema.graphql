@@ -71,17 +71,6 @@ enum CauseOfDeath {
   OTHER
 }
 
-enum FhirResourceType {
-  COMPOSITION
-  ENCOUNTER
-  OBSERVATION_BODY_WEIGHT # Body weight Measured
-  OBSERVATION_BIRTH_PLURALITY # Birth plurality of Pregnancy
-  OBSERVATION_BIRTH_ATTENDANT # Birth attendant title
-  OBSERVATION_BIRTH_AT_PRESENT # Present at birth registration
-  OBSERVATION_BIRTH_REG_TYPE # Birth registration type
-  OBSERVATION_BIRTH_SEQUENCE # Number born alive to mother
-}
-
 input CommentInput {
   user: UserInput
   comment: String
