@@ -1,11 +1,5 @@
 import { fhirWorkflowEventHandler } from 'src/features/events/handler'
 
-const enum RouteScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify'
-}
-
 export const getRoutes = () => {
   const routes = [
     // add ping route by default for health check
@@ -27,9 +21,6 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.',
-        auth: {
-          scope: [RouteScope.DECLARE, RouteScope.REGISTER] // TODO
-        },
         plugins: {
           'hapi-swagger': {
             responses: {

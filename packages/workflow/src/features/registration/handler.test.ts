@@ -608,4 +608,28 @@ describe('Verify handler', () => {
       expect(res.statusCode).toBe(500)
     })
   })
+
+  describe('fhirWorkflowEventHandler', () => {
+    it('returns un-authorized response when scope doesn not match event', async () => {
+      const token = jwt.sign(
+        { scope: ['???'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(401)
+    })
+  })
 })

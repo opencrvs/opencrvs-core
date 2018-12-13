@@ -7,8 +7,19 @@ import updateTaskHandler from '../task/handler'
 import { HEARTH_URL } from 'src/constants'
 import fetch, { RequestInit } from 'node-fetch'
 import { logger } from 'src/logger'
+import { isUserAuthorized } from './auth'
 
-function detectEvent(request: Hapi.Request): string {
+export enum Events {
+  BIRTH_NEW_DEC = '/events/birth/new-declaration',
+  BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
+  BIRTH_NEW_REG = '/events/birth/new-registration',
+  BIRTH_MARK_REG = '/events/birth/mark-registered',
+  BIRTH_MARK_CERT = '/events/birth/mark-certified',
+  BIRTH_MARK_VOID = '/events/birth/mark-voided',
+  UNKNOWN = 'unknown'
+}
+
+function detectEvent(request: Hapi.Request): Events {
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
@@ -23,19 +34,19 @@ function detectEvent(request: Hapi.Request): string {
       if (firstEntry.resourceType === 'Composition') {
         if (firstEntry.id) {
           // might need to switch between mark as registered and update registration here eventually
-          return '/events/birth/mark-registered'
+          return Events.BIRTH_MARK_REG
         } else {
-          return '/events/birth/new-declaration'
+          return Events.BIRTH_NEW_DEC
         }
       }
     }
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    return '/events/birth/mark-voided'
+    return Events.BIRTH_MARK_VOID
   }
 
-  return 'unknown'
+  return Events.UNKNOWN
 }
 
 async function forwardToHearth(request: Hapi.Request, h: Hapi.ResponseToolkit) {
@@ -74,24 +85,31 @@ export async function fhirWorkflowEventHandler(
   const event = detectEvent(request)
   logger.info(`Event detected: ${event}`)
 
-  // TODO handle user scopes
+  // Unknown event are allowed through to Hearth by default.
+  // We can restrict what resources can be used in Hearth directly if necessary
+  if (
+    event !== Events.UNKNOWN &&
+    !isUserAuthorized(request.auth.credentials.scope, event)
+  ) {
+    return h.response().code(401)
+  }
 
   let response
 
   switch (event) {
-    case '/events/birth/new-declaration':
+    case Events.BIRTH_NEW_DEC:
       response = await createBirthRegistrationHandler(request, h)
       break
-    case '/events/birth/update-declaration':
+    case Events.BIRTH_UPDATE_DEC:
       break
-    case '/events/birth/new-registration':
+    case Events.BIRTH_NEW_REG:
       break
-    case '/events/birth/mark-registered':
+    case Events.BIRTH_MARK_REG:
       response = await markBirthAsRegisteredHandler(request, h)
       break
-    case '/events/birth/mark-certified':
+    case Events.BIRTH_MARK_CERT:
       break
-    case '/events/birth/mark-voided':
+    case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h)
       break
     default:
