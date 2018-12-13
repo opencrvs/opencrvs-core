@@ -51,6 +51,7 @@ describe('WorkQueue tests', async () => {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 registration: {
                   trackingId: 'B111111',
+                  duplicates: null,
                   status: [
                     {
                       timestamp: '2018-12-07T13:11:49.380Z',
@@ -94,6 +95,7 @@ describe('WorkQueue tests', async () => {
                 id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
                 registration: {
                   trackingId: 'B222222',
+                  duplicates: null,
                   status: [
                     {
                       timestamp: '2018-12-07T13:11:49.380Z',
@@ -165,6 +167,7 @@ describe('WorkQueue tests', async () => {
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
         event: 'birth',
+        duplicates: null,
         status: [
           {
             location: 'Kaliganj Union Sub Center',
@@ -185,6 +188,7 @@ describe('WorkQueue tests', async () => {
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
         event: 'birth',
+        duplicates: null,
         status: [
           {
             location: 'Kaliganj Union Sub Center',
@@ -259,6 +263,7 @@ describe('WorkQueue tests', async () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
                     trackingId: 'B111111',
+                    duplicates: null,
                     status: [
                       {
                         timestamp: null,
@@ -376,6 +381,7 @@ describe('WorkQueue tests', async () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
                     trackingId: 'B111111',
+                    duplicates: null,
                     status: [
                       {
                         timestamp: null,
