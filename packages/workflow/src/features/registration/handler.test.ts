@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 import { createServer } from '../..'
-import { testFhirBundle } from 'src/test/utils'
+import { testFhirBundle, testFhirBundleWithIds } from 'src/test/utils'
 
 describe('Verify handler', () => {
   let server: any
@@ -166,7 +166,7 @@ describe('Verify handler', () => {
         ]
       )
     })
-    it('returns OK', async () => {
+    it('returns OK for a correctly authenticated user', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -193,46 +193,13 @@ describe('Verify handler', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/createBirthRegistration',
+        url: '/fhir',
         payload: testFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
       expect(res.statusCode).toBe(200)
-    })
-
-    it('throws error if invalid fhir data is provided', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      )
-
-      const token = jwt.sign(
-        { scope: ['declare'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/createBirthRegistration',
-        payload: { data: 'INVALID' },
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(500)
     })
 
     it('throws error if fhir returns an error', async () => {
@@ -250,7 +217,7 @@ describe('Verify handler', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/createBirthRegistration',
+        url: '/fhir',
         payload: testFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
@@ -287,7 +254,7 @@ describe('Verify handler', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/createBirthRegistration',
+        url: '/fhir',
         payload: testFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
@@ -317,7 +284,7 @@ describe('Verify handler', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/createBirthRegistration',
+        url: '/fhir',
         payload: testFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
@@ -608,46 +575,13 @@ describe('Verify handler', () => {
       )
       const res = await server.server.inject({
         method: 'POST',
-        url: '/markBirthAsRegistered',
-        payload: testFhirBundle,
+        url: '/fhir',
+        payload: testFhirBundleWithIds,
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
       expect(res.statusCode).toBe(200)
-    })
-
-    it('throws error if invalid fhir data is provided', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      )
-
-      const token = jwt.sign(
-        { scope: ['register'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:workflow-user'
-        }
-      )
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/markBirthAsRegistered',
-        payload: { data: 'INVALID' },
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(res.statusCode).toBe(500)
     })
 
     it('throws error if fhir returns an error', async () => {
@@ -665,8 +599,8 @@ describe('Verify handler', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/markBirthAsRegistered',
-        payload: testFhirBundle,
+        url: '/fhir',
+        payload: testFhirBundleWithIds,
         headers: {
           Authorization: `Bearer ${token}`
         }

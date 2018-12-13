@@ -86,16 +86,6 @@ describe('Registration root resolvers', () => {
       )
     })
 
-    it('throws an error when the request returns an error code', async () => {
-      fetch.mockResponseOnce('Boom!', { status: 401 })
-      await expect(
-        // @ts-ignore
-        resolvers.Mutation.createBirthRegistration({}, { details })
-      ).rejects.toThrowError(
-        'Workflow post to /createBirthRegistration failed with [401] body: Boom!'
-      )
-    })
-
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
