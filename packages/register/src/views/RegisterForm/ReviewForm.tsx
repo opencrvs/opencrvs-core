@@ -37,8 +37,8 @@ import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from '@opencrvs/register/src/utils/authUtils'
 import {
   IImage,
-  documentForWhomHhirMapping,
-  documentTypeHhirMapping
+  documentForWhomFhirMapping,
+  documentTypeFhirMapping
 } from './ProcessDraftData'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
@@ -374,11 +374,11 @@ export class ReviewFormView extends React.Component<IProps> {
     const attachments = (registration.attachments as GQLAttachment[]) || []
 
     documents.image_uploader = attachments.map(doc => {
-      const title = Object.keys(documentForWhomHhirMapping).find(
-        key => documentForWhomHhirMapping[key] === doc.subject
+      const title = Object.keys(documentForWhomFhirMapping).find(
+        key => documentForWhomFhirMapping[key] === doc.subject
       )
-      const description = Object.keys(documentTypeHhirMapping).find(
-        key => documentTypeHhirMapping[key] === doc.type
+      const description = Object.keys(documentTypeFhirMapping).find(
+        key => documentTypeFhirMapping[key] === doc.type
       )
 
       const options = []

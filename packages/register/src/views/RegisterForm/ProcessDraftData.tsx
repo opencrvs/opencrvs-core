@@ -14,14 +14,14 @@ export interface IImage {
   description?: string
 }
 
-export const documentForWhomHhirMapping = {
+export const documentForWhomFhirMapping = {
   Child: 'CHILD',
   Father: 'FATHER',
   Mother: 'MOTHER',
   Other: 'OTHER'
 }
 
-export const documentTypeHhirMapping = {
+export const documentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   NID: 'NATIONAL_ID',
   Passport: 'PASSPORT',
@@ -162,11 +162,11 @@ const processDraftData = (draftData: IFormData) => {
   }
 
   const images = (documents.image_uploader as IImage[]) || []
-  const attchments = images.map(img => {
+  const attachments = images.map(img => {
     return {
       data: img.data,
-      subject: documentForWhomHhirMapping[img.optionValues[0]],
-      type: documentTypeHhirMapping[img.optionValues[1]],
+      subject: documentForWhomFhirMapping[img.optionValues[0]],
+      type: documentTypeFhirMapping[img.optionValues[1]],
       contentType: img.type
     }
   })
@@ -203,7 +203,7 @@ const processDraftData = (draftData: IFormData) => {
           timestamp: new Date()
         }
       ],
-      attachments: attchments
+      attachments
     },
     attendantAtBirth: child.attendantAtBirth,
     birthType: child.typeOfBirth,
