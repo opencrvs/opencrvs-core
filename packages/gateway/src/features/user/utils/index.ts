@@ -2,6 +2,7 @@ import { USER_MGNT_SERVICE_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { logger } from 'src/logger'
 import { callingCountries } from 'country-data'
+import { IAuthHeader } from 'src/common-types'
 
 export const convertToLocal = (
   mobileWithCountryCode: string,
@@ -14,10 +15,7 @@ export const convertToLocal = (
   )
 }
 
-export async function getUserMobile(
-  userId: string,
-  authHeader: { Authorization: string }
-) {
+export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   try {
     const res = await fetch(`${USER_MGNT_SERVICE_URL}getUserMobile`, {
       method: 'POST',

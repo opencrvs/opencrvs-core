@@ -17,7 +17,8 @@ import {
   ITemplatedComposition
 } from '../registration/fhir-builders'
 import fetch from 'node-fetch'
-import { fhirUrl } from 'src/constants'
+import { FHIR_URL } from 'src/constants'
+import { IAuthHeader } from 'src/common-types'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -310,11 +311,19 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export const getFromFhir = (suffix: string) => {
-  return fetch(`${fhirUrl}${suffix}`, {
+export const fetchFHIR = (
+  suffix: string,
+  authHeader: IAuthHeader,
+  method: string = 'GET',
+  body: string | undefined = undefined
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
     headers: {
-      'Content-Type': 'application/json+fhir'
-    }
+      'Content-Type': 'application/fhir+json',
+      ...authHeader
+    },
+    body
   })
     .then(response => {
       return response.json()

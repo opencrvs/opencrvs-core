@@ -1,6 +1,6 @@
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
-import { fhirUrl } from 'src/constants'
+import { HEARTH_URL } from 'src/constants'
 import {
   modifyRegistrationBundle,
   markBundleAsRegistered,
@@ -14,7 +14,7 @@ import { getToken } from 'src/utils/authUtils'
 import { logger } from 'src/logger'
 
 async function sendBundleToHearth(payload: fhir.Bundle, count = 1) {
-  const res = await fetch(fhirUrl, {
+  const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
@@ -69,7 +69,7 @@ export async function markBirthAsRegisteredHandler(
       getToken(request)
     )
     /* hearth will do put calls if it finds id on the bundle */
-    const res = await fetch(fhirUrl, {
+    const res = await fetch(HEARTH_URL, {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
