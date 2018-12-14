@@ -402,18 +402,18 @@ function createRegStatusCommentTimeStamp(
 
 const builders: IFieldBuilders = {
   _fhirIDMap: {
-    Composition: (fhirBundle, fieldValue) => {
+    composition: (fhirBundle, fieldValue) => {
       fhirBundle.entry[0].resource.id = fieldValue as string
     },
-    Encounter: (fhirBundle, fieldValue) => {
+    encounter: (fhirBundle, fieldValue) => {
       const encounter = selectOrCreateEncounterResource(
         BIRTH_ENCOUNTER_CODE,
         fhirBundle
       )
       encounter.id = fieldValue as string
     },
-    Observation: {
-      BirthType: (fhirBundle, fieldValue, context) => {
+    observation: {
+      birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_PROCEDURE_CODE,
@@ -425,7 +425,7 @@ const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      WeightAtBirth: (fhirBundle, fieldValue, context) => {
+      weightAtBirth: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_VSIGN_CODE,
@@ -437,7 +437,7 @@ const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      AttendantAtBirth: (fhirBundle, fieldValue, context) => {
+      attendantAtBirth: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_PROCEDURE_CODE,
@@ -449,7 +449,7 @@ const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      BirthRegistrationType: (fhirBundle, fieldValue, context) => {
+      birthRegistrationType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_PROCEDURE_CODE,
@@ -461,7 +461,7 @@ const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      PresentAtBirthRegistration: (fhirBundle, fieldValue, context) => {
+      presentAtBirthRegistration: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_PROCEDURE_CODE,
@@ -473,7 +473,7 @@ const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      ChildrenBornAliveToMother: (fhirBundle, fieldValue, context) => {
+      childrenBornAliveToMother: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_VSIGN_CODE,
@@ -485,7 +485,7 @@ const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      FoetalDeathsToMother: (fhirBundle, fieldValue, context) => {
+      foetalDeathsToMother: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_VSIGN_CODE,
@@ -497,7 +497,7 @@ const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      LastPreviousLiveBirth: (fhirBundle, fieldValue, context) => {
+      lastPreviousLiveBirth: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_VSIGN_CODE,

@@ -143,19 +143,19 @@ test('should build a minimal FHIR registration document without error', async ()
     lastPreviousLiveBirth: '2014-01-28',
     createdAt: new Date(),
     _fhirIDMap: {
-      Composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
-      Encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
-      Observation: {
-        BirthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
-        WeightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
-        AttendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
-        BirthRegistrationType: '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
-        PresentAtBirthRegistration:
+      composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
+      encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
+      observation: {
+        birthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
+        weightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
+        attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
+        birthRegistrationType: '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
+        presentAtBirthRegistration:
           '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
-        ChildrenBornAliveToMother:
+        childrenBornAliveToMother:
           '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
-        FoetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
-        LastPreviousLiveBirth:
+        foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
+        lastPreviousLiveBirth:
           '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
       }
     }

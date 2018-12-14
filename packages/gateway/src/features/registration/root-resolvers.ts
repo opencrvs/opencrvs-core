@@ -5,7 +5,10 @@ import {
   updateFHIRTaskBundle
 } from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
-import { getFromFhir } from 'src/features/fhir/utils'
+import {
+  getFromFhir,
+  getCompositionIDFromFhirResponse
+} from 'src/features/fhir/utils'
 
 const statusMap = {
   declared: 'preliminary',
@@ -48,32 +51,13 @@ export const resolvers: GQLResolver = {
     async createBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)
 
-      const res = await fetch(
-        `${WORKFLOW_SERVICE_URL}createBirthRegistration`,
-        {
-          method: 'POST',
-          body: JSON.stringify(doc),
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
-          }
-        }
-      )
-
-      if (!res.ok) {
-        throw new Error(
-          `Workflow post to /createBirthRegistration failed with [${
-            res.status
-          }] body: ${await res.text()}`
-        )
-      }
-
-      const resBody = await res.json()
-      if (!resBody || !resBody.trackingid) {
-        throw new Error(`Workflow response did not send a valid response`)
-      }
       // return the trackingid
-      return resBody.trackingid
+      return await submitToWorkFlow(
+        'createBirthRegistration',
+        doc,
+        authHeader,
+        'trackingid'
+      )
     },
     async updateBirthRegistration(_, { details }) {
       const doc = await buildFHIRBundle(details)
@@ -94,19 +78,7 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const resBody = await res.json()
-      if (
-        !resBody ||
-        !resBody.entry ||
-        !resBody.entry[0] ||
-        !resBody.entry[0].response ||
-        !resBody.entry[0].response.location
-      ) {
-        throw new Error(`FHIR response did not send a valid response`)
-      }
-
-      // return the Composition's id
-      return resBody.entry[0].response.location.split('/')[3]
+      return await getCompositionIDFromFhirResponse(res)
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
       let doc
@@ -123,30 +95,13 @@ export const resolvers: GQLResolver = {
       } else {
         doc = await buildFHIRBundle(details)
       }
-
-      const res = await fetch(`${WORKFLOW_SERVICE_URL}markBirthAsRegistered`, {
-        method: 'POST',
-        body: JSON.stringify(doc),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      if (!res.ok) {
-        throw new Error(
-          `Workflow post to /markBirthAsRegistered failed with [${
-            res.status
-          }] body: ${await res.text()}`
-        )
-      }
-
-      const resBody = await res.json()
-      if (!resBody || !resBody.BirthRegistrationNumber) {
-        throw new Error(`Workflow response did not send a valid response`)
-      }
       // return the brn
-      return resBody.BirthRegistrationNumber
+      return await submitToWorkFlow(
+        'markBirthAsRegistered',
+        doc,
+        authHeader,
+        'BirthRegistrationNumber'
+      )
     },
     async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
       const taskBundle = await getFromFhir(`/Task?focus=Composition/${id}`)
@@ -161,29 +116,13 @@ export const resolvers: GQLResolver = {
         reason,
         comment
       )
-      const res = await fetch(`${WORKFLOW_SERVICE_URL}updateTask`, {
-        method: 'POST',
-        body: JSON.stringify(newTaskBundle),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      if (!res.ok) {
-        throw new Error(
-          `Workflow post to updateTask failed with [${
-            res.status
-          }] body: ${await res.text()}`
-        )
-      }
-
-      const resBody = await res.json()
-      if (!resBody || !resBody.taskId) {
-        throw new Error(`Workflow response did not send a valid response`)
-      }
       // return the taskId
-      return resBody.taskId
+      return await submitToWorkFlow(
+        'updateTask',
+        newTaskBundle,
+        authHeader,
+        'taskId'
+      )
     }
   }
 }
@@ -218,4 +157,34 @@ async function getComposition(tasksResponse: fhir.Bundle) {
       })
     ))
   )
+}
+
+async function submitToWorkFlow(
+  urlSuffix: string,
+  payload: object,
+  authHeader: object,
+  responseProperty: string
+): Promise<string> {
+  const res = await fetch(`${WORKFLOW_SERVICE_URL}${urlSuffix}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Workflow post to /${urlSuffix} failed with [${
+        res.status
+      }] body: ${await res.text()}`
+    )
+  }
+
+  const resBody = await res.json()
+  if (!resBody || !resBody[responseProperty]) {
+    throw new Error(`Workflow response did not send a valid response`)
+  }
+  return resBody[responseProperty]
 }

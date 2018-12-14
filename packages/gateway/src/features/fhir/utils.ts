@@ -16,7 +16,7 @@ import {
   ITemplatedBundle,
   ITemplatedComposition
 } from '../registration/fhir-builders'
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import { fhirUrl } from 'src/constants'
 import { FHIR_OBSERVATION_CATEGORY_URL } from './constants'
 
@@ -404,4 +404,21 @@ export const getFromFhir = (suffix: string) => {
     .catch(error => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
+}
+
+export async function getCompositionIDFromFhirResponse(
+  response: Response
+): Promise<string> {
+  const resBody = await response.json()
+  if (
+    !resBody ||
+    !resBody.entry ||
+    !resBody.entry[0] ||
+    !resBody.entry[0].response ||
+    !resBody.entry[0].response.location
+  ) {
+    throw new Error(`FHIR response did not send a valid response`)
+  }
+  // return the Composition's id
+  return resBody.entry[0].response.location.split('/')[3]
 }
