@@ -3,7 +3,7 @@ import {
   updateFHIRTaskBundle
 } from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
-import { fetchFHIR } from 'src/features/fhir/utils'
+import { fetchFHIR, getTrackingId } from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
 
 const statusMap = {
@@ -33,18 +33,30 @@ export const resolvers: GQLResolver = {
     async createBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)
 
-      const resBody = await fetchFHIR(
+      const resBody: fhir.Bundle = await fetchFHIR(
         '',
         authHeader,
         'POST',
         JSON.stringify(doc)
       )
 
-      if (!resBody || !resBody.trackingid) {
+      if (
+        !resBody ||
+        !resBody.entry ||
+        !resBody.entry[0] ||
+        !resBody.entry[0].response ||
+        !resBody.entry[0].response.location
+      ) {
         throw new Error(`Workflow response did not send a valid response`)
       }
+
+      const composition = await fetchFHIR(
+        resBody.entry[0].response.location.replace('/fhir', ''),
+        authHeader
+      )
+
       // return the trackingid
-      return resBody.trackingid
+      return getTrackingId(composition)
     },
     async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
       const taskBundle = await fetchFHIR(

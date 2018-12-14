@@ -7,13 +7,16 @@ import {
   setTrackingId
 } from './fhir/fhir-bundle-modifier'
 import { sendBirthNotification } from './utils'
-import { getTrackingId, getBirthRegistrationNumber } from './fhir/fhir-utils'
+import { getBirthRegistrationNumber } from './fhir/fhir-utils'
 import { EVENT_TYPE } from './fhir/constants'
 import { getTaskResource } from './fhir/fhir-template'
 import { getToken } from 'src/utils/authUtils'
 import { logger } from 'src/logger'
 
-async function sendBundleToHearth(payload: fhir.Bundle, count = 1) {
+async function sendBundleToHearth(
+  payload: fhir.Bundle,
+  count = 1
+): Promise<fhir.Bundle> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -24,14 +27,15 @@ async function sendBundleToHearth(payload: fhir.Bundle, count = 1) {
   if (!res.ok) {
     if (res.status === 409 && count < 5) {
       setTrackingId(payload)
-      await sendBundleToHearth(payload, count + 1)
-      return
+      return await sendBundleToHearth(payload, count + 1)
     }
 
     throw new Error(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
   }
+
+  return res.json()
 }
 
 export async function createBirthRegistrationHandler(
@@ -45,14 +49,14 @@ export async function createBirthRegistrationHandler(
       getToken(request)
     )
 
-    await sendBundleToHearth(payload)
+    const resBundle = await sendBundleToHearth(payload)
 
     /* sending notification to the contact */
     sendBirthNotification(payload, {
       Authorization: request.headers.authorization
     })
-    /* returning the newly created tracking id */
-    return { trackingid: getTrackingId(payload) }
+
+    return resBundle
   } catch (error) {
     logger.error(`Workflow/createBirthRegistrationHandler: error: ${error}`)
     throw new Error(error)

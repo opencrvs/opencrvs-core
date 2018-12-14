@@ -332,3 +332,12 @@ export const fetchFHIR = (
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
+
+export function getTrackingId(composition: fhir.Composition) {
+  if (!composition || !composition.identifier) {
+    throw new Error(
+      'getTrackingId: Invalid composition or composition has no identifier'
+    )
+  }
+  return composition.identifier.value
+}

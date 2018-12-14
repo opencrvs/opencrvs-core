@@ -66,10 +66,32 @@ describe('Registration root resolvers', () => {
   }
   describe('createBirthRegistration()', () => {
     it('posts a fhir bundle', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          trackingid: 'B123456'
-        })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: {
+                  status: '201',
+                  location:
+                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
+                }
+              }
+            ],
+            type: 'transaction-response'
+          })
+        ],
+        [
+          JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition',
+            identifier: {
+              system: 'urn:ietf:rfc:3986',
+              value: 'BewpkiM'
+            }
+          })
+        ]
       )
       // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
@@ -83,6 +105,38 @@ describe('Registration root resolvers', () => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it('throws an error when invalid composition is returned', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: {
+                  status: '201',
+                  location:
+                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
+                }
+              }
+            ],
+            type: 'transaction-response'
+          })
+        ],
+        [
+          JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition'
+          })
+        ]
+      )
+      // @ts-ignore
+      await expect(
+        resolvers.Mutation.createBirthRegistration({}, { details })
+      ).rejects.toThrowError(
+        'getTrackingId: Invalid composition or composition has no identifier'
       )
     })
 
