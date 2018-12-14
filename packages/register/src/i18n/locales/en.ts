@@ -651,6 +651,8 @@ export const ENGLISH_STATE = {
     'register.workQueue.listItem.status.dateLabel.registered': 'Registrated on',
     'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
+    'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
+    'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':
