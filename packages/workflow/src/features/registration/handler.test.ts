@@ -610,7 +610,7 @@ describe('Verify handler', () => {
   })
 
   describe('fhirWorkflowEventHandler', () => {
-    it('returns un-authorized response when scope doesn not match event', async () => {
+    it('returns un-authorized response when scope does not match event', async () => {
       const token = jwt.sign(
         { scope: ['???'] },
         readFileSync('../auth/test/cert.key'),
@@ -630,6 +630,36 @@ describe('Verify handler', () => {
         }
       })
       expect(res.statusCode).toBe(401)
+    })
+
+    it('forwards unknown events to Hearth', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({ resourceType: 'OperationOutcome' }),
+        {
+          headers: { Location: '/fhir/Patient/123' }
+        }
+      )
+
+      const token = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir/Patient',
+        payload: { id: 123, resourceType: 'Patient' },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
     })
   })
 })

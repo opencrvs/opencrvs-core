@@ -69,11 +69,9 @@ async function forwardToHearth(request: Hapi.Request, h: Hapi.ResponseToolkit) {
   const response = h.response(resBody)
 
   response.code(res.status)
-  for (const header in res.headers) {
-    if (res.headers.hasOwnProperty(header)) {
-      response.header(header, res.headers[header])
-    }
-  }
+  res.headers.forEach((headerVal, headerName) => {
+    response.header(headerName, headerVal)
+  })
 
   return response
 }
