@@ -209,11 +209,11 @@ export const mockTask = {
   extension: [
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
-      valueString: '<username>'
+      valueString: 'Practitioner/123'
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastLocation',
-      valueReference: 'Location/123'
+      valueString: 'Location/123'
     },
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
@@ -379,6 +379,20 @@ export const mockComposition = {
           reference: 'DocumentReference/zzz' // reference to a DocumentReference resource contained below
         }
       ]
+    }
+  ],
+  relatesTo: [
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composition/xyz'
+      }
+    },
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composition/abc'
+      }
     }
   ]
 }

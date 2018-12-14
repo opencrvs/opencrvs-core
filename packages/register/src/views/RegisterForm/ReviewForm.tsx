@@ -22,7 +22,10 @@ import {
   GQLIdentityType,
   GQLContactPoint,
   GQLRegistration,
-  GQLPerson
+  GQLPerson,
+  GQLAttachment,
+  GQLComment,
+  GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   storeDraft,
@@ -32,6 +35,11 @@ import {
 import { Dispatch } from 'redux'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from '@opencrvs/register/src/utils/authUtils'
+import {
+  IImage,
+  documentForWhomFhirMapping,
+  documentTypeFhirMapping
+} from './ProcessDraftData'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
@@ -56,6 +64,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         dateOfMarriage
         educationalAttainment
         nationality
+        multipleBirth
         identifier {
           id
           type
@@ -103,6 +112,18 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
       }
       registration {
         contact
+        attachments {
+          data
+          type
+          contentType
+          subject
+        }
+        status {
+          comments {
+            comment
+          }
+        }
+        paperFormID
       }
       attendantAtBirth
       weightAtBirth
@@ -245,6 +266,7 @@ export class ReviewFormView extends React.Component<IProps> {
     motherDetails.dateOfMarriage = mother.dateOfMarriage
     motherDetails.maritalStatus = mother.maritalStatus
     motherDetails.educationalAttainment = mother.educationalAttainment
+    motherDetails.multipleBirth = mother.multipleBirth
 
     const nationality = mother.nationality as string[]
     motherDetails.nationality = nationality[0]
@@ -335,7 +357,44 @@ export class ReviewFormView extends React.Component<IProps> {
       }
     })
 
+    const status = registration.status as GQLRegWorkflow[]
+    const comments = status && (status[0].comments as GQLComment[])
+    registrationDetails.commentsOrNotes = comments && comments[0].comment
+
+    registrationDetails.paperFormNumber = registration.paperFormID
+
     return registrationDetails
+  }
+
+  transformDocuments = (reg: GQLBirthRegistration) => {
+    const documents = {} as IReviewSectionDetails
+
+    const registration = reg.registration as GQLRegistration
+
+    const attachments = (registration.attachments as GQLAttachment[]) || []
+
+    documents.image_uploader = attachments.map(doc => {
+      const title = Object.keys(documentForWhomFhirMapping).find(
+        key => documentForWhomFhirMapping[key] === doc.subject
+      )
+      const description = Object.keys(documentTypeFhirMapping).find(
+        key => documentTypeFhirMapping[key] === doc.type
+      )
+
+      const options = []
+      options.push(title)
+      options.push(description)
+
+      return {
+        data: doc.data,
+        type: doc.contentType,
+        optionValues: options,
+        title,
+        description
+      }
+    }) as IImage[]
+
+    return documents
   }
   transformData = (reg: GQLBirthRegistration) => {
     if (!reg) {
@@ -345,13 +404,18 @@ export class ReviewFormView extends React.Component<IProps> {
     const child = this.transformChild(reg)
     const mother = this.transformMother(reg.mother)
     const father = this.transformFather(reg.father)
+
     this.setFatherAddressSameAsMother(father, mother)
+    child.orderOfBirth = mother.multipleBirth
+
     const registration = this.transformRegistration(reg)
 
+    const documents = this.transformDocuments(reg)
     const reviewData = {
       child,
       mother,
       father,
+      documents,
       registration
     }
 

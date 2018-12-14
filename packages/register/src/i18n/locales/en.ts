@@ -646,6 +646,11 @@ export const ENGLISH_STATE = {
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
     'register.workQueue.buttons.newApplication': 'New birth application',
+    'register.workQueue.listItem.status.dateLabel.application':
+      'Application submitted on',
+    'register.workQueue.listItem.status.dateLabel.registered': 'Registrated on',
+    'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
+    'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':

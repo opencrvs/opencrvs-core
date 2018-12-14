@@ -117,7 +117,10 @@ test('should build a minimal FHIR registration document without error', async ()
           originalFileName: 'original.png',
           systemFileName: 'system.png',
           type: 'PASSPORT',
-          createdAt: '2018-10-22'
+          createdAt: '2018-10-22',
+          subject: {
+            display: 'MOTHER'
+          }
         }
       ]
     },
@@ -330,6 +333,9 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     }
   ])
+  expect(fhir.entry[6].resource.subject).toEqual({
+    display: 'MOTHER'
+  })
   // Encounter
   expect(fhir.entry[7].resource.resourceType).toBe('Encounter')
   expect(fhir.entry[7].resource.location[0].location.reference).toEqual(

@@ -16,6 +16,12 @@ export const BENGALI_STATE = {
     'login.stepTwoInstruction':
       'দয়া করে এসএমএস কোড লিখুন যা আমরা আপনার মোবাইল ফোনে পাঠিয়েছি।',
     'login.clearForm': 'বাতিল',
+    'login.manager.registerAppTitle': 'OpenCRVS Homepage',
+    'login.manager.registerAppDescription':
+      'Manage applications, registrations and certifications here.',
+    'login.manager.performanceAppTitle': 'Performance Management',
+    'login.manager.performanceAppDescription':
+      "Analyse the performance of a particular area of your country in it's Civil Registration.",
     'validations.required': 'প্রয়োজনীয়',
     'validations.minLength': '{Min} অক্ষর বা আরো হওয়া আবশ্যক',
     'validations.numberRequired': 'অবশ্যই একটি সংখ্যা হবেr',
