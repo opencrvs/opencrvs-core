@@ -1,4 +1,7 @@
-import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
+import {
+  buildFHIRBundle,
+  updateFHIRTaskBundle
+} from 'src/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
@@ -85,6 +88,7 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     registration: {
       contact: 'MOTHER',
+      paperFormID: '12345678',
       status: [
         {
           comments: [
@@ -113,7 +117,10 @@ test('should build a minimal FHIR registration document without error', async ()
           originalFileName: 'original.png',
           systemFileName: 'system.png',
           type: 'PASSPORT',
-          createdAt: '2018-10-22'
+          createdAt: '2018-10-22',
+          subject: {
+            display: 'MOTHER'
+          }
         }
       ]
     },
@@ -263,6 +270,12 @@ test('should build a minimal FHIR registration document without error', async ()
     text: 'This is just a test data',
     time: '2018-10-31T09:45:05+10:00'
   })
+  expect(fhir.entry[4].resource.identifier).toEqual([
+    {
+      system: 'http://opencrvs.org/specs/id/paper-form-id',
+      value: '12345678'
+    }
+  ])
   // Attachment Test cases
   expect(fhir.entry[5].resource.docStatus).toBe('final')
   expect(fhir.entry[5].resource.created).toBe('2018-10-21')
@@ -320,6 +333,9 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     }
   ])
+  expect(fhir.entry[6].resource.subject).toEqual({
+    display: 'MOTHER'
+  })
   // Encounter
   expect(fhir.entry[7].resource.resourceType).toBe('Encounter')
   expect(fhir.entry[7].resource.location[0].location.reference).toEqual(
@@ -453,4 +469,63 @@ test('should build a minimal FHIR registration document without error', async ()
       display: 'Date last live birth'
     }
   ])
+})
+
+test('should update a task document as rejected', async () => {
+  const fhir = await updateFHIRTaskBundle(
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueString: 'DUMMY'
+          }
+        ],
+        lastModified: '2018-11-28T15:13:57.492Z',
+        note: [
+          { text: '', time: '2018-11-28T15:13:57.492Z', authorString: 'DUMMY' }
+        ],
+        focus: {
+          reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'B1mW7jA'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            { system: 'http://opencrvs.org/specs/reg-status', code: 'DECLARED' }
+          ]
+        },
+        meta: {
+          lastUpdated: '2018-11-29T14:50:34.127+00:00',
+          versionId: '6bd9d08f-58e2-48f7-8279-ca08e64a3942'
+        },
+        id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+      }
+    },
+    'REJECTED',
+    'Misspelling',
+    'Child name was misspelled'
+  )
+
+  const rejectedText = 'reason=Misspelling&comment=Child name was misspelled'
+  expect(fhir).toBeDefined()
+  expect(fhir.entry[0].resource.note[1].text).toEqual(rejectedText)
+  expect(fhir.entry[0].resource.businessStatus.coding[0].code).toEqual(
+    'REJECTED'
+  )
 })

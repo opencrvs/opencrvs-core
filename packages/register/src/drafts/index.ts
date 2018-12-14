@@ -2,6 +2,7 @@ import { IFormData } from '../forms'
 import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
+import { v4 as uuid } from 'uuid'
 
 const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
@@ -10,8 +11,9 @@ const WRITE_DRAFT = 'DRAFTS/WRITE_DRAFT'
 const DELETE_DRAFT = 'DRAFTS/DELETE_DRAFT'
 
 export interface IDraft {
-  id: number
+  id: string
   data: IFormData
+  review?: boolean
 }
 
 interface IStoreDraftAction {
@@ -42,7 +44,9 @@ interface ISetInitialDraftsAction {
 
 interface IDeleteDraftAction {
   type: typeof DELETE_DRAFT
-  payload: { draft: IDraft }
+  payload: {
+    draft: IDraft
+  }
 }
 
 type Action =
@@ -54,17 +58,23 @@ type Action =
   | IDeleteDraftAction
 
 export interface IDraftsState {
-  initalDraftsLoaded: boolean
+  initialDraftsLoaded: boolean
   drafts: IDraft[]
 }
 
 const initialState = {
-  initalDraftsLoaded: false,
+  initialDraftsLoaded: false,
   drafts: []
 }
 
 export function createDraft() {
-  return { id: Date.now(), data: {} }
+  return { id: uuid(), data: {} }
+}
+export function createReviewDraft(
+  draftId: string,
+  formData: IFormData
+): IDraft {
+  return { id: draftId, data: formData, review: true }
 }
 
 export function storeDraft(draft: IDraft): IStoreDraftAction {
@@ -145,14 +155,14 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftModification))
       )
     case WRITE_DRAFT:
-      if (state.initalDraftsLoaded && state.drafts) {
+      if (state.initialDraftsLoaded && state.drafts) {
         storage.setItem('drafts', JSON.stringify(action.payload.draft.drafts))
       }
       return state
     case SET_INITIAL_DRAFTS:
       return {
         ...state,
-        initalDraftsLoaded: true,
+        initialDraftsLoaded: true,
         drafts: action.payload.drafts
       }
     default:

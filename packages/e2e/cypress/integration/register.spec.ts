@@ -65,43 +65,74 @@ context('Register', () => {
 
     cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National ID', 'National ID')
-    cy.get('#iD').type('1592824588424')
-    cy.selectOption('#nationality','Bangladesh', 'Bangladesh')
-    cy.get('#firstNames').type('সত্য')
-    cy.get('#familyName').type('ঋষি')
-    cy.get('#firstNamesEng').type('Satya')
-    cy.get('#familyNameEng').type('Rishi')
-    cy.get('#fatherBirthDate-dd').type('23')
-    cy.get('#fatherBirthDate-mm').type('03')
-    cy.get('#fatherBirthDate-yyyy').type('1985')
-    cy.selectOption('#maritalStatus', 'Widowed', 'Widowed')
-    cy.get('#dateOfMarriage-dd').type('10')
-    cy.get('#dateOfMarriage-mm').type('10')
-    cy.get('#dateOfMarriage-yyyy').type('2010')
-    cy.selectOption('#educationalAttainment', 'Lower secondary', 'Lower secondary')
-    cy.get('#addressSameAsMother_true').click();
-    cy.get('#permanentAddressSameAsMother_true').click();
-    cy.get('#next_section').click();
+    cy.get('#iD').type('1')
+    cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
+    cy.get('#firstNames').type('গায়ত্রী')
+    cy.get('#familyName').type('স্পিভক')
+    cy.get('#firstNamesEng').type('Gayatri')
+    cy.get('#familyNameEng').type('Spivak')
+    cy.get('#fatherBirthDate-dd').type('01')
+    cy.get('#fatherBirthDate-mm').type('08')
+    cy.get('#fatherBirthDate-yyyy').type('2018')
+    cy.selectOption('#maritalStatus', 'Married', 'Married')
+    cy.get('#dateOfMarriage-dd').type('01')
+    cy.get('#dateOfMarriage-mm').type('08')
+    cy.get('#dateOfMarriage-yyyy').type('2018')
+    cy.selectOption(
+      '#educationalAttainment',
+      'Upper secondary',
+      'Upper secondary'
+    )
+    cy.get('#addressSameAsMother_false').click()
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Mymensingh Division', 'Mymensingh Division')
+    cy.selectOption('#district', 'Mymensingh District', 'Mymensingh District')
+    // Depends on fix for bug & better approach for administrative structure:  https://jembiprojects.jira.com/browse/OCRVS-588
 
-    cy.selectOption('#presentAtBirthRegistration', 'Both Parents','Both Parents')
-    cy.selectOption('#whoseContactDetails', 'Both Parents', 'Both Parents')
-    cy.get('#registrationEmail').type('maheshkandagatla@zoho.com')
-    cy.get('#registrationPhone').type('01741234567')
-    cy.get('#registrationCertificateLanguageBangla').click()
-    cy.get('#registrationCertificateLanguageEnglish').click()
-    cy.get('#paperFormNumber').type('1223')
-    cy.get('#commentsOrNotes').type('Both parents submitted all the documents needed')
-    cy.get('#next_section').click();
-    //cy.pause()
-     cy.get('#image_uploader').click()
-     cy.get('#uploadDocForWhom_Child').click()
-     cy.get('#whatDocToUpload_NID').click()
-     //cy.get('#upload_document').click()
-
-
-
-
-
+    cy.selectOption(
+      '#addressLine4',
+      'Mymensingh Sadar Upazila',
+      'Mymensingh Sadar Upazila'
+    )
+    cy.selectOption('#addressLine3Options1', 'Akua', 'Akua')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('10024')
+    cy.get('#permanentAddressSameAsMother_false').click()
+    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
+    cy.selectOption(
+      '#statePermanent',
+      'Mymensingh Division',
+      'Mymensingh Division'
+    )
+    cy.selectOption(
+      '#districtPermanent',
+      'Mymensingh District',
+      'Mymensingh District'
+    )
+    cy.selectOption(
+      '#addressLine4Permanent',
+      'Mymensingh Sadar Upazila',
+      'Mymensingh Sadar Upazila'
+    )
+    cy.selectOption('#addressLine3Options1Permanent', 'Akua', 'Akua')
+    cy.get('#addressLine2Permanent').type('My street')
+    cy.get('#addressLine1Permanent').type('40')
+    cy.get('#postCodePermanent').type('10024')
+    cy.get('#next_section').click()
+    // REGISTRATION
+    cy.selectOption(
+      '#presentAtBirthRegistration',
+      'Both Parents',
+      'Both Parents'
+    )
+    cy.selectOption('#whoseContactDetails', 'Father', 'Father')
+    cy.get('#registrationEmail').type('test@test.com')
+    cy.get('#registrationPhone').type('01711111111')
+    cy.get('#paperFormNumber').type('1')
+    cy.get('#commentsOrNotes').type('note')
+    cy.get('#next_section').click()
+    // DOCUMENTS
       // then((picture) => {
       //   return Cypress.Blob.base64StringToBlob(picture, 'image/jpg').then((blob) => {
       //       dropEvent.dataTransfer.files.push(blob);
@@ -118,11 +149,14 @@ context('Register', () => {
    // cy.get('#upload_document').click()
 
     cy.get('#next_section').click()
+    // PREVIEW
+
     cy.get('#next_button_child').click()
     cy.get('#next_button_mother').click()
     cy.get('#next_button_father').click()
     cy.get('#submit_form').click()
     cy.get('#submit_confirm').click();
+
 
   })
 })

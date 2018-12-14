@@ -12,7 +12,7 @@ import styled from 'src/styled-components'
 import Logo from 'src/components/Logo'
 import { Page } from 'src/components/Page'
 
-import { Legend, VerticalBar } from '@opencrvs/components/lib/charts'
+import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
 
 const messages = defineMessages({
   birthRegistrationBoxTitle: {
@@ -72,13 +72,31 @@ const messages = defineMessages({
   },
   birthRegistrationBarChartInAgesLabel: {
     id: 'performance.graph.birthRegistrationInAgesLabel',
-    defineMessages: 'Age (years)',
+    defaultMessage: 'Age (years)',
     description: 'The label for x-axis of birth registration bar chart'
   },
   birthRegistrationPercentageLabel: {
     id: 'performance.graph.birthRegistrationPercentageLabel',
-    defaultMessages: 'Total Births Registered (%)',
+    defaultMessage: 'Total Births Registered (%)',
     description: 'The label for y-axis of birth registration bar chart'
+  },
+  birthRegistrationRateWithin45DaysBoxTitle: {
+    id: 'performance.graph.birthRegistrationRateWithin45DaysTitle',
+    defaultMessage: 'Birth Rate For Registrations Within 45 Days',
+    description:
+      'The label for birth registration rate within 45 days per month line chart box'
+  },
+  birthRegistrationRatePerMonthLabel: {
+    id: 'performance.graph.birthRegistrationRatePerMonthLabel',
+    defaultMessage: 'Calendar Month',
+    description:
+      'The x-axis label for birth registration rate within 45 days per month line chart'
+  },
+  birthRegistrationPercentageOfEstimateLabel: {
+    id: 'performance.graph.birthRegistrationPercentageOfEstimateLabel',
+    defaultMessage: 'Birth Registration % of estimate',
+    description:
+      'The y-axis label for birth registration rate within 45 days per month line chart'
   }
 })
 
@@ -132,18 +150,33 @@ const getData = (intl: InjectedIntl): IData[] => {
 }
 
 const birthRegistrationData = [
-  { name: '45d', value: 2100 },
-  { name: '46d - 1yr', value: 2400 },
-  { name: '1', value: 1398 },
-  { name: '2', value: 6800 },
-  { name: '3', value: 3908 },
-  { name: '4', value: 4800 },
-  { name: '5', value: 3800 },
-  { name: '6', value: 4300 },
-  { name: '7', value: 2500 },
-  { name: '8', value: 5680 },
-  { name: '9', value: 4980 },
-  { name: '10', value: 2570 }
+  { label: '45d', value: 2100 },
+  { label: '46d - 1yr', value: 2400 },
+  { label: '1', value: 1398 },
+  { label: '2', value: 6800 },
+  { label: '3', value: 3908 },
+  { label: '4', value: 4800 },
+  { label: '5', value: 3800 },
+  { label: '6', value: 4300 },
+  { label: '7', value: 2500 },
+  { label: '8', value: 5680 },
+  { label: '9', value: 4980 },
+  { label: '10', value: 2570 }
+]
+
+const birthRegistrationDataPerMonth = [
+  { label: 'Jan', value: 2100, totalEstimate: 10000 },
+  { label: 'Feb', value: 2400, totalEstimate: 10000 },
+  { label: 'Mar', value: 1398, totalEstimate: 10000 },
+  { label: 'Apr', value: 6800, totalEstimate: 10000 },
+  { label: 'May', value: 3908, totalEstimate: 10000 },
+  { label: 'Jun', value: 4800, totalEstimate: 10000 },
+  { label: 'Jul', value: 3800, totalEstimate: 10000 },
+  { label: 'Aug', value: 4300, totalEstimate: 10000 },
+  { label: 'Sep', value: 2500, totalEstimate: 10000 },
+  { label: 'Oct', value: 5680, totalEstimate: 10000 },
+  { label: 'Nov', value: 4980, totalEstimate: 10000 },
+  { label: 'Dec', value: 8570, totalEstimate: 10000 }
 ]
 
 const StyledHeader = styled(Header)`
@@ -152,7 +185,6 @@ const StyledHeader = styled(Header)`
 `
 
 const BoxTitle = styled.div`
-  height: 25px;
   line-height: 25px;
   text-transform: capitalize !important;
   ${({ theme }) => theme.fonts.h2FontStyle}
@@ -179,6 +211,35 @@ const ChartContainer = styled(Box)`
 const Container = styled.div`
   padding: 20px 10px;
 `
+
+const LabelContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: row wrap;
+  padding: 20px 0;
+  color: ${({ theme }) => theme.colors.copy};
+  width: 100%;
+`
+const Label = styled.div`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  background-color: rgba(150, 150, 150, 0.1);
+  border-radius: 17px;
+  padding: 5px 10px 5px 7px;
+  margin: 2px 10px 2px 0;
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  align-items: center;
+  height: 32px;
+  & span {
+    text-transform: uppercase;
+    margin-left: 5px;
+    font-size: 13px;
+  }
+`
+
 class HomeView extends React.Component<InjectedIntlProps> {
   render() {
     const { intl } = this.props
@@ -208,6 +269,25 @@ class HomeView extends React.Component<InjectedIntlProps> {
               )}
               yAxisLabel={intl.formatMessage(
                 messages.birthRegistrationPercentageLabel
+              )}
+            />
+          </ChartContainer>
+          <ChartContainer>
+            <BoxTitle id="line_chart_box_title">
+              {intl.formatMessage(
+                messages.birthRegistrationRateWithin45DaysBoxTitle
+              )}
+            </BoxTitle>
+            <LabelContainer>
+              <Label>2018 estimate = 10000</Label>
+            </LabelContainer>
+            <Line
+              data={birthRegistrationDataPerMonth}
+              xAxisLabel={intl.formatMessage(
+                messages.birthRegistrationRatePerMonthLabel
+              )}
+              yAxisLabel={intl.formatMessage(
+                messages.birthRegistrationPercentageOfEstimateLabel
               )}
             />
           </ChartContainer>

@@ -41,26 +41,32 @@ import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { goToEvents as goToEventsAction } from 'src/navigation'
+import { goToTab as goToTabAction } from '../../navigation'
+import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
 
 export const FETCH_REGISTRATION_QUERY = gql`
-  query list {
-    listBirthRegistrations {
+  query list($locationIds: [String]) {
+    listBirthRegistrations(locationIds: $locationIds) {
       id
       registration {
         trackingId
-        # status { # these are disabled until we re actually setting these in the registrations
-        #   user { # they will be used by the expanded component
-        #     firstName
-        #     lastName
-        #     role {
-        #       type
-        #     }
-        #   }
-        #   location {
-        #     name
-        #     alias
-        #   }
-        # }
+        status {
+          user {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role
+          }
+          location {
+            name
+            alias
+          }
+          type
+          timestamp
+        }
       }
       child {
         name {
@@ -222,6 +228,28 @@ const messages = defineMessages({
     id: 'register.workQueue.list.buttons.review',
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
+  },
+  workflowStatusDateApplication: {
+    id: 'register.workQueue.listItem.status.dateLabel.application',
+    defaultMessage: 'Application submitted on',
+    description:
+      'Label for the workflow timestamp when the status is application'
+  },
+  workflowStatusDateRegistered: {
+    id: 'register.workQueue.listItem.status.dateLabel.registered',
+    defaultMessage: 'Registrated on',
+    description:
+      'Label for the workflow timestamp when the status is registered'
+  },
+  workflowStatusDateCollected: {
+    id: 'register.workQueue.listItem.status.dateLabel.collected',
+    defaultMessage: 'Collected on',
+    description: 'Label for the workflow timestamp when the status is collected'
+  },
+  workflowPractitionerLabel: {
+    id: 'register.workQueue.listItem.status.label.byPractitioner',
+    defaultMessage: 'By',
+    description: 'Label for the practitioner name in workflow'
   }
 })
 
@@ -252,7 +280,6 @@ const StyledIconAction = styled(IconAction)`
   padding: 0 20px 0 0;
   box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
   background-color: ${({ theme }) => theme.colors.accentLight};
-
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
@@ -263,12 +290,87 @@ const StyledIconAction = styled(IconAction)`
     color: ${({ theme }) => theme.colors.white};
   }
 `
+const StyledLabel = styled.label`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  margin-right: 3px;
+`
+const StyledValue = styled.span`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+`
+const Separator = styled.div`
+  height: 1.3em;
+  width: 1px;
+  margin: 1px 8px;
+  background: ${({ theme }) => theme.colors.copyAlpha80};
+`
+const ValueContainer = styled.div`
+  display: inline-flex;
+  flex-wrap: wrap;
+  line-height: 1.3em;
+`
+function LabelValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <StyledLabel>{label}:</StyledLabel>
+      <StyledValue>{value}</StyledValue>
+    </div>
+  )
+}
+
+function ValuesWithSeparator(props: {
+  strings: string[]
+  separator: React.ReactNode
+}): JSX.Element {
+  return (
+    <ValueContainer>
+      {props.strings.map((value, index) => {
+        return (
+          <React.Fragment key={index}>
+            {value}
+            {index < props.strings.length - 1 && value.length > 0
+              ? props.separator
+              : null}
+          </React.Fragment>
+        )
+      })}
+    </ValueContainer>
+  )
+}
+
+function formatRoleCode(str: string) {
+  const sections = str.split('_')
+  const formattedString: string[] = []
+  sections.map(section => {
+    section = section.charAt(0) + section.slice(1).toLowerCase()
+    formattedString.push(section)
+  })
+
+  return formattedString.join(' ')
+}
+
+const ExpansionContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  margin-bottom: 1px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`
+const ExpansionContentContainer = styled.div`
+  flex: 1;
+  margin-left: 10px;
+`
 
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
   scope: Scope
   goToEvents: typeof goToEventsAction
+  userDetails: IUserDetails
+  gotoTab: typeof goToTabAction
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -276,17 +378,30 @@ type IWorkQueueProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseWorkQueueProps
 
-class WorkQueueView extends React.Component<IWorkQueueProps> {
+export class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
-      case 'application':
+      case 'APPLICATION':
         return <StatusOrange />
-      case 'registered':
+      case 'REGISTERED':
         return <StatusGreen />
-      case 'collected':
+      case 'COLLECTED':
         return <StatusCollected />
       default:
         return <StatusOrange />
+    }
+  }
+
+  getWorkflowDateLabel = (status: string) => {
+    switch (status) {
+      case 'APPLICATION':
+        return messages.workflowStatusDateApplication
+      case 'REGISTERED':
+        return messages.workflowStatusDateRegistered
+      case 'COLLECTED':
+        return messages.workflowStatusDateCollected
+      default:
+        return messages.workflowStatusDateApplication
     }
   }
 
@@ -296,49 +411,122 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     }
 
     return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
-      const names = (reg.child && (reg.child.name as GQLHumanName[])) || []
-      const namesMap = names.filter(Boolean).reduce((prevNamesMap, name) => {
-        if (!name.use) {
-          /* tslint:disable:no-string-literal */
-          prevNamesMap['default'] = `${name.firstNames} ${
-            /* tslint:enable:no-string-literal */
+      const childNames = (reg.child && (reg.child.name as GQLHumanName[])) || []
+      const namesMap = (names: GQLHumanName[]) =>
+        names.filter(Boolean).reduce((prevNamesMap, name) => {
+          if (!name.use) {
+            /* tslint:disable:no-string-literal */
+            prevNamesMap['default'] = `${name.firstNames} ${
+              /* tslint:enable:no-string-literal */
+              name.familyName
+            }`.trim()
+            return prevNamesMap
+          }
+
+          prevNamesMap[name.use] = `${name.firstNames} ${
             name.familyName
           }`.trim()
           return prevNamesMap
-        }
-
-        prevNamesMap[name.use] = `${name.firstNames} ${name.familyName}`.trim()
-        return prevNamesMap
-      }, {})
+        }, {})
 
       return {
+        id: reg.id,
         name:
-          (namesMap[this.props.language] as string) ||
+          (namesMap(childNames)[this.props.language] as string) ||
           /* tslint:disable:no-string-literal */
-          (namesMap['default'] as string) ||
+          (namesMap(childNames)['default'] as string) ||
           /* tslint:enable:no-string-literal */
           '',
         dob: (reg.child && reg.child.birthDate) || '',
         date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
         tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
+        status:
+          reg.registration &&
+          reg.registration.status &&
+          reg.registration.status.map(status => {
+            return {
+              type: status && status.type,
+              practitionerName:
+                (status &&
+                  status.user &&
+                  (namesMap(status.user.name as GQLHumanName[])[
+                    this.props.language
+                  ] as string)) ||
+                (status &&
+                  status.user &&
+                  /* tslint:disable:no-string-literal */
+                  (namesMap(status.user.name as GQLHumanName[])[
+                    'default'
+                  ] as string)) ||
+                /* tslint:enable:no-string-literal */
+                '',
+              timestamp:
+                status && moment(status.timestamp).format('YYYY-MM-DD'),
+              practitionerRole: status && status.user && status.user.role,
+              location: status && status.location && status.location.name
+            }
+          }),
         declaration_status:
-          (reg.registration &&
-            reg.registration.status &&
-            (reg.registration.status[0] as GQLRegWorkflow).type) ||
-          'application', // TODO don't default to application - this is here as we don't have any status information at the moment
+          reg.registration &&
+          reg.registration.status &&
+          (reg.registration.status[0] as GQLRegWorkflow).type,
         event: 'birth',
         location:
           (reg.registration &&
             reg.registration.status &&
+            (reg.registration.status[0] as GQLRegWorkflow).location &&
             ((reg.registration.status[0] as GQLRegWorkflow)
               .location as GQLLocation).name) ||
           ''
       }
     })
   }
+  renderExpansionContent = (
+    item: {
+      [key: string]: string & Array<{ [key: string]: string }>
+    },
+    key: number
+  ): JSX.Element[] => {
+    return item.status.map(status => {
+      const { practitionerName, practitionerRole, location } = status
+      return (
+        <ExpansionContainer key={key}>
+          {this.getDeclarationStatusIcon(status.type)}
 
-  renderCell = (item: { [key: string]: string }, key: number): JSX.Element => {
+          <ExpansionContentContainer>
+            <LabelValue
+              label={this.props.intl.formatMessage(
+                this.getWorkflowDateLabel(status.type)
+              )}
+              value={status.timestamp}
+            />
+            <ValueContainer>
+              <StyledLabel>
+                {this.props.intl.formatMessage(
+                  messages.workflowPractitionerLabel
+                )}
+                :
+              </StyledLabel>
+              <ValuesWithSeparator
+                strings={[
+                  practitionerName,
+                  formatRoleCode(practitionerRole),
+                  location
+                ]}
+                separator={<Separator />}
+              />
+            </ValueContainer>
+          </ExpansionContentContainer>
+        </ExpansionContainer>
+      )
+    })
+  }
+
+  renderCell = (
+    item: { [key: string]: string & Array<{ type: string }> },
+    key: number
+  ): JSX.Element => {
     const info = []
     const status = []
 
@@ -368,7 +556,9 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     const listItemActions = [
       {
         label: this.props.intl.formatMessage(messages.review),
-        handler: () => console.log('TO DO')
+        handler: () => {
+          this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+        }
       }
     ]
 
@@ -377,13 +567,14 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
       expansionActions.push(
         <PrimaryButton
           id={`reviewAndRegisterBtn_${item.tracking_id}`}
-          onClick={() => console.log('TO DO')}
+          onClick={() =>
+            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+          }
         >
           {this.props.intl.formatMessage(messages.reviewAndRegister)}
         </PrimaryButton>
       )
     }
-
     return (
       <ListItem
         index={key}
@@ -394,19 +585,36 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         actions={listItemActions}
         expandedCellRenderer={() => (
           <ListItemExpansion actions={expansionActions}>
-            <p>Expansion content</p>
+            {this.renderExpansionContent(item, key)}
           </ListItemExpansion>
         )}
       />
     )
   }
-
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
-
   userHasDeclareScope() {
     return this.props.scope && this.props.scope.includes('declare')
+  }
+
+  getLocalLocationId() {
+    const area = this.props.userDetails && this.props.userDetails.catchmentArea
+    const identifier =
+      area &&
+      area.find((location: ILocation) => {
+        return (
+          (location.identifier &&
+            location.identifier.find((areaIdentifier: IIdentifier) => {
+              return (
+                areaIdentifier.system.endsWith('jurisdiction-type') &&
+                areaIdentifier.value === 'UNION'
+              )
+            })) !== undefined
+        )
+      })
+
+    return identifier && identifier.id
   }
 
   getNewEventButtonText() {
@@ -421,7 +629,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
 
   render() {
     const { intl, theme } = this.props
-
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -447,7 +654,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         ]
       }
     }
-
     const filterBy = {
       input: {
         label: intl.formatMessage(messages.filtersFilterBy)
@@ -518,7 +724,6 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
         ]
       }
     }
-
     return (
       <>
         <HomeViewHeader>
@@ -530,7 +735,12 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
           />
         </HomeViewHeader>
         <Container>
-          <Query query={FETCH_REGISTRATION_QUERY}>
+          <Query
+            query={FETCH_REGISTRATION_QUERY}
+            variables={{
+              locationIds: [this.getLocalLocationId()]
+            }}
+          >
             {({ loading, error, data }) => {
               if (loading) {
                 return (
@@ -547,9 +757,7 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
                   </ErrorText>
                 )
               }
-
               const transformedData = this.transformData(data)
-
               return (
                 <>
                   <StyledIconAction
@@ -590,11 +798,11 @@ class WorkQueueView extends React.Component<IWorkQueueProps> {
     )
   }
 }
-
 export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
-    scope: getScope(state)
+    scope: getScope(state),
+    userDetails: state.profile.userDetails
   }),
-  { goToEvents: goToEventsAction }
+  { goToEvents: goToEventsAction, gotoTab: goToTabAction }
 )(injectIntl(withTheme(WorkQueueView)))

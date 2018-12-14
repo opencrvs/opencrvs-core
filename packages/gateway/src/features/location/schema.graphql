@@ -20,9 +20,14 @@ enum LocationType {
   OTHER
 }
 
+type Identifier {
+  system: String
+  value: String
+}
+
 type Location { # -> Location (mostly the same property name except:)
   id: ID!
-  identifier: [ID]
+  identifier: [Identifier]
   status: String
   name: String
   alias: [String]

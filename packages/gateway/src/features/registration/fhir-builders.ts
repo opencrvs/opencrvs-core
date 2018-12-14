@@ -1,6 +1,8 @@
 import transformObj, { IFieldBuilders } from 'src/features/transformation'
+import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
+  updateTaskTemplate,
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
@@ -351,6 +353,16 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
     valueString: fieldValue
+  })
+}
+
+function createPaperFormID(resource: fhir.Task, fieldValue: string) {
+  if (!resource.identifier) {
+    resource.identifier = []
+  }
+  resource.identifier.push({
+    system: `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`,
+    value: fieldValue
   })
 }
 
@@ -736,6 +748,14 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
     },
+    paperFormID: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createPaperFormID(taskResource, fieldValue)
+    },
     status: {
       comments: {
         comment: (
@@ -895,6 +915,23 @@ const builders: IFieldBuilders = {
           ]
         }
         docRef.content[0].attachment.data = fieldValue
+      },
+      subject: {
+        display: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const docRef = selectOrCreateDocRefResource(
+            DOCS_CODE,
+            fhirBundle,
+            context
+          )
+          if (!docRef.subject) {
+            docRef.subject = {}
+          }
+          docRef.subject.display = fieldValue
+        }
       }
     }
   },
@@ -1049,13 +1086,30 @@ const builders: IFieldBuilders = {
 }
 
 export async function buildFHIRBundle(reg: object) {
+  const ref = uuid()
   const fhirBundle: ITemplatedBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate()]
+    entry: [createCompositionTemplate(ref)]
   }
 
   await transformObj(reg, fhirBundle, builders)
+  return fhirBundle
+}
+
+export async function updateFHIRTaskBundle(
+  taskEntry: ITaskBundleEntry,
+  status: string,
+  reason?: string,
+  comment?: string
+) {
+  const taskResource = taskEntry.resource as fhir.Task
+  taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
+  const fhirBundle: ITaskBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [taskEntry]
+  }
   return fhirBundle
 }
 
@@ -1071,4 +1125,14 @@ export interface ITemplatedBundle extends fhir.Bundle {
   resourceType: fhir.code
   // prettier-ignore
   entry: [ICompositionBundleEntry, ...fhir.BundleEntry[]]
+}
+
+export interface ITaskBundleEntry extends fhir.BundleEntry {
+  resource: fhir.Task
+}
+
+export interface ITaskBundle extends fhir.Bundle {
+  resourceType: fhir.code
+  // prettier-ignore
+  entry: [ITaskBundleEntry]
 }

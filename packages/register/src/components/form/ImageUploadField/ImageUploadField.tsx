@@ -163,15 +163,14 @@ class ImageUploadComponent extends React.Component<
           onClick={this.toggleNestedSection}
         />
 
-        {fileList &&
-          fileList.length > 0 && (
-            <FileViewer id="file_list_viewer">
-              <FileViewerLabel>
-                {intl.formatMessage(messages.uploadedList)}
-              </FileViewerLabel>
-              {fileList}
-            </FileViewer>
-          )}
+        {fileList && fileList.length > 0 && (
+          <FileViewer id="file_list_viewer">
+            <FileViewerLabel>
+              {intl.formatMessage(messages.uploadedList)}
+            </FileViewerLabel>
+            {fileList}
+          </FileViewer>
+        )}
 
         {this.state.showNestedOptionSection && (
           <ImageUploadOption
@@ -195,6 +194,4 @@ class ImageUploadComponent extends React.Component<
     )
   }
 }
-export const ImageUploadField = injectIntl<IFullProps>(
-  ImageUploadComponent
-)
+export const ImageUploadField = injectIntl<IFullProps>(ImageUploadComponent)

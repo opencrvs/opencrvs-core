@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid'
 import { ITemplatedComposition } from '../registration/fhir-builders'
 
 export const MOTHER_CODE = 'mother-details'
@@ -115,12 +114,13 @@ export function createEncounter(refUuid: string) {
   }
 }
 
-export function createCompositionTemplate() {
+export function createCompositionTemplate(refUuid: string) {
   return {
+    fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
-        value: uuid()
+        value: `${refUuid}`
       },
       resourceType: 'Composition',
       status: 'preliminary',
@@ -149,6 +149,34 @@ export function createCompositionTemplate() {
       author: []
     } as ITemplatedComposition
   }
+}
+
+export function updateTaskTemplate(
+  task: fhir.Task,
+  status: string,
+  reason?: string,
+  comment?: string
+): fhir.Task {
+  if (
+    !task ||
+    !task.note ||
+    !task.businessStatus ||
+    !task.businessStatus.coding ||
+    !task.businessStatus.coding[0] ||
+    !task.businessStatus.coding[0].code
+  ) {
+    throw new Error('Task has no businessStatus code')
+  }
+  task.businessStatus.coding[0].code = status
+  if (comment && reason) {
+    const newNote: fhir.Annotation = {
+      text: `reason=${reason}&comment=${comment}`,
+      time: new Date().toUTCString(),
+      authorString: ''
+    }
+    task.note.push(newNote)
+  }
+  return task
 }
 
 export function createPersonEntryTemplate(refUuid: string) {

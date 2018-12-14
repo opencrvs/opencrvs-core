@@ -1,8 +1,8 @@
 import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
+  WORK_QUEUE,
   DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_BIRTH_PARENT_FORM_TAB,
   SELECT_VITAL_EVENT
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
@@ -18,7 +18,8 @@ export const GO_TO_TAB = 'navigation/GO_TO_TAB'
 type GoToTabAction = {
   type: typeof GO_TO_TAB
   payload: {
-    draftId: number
+    tabRoute: string
+    draftId: string
     tabId: string
     fieldNameHash?: string
   }
@@ -37,18 +38,26 @@ export function goBack() {
   return back()
 }
 
-export function goToBirthRegistrationAsParent(draftId: number) {
+export function goToWorkQueue() {
+  return push(WORK_QUEUE)
+}
+
+export function goToBirthRegistrationAsParent(draftId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, { draftId: draftId.toString() })
   )
 }
 
 export function goToTab(
-  draftId: number,
+  tabRoute: string,
+  draftId: string,
   tabId: string,
   fieldNameHash?: string
 ) {
-  return { type: GO_TO_TAB, payload: { draftId, tabId, fieldNameHash } }
+  return {
+    type: GO_TO_TAB,
+    payload: { draftId, tabId, fieldNameHash, tabRoute }
+  }
 }
 
 export type INavigationState = undefined
@@ -56,12 +65,12 @@ export type INavigationState = undefined
 export function navigationReducer(state: INavigationState, action: Action) {
   switch (action.type) {
     case GO_TO_TAB:
-      const { fieldNameHash, draftId, tabId } = action.payload
+      const { fieldNameHash, draftId, tabId, tabRoute } = action.payload
       return loop(
         state,
         Cmd.action(
           push(
-            formatUrl(DRAFT_BIRTH_PARENT_FORM_TAB, {
+            formatUrl(tabRoute, {
               draftId: draftId.toString(),
               tabId
             }) + (fieldNameHash ? `#${fieldNameHash}` : '')

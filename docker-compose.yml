@@ -48,6 +48,8 @@ services:
     environment:
       - NODE_ENV=DEVELOPMENT
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - COUNTRY=bgd
     deploy:
       replicas: 2
 
@@ -58,7 +60,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - CONFIG_TOKEN_EXPIRY_SECONDS=600
+      - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
     deploy:

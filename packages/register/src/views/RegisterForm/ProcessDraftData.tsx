@@ -6,10 +6,40 @@ export interface IPersonDetails {
   [key: string]: any
 }
 
-const processDraftData = (draftData: IFormData) => {
-  const { child, father, mother, registration } = draftData
+export interface IImage {
+  data: string
+  optionValues: string[]
+  type: string
+  title?: string
+  description?: string
+}
 
-  if (!draftData || !child || !father || !mother || !registration) {
+export const documentForWhomFhirMapping = {
+  Child: 'CHILD',
+  Father: 'FATHER',
+  Mother: 'MOTHER',
+  Other: 'OTHER'
+}
+
+export const documentTypeFhirMapping = {
+  'Birth Registration': 'BIRTH_REGISTRATION',
+  NID: 'NATIONAL_ID',
+  Passport: 'PASSPORT',
+  'School Certificate': 'SCHOOL_CERTIFICATE',
+  Other: 'OTHER'
+}
+
+const processDraftData = (draftData: IFormData) => {
+  const { child, father, mother, registration, documents } = draftData
+
+  if (
+    !draftData ||
+    !child ||
+    !father ||
+    !mother ||
+    !registration ||
+    !documents
+  ) {
     return draftData
   }
 
@@ -37,6 +67,7 @@ const processDraftData = (draftData: IFormData) => {
     maritalStatus: mother.maritalStatus,
     dateOfMarriage: mother.dateOfMarriage,
     educationalAttainment: mother.educationalAttainment,
+    multipleBirth: child.orderOfBirth,
     address: [
       {
         type: 'PERMANENT',
@@ -130,6 +161,16 @@ const processDraftData = (draftData: IFormData) => {
     ]
   }
 
+  const images = (documents.image_uploader as IImage[]) || []
+  const attachments = images.map(img => {
+    return {
+      data: img.data,
+      subject: documentForWhomFhirMapping[img.optionValues[0]],
+      type: documentTypeFhirMapping[img.optionValues[1]],
+      contentType: img.type
+    }
+  })
+
   const draftDetails: IdraftDetails = {
     child: {
       gender: child.gender,
@@ -150,6 +191,7 @@ const processDraftData = (draftData: IFormData) => {
     mother: motherDetails,
     registration: {
       contact: registration.whoseContactDetails,
+      paperFormID: registration.paperFormNumber,
       status: [
         {
           comments: [
@@ -160,7 +202,8 @@ const processDraftData = (draftData: IFormData) => {
           ],
           timestamp: new Date()
         }
-      ]
+      ],
+      attachments
     },
     attendantAtBirth: child.attendantAtBirth,
     birthType: child.typeOfBirth,

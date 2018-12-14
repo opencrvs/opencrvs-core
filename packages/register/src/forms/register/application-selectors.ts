@@ -1,5 +1,5 @@
 import { IRegisterFormState } from './reducer'
-import { IStoreState } from '../../store'
+import { IStoreState } from '@opencrvs/register/src/store'
 import { IFormSection } from 'src/forms'
 
 const getPartialState = (store: IStoreState): IRegisterFormState =>

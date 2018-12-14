@@ -6,7 +6,7 @@ export interface IURLParams {
 }
 export type Scope = string[]
 export interface ITokenPayload {
-  subject: string
+  sub: string
   exp: string
   algorithm: string
   scope: Scope
@@ -27,6 +27,10 @@ export function getToken(): string {
 
 export function storeToken(token: string) {
   localStorage.setItem('opencrvs', token)
+}
+
+export function removeToken() {
+  localStorage.removeItem('opencrvs')
 }
 
 export const getTokenPayload = (token: string) => {

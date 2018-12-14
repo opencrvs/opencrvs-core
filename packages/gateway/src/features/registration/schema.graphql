@@ -50,6 +50,8 @@ enum AttachmentType {
   IMMUNISATION_CERTIFICATE
   PAPER_FORM
   PASSPORT_PHOTO
+  BIRTH_REGISTRATION
+  SCHOOL_CERTIFICATE
   OTHER
 }
 
@@ -220,6 +222,7 @@ type Registration { # -> Task
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
+  duplicates: [ID]
 }
 
 input AttachmentInput {
@@ -250,6 +253,7 @@ type Attachment { # -> DocumentReference
 }
 
 type Query {
+  fetchBirthRegistration(id: ID!): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String
@@ -286,11 +290,7 @@ type Mutation {
     id: ID!
     details: BirthRegistrationInput
   ): BirthRegistration # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
-  markBirthAsVoided(
-    id: ID!
-    reason: String!
-    comment: String
-  ): BirthRegistration # updated status to 'voided' - the registration was captured in error
+  markBirthAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): ID!
   updateDeathRegistration(

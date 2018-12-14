@@ -2,10 +2,14 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   CHILD_SECTION_CODE,
   MOTHER_SECTION_CODE,
-  FATHER_SECTION_CODE
+  FATHER_SECTION_CODE,
+  REG_STATUS_DECLARED,
+  REG_STATUS_REGISTERED
 } from './constants'
+import { fhirUrl } from 'src/constants'
 import { getTaskResource, findPersonEntry } from './fhir-template'
 import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
+import fetch from 'node-fetch'
 
 enum CONTACT {
   MOTHER,
@@ -98,6 +102,37 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
   return composition.identifier.value
 }
 
+export function getBirthRegistrationNumber(taskResource: fhir.Task) {
+  const brnIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+      )
+    })
+  if (!brnIdentifier || !brnIdentifier.value) {
+    throw new Error("Didn't find any identifier for birth registration number")
+  }
+  return brnIdentifier.value
+}
+
+export function getPaperFormID(taskResource: fhir.Task) {
+  const paperFormIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`
+      )
+    })
+  if (!paperFormIdentifier || !paperFormIdentifier.value) {
+    throw new Error("Didn't find any identifier for paper form id")
+  }
+  return paperFormIdentifier.value
+}
+
 function getContactSection(contact: CONTACT) {
   switch (contact) {
     case CONTACT.MOTHER:
@@ -113,13 +148,36 @@ export function getRegStatusCode(tokenPayload: ITokenPayload) {
   if (!tokenPayload.scope) {
     throw new Error('No scope found on token')
   }
-  if (tokenPayload.scope.indexOf(USER_SCOPE.CERTIFY.toString()) > -1) {
-    return 'CERTIFIED'
-  } else if (tokenPayload.scope.indexOf(USER_SCOPE.REGISTER.toString()) > -1) {
-    return 'REGISTERED'
+  if (tokenPayload.scope.indexOf(USER_SCOPE.REGISTER.toString()) > -1) {
+    return REG_STATUS_REGISTERED
   } else if (tokenPayload.scope.indexOf(USER_SCOPE.DECLARE.toString()) > -1) {
-    return 'DECLARED'
+    return REG_STATUS_DECLARED
   } else {
     throw new Error('No valid scope found on token')
   }
+}
+
+export function getEntryId(fhirBundle: fhir.Bundle) {
+  const composition =
+    fhirBundle &&
+    fhirBundle.entry &&
+    (fhirBundle.entry[0].resource as fhir.Composition)
+
+  if (!composition || !composition.id) {
+    throw new Error('getEntryId: Invalid FHIR bundle found for declaration')
+  }
+  return composition.id
+}
+export const getFromFhir = (suffix: string) => {
+  return fetch(`${fhirUrl}${suffix}`, {
+    headers: {
+      'Content-Type': 'application/json+fhir'
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
 }

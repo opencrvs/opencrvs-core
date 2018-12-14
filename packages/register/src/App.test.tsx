@@ -1,12 +1,14 @@
 import * as ReactApollo from 'react-apollo'
-import { createTestApp } from './tests/util'
+import { createTestApp, mockUserResponse } from './tests/util'
 import { config } from '../src/config'
+import { v4 as uuid } from 'uuid'
 import {
   HOME,
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  WORK_QUEUE
+  WORK_QUEUE,
+  REVIEW_BIRTH_PARENT_FORM_TAB
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -15,16 +17,21 @@ import { storeDraft, createDraft, IDraft } from './drafts'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import { storage } from 'src/storage'
+import { queries } from 'src/profile/queries'
 
 import processDraftData, {
   IPersonDetails
 } from './views/RegisterForm/ProcessDraftData'
+import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
+const mockFetchUserDetails = jest.fn()
+mockFetchUserDetails.mockReturnValue(mockUserResponse)
+queries.fetchUserDetails = mockFetchUserDetails
 
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
@@ -657,7 +664,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: Date.now(), data }
+      customDraft = { id: uuid(), data }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
@@ -762,37 +769,105 @@ describe('when user has a valid token in local storage', () => {
             .find('#submit_form')
             .hostNodes()
             .prop('disabled')
-        ).toBe(false)
+        ).toBe(true)
       })
-      describe('button clicked', () => {
+      describe('All sections visited', () => {
         beforeEach(async () => {
           app
-            .find('#submit_form')
+            .find('#next_button_child')
             .hostNodes()
             .simulate('click')
-
-          await flushPromises()
-          app.update()
-        })
-
-        it('confirmation screen should show up', () => {
-          expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
-        })
-
-        it('On successful submission tracking id should be visible', async () => {
-          jest.setMock('react-apollo', { default: ReactApollo })
-
           app
-            .find('#submit_confirm')
+            .find('#next_button_mother')
             .hostNodes()
             .simulate('click')
-
+          app
+            .find('#next_button_father')
+            .hostNodes()
+            .simulate('click')
           await flushPromises()
           app.update()
+        })
 
-          expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
+        it('Should be able to click SEND FOR REVIEW Button', () => {
+          expect(
+            app
+              .find('#submit_form')
+              .hostNodes()
+              .prop('disabled')
+          ).toBe(false)
+        })
+        describe('button clicked', () => {
+          beforeEach(async () => {
+            app
+              .find('#submit_form')
+              .hostNodes()
+              .simulate('click')
+
+            await flushPromises()
+            app.update()
+          })
+
+          it('confirmation screen should show up', () => {
+            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
+          })
+
+          it('On successful submission tracking id should be visible', async () => {
+            jest.setMock('react-apollo', { default: ReactApollo })
+
+            app
+              .find('#submit_confirm')
+              .hostNodes()
+              .simulate('click')
+
+            await flushPromises()
+            app.update()
+
+            expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
+          })
         })
       })
+    })
+  })
+  describe('when user is in the review section', () => {
+    let customDraft: IDraft
+    const registerScopeToken =
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
+
+    beforeEach(() => {
+      getItem.mockReturnValue(registerScopeToken)
+      store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      const data = {
+        child: {},
+        father: {},
+        mother: {},
+        registration: {},
+        documents: { image_uploader: [] }
+      }
+
+      customDraft = { id: uuid(), data, review: true }
+      store.dispatch(storeDraft(customDraft))
+      history.replace(
+        REVIEW_BIRTH_PARENT_FORM_TAB.replace(
+          ':draftId',
+          customDraft.id.toString()
+        ).replace(':tabId', 'review')
+      )
+      app.update()
+      app
+        .find('#tab_child')
+        .hostNodes()
+        .simulate('click')
+      app.update()
+      app
+        .find('#tab_review')
+        .hostNodes()
+        .simulate('click')
+      app.update()
+    })
+
+    it('review tab should show up', () => {
+      expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
     })
   })
 })

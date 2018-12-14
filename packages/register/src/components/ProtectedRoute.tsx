@@ -14,6 +14,7 @@ import { parse } from 'querystring'
 
 export interface IProps {
   authenticated: boolean
+  userDetailsFetched: boolean
 }
 interface IDispatchProps {
   checkAuth: (urlValues: IURLParams) => void
@@ -27,7 +28,7 @@ class ProtectedRouteWrapper extends Route<
     this.props.checkAuth(values)
   }
   public render() {
-    if (!this.props.authenticated) {
+    if (!this.props.authenticated && !this.props.userDetailsFetched) {
       return <div />
     }
     return <Route {...this.props} />
@@ -36,11 +37,15 @@ class ProtectedRouteWrapper extends Route<
 
 const mapStateToProps = (store: IStoreState): IProps => {
   return {
-    authenticated: getAuthenticated(store)
+    authenticated: getAuthenticated(store),
+    userDetailsFetched: store.profile.userDetailsFetched
   }
 }
 export const ProtectedRoute = withRouter(
-  connect<IProps, IDispatchProps>(mapStateToProps, {
-    checkAuth
-  })(ProtectedRouteWrapper)
+  connect<IProps, IDispatchProps>(
+    mapStateToProps,
+    {
+      checkAuth
+    }
+  )(ProtectedRouteWrapper)
 )

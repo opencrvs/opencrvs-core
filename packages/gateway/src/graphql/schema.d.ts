@@ -12,6 +12,7 @@ import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql'
  *******************************/
 export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
+  fetchBirthRegistration?: GQLBirthRegistration
   listBirthRegistrations?: Array<GQLBirthRegistration | null>
   listDeathRegistrations?: Array<GQLBirthRegistration | null>
   locationsByParent?: Array<GQLLocation | null>
@@ -147,7 +148,7 @@ export enum GQLEducationType {
 
 export interface GQLLocation {
   id: string
-  identifier?: Array<string | null>
+  identifier?: Array<GQLIdentifier | null>
   status?: string
   name?: string
   alias?: Array<string | null>
@@ -159,6 +160,11 @@ export interface GQLLocation {
   latitude?: number
   altitude?: number
   geoData?: string
+}
+
+export interface GQLIdentifier {
+  system?: string
+  value?: string
 }
 
 export enum GQLLocationType {
@@ -199,6 +205,7 @@ export interface GQLRegistration {
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachment | null>
+  duplicates?: Array<string | null>
 }
 
 export enum GQLRegistrationContactType {
@@ -285,7 +292,7 @@ export interface GQLMutation {
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsRegistered?: GQLBirthRegistration
   markBirthAsCertified?: GQLBirthRegistration
-  markBirthAsVoided?: GQLBirthRegistration
+  markBirthAsVoided: string
   createDeathRegistration: string
   updateDeathRegistration: GQLDeathRegistration
   markDeathAsVerified?: GQLDeathRegistration
@@ -490,6 +497,7 @@ export interface GQLResolver {
   Address?: GQLAddressTypeResolver
   Attachment?: GQLAttachmentTypeResolver
   Location?: GQLLocationTypeResolver
+  Identifier?: GQLIdentifierTypeResolver
   BirthRegistration?: GQLBirthRegistrationTypeResolver
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
@@ -501,6 +509,7 @@ export interface GQLResolver {
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
+  fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
@@ -522,6 +531,21 @@ export interface QueryToListNotificationsResolver<
   (
     parent: TParent,
     args: QueryToListNotificationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchBirthRegistrationArgs {
+  id: string
+}
+export interface QueryToFetchBirthRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchBirthRegistrationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -953,6 +977,19 @@ export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLIdentifierTypeResolver<TParent = any> {
+  system?: IdentifierToSystemResolver<TParent>
+  value?: IdentifierToValueResolver<TParent>
+}
+
+export interface IdentifierToSystemResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IdentifierToValueResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   id?: BirthRegistrationToIdResolver<TParent>
   registration?: BirthRegistrationToRegistrationResolver<TParent>
@@ -1117,6 +1154,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
+  duplicates?: RegistrationToDuplicatesResolver<TParent>
 }
 
 export interface RegistrationToTrackingIdResolver<
@@ -1161,6 +1199,13 @@ export interface RegistrationToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToAttachmentsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToDuplicatesResolver<
   TParent = any,
   TResult = any
 > {

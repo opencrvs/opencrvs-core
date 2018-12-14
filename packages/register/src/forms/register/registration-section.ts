@@ -4,7 +4,7 @@ import {
   SELECT_WITH_OPTIONS,
   TEXT,
   TEL,
-  CHECKBOX_GROUP,
+  NUMBER,
   TEXTAREA
 } from 'src/forms'
 import { phoneNumberFormat, emailAddressFormat } from 'src/utils/validate'
@@ -191,30 +191,8 @@ export const registrationSection: IFormSection = {
       validate: [phoneNumberFormat]
     },
     {
-      name: 'registrationCertificateLanguage',
-      type: CHECKBOX_GROUP,
-      label: messages.registrationCertificateLanguage,
-      required: true,
-      initialValue: [],
-      validate: [],
-      options: [
-        {
-          value: 'bn',
-          label: messages.registrationCertificateBN
-        },
-        {
-          value: 'en',
-          label: messages.registrationCertificateEN
-        },
-        {
-          value: 'other',
-          label: messages.registrationCertificateOther
-        }
-      ]
-    },
-    {
       name: 'paperFormNumber',
-      type: TEXT,
+      type: NUMBER,
       label: messages.paperFormNumberLabel,
       required: true,
       initialValue: '',
