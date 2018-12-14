@@ -150,6 +150,8 @@ export interface IConditionals {
   addressLine4: IConditional
   addressLine3Options1: IConditional
   uploadDocForWhom: IConditional
+  motherCollectsCertificate: IConditional
+  otherPersonCollectsCertificate: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

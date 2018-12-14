@@ -2,9 +2,11 @@ import * as React from 'react'
 import gql from 'graphql-tag'
 import { Query } from 'react-apollo'
 import styled from 'styled-components'
-import { ActionPage } from '@opencrvs/components/lib/interface'
+import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { FormFieldGenerator } from 'src/components/form'
+import { printCertificateForm } from './print-certificate'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -28,6 +30,9 @@ const ErrorText = styled.div`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
+`
+const FormContainer = styled.div`
+  padding: 35px 25px;
 `
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
@@ -106,6 +111,21 @@ class PrintCertificateActionComponent extends React.Component<
             {({ loading, error, data }) => {
               if (loading) {
                 return <StyledSpinner id="print-certificate-spinner" />
+              }
+
+              if (data) {
+                return (
+                  <FormContainer>
+                    <Box>
+                      <FormFieldGenerator
+                        id={printCertificateForm.id}
+                        onChange={() => console.log('on change called')}
+                        setAllFieldsDirty={false}
+                        fields={printCertificateForm.fields}
+                      />
+                    </Box>
+                  </FormContainer>
+                )
               }
               if (error) {
                 return (

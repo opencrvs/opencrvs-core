@@ -151,5 +151,13 @@ export const conditionals: IConditionals = {
   uploadDocForWhom: {
     action: 'hide',
     expression: '!values.uploadDocForWhom'
+  },
+  motherCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="MOTHER"'
+  },
+  otherPersonCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="OTHER"'
   }
 }
