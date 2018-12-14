@@ -123,6 +123,7 @@ describe('ReviewForm tests', async () => {
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT' }],
+                multipleBirth: 1,
                 address: [
                   {
                     type: 'PERMANENT',
@@ -154,7 +155,10 @@ describe('ReviewForm tests', async () => {
               },
               father: null,
               registration: {
-                contact: 'MOTHER'
+                contact: 'MOTHER',
+                attachments: null,
+                status: null,
+                paperFormID: '123'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -202,6 +206,7 @@ describe('ReviewForm tests', async () => {
       firstNames: '',
       firstNamesEng: '',
       gender: 'male',
+      orderOfBirth: 1,
       typeOfBirth: 'SINGLE',
       weightAtBirth: 2
     })
@@ -310,7 +315,10 @@ describe('ReviewForm tests', async () => {
                 ]
               },
               registration: {
-                contact: 'FATHER'
+                contact: 'FATHER',
+                attachments: null,
+                status: null,
+                paperFormID: '123'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -369,7 +377,10 @@ describe('ReviewForm tests', async () => {
               mother: null,
               father: null,
               registration: {
-                contact: 'MOTHER'
+                contact: 'MOTHER',
+                attachments: null,
+                status: null,
+                paperFormID: '123'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -415,6 +426,210 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
 
+  it('when registration has attachment', async () => {
+    const draft = createReviewDraft(uuid(), {})
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          variables: { id: draft.id }
+        },
+        result: {
+          data: {
+            fetchBirthRegistration: {
+              child: null,
+              mother: null,
+              father: null,
+              registration: {
+                contact: 'MOTHER',
+                attachments: [
+                  {
+                    contentType: 'image/jpeg',
+                    subject: 'MOTHER',
+                    type: 'BIRTH_REGISTRATION',
+                    data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQECWAJYAAD'
+                  }
+                ],
+                status: null,
+                paperFormID: '123'
+              },
+              attendantAtBirth: 'NURSE',
+              weightAtBirth: 2,
+              birthType: 'SINGLE',
+              presentAtBirthRegistration: 'MOTHER_ONLY'
+            }
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        registerForm={form}
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: draft.id, tabId: 'review' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftId={draft.id}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
+
+    testComponent.component.update()
+
+    const data = testComponent.component
+      .find(RegisterForm)
+      .prop('draft') as IDraft
+
+    expect(data.data.documents.image_uploader).toEqual([
+      {
+        optionValues: ['Mother', 'Birth Registration'],
+        type: 'image/jpeg',
+        title: 'Mother',
+        description: 'Birth Registration',
+        data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQECWAJYAAD'
+      }
+    ])
+
+    testComponent.component.unmount()
+  })
+  it('check registration', async () => {
+    const draft = createReviewDraft(uuid(), {})
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          variables: { id: draft.id }
+        },
+        result: {
+          data: {
+            fetchBirthRegistration: {
+              child: null,
+              mother: {
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'ময়না'
+                  },
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Moyna'
+                  }
+                ],
+                birthDate: '2001-01-01',
+                maritalStatus: 'MARRIED',
+                dateOfMarriage: '2001-01-01',
+                educationalAttainment: 'PRIMARY_ISCED_1',
+                nationality: ['BGD'],
+                identifier: [{ id: '1233', type: 'PASSPORT' }],
+                multipleBirth: 1,
+                address: [
+                  {
+                    type: 'PERMANENT',
+                    line: ['12', '', 'union1', 'upazila10'],
+                    district: 'district2',
+                    state: 'state2',
+                    postalCode: '',
+                    country: 'BGD'
+                  },
+                  {
+                    type: 'CURRENT',
+                    line: ['12', '', 'union1', 'upazila10'],
+                    district: 'district2',
+                    state: 'state2',
+                    postalCode: '',
+                    country: 'BGD'
+                  }
+                ],
+                telecom: [
+                  {
+                    system: 'phone',
+                    value: '01711111111'
+                  },
+                  {
+                    system: 'email',
+                    value: 'moyna@ocrvs.com'
+                  }
+                ]
+              },
+              father: null,
+              registration: {
+                contact: 'MOTHER',
+                attachments: null,
+                status: [
+                  {
+                    comments: [
+                      {
+                        comment: 'This is a note'
+                      }
+                    ]
+                  }
+                ],
+                paperFormID: '123'
+              },
+              attendantAtBirth: 'NURSE',
+              weightAtBirth: 2,
+              birthType: 'SINGLE',
+              presentAtBirthRegistration: 'MOTHER_ONLY'
+            }
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        registerForm={form}
+        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: draft.id, tabId: 'review' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftId={draft.id}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
+
+    testComponent.component.update()
+
+    const data = testComponent.component
+      .find(RegisterForm)
+      .prop('draft') as IDraft
+
+    expect(data.data.registration).toEqual({
+      whoseContactDetails: 'MOTHER',
+      presentAtBirthRegistration: 'MOTHER_ONLY',
+      registrationPhone: '01711111111',
+      registrationEmail: 'moyna@ocrvs.com',
+      paperFormNumber: '123',
+      commentsOrNotes: 'This is a note'
+    })
+
+    testComponent.component.unmount()
+  })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const draft = createReviewDraft(uuid(), {})
     draft.data = {
@@ -511,7 +726,10 @@ describe('ReviewForm tests', async () => {
                 mother: null,
                 father: null,
                 registration: {
-                  contact: 'MOTHER'
+                  contact: 'MOTHER',
+                  attachments: null,
+                  status: null,
+                  paperFormID: '123'
                 },
                 attendantAtBirth: 'NURSE',
                 weightAtBirth: 2,

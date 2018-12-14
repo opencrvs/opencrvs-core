@@ -268,6 +268,9 @@ export const typeResolvers: GQLResolver = {
     data(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data
     },
+    contentType(docRef: fhir.DocumentReference) {
+      return docRef.content[0].attachment.contentType
+    },
     originalFileName(docRef: fhir.DocumentReference) {
       const foundIdentifier =
         docRef.identifier &&
@@ -492,6 +495,10 @@ export const typeResolvers: GQLResolver = {
         `${fhirUrl}/${encounterSection.entry[0].reference}`
       )
       const data = await res.json()
+
+      if (!data || !data.location || !data.location[0].location) {
+        return null
+      }
 
       const locationRes = await fetch(
         `${fhirUrl}/${data.location[0].location.reference}`

@@ -842,7 +842,7 @@ describe('when user has a valid token in local storage', () => {
         father: {},
         mother: {},
         registration: {},
-        documents: { image_uploader: '' }
+        documents: { image_uploader: [] }
       }
 
       customDraft = { id: uuid(), data, review: true }
