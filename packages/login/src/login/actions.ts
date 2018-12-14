@@ -20,6 +20,8 @@ export const RESEND_SMS = 'login/RESEND_SMS'
 export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
 export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
 
+export const GOTO_APP = 'login/GOTO_APP'
+
 export type AuthenticationDataAction = {
   type: typeof AUTHENTICATE
   payload: IAuthenticationData
@@ -64,6 +66,11 @@ export type VerifyCodeFailedAction = {
   payload: Error
 }
 
+export type GoToAppAction = {
+  type: typeof GOTO_APP
+  payload: string
+}
+
 export type Action =
   | RouterAction
   | AuthenticationDataAction
@@ -75,6 +82,7 @@ export type Action =
   | VerifyCodeAction
   | VerifyCodeCompleteAction
   | VerifyCodeFailedAction
+  | GoToAppAction
 
 export const authenticate = (
   values: IAuthenticationData
@@ -148,4 +156,8 @@ export const completeVerifyCode = (
 export const failVerifyCode = (error: AxiosError): VerifyCodeFailedAction => ({
   type: VERIFY_CODE_FAILED,
   payload: error
+})
+export const gotoApp = (appId: string): GoToAppAction => ({
+  type: GOTO_APP,
+  payload: appId
 })

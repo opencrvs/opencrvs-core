@@ -16,6 +16,12 @@ export const ENGLISH_STATE = {
     'login.stepTwoInstruction':
       'Please enter the sms code we have sent to your mobile phone.',
     'login.clearForm': 'Clear form',
+    'login.manager.registerAppTitle': 'OpenCRVS Homepage',
+    'login.manager.registerAppDescription':
+      'Manage applications, registrations and certifications here.',
+    'login.manager.performanceAppTitle': 'Performance Management',
+    'login.manager.performanceAppDescription':
+      "Analyse the performance of a particular area of your country in it's Civil Registration.",
     'validations.required': 'required',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
