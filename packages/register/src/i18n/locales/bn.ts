@@ -648,6 +648,17 @@ export const BENGALI_STATE = {
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.collected': 'সংগৃহীত',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
+    'register.workQueue.print.form.name': 'মুদ্রণ',
+    'register.workQueue.print.form.title': 'সার্টিফিকেট মুদ্রণ',
+    'formFields.print.whoToCollect': 'কে সার্টিফিকেট সংগ্রহ করছে?',
+    'register.workQueue.print.collector.mother': 'মা',
+    'register.workQueue.print.collector.father': 'পিতা',
+    'register.workQueue.print.collector.other': 'অন্যান্য',
+    'formFields.print.confirmMotherInformation':
+      'আইডি নথি তাদের প্রমাণ নিম্নলিখিত বিবরণ মেলে?',
+    'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',
+    'formFields.print.otherPersonFamilyName': 'পারিবারিক নাম',
+    'formFields.print.signedAffidavit': 'তার একটি স্বাক্ষরিত হলফনামা আছে?',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
     'review.edit.modal.confirmationText':

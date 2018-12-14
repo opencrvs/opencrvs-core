@@ -4,12 +4,17 @@ import { conditionals } from 'src/forms/utils'
 
 const messages = defineMessages({
   printCertificate: {
-    id: 'register.workQueue.list.buttons.printCertificate',
+    id: 'register.workQueue.print.form.name',
+    defaultMessage: 'Print',
+    description: 'The title of review button in list expansion actions'
+  },
+  print: {
+    id: 'register.workQueue.print.form.title',
     defaultMessage: 'Print certificate',
     description: 'The title of review button in list expansion actions'
   },
   whoToCollect: {
-    id: 'register.workQueue.print.whoToCollect',
+    id: 'formFields.print.whoToCollect',
     defaultMessage: 'Who is collecting the certificate?',
     description: 'The label for collector of certificate select'
   },
@@ -31,8 +36,8 @@ const messages = defineMessages({
     description:
       'The label for select value when the collector of certificate is other person'
   },
-  motherDetailsTextTMP: {
-    id: 'register.workQueue.print.collector.motherDetailsText',
+  confirmMotherDetails: {
+    id: 'formFields.print.confirmMotherInformation',
     defaultMessage:
       'Does their proof of ID document match the following details?',
     description: 'The label for mother details paragraph'
@@ -85,7 +90,7 @@ export const printCertificateForm: IFormSection = {
     {
       name: 'motherDetails',
       type: RADIO_GROUP,
-      label: messages.motherDetailsTextTMP,
+      label: messages.confirmMotherDetails,
       required: true,
       initialValue: '',
       validate: [],

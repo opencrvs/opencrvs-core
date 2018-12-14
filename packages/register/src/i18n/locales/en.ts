@@ -656,6 +656,17 @@ export const ENGLISH_STATE = {
     'register.workQueue.listItem.status.dateLabel.registered': 'Registrated on',
     'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
+    'register.workQueue.print.form.name': 'Print',
+    'register.workQueue.print.form.title': 'Print certificate',
+    'formFields.print.whoToCollect': 'Who is collecting the certificate?',
+    'register.workQueue.print.collector.mother': 'Mother',
+    'register.workQueue.print.collector.father': 'Father',
+    'register.workQueue.print.collector.other': 'Other',
+    'formFields.print.confirmMotherInformation':
+      'Does their proof of ID document match the following details?',
+    'formFields.print.otherPersonGivenNames': 'Given name',
+    'formFields.print.otherPersonFamilyName': 'Family name',
+    'formFields.print.signedAffidavit': 'Do they have a signed affidavit?',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':
