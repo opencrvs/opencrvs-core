@@ -385,7 +385,9 @@ const ExpansionContentContainer = styled.div`
   flex: 1;
   margin-left: 10px;
 `
-
+const StyledPrimaryButton = styled(PrimaryButton)`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+`
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -601,7 +603,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     if (this.userHasRegisterScope()) {
       if (!item.duplicates) {
         expansionActions.push(
-          <PrimaryButton
+          <StyledPrimaryButton
             id={`reviewAndRegisterBtn_${item.tracking_id}`}
             onClick={() =>
               this.props.gotoTab(
@@ -612,19 +614,19 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
             }
           >
             {this.props.intl.formatMessage(messages.reviewAndRegister)}
-          </PrimaryButton>
+          </StyledPrimaryButton>
         )
       }
       if (item.duplicates) {
         expansionActions.push(
-          <PrimaryButton
+          <StyledPrimaryButton
             id={`reviewDuplicatesBtn_${item.tracking_id}`}
             onClick={() => {
               console.log('TO DO')
             }}
           >
             {this.props.intl.formatMessage(messages.reviewDuplicates)}
-          </PrimaryButton>
+          </StyledPrimaryButton>
         )
       }
     }
