@@ -43,7 +43,6 @@ import {
   PARAGRAPH,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  CHECKBOX_GROUP,
   ISelectOption,
   IDynamicOptions,
   IFormSectionData
@@ -318,24 +317,6 @@ function renderSelectDynamicLabel(
   return selectedOption ? intl.formatMessage(selectedOption.label) : value
 }
 
-function renderCheckboxGroup(
-  values: string[],
-  options: ISelectOption[],
-  intl: InjectedIntl
-) {
-  let result = ''
-  values.forEach((value, key) => {
-    const tempValue = options.find(option => option.value === value)
-
-    if (key > 0) {
-      result += ', '
-    }
-
-    result += tempValue ? intl.formatMessage(tempValue.label) : value
-  })
-  return result
-}
-
 const renderValue = (
   draft: IDraft,
   section: IFormSection,
@@ -356,10 +337,6 @@ const renderValue = (
       draftData,
       intl
     )
-  }
-  if (field.type === CHECKBOX_GROUP && field.options) {
-    const checkBoxValue: string[] = value as string[]
-    return renderCheckboxGroup(checkBoxValue, field.options, intl)
   }
   if (typeof value === 'string') {
     return value
@@ -495,10 +472,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
-  }
-
-  userHasDeclareScope() {
-    return this.props.scope && this.props.scope.includes('declare')
   }
 
   render() {
