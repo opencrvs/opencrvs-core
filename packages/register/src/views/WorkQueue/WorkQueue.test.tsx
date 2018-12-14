@@ -365,7 +365,7 @@ describe('WorkQueue tests', async () => {
       getItem.mockReturnValue(registerScopeToken)
       store.dispatch(checkAuth({ '?token': registerScopeToken }))
     })
-    it('renders review and register button for user with register scope', async () => {
+    it('renders review duplicates button for user with register scope', async () => {
       const graphqlMock = [
         {
           request: {
