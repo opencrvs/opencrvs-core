@@ -22,6 +22,7 @@ import {
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle({
     mother: {
+      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
       identifier: [{ id: '123456', type: 'PASSPORT' }],
       gender: 'female',
       birthDate: '2000-01-28',
@@ -34,6 +35,7 @@ test('should build a minimal FHIR registration document without error', async ()
       educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
     },
     father: {
+      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb40',
       gender: 'male',
       name: [],
       telecom: [{ use: 'mobile', system: 'phone', value: '0171111111' }],
@@ -76,6 +78,7 @@ test('should build a minimal FHIR registration document without error', async ()
       educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
     },
     child: {
+      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
       gender: 'male',
       name: [],
       birthDate: '2018-01-28',
@@ -87,6 +90,7 @@ test('should build a minimal FHIR registration document without error', async ()
       educationalAttainment: 'NO_SCHOOLING'
     },
     registration: {
+      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
       contact: 'MOTHER',
       paperFormID: '12345678',
       status: [
@@ -102,6 +106,7 @@ test('should build a minimal FHIR registration document without error', async ()
       ],
       attachments: [
         {
+          _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce11',
           contentType: 'image/jpeg',
           data: 'SampleData',
           status: 'final',
@@ -111,6 +116,7 @@ test('should build a minimal FHIR registration document without error', async ()
           createdAt: '2018-10-21'
         },
         {
+          _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce22',
           contentType: 'image/png',
           data: 'ExampleData',
           status: 'deleted',
@@ -138,43 +144,45 @@ test('should build a minimal FHIR registration document without error', async ()
     childrenBornAliveToMother: 2,
     foetalDeathsToMother: 0,
     lastPreviousLiveBirth: '2014-01-28',
-    createdAt: new Date()
+    createdAt: new Date(),
+    _fhirIDMap: {
+      composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
+      encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
+      observation: {
+        birthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
+        weightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
+        attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
+        birthRegistrationType: '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
+        presentAtBirthRegistration:
+          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
+        childrenBornAliveToMother:
+          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
+        foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
+        lastPreviousLiveBirth:
+          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
+      }
+    }
   })
 
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(5)
   expect(fhir.entry[0].resource.date).toBeDefined()
+  expect(fhir.entry[0].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd'
+  )
+
   expect(fhir.entry[1].resource.gender).toBe('female')
-  expect(fhir.entry[2].resource.gender).toBe('male')
-  expect(fhir.entry[3].resource.gender).toBe('male')
+  expect(fhir.entry[1].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eeb39')
   expect(fhir.entry[1].resource.name[0].given[0]).toBe('Jane')
   expect(fhir.entry[1].resource.name[0].family[0]).toBe('Doe')
   expect(fhir.entry[1].resource.name[0].use).toBe('en')
   expect(fhir.entry[1].resource.identifier[0].id).toBe('123456')
   expect(fhir.entry[1].resource.identifier[0].type).toBe('PASSPORT')
-  expect(fhir.entry[2].resource.telecom[0].value).toBe('0171111111')
-  expect(fhir.entry[2].resource.telecom[0].system).toBe('phone')
-  expect(fhir.entry[2].resource.telecom[0].use).toBe('mobile')
   expect(fhir.entry[1].resource.birthDate).toBe('2000-01-28')
-  expect(fhir.entry[2].resource.birthDate).toBe('2000-09-28')
-  expect(fhir.entry[3].resource.birthDate).toBe('2018-01-28')
-  expect(fhir.entry[2].resource.maritalStatus.text).toBe('MARRIED')
   expect(fhir.entry[1].resource.maritalStatus.text).toBe('MARRIED')
-  expect(fhir.entry[3].resource.maritalStatus.text).toBe('NOT_STATED')
-  expect(fhir.entry[2].resource.maritalStatus.coding[0].code).toBe('M')
   expect(fhir.entry[1].resource.maritalStatus.coding[0].code).toBe('M')
-  expect(fhir.entry[3].resource.maritalStatus.coding[0].code).toBe('UNK')
   expect(fhir.entry[1].resource.multipleBirthInteger).toBe(1)
-  expect(fhir.entry[2].resource.multipleBirthInteger).toBe(2)
-  expect(fhir.entry[3].resource.multipleBirthInteger).toBe(3)
   expect(fhir.entry[1].resource.deceasedBoolean).toBe(false)
-  expect(fhir.entry[2].resource.deceasedBoolean).toBe(false)
-  expect(fhir.entry[3].resource.deceasedBoolean).toBe(false)
-  expect(fhir.entry[2].resource.photo[0].title).toBe('father-national-id')
-  expect(fhir.entry[2].resource.address[0].use).toBe('home')
-  expect(fhir.entry[2].resource.address[0].line[0]).toBe('2760 Mlosi Street')
-  expect(fhir.entry[2].resource.address[1].line[0]).toBe('40 Orbis Wharf')
-  expect(fhir.entry[2].resource.address[1].text).toBe('Optional address text')
   expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
   expect(fhir.entry[1].resource.extension[1]).toEqual({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
@@ -201,6 +209,22 @@ test('should build a minimal FHIR registration document without error', async ()
     `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`
   )
   expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
+
+  expect(fhir.entry[2].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eeb40')
+  expect(fhir.entry[2].resource.gender).toBe('male')
+  expect(fhir.entry[2].resource.telecom[0].value).toBe('0171111111')
+  expect(fhir.entry[2].resource.telecom[0].system).toBe('phone')
+  expect(fhir.entry[2].resource.telecom[0].use).toBe('mobile')
+  expect(fhir.entry[2].resource.birthDate).toBe('2000-09-28')
+  expect(fhir.entry[2].resource.maritalStatus.text).toBe('MARRIED')
+  expect(fhir.entry[2].resource.maritalStatus.coding[0].code).toBe('M')
+  expect(fhir.entry[2].resource.multipleBirthInteger).toBe(2)
+  expect(fhir.entry[2].resource.deceasedBoolean).toBe(false)
+  expect(fhir.entry[2].resource.photo[0].title).toBe('father-national-id')
+  expect(fhir.entry[2].resource.address[0].use).toBe('home')
+  expect(fhir.entry[2].resource.address[0].line[0]).toBe('2760 Mlosi Street')
+  expect(fhir.entry[2].resource.address[1].line[0]).toBe('40 Orbis Wharf')
+  expect(fhir.entry[2].resource.address[1].text).toBe('Optional address text')
   expect(fhir.entry[2].resource.extension[1]).toEqual({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
     extension: [
@@ -225,6 +249,13 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.extension[2].url).toBe(
     `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`
   )
+  expect(fhir.entry[3].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eeb41')
+  expect(fhir.entry[3].resource.gender).toBe('male')
+  expect(fhir.entry[3].resource.birthDate).toBe('2018-01-28')
+  expect(fhir.entry[3].resource.maritalStatus.text).toBe('NOT_STATED')
+  expect(fhir.entry[3].resource.maritalStatus.coding[0].code).toBe('UNK')
+  expect(fhir.entry[3].resource.multipleBirthInteger).toBe(3)
+  expect(fhir.entry[3].resource.deceasedBoolean).toBe(false)
   expect(fhir.entry[3].resource.extension[0].valueDateTime).toBe('')
   expect(fhir.entry[3].resource.extension[1]).toEqual({
     url: `${FHIR_SPECIFICATION_URL}patient-nationality`,
@@ -251,6 +282,7 @@ test('should build a minimal FHIR registration document without error', async ()
 
   /* Task Test cases */
   expect(fhir.entry[4].resource.resourceType).toBe('Task')
+  expect(fhir.entry[4].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eebce')
   expect(fhir.entry[4].resource.code).toEqual({
     coding: [
       {
@@ -277,6 +309,9 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   // Attachment Test cases
+  expect(fhir.entry[5].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce11'
+  )
   expect(fhir.entry[5].resource.docStatus).toBe('final')
   expect(fhir.entry[5].resource.created).toBe('2018-10-21')
   expect(fhir.entry[5].resource.type).toEqual({
@@ -305,6 +340,9 @@ test('should build a minimal FHIR registration document without error', async ()
       value: 'system.jpg'
     }
   ])
+  expect(fhir.entry[6].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce22'
+  )
   expect(fhir.entry[6].resource.docStatus).toBe('deleted')
   expect(fhir.entry[6].resource.created).toBe('2018-10-22')
   expect(fhir.entry[6].resource.type).toEqual({
@@ -337,6 +375,9 @@ test('should build a minimal FHIR registration document without error', async ()
     display: 'MOTHER'
   })
   // Encounter
+  expect(fhir.entry[7].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
+  )
   expect(fhir.entry[7].resource.resourceType).toBe('Encounter')
   expect(fhir.entry[7].resource.location[0].location.reference).toEqual(
     fhir.entry[8].fullUrl
@@ -348,6 +389,9 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[8].resource.position.longitude).toBe(90.399452)
 
   // Observation
+  expect(fhir.entry[9].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283'
+  )
   expect(fhir.entry[9].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[9].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
@@ -370,6 +414,9 @@ test('should build a minimal FHIR registration document without error', async ()
       display: 'Birth plurality of Pregnancy'
     }
   ])
+  expect(fhir.entry[10].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293'
+  )
   expect(fhir.entry[10].resource.valueQuantity.value).toBe(3)
   expect(fhir.entry[10].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
@@ -392,6 +439,9 @@ test('should build a minimal FHIR registration document without error', async ()
       display: 'Body weight Measured'
     }
   ])
+  expect(fhir.entry[11].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203'
+  )
   expect(fhir.entry[11].resource.valueString).toBe('NURSE')
   expect(fhir.entry[11].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
@@ -414,50 +464,65 @@ test('should build a minimal FHIR registration document without error', async ()
       display: 'Birth attendant title'
     }
   ])
+  expect(fhir.entry[12].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes'
+  )
   expect(fhir.entry[12].resource.valueString).toBe('INFORMANT_ONLY')
   expect(fhir.entry[12].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
   )
   expect(fhir.entry[12].resource.code.coding).toEqual([
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: 'http://loinc.org',
       code: BIRTH_REG_TYPE_CODE,
       display: 'Birth registration type'
     }
   ])
+  expect(fhir.entry[13].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586'
+  )
   expect(fhir.entry[13].resource.valueString).toBe('INFORMANT_ONLY')
   expect(fhir.entry[13].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
   )
   expect(fhir.entry[13].resource.code.coding).toEqual([
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: 'http://loinc.org',
       code: BIRTH_REG_PRESENT_CODE,
       display: 'Present at birth registration'
     }
   ])
+  expect(fhir.entry[14].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
+  )
   expect(fhir.entry[14].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[14].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
   )
   expect(fhir.entry[14].resource.code.coding).toEqual([
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: 'http://loinc.org',
       code: NUMBER_BORN_ALIVE_CODE,
       display: 'Number born alive to mother'
     }
   ])
+  expect(fhir.entry[15].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
+  )
   expect(fhir.entry[15].resource.valueQuantity.value).toBe(0)
   expect(fhir.entry[15].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
   )
   expect(fhir.entry[15].resource.code.coding).toEqual([
     {
-      system: 'http://opencrvs.org/specs/obs-type',
+      system: 'http://loinc.org',
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
   ])
+  expect(fhir.entry[16].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
+  )
   expect(fhir.entry[16].resource.valueDateTime).toBe('2014-01-28')
   expect(fhir.entry[16].resource.context.reference).toEqual(
     fhir.entry[7].fullUrl
