@@ -22,6 +22,9 @@ ShallowWrapper {
     "nodeType": "class",
     "props": Object {
       "children": Array [
+        <styled.div>
+          <Unknown />
+        </styled.div>,
         <Connect(InjectIntl(TopMenuComponent))
           hideBackButton={true}
         />,
@@ -39,6 +42,25 @@ ShallowWrapper {
     },
     "ref": null,
     "rendered": Array [
+      Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "class",
+        "props": Object {
+          "children": <Unknown />,
+        },
+        "ref": null,
+        "rendered": Object {
+          "instance": null,
+          "key": undefined,
+          "nodeType": "function",
+          "props": Object {},
+          "ref": null,
+          "rendered": null,
+          "type": [Function],
+        },
+        "type": [Function],
+      },
       Object {
         "instance": null,
         "key": undefined,
@@ -83,6 +105,9 @@ ShallowWrapper {
       "nodeType": "class",
       "props": Object {
         "children": Array [
+          <styled.div>
+            <Unknown />
+          </styled.div>,
           <Connect(InjectIntl(TopMenuComponent))
             hideBackButton={true}
           />,
@@ -100,6 +125,25 @@ ShallowWrapper {
       },
       "ref": null,
       "rendered": Array [
+        Object {
+          "instance": null,
+          "key": undefined,
+          "nodeType": "class",
+          "props": Object {
+            "children": <Unknown />,
+          },
+          "ref": null,
+          "rendered": Object {
+            "instance": null,
+            "key": undefined,
+            "nodeType": "function",
+            "props": Object {},
+            "ref": null,
+            "rendered": null,
+            "type": [Function],
+          },
+          "type": [Function],
+        },
         Object {
           "instance": null,
           "key": undefined,

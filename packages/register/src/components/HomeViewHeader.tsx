@@ -4,7 +4,7 @@ import { Header } from '@opencrvs/components/lib/interface'
 import { ActionList } from '@opencrvs/components/lib/buttons'
 import styled from '../styled-components'
 import { TopMenu } from '../components/TopMenu'
-import { Logo } from '@opencrvs/components/lib/icons'
+import { Logo, Offline, Online } from '@opencrvs/components/lib/icons'
 
 const StretchedHeader = styled(Header)`
   justify-content: flex-end;
@@ -22,11 +22,32 @@ const StyledLogo = styled(Logo)`
   margin: -71px auto auto 17px;
 `
 
+const StyledOnline = styled.div`
+  position: absolute;
+  top: 32px;
+  right: 234px;
+`
+
+const StyledOffline = styled.div`
+  position: absolute;
+  top: 32px;
+  right: 234px;
+`
+
 export class HomeViewHeader extends React.Component<IViewHeadingProps> {
   render() {
     const { title, description, id } = this.props
     return (
       <StretchedHeader {...this.props}>
+        {navigator.onLine ? (
+          <StyledOnline>
+            <Online />
+          </StyledOnline>
+        ) : (
+          <StyledOffline>
+            <Offline />
+          </StyledOffline>
+        )}
         <TopMenu hideBackButton={true} />
         <StyledLogo />
         <ViewHeading {...{ title, description, id }} />
