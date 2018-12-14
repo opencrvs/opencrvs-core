@@ -794,9 +794,9 @@ export class WorkQueueView extends React.Component<
         <Container>
           <Query
             query={FETCH_REGISTRATION_QUERY}
-            variables={{
-              locationIds: [this.getLocalLocationId()]
-            }}
+            // variables={{
+            //   locationIds: [this.getLocalLocationId()]
+            // }}
           >
             {({ loading, error, data }) => {
               if (loading) {
@@ -850,15 +850,15 @@ export class WorkQueueView extends React.Component<
               )
             }}
           </Query>
-          {this.state.printCertificateModalVisible ? (
-            <PrintCertificateAction
-              title={this.props.intl.formatMessage(messages.printCertificate)}
-              backLabel={this.props.intl.formatMessage(messages.back)}
-              registrationId={(this.state.regId && this.state.regId) || ''}
-              togglePrintCertificateSection={this.togglePrintModal}
-            />
-          ) : null}
         </Container>
+        {this.state.printCertificateModalVisible ? (
+          <PrintCertificateAction
+            title={this.props.intl.formatMessage(messages.printCertificate)}
+            backLabel={this.props.intl.formatMessage(messages.back)}
+            registrationId={(this.state.regId && this.state.regId) || ''}
+            togglePrintCertificateSection={this.togglePrintModal}
+          />
+        ) : null}
       </>
     )
   }
