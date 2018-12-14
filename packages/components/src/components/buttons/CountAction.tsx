@@ -26,16 +26,6 @@ const ActionTitle = styled.h3.attrs<{
   color: ${({ theme }) => theme.colors.copy};
   margin-left: 11px;
 `
-const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.secondary};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
-  margin: 3px 0px 0px 80px;
-  strong {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
-  }
-`
 
 const StyledStatus = styled.div`
   font-family: ${({ theme }) => theme.fonts.boldFont};

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Header } from '@opencrvs/components/lib/interface'
 import styled from 'styled-components'
-import Logo from './Logo'
+import { Logo } from '@opencrvs/components/lib/icons'
 
 const StretchedHeader = styled(Header)`
   justify-content: flex-end;

@@ -1,8 +1,7 @@
 import * as React from 'react'
 
-const Logo = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={60} height={60} viewBox="0 0 100 100" {...props}>
-    <title>BAE0DF0B-8368-40C9-AE10-CED7706389CA</title>
+export const Logo = (props: React.HTMLAttributes<SVGElement>) => (
+  <svg width={80} height={80} viewBox="0 0 100 100" {...props}>
     <defs>
       <linearGradient x1="3.135%" y1="95.778%" x2="60.677%" y2="39.964%" id="a">
         <stop stopColor="#7EACF5" offset="0%" />
@@ -30,5 +29,3 @@ const Logo = (props: React.HTMLAttributes<SVGElement>) => (
     </g>
   </svg>
 )
-
-export default Logo
