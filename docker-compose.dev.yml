@@ -16,6 +16,7 @@ services:
     volumes:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
       - "./infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js"
+      - "./infrastructure/hearth-queryparam-extensions.json:/src/hearth/config/queryparam-extensions.json"
     ports:
       - "3447:3447"
 

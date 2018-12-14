@@ -3,10 +3,13 @@ import { push } from 'react-router-redux'
 import * as actions from './actions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
-import { getRedirectURL } from '../utils/authUtils'
+import { ITokenPayload, getTokenPayload } from '../utils/authUtils'
+import { config } from '../config'
+import { REGISTER_APP } from '../navigation/routes'
 
 export type LoginState = {
   submitting: boolean
+  token: string
   authenticationDetails: { nonce: string }
   submissionError: boolean
   resentSMS: boolean
@@ -14,6 +17,7 @@ export type LoginState = {
 
 export const initialState: LoginState = {
   submitting: false,
+  token: '',
   authenticationDetails: {
     nonce: ''
   },
@@ -107,19 +111,52 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.VERIFY_CODE_FAILED:
       return { ...state, submitting: false, submissionError: true }
     case actions.VERIFY_CODE_COMPLETED:
-      const redirectURL = getRedirectURL(action.payload.token)
+      const decoded: ITokenPayload = getTokenPayload(
+        action.payload.token
+      ) as ITokenPayload
+      const isPerformanceUser = decoded.scope.indexOf('performance') > -1
+      if (isPerformanceUser) {
+        return loop(
+          {
+            ...state,
+            stepSubmitting: false,
+            submissionError: false,
+            resentSMS: false,
+            token: action.payload.token
+          },
+          Cmd.action(push(routes.MANAGER))
+        )
+      } else {
+        return loop(
+          {
+            ...state,
+            stepSubmitting: false,
+            submissionError: false,
+            resentSMS: false,
+            token: action.payload.token
+          },
+          Cmd.run(() => {
+            window.location.assign(
+              `${config.REGISTER_APP_URL}?token=${action.payload.token}`
+            )
+          })
+        )
+      }
+    case actions.GOTO_APP:
+      let redirectUrl: string
+      if (action.payload === REGISTER_APP) {
+        redirectUrl = `${config.REGISTER_APP_URL}?token=${state.token}`
+      } else {
+        redirectUrl = `${config.PERFORMANCE_APP_URL}?token=${state.token}`
+      }
       return loop(
         {
-          ...state,
-          stepSubmitting: false,
-          submissionError: false,
-          resentSMS: false
+          ...state
         },
         Cmd.run(() => {
-          window.location.assign(redirectURL)
+          window.location.assign(redirectUrl)
         })
       )
-
     default:
       return state
   }

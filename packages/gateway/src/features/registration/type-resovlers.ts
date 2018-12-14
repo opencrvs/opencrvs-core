@@ -181,6 +181,22 @@ export const typeResolvers: GQLResolver = {
           coding.system === `${OPENCRVS_SPECIFICATION_URL}types`
       )
       return (taskCode && taskCode.code) || null
+    },
+    duplicates: async (task, _, authHeader) => {
+      if (!task.focus) {
+        throw new Error(
+          'Task resource does not have a focus property necessary to lookup the composition'
+        )
+      }
+
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
+      return composition.relatesTo.map(
+        (duplicate: fhir.CompositionRelatesTo) =>
+          duplicate.targetReference && duplicate.targetReference.reference
+      )
     }
   },
   RegWorkflow: {
@@ -196,13 +212,18 @@ export const typeResolvers: GQLResolver = {
 
       return (statusType && statusType.code) || null
     },
-    user: task => {
+    user: async (task, _, authHeader) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
       )
-      return (user && user.valueString) || null
+      if (!user) {
+        return null
+      }
+
+      return await fetchFHIR(`/${user.valueString}`, authHeader)
     },
+
     timestamp: task => task.lastModified,
     comments: task => task.note,
     location: async (task, _, authHeader) => {
@@ -213,7 +234,29 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation) {
         return null
       }
-      return await fetchFHIR(`/${taskLocation.valueReference}`, authHeader)
+      return await fetchFHIR(`/${taskLocation.valueString}`, authHeader)
+    }
+  },
+  User: {
+    role: async (user, _, authHeader) => {
+      const practitionerRole = await fetchFHIR(
+        `/PractitionerRole?practitioner=${user.id}`,
+        authHeader
+      )
+      const roleEntry = practitionerRole.entry[0].resource
+      if (
+        !roleEntry ||
+        !roleEntry.code ||
+        !roleEntry.code[0] ||
+        !roleEntry.code[0].coding ||
+        !roleEntry.code[0].coding[0] ||
+        !roleEntry.code[0].coding[0].code
+      ) {
+        throw new Error('PractitionerRole has no role code')
+      }
+      const role = roleEntry.code[0].coding[0].code
+
+      return role
     }
   },
   Comment: {
@@ -227,6 +270,9 @@ export const typeResolvers: GQLResolver = {
     },
     data(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data
+    },
+    contentType(docRef: fhir.DocumentReference) {
+      return docRef.content[0].attachment.contentType
     },
     originalFileName(docRef: fhir.DocumentReference) {
       const foundIdentifier =
@@ -478,6 +524,10 @@ export const typeResolvers: GQLResolver = {
         `/${encounterSection.entry[0].reference}`,
         authHeader
       )
+
+      if (!data || !data.location || !data.location[0].location) {
+        return null
+      }
 
       return await fetchFHIR(
         `/${data.location[0].location.reference}`,

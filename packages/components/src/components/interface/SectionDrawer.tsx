@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from './../buttons'
-import { boolean } from 'joi'
+import * as ReactDOM from 'react-dom'
 
 const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
   background: ${({ theme }) => theme.colors.white};
@@ -41,8 +41,11 @@ const Seperator = styled.span`
     content: '|';
   }
 `
-const SectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
-  max-height: ${({ expanded }) => (expanded ? `1000px` : `0px`)};
+const SectionContainer = styled.div.attrs<{
+  expanded: boolean
+  maxHeight: string
+}>({})`
+  max-height: ${({ expanded, maxHeight }) => (expanded ? maxHeight : `0px`)};
   overflow: hidden;
   transition: ${({ expanded }) =>
     expanded
@@ -58,9 +61,44 @@ interface IProps {
   isExpanded: boolean
   visited?: boolean
 }
-export class SectionDrawer extends React.Component<IProps> {
+
+interface IState {
+  maxHeight: string
+}
+
+interface IElement extends Element {
+  querySelector: (selector: string) => Element
+}
+
+export class SectionDrawer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
+
+    this.state = {
+      maxHeight: '0px'
+    }
+  }
+
+  componentDidMount() {
+    this.calculateMaxHeight()
+  }
+
+  componentDidUpdate() {
+    this.calculateMaxHeight()
+  }
+
+  calculateMaxHeight() {
+    const extraHeight = 130
+    const elem = ReactDOM.findDOMNode(this) as IElement
+
+    const maxHeight =
+      elem.querySelector('div:nth-child(3) > div').clientHeight +
+      extraHeight +
+      'px'
+
+    if (this.state.maxHeight !== maxHeight) {
+      this.setState(() => ({ maxHeight }))
+    }
   }
 
   render() {
@@ -111,8 +149,13 @@ export class SectionDrawer extends React.Component<IProps> {
             />
           )}
         </TitleContainer>
-        <SectionContainer className="_sectionContainer" expanded={isExpanded}>
-          {children}
+
+        <SectionContainer
+          className="_sectionContainer"
+          expanded={isExpanded}
+          maxHeight={this.state.maxHeight}
+        >
+          <div>{children}</div>
         </SectionContainer>
       </SectionDrawerContainer>
     )
