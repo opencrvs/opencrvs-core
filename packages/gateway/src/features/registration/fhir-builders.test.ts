@@ -124,9 +124,7 @@ test('should build a minimal FHIR registration document without error', async ()
           systemFileName: 'system.png',
           type: 'PASSPORT',
           createdAt: '2018-10-22',
-          subject: {
-            display: 'MOTHER'
-          }
+          subject: 'MOTHER'
         }
       ]
     },
