@@ -3,7 +3,8 @@ import {
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   TEXT,
-  INFORMATIVE_RADIO_GROUP
+  INFORMATIVE_RADIO_GROUP,
+  WARNING
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { conditionals } from 'src/forms/utils'
@@ -78,6 +79,12 @@ const messages = defineMessages({
     id: 'formFields.print.documentNumber',
     defaultMessage: 'Document number',
     description: 'Label for document number input field'
+  },
+  warningNotVerified: {
+    id: 'formFields.print.warningNotVerified',
+    defaultMessage:
+      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
+    description: 'Label for warning message when the collector is not verified'
   }
 })
 export const printCertificateForm: IFormSection = {
@@ -194,6 +201,14 @@ export const printCertificateForm: IFormSection = {
         { value: 'No', label: messages.deny }
       ],
       conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'warningNotVerified',
+      type: WARNING,
+      label: messages.warningNotVerified,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.certificateCollectorNotVerified]
     }
   ]
 }

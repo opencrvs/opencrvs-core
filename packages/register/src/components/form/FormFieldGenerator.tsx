@@ -40,7 +40,8 @@ import {
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
   TEL,
-  INFORMATIVE_RADIO_GROUP
+  INFORMATIVE_RADIO_GROUP,
+  WARNING
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -207,6 +208,11 @@ function GeneratedInputField({
       </InputField>
     )
   }
+
+  if (fieldDefinition.type === WARNING) {
+    return <InputField {...inputFieldProps}>{}</InputField>
+  }
+
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
     return (
       <ImageUploadField

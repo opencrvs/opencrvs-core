@@ -21,6 +21,7 @@ export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
+export const WARNING = 'WARNING'
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
@@ -120,6 +121,10 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   optionSection: IFormSection
 }
 
+export interface IWarningField extends IFormFieldBase {
+  type: typeof WARNING
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -136,6 +141,7 @@ export type IFormField =
   | IListFormField
   | IParagraphFormField
   | IImageUploaderWithOptionsFormField
+  | IWarningField
 
 export interface IConditional {
   action: string
@@ -160,6 +166,7 @@ export interface IConditionals {
   motherCollectsCertificate: IConditional
   fatherCollectsCertificate: IConditional
   otherPersonCollectsCertificate: IConditional
+  certificateCollectorNotVerified: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
@@ -250,6 +257,9 @@ export interface Ii18nImageUploaderWithOptionsFormField
   optionSection: IFormSection
 }
 
+export interface Ii18nWarningField extends Ii18nFormFieldBase {
+  type: typeof WARNING
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -265,6 +275,7 @@ export type Ii18nFormField =
   | Ii18nListFormField
   | Ii18nParagraphFormField
   | Ii18nImageUploaderWithOptionsFormField
+  | Ii18nWarningField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
