@@ -45,6 +45,7 @@ import { goToEvents as goToEventsAction } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
+import { APPLICATIONS_STATUS } from 'src/utils/constants'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -783,7 +784,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     }
     return (
       <>
-        <HomeViewHeader>
+        <HomeViewHeader id="work_queue_header">
           <ViewHeading
             id="work_queue_view"
             title={intl.formatMessage(messages.headerTitle)}
@@ -826,6 +827,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                   <Banner
                     text={intl.formatMessage(messages.bannerTitle)}
                     count={transformedData.length}
+                    status={APPLICATIONS_STATUS}
                   />
                   <SearchInput
                     placeholder={intl.formatMessage(

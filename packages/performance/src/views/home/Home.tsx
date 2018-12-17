@@ -9,7 +9,7 @@ import {
 } from 'react-intl'
 import { Header, Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
-import Logo from 'src/components/Logo'
+import { Logo } from '@opencrvs/components/lib/icons'
 import { Page } from 'src/components/Page'
 
 import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
@@ -180,7 +180,7 @@ const birthRegistrationDataPerMonth = [
 ]
 
 const StyledHeader = styled(Header)`
-  padding: 0 26px;
+  padding: 25px;
   box-shadow: none;
 `
 

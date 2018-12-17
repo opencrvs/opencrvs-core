@@ -1,4 +1,8 @@
-import { GQLLocation, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLLocation,
+  GQLUser,
+  GQLHumanName
+} from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/register/src/storage'
 
 export const USER_DETAILS = 'USER_DETAILS'
@@ -15,14 +19,21 @@ export interface ILocation {
 }
 
 export interface IUserDetails {
+  role?: string
+  name?: Array<GQLHumanName | null>
   catchmentArea?: ILocation[]
   primaryOffice?: ILocation
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
-  const { catchmentArea, primaryOffice } = user
+  const { catchmentArea, primaryOffice, name, role } = user
   const userDetails: IUserDetails = {}
-
+  if (name) {
+    userDetails.name = name
+  }
+  if (role) {
+    userDetails.role = role
+  }
   if (primaryOffice) {
     userDetails.primaryOffice = {
       id: primaryOffice.id,
