@@ -62,6 +62,12 @@ enum AddressType {
   UNHCR_CAMP # -> UNHCR Camp
 }
 
+enum RelationshipType {
+  MOTHER
+  FATHER
+  OTHER
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -70,6 +76,16 @@ input IdentityInput {
 type IdentityType { # -> Identifier
   id: ID # -> .value
   type: IdentityIDType # -> .system
+}
+
+input RelatedPersonInput {
+  relationship: RelationshipType
+  individual: PersonInput
+}
+
+type RelatedPerson { # -> Related Person
+  relationship: RelationshipType # -> .relationship.coding
+  individual: Person # -> .patient.reference
 }
 
 input PersonInput {

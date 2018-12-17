@@ -73,6 +73,34 @@ enum CauseOfDeath {
   OTHER
 }
 
+enum PaymentType {
+  MANUAL
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
+}
+
+input PaymentInput {
+  paymentId: ID
+  type: PaymentType
+  total: Float
+  amount: Float
+  outcome: PaymentOutcomeType
+  date: Date
+}
+
+type Payment { # -> PaymentReconciliation
+  paymentId: ID # -> .identifier
+  type: PaymentType # -> .detail.type
+  total: Float # -> .total
+  amount: Float # .detail.amount
+  outcome: PaymentOutcomeType # -> .outcome
+  date: Date # -> .detail.date
+}
+
 input CommentInput {
   user: UserInput
   comment: String
@@ -101,23 +129,6 @@ type RegWorkflow { # Task
   timestamp: Date # -> lastModified
   comments: [Comment] # -> .note
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
-}
-
-input CertificateInput {
-  paperId: ID!
-  reciever: PersonInput
-  location: LocationInput
-  User: UserInput
-  createdAt: Date
-}
-
-type Certificate { # In manual register system (signature) not in BDRIS2
-  id: ID!
-  paperId: ID!
-  reciever: Person
-  location: Location
-  User: User
-  createdAt: Date
 }
 
 input BirthRegistrationInput {
@@ -210,6 +221,7 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
+  certificates: [CertificateInput]
   location: LocationInput
 }
 
@@ -226,7 +238,22 @@ type Registration { # -> Task
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
+  certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
   duplicates: [ID]
+}
+
+input CertificateInput {
+  collector: RelatedPersonInput
+  hasShowedVerifiedDocument: Boolean
+  payments: [PaymentInput]
+  data: String
+}
+
+type Certificate { # -> Document Reference
+  collector: RelatedPerson # -> .extension
+  hasShowedVerifiedDocument: Boolean # -> .extension
+  payments: [Payment] # -> .extension
+  data: String # -> .content.attachment.data base64
 }
 
 input AttachmentInput {
