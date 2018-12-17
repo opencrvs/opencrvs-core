@@ -916,22 +916,20 @@ const builders: IFieldBuilders = {
         }
         docRef.content[0].attachment.data = fieldValue
       },
-      subject: {
-        display: (
-          fhirBundle: ITemplatedBundle,
-          fieldValue: string,
-          context: any
-        ) => {
-          const docRef = selectOrCreateDocRefResource(
-            DOCS_CODE,
-            fhirBundle,
-            context
-          )
-          if (!docRef.subject) {
-            docRef.subject = {}
-          }
-          docRef.subject.display = fieldValue
+      subject: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const docRef = selectOrCreateDocRefResource(
+          DOCS_CODE,
+          fhirBundle,
+          context
+        )
+        if (!docRef.subject) {
+          docRef.subject = {}
         }
+        docRef.subject.display = fieldValue
       }
     }
   },
