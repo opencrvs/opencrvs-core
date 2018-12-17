@@ -10,6 +10,7 @@ export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
+export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const DATE = 'DATE'
 export const TEXTAREA = 'TEXTAREA'
@@ -75,6 +76,11 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   options: IRadioOption[]
 }
 
+export interface IInformativeRadioGroupFormField extends IFormFieldBase {
+  type: typeof INFORMATIVE_RADIO_GROUP
+  options: IRadioOption[]
+}
+
 export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
 }
@@ -121,6 +127,7 @@ export type IFormField =
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
   | IRadioGroupFormField
+  | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
   | IDateFormField
   | ITextareaFormField
@@ -151,6 +158,7 @@ export interface IConditionals {
   addressLine3Options1: IConditional
   uploadDocForWhom: IConditional
   motherCollectsCertificate: IConditional
+  fatherCollectsCertificate: IConditional
   otherPersonCollectsCertificate: IConditional
 }
 
@@ -194,6 +202,12 @@ export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
 
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
+  options: RadioComponentOption[]
+}
+
+export interface Ii18nInformativeRadioGroupFormField
+  extends Ii18nFormFieldBase {
+  type: typeof INFORMATIVE_RADIO_GROUP
   options: RadioComponentOption[]
 }
 
@@ -242,6 +256,7 @@ export type Ii18nFormField =
   | Ii18nNumberFormField
   | Ii18nSelectFormField
   | Ii18nRadioGroupFormField
+  | Ii18nInformativeRadioGroupFormField
   | Ii18nCheckboxGroupFormField
   | Ii18nDateFormField
   | Ii18nTextareaFormField

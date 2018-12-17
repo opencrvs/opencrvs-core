@@ -156,6 +156,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: 'values.personCollectingCertificate!="MOTHER"'
   },
+  fatherCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="FATHER"'
+  },
   otherPersonCollectsCertificate: {
     action: 'hide',
     expression: 'values.personCollectingCertificate!="OTHER"'

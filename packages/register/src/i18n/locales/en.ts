@@ -667,6 +667,7 @@ export const ENGLISH_STATE = {
     'formFields.print.otherPersonGivenNames': 'Given name',
     'formFields.print.otherPersonFamilyName': 'Family name',
     'formFields.print.signedAffidavit': 'Do they have a signed affidavit?',
+    'formFields.print.documentNumber': 'Document number',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':

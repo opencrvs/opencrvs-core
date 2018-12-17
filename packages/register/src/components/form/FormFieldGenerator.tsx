@@ -39,7 +39,8 @@ import {
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
-  TEL
+  TEL,
+  INFORMATIVE_RADIO_GROUP
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -131,6 +132,11 @@ function GeneratedInputField({
       </InputField>
     )
   }
+
+  if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
+    return <InputField {...inputFieldProps}>{}</InputField>
+  }
+
   if (fieldDefinition.type === CHECKBOX_GROUP) {
     return (
       <InputField {...inputFieldProps}>
