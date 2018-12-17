@@ -16,8 +16,9 @@ import {
   ITemplatedBundle,
   ITemplatedComposition
 } from '../registration/fhir-builders'
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import { fhirUrl } from 'src/constants'
+import { FHIR_OBSERVATION_CATEGORY_URL } from './constants'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -120,6 +121,83 @@ export function selectOrCreateEncounterResource(
   }
 
   return encounterEntry.resource as fhir.Encounter
+}
+
+export function selectOrCreateObservationResource(
+  sectionCode: string,
+  categoryCode: string,
+  categoryDescription: string,
+  observationCode: string,
+  observationDescription: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Observation {
+  let observation = fhirBundle.entry.find(entry => {
+    if (
+      !entry ||
+      !entry.resource ||
+      entry.resource.resourceType !== 'Observation'
+    ) {
+      return false
+    }
+    const observationEntry = entry.resource as fhir.Observation
+    const obCoding =
+      observationEntry.code &&
+      observationEntry.code.coding &&
+      observationEntry.code.coding.find(
+        obCode => obCode.code === observationCode
+      )
+    if (obCoding) {
+      return true
+    }
+    return false
+  })
+
+  if (observation) {
+    return observation.resource as fhir.Observation
+  }
+  /* Existing obseration not found for given type */
+  observation = createObservationResource(sectionCode, fhirBundle, context)
+  return updateObservationInfo(
+    observation as fhir.Observation,
+    categoryCode,
+    categoryDescription,
+    observationCode,
+    observationDescription
+  )
+}
+
+export function updateObservationInfo(
+  observation: fhir.Observation,
+  categoryCode: string,
+  categoryDescription: string,
+  observationCode: string,
+  observationDescription: string
+): fhir.Observation {
+  const categoryCoding = {
+    coding: [
+      {
+        system: FHIR_OBSERVATION_CATEGORY_URL,
+        code: categoryCode,
+        display: categoryDescription
+      }
+    ]
+  }
+
+  if (!observation.category) {
+    observation.category = []
+  }
+  observation.category.push(categoryCoding)
+
+  const coding = [
+    {
+      system: 'http://loinc.org',
+      code: observationCode,
+      display: observationDescription
+    }
+  ]
+  setArrayPropInResourceObject(observation, 'code', coding, 'coding')
+  return observation
 }
 
 export function createObservationResource(
@@ -240,7 +318,7 @@ export function selectOrCreateTaskRefResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.Task {
-  let taskResource =
+  let taskEntry =
     fhirBundle.entry &&
     fhirBundle.entry.find(entry => {
       if (entry.resource && entry.resource.resourceType === 'Task') {
@@ -248,13 +326,17 @@ export function selectOrCreateTaskRefResource(
       }
       return false
     })
-  if (!taskResource) {
-    taskResource = createTaskRefTemplate(uuid())
-    fhirBundle.entry.push(taskResource)
+  if (!taskEntry) {
+    taskEntry = createTaskRefTemplate(uuid())
+    const taskResource = taskEntry.resource as fhir.Task
+    if (!taskResource.focus) {
+      taskResource.focus = { reference: '' }
+    }
+    taskResource.focus.reference = fhirBundle.entry[0].fullUrl
+    fhirBundle.entry.push(taskEntry)
   }
-  return taskResource.resource as fhir.Task
+  return taskEntry.resource as fhir.Task
 }
-
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
@@ -322,4 +404,21 @@ export const getFromFhir = (suffix: string) => {
     .catch(error => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
+}
+
+export async function getCompositionIDFromFhirResponse(
+  response: Response
+): Promise<string> {
+  const resBody = await response.json()
+  if (
+    !resBody ||
+    !resBody.entry ||
+    !resBody.entry[0] ||
+    !resBody.entry[0].response ||
+    !resBody.entry[0].response.location
+  ) {
+    throw new Error(`FHIR response did not send a valid response`)
+  }
+  // return the Composition's id
+  return resBody.entry[0].response.location.split('/')[3]
 }

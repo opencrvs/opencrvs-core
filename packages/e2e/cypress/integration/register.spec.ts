@@ -148,8 +148,6 @@ context('Register', () => {
     cy.selectOption('#whoseContactDetails', 'Father', 'Father')
     cy.get('#registrationEmail').type('test@test.com')
     cy.get('#registrationPhone').type('01711111111')
-    cy.get('#registrationCertificateLanguageBangla').click()
-    cy.get('#registrationCertificateLanguageEnglish').click()
     cy.get('#paperFormNumber').type('1')
     cy.get('#commentsOrNotes').type('note')
     cy.get('#next_section').click()

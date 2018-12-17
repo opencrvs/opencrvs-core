@@ -303,6 +303,7 @@ input PersonInput {
   maritalStatus: MaritalStatusType
   dateOfMarriage: Date
   educationalAttainment: EducationType
+  multipleBirth: Int
 }
 
 type Query {

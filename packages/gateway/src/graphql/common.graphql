@@ -1,6 +1,7 @@
 # automatically map from FHIR
 
 scalar Date
+scalar Map
 
 input HumanNameInput {
   use: String # bn | en - the language the name text is written in
@@ -72,6 +73,7 @@ type IdentityType { # -> Identifier
 }
 
 input PersonInput {
+  _fhirID: ID
   identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
@@ -90,6 +92,7 @@ input PersonInput {
 
 type Person { # -> Patient
   id: ID
+  _fhirID: ID # -> .id
   identifier: [IdentityType] # -> .identifier
   name: [HumanName] # -> .name
   telecom: [ContactPoint] # -> .telecom

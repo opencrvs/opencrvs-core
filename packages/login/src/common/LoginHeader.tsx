@@ -9,7 +9,7 @@ const StretchedHeader = styled(Header)`
 `
 
 const StyledLogo = styled(Logo)`
-  margin: 12px auto auto 5%;
+  margin: 23px auto auto 5%;
 `
 
 export class LoginHeader extends React.Component {
