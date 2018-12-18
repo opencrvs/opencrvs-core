@@ -6,7 +6,7 @@ import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { FormFieldGenerator } from 'src/components/form'
-import { printCertificateForm } from './print-certificate'
+import { IFormSection } from 'src/forms'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -74,6 +74,7 @@ type IProps = {
   title: string
   registrationId: string
   togglePrintCertificateSection: () => void
+  printCertificateFormSection: IFormSection
 }
 
 type IFullProps = InjectedIntlProps & IProps
@@ -93,7 +94,8 @@ class PrintCertificateActionComponent extends React.Component<
       title,
       backLabel,
       registrationId,
-      togglePrintCertificateSection
+      togglePrintCertificateSection,
+      printCertificateFormSection
     } = this.props
     return (
       <ActionPageWrapper>
@@ -118,10 +120,10 @@ class PrintCertificateActionComponent extends React.Component<
                   <FormContainer>
                     <Box>
                       <FormFieldGenerator
-                        id={printCertificateForm.id}
+                        id={printCertificateFormSection.id}
                         onChange={() => console.log('on change called')}
                         setAllFieldsDirty={false}
-                        fields={printCertificateForm.fields}
+                        fields={printCertificateFormSection.fields}
                       />
                     </Box>
                   </FormContainer>

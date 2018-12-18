@@ -156,8 +156,17 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: 'values.personCollectingCertificate!="MOTHER"'
   },
+  fatherCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="FATHER"'
+  },
   otherPersonCollectsCertificate: {
     action: 'hide',
     expression: 'values.personCollectingCertificate!="OTHER"'
+  },
+  certificateCollectorNotVerified: {
+    action: 'hide',
+    expression:
+      '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
   }
 }

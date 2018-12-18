@@ -659,6 +659,9 @@ export const BENGALI_STATE = {
     'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',
     'formFields.print.otherPersonFamilyName': 'পারিবারিক নাম',
     'formFields.print.signedAffidavit': 'তার একটি স্বাক্ষরিত হলফনামা আছে?',
+    'formFields.print.documentNumber': 'ডকুমেন্ট সংখ্যা',
+    'formFields.print.warningNotVerified':
+      'দয়া করে সচেতন থাকুন যে আপনি যদি অগ্রসর হন তবে সংগ্রাহক থেকে ID এর প্রয়োজনীয় প্রমাণ ছাড়াই আপনি একটি শংসাপত্র দেওয়ার জন্য দায়বদ্ধ হবেন।',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
     'review.edit.modal.confirmationText':

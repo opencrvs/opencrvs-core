@@ -45,6 +45,7 @@ import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
 import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
+import { IFormSection } from 'src/forms'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -387,6 +388,7 @@ interface IBaseWorkQueueProps {
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
+  printForm: IFormSection
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -685,7 +687,7 @@ export class WorkQueueView extends React.Component<
   }
 
   render() {
-    const { intl, theme } = this.props
+    const { intl, theme, printForm } = this.props
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -857,6 +859,7 @@ export class WorkQueueView extends React.Component<
             backLabel={this.props.intl.formatMessage(messages.back)}
             registrationId={(this.state.regId && this.state.regId) || ''}
             togglePrintCertificateSection={this.togglePrintModal}
+            printCertificateFormSection={printForm}
           />
         ) : null}
       </>
@@ -867,7 +870,8 @@ export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: state.profile.userDetails
+    userDetails: state.profile.userDetails,
+    printForm: state.printCertificateForm.printCertificateForm.sections[0]
   }),
   { goToEvents: goToEventsAction, gotoTab: goToTabAction }
 )(injectIntl(withTheme(WorkQueueView)))

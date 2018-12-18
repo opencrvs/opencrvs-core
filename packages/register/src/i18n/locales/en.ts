@@ -667,6 +667,9 @@ export const ENGLISH_STATE = {
     'formFields.print.otherPersonGivenNames': 'Given name',
     'formFields.print.otherPersonFamilyName': 'Family name',
     'formFields.print.signedAffidavit': 'Do they have a signed affidavit?',
+    'formFields.print.documentNumber': 'Document number',
+    'formFields.print.warningNotVerified':
+      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':

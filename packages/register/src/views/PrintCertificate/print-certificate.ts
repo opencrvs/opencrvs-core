@@ -1,6 +1,14 @@
-import { IFormSection, SELECT_WITH_OPTIONS, RADIO_GROUP, TEXT } from 'src/forms'
+import {
+  IFormSection,
+  SELECT_WITH_OPTIONS,
+  RADIO_GROUP,
+  TEXT,
+  INFORMATIVE_RADIO_GROUP,
+  WARNING
+} from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { conditionals } from 'src/forms/utils'
+import { messages as identityMessages } from 'src/forms/identity'
 
 const messages = defineMessages({
   printCertificate: {
@@ -66,9 +74,21 @@ const messages = defineMessages({
     id: 'formFields.print.signedAffidavit',
     defaultMessage: 'Do they have a signed affidavit?',
     description: 'Label for signed affidavit confirmation radio group'
+  },
+  documentNumber: {
+    id: 'formFields.print.documentNumber',
+    defaultMessage: 'Document number',
+    description: 'Label for document number input field'
+  },
+  warningNotVerified: {
+    id: 'formFields.print.warningNotVerified',
+    defaultMessage:
+      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
+    description: 'Label for warning message when the collector is not verified'
   }
 })
-export const printCertificateForm: IFormSection = {
+
+export const printCertificateFormSection: IFormSection = {
   id: 'print',
   viewType: 'form',
   name: messages.printCertificate,
@@ -79,7 +99,7 @@ export const printCertificateForm: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: messages.whoToCollect,
       required: true,
-      initialValue: '',
+      initialValue: 'MOTHER',
       validate: [],
       options: [
         { value: 'MOTHER', label: messages.mother },
@@ -89,16 +109,68 @@ export const printCertificateForm: IFormSection = {
     },
     {
       name: 'motherDetails',
-      type: RADIO_GROUP,
+      type: INFORMATIVE_RADIO_GROUP,
       label: messages.confirmMotherDetails,
       required: true,
       initialValue: '',
       validate: [],
       options: [
-        { value: 'Yes', label: messages.confirm },
-        { value: 'No', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.motherCollectsCertificate]
+    },
+    {
+      name: 'fatherDetails',
+      type: INFORMATIVE_RADIO_GROUP,
+      label: messages.confirmMotherDetails,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
+      ],
+      conditionals: [conditionals.fatherCollectsCertificate]
+    },
+    {
+      name: 'otherPersonIDType',
+      type: SELECT_WITH_OPTIONS,
+      label: identityMessages.iDType,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
+        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
+        {
+          value: 'DRIVING_LICENCE',
+          label: identityMessages.iDTypeDrivingLicence
+        },
+        {
+          value: 'BIRTH_REGISTRATION_NUMBER',
+          label: identityMessages.iDTypeBRN
+        },
+        {
+          value: 'DEATH_REGISTRATION_NUMBER',
+          label: identityMessages.iDTypeDRN
+        },
+        {
+          value: 'REFUGEE_NUMBER',
+          label: identityMessages.iDTypeRefugeeNumber
+        },
+        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
+      ],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'documentNumber',
+      type: TEXT,
+      label: messages.documentNumber,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
     },
     {
       name: 'otherPersonGivenNames',
@@ -126,10 +198,18 @@ export const printCertificateForm: IFormSection = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'Yes', label: messages.confirm },
-        { value: 'No', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'warningNotVerified',
+      type: WARNING,
+      label: messages.warningNotVerified,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.certificateCollectorNotVerified]
     }
   ]
 }
