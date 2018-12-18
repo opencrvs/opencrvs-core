@@ -134,7 +134,7 @@ export const fatherSection: IFormSection = {
       type: RADIO_GROUP,
       label: messages.fathersDetailsExist,
       required: true,
-      initialValue: false,
+      initialValue: true,
       validate: [],
       options: [
         { value: true, label: messages.confirm },
