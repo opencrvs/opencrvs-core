@@ -87,7 +87,8 @@ const messages = defineMessages({
     description: 'Label for warning message when the collector is not verified'
   }
 })
-export const printCertificateForm: IFormSection = {
+
+export const printCertificateFormSection: IFormSection = {
   id: 'print',
   viewType: 'form',
   name: messages.printCertificate,
