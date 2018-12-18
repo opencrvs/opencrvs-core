@@ -10,7 +10,8 @@ import {
   CHECKBOX_GROUP,
   IRadioOption,
   ICheckboxOption,
-  ISelectFormFieldWithDynamicOptions
+  ISelectFormFieldWithDynamicOptions,
+  INFORMATIVE_RADIO_GROUP
 } from './'
 import { InjectedIntl } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -28,6 +29,7 @@ export const internationaliseFieldObject = (
   if (
     base.type === SELECT_WITH_OPTIONS ||
     base.type === RADIO_GROUP ||
+    base.type === INFORMATIVE_RADIO_GROUP ||
     base.type === CHECKBOX_GROUP
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
