@@ -13,19 +13,19 @@ type IInputProps = {
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
   value: IFormFieldValue
-  disabled: boolean
+  disabled?: boolean
   error: boolean
-  touched: boolean
+  touched?: boolean
 }
 
 type IInputFieldProps = {
   id: string
   label: string
-  description: string
-  required: boolean
-  disabled: boolean
-  prefix: string
-  postfix: string
+  description?: string
+  required?: boolean
+  disabled?: boolean
+  prefix?: string
+  postfix?: string
   error: string
   touched: boolean
 }

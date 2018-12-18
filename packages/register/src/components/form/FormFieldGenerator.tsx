@@ -50,6 +50,7 @@ import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
+import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -135,7 +136,15 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
-    return <InputField {...inputFieldProps}>{}</InputField>
+    return (
+      <InformativeRadioGroup
+        inputProps={inputProps}
+        value={value as string}
+        onSetFieldValue={onSetFieldValue}
+        fieldDefinition={fieldDefinition}
+        inputFieldProps={inputFieldProps}
+      />
+    )
   }
 
   if (fieldDefinition.type === CHECKBOX_GROUP) {
