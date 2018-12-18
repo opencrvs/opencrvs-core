@@ -115,8 +115,8 @@ export const printCertificateFormSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'Yes', label: messages.confirm },
-        { value: 'No', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.motherCollectsCertificate]
     },
@@ -128,8 +128,8 @@ export const printCertificateFormSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'Yes', label: messages.confirm },
-        { value: 'No', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.fatherCollectsCertificate]
     },
@@ -198,8 +198,8 @@ export const printCertificateFormSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'Yes', label: messages.confirm },
-        { value: 'No', label: messages.deny }
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.otherPersonCollectsCertificate]
     },

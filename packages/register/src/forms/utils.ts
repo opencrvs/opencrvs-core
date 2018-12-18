@@ -167,6 +167,6 @@ export const conditionals: IConditionals = {
   certificateCollectorNotVerified: {
     action: 'hide',
     expression:
-      'values.otherPersonSignedAffidavit!="No" && values.motherDetails!="No" && values.fatherDetails!="No"'
+      '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
   }
 }

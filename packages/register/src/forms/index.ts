@@ -79,6 +79,7 @@ export interface IRadioGroupFormField extends IFormFieldBase {
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
+  information?: IFormSectionData
   options: IRadioOption[]
 }
 
@@ -215,6 +216,7 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
 export interface Ii18nInformativeRadioGroupFormField
   extends Ii18nFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
+  information?: IFormSectionData
   options: RadioComponentOption[]
 }
 
