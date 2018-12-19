@@ -193,9 +193,12 @@ export const typeResolvers: GQLResolver = {
         `/${task.focus.reference}`,
         authHeader
       )
-      return composition.relatesTo.map(
-        (duplicate: fhir.CompositionRelatesTo) =>
-          duplicate.targetReference && duplicate.targetReference.reference
+      return (
+        composition.relatesTo &&
+        composition.relatesTo.map(
+          (duplicate: fhir.CompositionRelatesTo) =>
+            duplicate.targetReference && duplicate.targetReference.reference
+        )
       )
     }
   },

@@ -19,6 +19,10 @@ import {
 import fetch from 'node-fetch'
 import { FHIR_URL } from 'src/constants'
 import { IAuthHeader } from 'src/common-types'
+import {
+  FHIR_OBSERVATION_CATEGORY_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from './constants'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -121,6 +125,83 @@ export function selectOrCreateEncounterResource(
   }
 
   return encounterEntry.resource as fhir.Encounter
+}
+
+export function selectOrCreateObservationResource(
+  sectionCode: string,
+  categoryCode: string,
+  categoryDescription: string,
+  observationCode: string,
+  observationDescription: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Observation {
+  let observation = fhirBundle.entry.find(entry => {
+    if (
+      !entry ||
+      !entry.resource ||
+      entry.resource.resourceType !== 'Observation'
+    ) {
+      return false
+    }
+    const observationEntry = entry.resource as fhir.Observation
+    const obCoding =
+      observationEntry.code &&
+      observationEntry.code.coding &&
+      observationEntry.code.coding.find(
+        obCode => obCode.code === observationCode
+      )
+    if (obCoding) {
+      return true
+    }
+    return false
+  })
+
+  if (observation) {
+    return observation.resource as fhir.Observation
+  }
+  /* Existing obseration not found for given type */
+  observation = createObservationResource(sectionCode, fhirBundle, context)
+  return updateObservationInfo(
+    observation as fhir.Observation,
+    categoryCode,
+    categoryDescription,
+    observationCode,
+    observationDescription
+  )
+}
+
+export function updateObservationInfo(
+  observation: fhir.Observation,
+  categoryCode: string,
+  categoryDescription: string,
+  observationCode: string,
+  observationDescription: string
+): fhir.Observation {
+  const categoryCoding = {
+    coding: [
+      {
+        system: FHIR_OBSERVATION_CATEGORY_URL,
+        code: categoryCode,
+        display: categoryDescription
+      }
+    ]
+  }
+
+  if (!observation.category) {
+    observation.category = []
+  }
+  observation.category.push(categoryCoding)
+
+  const coding = [
+    {
+      system: 'http://loinc.org',
+      code: observationCode,
+      display: observationDescription
+    }
+  ]
+  setArrayPropInResourceObject(observation, 'code', coding, 'coding')
+  return observation
 }
 
 export function createObservationResource(
@@ -241,7 +322,7 @@ export function selectOrCreateTaskRefResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.Task {
-  let taskResource =
+  let taskEntry =
     fhirBundle.entry &&
     fhirBundle.entry.find(entry => {
       if (entry.resource && entry.resource.resourceType === 'Task') {
@@ -249,13 +330,17 @@ export function selectOrCreateTaskRefResource(
       }
       return false
     })
-  if (!taskResource) {
-    taskResource = createTaskRefTemplate(uuid())
-    fhirBundle.entry.push(taskResource)
+  if (!taskEntry) {
+    taskEntry = createTaskRefTemplate(uuid())
+    const taskResource = taskEntry.resource as fhir.Task
+    if (!taskResource.focus) {
+      taskResource.focus = { reference: '' }
+    }
+    taskResource.focus.reference = fhirBundle.entry[0].fullUrl
+    fhirBundle.entry.push(taskEntry)
   }
-  return taskResource.resource as fhir.Task
+  return taskEntry.resource as fhir.Task
 }
-
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
@@ -326,6 +411,15 @@ export const fetchFHIR = (
     body
   })
     .then(response => {
+      if (!response.ok) {
+        return Promise.reject(
+          new Error(
+            `FHIR post to /fhir failed with [${
+              response.status
+            }] body: ${response.text()}`
+          )
+        )
+      }
       return response.json()
     })
     .catch(error => {
@@ -333,11 +427,62 @@ export const fetchFHIR = (
     })
 }
 
-export function getTrackingId(composition: fhir.Composition) {
-  if (!composition || !composition.identifier) {
+export async function getTrackingIdFromResponse(
+  resBody: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  const compositionBundle = await fetchFHIR(
+    `/Composition/${getCompositionIDFromResponse(resBody)}`,
+    authHeader
+  )
+  if (
+    !compositionBundle ||
+    !compositionBundle.entry ||
+    !compositionBundle.entry[0].identifier
+  ) {
     throw new Error(
-      'getTrackingId: Invalid composition or composition has no identifier'
+      'getTrackingIdFromResponse: Invalid composition or composition has no identifier'
     )
   }
-  return composition.identifier.value
+  return compositionBundle.entry[0].identifier.value
+}
+
+export async function getBRNFromResponse(
+  resBody: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  const taskBundle = await fetchFHIR(
+    `/Task?focus=Composition/${getCompositionIDFromResponse(resBody)}`,
+    authHeader
+  )
+  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0].identifier) {
+    throw new Error(
+      'getBRNFromResponse: Invalid task or task has no identifier'
+    )
+  }
+  const brnIdentifier =
+    taskBundle.entry[0].identifier &&
+    taskBundle.entry[0].identifier.find(
+      (identifier: fhir.Identifier) =>
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+    )
+  if (!brnIdentifier || !brnIdentifier.value) {
+    throw new Error('getBRNFromResponse: Task does not have any brn identifier')
+  }
+  return brnIdentifier.value
+}
+
+export function getCompositionIDFromResponse(resBody: fhir.Bundle): string {
+  if (
+    !resBody ||
+    !resBody.entry ||
+    !resBody.entry[0] ||
+    !resBody.entry[0].response ||
+    !resBody.entry[0].response.location
+  ) {
+    throw new Error(`FHIR response did not send a valid response`)
+  }
+  // return the Composition's id
+  return resBody.entry[0].response.location.split('/')[3]
 }

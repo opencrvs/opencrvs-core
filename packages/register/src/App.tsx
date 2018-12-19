@@ -30,7 +30,9 @@ import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
 import { storage } from 'src/storage'
 import { setInitialDrafts } from 'src/drafts'
+import { setInitialUserDetails } from 'src/profile/profileActions'
 import { client } from 'src/utils/apolloClient'
+import { USER_DETAILS } from 'src/utils/userUtils'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -62,6 +64,9 @@ export class App extends React.Component<IAppProps, IState> {
     const drafts = JSON.parse(draftsString ? draftsString : '[]')
     this.props.store.dispatch(setInitialDrafts(drafts))
     this.setState({ initialDraftsLoaded: true })
+    const userDetailsString = await storage.getItem(USER_DETAILS)
+    const userDetails = JSON.parse(userDetailsString ? userDetailsString : '[]')
+    this.props.store.dispatch(setInitialUserDetails(userDetails))
   }
 
   public render() {

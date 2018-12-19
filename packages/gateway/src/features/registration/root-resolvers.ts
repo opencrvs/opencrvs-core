@@ -3,7 +3,12 @@ import {
   updateFHIRTaskBundle
 } from 'src/features/registration/fhir-builders'
 import { GQLResolver } from 'src/graphql/schema'
-import { fetchFHIR, getTrackingId } from 'src/features/fhir/utils'
+import {
+  fetchFHIR,
+  getCompositionIDFromResponse,
+  getTrackingIdFromResponse,
+  getBRNFromResponse
+} from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
 
 const statusMap = {
@@ -33,30 +38,39 @@ export const resolvers: GQLResolver = {
     async createBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)
 
-      const resBody: fhir.Bundle = await fetchFHIR(
-        '',
-        authHeader,
-        'POST',
-        JSON.stringify(doc)
-      )
+      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+      // return tracking-id
+      return await getTrackingIdFromResponse(res, authHeader)
+    },
+    async updateBirthRegistration(_, { details }, authHeader) {
+      const doc = await buildFHIRBundle(details)
 
-      if (
-        !resBody ||
-        !resBody.entry ||
-        !resBody.entry[0] ||
-        !resBody.entry[0].response ||
-        !resBody.entry[0].response.location
-      ) {
-        throw new Error(`Workflow response did not send a valid response`)
+      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+      // return composition-id
+      return getCompositionIDFromResponse(res)
+    },
+    async markBirthAsRegistered(_, { id, details }, authHeader) {
+      let doc
+      if (!details) {
+        const taskBundle = await fetchFHIR(
+          `/Task?focus=Composition/${id}`,
+          authHeader
+        )
+        if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+          throw new Error('Task does not exist')
+        }
+        doc = {
+          resourceType: 'Bundle',
+          type: 'document',
+          entry: taskBundle.entry
+        }
+      } else {
+        doc = await buildFHIRBundle(details)
       }
 
-      const composition = await fetchFHIR(
-        resBody.entry[0].response.location.replace('/fhir', ''),
-        authHeader
-      )
-
-      // return the trackingid
-      return getTrackingId(composition)
+      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+      // return the brn
+      return await getBRNFromResponse(res, authHeader)
     },
     async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
       const taskBundle = await fetchFHIR(
@@ -74,18 +88,10 @@ export const resolvers: GQLResolver = {
         reason,
         comment
       )
-      const resBody = await fetchFHIR(
-        `/Task`,
-        authHeader,
-        'PUT',
-        JSON.stringify(newTaskBundle)
-      )
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
 
-      if (!resBody || !resBody.taskId) {
-        throw new Error(`Workflow response did not send a valid response`)
-      }
       // return the taskId
-      return resBody.taskId
+      return taskEntry.id
     }
   }
 }

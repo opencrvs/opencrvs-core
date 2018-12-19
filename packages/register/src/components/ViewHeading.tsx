@@ -3,7 +3,7 @@ import styled from '../styled-components'
 
 export interface IViewHeadingProps {
   id: string
-  title: string
+  title?: string
   description?: string
   breadcrumb?: string
   hideBackButton?: boolean
@@ -44,7 +44,7 @@ export function ViewHeading({
   return (
     <ViewHeadingContainer id={id}>
       {breadcrumb && <Breadcrumb>{breadcrumb}</Breadcrumb>}
-      <ViewTitle id="view_title">{title}</ViewTitle>
+      {title && <ViewTitle id="view_title">{title}</ViewTitle>}
       {description && <ViewDescription>{description}</ViewDescription>}
     </ViewHeadingContainer>
   )

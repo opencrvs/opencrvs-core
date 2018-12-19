@@ -510,6 +510,13 @@ export const BENGALI_STATE = {
     'register.form.modal.submitDescription':
       '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
+    'register.home.hedaer.hello': 'Hello {fullName}',
+    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
+    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
+    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar',
     'register.notification.newContentAvailable':
       'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
@@ -575,10 +582,16 @@ export const BENGALI_STATE = {
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle': 'একটি নতুন ইভেন্ট ঘোষণা',
-    'register.home.buttons.registerNewEvent': 'একটি নতুন ইভেন্ট ঘোষণা',
+    'register.home.buttons.registerNewEvent': 'New applications',
     'register.home.buttons.mydraft': 'আমার খসড়াগুলি',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
     'register.home.buttons.completedSumissions': 'সমাপ্ত জমাগুলি',
+    'register.home.banner.notificationsToComplete':
+      'Notifications to complete in my area',
+    'register.home.banner.rejectedApplications': 'My rejected applications',
+    'register.home.button.savedDrafts': 'My saved drafts',
+    'register.home.button.records': 'My records',
+    'register.home.buttons.trackingId': 'Tracking ID',
     'register.home.logout': 'প্রস্থান',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
@@ -645,6 +658,9 @@ export const BENGALI_STATE = {
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.collected': 'সংগৃহীত',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
+    'register.workQueue.labels.results.duplicate':
+      'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
+    'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
     'review.edit.modal.confirmationText':

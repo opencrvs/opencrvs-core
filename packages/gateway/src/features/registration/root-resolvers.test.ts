@@ -54,17 +54,17 @@ describe('Registration root resolvers', () => {
       expect(compositions).toHaveLength(2)
     })
   })
-  const details = {
-    child: {
-      name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
-    },
-    mother: {
-      name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
-      telecom: [{ system: 'phone', value: '+8801622688231' }]
-    },
-    registration: { contact: 'MOTHER' }
-  }
   describe('createBirthRegistration()', () => {
+    const details = {
+      child: {
+        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
+      },
+      mother: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
+      },
+      registration: { contact: 'MOTHER' }
+    }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [
@@ -346,6 +346,385 @@ describe('Registration root resolvers', () => {
           'Workflow response did not send a valid response'
         )
       })
+    })
+  })
+  describe('markBirthAsRegistered()', () => {
+    it('updates status successfully when only composition id is sent', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: '0a84365d-1925-40cf-a48b-17fcf3425040',
+            meta: {
+              lastUpdated: '2018-12-13T03:55:12.629+00:00'
+            },
+            type: 'searchset',
+            total: 1,
+            link: [
+              {
+                relation: 'self',
+                url:
+                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+              }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'BIRTH'
+                      }
+                    ]
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/paper-form-id',
+                      value: '23423'
+                    },
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'BlAqHa7'
+                    }
+                  ],
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/contact-person',
+                      valueString: 'MOTHER'
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueString:
+                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                    },
+                    {
+                      url:
+                        'http://opencrvs.org/specs/extension/regLastLocation',
+                      valueString:
+                        'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                    }
+                  ],
+                  lastModified: '2018-12-11T11:55:46.775Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-12-11T11:55:46.775Z',
+                      authorString:
+                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                  },
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'DECLARED'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-12-11T12:29:48.862+00:00',
+                    versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
+                  },
+                  id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
+                }
+              }
+            ]
+          })
+        ],
+        [JSON.stringify({ BirthRegistrationNumber: '2018333417123456786' })]
+      )
+      const result = await resolvers.Mutation.markBirthAsRegistered(
+        {},
+        { id: compositionID }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('2018333417123456786')
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+    it('throws error if no task entry found given id', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          id: 'd2ca298f-662f-4086-a8c5-697517a2b5a3',
+          meta: {
+            lastUpdated: '2018-12-13T04:02:42.003+00:00'
+          },
+          type: 'searchset',
+          total: 0,
+          link: [
+            {
+              relation: 'self',
+              url:
+                'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
+            }
+          ],
+          entry: []
+        })
+      )
+      expect(
+        resolvers.Mutation.markBirthAsRegistered({}, { id: compositionID })
+      ).rejects.toThrowError('Task does not exist')
+    })
+    it('throws an error when the workflow request returns an error code', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          id: '0a84365d-1925-40cf-a48b-17fcf3425040',
+          meta: {
+            lastUpdated: '2018-12-13T03:55:12.629+00:00'
+          },
+          type: 'searchset',
+          total: 1,
+          link: [
+            {
+              relation: 'self',
+              url:
+                'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+            }
+          ],
+          entry: [
+            {
+              fullUrl:
+                'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
+              resource: {
+                resourceType: 'Task',
+                status: 'requested',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/types',
+                      code: 'BIRTH'
+                    }
+                  ]
+                },
+                identifier: [
+                  {
+                    system: 'http://opencrvs.org/specs/id/paper-form-id',
+                    value: '23423'
+                  },
+                  {
+                    system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                    value: 'BlAqHa7'
+                  }
+                ],
+                extension: [
+                  {
+                    url: 'http://opencrvs.org/specs/extension/contact-person',
+                    valueString: 'MOTHER'
+                  },
+                  {
+                    url: 'http://opencrvs.org/specs/extension/regLastUser',
+                    valueString:
+                      'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                  },
+                  {
+                    url: 'http://opencrvs.org/specs/extension/regLastLocation',
+                    valueString: 'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                  }
+                ],
+                lastModified: '2018-12-11T11:55:46.775Z',
+                note: [
+                  {
+                    text: '',
+                    time: '2018-12-11T11:55:46.775Z',
+                    authorString:
+                      'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                  }
+                ],
+                focus: {
+                  reference: 'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                },
+                businessStatus: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/reg-status',
+                      code: 'DECLARED'
+                    }
+                  ]
+                },
+                meta: {
+                  lastUpdated: '2018-12-11T12:29:48.862+00:00',
+                  versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
+                },
+                id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
+              }
+            }
+          ]
+        })
+      )
+      fetch.mockResponseOnce('Boom!', { status: 401 })
+      await expect(
+        // @ts-ignore
+        resolvers.Mutation.markBirthAsRegistered({}, { id: compositionID })
+      ).rejects.toThrowError(
+        'Workflow post to /markBirthAsRegistered failed with [401] body: Boom!'
+      )
+    })
+    it('throws error if workflow doesnot send BirthRegistrationNumber as response', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: 'd2ca298f-662f-4086-a8c5-697517a2b5a3',
+            meta: {
+              lastUpdated: '2018-12-13T04:02:42.003+00:00'
+            },
+            type: 'searchset',
+            total: 0,
+            link: [
+              {
+                relation: 'self',
+                url:
+                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
+              }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'BIRTH'
+                      }
+                    ]
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/paper-form-id',
+                      value: '23423'
+                    },
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'BlAqHa7'
+                    }
+                  ],
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/contact-person',
+                      valueString: 'MOTHER'
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueString:
+                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                    },
+                    {
+                      url:
+                        'http://opencrvs.org/specs/extension/regLastLocation',
+                      valueString:
+                        'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                    }
+                  ],
+                  lastModified: '2018-12-11T11:55:46.775Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-12-11T11:55:46.775Z',
+                      authorString:
+                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                  },
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'DECLARED'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-12-11T12:29:48.862+00:00',
+                    versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
+                  },
+                  id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
+                }
+              }
+            ]
+          })
+        ],
+        [JSON.stringify({ SomethingDifferent: '2018333417123456786' })]
+      )
+      expect(
+        resolvers.Mutation.markBirthAsRegistered({}, { id: compositionID })
+      ).rejects.toThrowError('Workflow response did not send a valid response')
+    })
+  })
+  describe('updateBirthRegistration()', () => {
+    const details = {
+      child: {
+        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
+      },
+      mother: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
+      },
+      registration: { contact: 'MOTHER' }
+    }
+    it('posts a fhir bundle', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Mutation.updateBirthRegistration(
+        {},
+        { details }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('1')
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it('throws an error when the request returns an error code', async () => {
+      fetch.mockResponseOnce('Boom!', { status: 401 })
+      await expect(
+        // @ts-ignore
+        resolvers.Mutation.updateBirthRegistration({}, { details })
+      ).rejects.toThrowError('FHIR post to /fhir failed with [401] body: Boom!')
+    })
+
+    it("throws an error when the response isn't what we expect", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        // @ts-ignore
+        resolvers.Mutation.updateBirthRegistration({}, { details })
+      ).rejects.toThrowError('FHIR response did not send a valid response')
     })
   })
 })
