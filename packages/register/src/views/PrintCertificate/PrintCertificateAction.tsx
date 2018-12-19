@@ -6,7 +6,11 @@ import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { FormFieldGenerator } from 'src/components/form'
-import { IFormSection } from 'src/forms'
+import {
+  IFormSection,
+  IFormSectionData,
+  INFORMATIVE_RADIO_GROUP
+} from 'src/forms'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -67,7 +71,9 @@ const messages = defineMessages({
   }
 })
 
-type State = {}
+type State = {
+  data: IFormSectionData
+}
 
 type IProps = {
   backLabel: string
@@ -85,7 +91,15 @@ class PrintCertificateActionComponent extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
-    this.state = {}
+    this.state = {
+      data: {
+        personCollectingCertificate: 'MOTHER'
+      }
+    }
+  }
+
+  storeData = (documentData: IFormSectionData) => {
+    this.setState(() => ({ data: documentData }))
   }
 
   render = () => {
@@ -121,7 +135,7 @@ class PrintCertificateActionComponent extends React.Component<
                     <Box>
                       <FormFieldGenerator
                         id={printCertificateFormSection.id}
-                        onChange={() => console.log('on change called')}
+                        onChange={this.storeData}
                         setAllFieldsDirty={false}
                         fields={printCertificateFormSection.fields}
                       />
