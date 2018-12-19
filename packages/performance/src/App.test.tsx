@@ -5,6 +5,7 @@ import { Store } from 'redux'
 import { storage } from 'src/storage'
 import { queries } from 'src/profile/queries'
 import { setInitialUserDetails } from '@opencrvs/performance/src/profile/actions'
+import { goToRegister as goToRegisterAction } from 'src/navigation'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -78,5 +79,26 @@ describe('when user has a valid token in local storage', () => {
     it('displays the home view', () => {
       expect(app.find('#home_view').hostNodes()).toHaveLength(2)
     })
+  })
+})
+describe('when user navigates', () => {
+  let app: ReactWrapper
+
+  beforeEach(() => {
+    const testApp = createTestApp()
+    app = testApp.app
+    Object.defineProperty(window.location, 'assign', {
+      configurable: true
+    })
+    window.location.assign = jest.fn()
+  })
+
+  it('Redirects user to register app', async () => {
+    goToRegisterAction()
+    app.update()
+    expect(window.location.assign).toHaveBeenCalled()
+    expect((window.location.assign as jest.Mock).mock.calls[0][0]).toContain(
+      `${config.REGISTER_URL}?token=`
+    )
   })
 })
