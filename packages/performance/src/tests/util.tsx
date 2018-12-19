@@ -6,6 +6,11 @@ import {
   AppStore
 } from '@opencrvs/performance/src/store'
 import { mount, configure, shallow } from 'enzyme'
+import { graphql, print } from 'graphql'
+import ApolloClient from 'apollo-client'
+import { getSchema } from './graphql-schema-mock'
+import { ApolloLink, Observable } from 'apollo-link'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
@@ -13,6 +18,7 @@ import { ENGLISH_STATE } from '@opencrvs/performance/src/i18n/locales/en'
 import { IntlProvider, intlShape } from 'react-intl'
 import { I18nContainer } from '@opencrvs/performance/src/i18n/components/I18nContainer'
 import { config } from '../config'
+import { App } from '../App'
 
 configure({ adapter: new Adapter() })
 
@@ -65,79 +71,117 @@ export function createTestComponent(
   return { component, store }
 }
 
-export const mockUserResponse = {
-  data: {
-    getUser: {
-      catchmentArea: [
+function createGraphQLClient() {
+  const schema = getSchema()
+
+  return new ApolloClient({
+    cache: new InMemoryCache(),
+    link: new ApolloLink(operation => {
+      return new Observable(observer => {
+        const { query, operationName, variables } = operation
+
+        graphql(schema, print(query), null, null, variables, operationName)
+          .then(result => {
+            observer.next(result)
+            observer.complete()
+          })
+          .catch(observer.error.bind(observer))
+      })
+    })
+  })
+}
+
+export function createTestApp() {
+  const { store, history } = createStore()
+  const app = mount(
+    <App store={store} history={history} client={createGraphQLClient()} />
+  )
+
+  return { history, app, store }
+}
+
+export const user = {
+  id: '0',
+  role: 'DISTRICT_REGISTRAR',
+  name: [
+    {
+      use: 'en',
+      firstNames: 'Muhammad Abdul Muid',
+      familyName: 'Khan',
+      __typename: 'HumanName'
+    },
+    { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
+  ],
+  catchmentArea: [
+    {
+      id: 'a590de84-1d84-4dcf-a20b-8e60c7c66130',
+      name: 'Dhaka',
+      status: 'active',
+      identifier: [
         {
-          id: 'ddab090d-040e-4bef-9475-314a448a576a',
-          name: 'Dhaka',
-          status: 'active',
-          __typename: 'Location'
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '3',
+          __typename: 'Identifier'
         },
         {
-          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
-          name: 'GAZIPUR',
-          status: 'active',
-          __typename: 'Location'
+          system: 'http://opencrvs.org/specs/id/bbs-code',
+          value: '30',
+          __typename: 'Identifier'
         },
         {
-          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
-          name: 'KALIGANJ',
-          status: 'active',
-          __typename: 'Location'
-        },
-        {
-          id: '123456789',
-          name: 'BAKTARPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UNION',
-              __typename: 'Identifier'
-            }
-          ],
-          __typename: 'Location'
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'DIVISION',
+          __typename: 'Identifier'
         }
       ],
-      primaryOffice: {
-        id: '2a83cf14-b959-47f4-8097-f75a75d1867f',
-        name: 'Kaliganj Union Sub Center',
-        status: 'active',
-        __typename: 'Location'
-      },
-      __typename: 'User'
+      __typename: 'Location'
+    },
+    {
+      id: '3e769963-2d07-48f6-9d5a-8aa12c1a66b9',
+      name: 'GAZIPUR',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '20',
+          __typename: 'Identifier'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/bbs-code',
+          value: '33',
+          __typename: 'Identifier'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'DISTRICT',
+          __typename: 'Identifier'
+        }
+      ],
+      __typename: 'Location'
     }
-  }
+  ],
+  primaryOffice: undefined,
+  __typename: 'User'
 }
 
 export const userDetails = {
   name: [
     {
       use: 'en',
-      firstNames: 'Shakib',
-      familyName: 'Al Hasan',
+      firstNames: 'Muhammad Abdul Muid',
+      familyName: 'Khan',
       __typename: 'HumanName'
     },
     { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
   ],
   role: 'DISTRICT_REGISTRAR',
-  primaryOffice: {
-    id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
-    name: 'Kaliganj Union Sub Center',
-    status: 'active'
-  },
   catchmentArea: [
     {
-      id: '850f50f3-2ed4-4ae6-b427-2d894d4a3329',
+      id: 'a590de84-1d84-4dcf-a20b-8e60c7c66130',
       name: 'Dhaka',
       status: 'active',
       identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-          value: '3'
-        },
+        { system: 'http://opencrvs.org/specs/id/a2i-internal-id', value: '3' },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
         {
           system: 'http://opencrvs.org/specs/id/jurisdiction-type',
@@ -146,52 +190,23 @@ export const userDetails = {
       ]
     },
     {
-      id: '812ed387-f8d5-4d55-ad05-936292385990',
+      id: '3e769963-2d07-48f6-9d5a-8aa12c1a66b9',
       name: 'GAZIPUR',
       status: 'active',
       identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-          value: '20'
-        },
+        { system: 'http://opencrvs.org/specs/id/a2i-internal-id', value: '20' },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
         {
           system: 'http://opencrvs.org/specs/id/jurisdiction-type',
           value: 'DISTRICT'
         }
       ]
-    },
-    {
-      id: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
-      name: 'KALIGANJ',
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-          value: '165'
-        },
-        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'UPAZILA'
-        }
-      ]
-    },
-    {
-      id: '43c17986-62cf-4551-877c-be095fb6e5d0',
-      name: 'BAKTARPUR',
-      status: 'active',
-      identifier: [
-        {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-          value: '3473'
-        },
-        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
-        {
-          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-          value: 'UNION'
-        }
-      ]
     }
   ]
+}
+
+export const mockUserResponse = {
+  data: {
+    getUser: user
+  }
 }
