@@ -651,6 +651,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
+    'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
     'register.workQueue.queryError': 'An error occurred while searching',
     'register.workQueue.dataTable.results': 'Results',
     'register.workQueue.dataTable.noResults': 'No result to display',
@@ -666,6 +667,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
+    'register.workQueue.buttons.printCertificate': 'Print Certificate',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':

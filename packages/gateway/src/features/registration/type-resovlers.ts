@@ -105,6 +105,17 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
+    async brn(task: fhir.Task) {
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+        )
+
+      return (foundIdentifier && foundIdentifier.value) || null
+    },
     async attachments(task: fhir.Task) {
       if (!task.focus) {
         throw new Error(
