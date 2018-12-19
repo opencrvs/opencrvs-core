@@ -694,6 +694,16 @@ export const ENGLISH_STATE = {
     'review.form.deleteApplication': 'Delete Application',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
-    'app.logout.modal.confirmationText': 'Are you sure you wish to log out?'
+    'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',
+    'certificate.parent.details.label.firstName': 'First Name(s)',
+    'certificate.parent.details.label.familyName': 'Family Name',
+    'certificate.parent.details.label.firstNameInEng':
+      'First Name(s)(in english)',
+    'certificate.parent.details.label.familyNameInEng':
+      'Family Name(in english)',
+    'certificate.parent.details.label.dateOfBirth': 'Date of Birth',
+    'certificate.parent.details.label.nationality': 'Nationality',
+    'certificate.parent.details.label.typeOfID': 'Type of ID',
+    'certificate.parent.details.label.number': 'Number'
   }
 }

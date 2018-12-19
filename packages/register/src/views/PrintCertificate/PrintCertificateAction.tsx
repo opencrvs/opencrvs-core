@@ -44,18 +44,28 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
     fetchBirthRegistration(id: $id) {
       id
       mother {
-        gender
         name {
           firstNames
           familyName
         }
+        identifier {
+          id
+          type
+        }
+        birthDate
+        nationality
       }
       father {
-        gender
         name {
           firstNames
           familyName
         }
+        identifier {
+          id
+          type
+        }
+        birthDate
+        nationality
       }
       createdAt
     }

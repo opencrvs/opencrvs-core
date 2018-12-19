@@ -686,6 +686,15 @@ export const BENGALI_STATE = {
     'review.form.deleteApplication': 'আবেদন মুছে দিন',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হাঁ',
-    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?'
+    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
+    'certificate.parent.details.label.firstName': 'নামের প্রথম অংশ',
+    'certificate.parent.details.label.familyName': 'পরিবারের নাম',
+    'certificate.parent.details.label.firstNameInEng':
+      'নামের প্রথম অংশ(ইংরেজি)',
+    'certificate.parent.details.label.familyNameInEng': 'পরিবারের নাম(ইংরেজি)',
+    'certificate.parent.details.label.dateOfBirth': 'জন্ম তারিখ',
+    'certificate.parent.details.label.nationality': 'জাতীয়তা',
+    'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
+    'certificate.parent.details.label.number': 'সংখ্যা'
   }
 }

@@ -79,7 +79,7 @@ export interface IRadioGroupFormField extends IFormFieldBase {
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
-  information?: IFormSectionData
+  information: IFormSectionData
   options: IRadioOption[]
 }
 
@@ -213,10 +213,25 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   options: RadioComponentOption[]
 }
 
+type Name = {
+  firstNames: string
+  familyName: string
+}
+type Identifier = {
+  id: string
+  type: string
+}
+type Infomation = {
+  name: Name[]
+  birthDate: string
+  nationality: [string]
+  identifier: [Identifier] | null
+}
+
 export interface Ii18nInformativeRadioGroupFormField
   extends Ii18nFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
-  information?: IFormSectionData
+  information: Infomation
   options: RadioComponentOption[]
 }
 

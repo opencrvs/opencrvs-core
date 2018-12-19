@@ -4,9 +4,18 @@ import { InputField } from 'src/components/form/InputField'
 import {
   Ii18nFormField,
   IFormFieldValue,
-  Ii18nRadioGroupFormField
+  Ii18nRadioGroupFormField,
+  Ii18nInformativeRadioGroupFormField
 } from 'src/forms'
 import { injectIntl } from 'react-intl'
+import { ParentDetails } from './ParentDetails'
+import styled from '../../styled-components'
+
+const RadioGroupWrapper = styled.div`
+  > div > span {
+    display: block !important;
+  }
+`
 
 type IInputProps = {
   id: string
@@ -46,15 +55,22 @@ function InformativeRadioGroupComponent({
   fieldDefinition
 }: IProps) {
   return (
-    <InputField {...inputFieldProps}>
-      <RadioGroup
-        {...inputProps}
-        onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
-        options={(fieldDefinition as Ii18nRadioGroupFormField).options}
-        name={fieldDefinition.name}
-        value={value as string}
-      />
-    </InputField>
+    <RadioGroupWrapper>
+      <InputField {...inputFieldProps}>
+        <ParentDetails
+          information={
+            (fieldDefinition as Ii18nInformativeRadioGroupFormField).information
+          }
+        />
+        <RadioGroup
+          {...inputProps}
+          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          options={(fieldDefinition as Ii18nRadioGroupFormField).options}
+          name={fieldDefinition.name}
+          value={value as string}
+        />
+      </InputField>
+    </RadioGroupWrapper>
   )
 }
 
