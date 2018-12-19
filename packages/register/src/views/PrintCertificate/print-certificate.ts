@@ -4,7 +4,8 @@ import {
   RADIO_GROUP,
   TEXT,
   INFORMATIVE_RADIO_GROUP,
-  WARNING
+  WARNING,
+  PARAGRAPH
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { conditionals } from 'src/forms/utils'
@@ -85,6 +86,12 @@ const messages = defineMessages({
     defaultMessage:
       'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
     description: 'Label for warning message when the collector is not verified'
+  },
+  prompt: {
+    id: 'formFields.print.otherPersonPrompt',
+    defaultMessage:
+      'Because there are no details of this person on record, we need to capture their details:',
+    description: 'Labal for prompt in case of other person collects certificate'
   }
 })
 
@@ -134,6 +141,14 @@ export const printCertificateFormSection: IFormSection = {
         { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.fatherCollectsCertificate]
+    },
+    {
+      name: 'otherPersonPrompt',
+      type: PARAGRAPH,
+      label: messages.prompt,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
     },
     {
       name: 'otherPersonIDType',
