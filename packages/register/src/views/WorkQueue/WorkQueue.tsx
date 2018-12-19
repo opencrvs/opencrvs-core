@@ -596,7 +596,7 @@ export class WorkQueueView extends React.Component<
 
     const expansionActions: JSX.Element[] = []
     if (this.userHasRegisterScope()) {
-      if (!registeredButNotCertified) {
+      if (registeredButNotCertified) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.print),
           handler: () => this.togglePrintModal(item.id)
@@ -794,7 +794,12 @@ export class WorkQueueView extends React.Component<
           />
         </HomeViewHeader>
         <Container>
-          <Query query={FETCH_REGISTRATION_QUERY}>
+          <Query
+            query={FETCH_REGISTRATION_QUERY}
+            variables={{
+              locationIds: [this.getLocalLocationId()]
+            }}
+          >
             {({ loading, error, data }) => {
               if (loading) {
                 return (
