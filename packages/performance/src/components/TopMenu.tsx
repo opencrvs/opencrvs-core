@@ -180,7 +180,7 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
     ]
 
     return (
-      <TopMenuContainer>
+      <TopMenuContainer id="top-menu-container">
         {!hideBackButton && (
           <BackButtonContainer onClick={goBack}>
             <BackButton icon={() => <ArrowBack />} />
