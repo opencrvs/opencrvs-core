@@ -130,6 +130,24 @@ class PrintCertificateActionComponent extends React.Component<
               }
 
               if (data) {
+                let fields = printCertificateFormSection.fields
+                fields = fields.map(field => {
+                  if (
+                    field &&
+                    field.type === INFORMATIVE_RADIO_GROUP &&
+                    field.name === 'motherDetails'
+                  ) {
+                    field.information = data.fetchBirthRegistration.mother
+                  } else if (
+                    field &&
+                    field.type === INFORMATIVE_RADIO_GROUP &&
+                    field.name === 'fatherDetails'
+                  ) {
+                    field.information = data.fetchBirthRegistration.father
+                  }
+
+                  return field
+                })
                 return (
                   <FormContainer>
                     <Box>

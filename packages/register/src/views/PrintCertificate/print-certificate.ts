@@ -113,6 +113,7 @@ export const printCertificateFormSection: IFormSection = {
       label: messages.confirmMotherDetails,
       required: true,
       initialValue: '',
+      information: {},
       validate: [],
       options: [
         { value: true, label: messages.confirm },
@@ -126,6 +127,7 @@ export const printCertificateFormSection: IFormSection = {
       label: messages.confirmMotherDetails,
       required: true,
       initialValue: '',
+      information: {},
       validate: [],
       options: [
         { value: true, label: messages.confirm },
