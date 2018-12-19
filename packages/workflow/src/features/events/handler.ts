@@ -39,6 +39,9 @@ function detectEvent(request: Hapi.Request): Events {
           return Events.BIRTH_NEW_DEC
         }
       }
+      if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+        return Events.BIRTH_MARK_REG
+      }
     }
   }
 
@@ -60,11 +63,14 @@ async function forwardToHearth(request: Hapi.Request, h: Hapi.ResponseToolkit) {
       'Content-Type': 'application/fhir+json'
     }
   }
+
+  let path = request.path
   if (request.method === 'post' || request.method === 'put') {
     requestOpts.body = JSON.stringify(request.payload)
+  } else if (request.method === 'get' && request.url.path) {
+    path = request.url.path
   }
-
-  const res = await fetch(HEARTH_URL + request.path.replace('/fhir', ''))
+  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
   const resBody = await res.json()
   const response = h.response(resBody)
 

@@ -411,15 +411,6 @@ export const fetchFHIR = (
     body
   })
     .then(response => {
-      if (!response.ok) {
-        return Promise.reject(
-          new Error(
-            `FHIR post to /fhir failed with [${
-              response.status
-            }] body: ${response.text()}`
-          )
-        )
-      }
       return response.json()
     })
     .catch(error => {
@@ -432,40 +423,43 @@ export async function getTrackingIdFromResponse(
   authHeader: IAuthHeader
 ) {
   const compositionBundle = await fetchFHIR(
-    `/Composition/${getCompositionIDFromResponse(resBody)}`,
+    `/Composition/${getIDFromResponse(resBody)}`,
     authHeader
   )
-  if (
-    !compositionBundle ||
-    !compositionBundle.entry ||
-    !compositionBundle.entry[0].identifier
-  ) {
+  if (!compositionBundle || !compositionBundle.identifier) {
     throw new Error(
       'getTrackingIdFromResponse: Invalid composition or composition has no identifier'
     )
   }
-  return compositionBundle.entry[0].identifier.value
+  return compositionBundle.identifier.value
 }
 
 export async function getBRNFromResponse(
   resBody: fhir.Bundle,
   authHeader: IAuthHeader
 ) {
-  const taskBundle = await fetchFHIR(
-    `/Task?focus=Composition/${getCompositionIDFromResponse(resBody)}`,
-    authHeader
-  )
-  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0].identifier) {
-    throw new Error(
-      'getBRNFromResponse: Invalid task or task has no identifier'
-    )
+  let path
+  if (isTaskResponse(resBody)) {
+    path = `/Task/${getIDFromResponse(resBody)}`
+  } else {
+    path = `/Task?focus=Composition/${getIDFromResponse(resBody)}`
+  }
+  const taskBundle = await fetchFHIR(path, authHeader)
+
+  let taskResource
+  if (taskBundle && taskBundle.entry && taskBundle.entry[0].resource) {
+    taskResource = taskBundle.entry[0].resource
+  } else if (taskBundle.resourceType === 'Task') {
+    taskResource = taskBundle
+  } else {
+    throw new Error('getBRNFromResponse: Invalid task found')
   }
   const brnIdentifier =
-    taskBundle.entry[0].identifier &&
-    taskBundle.entry[0].identifier.find(
+    taskResource.identifier &&
+    taskResource.identifier.find(
       (identifier: fhir.Identifier) =>
         identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
     )
   if (!brnIdentifier || !brnIdentifier.value) {
     throw new Error('getBRNFromResponse: Task does not have any brn identifier')
@@ -473,7 +467,7 @@ export async function getBRNFromResponse(
   return brnIdentifier.value
 }
 
-export function getCompositionIDFromResponse(resBody: fhir.Bundle): string {
+export function getIDFromResponse(resBody: fhir.Bundle): string {
   if (
     !resBody ||
     !resBody.entry ||
@@ -485,4 +479,17 @@ export function getCompositionIDFromResponse(resBody: fhir.Bundle): string {
   }
   // return the Composition's id
   return resBody.entry[0].response.location.split('/')[3]
+}
+
+export function isTaskResponse(resBody: fhir.Bundle): boolean {
+  if (
+    !resBody ||
+    !resBody.entry ||
+    !resBody.entry[0] ||
+    !resBody.entry[0].response ||
+    !resBody.entry[0].response.location
+  ) {
+    throw new Error(`FHIR response did not send a valid response`)
+  }
+  return resBody.entry[0].response.location.indexOf('Task') > -1
 }

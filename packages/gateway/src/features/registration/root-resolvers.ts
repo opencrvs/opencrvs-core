@@ -5,7 +5,7 @@ import {
 import { GQLResolver } from 'src/graphql/schema'
 import {
   fetchFHIR,
-  getCompositionIDFromResponse,
+  getIDFromResponse,
   getTrackingIdFromResponse,
   getBRNFromResponse
 } from 'src/features/fhir/utils'
@@ -47,7 +47,7 @@ export const resolvers: GQLResolver = {
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       // return composition-id
-      return getCompositionIDFromResponse(res)
+      return getIDFromResponse(res)
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
       let doc
@@ -88,10 +88,14 @@ export const resolvers: GQLResolver = {
         reason,
         comment
       )
-      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
-
+      const res = await fetchFHIR(
+        '/Task',
+        authHeader,
+        'PUT',
+        JSON.stringify(newTaskBundle)
+      )
       // return the taskId
-      return taskEntry.id
+      return getIDFromResponse(res)
     }
   }
 }

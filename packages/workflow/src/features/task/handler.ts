@@ -38,8 +38,7 @@ export default async function updateTaskHandler(
         }] body: ${await res.text()}`
       )
     }
-    /* returning the newly created tracking id */
-    return { taskId }
+    return res.json()
   } catch (error) {
     logger.error(`Workflow/updateTaskHandler: error: ${error}`)
     throw new Error(error)
