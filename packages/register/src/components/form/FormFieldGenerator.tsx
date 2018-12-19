@@ -50,6 +50,7 @@ import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
+import { WarningMessage } from './WarningMessage'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -210,7 +211,7 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === WARNING) {
-    return <InputField {...inputFieldProps}>{}</InputField>
+    return <WarningMessage>{fieldDefinition.label}</WarningMessage>
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
