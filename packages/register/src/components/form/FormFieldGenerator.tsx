@@ -52,6 +52,8 @@ import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
 
+import { WarningMessage } from './WarningMessage'
+
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -219,7 +221,7 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === WARNING) {
-    return <InputField {...inputFieldProps}>{}</InputField>
+    return <WarningMessage>{fieldDefinition.label}</WarningMessage>
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
