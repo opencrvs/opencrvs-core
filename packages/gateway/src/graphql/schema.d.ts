@@ -206,6 +206,7 @@ export type GQLMap = any
 export interface GQLRegistration {
   _fhirID?: string
   trackingId?: string
+  brn?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -1248,6 +1249,7 @@ export interface BirthRegistrationToUpdatedAtResolver<
 export interface GQLRegistrationTypeResolver<TParent = any> {
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
+  brn?: RegistrationToBrnResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
@@ -1268,6 +1270,10 @@ export interface RegistrationToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToBrnResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
