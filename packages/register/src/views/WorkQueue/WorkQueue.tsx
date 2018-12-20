@@ -250,10 +250,16 @@ const messages = defineMessages({
     defaultMessage: 'Print',
     description: 'The title of print button in list item actions'
   },
+  certificateCollectionActionTitle: {
+    id: 'register.workQueue.title.certificateCollection',
+    defaultMessage: 'Certificate Collection',
+    description: 'The title of print certificate action'
+  },
   printCertificate: {
     id: 'register.workQueue.list.buttons.printCertificate',
     defaultMessage: 'Print certificate',
-    description: 'The title of review button in list expansion actions'
+    description:
+      'The title of print certificate button in list expansion actions'
   },
   workflowStatusDateApplication: {
     id: 'register.workQueue.listItem.status.dateLabel.application',
@@ -920,7 +926,9 @@ export class WorkQueueView extends React.Component<
         </Container>
         {this.state.printCertificateModalVisible ? (
           <PrintCertificateAction
-            title={this.props.intl.formatMessage(messages.printCertificate)}
+            title={this.props.intl.formatMessage(
+              messages.certificateCollectionActionTitle
+            )}
             backLabel={this.props.intl.formatMessage(messages.back)}
             registrationId={(this.state.regId && this.state.regId) || ''}
             togglePrintCertificateSection={this.togglePrintModal}

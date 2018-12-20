@@ -662,6 +662,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
     'register.workQueue.list.buttons.review': 'Review',
     'register.workQueue.list.buttons.print': 'Print',
+    'register.workQueue.title.certificateCollection': 'Certificate Collection',
     'register.workQueue.list.buttons.printCertificate': 'Print certificate',
     'register.workQueue.buttons.newApplication': 'New birth application',
     'register.workQueue.listItem.status.dateLabel.application':
