@@ -238,7 +238,7 @@ export const childSection: IFormSection = {
       name: 'familyNameEng',
       type: TEXT,
       label: messages.childFamilyNameEng,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
@@ -268,7 +268,7 @@ export const childSection: IFormSection = {
       name: 'attendantAtBirth',
       type: SELECT_WITH_OPTIONS,
       label: messages.attendantAtBirth,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
@@ -288,7 +288,7 @@ export const childSection: IFormSection = {
       name: 'typeOfBirth',
       type: SELECT_WITH_OPTIONS,
       label: messages.typeOfBirth,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
@@ -315,7 +315,7 @@ export const childSection: IFormSection = {
       type: NUMBER,
       step: 0.01,
       label: messages.weightAtBirth,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       postfix: 'Kg'
@@ -324,6 +324,7 @@ export const childSection: IFormSection = {
       name: 'placeOfDelivery',
       type: SELECT_WITH_OPTIONS,
       label: messages.placeOfDelivery,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
@@ -340,6 +341,7 @@ export const childSection: IFormSection = {
       name: 'deliveryInstitution',
       type: SELECT_WITH_OPTIONS,
       label: messages.deliveryInstitution,
+      required: false,
       initialValue: '',
       validate: [],
       options: [{ value: '?', label: messages.deliveryInstitution }]
@@ -348,6 +350,7 @@ export const childSection: IFormSection = {
       name: 'deliveryAddress',
       type: TEXTAREA,
       label: messages.deliveryAddress,
+      required: false,
       initialValue: '',
       validate: [],
       disabled: true
