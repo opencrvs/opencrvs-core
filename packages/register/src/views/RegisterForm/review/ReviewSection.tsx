@@ -40,7 +40,12 @@ import {
   IFileValue,
   IFormFieldValue,
   LIST,
-  PARAGRAPH
+  PARAGRAPH,
+  SELECT_WITH_OPTIONS,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  ISelectOption,
+  IDynamicOptions,
+  IFormSectionData
 } from 'src/forms'
 
 const messages = defineMessages({
@@ -288,6 +293,30 @@ const getSectionExpansionConfig = (
   return sectionExpansionConfig
 }
 
+function renderSelectLabel(
+  value: IFormFieldValue,
+  options: ISelectOption[],
+  intl: InjectedIntl
+) {
+  const selectedOption = options.find(option => option.value === value)
+  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+}
+
+function renderSelectDynamicLabel(
+  value: IFormFieldValue,
+  options: IDynamicOptions,
+  draftData: IFormSectionData,
+  intl: InjectedIntl
+) {
+  const dependency = options.dependency ? draftData[options.dependency] : false
+  const selectedOption = dependency
+    ? options.options[dependency.toString()].find(
+        option => option.value === value
+      )
+    : false
+  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+}
+
 const renderValue = (
   draft: IDraft,
   section: IFormSection,
@@ -297,6 +326,18 @@ const renderValue = (
   const value: IFormFieldValue = draft.data[section.id]
     ? draft.data[section.id][field.name]
     : ''
+  if (field.type === SELECT_WITH_OPTIONS && field.options) {
+    return renderSelectLabel(value, field.options, intl)
+  }
+  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
+    const draftData = draft.data[section.id]
+    return renderSelectDynamicLabel(
+      value,
+      field.dynamicOptions,
+      draftData,
+      intl
+    )
+  }
   if (typeof value === 'string') {
     return value
   }
@@ -431,10 +472,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
-  }
-
-  userHasDeclareScope() {
-    return this.props.scope && this.props.scope.includes('declare')
   }
 
   render() {

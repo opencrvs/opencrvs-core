@@ -50,6 +50,8 @@ enum AttachmentType {
   IMMUNISATION_CERTIFICATE
   PAPER_FORM
   PASSPORT_PHOTO
+  BIRTH_REGISTRATION
+  SCHOOL_CERTIFICATE
   OTHER
 }
 
@@ -69,6 +71,34 @@ enum CauseOfDeath {
   NATURAL
   ACCIDENT
   OTHER
+}
+
+enum PaymentType {
+  MANUAL
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
+}
+
+input PaymentInput {
+  paymentId: ID
+  type: PaymentType
+  total: Float
+  amount: Float
+  outcome: PaymentOutcomeType
+  date: Date
+}
+
+type Payment { # -> PaymentReconciliation
+  paymentId: ID # -> .identifier
+  type: PaymentType # -> .detail.type
+  total: Float # -> .total
+  amount: Float # .detail.amount
+  outcome: PaymentOutcomeType # -> .outcome
+  date: Date # -> .detail.date
 }
 
 input CommentInput {
@@ -101,24 +131,8 @@ type RegWorkflow { # Task
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
 }
 
-input CertificateInput {
-  paperId: ID!
-  reciever: PersonInput
-  location: LocationInput
-  User: UserInput
-  createdAt: Date
-}
-
-type Certificate { # In manual register system (signature) not in BDRIS2
-  id: ID!
-  paperId: ID!
-  reciever: Person
-  location: Location
-  User: User
-  createdAt: Date
-}
-
 input BirthRegistrationInput {
+  _fhirIDMap: Map
   registration: RegistrationInput
   child: PersonInput
   mother: PersonInput
@@ -141,6 +155,7 @@ input BirthRegistrationInput {
 
 type BirthRegistration { # -> Composition
   id: ID! # long uuid
+  _fhirIDMap: Map
   registration: Registration
   child: Person # -> .section(code='child-details').entry.reference
   mother: Person # -> .section(code='mother-details').entry.reference
@@ -194,6 +209,7 @@ type DeathRegistration { # -> Composition
 }
 
 input RegistrationInput {
+  _fhirID: ID
   # short uuid easy to remember
   trackingId: String
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -205,10 +221,12 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
+  certificates: [CertificateInput]
   location: LocationInput
 }
 
 type Registration { # -> Task
+  _fhirID: ID # -> .id
   # short uuid easy to remember
   trackingId: String # -> .identifier
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -220,10 +238,26 @@ type Registration { # -> Task
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
+  certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
   duplicates: [ID]
 }
 
+input CertificateInput {
+  collector: RelatedPersonInput
+  hasShowedVerifiedDocument: Boolean
+  payments: [PaymentInput]
+  data: String
+}
+
+type Certificate { # -> Document Reference
+  collector: RelatedPerson # -> .extension
+  hasShowedVerifiedDocument: Boolean # -> .extension
+  payments: [Payment] # -> .extension
+  data: String # -> .content.attachment.data base64
+}
+
 input AttachmentInput {
+  _fhirID: ID
   contentType: String
   # base64
   data: String
@@ -238,6 +272,7 @@ input AttachmentInput {
 
 type Attachment { # -> DocumentReference
   id: ID! # uuid
+  _fhirID: ID # -> .id
   contentType: String # -> .content.attachment.contentType
   # base64
   data: String # -> .content.attachment.data base64
@@ -271,19 +306,13 @@ type Query {
 type Mutation {
   # BIRTH
   createBirthRegistration(details: BirthRegistrationInput!): ID!
-  updateBirthRegistration(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): BirthRegistration!
+  updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(
     id: ID!
     details: BirthRegistrationInput
   ): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration - internally call update if details exists
-  markBirthAsRegistered(
-    id: ID!
-    details: BirthRegistrationInput
-  ): BirthRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(
     id: ID!
     details: BirthRegistrationInput

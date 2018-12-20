@@ -513,6 +513,13 @@ export const ENGLISH_STATE = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
+    'register.home.hedaer.hello': 'Hello {fullName}',
+    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
+    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
+    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
@@ -581,9 +588,15 @@ export const ENGLISH_STATE = {
     'register.selectVitalEvent.registerNewEventTitle':
       'Declare a new vital event',
     'register.home.buttons.mydraft': 'My draft',
-    'register.home.buttons.registerNewEvent': 'Declare a new vital event',
+    'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
     'register.home.buttons.completedSumissions': 'Completed submissions',
+    'register.home.banner.notificationsToComplete':
+      'Notifications to complete in my area',
+    'register.home.banner.rejectedApplications': 'My rejected applications',
+    'register.home.button.savedDrafts': 'My saved drafts',
+    'register.home.button.records': 'My records',
+    'register.home.buttons.trackingId': 'Tracking ID',
     'register.home.logout': 'Log out',
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
@@ -672,6 +685,8 @@ export const ENGLISH_STATE = {
       'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
     'formFields.print.otherPersonPrompt':
       'Because there are no details of this person on record, we need to capture their details:',
+    'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
+    'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':

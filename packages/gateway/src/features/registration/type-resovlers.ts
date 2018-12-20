@@ -188,9 +188,12 @@ export const typeResolvers: GQLResolver = {
 
       const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
       const composition = await res.json()
-      return composition.relatesTo.map(
-        (duplicate: fhir.CompositionRelatesTo) =>
-          duplicate.targetReference && duplicate.targetReference.reference
+      return (
+        composition.relatesTo &&
+        composition.relatesTo.map(
+          (duplicate: fhir.CompositionRelatesTo) =>
+            duplicate.targetReference && duplicate.targetReference.reference
+        )
       )
     }
   },
@@ -267,6 +270,9 @@ export const typeResolvers: GQLResolver = {
     },
     data(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data
+    },
+    contentType(docRef: fhir.DocumentReference) {
+      return docRef.content[0].attachment.contentType
     },
     originalFileName(docRef: fhir.DocumentReference) {
       const foundIdentifier =
@@ -492,6 +498,10 @@ export const typeResolvers: GQLResolver = {
         `${fhirUrl}/${encounterSection.entry[0].reference}`
       )
       const data = await res.json()
+
+      if (!data || !data.location || !data.location[0].location) {
+        return null
+      }
 
       const locationRes = await fetch(
         `${fhirUrl}/${data.location[0].location.reference}`

@@ -51,6 +51,7 @@ describe('WorkQueue tests', async () => {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 registration: {
                   trackingId: 'B111111',
+                  duplicates: null,
                   status: [
                     {
                       timestamp: '2018-12-07T13:11:49.380Z',
@@ -94,6 +95,7 @@ describe('WorkQueue tests', async () => {
                 id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
                 registration: {
                   trackingId: 'B222222',
+                  duplicates: null,
                   status: [
                     {
                       timestamp: '2018-12-07T13:11:49.380Z',
@@ -165,6 +167,7 @@ describe('WorkQueue tests', async () => {
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
         event: 'birth',
+        duplicates: null,
         status: [
           {
             location: 'Kaliganj Union Sub Center',
@@ -185,6 +188,7 @@ describe('WorkQueue tests', async () => {
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
         event: 'birth',
+        duplicates: null,
         status: [
           {
             location: 'Kaliganj Union Sub Center',
@@ -259,6 +263,7 @@ describe('WorkQueue tests', async () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
                     trackingId: 'B111111',
+                    duplicates: null,
                     status: [
                       {
                         timestamp: null,
@@ -452,6 +457,104 @@ describe('WorkQueue tests', async () => {
     })
   })
 
+  describe('WorkQueue tests with duplicates for register scope', () => {
+    beforeAll(() => {
+      getItem.mockReturnValue(registerScopeToken)
+      store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    })
+    it('renders review duplicates button for user with register scope', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_REGISTRATION_QUERY,
+            variables: {
+              locationIds: ['123456789']
+            }
+          },
+          result: {
+            data: {
+              listBirthRegistrations: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    duplicates: ['e302f7c5-ad87-4117-91c1-35eaf2ea7be8'],
+                    status: [
+                      {
+                        timestamp: null,
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: null,
+                        firstNames: 'Baby',
+                        familyName: 'Doe'
+                      }
+                    ],
+                    birthDate: null
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
+          }
+        }
+      ]
+
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <WorkQueue />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      testComponent.component.update()
+      const instance = testComponent.component
+        .find(DataTable)
+        .find(ListItem)
+        .instance() as any
+
+      instance.toggleExpanded()
+      testComponent.component.update()
+
+      expect(
+        testComponent.component
+          .find(DataTable)
+          .find('#reviewDuplicatesBtn_B111111')
+          .hostNodes().length
+      ).toBe(1)
+      testComponent.component.unmount()
+    })
+  })
+
   describe('WorkQueue tests for declare scope', () => {
     beforeAll(() => {
       getItem.mockReturnValue(declareScope)
@@ -473,6 +576,7 @@ describe('WorkQueue tests', async () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
                     trackingId: 'B111111',
+                    duplicates: null,
                     status: [
                       {
                         timestamp: null,

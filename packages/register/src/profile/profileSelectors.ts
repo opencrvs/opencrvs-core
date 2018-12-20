@@ -20,3 +20,7 @@ export const getScope = (store: IStoreState): Scope | null => {
   const tokenPayload = getTokenPayload(store)
   return tokenPayload && tokenPayload.scope
 }
+
+export const getUserDetails = (
+  store: IStoreState
+): ProfileState['userDetails'] => getKey(store, 'userDetails')
