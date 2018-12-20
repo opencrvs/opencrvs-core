@@ -1,4 +1,4 @@
-import { USER_MGNT_SERVICE_URL } from 'src/constants'
+import { USER_MANAGEMENT_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
 import { logger } from 'src/logger'
@@ -14,7 +14,7 @@ export async function getUserMobile(
   authHeader: { Authorization: string }
 ) {
   try {
-    const res = await fetch(`${USER_MGNT_SERVICE_URL}getUserMobile`, {
+    const res = await fetch(`${USER_MANAGEMENT_URL}getUserMobile`, {
       method: 'POST',
       body: JSON.stringify({ userId }),
       headers: {

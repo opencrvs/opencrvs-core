@@ -53,6 +53,16 @@ services:
     deploy:
       replicas: 2
 
+  deduplication:
+    image: jembi/ocrvs-deduplication:latest
+    build: packages/deduplication
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=DEVELOPMENT
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+    deploy:
+      replicas: 2
+
   auth:
     image: jembi/ocrvs-auth:latest
     build: packages/auth
