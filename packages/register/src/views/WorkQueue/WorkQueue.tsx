@@ -691,7 +691,10 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       }
       if (applicationIsRegistered) {
         expansionActions.push(
-          <StyledSecondaryButton disabled={true}>
+          <StyledSecondaryButton
+            id={`editBtn_${item.tracking_id}`}
+            disabled={true}
+          >
             <Edit />
             {this.props.intl.formatMessage(messages.EditBtnText)}
           </StyledSecondaryButton>

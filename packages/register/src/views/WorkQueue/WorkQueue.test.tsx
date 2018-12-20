@@ -363,6 +363,106 @@ describe('WorkQueue tests', async () => {
 
       testComponent.component.unmount()
     })
+
+    it('Should Render Print Certificate & Edit button', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_REGISTRATION_QUERY,
+            variables: {
+              locationIds: ['123456789']
+            }
+          },
+          result: {
+            data: {
+              listBirthRegistrations: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    brn: null,
+                    trackingId: 'B111111',
+                    duplicates: null,
+                    status: [
+                      {
+                        timestamp: null,
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: null,
+                        firstNames: 'Baby',
+                        familyName: 'Doe'
+                      }
+                    ],
+                    birthDate: null
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
+          }
+        }
+      ]
+
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <WorkQueue />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      testComponent.component.update()
+      const instance = testComponent.component
+        .find(DataTable)
+        .find(ListItem)
+        .instance() as any
+
+      instance.toggleExpanded()
+      testComponent.component.update()
+
+      expect(
+        testComponent.component
+          .find(DataTable)
+          .find('#editBtn_B111111')
+          .hostNodes().length
+      ).toBe(1)
+
+      expect(
+        testComponent.component
+          .find(DataTable)
+          .find('#printCertificate_B111111')
+          .hostNodes().length
+      ).toBe(1)
+      testComponent.component.unmount()
+    })
   })
 
   describe('WorkQueue tests with duplicates for register scope', () => {
