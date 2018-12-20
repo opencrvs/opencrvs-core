@@ -53,7 +53,7 @@ services:
     deploy:
       replicas: 2
 
-  workflow:
+  deduplication:
     image: jembi/ocrvs-deduplication:latest
     build: packages/deduplication
     restart: unless-stopped
