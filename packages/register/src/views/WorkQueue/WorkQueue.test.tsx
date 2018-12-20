@@ -375,6 +375,7 @@ describe('WorkQueue tests', async () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
                     trackingId: 'B111111',
+                    duplicates: null,
                     status: [
                       {
                         timestamp: null,
