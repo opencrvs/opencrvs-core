@@ -233,7 +233,7 @@
   resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.18.tgz#6a60435d4663e290f3709898a4f75014f279c4d6"
   integrity sha512-OTPWHmsyW18BhrnG5x8F7PzeZ2nFxmHGb42bZn79P9hl+GI5cMzyPgQTwNjbem0lJhoru/8vtjAFCUOu3+gE2w==
 
-"@types/boom@*", "@types/boom@^7.2.0":
+"@types/boom@*", "@types/boom@^7.2.0", "@types/boom@^7.2.1":
   version "7.2.1"
   resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.2.1.tgz#a21e21ba08cc49d17b26baef98e1a77ee4d6cdb0"
   integrity sha512-kOiap+kSa4DPoookJXQGQyKy1rjZ55tgfKAh9F0m1NUdukkcwVzpSnXPMH42a5L+U++ugdQlh/xFJu/WAdr1aw==
@@ -541,7 +541,7 @@
   resolved "https://registry.yarnpkg.com/@types/nedb/-/nedb-1.8.6.tgz#cbb63bce2f975507452b5d6ec6b57d8f6e52052d"
   integrity sha512-q+oTznDfqMt1lEmjtABVPhXQHXmXH5EJzMXkwpO8sMauohL8k3wNZvNOxoaSVnDXi79PA4jhnTS8VGyQ9UoIWQ==
 
-"@types/node-fetch@^2.1.2":
+"@types/node-fetch@^2.1.2", "@types/node-fetch@^2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.1.4.tgz#093d1beae11541aef25999d70aa09286fd025b1a"
   integrity sha512-tR1ekaXUGpmzOcDXWU9BW73YfA2/VW1DF1FH+wlJ82BbCSnWTbdX+JkqWQXWKIGsFPnPsYadbXfNgz28g+ccWg==
