@@ -552,7 +552,7 @@ describe('Verify handler', () => {
       )
     })
 
-    it('returns OK', async () => {
+    it('returns OK with full fhir bundle as payload', async () => {
       const token = jwt.sign(
         { scope: ['register'] },
         readFileSync('../auth/test/cert.key'),
@@ -568,7 +568,7 @@ describe('Verify handler', () => {
           resourceType: 'Bundle',
           entry: [
             {
-              response: { location: 'Patient/12423/_history/1' }
+              response: { location: 'Composition/12423/_history/1' }
             }
           ]
         })
@@ -577,6 +577,73 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testFhirBundleWithIds,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('returns OK with task entry as payload', async () => {
+      const token = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Task/12423/_history/1' }
+            }
+          ]
+        })
+      )
+      const taskBundle = {
+        resourceType: 'Bundle',
+        type: 'document',
+        entry: [
+          {
+            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'birth-registration'
+                  }
+                ]
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/paper-form-id',
+                  value: '12345678'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'MOTHER'
+                }
+              ],
+              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+            }
+          }
+        ]
+      }
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: taskBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -660,6 +727,40 @@ describe('Verify handler', () => {
       })
 
       expect(res.statusCode).toBe(200)
+    })
+
+    it('forwards get calls with query params to Hearth', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({ resourceType: 'OperationOutcome' })
+      )
+
+      const token = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'GET',
+        url: '/fhir/Task?focus=Composition/123',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+      expect(mock).toBeCalledWith(
+        'http://localhost:3447/fhir/Task?focus=Composition/123',
+        {
+          body: undefined,
+          headers: { 'Content-Type': 'application/fhir+json' },
+          method: 'get'
+        }
+      )
     })
   })
 })
