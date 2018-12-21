@@ -219,7 +219,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
 
-      const res = await fetch(`${fhirUrl}/${user.valueString}`)
+      const res = await fetch(`${fhirUrl}/${user.valueReference}`)
       return res.json()
     },
 
@@ -233,7 +233,7 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation) {
         return null
       }
-      const res = await fetch(`${fhirUrl}/${taskLocation.valueString}`)
+      const res = await fetch(`${fhirUrl}/${taskLocation.valueReference}`)
       return res.json()
     }
   },
