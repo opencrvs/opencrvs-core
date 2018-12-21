@@ -181,7 +181,7 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         onClick: this.toggleLogoutModal
       }
     ]
-    if (userScope && userScope.indexOf('performance')) {
+    if ((userScope.length && userScope.indexOf('performance')) !== -1) {
       menuItems
         .splice(2, 0, {
           title: intl.formatMessage(messages.performance),
