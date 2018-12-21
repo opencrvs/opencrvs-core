@@ -42,7 +42,20 @@ const processDraftData = (draftData: IFormData) => {
   ) {
     return draftData
   }
-
+  const newDraftDetails = {
+    child: {},
+    mother: {},
+    registration: {},
+    father: {},
+    createdAt: new Date()
+  }
+  console.log(JSON.stringify(child))
+  Object.keys(child).forEach((filterKey: string) => {
+    if (typeof child[filterKey] !== 'undefined') {
+      newDraftDetails.child[filterKey] = child[filterKey]
+    }
+  })
+  console.log(JSON.stringify(newDraftDetails.child))
   const fatherPermanentAddress = father.permanentAddressSameAsMother
     ? mother
     : father
