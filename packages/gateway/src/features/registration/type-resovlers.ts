@@ -105,7 +105,7 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async brn(task: fhir.Task) {
+    async registrationNumber(task: fhir.Task) {
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(

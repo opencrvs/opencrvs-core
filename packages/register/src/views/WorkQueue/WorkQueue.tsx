@@ -54,7 +54,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
       id
       registration {
         trackingId
-        brn
+        registrationNumber
         status {
           user {
             name {
@@ -498,7 +498,8 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           '',
         dob: (reg.child && reg.child.birthDate) || '',
         date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
-        brn: (reg.registration && reg.registration.brn) || '',
+        registrationNumber:
+          (reg.registration && reg.registration.registrationNumber) || '',
         tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
         status:
@@ -625,7 +626,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
         label: this.props.intl.formatMessage(
           messages.listItemBirthRegistrationNumber
         ),
-        value: item.brn
+        value: item.registrationNumber
       })
     }
 
@@ -869,9 +870,9 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
         <Container>
           <Query
             query={FETCH_REGISTRATION_QUERY}
-            variables={{
-              locationIds: [this.getLocalLocationId()]
-            }}
+            // variables={{
+            //   locationIds: [this.getLocalLocationId()]
+            // }}
           >
             {({ loading, error, data }) => {
               if (loading) {

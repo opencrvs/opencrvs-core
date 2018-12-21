@@ -229,7 +229,6 @@ type Registration { # -> Task
   _fhirID: ID # -> .id
   # short uuid easy to remember
   trackingId: String # -> .identifier
-  brn: String
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   registrationNumber: String # -> .identifier
   paperFormID: String # -> .identifier
