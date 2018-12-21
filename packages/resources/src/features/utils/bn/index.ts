@@ -14,6 +14,16 @@ export interface IOISFLocation {
   id: number
 }
 
+export interface ILocation {
+  id?: string
+  name?: string
+  nameBn?: string
+  physicalType?: string
+  juristictionType?: string
+  type?: string
+  partOf?: string
+}
+
 export const sendToFhir = (
   doc: ISupportedType,
   suffix: string,
