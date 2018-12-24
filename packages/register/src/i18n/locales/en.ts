@@ -11,6 +11,7 @@ export const ENGLISH_STATE = {
     'menu.items.changeLanguage': 'Change Language',
     'menu.items.changeLanguage.english': 'English',
     'menu.items.changeLanguage.bengali': 'Bengali',
+    'menu.items.performance': 'Performance',
     'states.state1': 'Barishal Division',
     'states.state2': 'Dhaka Division',
     'states.state3': 'Khulna Division',

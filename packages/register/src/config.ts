@@ -4,5 +4,7 @@ export const config = {
   LANGUAGE: process.env.REACT_APP_LANGUAGE || 'en',
   COUNTRY: process.env.REACT_APP_COUNTRY || 'bgd',
   LOGIN_URL: process.env.REACT_APP_LOGIN_URL || 'http://localhost:3020',
+  PERFORMANCE_URL:
+    process.env.REACT_APP_PERFORMANCE_APP_URL || 'http://localhost:3001',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel'
 }

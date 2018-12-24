@@ -8,7 +8,7 @@ export interface IntlMessages {
   [key: string]: string
 }
 
-const languages = {
+export const languages = {
   en: ENGLISH_STATE,
   bn: BENGALI_STATE
 }
