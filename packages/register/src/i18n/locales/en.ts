@@ -662,7 +662,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.buttons.newApplication': 'New birth application',
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
-    'register.workQueue.listItem.status.dateLabel.registered': 'Registrated on',
+    'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',
     'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',

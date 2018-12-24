@@ -422,6 +422,9 @@ const StyledSecondaryButton = styled(SecondaryButton)`
     background-color: ${({ theme }) => theme.colors.inputBackground};
   }
 `
+const StatusIcon = styled.div`
+  margin-top: 3px;
+`
 
 interface IBaseWorkQueueProps {
   theme: ITheme
@@ -441,13 +444,29 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'APPLICATION':
-        return <StatusOrange />
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
       case 'REGISTERED':
-        return <StatusGreen />
+        return (
+          <StatusIcon>
+            <StatusGreen />
+          </StatusIcon>
+        )
       case 'COLLECTED':
-        return <StatusCollected />
+        return (
+          <StatusIcon>
+            <StatusCollected />
+          </StatusIcon>
+        )
       default:
-        return <StatusOrange />
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
     }
   }
 
