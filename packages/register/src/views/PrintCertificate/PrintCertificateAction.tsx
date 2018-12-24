@@ -220,7 +220,10 @@ class PrintCertificateActionComponent extends React.Component<
                       />
                     </Box>
                     <ButtonContainer>
-                      <StyledPrimaryButton disabled={!isAllQuestionsAnswered}>
+                      <StyledPrimaryButton
+                        id="print-confirm-button"
+                        disabled={!isAllQuestionsAnswered}
+                      >
                         {intl.formatMessage(messages.confirm)}
                       </StyledPrimaryButton>
                     </ButtonContainer>

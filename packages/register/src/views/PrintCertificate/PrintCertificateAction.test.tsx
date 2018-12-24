@@ -9,6 +9,7 @@ import * as React from 'react'
 import { FormFieldGenerator } from 'src/components/form'
 import { printCertificateFormSection } from './print-certificate'
 import { IInformativeRadioGroupFormField } from 'src/forms'
+import { ReactWrapper } from 'enzyme'
 
 describe('when user wants to print certificate', async () => {
   const { store } = createStore()
@@ -228,5 +229,146 @@ describe('when user wants to print certificate', async () => {
     ).toHaveLength(1)
 
     testComponent.component.unmount()
+  })
+
+  describe('when user interacts', async () => {
+    let component: ReactWrapper<{}, {}>
+
+    beforeEach(async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_BIRTH_REGISTRATION_QUERY,
+            variables: { id: 'asdhdqe2472487jsdfsdf' }
+          },
+          result: {
+            data: {
+              fetchBirthRegistration: {
+                id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+                mother: {
+                  name: [
+                    {
+                      firstNames: 'মা',
+                      familyName: 'নাম'
+                    },
+                    {
+                      firstNames: 'Mother',
+                      familyName: 'Name'
+                    }
+                  ],
+                  identifier: [
+                    {
+                      id: '4564',
+                      type: 'PASSPORT'
+                    }
+                  ],
+                  birthDate: '1960-08-18',
+                  nationality: ['BGD']
+                },
+                father: {
+                  name: [
+                    {
+                      firstNames: 'পিতা',
+                      familyName: 'নাম'
+                    },
+                    {
+                      firstNames: 'Father',
+                      familyName: 'Name'
+                    }
+                  ],
+                  identifier: [
+                    {
+                      id: '4564',
+                      type: 'BIRTH_REGISTRATION_NUMBER'
+                    }
+                  ],
+                  birthDate: '1955-08-18',
+                  nationality: ['BGD']
+                },
+                createdAt: '2018-12-07T13:11:49.380Z'
+              }
+            }
+          }
+        }
+      ]
+
+      const testComponent = createTestComponent(
+        <PrintCertificateAction
+          backLabel="Back"
+          title="Print certificate"
+          registrationId="asdhdqe2472487jsdfsdf"
+          togglePrintCertificateSection={mock}
+          printCertificateFormSection={formSection}
+        />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      testComponent.component.update()
+      component = testComponent.component
+    })
+
+    it('renders the form', () => {
+      const fields = printCertificateFormSection.fields
+      ;(fields[1] as IInformativeRadioGroupFormField).information = {
+        // @ts-ignore
+        name: [
+          {
+            firstNames: 'মা',
+            familyName: 'নাম'
+          },
+          {
+            firstNames: 'Mother',
+            familyName: 'Name'
+          }
+        ],
+        // @ts-ignore
+        identifier: [
+          {
+            id: '4564',
+            type: 'PASSPORT'
+          }
+        ],
+        birthDate: '1960-08-18',
+        nationality: ['BGD']
+      }
+      ;(fields[2] as IInformativeRadioGroupFormField).information = {
+        // @ts-ignore
+        name: [
+          {
+            firstNames: 'পিতা',
+            familyName: 'নাম'
+          },
+          {
+            firstNames: 'Father',
+            familyName: 'Name'
+          }
+        ],
+        // @ts-ignore
+        identifier: [
+          {
+            id: '4564',
+            type: 'BIRTH_REGISTRATION_NUMBER'
+          }
+        ],
+        birthDate: '1955-08-18',
+        nationality: ['BGD']
+      }
+      expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
+    })
+
+    it('confirm button is disabled', () => {
+      expect(
+        component
+          .find('#print-confirm-button')
+          .hostNodes()
+          .prop('disabled')
+      ).toBe(true)
+    })
   })
 })
