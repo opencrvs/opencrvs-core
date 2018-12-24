@@ -1,17 +1,17 @@
 import { ORG_URL } from '../../../../constants'
-import { getUpazilaID, sendToFhir } from '../../../utils/bn'
+import { getLocationIDByDescription, sendToFhir } from '../../../utils/bn'
 interface IDGHSFacility {
   division: string
   district: string
   upazila: string
   union: string
+  A2IReference: string
   facilityNameBengali: string
   facilityNameEnglish: string
   facilityTypeBengali: string
   facilityTypeEnglish: string
   email: string
   phone: string
-  type: string
 }
 
 const composeFhirLocation = (
@@ -32,7 +32,7 @@ const composeFhirLocation = (
       coding: [
         {
           system: `${ORG_URL}/specs/location-type`,
-          code: location.type
+          code: location.facilityTypeEnglish
         }
       ]
     },
@@ -58,17 +58,20 @@ const composeFhirLocation = (
 
 export async function composeAndSaveFacilities(
   facilities: IDGHSFacility[],
-  upazilas: fhir.Location[]
+  unions: fhir.Location[]
 ): Promise<boolean> {
   for (const facility of facilities) {
-    const upazilaID = await getUpazilaID(upazilas, facility.upazila)
+    const unionID = await getLocationIDByDescription(
+      unions,
+      facility.A2IReference
+    )
     const newLocation: fhir.Location = composeFhirLocation(
       facility,
-      `Location/${upazilaID}`
+      `Location/${unionID}`
     )
     // tslint:disable-next-line:no-console
     console.log(
-      `Saving facility ... type: ${facility.type}, name: ${
+      `Saving facility ... type: ${facility.facilityTypeEnglish}, name: ${
         facility.facilityNameEnglish
       }`
     )

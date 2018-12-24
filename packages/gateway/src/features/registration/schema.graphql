@@ -125,7 +125,7 @@ input RegWorkflowInput {
 type RegWorkflow { # Task
   id: ID!
   type: RegStatus # -> .businessStatus
-  user: User # -> extension(url='http://opencrvs.org/specs/extension/regLastUser').valueString
+  user: User # -> extension(url='http://opencrvs.org/specs/extension/regLastUser').valueReference
   timestamp: Date # -> lastModified
   comments: [Comment] # -> .note
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
