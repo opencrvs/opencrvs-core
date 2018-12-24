@@ -83,6 +83,7 @@ const messages = defineMessages({
 
 type State = {
   data: IFormSectionData
+  isAllQuestionsAnswered: boolean
 }
 
 type IProps = {
@@ -102,6 +103,7 @@ class PrintCertificateActionComponent extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = {
+      isAllQuestionsAnswered: false,
       data: {
         personCollectingCertificate: 'MOTHER'
       }
@@ -110,6 +112,33 @@ class PrintCertificateActionComponent extends React.Component<
 
   storeData = (documentData: IFormSectionData) => {
     this.setState(() => ({ data: documentData }))
+  }
+
+  isAllQuestionsAnswered = (
+    documentData: IFormSectionData,
+    personCollectingCertificate: string
+  ): boolean => {
+    switch (personCollectingCertificate) {
+      case 'MOTHER':
+        return documentData.motherDetails !== '' ? true : false
+      case 'FATHER':
+        return documentData.fatherDetails !== '' ? true : false
+      case 'OTHER':
+        const {
+          otherPersonFamilyName,
+          otherPersonGivenNames,
+          otherPersonIDType,
+          otherPersonSignedAffidavit
+        } = documentData
+        const allFieldsNotCovered =
+          otherPersonFamilyName === '' ||
+          otherPersonGivenNames === '' ||
+          otherPersonIDType === '' ||
+          otherPersonSignedAffidavit === ''
+        return allFieldsNotCovered
+      default:
+        return false
+    }
   }
 
   render = () => {
