@@ -50,25 +50,25 @@ export const getFromFhir = (suffix: string) => {
     })
 }
 
-// This is a temporary solution, used to map facilities and employees to upazilas
+// This is a temporary solution, used to map facilities and employees to a location
 // Currently we are requesting facility and employee information manually from a csv file
 // Until the A2I system is complete and has ORG and Health staff and facilities fully populated and internally mapped,
 // or until we scale out an OpenCRVS team management system, to allow all OpenCRVS employees, facilities, and administrative structures
 // to be configurable, we have a temporary solution here, to connect the reference data only in the areas of our test in March 2019
 
+export function getLocationIDByDescription(
+  locations: fhir.Location[],
+  description: string
+) {
+  const location = locations.find(obj => {
+    return obj.description === description
+  }) as fhir.Location
+  return location.id as string
+}
+
 const kaliganjA2IIdescription = 'division=3&district=20&upazila=165'
 const narsingdiA2IIdescription = 'division=3&district=29&upazila=229'
 const kurigramA2IIdescription = 'division=6&district=55&upazila=417'
-
-function getUpazilaIDByDescription(
-  upazilas: fhir.Location[],
-  description: string
-) {
-  const relevantUpazila = upazilas.find(upazila => {
-    return upazila.description === description
-  }) as fhir.Location
-  return relevantUpazila.id as string
-}
 
 export async function getUpazilaID(
   upazilas: fhir.Location[],
@@ -83,7 +83,7 @@ export async function getUpazilaID(
     description = kurigramA2IIdescription
   }
 
-  return await getUpazilaIDByDescription(upazilas, description)
+  return await getLocationIDByDescription(upazilas, description)
 }
 
 export function checkDuplicate(

@@ -187,7 +187,7 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueString: 'DUMMY'
+                      valueReference: 'DUMMY'
                     }
                   ],
                   lastModified: '2018-11-28T15:13:57.492Z',
@@ -254,6 +254,7 @@ describe('Registration root resolvers', () => {
       )
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
     })
+
     it('throws an error if fhir responds without a task', async () => {
       fetch.mockResponses(
         [
@@ -292,7 +293,7 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueString: 'DUMMY'
+                      valueReference: 'DUMMY'
                     }
                   ],
                   lastModified: '2018-11-28T15:13:57.492Z',
@@ -402,13 +403,13 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueString:
+                      valueReference:
                         'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
                     },
                     {
                       url:
                         'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueString:
+                      valueReference:
                         'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
                     }
                   ],
@@ -610,13 +611,13 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueString:
+                      valueReference:
                         'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
                     },
                     {
                       url:
                         'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueString:
+                      valueReference:
                         'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
                     }
                   ],
@@ -655,7 +656,7 @@ describe('Registration root resolvers', () => {
       )
       expect(
         resolvers.Mutation.markBirthAsRegistered({}, { id: compositionID })
-      ).rejects.toThrowError('Workflow response did not send a valid response')
+      ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
   describe('updateBirthRegistration()', () => {

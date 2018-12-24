@@ -223,8 +223,7 @@ export const typeResolvers: GQLResolver = {
       if (!user) {
         return null
       }
-
-      return await fetchFHIR(`/${user.valueString}`, authHeader)
+      return await fetchFHIR(`/${user.valueReference}`, authHeader)
     },
 
     timestamp: task => task.lastModified,
@@ -237,7 +236,7 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation) {
         return null
       }
-      return await fetchFHIR(`/${taskLocation.valueString}`, authHeader)
+      return await fetchFHIR(`/${taskLocation.valueReference}`, authHeader)
     }
   },
   User: {

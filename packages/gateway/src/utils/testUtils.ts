@@ -209,11 +209,11 @@ export const mockTask = {
   extension: [
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
-      valueString: 'Practitioner/123'
+      valueReference: 'Practitioner/123'
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastLocation',
-      valueString: 'Location/123'
+      valueReference: 'Location/123'
     },
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
