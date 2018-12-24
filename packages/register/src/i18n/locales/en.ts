@@ -654,6 +654,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',
+    'print.certificate.confirm': 'Confirm',
     'register.workQueue.dataTable.results': 'Results',
     'register.workQueue.dataTable.noResults': 'No result to display',
     'register.workQueue.header.title': 'Hello Registrar',

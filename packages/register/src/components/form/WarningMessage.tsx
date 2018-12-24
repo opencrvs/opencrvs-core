@@ -12,7 +12,8 @@ const Container = styled.div`
   display: flex;
 `
 const StyledParagraph = styled(Paragraph)`
-  margin: 5px 10px;
+  margin: 3px 10px;
+  line-height: 1.6em;
 `
 
 export function WarningMessage(props: IWarningProps) {

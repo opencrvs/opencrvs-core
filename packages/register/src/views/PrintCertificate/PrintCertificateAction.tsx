@@ -11,6 +11,7 @@ import {
   IFormSectionData,
   INFORMATIVE_RADIO_GROUP
 } from 'src/forms'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -37,6 +38,15 @@ const ErrorText = styled.div`
 `
 const FormContainer = styled.div`
   padding: 35px 25px;
+`
+const ButtonContainer = styled.div`
+  background-color: ${({ theme }) => theme.colors.inputBackground};
+  padding: 25px;
+  margin-top: 5px;
+  margin-bottom: 2px;
+`
+const StyledPrimaryButton = styled(PrimaryButton)`
+  font-weight: 600;
 `
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
@@ -78,6 +88,12 @@ const messages = defineMessages({
     defaultMessage:
       'An error occurred while quering for birth registration data',
     description: 'The error message shown when a query fails'
+  },
+  confirm: {
+    id: 'print.certificate.confirm',
+    defaultMessage: 'Confirm',
+    description:
+      'The label for confirm button when all information of the collector is provided'
   }
 })
 
@@ -111,7 +127,11 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   storeData = (documentData: IFormSectionData) => {
-    this.setState(() => ({ data: documentData }))
+    const isAllQuestionsAnswered = this.isAllQuestionsAnswered(
+      documentData,
+      documentData.personCollectingCertificate as string
+    )
+    this.setState(() => ({ data: documentData, isAllQuestionsAnswered }))
   }
 
   isAllQuestionsAnswered = (
@@ -150,6 +170,8 @@ class PrintCertificateActionComponent extends React.Component<
       togglePrintCertificateSection,
       printCertificateFormSection
     } = this.props
+
+    const { isAllQuestionsAnswered } = this.state
     return (
       <ActionPageWrapper>
         <ActionPage
@@ -197,6 +219,11 @@ class PrintCertificateActionComponent extends React.Component<
                         fields={printCertificateFormSection.fields}
                       />
                     </Box>
+                    <ButtonContainer>
+                      <StyledPrimaryButton disabled={!isAllQuestionsAnswered}>
+                        {intl.formatMessage(messages.confirm)}
+                      </StyledPrimaryButton>
+                    </ButtonContainer>
                   </FormContainer>
                 )
               }
