@@ -3,6 +3,14 @@ export const ENGLISH_STATE = {
   messages: {
     'menu.back': 'Back',
     'menu.menu': 'Menu',
+    'menu.items.homepage': 'Homepage',
+    'menu.items.register': 'Register',
+    'menu.items.drafts': 'Drafts',
+    'menu.items.settings': 'Settings',
+    'menu.items.logout': 'Log out',
+    'menu.items.changeLanguage': 'Change Language',
+    'menu.items.changeLanguage.english': 'English',
+    'menu.items.changeLanguage.bengali': 'Bengali',
     'performance.hello': 'Hello',
     'performance.graph.birthRegistrationBoxTitle':
       'Birth Registration Key Figures',
@@ -30,6 +38,13 @@ export const ENGLISH_STATE = {
       'Birth Rate For Registrations Within 45 Days',
     'performance.graph.birthRegistrationRatePerMonthLabel': 'Calendar Month',
     'performance.graph.birthRegistrationPercentageOfEstimateLabel':
-      'Birth Registration % of estimate'
+      'Birth Registration % of estimate',
+    'register.home.hedaer.hello': 'Hello {fullName}',
+    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
+    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
+    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar'
   }
 }
