@@ -104,14 +104,8 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_NEW_DEC:
       response = await createBirthRegistrationHandler(request, h)
       break
-    case Events.BIRTH_UPDATE_DEC:
-      break
-    case Events.BIRTH_NEW_REG:
-      break
     case Events.BIRTH_MARK_REG:
       response = await markBirthAsRegisteredHandler(request, h)
-      break
-    case Events.BIRTH_MARK_CERT:
       break
     case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h)
