@@ -1,12 +1,16 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-
+import { Scope } from 'src/utils/authUtils'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
 import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
-
+import { getScope } from 'src/profile/profileSelectors'
 import styled from '../styled-components'
-import { goBack as goBackAction } from 'src/navigation'
+import {
+  goBack as goBackAction,
+  goToHome as goToHomeAction,
+  goToPerformance as goToPerformanceAction
+} from 'src/navigation'
 import { redirectToAuthentication } from 'src/profile/profileActions'
 import { getLanguages } from 'src/i18n/selectors'
 import { IStoreState } from 'src/store'
@@ -30,6 +34,11 @@ const messages = defineMessages({
     id: 'menu.items.homepage',
     defaultMessage: 'Homepage',
     description: 'Menu item homepage'
+  },
+  performance: {
+    id: 'menu.items.performance',
+    defaultMessage: 'Performance',
+    description: 'Menu item performance'
   },
   register: {
     id: 'menu.items.register',
@@ -104,9 +113,12 @@ const BackButtonText = styled.span`
 type Props = {
   hideBackButton?: true | false | undefined | null
   goBack: typeof goBackAction
+  goToHome: typeof goToHomeAction
+  goToPerformance: typeof goToPerformanceAction
   changeLanguage: typeof changeLanguageAction
   redirectToAuthentication: typeof redirectToAuthentication
   languages: IntlState['languages']
+  userScope: Scope
 }
 
 interface IState {
@@ -127,9 +139,14 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
       showLogoutModal: !state.showLogoutModal
     }))
   }
-
+  goToPerformance = () => {
+    this.props.goToPerformance()
+  }
+  goToHome = () => {
+    this.props.goToHome()
+  }
   render() {
-    const { intl, goBack, hideBackButton } = this.props
+    const { intl, goBack, hideBackButton, userScope } = this.props
 
     const menuItems = [
       {
@@ -151,15 +168,8 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
       },
       {
         title: intl.formatMessage(messages.homepage),
-        key: 'homepage'
-      },
-      {
-        title: intl.formatMessage(messages.register),
-        key: 'register'
-      },
-      {
-        title: intl.formatMessage(messages.drafts),
-        key: 'drafts'
+        key: 'homepage',
+        onClick: this.goToHome
       },
       {
         title: intl.formatMessage(messages.settings),
@@ -171,6 +181,15 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         onClick: this.toggleLogoutModal
       }
     ]
+    if ((userScope && userScope.indexOf('performance')) !== -1) {
+      menuItems
+        .splice(2, 0, {
+          title: intl.formatMessage(messages.performance),
+          key: 'performance',
+          onClick: this.goToPerformance
+        })
+        .join()
+    }
 
     return (
       <TopMenuContainer>
@@ -197,9 +216,12 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
 export const TopMenu = connect(
   (state: IStoreState) => ({
     languages: getLanguages(state),
+    userScope: getScope(state),
     language: state.i18n.language
   }),
   {
+    goToHome: goToHomeAction,
+    goToPerformance: goToPerformanceAction,
     goBack: goBackAction,
     changeLanguage: changeLanguageAction,
     redirectToAuthentication

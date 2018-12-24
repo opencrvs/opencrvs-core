@@ -1,6 +1,7 @@
 import * as actions from './actions'
 import { initialState } from './reducer'
 import { createStore, AppStore } from '../store'
+import { mockUserResponse } from 'src/tests/util'
 
 describe('profileReducer tests', () => {
   let store: AppStore
@@ -22,5 +23,14 @@ describe('profileReducer tests', () => {
     }
     store.dispatch(action)
     expect(store.getState().profile).toEqual(expectedState)
+  })
+
+  it('sets user details', async () => {
+    const action = {
+      type: actions.SET_USER_DETAILS,
+      payload: mockUserResponse
+    }
+    store.dispatch(action)
+    expect(store.getState().profile.userDetailsFetched).toEqual(true)
   })
 })

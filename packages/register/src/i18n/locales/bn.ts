@@ -11,6 +11,7 @@ export const BENGALI_STATE = {
     'menu.items.changeLanguage': 'ভাষা পরিবর্তন',
     'menu.items.changeLanguage.english': 'ইংরেজি',
     'menu.items.changeLanguage.bengali': 'বাংলা',
+    'menu.items.performance': 'Performance',
     'states.state1': 'বরিশাল',
     'states.state2': 'ঢাকা',
     'states.state3': 'খুলনা',
