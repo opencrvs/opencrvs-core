@@ -1,6 +1,13 @@
 import * as React from 'react'
 import styled from '../../styled-components'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import {
+  injectIntl,
+  InjectedIntlProps,
+  defineMessages,
+  FormattedMessage
+} from 'react-intl'
+import { messages as identityMessages } from 'src/forms/identity'
+import { countries } from 'src/forms/countries'
 
 const messages = defineMessages({
   firstName: {
@@ -91,10 +98,32 @@ interface IProps {
   information: ParentDetails
 }
 
+function iDType(code: string): FormattedMessage.MessageDescriptor {
+  switch (code) {
+    case 'NATIONAL_ID':
+      return identityMessages.iDTypeNationalID
+    case 'PASSPORT':
+      return identityMessages.iDTypePassport
+    case 'BIRTH_REGISTRATION_NUMBER':
+      return identityMessages.iDTypeBRN
+    case 'DEATH_REGISTRATION_NUMBER':
+      return identityMessages.iDTypeDRN
+    case 'REFUGEE_NUMBER':
+      return identityMessages.iDTypeRefugeeNumber
+    case 'ALIEN_NUMBER':
+      return identityMessages.iDTypeAlienNumber
+    default:
+      return identityMessages.iDType
+  }
+}
+
 function ParentDetailsComponent({
   intl,
   information
 }: IProps & InjectedIntlProps) {
+  const nationality = countries.find(
+    country => country.value === information.nationality[0]
+  )
   return (
     <Wrapper>
       <Label>{intl.formatMessage(messages.firstName)}:</Label>
@@ -113,10 +142,16 @@ function ParentDetailsComponent({
       <Text>{information.birthDate}</Text>
       <br />
       <Label>{intl.formatMessage(messages.nationality)}:</Label>
-      <Text>{information.nationality[0]}</Text>
+      <Text>{nationality && intl.formatMessage(nationality.label)}</Text>
       <br />
       <Label>{intl.formatMessage(messages.typeOfID)}:</Label>
-      <Text>{information.identifier && information.identifier[0].type}</Text>
+      <Text>
+        {information.identifier &&
+          information.identifier[0].type &&
+          intl.formatMessage(
+            iDType(information.identifier && information.identifier[0].type)
+          )}
+      </Text>
       <Divider />
       <Label>{intl.formatMessage(messages.number)}:</Label>
       <Text>{information.identifier && information.identifier[0].id}</Text>
