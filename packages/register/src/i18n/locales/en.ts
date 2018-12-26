@@ -652,6 +652,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
+    'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
     'register.workQueue.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',
@@ -669,7 +670,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.buttons.newApplication': 'New birth application',
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
-    'register.workQueue.listItem.status.dateLabel.registered': 'Registrated on',
+    'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',
     'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.print.form.name': 'Print',
@@ -690,6 +691,7 @@ export const ENGLISH_STATE = {
       'Because there are no details of this person on record, we need to capture their details:',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
+    'register.workQueue.buttons.printCertificate': 'Print Certificate',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':
