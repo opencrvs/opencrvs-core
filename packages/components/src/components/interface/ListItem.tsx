@@ -80,7 +80,7 @@ const ListContentContainer = styled.div`
   justify-content: space-between;
   flex: 1;
   align-items: center;
-  padding: 10px;
+  padding: 24px;
   font-family: ${({ theme }) => theme.fonts.regularFont};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
