@@ -16,9 +16,13 @@ import {
   ITemplatedBundle,
   ITemplatedComposition
 } from '../registration/fhir-builders'
-import fetch, { Response } from 'node-fetch'
-import { fhirUrl } from 'src/constants'
-import { FHIR_OBSERVATION_CATEGORY_URL } from './constants'
+import fetch from 'node-fetch'
+import { FHIR_URL } from 'src/constants'
+import { IAuthHeader } from 'src/common-types'
+import {
+  FHIR_OBSERVATION_CATEGORY_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from './constants'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -392,11 +396,19 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export const getFromFhir = (suffix: string) => {
-  return fetch(`${fhirUrl}${suffix}`, {
+export const fetchFHIR = (
+  suffix: string,
+  authHeader: IAuthHeader,
+  method: string = 'GET',
+  body: string | undefined = undefined
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
     headers: {
-      'Content-Type': 'application/json+fhir'
-    }
+      'Content-Type': 'application/fhir+json',
+      ...authHeader
+    },
+    body
   })
     .then(response => {
       return response.json()
@@ -406,10 +418,56 @@ export const getFromFhir = (suffix: string) => {
     })
 }
 
-export async function getCompositionIDFromFhirResponse(
-  response: Response
-): Promise<string> {
-  const resBody = await response.json()
+export async function getTrackingIdFromResponse(
+  resBody: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  const compositionBundle = await fetchFHIR(
+    `/Composition/${getIDFromResponse(resBody)}`,
+    authHeader
+  )
+  if (!compositionBundle || !compositionBundle.identifier) {
+    throw new Error(
+      'getTrackingIdFromResponse: Invalid composition or composition has no identifier'
+    )
+  }
+  return compositionBundle.identifier.value
+}
+
+export async function getBRNFromResponse(
+  resBody: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  let path
+  if (isTaskResponse(resBody)) {
+    path = `/Task/${getIDFromResponse(resBody)}`
+  } else {
+    path = `/Task?focus=Composition/${getIDFromResponse(resBody)}`
+  }
+  const taskBundle = await fetchFHIR(path, authHeader)
+
+  let taskResource
+  if (taskBundle && taskBundle.entry && taskBundle.entry[0].resource) {
+    taskResource = taskBundle.entry[0].resource
+  } else if (taskBundle.resourceType === 'Task') {
+    taskResource = taskBundle
+  } else {
+    throw new Error('getBRNFromResponse: Invalid task found')
+  }
+  const brnIdentifier =
+    taskResource.identifier &&
+    taskResource.identifier.find(
+      (identifier: fhir.Identifier) =>
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+    )
+  if (!brnIdentifier || !brnIdentifier.value) {
+    throw new Error('getBRNFromResponse: Task does not have any brn identifier')
+  }
+  return brnIdentifier.value
+}
+
+export function getIDFromResponse(resBody: fhir.Bundle): string {
   if (
     !resBody ||
     !resBody.entry ||
@@ -417,8 +475,21 @@ export async function getCompositionIDFromFhirResponse(
     !resBody.entry[0].response ||
     !resBody.entry[0].response.location
   ) {
-    throw new Error(`FHIR response did not send a valid response`)
+    throw new Error(`FHIR did not send a valid response`)
   }
   // return the Composition's id
   return resBody.entry[0].response.location.split('/')[3]
+}
+
+export function isTaskResponse(resBody: fhir.Bundle): boolean {
+  if (
+    !resBody ||
+    !resBody.entry ||
+    !resBody.entry[0] ||
+    !resBody.entry[0].response ||
+    !resBody.entry[0].response.location
+  ) {
+    throw new Error(`FHIR did not send a valid response`)
+  }
+  return resBody.entry[0].response.location.indexOf('Task') > -1
 }

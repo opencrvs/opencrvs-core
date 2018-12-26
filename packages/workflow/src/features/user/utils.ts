@@ -106,6 +106,7 @@ export async function getLoggedInPractitionerResource(
   if (
     !practitionerBundle ||
     !practitionerBundle.entry ||
+    !practitionerBundle.entry[0] ||
     !practitionerBundle.entry[0].resource
   ) {
     throw new Error('Practitioner resource not found')

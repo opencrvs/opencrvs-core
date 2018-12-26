@@ -60,7 +60,7 @@ describe('Verify handler', () => {
       ]
     )
   })
-  it('updateTaskHandler returns OK', async () => {
+  it('updateTaskHandler returns OK for a correctly authenticated user', async () => {
     fetch.mockResponse(
       JSON.stringify({
         resourceType: 'Bundle',
@@ -83,8 +83,8 @@ describe('Verify handler', () => {
     )
 
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/updateTask',
+      method: 'PUT',
+      url: '/fhir/Task/123',
       payload: testFhirTaskBundle,
       headers: {
         Authorization: `Bearer ${token}`
@@ -115,8 +115,8 @@ describe('Verify handler', () => {
     )
 
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/updateTask',
+      method: 'PUT',
+      url: '/fhir/Task/123',
       payload: { data: 'INVALID' },
       headers: {
         Authorization: `Bearer ${token}`
@@ -138,8 +138,8 @@ describe('Verify handler', () => {
     )
 
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/updateTask',
+      method: 'PUT',
+      url: '/fhir/Task/123',
       payload: testFhirTaskBundle,
       headers: {
         Authorization: `Bearer ${token}`

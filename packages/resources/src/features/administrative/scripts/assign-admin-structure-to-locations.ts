@@ -3,7 +3,6 @@ import {
   getLocationsByParentDivisions
 } from './service'
 import chalk from 'chalk'
-import { internal } from 'boom'
 import * as fs from 'fs'
 import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
 
@@ -37,7 +36,10 @@ export default async function importAdminStructure() {
     )
     divisions = await fetchAndComposeLocations('division', '0', 'DIVISION')
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -47,7 +49,10 @@ export default async function importAdminStructure() {
     )
     districts = await getLocationsByParentDivisions('district', divisions)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -57,7 +62,10 @@ export default async function importAdminStructure() {
     )
     upazilas = await getLocationsByParentDivisions('upazila', districts)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -67,7 +75,10 @@ export default async function importAdminStructure() {
     )
     thanas = await getLocationsByParentDivisions('thana', districts)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -77,7 +88,10 @@ export default async function importAdminStructure() {
     )
     cities = await getLocationsByParentDivisions('citycorporation', districts)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -90,7 +104,10 @@ export default async function importAdminStructure() {
       cities
     )
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -100,7 +117,10 @@ export default async function importAdminStructure() {
     )
     unions = await getLocationsByParentDivisions('union', upazilas)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -113,7 +133,10 @@ export default async function importAdminStructure() {
       upazilas
     )
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -128,7 +151,10 @@ export default async function importAdminStructure() {
       municipalities
     )
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   fs.writeFileSync(
