@@ -112,6 +112,35 @@ type IProps = {
 
 type IFullProps = InjectedIntlProps & IProps
 
+function isAllAnswered(
+  documentData: IFormSectionData,
+  personCollectingCertificate: string
+): boolean {
+  switch (personCollectingCertificate) {
+    case 'MOTHER':
+      return documentData.motherDetails !== '' ? true : false
+    case 'FATHER':
+      return documentData.fatherDetails !== '' ? true : false
+    case 'OTHER':
+      const {
+        otherPersonFamilyName,
+        otherPersonGivenNames,
+        otherPersonIDType,
+        otherPersonDocumentNumber,
+        otherPersonSignedAffidavit
+      } = documentData
+      const allFieldsNotCovered =
+        otherPersonFamilyName === '' ||
+        otherPersonGivenNames === '' ||
+        otherPersonIDType === '' ||
+        otherPersonDocumentNumber === '' ||
+        otherPersonSignedAffidavit === ''
+      return !allFieldsNotCovered
+    default:
+      return false
+  }
+}
+
 class PrintCertificateActionComponent extends React.Component<
   IFullProps,
   State
@@ -127,38 +156,11 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   storeData = (documentData: IFormSectionData) => {
-    const isAllQuestionsAnswered = this.isAllQuestionsAnswered(
+    const isAllQuestionsAnswered = isAllAnswered(
       documentData,
       documentData.personCollectingCertificate as string
     )
     this.setState(() => ({ data: documentData, isAllQuestionsAnswered }))
-  }
-
-  isAllQuestionsAnswered = (
-    documentData: IFormSectionData,
-    personCollectingCertificate: string
-  ): boolean => {
-    switch (personCollectingCertificate) {
-      case 'MOTHER':
-        return documentData.motherDetails !== '' ? true : false
-      case 'FATHER':
-        return documentData.fatherDetails !== '' ? true : false
-      case 'OTHER':
-        const {
-          otherPersonFamilyName,
-          otherPersonGivenNames,
-          otherPersonIDType,
-          otherPersonSignedAffidavit
-        } = documentData
-        const allFieldsNotCovered =
-          otherPersonFamilyName === '' ||
-          otherPersonGivenNames === '' ||
-          otherPersonIDType === '' ||
-          otherPersonSignedAffidavit === ''
-        return allFieldsNotCovered
-      default:
-        return false
-    }
   }
 
   render = () => {

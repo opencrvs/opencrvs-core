@@ -10,6 +10,7 @@ import { FormFieldGenerator } from 'src/components/form'
 import { printCertificateFormSection } from './print-certificate'
 import { IInformativeRadioGroupFormField } from 'src/forms'
 import { ReactWrapper } from 'enzyme'
+import { iDType } from './ParentDetails'
 
 describe('when user wants to print certificate', async () => {
   const { store } = createStore()
@@ -231,6 +232,39 @@ describe('when user wants to print certificate', async () => {
     testComponent.component.unmount()
   })
 
+  it('renders i18n idType', () => {
+    expect(iDType('NATIONAL_ID')).toEqual({
+      id: 'formFields.iDTypeNationalID',
+      defaultMessage: 'National ID',
+      description: 'Option for form field: Type of ID'
+    })
+    expect(iDType('BIRTH_REGISTRATION_NUMBER')).toEqual({
+      id: 'formFields.iDTypeBRN',
+      defaultMessage: 'Birth Registration Number',
+      description: 'Option for form field: Type of ID'
+    })
+    expect(iDType('DEATH_REGISTRATION_NUMBER')).toEqual({
+      id: 'formFields.iDTypeDRN',
+      defaultMessage: 'Death Registration Number',
+      description: 'Option for form field: Type of ID'
+    })
+    expect(iDType('REFUGEE_NUMBER')).toEqual({
+      id: 'formFields.iDTypeRefugeeNumber',
+      defaultMessage: 'Refugee Number',
+      description: 'Option for form field: Type of ID'
+    })
+    expect(iDType('ALIEN_NUMBER')).toEqual({
+      id: 'formFields.iDTypeAlienNumber',
+      defaultMessage: 'Alien Number',
+      description: 'Option for form field: Type of ID'
+    })
+    expect(iDType('UNKNOWN')).toEqual({
+      id: 'formFields.iD',
+      defaultMessage: 'NID number',
+      description: 'Label for form field: NID number'
+    })
+  })
+
   describe('when user interacts', async () => {
     let component: ReactWrapper<{}, {}>
 
@@ -313,6 +347,10 @@ describe('when user wants to print certificate', async () => {
       component = testComponent.component
     })
 
+    afterAll(() => {
+      component.unmount()
+    })
+
     it('renders the form', () => {
       const fields = printCertificateFormSection.fields
       ;(fields[1] as IInformativeRadioGroupFormField).information = {
@@ -362,13 +400,62 @@ describe('when user wants to print certificate', async () => {
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
     })
 
-    it('confirm button is disabled', () => {
+    it('confirm button is disabled at first', () => {
       expect(
         component
           .find('#print-confirm-button')
           .hostNodes()
           .prop('disabled')
       ).toBe(true)
+    })
+
+    it('when mother has answered all questions, enables confirm button', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: true
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+      expect(
+        component
+          .find('#print-confirm-button')
+          .hostNodes()
+          .prop('disabled')
+      ).toBe(false)
+    })
+
+    it('when father has answered all questions, enables confirm button', () => {
+      const documentData = {
+        personCollectingCertificate: 'FATHER',
+        fatherDetails: true
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+      expect(
+        component
+          .find('#print-confirm-button')
+          .hostNodes()
+          .prop('disabled')
+      ).toBe(false)
+    })
+
+    it('when other person has answered all questions, enables confirm button', () => {
+      const documentData = {
+        personCollectingCertificate: 'OTHER',
+        otherPersonGivenNames: 'John',
+        otherPersonFamilyName: 'Doe',
+        otherPersonIDType: 'NATIONAL_ID',
+        otherPersonDocumentNumber: '2345',
+        otherPersonSignedAddidavit: true
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+      expect(
+        component
+          .find('#print-confirm-button')
+          .hostNodes()
+          .prop('disabled')
+      ).toBe(false)
     })
   })
 })

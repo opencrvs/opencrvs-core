@@ -98,7 +98,7 @@ interface IProps {
   information: ParentDetails
 }
 
-function iDType(code: string): FormattedMessage.MessageDescriptor {
+export function iDType(code: string): FormattedMessage.MessageDescriptor {
   switch (code) {
     case 'NATIONAL_ID':
       return identityMessages.iDTypeNationalID
@@ -113,7 +113,7 @@ function iDType(code: string): FormattedMessage.MessageDescriptor {
     case 'ALIEN_NUMBER':
       return identityMessages.iDTypeAlienNumber
     default:
-      return identityMessages.iDType
+      return identityMessages.iD
   }
 }
 
