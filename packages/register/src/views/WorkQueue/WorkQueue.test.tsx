@@ -50,6 +50,7 @@ describe('WorkQueue tests', async () => {
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 registration: {
+                  registrationNumber: null,
                   trackingId: 'B111111',
                   duplicates: null,
                   status: [
@@ -94,6 +95,7 @@ describe('WorkQueue tests', async () => {
               {
                 id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
                 registration: {
+                  registrationNumber: null,
                   trackingId: 'B222222',
                   duplicates: null,
                   status: [
@@ -163,6 +165,7 @@ describe('WorkQueue tests', async () => {
         name: 'Baby Doe',
         dob: '',
         date_of_application: '2018-05-23',
+        registrationNumber: '',
         tracking_id: 'B111111',
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
@@ -184,6 +187,7 @@ describe('WorkQueue tests', async () => {
         name: 'Baby Smith',
         dob: '',
         date_of_application: '2018-05-23',
+        registrationNumber: '',
         tracking_id: 'B222222',
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
@@ -262,6 +266,120 @@ describe('WorkQueue tests', async () => {
                 {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
+                    registrationNumber: null,
+                    trackingId: 'B111111',
+                    duplicates: null,
+                    status: [
+                      {
+                        timestamp: null,
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'DECLARED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: null,
+                        firstNames: 'Baby',
+                        familyName: 'Doe'
+                      }
+                    ],
+                    birthDate: null
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
+          }
+        }
+      ]
+
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <WorkQueue />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      testComponent.component.update()
+      const instance = testComponent.component
+        .find(DataTable)
+        .find(ListItem)
+        .instance() as any
+
+      instance.toggleExpanded()
+      testComponent.component.update()
+
+      expect(
+        testComponent.component
+          .find(DataTable)
+          .find('#reviewAndRegisterBtn_B111111')
+          .hostNodes().length
+      ).toBe(1)
+      testComponent.component
+        .find(DataTable)
+        .find('#reviewAndRegisterBtn_B111111')
+        .hostNodes()
+        .simulate('click')
+
+      testComponent.component
+        .find(DataTable)
+        .find('button')
+        .at(1)
+        .hostNodes()
+        .simulate('click')
+
+      expect(
+        testComponent.component
+          .find('#new_registration')
+          .hostNodes()
+          .text()
+      ).toContain('New birth registration')
+
+      testComponent.component.unmount()
+    })
+
+    it('Should Render Print Certificate & Edit button', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_REGISTRATION_QUERY,
+            variables: {
+              locationIds: ['123456789']
+            }
+          },
+          result: {
+            data: {
+              listBirthRegistrations: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    registrationNumber: null,
                     trackingId: 'B111111',
                     duplicates: null,
                     status: [
@@ -333,29 +451,16 @@ describe('WorkQueue tests', async () => {
       expect(
         testComponent.component
           .find(DataTable)
-          .find('#reviewAndRegisterBtn_B111111')
+          .find('#editBtn_B111111')
           .hostNodes().length
       ).toBe(1)
-      testComponent.component
-        .find(DataTable)
-        .find('#reviewAndRegisterBtn_B111111')
-        .hostNodes()
-        .simulate('click')
-
-      testComponent.component
-        .find(DataTable)
-        .find('button')
-        .at(1)
-        .hostNodes()
-        .simulate('click')
 
       expect(
         testComponent.component
-          .find('#new_registration')
-          .hostNodes()
-          .text()
-      ).toContain('New birth registration')
-
+          .find(DataTable)
+          .find('#printCertificate_B111111')
+          .hostNodes().length
+      ).toBe(1)
       testComponent.component.unmount()
     })
   })
@@ -380,6 +485,7 @@ describe('WorkQueue tests', async () => {
                 {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
+                    registrationNumber: null,
                     trackingId: 'B111111',
                     duplicates: ['e302f7c5-ad87-4117-91c1-35eaf2ea7be8'],
                     status: [
@@ -405,7 +511,7 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'REGISTERED'
+                        type: 'DECLARED'
                       }
                     ]
                   },
@@ -478,6 +584,7 @@ describe('WorkQueue tests', async () => {
                 {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
+                    registrationNumber: null,
                     trackingId: 'B111111',
                     duplicates: null,
                     status: [
@@ -503,7 +610,7 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'REGISTERED'
+                        type: 'DECLARED'
                       }
                     ]
                   },

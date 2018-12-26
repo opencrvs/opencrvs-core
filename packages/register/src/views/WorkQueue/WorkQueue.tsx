@@ -7,9 +7,10 @@ import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   IconAction,
   ActionTitle,
-  PrimaryButton
+  PrimaryButton,
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Plus } from '@opencrvs/components/lib/icons'
+import { Plus, Edit } from '@opencrvs/components/lib/icons'
 import {
   Banner,
   SearchInput,
@@ -53,6 +54,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
       id
       registration {
         trackingId
+        registrationNumber
         status {
           user {
             name {
@@ -211,6 +213,11 @@ const messages = defineMessages({
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
   },
+  listItemBirthRegistrationNumber: {
+    id: 'register.workQueue.labels.results.birthRegistrationNumber',
+    defaultMessage: 'BRN',
+    description: 'Label for BRN in work queue list item'
+  },
   listItemDuplicateLabel: {
     id: 'register.workQueue.labels.results.duplicate',
     defaultMessage: 'Possible duplicate found',
@@ -264,6 +271,16 @@ const messages = defineMessages({
     id: 'register.workQueue.listItem.status.label.byPractitioner',
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
+  },
+  EditBtnText: {
+    id: 'review.edit.modal.editButton',
+    defaultMessage: 'Edit',
+    description: 'Edit button text'
+  },
+  printCertificateBtnText: {
+    id: 'register.workQueue.buttons.printCertificate',
+    defaultMessage: 'Print Certificate',
+    description: 'Print Certificate Button text'
   }
 })
 
@@ -389,6 +406,26 @@ const ExpansionContentContainer = styled.div`
 const StyledPrimaryButton = styled(PrimaryButton)`
   font-family: ${({ theme }) => theme.fonts.boldFont};
 `
+
+const StyledSecondaryButton = styled(SecondaryButton)`
+  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  color: ${({ theme }) => theme.colors.primary} !important;
+  font-weight: bold;
+  svg {
+    margin-right: 15px;
+  }
+  &:hover {
+    background: inherit;
+    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  }
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.inputBackground};
+  }
+`
+const StatusIcon = styled.div`
+  margin-top: 3px;
+`
+
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -407,13 +444,29 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'APPLICATION':
-        return <StatusOrange />
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
       case 'REGISTERED':
-        return <StatusGreen />
+        return (
+          <StatusIcon>
+            <StatusGreen />
+          </StatusIcon>
+        )
       case 'COLLECTED':
-        return <StatusCollected />
+        return (
+          <StatusIcon>
+            <StatusCollected />
+          </StatusIcon>
+        )
       default:
-        return <StatusOrange />
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
     }
   }
 
@@ -464,6 +517,8 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           '',
         dob: (reg.child && reg.child.birthDate) || '',
         date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
+        registrationNumber:
+          (reg.registration && reg.registration.registrationNumber) || '',
         tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
         status:
@@ -562,6 +617,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     item: { [key: string]: string & Array<{ type: string }> },
     key: number
   ): JSX.Element => {
+    const applicationIsRegistered = item.declaration_status === 'REGISTERED'
     const info = []
     const status = []
     const icons = []
@@ -578,10 +634,20 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
       value: item.date_of_application
     })
-    info.push({
-      label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
-      value: item.tracking_id
-    })
+    if (!applicationIsRegistered) {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
+        value: item.tracking_id
+      })
+    }
+    if (applicationIsRegistered) {
+      info.push({
+        label: this.props.intl.formatMessage(
+          messages.listItemBirthRegistrationNumber
+        ),
+        value: item.registrationNumber
+      })
+    }
 
     status.push({ icon: <StatusGray />, label: item.event })
     status.push({
@@ -601,8 +667,21 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     ]
 
     const expansionActions: JSX.Element[] = []
+    if (this.userHasCertifyScope()) {
+      if (applicationIsRegistered) {
+        expansionActions.push(
+          <StyledPrimaryButton
+            id={`printCertificate_${item.tracking_id}`}
+            onClick={() => alert('Print Certificate')}
+          >
+            {this.props.intl.formatMessage(messages.printCertificateBtnText)}
+          </StyledPrimaryButton>
+        )
+      }
+    }
+
     if (this.userHasRegisterScope()) {
-      if (!item.duplicates) {
+      if (!item.duplicates && !applicationIsRegistered) {
         expansionActions.push(
           <StyledPrimaryButton
             id={`reviewAndRegisterBtn_${item.tracking_id}`}
@@ -618,7 +697,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           </StyledPrimaryButton>
         )
       }
-      if (item.duplicates) {
+      if (item.duplicates && !applicationIsRegistered) {
         expansionActions.push(
           <StyledPrimaryButton
             id={`reviewDuplicatesBtn_${item.tracking_id}`}
@@ -628,6 +707,17 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           >
             {this.props.intl.formatMessage(messages.reviewDuplicates)}
           </StyledPrimaryButton>
+        )
+      }
+      if (applicationIsRegistered) {
+        expansionActions.push(
+          <StyledSecondaryButton
+            id={`editBtn_${item.tracking_id}`}
+            disabled={true}
+          >
+            <Edit />
+            {this.props.intl.formatMessage(messages.EditBtnText)}
+          </StyledSecondaryButton>
         )
       }
     }
@@ -654,6 +744,10 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
   }
   userHasDeclareScope() {
     return this.props.scope && this.props.scope.includes('declare')
+  }
+
+  userHasCertifyScope() {
+    return this.props.scope && this.props.scope.includes('certify')
   }
 
   getLocalLocationId() {
