@@ -6,5 +6,5 @@ export const NOTIFICATION_SERVICE_URL =
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
-export const USER_MGNT_SERVICE_URL =
-  process.env.USER_MGNT_SERVICE_URL || 'http://localhost:3030/'
+export const USER_MANAGEMENT_URL =
+  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
