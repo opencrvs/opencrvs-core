@@ -19,7 +19,7 @@
       "rewriteUrlsConfig": [],
       "addAutoRewriteRules": true,
       "rewriteUrls": false,
-      "status": "enabled",
+      "status": "disabled",
       "alerts": [],
       "txRerunAcl": [],
       "txViewFullAcl": [],
@@ -37,9 +37,62 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246b431955a10011b81795"
-          },
+          "forwardAuthHeader": true,
+          "status": "enabled",
+          "type": "http"
+        }
+      ],
+      "authType": "public",
+      "whitelist": [],
+      "allow": [],
+      "type": "http",
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PUT",
+        "OPTIONS",
+        "HEAD",
+        "TRACE",
+        "CONNECT",
+        "PATCH"
+      ]
+    },
+    {
+      "requestBody": true,
+      "responseBody": true,
+      "name": "Workflow passthrough",
+      "urlPattern": "^.*$",
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "pollingSchedule": null,
+      "tcpHost": null,
+      "tcpPort": null,
+      "autoRetryPeriodMinutes": 60,
+      "autoRetryEnabled": false,
+      "rewriteUrlsConfig": [],
+      "addAutoRewriteRules": true,
+      "rewriteUrls": false,
+      "status": "enabled",
+      "alerts": [],
+      "txRerunAcl": [],
+      "txViewFullAcl": [],
+      "txViewAcl": [],
+      "properties": [],
+      "matchContentTypes": [],
+      "routes": [
+        {
+          "name": "Workflow",
+          "secured": false,
+          "host": "10.0.0.73",
+          "port": 5050,
+          "path": "",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": "",
           "forwardAuthHeader": true,
           "status": "enabled",
           "type": "http"
@@ -60,68 +113,6 @@
         "CONNECT",
         "PATCH"
       ],
-      "__v": 9,
-      "priority": 1
-    },
-    {
-      "requestBody": true,
-      "responseBody": true,
-      "name": "test",
-      "urlPattern": "^/ping$",
-      "matchContentRegex": null,
-      "matchContentXpath": null,
-      "matchContentValue": null,
-      "matchContentJson": null,
-      "pollingSchedule": null,
-      "tcpHost": null,
-      "tcpPort": null,
-      "autoRetryPeriodMinutes": 60,
-      "autoRetryEnabled": false,
-      "rewriteUrlsConfig": [],
-      "addAutoRewriteRules": true,
-      "rewriteUrls": false,
-      "status": "deleted",
-      "alerts": [],
-      "txRerunAcl": [],
-      "txViewFullAcl": [],
-      "txViewAcl": [],
-      "properties": [],
-      "matchContentTypes": [],
-      "routes": [
-        {
-          "name": "Ping",
-          "secured": false,
-          "host": "gateway",
-          "port": 7070,
-          "path": "",
-          "pathTransform": "",
-          "primary": true,
-          "username": "",
-          "password": "",
-          "_id": {
-            "$oid": "5c1b2df9934d1a0012fd57d1"
-          },
-          "forwardAuthHeader": false,
-          "status": "enabled",
-          "type": "http"
-        }
-      ],
-      "authType": "public",
-      "whitelist": [],
-      "allow": [],
-      "type": "http",
-      "methods": [
-        "GET",
-        "POST",
-        "DELETE",
-        "PUT",
-        "OPTIONS",
-        "HEAD",
-        "TRACE",
-        "CONNECT",
-        "PATCH"
-      ],
-      "__v": 23,
       "priority": 2
     },
     {
@@ -159,9 +150,6 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246cb41955a10011b81835"
-          },
           "forwardAuthHeader": false,
           "status": "enabled",
           "type": "http"
@@ -182,7 +170,7 @@
         "CONNECT",
         "PATCH"
       ],
-      "__v": 0
+      "priority": 1
     },
     {
       "requestBody": true,
@@ -195,7 +183,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "__v": 0,
       "name": "Updated declaration",
       "autoRetryPeriodMinutes": 60,
       "autoRetryEnabled": false,
@@ -220,9 +207,6 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246cb41955a10011b81835"
-          },
           "forwardAuthHeader": false,
           "status": "enabled",
           "type": "http"
@@ -242,7 +226,8 @@
         "TRACE",
         "CONNECT",
         "PATCH"
-      ]
+      ],
+      "priority": 1
     },
     {
       "requestBody": true,
@@ -255,7 +240,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "__v": 0,
       "name": "New Registration",
       "autoRetryPeriodMinutes": 60,
       "autoRetryEnabled": false,
@@ -280,9 +264,6 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246cb41955a10011b81835"
-          },
           "forwardAuthHeader": false,
           "status": "enabled",
           "type": "http"
@@ -302,7 +283,8 @@
         "TRACE",
         "CONNECT",
         "PATCH"
-      ]
+      ],
+      "priority": 1
     },
     {
       "requestBody": true,
@@ -340,9 +322,6 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246d6a1955a10011b818bc"
-          },
           "forwardAuthHeader": false,
           "status": "enabled",
           "type": "http"
@@ -363,7 +342,7 @@
         "CONNECT",
         "PATCH"
       ],
-      "__v": 0
+      "priority": 1
     },
     {
       "requestBody": true,
@@ -376,7 +355,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "__v": 0,
       "name": "Certification",
       "autoRetryPeriodMinutes": 60,
       "autoRetryEnabled": false,
@@ -401,9 +379,6 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246cb41955a10011b81835"
-          },
           "forwardAuthHeader": false,
           "status": "enabled",
           "type": "http"
@@ -423,7 +398,8 @@
         "TRACE",
         "CONNECT",
         "PATCH"
-      ]
+      ],
+      "priority": 1
     },
     {
       "requestBody": true,
@@ -436,7 +412,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "__v": 1,
       "name": "Voided declaration",
       "autoRetryPeriodMinutes": 60,
       "autoRetryEnabled": false,
@@ -461,9 +436,6 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246cb41955a10011b81835"
-          },
           "forwardAuthHeader": false,
           "status": "enabled",
           "type": "http"
@@ -483,7 +455,8 @@
         "TRACE",
         "CONNECT",
         "PATCH"
-      ]
+      ],
+      "priority": 1
     },
     {
       "requestBody": true,
@@ -496,7 +469,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "__v": 0,
       "name": "Voided Registration",
       "autoRetryPeriodMinutes": 60,
       "autoRetryEnabled": false,
@@ -521,9 +493,6 @@
           "primary": true,
           "username": "",
           "password": "",
-          "_id": {
-            "$oid": "5c246cb41955a10011b81835"
-          },
           "forwardAuthHeader": false,
           "status": "enabled",
           "type": "http"
@@ -543,7 +512,8 @@
         "TRACE",
         "CONNECT",
         "PATCH"
-      ]
+      ],
+      "priority": 1
     }
   ],
   "Mediators": [],
