@@ -1,4 +1,8 @@
-import { findCompositionSection, findExtension } from 'src/features/fhir/utils'
+import {
+  findCompositionSection,
+  findExtension,
+  fetchFHIR
+} from 'src/features/fhir/utils'
 import {
   MOTHER_CODE,
   FATHER_CODE,
@@ -14,8 +18,6 @@ import {
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE
 } from 'src/features/fhir/templates'
-import fetch from 'node-fetch'
-import { fhirUrl } from 'src/constants'
 import { GQLResolver } from 'src/graphql/schema'
 import {
   ORIGINAL_FILE_NAME_SYSTEM,
@@ -116,15 +118,17 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async attachments(task: fhir.Task) {
+    async attachments(task: fhir.Task, _, authHeader) {
       if (!task.focus) {
         throw new Error(
           'Task resource does not have a focus property necessary to lookup the composition'
         )
       }
 
-      const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
-      const composition = await res.json()
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
       const docSection = findCompositionSection(DOCS_CODE, composition)
       if (!docSection || !docSection.entry) {
         return null
@@ -133,8 +137,7 @@ export const typeResolvers: GQLResolver = {
         (docRefEntry: fhir.Reference) => docRefEntry.reference
       )
       return docRefReferences.map(async (docRefReference: string) => {
-        const docRefRes = await fetch(`${fhirUrl}/${docRefReference}`)
-        return docRefRes.json()
+        return await fetchFHIR(`/${docRefReference}`, authHeader)
       })
     },
     contact: task => {
@@ -190,15 +193,17 @@ export const typeResolvers: GQLResolver = {
       )
       return (taskCode && taskCode.code) || null
     },
-    duplicates: async task => {
+    duplicates: async (task, _, authHeader) => {
       if (!task.focus) {
         throw new Error(
           'Task resource does not have a focus property necessary to lookup the composition'
         )
       }
 
-      const res = await fetch(`${fhirUrl}/${task.focus.reference}`)
-      const composition = await res.json()
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
       return (
         composition.relatesTo &&
         composition.relatesTo.map(
@@ -221,7 +226,7 @@ export const typeResolvers: GQLResolver = {
 
       return (statusType && statusType.code) || null
     },
-    user: async task => {
+    user: async (task, _, authHeader) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
@@ -229,14 +234,12 @@ export const typeResolvers: GQLResolver = {
       if (!user) {
         return null
       }
-
-      const res = await fetch(`${fhirUrl}/${user.valueReference}`)
-      return res.json()
+      return await fetchFHIR(`/${user.valueReference}`, authHeader)
     },
 
     timestamp: task => task.lastModified,
     comments: task => task.note,
-    location: async task => {
+    location: async (task, _, authHeader) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension
@@ -244,16 +247,15 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation) {
         return null
       }
-      const res = await fetch(`${fhirUrl}/${taskLocation.valueReference}`)
-      return res.json()
+      return await fetchFHIR(`/${taskLocation.valueReference}`, authHeader)
     }
   },
   User: {
-    role: async user => {
-      const practitionerRoleResponse = await fetch(
-        `${fhirUrl}/PractitionerRole?practitioner=${user.id}`
+    role: async (user, _, authHeader) => {
+      const practitionerRole = await fetchFHIR(
+        `/PractitionerRole?practitioner=${user.id}`,
+        authHeader
       )
-      const practitionerRole = await practitionerRoleResponse.json()
       const roleEntry = practitionerRole.entry[0].resource
       if (
         !roleEntry ||
@@ -334,42 +336,48 @@ export const typeResolvers: GQLResolver = {
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
-    async mother(composition: ITemplatedComposition) {
+    async mother(composition: ITemplatedComposition, _, authHeader) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
-      const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
-      return res.json()
+      return await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
     },
-    async father(composition: ITemplatedComposition) {
+    async father(composition: ITemplatedComposition, _, authHeader) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
-      const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
-      return res.json()
+      return await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
     },
-    async child(composition: ITemplatedComposition) {
+    async child(composition: ITemplatedComposition, _, authHeader) {
       const patientSection = findCompositionSection(CHILD_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
-      const res = await fetch(`${fhirUrl}/${patientSection.entry[0].reference}`)
-      return res.json()
+      return await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
     },
-    async registration(composition: ITemplatedComposition) {
-      const res = await fetch(
-        `${fhirUrl}/Task?focus=Composition/${composition.id}`
-      ) // TODO this is returning all tasks no matter what
-      const taskBundle = await res.json()
+    async registration(composition: ITemplatedComposition, _, authHeader) {
+      const taskBundle = await fetchFHIR(
+        `/Task?focus=Composition/${composition.id}`,
+        authHeader
+      )
 
       if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
         return null
       }
       return taskBundle.entry[0].resource
     },
-    async weightAtBirth(composition: ITemplatedComposition) {
+    async weightAtBirth(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -377,15 +385,15 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${BODY_WEIGHT_CODE}`
+        }&code=${BODY_WEIGHT_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.entry[0].resource.valueQuantity.value
+      return observations.entry[0].resource.valueQuantity.value
     },
-    async birthType(composition: ITemplatedComposition) {
+    async birthType(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -393,15 +401,15 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${BIRTH_TYPE_CODE}`
+        }&code=${BIRTH_TYPE_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.entry[0].resource.valueQuantity.value
+      return observations.entry[0].resource.valueQuantity.value
     },
-    async attendantAtBirth(composition: ITemplatedComposition) {
+    async attendantAtBirth(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -409,15 +417,19 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${BIRTH_ATTENDANT_CODE}`
+        }&code=${BIRTH_ATTENDANT_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.entry[0].resource.valueString
+      return observations.entry[0].resource.valueString
     },
-    async birthRegistrationType(composition: ITemplatedComposition) {
+    async birthRegistrationType(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -425,15 +437,19 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${BIRTH_REG_TYPE_CODE}`
+        }&code=${BIRTH_REG_TYPE_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.entry[0].resource.valueString
+      return observations.entry[0].resource.valueString
     },
-    async presentAtBirthRegistration(composition: ITemplatedComposition) {
+    async presentAtBirthRegistration(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -441,15 +457,19 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${BIRTH_REG_PRESENT_CODE}`
+        }&code=${BIRTH_REG_PRESENT_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.entry[0].resource.valueString
+      return observations.entry[0].resource.valueString
     },
-    async childrenBornAliveToMother(composition: ITemplatedComposition) {
+    async childrenBornAliveToMother(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -457,15 +477,19 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${NUMBER_BORN_ALIVE_CODE}`
+        }&code=${NUMBER_BORN_ALIVE_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.resource.valueInteger
+      return observations.resource.valueInteger
     },
-    async foetalDeathsToMother(composition: ITemplatedComposition) {
+    async foetalDeathsToMother(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -473,15 +497,19 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${NUMBER_FOEATAL_DEATH_CODE}`
+        }&code=${NUMBER_FOEATAL_DEATH_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.resource.valueInteger
+      return observations.resource.valueInteger
     },
-    async lastPreviousLiveBirth(composition: ITemplatedComposition) {
+    async lastPreviousLiveBirth(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -489,15 +517,15 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/Observation?encounter=${
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
           encounterSection.entry[0].reference
-        }&code=${LAST_LIVE_BIRTH_CODE}`
+        }&code=${LAST_LIVE_BIRTH_CODE}`,
+        authHeader
       )
-      const data = await res.json()
-      return data.resource.valueDateTime
+      return observations.resource.valueDateTime
     },
-    async birthLocation(composition: ITemplatedComposition) {
+    async birthLocation(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -505,19 +533,19 @@ export const typeResolvers: GQLResolver = {
       if (!encounterSection || !encounterSection.entry) {
         return null
       }
-      const res = await fetch(
-        `${fhirUrl}/${encounterSection.entry[0].reference}`
+      const data = await fetchFHIR(
+        `/${encounterSection.entry[0].reference}`,
+        authHeader
       )
-      const data = await res.json()
 
       if (!data || !data.location || !data.location[0].location) {
         return null
       }
 
-      const locationRes = await fetch(
-        `${fhirUrl}/${data.location[0].location.reference}`
+      return await fetchFHIR(
+        `/${data.location[0].location.reference}`,
+        authHeader
       )
-      return locationRes.json()
     }
   }
 }
