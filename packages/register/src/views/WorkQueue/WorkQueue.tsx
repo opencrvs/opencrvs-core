@@ -1020,7 +1020,7 @@ export const WorkQueue = connect(
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: state.profile.userDetails,
-    printForm: state.printCertificateForm.printCertificateForm.sections[0]
+    printForm: state.printCertificateForm.collectCertificateFrom
   }),
   { goToEvents: goToEventsAction, gotoTab: goToTabAction }
 )(injectIntl(withTheme(WorkQueueView)))
