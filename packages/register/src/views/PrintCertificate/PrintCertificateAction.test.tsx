@@ -7,7 +7,7 @@ import { createStore } from 'src/store'
 import * as React from 'react'
 
 import { FormFieldGenerator } from 'src/components/form'
-import { printCertificateFormSection } from './print-certificate'
+import { collectCertificateFormSection } from './print-certificate'
 import { IInformativeRadioGroupFormField } from 'src/forms'
 import { ReactWrapper } from 'enzyme'
 import { iDType } from './ParentDetails'
@@ -15,8 +15,8 @@ import { iDType } from './ParentDetails'
 describe('when user wants to print certificate', async () => {
   const { store } = createStore()
   const mock: () => void = jest.fn()
-  const formSection = store.getState().printCertificateForm.printCertificateForm
-    .sections[0]
+  const formSection = store.getState().printCertificateForm
+    .collectCertificateFrom
 
   it('renders fields after successful graphql query', async () => {
     const graphqlMock = [
@@ -94,7 +94,7 @@ describe('when user wants to print certificate', async () => {
     })
 
     testComponent.component.update()
-    const fields = printCertificateFormSection.fields
+    const fields = collectCertificateFormSection.fields
     ;(fields[1] as IInformativeRadioGroupFormField).information = {
       // @ts-ignore
       name: [
@@ -352,7 +352,7 @@ describe('when user wants to print certificate', async () => {
     })
 
     it('renders the form', () => {
-      const fields = printCertificateFormSection.fields
+      const fields = collectCertificateFormSection.fields
       ;(fields[1] as IInformativeRadioGroupFormField).information = {
         // @ts-ignore
         name: [

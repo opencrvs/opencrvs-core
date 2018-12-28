@@ -95,8 +95,8 @@ const messages = defineMessages({
   }
 })
 
-export const printCertificateFormSection: IFormSection = {
-  id: 'print',
+export const collectCertificateFormSection: IFormSection = {
+  id: 'collectCertificate',
   viewType: 'form',
   name: messages.printCertificate,
   title: messages.printCertificate,

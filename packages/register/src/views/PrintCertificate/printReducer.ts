@@ -1,15 +1,13 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { printCertificateFormSection } from './print-certificate'
+import { collectCertificateFormSection } from './print-certificate'
 import { Action } from 'redux'
-import { IForm } from 'src/forms'
+import { IFormSection } from 'src/forms'
 
 const initialState: IPrintFormState = {
-  printCertificateForm: {
-    sections: [printCertificateFormSection]
-  }
+  collectCertificateFrom: collectCertificateFormSection
 }
 export interface IPrintFormState {
-  printCertificateForm: IForm
+  collectCertificateFrom: IFormSection
 }
 
 export const printReducer: LoopReducer<IPrintFormState, Action> = (
