@@ -12,6 +12,8 @@ import {
   INFORMATIVE_RADIO_GROUP
 } from 'src/forms'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { connect } from 'react-redux'
+import { IStoreState } from 'src/store'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -98,6 +100,7 @@ const messages = defineMessages({
 })
 
 type State = {
+  formID: string
   data: IFormSectionData
   isAllQuestionsAnswered: boolean
 }
@@ -108,6 +111,7 @@ type IProps = {
   registrationId: string
   togglePrintCertificateSection: () => void
   printCertificateFormSection: IFormSection
+  paymentFormSection: IFormSection
 }
 
 type IFullProps = InjectedIntlProps & IProps
@@ -148,6 +152,7 @@ class PrintCertificateActionComponent extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = {
+      formID: 'collectCertificate',
       isAllQuestionsAnswered: false,
       data: {
         personCollectingCertificate: 'MOTHER'
@@ -163,21 +168,45 @@ class PrintCertificateActionComponent extends React.Component<
     this.setState(() => ({ data: documentData, isAllQuestionsAnswered }))
   }
 
+  getForm = (formID: string) => {
+    const { printCertificateFormSection, paymentFormSection } = this.props
+    switch (formID) {
+      case 'collectCertificate':
+        return printCertificateFormSection
+      case 'payment':
+        return paymentFormSection
+      default:
+        throw new Error(`No form found for id ${formID}`)
+    }
+  }
+
+  onConfirmForm = () => {
+    const { formID } = this.state
+    switch (formID) {
+      case 'collectCertificate':
+        this.setState({ formID: 'payment' })
+        break
+      default:
+        break
+    }
+  }
+
   render = () => {
     const {
       intl,
-      title,
       backLabel,
       registrationId,
       togglePrintCertificateSection,
       printCertificateFormSection
     } = this.props
 
-    const { isAllQuestionsAnswered } = this.state
+    const { isAllQuestionsAnswered, formID } = this.state
+    const form = this.getForm(formID)
+
     return (
       <ActionPageWrapper>
         <ActionPage
-          title={title}
+          title={intl.formatMessage(form.title)}
           backLabel={backLabel}
           goBack={togglePrintCertificateSection}
         >
@@ -215,16 +244,17 @@ class PrintCertificateActionComponent extends React.Component<
                   <FormContainer>
                     <Box>
                       <FormFieldGenerator
-                        id={printCertificateFormSection.id}
+                        id={form.id}
                         onChange={this.storeData}
                         setAllFieldsDirty={false}
-                        fields={printCertificateFormSection.fields}
+                        fields={form.fields}
                       />
                     </Box>
                     <ButtonContainer>
                       <StyledPrimaryButton
                         id="print-confirm-button"
                         disabled={!isAllQuestionsAnswered}
+                        onClick={this.onConfirmForm}
                       >
                         {intl.formatMessage(messages.confirm)}
                       </StyledPrimaryButton>
@@ -249,6 +279,6 @@ class PrintCertificateActionComponent extends React.Component<
   }
 }
 
-export const PrintCertificateAction = injectIntl<IFullProps>(
-  PrintCertificateActionComponent
-)
+export const PrintCertificateAction = connect((state: IStoreState) => ({
+  paymentFormSection: state.printCertificateForm.paymentForm
+}))(injectIntl<IFullProps>(PrintCertificateActionComponent))

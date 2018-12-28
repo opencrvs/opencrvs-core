@@ -35,7 +35,7 @@ const messages = defineMessages({
     description: 'The label for payment amount subsection'
   }
 })
-export const paymentSection: IFormSection = {
+export const paymentFormSection: IFormSection = {
   id: 'payment',
   viewType: 'form' as ViewType,
   name: messages.payment,

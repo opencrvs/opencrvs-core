@@ -12,6 +12,11 @@ import { conditionals } from 'src/forms/utils'
 import { messages as identityMessages } from 'src/forms/identity'
 
 const messages = defineMessages({
+  certificateCollectionTitle: {
+    id: 'register.workQueue.title.certificateCollection',
+    defaultMessage: 'Certificate Collection',
+    description: 'The title of print certificate action'
+  },
   printCertificate: {
     id: 'register.workQueue.print.form.name',
     defaultMessage: 'Print',
@@ -99,7 +104,7 @@ export const collectCertificateFormSection: IFormSection = {
   id: 'collectCertificate',
   viewType: 'form',
   name: messages.printCertificate,
-  title: messages.printCertificate,
+  title: messages.certificateCollectionTitle,
   fields: [
     {
       name: 'personCollectingCertificate',
