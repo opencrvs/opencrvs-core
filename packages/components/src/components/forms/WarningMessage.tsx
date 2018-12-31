@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Warning } from '@opencrvs/components/lib/icons'
-import { Paragraph } from '@opencrvs/components/lib/typography'
+import { Warning } from '../icons'
+import { Paragraph } from '../typography'
 
 interface IWarningProps {
   children: string
