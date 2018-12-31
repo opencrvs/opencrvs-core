@@ -121,11 +121,15 @@ function ParentDetailsComponent({
   intl,
   information
 }: IProps & InjectedIntlProps) {
-  const nationality = countries.find(
-    country => country.value === information.nationality[0]
+  const nationalities = countries.filter(country =>
+    information.nationality.includes(country.value)
   )
+  const i18nNationality = nationalities
+    .map(nationality => intl.formatMessage(nationality.label))
+    .join(', ')
+
   return (
-    <Wrapper>
+    <Wrapper id="parent_details">
       <Label>{intl.formatMessage(messages.firstName)}:</Label>
       <Text>{information.name[0].firstNames}</Text>
       <Divider />
@@ -142,7 +146,7 @@ function ParentDetailsComponent({
       <Text>{information.birthDate}</Text>
       <br />
       <Label>{intl.formatMessage(messages.nationality)}:</Label>
-      <Text>{nationality && intl.formatMessage(nationality.label)}</Text>
+      <Text>{i18nNationality}</Text>
       <br />
       <Label>{intl.formatMessage(messages.typeOfID)}:</Label>
       <Text>
