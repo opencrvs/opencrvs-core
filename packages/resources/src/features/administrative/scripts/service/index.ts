@@ -1,6 +1,6 @@
 import fetch, { Response } from 'node-fetch'
 import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
-import { sendToFhir, IOISFLocation } from '../../../utils/bn'
+import { sendToFhir, IOISFLocation, ILocation } from '../../../utils/bn'
 import chalk from 'chalk'
 
 const composeFhirLocation = (
@@ -116,6 +116,27 @@ export async function fetchAndComposeLocations(
     locations.push(newLocation)
   }
   return locations
+}
+
+export function generateLocationResource(
+  fhirLocation: fhir.Location
+): ILocation {
+  const loc = {} as ILocation
+  loc.id = fhirLocation.id
+  loc.name = fhirLocation.name
+  loc.nameBn = fhirLocation.alias && fhirLocation.alias[0]
+  loc.physicalType =
+    fhirLocation.physicalType &&
+    fhirLocation.physicalType.coding &&
+    fhirLocation.physicalType.coding[0].display
+  loc.juristictionType =
+    fhirLocation.identifier && fhirLocation.identifier[2].value
+  loc.type =
+    fhirLocation.type &&
+    fhirLocation.type.coding &&
+    fhirLocation.type.coding[0].code
+  loc.partOf = fhirLocation.partOf && fhirLocation.partOf.reference
+  return loc
 }
 
 export async function getLocationsByParentDivisions(
