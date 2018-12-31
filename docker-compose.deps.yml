@@ -16,6 +16,12 @@ services:
     image: redis
     restart: unless-stopped
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    restart: unless-stopped
+    volumes:
+      - '/elasticdata:/elasticdata'
+
   hearth:
     image: jembi/hearth:latest
     environment:
