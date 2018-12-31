@@ -149,9 +149,7 @@ class PrintCertificateActionComponent extends React.Component<
     super(props)
     this.state = {
       isAllQuestionsAnswered: false,
-      data: {
-        personCollectingCertificate: 'MOTHER'
-      }
+      data: {}
     }
   }
 
@@ -221,14 +219,16 @@ class PrintCertificateActionComponent extends React.Component<
                         fields={printCertificateFormSection.fields}
                       />
                     </Box>
-                    <ButtonContainer>
-                      <StyledPrimaryButton
-                        id="print-confirm-button"
-                        disabled={!isAllQuestionsAnswered}
-                      >
-                        {intl.formatMessage(messages.confirm)}
-                      </StyledPrimaryButton>
-                    </ButtonContainer>
+                    {this.state.data.personCollectingCertificate && (
+                      <ButtonContainer>
+                        <StyledPrimaryButton
+                          id="print-confirm-button"
+                          disabled={!isAllQuestionsAnswered}
+                        >
+                          {intl.formatMessage(messages.confirm)}
+                        </StyledPrimaryButton>
+                      </ButtonContainer>
+                    )}
                   </FormContainer>
                 )
               }

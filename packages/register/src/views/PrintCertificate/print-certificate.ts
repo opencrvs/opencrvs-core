@@ -106,7 +106,7 @@ export const collectCertificateFormSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: messages.whoToCollect,
       required: true,
-      initialValue: 'MOTHER',
+      initialValue: '',
       validate: [],
       options: [
         { value: 'MOTHER', label: messages.mother },
