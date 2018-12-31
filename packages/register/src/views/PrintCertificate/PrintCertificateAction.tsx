@@ -12,6 +12,7 @@ import {
   INFORMATIVE_RADIO_GROUP
 } from 'src/forms'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { hasFormError } from 'src/forms/utils'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -99,7 +100,7 @@ const messages = defineMessages({
 
 type State = {
   data: IFormSectionData
-  isAllQuestionsAnswered: boolean
+  enableConfirmButton: boolean
 }
 
 type IProps = {
@@ -112,35 +113,6 @@ type IProps = {
 
 type IFullProps = InjectedIntlProps & IProps
 
-function isAllAnswered(
-  documentData: IFormSectionData,
-  personCollectingCertificate: string
-): boolean {
-  switch (personCollectingCertificate) {
-    case 'MOTHER':
-      return documentData.motherDetails !== '' ? true : false
-    case 'FATHER':
-      return documentData.fatherDetails !== '' ? true : false
-    case 'OTHER':
-      const {
-        otherPersonFamilyName,
-        otherPersonGivenNames,
-        otherPersonIDType,
-        otherPersonDocumentNumber,
-        otherPersonSignedAffidavit
-      } = documentData
-      const allFieldsNotCovered =
-        otherPersonFamilyName === '' ||
-        otherPersonGivenNames === '' ||
-        otherPersonIDType === '' ||
-        otherPersonDocumentNumber === '' ||
-        otherPersonSignedAffidavit === ''
-      return !allFieldsNotCovered
-    default:
-      return false
-  }
-}
-
 class PrintCertificateActionComponent extends React.Component<
   IFullProps,
   State
@@ -148,17 +120,28 @@ class PrintCertificateActionComponent extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      isAllQuestionsAnswered: false,
-      data: {}
+      data: {},
+      enableConfirmButton: false
     }
   }
 
   storeData = (documentData: IFormSectionData) => {
-    const isAllQuestionsAnswered = isAllAnswered(
-      documentData,
-      documentData.personCollectingCertificate as string
+    this.setState(
+      () => ({
+        data: documentData
+      }),
+      () =>
+        this.setState(() => ({
+          enableConfirmButton: this.shouldEnableConfirmButton(documentData)
+        }))
     )
-    this.setState(() => ({ data: documentData, isAllQuestionsAnswered }))
+  }
+
+  shouldEnableConfirmButton = (documentData: IFormSectionData) => {
+    return (
+      documentData &&
+      !hasFormError(this.props.printCertificateFormSection.fields, documentData)
+    )
   }
 
   render = () => {
@@ -171,7 +154,7 @@ class PrintCertificateActionComponent extends React.Component<
       printCertificateFormSection
     } = this.props
 
-    const { isAllQuestionsAnswered } = this.state
+    const { enableConfirmButton } = this.state
     return (
       <ActionPageWrapper>
         <ActionPage
@@ -223,7 +206,7 @@ class PrintCertificateActionComponent extends React.Component<
                       <ButtonContainer>
                         <StyledPrimaryButton
                           id="print-confirm-button"
-                          disabled={!isAllQuestionsAnswered}
+                          disabled={!enableConfirmButton}
                         >
                           {intl.formatMessage(messages.confirm)}
                         </StyledPrimaryButton>

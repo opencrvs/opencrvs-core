@@ -400,7 +400,19 @@ describe('when user wants to print certificate', async () => {
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
     })
 
-    it('confirm button is disabled at first', () => {
+    it('confirm button is not rendered at first', () => {
+      expect(component.find('#print-confirm-button').hostNodes()).toHaveLength(
+        0
+      )
+    })
+
+    it('when mother is selected, confirm button is rendered but disabled at first', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: ''
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
       expect(
         component
           .find('#print-confirm-button')
@@ -445,8 +457,8 @@ describe('when user wants to print certificate', async () => {
         otherPersonGivenNames: 'John',
         otherPersonFamilyName: 'Doe',
         otherPersonIDType: 'NATIONAL_ID',
-        otherPersonDocumentNumber: '2345',
-        otherPersonSignedAddidavit: true
+        documentNumber: '2345',
+        otherPersonSignedAffidavit: true
       }
       component.find(FormFieldGenerator).prop('onChange')(documentData)
       component.update()
