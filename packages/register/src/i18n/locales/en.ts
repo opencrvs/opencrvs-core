@@ -654,18 +654,41 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
     'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
     'register.workQueue.queryError': 'An error occurred while searching',
+    'print.certificate.queryError':
+      'An error occurred while quering for birth registration data',
+    'print.certificate.confirm': 'Confirm',
     'register.workQueue.dataTable.results': 'Results',
     'register.workQueue.dataTable.noResults': 'No result to display',
     'register.workQueue.header.title': 'Hello Registrar',
     'register.workQueue.header.description':
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
+    'register.workQueue.list.buttons.review': 'Review',
+    'register.workQueue.list.buttons.print': 'Print',
+    'register.workQueue.title.certificateCollection': 'Certificate Collection',
+    'register.workQueue.list.buttons.printCertificate': 'Print certificate',
     'register.workQueue.buttons.newApplication': 'New birth application',
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
     'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',
     'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
+    'register.workQueue.print.form.name': 'Print',
+    'register.workQueue.print.form.title': 'Print certificate',
+    'formFields.print.whoToCollect': 'Who is collecting the certificate?',
+    'register.workQueue.print.collector.mother': 'Mother',
+    'register.workQueue.print.collector.father': 'Father',
+    'register.workQueue.print.collector.other': 'Other',
+    'formFields.print.confirmMotherInformation':
+      'Does their proof of ID document match the following details?',
+    'formFields.print.otherPersonGivenNames': 'Given name',
+    'formFields.print.otherPersonFamilyName': 'Family name',
+    'formFields.print.signedAffidavit': 'Do they have a signed affidavit?',
+    'formFields.print.documentNumber': 'Document number',
+    'formFields.print.warningNotVerified':
+      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
+    'formFields.print.otherPersonPrompt':
+      'Because there are no details of this person on record, we need to capture their details:',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
@@ -693,6 +716,16 @@ export const ENGLISH_STATE = {
     'review.form.deleteApplication': 'Delete Application',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
-    'app.logout.modal.confirmationText': 'Are you sure you wish to log out?'
+    'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',
+    'certificate.parent.details.label.firstName': 'First Name(s)',
+    'certificate.parent.details.label.familyName': 'Family Name',
+    'certificate.parent.details.label.firstNameInEng':
+      'First Name(s)(in english)',
+    'certificate.parent.details.label.familyNameInEng':
+      'Family Name(in english)',
+    'certificate.parent.details.label.dateOfBirth': 'Date of Birth',
+    'certificate.parent.details.label.nationality': 'Nationality',
+    'certificate.parent.details.label.typeOfID': 'Type of ID',
+    'certificate.parent.details.label.number': 'Number'
   }
 }
