@@ -9,7 +9,8 @@ import {
   CheckboxGroup,
   DateField,
   TextArea,
-  SubSectionDivider
+  SubSectionDivider,
+  WarningMessage
 } from '@opencrvs/components/lib/forms'
 import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
@@ -51,8 +52,6 @@ import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
-
-import { WarningMessage } from './WarningMessage'
 
 const fadeIn = keyframes`
   from { opacity: 0; }

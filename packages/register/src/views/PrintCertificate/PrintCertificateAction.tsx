@@ -14,6 +14,7 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
+import { hasFormError } from 'src/forms/utils'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -102,7 +103,7 @@ const messages = defineMessages({
 type State = {
   formID: string
   data: IFormSectionData
-  isAllQuestionsAnswered: boolean
+  enableConfirmButton: boolean
 }
 
 type IProps = {
@@ -116,35 +117,6 @@ type IProps = {
 
 type IFullProps = InjectedIntlProps & IProps
 
-function isAllAnswered(
-  documentData: IFormSectionData,
-  personCollectingCertificate: string
-): boolean {
-  switch (personCollectingCertificate) {
-    case 'MOTHER':
-      return documentData.motherDetails !== '' ? true : false
-    case 'FATHER':
-      return documentData.fatherDetails !== '' ? true : false
-    case 'OTHER':
-      const {
-        otherPersonFamilyName,
-        otherPersonGivenNames,
-        otherPersonIDType,
-        otherPersonDocumentNumber,
-        otherPersonSignedAffidavit
-      } = documentData
-      const allFieldsNotCovered =
-        otherPersonFamilyName === '' ||
-        otherPersonGivenNames === '' ||
-        otherPersonIDType === '' ||
-        otherPersonDocumentNumber === '' ||
-        otherPersonSignedAffidavit === ''
-      return !allFieldsNotCovered
-    default:
-      return false
-  }
-}
-
 class PrintCertificateActionComponent extends React.Component<
   IFullProps,
   State
@@ -152,20 +124,29 @@ class PrintCertificateActionComponent extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      formID: 'collectCertificate',
-      isAllQuestionsAnswered: false,
-      data: {
-        personCollectingCertificate: 'MOTHER'
-      }
+      data: {},
+      enableConfirmButton: false,
+      formID: 'collectCertificate'
     }
   }
 
   storeData = (documentData: IFormSectionData) => {
-    const isAllQuestionsAnswered = isAllAnswered(
-      documentData,
-      documentData.personCollectingCertificate as string
+    this.setState(
+      () => ({
+        data: documentData
+      }),
+      () =>
+        this.setState(() => ({
+          enableConfirmButton: this.shouldEnableConfirmButton(documentData)
+        }))
     )
-    this.setState(() => ({ data: documentData, isAllQuestionsAnswered }))
+  }
+
+  shouldEnableConfirmButton = (documentData: IFormSectionData) => {
+    return (
+      documentData &&
+      !hasFormError(this.props.printCertificateFormSection.fields, documentData)
+    )
   }
 
   getForm = (formID: string) => {
@@ -200,7 +181,7 @@ class PrintCertificateActionComponent extends React.Component<
       printCertificateFormSection
     } = this.props
 
-    const { isAllQuestionsAnswered, formID } = this.state
+    const { enableConfirmButton, formID } = this.state
     const form = this.getForm(formID)
 
     return (
@@ -250,15 +231,17 @@ class PrintCertificateActionComponent extends React.Component<
                         fields={form.fields}
                       />
                     </Box>
-                    <ButtonContainer>
-                      <StyledPrimaryButton
-                        id="print-confirm-button"
-                        disabled={!isAllQuestionsAnswered}
-                        onClick={this.onConfirmForm}
-                      >
-                        {intl.formatMessage(messages.confirm)}
-                      </StyledPrimaryButton>
-                    </ButtonContainer>
+                    {this.state.data.personCollectingCertificate && (
+                      <ButtonContainer>
+                        <StyledPrimaryButton
+                          id="print-confirm-button"
+                          disabled={!enableConfirmButton}
+                          onClick={this.onConfirmForm}
+                        >
+                          {intl.formatMessage(messages.confirm)}
+                        </StyledPrimaryButton>
+                      </ButtonContainer>
+                    )}
                   </FormContainer>
                 )
               }

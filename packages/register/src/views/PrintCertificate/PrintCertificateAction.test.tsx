@@ -8,9 +8,14 @@ import * as React from 'react'
 
 import { FormFieldGenerator } from 'src/components/form'
 import { collectCertificateFormSection } from './print-certificate'
-import { IInformativeRadioGroupFormField } from 'src/forms'
+import {
+  IInformativeRadioGroupFormField,
+  INFORMATIVE_RADIO_GROUP
+} from 'src/forms'
 import { ReactWrapper } from 'enzyme'
-import { iDType } from './ParentDetails'
+import { iDType, ParentDetails } from './ParentDetails'
+import { InformativeRadioGroup } from './InformativeRadioGroup'
+import { conditionals } from 'src/forms/utils'
 
 describe('when user wants to print certificate', async () => {
   const { store } = createStore()
@@ -238,6 +243,11 @@ describe('when user wants to print certificate', async () => {
       defaultMessage: 'National ID',
       description: 'Option for form field: Type of ID'
     })
+    expect(iDType('PASSPORT')).toEqual({
+      id: 'formFields.iDTypePassport',
+      defaultMessage: 'Passport',
+      description: 'Option for form field: Type of ID'
+    })
     expect(iDType('BIRTH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeBRN',
       defaultMessage: 'Birth Registration Number',
@@ -263,6 +273,97 @@ describe('when user wants to print certificate', async () => {
       defaultMessage: 'NID number',
       description: 'Label for form field: NID number'
     })
+  })
+
+  it('renders parent details component', () => {
+    const parentDetailsComponent = createTestComponent(
+      <ParentDetails
+        information={{
+          name: [
+            {
+              firstNames: 'মা',
+              familyName: 'নাম'
+            },
+            {
+              firstNames: 'Mother',
+              familyName: 'Name'
+            }
+          ],
+          identifier: [
+            {
+              id: '4564',
+              type: 'NATIONAL_ID'
+            }
+          ],
+          birthDate: '1960-08-18',
+          nationality: ['BGD']
+        }}
+      />,
+      store
+    )
+
+    expect(
+      parentDetailsComponent.component.find('#parent_details').hostNodes()
+        .length
+    ).toBe(1)
+  })
+
+  it('renders informative radio group component', () => {
+    const id = 'informative_radio_group'
+    const onChange = mock
+    const onBlur = mock
+    const value = true
+    const touched = false
+    const error = ''
+    const informativeRadioGroupComponent = createTestComponent(
+      <InformativeRadioGroup
+        inputProps={{ id, onChange, onBlur, value, error: Boolean(error) }}
+        inputFieldProps={{
+          id,
+          label: 'Informative radio group',
+          touched,
+          error
+        }}
+        value={true}
+        // @ts-ignore
+        fieldDefinition={{
+          name: 'motherDetails',
+          type: INFORMATIVE_RADIO_GROUP,
+          label: 'Informative radio group',
+          required: true,
+          information: {
+            name: [
+              {
+                firstNames: 'মা',
+                familyName: 'নাম'
+              },
+              {
+                firstNames: 'Mother',
+                familyName: 'Name'
+              }
+            ],
+            identifier: [
+              {
+                id: '4564',
+                type: 'NATIONAL_ID'
+              }
+            ],
+            birthDate: '1960-08-18',
+            nationality: ['BGD']
+          },
+          validate: [],
+          options: [
+            { value: true, label: 'Confirm' },
+            { value: false, label: 'Deny' }
+          ],
+          conditionals: [conditionals.motherCollectsCertificate]
+        }}
+        onSetFieldValue={mock}
+      />,
+      store
+    )
+
+    expect(informativeRadioGroupComponent.component.exists()).toBe(true)
   })
 
   describe('when user interacts', async () => {
@@ -400,7 +501,19 @@ describe('when user wants to print certificate', async () => {
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
     })
 
-    it('confirm button is disabled at first', () => {
+    it('confirm button is not rendered at first', () => {
+      expect(component.find('#print-confirm-button').hostNodes()).toHaveLength(
+        0
+      )
+    })
+
+    it('when mother is selected, confirm button is rendered but disabled at first', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: ''
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
       expect(
         component
           .find('#print-confirm-button')
@@ -445,8 +558,8 @@ describe('when user wants to print certificate', async () => {
         otherPersonGivenNames: 'John',
         otherPersonFamilyName: 'Doe',
         otherPersonIDType: 'NATIONAL_ID',
-        otherPersonDocumentNumber: '2345',
-        otherPersonSignedAddidavit: true
+        documentNumber: '2345',
+        otherPersonSignedAffidavit: true
       }
       component.find(FormFieldGenerator).prop('onChange')(documentData)
       component.update()
