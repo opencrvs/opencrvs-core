@@ -8,13 +8,17 @@ This repo contains the frontend components and frontend related middleware for t
 
 Pre-requisites:
 
-* [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
-* [Yarn](https://yarnpkg.com/lang/en/docs/install)
-* [Docker](https://docs.docker.com/install/) - if on linux you will need to make sure docker can be run by your user, not only by root or using sudo - see [here](https://docs.docker.com/install/linux/linux-postinstall/).
+- [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
+- [Yarn](https://yarnpkg.com/lang/en/docs/install)
+- [Docker](https://docs.docker.com/install/) - if on linux you will need to make sure docker can be run by your user, not only by root or using sudo - see [here](https://docs.docker.com/install/linux/linux-postinstall/).
 
-On Linux you will also need so increase you file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+On Linux you will also need to:
+
+- increase your file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+- increase vm max heap for elasticsearch using: `echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
 
 Then:
+
 1. Clone the repo
 2. Run `yarn` to install deps
 3. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose)
@@ -22,10 +26,10 @@ Then:
 
 Apps can be found running in following URLs:
 
-* Styleguide: http://localhost:6060/
-* Login: http://localhost:3020/ - A test user you can use is u: 07111111111, p: test, code: 000000
-* Register: http://localhost:3000/
-* Performance management: http://localhost:3001/
+- Styleguide: http://localhost:6060/
+- Login: http://localhost:3020/ - A test user you can use is u: 07111111111, p: test, code: 000000
+- Register: http://localhost:3000/
+- Performance management: http://localhost:3001/
 
 You can open all of them by running `yarn open`
 
@@ -46,7 +50,6 @@ You can use **ctrl + b** and arrow keys to navigate between tmux windows.
 
 This will require installation of [tmux](https://github.com/tmux/tmux/wiki) which is `brew install tmux` on OSX and [tmuxinator](https://github.com/tmuxinator/tmuxinator) which is usually `gem install tmuxinator`.
 
-
 ## Docker scripts
 
 There are a number of docker scripts available via `yarn`. `yarn dev` is the easiest command to run to get started (see above) but if you need to manage the docker containers some of these scripts may be useful.
@@ -54,10 +57,11 @@ There are a number of docker scripts available via `yarn`. `yarn dev` is the eas
 The `yarn compose:*` scripts only setup the dependencies in docker containers and not the applications in this repository. The `yarn compose:all:*` scripts setup everything including the applications in this repository in docker containers. These scripts are useful to test everything in an environment that more closely resembles staging and/or production.
 
 For each of the above there are:
-  * base scripts which build and start the containers. E.g. `yarn compose` and `yarn compose:all`
-  * `*:build` scripts which just build the images
-  * `*:up` scripts which just run pre-build images in containers
-  * `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)
+
+- base scripts which build and start the containers. E.g. `yarn compose` and `yarn compose:all`
+- `*:build` scripts which just build the images
+- `*:up` scripts which just run pre-build images in containers
+- `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)
 
 ## Deploying to staging
 
@@ -67,14 +71,15 @@ The deploy is easily executed by just running: `yarn deploy:staging` - you will 
 
 The applications will be available here:
 
-* [Register app](https://register.opencrvs-staging.jembi.org/)
-* [Login app](https://login.opencrvs-staging.jembi.org/)
-* [GraphQl gateway](https://gateway.opencrvs-staging.jembi.org/)
-* [Auth service](https://auth.opencrvs-staging.jembi.org/)
+- [Register app](https://register.opencrvs-staging.jembi.org/)
+- [Login app](https://login.opencrvs-staging.jembi.org/)
+- [GraphQl gateway](https://gateway.opencrvs-staging.jembi.org/)
+- [Auth service](https://auth.opencrvs-staging.jembi.org/)
 
 Some useful commands to manage the swarm:
-  * `ssh root@opencrvs-staging.jembi.org docker service ls` - see all services running in the swarm including how many replicas are running
-  * `ssh root@opencrvs-staging.jembi.org docker service logs -f <service-id>` - stream the logs for a particular service (which could include logs from multiple replicas)
-  * `ssh root@opencrvs-staging.jembi.org docker stack ps opencrvs` - view all tasks (containers) running in the opencrvs stack
+
+- `ssh root@opencrvs-staging.jembi.org docker service ls` - see all services running in the swarm including how many replicas are running
+- `ssh root@opencrvs-staging.jembi.org docker service logs -f <service-id>` - stream the logs for a particular service (which could include logs from multiple replicas)
+- `ssh root@opencrvs-staging.jembi.org docker stack ps opencrvs` - view all tasks (containers) running in the opencrvs stack
 
 To scale a service change the deploy->replicas setting in the corresponding compose file and run the deploy again.
