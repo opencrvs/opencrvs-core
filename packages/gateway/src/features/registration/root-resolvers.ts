@@ -96,6 +96,13 @@ export const resolvers: GQLResolver = {
       )
       // return the taskId
       return getIDFromResponse(res)
+    },
+    async markBirthAsCertified(_, { details }, authHeader) {
+      const doc = await buildFHIRBundle(details)
+
+      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+      // return composition-id
+      return getIDFromResponse(res)
     }
   }
 }

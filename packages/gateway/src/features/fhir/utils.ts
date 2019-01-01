@@ -271,6 +271,7 @@ export function selectOrCreateLocationRefResource(
 
 export function selectOrCreateDocRefResource(
   sectionCode: string,
+  sectionTitle: string,
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.DocumentReference {
@@ -279,7 +280,10 @@ export function selectOrCreateDocRefResource(
   let docRef
   if (!section) {
     const ref = uuid()
-    const docSection = createSupportingDocumentsSection()
+    const docSection = createSupportingDocumentsSection(
+      sectionCode,
+      sectionTitle
+    )
     docSection.entry[context._index.attachments] = {
       reference: `urn:uuid:${ref}`
     }

@@ -8,7 +8,8 @@ import {
   CHILD_CODE,
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
-  DOCS_CODE,
+  ATTACHMENT_DOCS_CODE,
+  CERTIFICATE_DOCS_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
@@ -19,7 +20,9 @@ import {
   OBSERVATION_CATEGORY_PROCEDURE_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_DESC,
   OBSERVATION_CATEGORY_VSIGN_CODE,
-  OBSERVATION_CATEGORY_VSIGN_DESC
+  OBSERVATION_CATEGORY_VSIGN_DESC,
+  ATTACHMENT_DOCS_TITLE,
+  CERTIFICATE_DOCS_TITLE
 } from 'src/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -752,7 +755,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -764,7 +768,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -783,7 +788,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -802,7 +808,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -814,7 +821,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -833,7 +841,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -846,7 +855,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -865,7 +875,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -884,7 +895,8 @@ const builders: IFieldBuilders = {
         context: any
       ) => {
         const docRef = selectOrCreateDocRefResource(
-          DOCS_CODE,
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
           fhirBundle,
           context
         )
@@ -893,6 +905,31 @@ const builders: IFieldBuilders = {
         }
         docRef.subject.display = fieldValue
       }
+    },
+    certificates: {
+      collector: {
+        relationship: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const relatedPersonRes = selectOrCreateRelatedPersonResource(
+            fhirBundle,
+            context
+          )
+        },
+        individual: () => {}
+      },
+      hasShowedVerifiedDocument: () => {},
+      payments: {
+        paymentId: () => {},
+        type: () => {},
+        total: () => {},
+        amount: () => {},
+        outcome: () => {},
+        date: () => {}
+      },
+      data: () => {}
     }
   },
   birthLocation: {
