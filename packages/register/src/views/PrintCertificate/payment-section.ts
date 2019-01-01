@@ -45,6 +45,7 @@ export const paymentFormSection: IFormSection = {
       name: 'paymentMethod',
       type: SELECT_WITH_OPTIONS,
       label: messages.paymentMethod,
+      disabled: true,
       initialValue: 'MANUAL',
       validate: [],
       options: [{ value: 'MANUAL', label: messages.manualPaymentMethod }]

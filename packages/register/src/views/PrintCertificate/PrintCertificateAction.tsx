@@ -16,6 +16,9 @@ import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { hasFormError } from 'src/forms/utils'
 
+const COLLECT_CERTIFICATE = 'collectCertificate'
+const PAYMENT = 'payment'
+
 export const ActionPageWrapper = styled.div`
   position: fixed;
   top: 0;
@@ -126,14 +129,14 @@ class PrintCertificateActionComponent extends React.Component<
     this.state = {
       data: {},
       enableConfirmButton: false,
-      formID: 'collectCertificate'
+      formID: COLLECT_CERTIFICATE
     }
   }
 
   storeData = (documentData: IFormSectionData) => {
     this.setState(
-      () => ({
-        data: documentData
+      prevState => ({
+        data: { ...prevState.data, ...documentData }
       }),
       () =>
         this.setState(() => ({
@@ -143,18 +146,16 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   shouldEnableConfirmButton = (documentData: IFormSectionData) => {
-    return (
-      documentData &&
-      !hasFormError(this.props.printCertificateFormSection.fields, documentData)
-    )
+    const form = this.getForm(this.state.formID)
+    return documentData && !hasFormError(form.fields, documentData)
   }
 
   getForm = (formID: string) => {
     const { printCertificateFormSection, paymentFormSection } = this.props
     switch (formID) {
-      case 'collectCertificate':
+      case COLLECT_CERTIFICATE:
         return printCertificateFormSection
-      case 'payment':
+      case PAYMENT:
         return paymentFormSection
       default:
         throw new Error(`No form found for id ${formID}`)
@@ -164,8 +165,8 @@ class PrintCertificateActionComponent extends React.Component<
   onConfirmForm = () => {
     const { formID } = this.state
     switch (formID) {
-      case 'collectCertificate':
-        this.setState({ formID: 'payment' })
+      case COLLECT_CERTIFICATE:
+        this.setState({ formID: PAYMENT })
         break
       default:
         break

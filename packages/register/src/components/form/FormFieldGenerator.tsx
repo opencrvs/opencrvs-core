@@ -111,6 +111,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <Select
           {...inputProps}
+          isDisabled={fieldDefinition.disabled}
           value={value as string}
           onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
