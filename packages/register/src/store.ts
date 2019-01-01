@@ -35,6 +35,10 @@ import {
   IRejectState,
   rejectReducer
 } from '@opencrvs/register/src/review/reducer'
+import {
+  IPrintFormState,
+  printReducer
+} from './views/PrintCertificate/printReducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -45,6 +49,7 @@ export interface IStoreState {
   navigation: INavigationState
   notification: NotificationState
   reviewForm: IReviewFormState
+  printCertificateForm: IPrintFormState
   reject: IRejectState
 }
 
@@ -57,7 +62,8 @@ const reducers = combineReducers<IStoreState>({
   navigation: navigationReducer,
   notification: notificationReducer,
   reviewForm: reviewReducer,
-  reject: rejectReducer
+  reject: rejectReducer,
+  printCertificateForm: printReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

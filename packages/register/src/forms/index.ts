@@ -10,6 +10,7 @@ export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
+export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const DATE = 'DATE'
 export const TEXTAREA = 'TEXTAREA'
@@ -20,6 +21,7 @@ export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
+export const WARNING = 'WARNING'
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
@@ -75,6 +77,12 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   options: IRadioOption[]
 }
 
+export interface IInformativeRadioGroupFormField extends IFormFieldBase {
+  type: typeof INFORMATIVE_RADIO_GROUP
+  information: IFormSectionData
+  options: IRadioOption[]
+}
+
 export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
 }
@@ -114,6 +122,10 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   optionSection: IFormSection
 }
 
+export interface IWarningField extends IFormFieldBase {
+  type: typeof WARNING
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -121,6 +133,7 @@ export type IFormField =
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
   | IRadioGroupFormField
+  | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
   | IDateFormField
   | ITextareaFormField
@@ -129,6 +142,7 @@ export type IFormField =
   | IListFormField
   | IParagraphFormField
   | IImageUploaderWithOptionsFormField
+  | IWarningField
 
 export interface IConditional {
   action: string
@@ -150,6 +164,10 @@ export interface IConditionals {
   addressLine4: IConditional
   addressLine3Options1: IConditional
   uploadDocForWhom: IConditional
+  motherCollectsCertificate: IConditional
+  fatherCollectsCertificate: IConditional
+  otherPersonCollectsCertificate: IConditional
+  certificateCollectorNotVerified: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
@@ -195,6 +213,28 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   options: RadioComponentOption[]
 }
 
+type Name = {
+  firstNames: string
+  familyName: string
+}
+type Identifier = {
+  id: string
+  type: string
+}
+type Infomation = {
+  name: Name[]
+  birthDate: string
+  nationality: [string]
+  identifier: [Identifier] | null
+}
+
+export interface Ii18nInformativeRadioGroupFormField
+  extends Ii18nFormFieldBase {
+  type: typeof INFORMATIVE_RADIO_GROUP
+  information: Infomation
+  options: RadioComponentOption[]
+}
+
 export interface Ii18nTextFormField extends Ii18nFormFieldBase {
   type: typeof TEXT
 }
@@ -234,12 +274,16 @@ export interface Ii18nImageUploaderWithOptionsFormField
   optionSection: IFormSection
 }
 
+export interface Ii18nWarningField extends Ii18nFormFieldBase {
+  type: typeof WARNING
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
   | Ii18nNumberFormField
   | Ii18nSelectFormField
   | Ii18nRadioGroupFormField
+  | Ii18nInformativeRadioGroupFormField
   | Ii18nCheckboxGroupFormField
   | Ii18nDateFormField
   | Ii18nTextareaFormField
@@ -248,6 +292,7 @@ export type Ii18nFormField =
   | Ii18nListFormField
   | Ii18nParagraphFormField
   | Ii18nImageUploaderWithOptionsFormField
+  | Ii18nWarningField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
