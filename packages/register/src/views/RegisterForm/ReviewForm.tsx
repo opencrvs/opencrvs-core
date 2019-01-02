@@ -44,7 +44,10 @@ import {
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
     fetchBirthRegistration(id: $id) {
+      _fhirIDMap
+      id
       child {
+        id
         name {
           use
           firstNames
@@ -54,6 +57,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         gender
       }
       mother {
+        id
         name {
           use
           firstNames
@@ -83,6 +87,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         }
       }
       father {
+        id
         name {
           use
           firstNames
@@ -111,6 +116,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         }
       }
       registration {
+        _fhirID
         contact
         attachments {
           data
@@ -243,6 +249,9 @@ export class ReviewFormView extends React.Component<IProps> {
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
     childDetails.typeOfBirth = reg.birthType
+    if (reg.id) {
+      childDetails._fhirID = reg.id
+    }
 
     return childDetails
   }
@@ -275,6 +284,10 @@ export class ReviewFormView extends React.Component<IProps> {
 
     this.tramsformAddress(addresses, motherDetails)
 
+    if (mother.id) {
+      motherDetails._fhirID = mother.id
+    }
+
     return motherDetails
   }
 
@@ -304,6 +317,10 @@ export class ReviewFormView extends React.Component<IProps> {
     const addresses = father.address as GQLAddress[]
 
     this.tramsformAddress(addresses, fatherDetails)
+
+    if (father.id) {
+      fatherDetails._fhirID = father.id
+    }
 
     return fatherDetails
   }
@@ -363,6 +380,10 @@ export class ReviewFormView extends React.Component<IProps> {
 
     registrationDetails.paperFormNumber = registration.paperFormID
 
+    if (registration._fhirID) {
+      registrationDetails._fhirID = registration._fhirID
+    }
+
     return registrationDetails
   }
 
@@ -411,12 +432,14 @@ export class ReviewFormView extends React.Component<IProps> {
     const registration = this.transformRegistration(reg)
 
     const documents = this.transformDocuments(reg)
+
     const reviewData = {
       child,
       mother,
       father,
       documents,
-      registration
+      registration,
+      _fhirID: reg.id
     }
 
     return reviewData

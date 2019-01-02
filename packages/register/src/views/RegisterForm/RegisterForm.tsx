@@ -159,6 +159,7 @@ type FullProps = IFormProps &
 
 type State = {
   showSubmitModal: boolean
+  showRegisterModal: boolean
   rejectFormOpen: boolean
   selectedTabId: string
 }
@@ -166,6 +167,11 @@ type State = {
 const postMutation = gql`
   mutation submitBirthRegistration($details: BirthRegistrationInput!) {
     createBirthRegistration(details: $details)
+  }
+`
+const patchMutation = gql`
+  mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput) {
+    markBirthAsRegistered(id: $id, details: $details)
   }
 `
 const VIEW_TYPE = {
@@ -209,7 +215,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.state = {
       showSubmitModal: false,
       selectedTabId: '',
-      rejectFormOpen: false
+      rejectFormOpen: false,
+      showRegisterModal: false
     }
   }
 
@@ -249,13 +256,28 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.props.deleteDraft(draft)
   }
 
+  successfullyRegistered = () => {
+    window.location.href = '/work-queue'
+  }
+
   submitForm = () => {
     this.setState({ showSubmitModal: true })
+  }
+
+  registerApplication = () => {
+    console.log(this.props.draft)
+    this.setState({ showRegisterModal: true })
   }
 
   toggleSubmitModalOpen = () => {
     this.setState((prevState: State) => ({
       showSubmitModal: !prevState.showSubmitModal
+    }))
+  }
+
+  toggleRegisterModalOpen = () => {
+    this.setState((prevState: State) => ({
+      showRegisterModal: !prevState.showRegisterModal
     }))
   }
 
@@ -372,9 +394,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 rejectApplicationClickEvent={() => {
                   this.toggleRejectForm()
                 }}
-                registerClickEvent={() => {
-                  alert('Register')
-                }}
+                registerClickEvent={this.registerApplication}
               />
             )}
             {activeSection.viewType === 'form' && (
@@ -428,7 +448,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
             if (data && data.createBirthRegistration) {
               this.successfulSubmission(data.createBirthRegistration)
             }
-
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -454,6 +473,48 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 ]}
                 show={this.state.showSubmitModal}
                 handleClose={this.toggleSubmitModalOpen}
+              >
+                {intl.formatMessage(messages.submitDescription)}
+              </Modal>
+            )
+          }}
+        </Mutation>
+
+        <Mutation
+          mutation={patchMutation}
+          variables={{ id: draft.id /*, details: this.processSubmitData()*/ }}
+        >
+          {(markBirthAsRegistered, { data }) => {
+            if (data && data.markBirthAsRegistered) {
+              console.log(markBirthAsRegistered, data)
+              this.successfullyRegistered()
+            }
+
+            return (
+              <Modal
+                title="Are you ready to submit?"
+                actions={[
+                  <PrimaryButton
+                    key="register"
+                    id="register_confirm"
+                    onClick={() => markBirthAsRegistered()}
+                  >
+                    {intl.formatMessage(messages.submitButton)}
+                  </PrimaryButton>,
+                  <PreviewButton
+                    key="review"
+                    onClick={() => {
+                      this.toggleSubmitModalOpen()
+                      if (document.documentElement) {
+                        document.documentElement.scrollTop = 0
+                      }
+                    }}
+                  >
+                    {intl.formatMessage(messages.preview)}
+                  </PreviewButton>
+                ]}
+                show={this.state.showRegisterModal}
+                handleClose={this.toggleRegisterModalOpen}
               >
                 {intl.formatMessage(messages.submitDescription)}
               </Modal>

@@ -96,6 +96,9 @@ export const typeResolvers: GQLResolver = {
   },
 
   Registration: {
+    _fhirID: task => {
+      return task.id
+    },
     async trackingId(task: fhir.Task) {
       const foundIdentifier =
         task.identifier &&
@@ -333,6 +336,20 @@ export const typeResolvers: GQLResolver = {
   },
 
   BirthRegistration: {
+    async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+      // Preparing Encounter
+      const encounterResult = await fetchFHIR(
+        `/Task?focus=Composition/${composition.id}`,
+        authHeader
+      )
+      return {
+        composition: composition.id,
+        encounter: encounterResult,
+        observation: {
+          birthType: 'S?OME VALUE'
+        }
+      }
+    },
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
