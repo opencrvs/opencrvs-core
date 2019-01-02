@@ -9,7 +9,8 @@ import {
   CheckboxGroup,
   DateField,
   TextArea,
-  SubSectionDivider
+  SubSectionDivider,
+  WarningMessage
 } from '@opencrvs/components/lib/forms'
 import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
@@ -39,7 +40,9 @@ import {
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
-  TEL
+  TEL,
+  INFORMATIVE_RADIO_GROUP,
+  WARNING
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -48,6 +51,7 @@ import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
+import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -131,6 +135,19 @@ function GeneratedInputField({
       </InputField>
     )
   }
+
+  if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
+    return (
+      <InformativeRadioGroup
+        inputProps={inputProps}
+        value={value as string}
+        onSetFieldValue={onSetFieldValue}
+        fieldDefinition={fieldDefinition}
+        inputFieldProps={inputFieldProps}
+      />
+    )
+  }
+
   if (fieldDefinition.type === CHECKBOX_GROUP) {
     return (
       <InputField {...inputFieldProps}>
@@ -201,6 +218,11 @@ function GeneratedInputField({
       </InputField>
     )
   }
+
+  if (fieldDefinition.type === WARNING) {
+    return <WarningMessage>{fieldDefinition.label}</WarningMessage>
+  }
+
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
     return (
       <ImageUploadField

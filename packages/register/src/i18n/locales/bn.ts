@@ -646,6 +646,8 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
     'register.workQueue.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
+    'print.certificate.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
+    'print.certificate.confirm': 'নিশ্চিত করুন',
     'register.workQueue.dataTable.results': 'ফলাফল',
     'register.workQueue.dataTable.noResults': 'প্রদর্শন ফলাফল নেই',
     'register.workQueue.header.title': 'হ্যালো নিবন্ধক',
@@ -654,14 +656,35 @@ export const BENGALI_STATE = {
     'register.workQueue.buttons.newRegistration': 'নতুন জন্ম নিবন্ধন',
     'register.workQueue.buttons.reviewAndRegister': 'পর্যালোচনা এবং নিবন্ধন',
     'register.workQueue.list.buttons.review': 'পর্যালোচনা',
+    'register.workQueue.list.buttons.print': 'মুদ্রণ',
+    'register.workQueue.title.certificateCollection': 'সার্টিফিকেট সংগ্রহ',
+    'register.workQueue.list.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
     'register.workQueue.listItem.status.dateLabel.application': 'আবেদন জমা',
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.collected': 'সংগৃহীত',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
+    'register.workQueue.print.form.name': 'মুদ্রণ',
+    'register.workQueue.print.form.title': 'সার্টিফিকেট মুদ্রণ',
+    'formFields.print.whoToCollect': 'কে সার্টিফিকেট সংগ্রহ করছে?',
+    'register.workQueue.print.collector.mother': 'মা',
+    'register.workQueue.print.collector.father': 'পিতা',
+    'register.workQueue.print.collector.other': 'অন্যান্য',
+    'formFields.print.confirmMotherInformation':
+      'আইডি নথি তাদের প্রমাণ নিম্নলিখিত বিবরণ মেলে?',
+    'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',
+    'formFields.print.otherPersonFamilyName': 'পারিবারিক নাম',
+    'formFields.print.signedAffidavit': 'তার একটি স্বাক্ষরিত হলফনামা আছে?',
+    'formFields.print.documentNumber': 'ডকুমেন্ট সংখ্যা',
+    'formFields.print.warningNotVerified':
+      'দয়া করে সচেতন থাকুন যে আপনি যদি অগ্রসর হন তবে সংগ্রাহক থেকে ID এর প্রয়োজনীয় প্রমাণ ছাড়াই আপনি একটি শংসাপত্র দেওয়ার জন্য দায়বদ্ধ হবেন।',
+    'formFields.print.otherPersonPrompt':
+      'যেহেতু রেকর্ডে এই ব্যক্তির কোন বিবরণ নেই, তাদের বিবরণ নিতে হবে:',
+
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',
+    'register.workQueue.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
     'review.edit.modal.confirmationText':
@@ -686,6 +709,15 @@ export const BENGALI_STATE = {
     'review.form.deleteApplication': 'আবেদন মুছে দিন',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হাঁ',
-    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?'
+    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
+    'certificate.parent.details.label.firstName': 'নামের প্রথম অংশ',
+    'certificate.parent.details.label.familyName': 'পরিবারের নাম',
+    'certificate.parent.details.label.firstNameInEng':
+      'নামের প্রথম অংশ(ইংরেজি)',
+    'certificate.parent.details.label.familyNameInEng': 'পরিবারের নাম(ইংরেজি)',
+    'certificate.parent.details.label.dateOfBirth': 'জন্ম তারিখ',
+    'certificate.parent.details.label.nationality': 'জাতীয়তা',
+    'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
+    'certificate.parent.details.label.number': 'সংখ্যা'
   }
 }

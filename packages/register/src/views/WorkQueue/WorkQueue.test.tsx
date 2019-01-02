@@ -461,6 +461,7 @@ describe('WorkQueue tests', async () => {
           .find('#printCertificate_B111111')
           .hostNodes().length
       ).toBe(1)
+
       testComponent.component.unmount()
     })
   })
