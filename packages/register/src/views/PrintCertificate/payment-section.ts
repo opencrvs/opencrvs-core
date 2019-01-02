@@ -47,6 +47,7 @@ export const paymentFormSection: IFormSection = {
       label: messages.paymentMethod,
       disabled: true,
       initialValue: 'MANUAL',
+      required: true,
       validate: [],
       options: [{ value: 'MANUAL', label: messages.manualPaymentMethod }]
     },
