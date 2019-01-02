@@ -202,7 +202,11 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === PARAGRAPH) {
-    return <Paragraph>{fieldDefinition.label}</Paragraph>
+    return (
+      <Paragraph fontSize={fieldDefinition.fontSize}>
+        {fieldDefinition.label}
+      </Paragraph>
+    )
   }
   if (fieldDefinition.type === LIST) {
     return <FormList list={fieldDefinition.items} />

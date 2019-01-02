@@ -2,8 +2,7 @@ import {
   IFormSection,
   ViewType,
   SELECT_WITH_OPTIONS,
-  PARAGRAPH,
-  SUBSECTION
+  PARAGRAPH
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 
@@ -45,7 +44,6 @@ export const paymentFormSection: IFormSection = {
       name: 'paymentMethod',
       type: SELECT_WITH_OPTIONS,
       label: messages.paymentMethod,
-      disabled: true,
       initialValue: 'MANUAL',
       required: true,
       validate: [],
@@ -60,9 +58,10 @@ export const paymentFormSection: IFormSection = {
     },
     {
       name: 'paymentAmount',
-      type: SUBSECTION,
+      type: PARAGRAPH,
       label: messages.paymentAmount,
       initialValue: '',
+      fontSize: 'h1FontStyle',
       required: false,
       validate: []
     }

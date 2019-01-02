@@ -10,7 +10,7 @@ import {
   IFormSection,
   IFormSectionData,
   INFORMATIVE_RADIO_GROUP,
-  SUBSECTION
+  PARAGRAPH
 } from 'src/forms'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
@@ -244,7 +244,7 @@ class PrintCertificateActionComponent extends React.Component<
                 paymentFormSection.fields.map(field => {
                   if (
                     field &&
-                    field.type === SUBSECTION &&
+                    field.type === PARAGRAPH &&
                     field.name === 'paymentAmount'
                   ) {
                     field.label = paymentAmountLabel
