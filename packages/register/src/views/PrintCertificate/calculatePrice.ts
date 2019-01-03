@@ -1,4 +1,5 @@
 const DAY: number = 1000 * 60 * 60 * 24
+const MONTH_IN_DAYS: number = 30
 const YEAR_IN_DAYS: number = 365
 
 function parseDate(dateString: string) {
@@ -27,6 +28,39 @@ export function calculateDays(dob: string) {
   )
 
   return differenceInDays
+}
+
+interface ITimeInWordsProps {
+  days: number
+  language: string
+  monthString: string
+  yearString: string
+}
+
+export function timeElapsedInWords(props: ITimeInWordsProps) {
+  const { days, language, monthString, yearString } = props
+
+  let output: string = ''
+  let pluralChar = ''
+
+  const year = Math.round(days / YEAR_IN_DAYS)
+  const month = Math.round(days / MONTH_IN_DAYS)
+
+  if (year > 0) {
+    if (year > 1 && language === 'en') {
+      pluralChar = 's'
+    }
+    output = `${year} ${yearString}${pluralChar}`
+  } else if (month > 0) {
+    if (month > 1 && language === 'en') {
+      pluralChar = 's'
+    }
+    output = `${month} ${monthString}${pluralChar}`
+  } else {
+    output = `${days}`
+  }
+
+  return output
 }
 
 interface IRange {

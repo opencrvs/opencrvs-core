@@ -12,11 +12,16 @@ import {
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH
 } from 'src/forms'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, IconAction } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { hasFormError } from 'src/forms/utils'
-import { calculatePrice } from './calculatePrice'
+import {
+  calculatePrice,
+  timeElapsedInWords,
+  calculateDays
+} from './calculatePrice'
+import { Draft } from '@opencrvs/components/lib/icons'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -47,16 +52,57 @@ const ErrorText = styled.div`
 const FormContainer = styled.div`
   padding: 35px 25px;
 `
+const Column = styled.div`
+  margin: 5px 0px;
+  width: 100%;
+
+  &:first-child {
+    margin-left: 0px;
+  }
+  &:last-child {
+    margin-right: 0px;
+  }
+`
+
 const ButtonContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.inputBackground};
   padding: 25px;
-  margin-top: 5px;
   margin-bottom: 2px;
 `
 const StyledPrimaryButton = styled(PrimaryButton)`
   font-weight: 600;
 `
 
+const StyledIconAction = styled(IconAction)`
+  background-color: transparent;
+  box-shadow: none;
+  min-height: auto;
+  padding: 0px;
+  width: auto;
+  div:first-of-type {
+    height: 50px;
+    background-color: ${({ theme }) => theme.colors.saveDraftBtn};
+    padding: 0px;
+  }
+  h3 {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+    margin-left: 70px;
+    color: ${({ theme }) => theme.colors.secondary};
+    text-decoration: underline;
+    font-size: 16px;
+  }
+  &:disabled {
+    div:first-of-type {
+      background: ${({ theme }) => theme.colors.disabledButton};
+    }
+    g {
+      fill: ${({ theme }) => theme.colors.disabled};
+    }
+    h3 {
+      color: ${({ theme }) => theme.colors.disabled};
+    }
+  }
+`
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
     fetchBirthRegistration(id: $id) {
@@ -105,6 +151,26 @@ const messages = defineMessages({
     defaultMessage: 'Confirm',
     description:
       'The label for confirm button when all information of the collector is provided'
+  },
+  printReceipt: {
+    id: 'print.certificate.printReceipt',
+    defaultMessage: 'Print receipt',
+    description: 'The label for print receipt button'
+  },
+  next: {
+    id: 'print.certificate.next',
+    defaultMessage: 'Next',
+    description: 'The label for next button'
+  },
+  year: {
+    id: 'print.certificate.year',
+    defaultMessage: 'year',
+    description: 'The label for year text in paragraph'
+  },
+  month: {
+    id: 'print.certificate.month',
+    defaultMessage: 'month',
+    description: 'The label for month text in paragraph'
   }
 })
 
@@ -118,6 +184,7 @@ type IProps = {
   backLabel: string
   title: string
   registrationId: string
+  language: string
   togglePrintCertificateSection: () => void
   printCertificateFormSection: IFormSection
   paymentFormSection: IFormSection
@@ -167,6 +234,51 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
+  getFormAction = (formID: string) => {
+    const { intl } = this.props
+    const { enableConfirmButton } = this.state
+
+    switch (formID) {
+      case COLLECT_CERTIFICATE:
+        return (
+          <ButtonContainer>
+            <StyledPrimaryButton
+              id="print-confirm-button"
+              disabled={!enableConfirmButton}
+              onClick={this.onConfirmForm}
+            >
+              {intl.formatMessage(messages.confirm)}
+            </StyledPrimaryButton>
+          </ButtonContainer>
+        )
+      case PAYMENT:
+        return (
+          <>
+            <ButtonContainer>
+              <StyledIconAction
+                id="print-receipt"
+                title={intl.formatMessage(messages.printReceipt)}
+                icon={() => <Draft />}
+                onClick={() => console.log('clicked')}
+              />
+            </ButtonContainer>
+
+            <ButtonContainer>
+              <StyledPrimaryButton
+                id="payment-confirm-button"
+                disabled={!enableConfirmButton}
+                onClick={this.onConfirmForm}
+              >
+                {intl.formatMessage(messages.next)}
+              </StyledPrimaryButton>
+            </ButtonContainer>
+          </>
+        )
+      default:
+        return null
+    }
+  }
+
   onConfirmForm = () => {
     const { formID } = this.state
     let destForm = COLLECT_CERTIFICATE
@@ -191,7 +303,7 @@ class PrintCertificateActionComponent extends React.Component<
       paymentFormSection
     } = this.props
 
-    const { enableConfirmButton, formID } = this.state
+    const { formID } = this.state
     const form = this.getForm(formID)
 
     return (
@@ -235,11 +347,15 @@ class PrintCertificateActionComponent extends React.Component<
                 const paymentAmount = calculatePrice(
                   data.fetchBirthRegistration.child.birthDate
                 )
-                const paymentAmountLabel = {
-                  id: 'register.workQueue.print.paymentAmount',
-                  defaultMessage: `\u09F3 ${paymentAmount}`,
-                  description: 'The label for payment amount subsection'
-                }
+
+                const timeDuration = timeElapsedInWords({
+                  days: calculateDays(
+                    data.fetchBirthRegistration.child.birthDate
+                  ),
+                  yearString: intl.formatMessage(messages.year),
+                  monthString: intl.formatMessage(messages.month),
+                  language: this.props.language
+                })
 
                 paymentFormSection.fields.map(field => {
                   if (
@@ -247,10 +363,20 @@ class PrintCertificateActionComponent extends React.Component<
                     field.type === PARAGRAPH &&
                     field.name === 'paymentAmount'
                   ) {
-                    field.label = paymentAmountLabel
                     field.initialValue = paymentAmount
                   }
                 })
+
+                paymentFormSection.fields.map(field => {
+                  if (
+                    field &&
+                    field.type === PARAGRAPH &&
+                    field.name === 'service'
+                  ) {
+                    field.initialValue = timeDuration
+                  }
+                })
+
                 return (
                   <FormContainer>
                     <Box>
@@ -261,17 +387,10 @@ class PrintCertificateActionComponent extends React.Component<
                         fields={form.fields}
                       />
                     </Box>
-                    {this.state.data.personCollectingCertificate && (
-                      <ButtonContainer>
-                        <StyledPrimaryButton
-                          id="print-confirm-button"
-                          disabled={!enableConfirmButton}
-                          onClick={this.onConfirmForm}
-                        >
-                          {intl.formatMessage(messages.confirm)}
-                        </StyledPrimaryButton>
-                      </ButtonContainer>
-                    )}
+                    <Column>
+                      {this.state.data.personCollectingCertificate &&
+                        this.getFormAction(this.state.formID)}
+                    </Column>
                   </FormContainer>
                 )
               }
@@ -293,5 +412,6 @@ class PrintCertificateActionComponent extends React.Component<
 }
 
 export const PrintCertificateAction = connect((state: IStoreState) => ({
+  language: state.i18n.language,
   paymentFormSection: state.printCertificateForm.paymentForm
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))

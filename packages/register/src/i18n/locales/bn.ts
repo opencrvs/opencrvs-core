@@ -680,7 +680,18 @@ export const BENGALI_STATE = {
       'দয়া করে সচেতন থাকুন যে আপনি যদি অগ্রসর হন তবে সংগ্রাহক থেকে ID এর প্রয়োজনীয় প্রমাণ ছাড়াই আপনি একটি শংসাপত্র দেওয়ার জন্য দায়বদ্ধ হবেন।',
     'formFields.print.otherPersonPrompt':
       'যেহেতু রেকর্ডে এই ব্যক্তির কোন বিবরণ নেই, তাদের বিবরণ নিতে হবে:',
-
+    'register.workQueue.print.payment': 'মূল্যপরিশোধ',
+    'register.workQueue.print.paymentMethod': 'মূল্যপরিশোধ পদ্ধতি',
+    'register.workQueue.print.manualPaymentMethod': 'হস্তকৃত',
+    'register.workQueue.print.collectPayment':
+      'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
+    'register.workQueue.print.service':
+      'সেবা: জন্মদিবসের {service} পরে জন্ম নিবন্ধন',
+    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
+    'print.certificate.next': 'পরবর্তী',
+    'print.certificate.year': 'বছর',
+    'print.certificate.month': 'মাস',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',

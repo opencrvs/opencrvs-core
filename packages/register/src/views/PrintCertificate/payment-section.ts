@@ -28,9 +28,14 @@ const messages = defineMessages({
       'Please collect the payment, print the receipt and hand it over to the payee.',
     description: 'The label for collect payment paragraph'
   },
+  service: {
+    id: 'register.workQueue.print.service',
+    defaultMessage: 'Service: Birth registration after {service} of D.o.B.',
+    description: 'The label for service paragraph'
+  },
   paymentAmount: {
     id: 'register.workQueue.print.paymentAmount',
-    defaultMessage: `\u09F3 5.00`,
+    defaultMessage: '\u09F3 {paymentAmount}',
     description: 'The label for payment amount subsection'
   }
 })
@@ -53,6 +58,13 @@ export const paymentFormSection: IFormSection = {
       name: 'collectPayment',
       type: PARAGRAPH,
       label: messages.collectPayment,
+      initialValue: '',
+      validate: []
+    },
+    {
+      name: 'service',
+      type: PARAGRAPH,
+      label: messages.service,
       initialValue: '',
       validate: []
     },
