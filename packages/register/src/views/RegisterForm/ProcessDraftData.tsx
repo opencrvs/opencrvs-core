@@ -1,10 +1,5 @@
 import { IFormData, IFormSectionData } from '../../forms'
 
-export interface IHumanName {
-  use: string
-  firstNames: string
-  familyName: string
-}
 export interface IPersonDetails {
   [key: string]: any
 }
