@@ -550,13 +550,13 @@ export const ENGLISH_STATE = {
       'The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.',
     'register.savedRegistration.nextCard.title': 'What next?',
     'register.savedRegistration.online.nextCard.text1':
-      'You will be notified through OpenCRVS when application is complete or if there are any delays in the process.',
+      'You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.',
     'register.savedRegistration.offline.nextCard.text1':
       'All you need to do is login once you have internet connectivity on your device within the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.',
     'register.savedRegistration.online.nextCard.text2':
-      'The informant has given their contact details and will also be informed when the application is complete.',
+      'The informant has given their contact details and will also be informed when the registration is complete.',
     'register.savedRegistration.offline.nextCard.text2':
-      'Once the application is succesfully submited, you and the informant will be notified when the application is complete.',
+      'Once the application is succesfully submited, you and the informant will be notified when the registration is complete.',
     'register.completeRegistration.nextCard.text1':
       'The registration process is complete.',
     'register.completeRegistration.nextCard.text2':
