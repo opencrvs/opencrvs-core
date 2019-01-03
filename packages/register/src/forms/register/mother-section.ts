@@ -190,7 +190,7 @@ export const motherSection: IFormSection = {
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'motherBirthDate',
+      name: 'birthDate',
       type: DATE,
       label: messages.motherDateOfBirth,
       required: false,

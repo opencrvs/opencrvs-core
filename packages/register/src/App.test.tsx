@@ -668,15 +668,15 @@ describe('when user has a valid token in local storage', () => {
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
-      orderOfBirth: '2',
-      placeOfDelivery: 'HOSPITAL',
-      typeOfBirth: 'SINGLE',
+      multipleBirth: '2',
+      placeOfBirth: 'HOSPITAL',
+      birthType: 'SINGLE',
       weightAtBirth: '10'
     }
 
@@ -689,7 +689,7 @@ describe('when user has a valid token in local storage', () => {
       country: 'BGD',
       countryPermanent: 'BGD',
       currentAddress: '',
-      fatherBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       familyName: 'ইসলাম',
@@ -711,7 +711,7 @@ describe('when user has a valid token in local storage', () => {
       firstNamesEng: 'Rokeya',
       maritalStatus: 'MARRIED',
       dateOfMarriage: '2010-10-10',
-      motherBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       addressLine1: 'Rd #10',
       addressLine1Permanent: 'Rd#10',

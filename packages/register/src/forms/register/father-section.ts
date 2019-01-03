@@ -227,7 +227,7 @@ export const fatherSection: IFormSection = {
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherBirthDate',
+      name: 'birthDate',
       type: DATE,
       label: messages.fatherDateOfBirth,
       required: false,

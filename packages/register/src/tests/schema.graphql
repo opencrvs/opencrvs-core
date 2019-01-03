@@ -57,6 +57,7 @@ type BirthRegistration {
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   presentAtBirthRegistration: BirthRegPresence
+  placeOfBirth: Address
   birthLocation: Location
   birthRegistrationType: BirthRegType
   createdAt: Date
@@ -73,6 +74,7 @@ input BirthRegistrationInput {
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   presentAtBirthRegistration: BirthRegPresence
+  placeOfBirth: AddressInput
   birthLocation: LocationInput
   birthRegistrationType: BirthRegType
   createdAt: Date
