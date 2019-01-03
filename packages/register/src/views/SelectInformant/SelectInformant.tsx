@@ -12,7 +12,7 @@ import { createDraft, storeDraft } from '../../drafts'
 export const messages = defineMessages({
   newBirthRegistration: {
     id: 'register.selectInformant.newBirthRegistration',
-    defaultMessage: 'New birth declaration',
+    defaultMessage: 'New birth application',
     description: 'The message that appears for new birth registrations'
   },
   informantTitle: {
@@ -108,14 +108,15 @@ export class SelectInformantView extends React.Component<
   }
 }
 
-export const SelectInformant = connect(null, function mapDispatchToProps(
-  dispatch: Dispatch
-) {
-  return {
-    goToBirthRegistrationAsParent: () => {
-      const draft = createDraft()
-      dispatch(storeDraft(draft))
-      dispatch(goToBirthRegistrationAsParent(draft.id))
+export const SelectInformant = connect(
+  null,
+  function mapDispatchToProps(dispatch: Dispatch) {
+    return {
+      goToBirthRegistrationAsParent: () => {
+        const draft = createDraft()
+        dispatch(storeDraft(draft))
+        dispatch(goToBirthRegistrationAsParent(draft.id))
+      }
     }
   }
-})(injectIntl(SelectInformantView))
+)(injectIntl(SelectInformantView))

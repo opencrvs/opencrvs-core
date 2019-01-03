@@ -461,10 +461,9 @@ export const ENGLISH_STATE = {
       'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
     'register.form.section.documents.list.otherDocuments':
       'Attested copy(s) of the document as prescribed by the Registrar',
-    'register.form.tabs.registrationTab': 'Registration',
-    'register.form.section.registrationTitle': 'Registration',
-    'formFields.registration.whoIsPresent':
-      "Who's present for the registration",
+    'register.form.tabs.registrationTab': 'Application',
+    'register.form.section.registrationTitle': 'Application',
+    'formFields.registration.whoIsPresent': "Who's present for the application",
     'formFields.registration.whoIsPresent.both': 'Both Parents',
     'formFields.registration.whoIsPresent.mother': 'Mother',
     'formFields.registration.whoIsPresent.father': 'Father',
@@ -485,13 +484,7 @@ export const ENGLISH_STATE = {
     'formFields.registration.certificateLanguage.other': 'Other',
     'formFields.registration.commentsOrNotes': 'Comments or notes',
     'formFields.registration.commentsOrNotes.description':
-      'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.',
-    'login.stepOneTitle': 'Login to OpenCRVS',
-    'login.stepOneInstruction': 'Please enter your mobile number and password.',
-    'login.mobileNumberLabel': 'Mobile number',
-    'login.mobileNumberPlaceholder': 'e.g: +44-7XXX-XXXXXX',
-    'login.passwordLabel': 'Password',
-    'login.submit': 'Submit',
+      'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
@@ -505,9 +498,9 @@ export const ENGLISH_STATE = {
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
-    'register.form.newBirthRegistration': 'New birth declaration',
+    'register.form.newBirthRegistration': 'New birth application',
     'register.form.previewBirthRegistration': 'Birth Application Preview',
-    'register.form.reviewBirthRegistration': 'Birth Application Review',
+    'register.form.reviewBirthRegistration': 'Birth Registration Review',
     'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
@@ -524,8 +517,8 @@ export const ENGLISH_STATE = {
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
-      'As you have connectivity, we have synced {syncCount} new birth declarations.',
-    'register.savedRegistration.online.title': 'Declaration submitted',
+      'As you have connectivity, we have synced {syncCount} new birth applications.',
+    'register.savedRegistration.online.title': 'Application submitted',
     'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'Registration complete',
     'register.savedRegistration.online.desc':
@@ -552,18 +545,18 @@ export const ENGLISH_STATE = {
     'register.completeRegistration.trackingCard.title':
       'Birth Registration Number:',
     'register.savedRegistration.trackingCard.text':
-      'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',
+      'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their application.',
     'register.savedRegistration.registrationNumber.text':
       'The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.',
     'register.savedRegistration.nextCard.title': 'What next?',
     'register.savedRegistration.online.nextCard.text1':
-      'You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.',
+      'You will be notified through OpenCRVS when application is complete or if there are any delays in the process.',
     'register.savedRegistration.offline.nextCard.text1':
       'All you need to do is login once you have internet connectivity on your device within the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.',
     'register.savedRegistration.online.nextCard.text2':
-      'The informant has given their contact details and will also be informed when the registration is complete.',
+      'The informant has given their contact details and will also be informed when the application is complete.',
     'register.savedRegistration.offline.nextCard.text2':
-      'Once the application is succesfully submited, you and the informant will be notified when the registration is complete.',
+      'Once the application is succesfully submited, you and the informant will be notified when the application is complete.',
     'register.completeRegistration.nextCard.text1':
       'The registration process is complete.',
     'register.completeRegistration.nextCard.text2':
