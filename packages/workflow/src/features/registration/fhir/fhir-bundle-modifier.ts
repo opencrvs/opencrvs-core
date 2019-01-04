@@ -8,7 +8,11 @@ import {
 import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
 import { ITokenPayload, getTokenPayload } from 'src/utils/authUtils.ts'
-import { REG_STATUS_REGISTERED, REG_STATUS_CERTIFIED } from './constants'
+import {
+  REG_STATUS_DECLARED,
+  REG_STATUS_REGISTERED,
+  REG_STATUS_CERTIFIED
+} from './constants'
 import { generateBirthRegistrationNumber } from '../brnGenerator'
 
 export async function modifyRegistrationBundle(
@@ -32,7 +36,11 @@ export async function modifyRegistrationBundle(
   setupRegistrationType(taskResource, eventType)
 
   /* setting registration workflow status here */
-  setupRegistrationWorkflow(taskResource, getTokenPayload(token))
+  setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_DECLARED
+  )
 
   const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */

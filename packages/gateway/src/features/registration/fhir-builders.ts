@@ -1391,7 +1391,9 @@ const builders: IFieldBuilders = {
         if (!certDocResource.content) {
           certDocResource.content = [
             {
-              attachment: {}
+              attachment: {
+                contentType: 'application/pdf'
+              }
             }
           ]
         }

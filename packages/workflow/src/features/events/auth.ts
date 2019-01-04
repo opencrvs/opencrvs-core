@@ -12,7 +12,7 @@ function getEventToScopeMap() {
     [Events.BIRTH_NEW_REG]: [],
     [Events.BIRTH_UPDATE_DEC]: [],
     [Events.BIRTH_MARK_REG]: [Scopes.REGISTER],
-    [Events.BIRTH_MARK_CERT]: [],
+    [Events.BIRTH_MARK_CERT]: [Scopes.CERTIFY],
     [Events.BIRTH_MARK_VOID]: [Scopes.DECLARE, Scopes.REGISTER, Scopes.CERTIFY]
   }
 }

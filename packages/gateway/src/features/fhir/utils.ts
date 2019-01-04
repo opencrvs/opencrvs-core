@@ -361,7 +361,7 @@ export function selectOrCreateRelatedPersonResource(
     fhirBundle.entry.push(relatedPersonEntry)
     docRef.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
-      valueReference: relatedPersonEntry as fhir.Reference
+      valueReference: relatedPersonEntry.fullUrl as fhir.Reference
     })
     return relatedPersonEntry.resource
   } else {
