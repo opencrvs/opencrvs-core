@@ -14,7 +14,7 @@ import {
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH
 } from './'
-import { InjectedIntl, MessageValue } from 'react-intl'
+import { InjectedIntl } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 
 export const internationaliseFieldObject = (
@@ -23,14 +23,9 @@ export const internationaliseFieldObject = (
 ): Ii18nFormField => {
   const base = {
     ...field,
-    label: intl.formatMessage(field.label),
+    label:
+      field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
     description: field.description && intl.formatMessage(field.description)
-  }
-
-  if (base.type === PARAGRAPH) {
-    base.label = intl.formatMessage(field.label, {
-      [field.name]: field.initialValue as MessageValue
-    })
   }
 
   if (

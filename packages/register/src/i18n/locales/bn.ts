@@ -686,7 +686,7 @@ export const BENGALI_STATE = {
     'register.workQueue.print.collectPayment':
       'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
     'register.workQueue.print.service':
-      'সেবা: জন্মদিবসের {service} পরে জন্ম নিবন্ধন',
+      'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',

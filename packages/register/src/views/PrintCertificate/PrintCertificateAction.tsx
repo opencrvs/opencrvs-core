@@ -21,7 +21,7 @@ import {
   timeElapsedInWords,
   calculateDays
 } from './calculatePrice'
-import { Draft } from '@opencrvs/components/lib/icons'
+import { Print } from '@opencrvs/components/lib/icons'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -72,7 +72,10 @@ const ButtonContainer = styled.div`
 const StyledPrimaryButton = styled(PrimaryButton)`
   font-weight: 600;
 `
-
+const StyledPrintIcon = styled(Print)`
+  display: flex;
+  margin: -13px;
+`
 const StyledIconAction = styled(IconAction)`
   background-color: transparent;
   box-shadow: none;
@@ -81,7 +84,6 @@ const StyledIconAction = styled(IconAction)`
   width: auto;
   div:first-of-type {
     height: 50px;
-    background-color: ${({ theme }) => theme.colors.saveDraftBtn};
     padding: 0px;
   }
   h3 {
@@ -258,7 +260,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledIconAction
                 id="print-receipt"
                 title={intl.formatMessage(messages.printReceipt)}
-                icon={() => <Draft />}
+                icon={() => <StyledPrintIcon />}
                 onClick={() => console.log('clicked')}
               />
             </ButtonContainer>

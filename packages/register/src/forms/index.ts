@@ -199,6 +199,7 @@ export interface Ii18nFormFieldBase {
   validate: Validation[]
   required?: boolean
   prefix?: string
+  initialValue?: IFormFieldValue
   postfix?: string
   disabled?: boolean
   conditionals?: IConditional[]

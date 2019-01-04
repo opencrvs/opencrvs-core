@@ -1,7 +1,13 @@
 import * as React from 'react'
 import { withFormik, Field, FormikProps, FieldProps } from 'formik'
 import { isEqual } from 'lodash'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  InjectedIntlProps,
+  injectIntl,
+  FormattedHTMLMessage,
+  FormattedMessage,
+  MessageValue
+} from 'react-intl'
 import {
   TextInput,
   Select,
@@ -202,9 +208,16 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === PARAGRAPH) {
+    const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
+
     return (
       <Paragraph fontSize={fieldDefinition.fontSize}>
-        {fieldDefinition.label}
+        <FormattedHTMLMessage
+          {...label}
+          values={{
+            [fieldDefinition.name]: fieldDefinition.initialValue as MessageValue
+          }}
+        />
       </Paragraph>
     )
   }
