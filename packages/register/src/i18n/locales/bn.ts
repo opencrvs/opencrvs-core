@@ -718,6 +718,15 @@ export const BENGALI_STATE = {
     'certificate.parent.details.label.dateOfBirth': 'জন্ম তারিখ',
     'certificate.parent.details.label.nationality': 'জাতীয়তা',
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
-    'certificate.parent.details.label.number': 'সংখ্যা'
+    'certificate.parent.details.label.number': 'সংখ্যা',
+    'review.form.section.reviewTitle': 'পর্যালোচনা',
+    'validations.bengaliOnlyNameFormat': 'শুধুমাত্র বাংলা অক্ষর থাকতে হবে',
+    'validations.englishOnlyNameFormat': 'শুধুমাত্র ইংরেজি অক্ষর থাকা আবশ্যক',
+    'register.home.header.hello': 'হ্যালো {fullName}',
+    'review.birthRegistration.queryError':
+      'জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে',
+    'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
+    'register.workQueue.labels.results.birthRegistrationNumber':
+      'জন্ম নিবন্ধন সংখ্যা'
   }
 }
