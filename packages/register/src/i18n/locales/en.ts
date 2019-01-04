@@ -442,7 +442,10 @@ export const ENGLISH_STATE = {
     'formFields.motherEducationAttainment':
       "Mother's level of formal education attained",
     'formFields.optionalLabel': 'Optional',
-
+    'formFields.hospital': 'Hospital',
+    'formFields.otherHealthInstitution': 'Other Health Institution',
+    'formFields.privateHome': 'Private Home',
+    'formFields.otherInstitution': 'Other Institution',
     'register.form.tabs.documentsTab': 'Documents',
     'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
@@ -719,6 +722,17 @@ export const ENGLISH_STATE = {
     'certificate.parent.details.label.dateOfBirth': 'Date of Birth',
     'certificate.parent.details.label.nationality': 'Nationality',
     'certificate.parent.details.label.typeOfID': 'Type of ID',
-    'certificate.parent.details.label.number': 'Number'
+    'certificate.parent.details.label.number': 'Number',
+    'review.form.section.reviewTitle': 'Review',
+    'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
+    'validations.englishOnlyNameFormat': 'Must contain only English characters',
+    'register.home.header.hello': 'Hello {fullName}',
+    'register.form.valueYes': 'Yes',
+    'register.form.valueNo': 'No',
+    'review.birthRegistration.queryError':
+      'An error occurred while fetching birth registration',
+    'review.error.unauthorized': 'We are unable to display this page to you',
+    'register.workQueue.buttons.newRegistration': 'New birth application',
+    'register.workQueue.buttons.reviewAndRegister': 'Review and Register'
   }
 }
