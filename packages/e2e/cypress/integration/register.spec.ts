@@ -132,21 +132,6 @@ context('Register', () => {
     cy.get('#paperFormNumber').type('1')
     cy.get('#commentsOrNotes').type('note')
     cy.get('#next_section').click()
-    // DOCUMENTS
-      // then((picture) => {
-      //   return Cypress.Blob.base64StringToBlob(picture, 'image/jpg').then((blob) => {
-      //       dropEvent.dataTransfer.files.push(blob);
-      //   });
-      //  });
-
-  //  cy.fixture('images/cert.jpg').then((picture) => {
-  //      return Cypress.Blob.base64StringToBlob(picture, 'image/jpg').then((blob) => {
-  //          dropEvent.dataTransfer.files.push(blob);
-  //      });
-  //     });
-
-   // cy.get('#upload_document').trigger('drop', dropEvent);
-   // cy.get('#upload_document').click()
 
     cy.get('#next_section').click()
     // PREVIEW
