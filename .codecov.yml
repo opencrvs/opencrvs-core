@@ -24,8 +24,6 @@ coverage:
       register:
         paths:
           - packages/register
-        ignore:
-          - packages/register/src/extract-translations.ts
         threshold: 0.5
       performance:
         paths:
@@ -43,3 +41,5 @@ coverage:
         paths:
           - packages/workflow
         threshold: 0.5
+ignore:
+  - 'packages/register/src/extract-translations.ts'
