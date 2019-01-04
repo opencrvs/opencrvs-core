@@ -18,60 +18,29 @@ export const OBSERVATION_CATEGORY_PROCEDURE_CODE = 'procedure'
 export const OBSERVATION_CATEGORY_PROCEDURE_DESC = 'Procedure'
 export const OBSERVATION_CATEGORY_VSIGN_CODE = 'vital-signs'
 export const OBSERVATION_CATEGORY_VSIGN_DESC = 'Vital Signs'
+export const MOTHER_TITLE = "Mother's details"
+export const FATHER_TITLE = "Father's details"
+export const CHILD_TITLE = 'Child details'
 export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
 export const CERTIFICATE_DOCS_TITLE = 'Certificates'
+export const ATTACHMENT_CONTEXT_KEY = 'attachments'
+export const CERTIFICATE_CONTEXT_KEY = 'certificates'
 
-export function createMotherSection(refUuid: string) {
+export function createPersonSection(
+  refUuid: string,
+  sectionCode: string,
+  sectionTitle: string
+) {
   return {
-    title: "Mother's details",
+    title: sectionTitle,
     code: {
       coding: [
         {
           system: 'http://opencrvs.org/doc-sections',
-          code: 'mother-details'
+          code: sectionCode
         }
       ],
-      text: "Mother's details"
-    },
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
-  }
-}
-
-export function createFatherSection(refUuid: string) {
-  return {
-    title: "Father's details",
-    code: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/doc-sections',
-          code: 'father-details'
-        }
-      ],
-      text: "Father's details"
-    },
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
-  }
-}
-
-export function createChildSection(refUuid: string) {
-  return {
-    title: 'Child details',
-    code: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/doc-sections',
-          code: 'child-details'
-        }
-      ],
-      text: 'Child details'
+      text: sectionTitle
     },
     entry: [
       {
@@ -118,6 +87,25 @@ export function createEncounter(refUuid: string) {
       resourceType: 'Encounter',
       status: 'finished'
     } as fhir.Encounter
+  }
+}
+
+export function createRelatedPersonTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'RelatedPerson'
+    } as fhir.RelatedPerson
+  }
+}
+
+export function createPaymentReconciliationTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'PaymentReconciliation',
+      status: 'active'
+    } as fhir.PaymentReconciliation
   }
 }
 

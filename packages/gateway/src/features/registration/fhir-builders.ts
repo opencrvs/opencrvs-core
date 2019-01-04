@@ -9,7 +9,6 @@ import {
   BIRTH_ENCOUNTER_CODE,
   BIRTH_TYPE_CODE,
   ATTACHMENT_DOCS_CODE,
-  CERTIFICATE_DOCS_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
@@ -21,8 +20,11 @@ import {
   OBSERVATION_CATEGORY_PROCEDURE_DESC,
   OBSERVATION_CATEGORY_VSIGN_CODE,
   OBSERVATION_CATEGORY_VSIGN_DESC,
+  MOTHER_TITLE,
+  FATHER_TITLE,
+  CHILD_TITLE,
   ATTACHMENT_DOCS_TITLE,
-  CERTIFICATE_DOCS_TITLE
+  ATTACHMENT_CONTEXT_KEY
 } from 'src/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -32,17 +34,27 @@ import {
   selectOrCreateLocationRefResource,
   setObjectPropInResourceArray,
   getMaritalStatusCode,
-  selectOrCreateTaskRefResource
+  selectOrCreateTaskRefResource,
+  selectOrCreateCertificateDocRefResource,
+  selectOrCreateRelatedPersonResource,
+  selectOrCreateCollectorPersonResource,
+  setCertificateCollectorReference,
+  selectOrCreatePaymentReconciliationResource
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
-  FHIR_SPECIFICATION_URL
+  FHIR_SPECIFICATION_URL,
+  EVENT_TYPE
 } from '../fhir/constants'
 
-function createNameBuilder(sectionCode: string) {
+function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
     use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(person, 'name', fieldValue, 'use', context)
     },
     firstNames: (
@@ -50,7 +62,11 @@ function createNameBuilder(sectionCode: string) {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'name',
@@ -64,7 +80,11 @@ function createNameBuilder(sectionCode: string) {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'name',
@@ -76,10 +96,14 @@ function createNameBuilder(sectionCode: string) {
   }
 }
 
-function createIDBuilder(sectionCode: string) {
+function createIDBuilder(sectionCode: string, sectionTitle: string) {
   return {
     id: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'identifier',
@@ -89,7 +113,11 @@ function createIDBuilder(sectionCode: string) {
       )
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'identifier',
@@ -101,14 +129,18 @@ function createIDBuilder(sectionCode: string) {
   }
 }
 
-function createTelecomBuilder(sectionCode: string) {
+function createTelecomBuilder(sectionCode: string, sectionTitle: string) {
   return {
     system: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'telecom',
@@ -118,7 +150,11 @@ function createTelecomBuilder(sectionCode: string) {
       )
     },
     value: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'telecom',
@@ -128,7 +164,11 @@ function createTelecomBuilder(sectionCode: string) {
       )
     },
     use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'telecom',
@@ -140,14 +180,18 @@ function createTelecomBuilder(sectionCode: string) {
   }
 }
 
-function createPhotoBuilder(sectionCode: string) {
+function createPhotoBuilder(sectionCode: string, sectionTitle: string) {
   return {
     contentType: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'photo',
@@ -157,11 +201,19 @@ function createPhotoBuilder(sectionCode: string) {
       )
     },
     data: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(person, 'photo', fieldValue, 'data', context)
     },
     title: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'photo',
@@ -173,10 +225,14 @@ function createPhotoBuilder(sectionCode: string) {
   }
 }
 
-function createAddressBuilder(sectionCode: string) {
+function createAddressBuilder(sectionCode: string, sectionTitle: string) {
   return {
     use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -186,7 +242,11 @@ function createAddressBuilder(sectionCode: string) {
       )
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -196,7 +256,11 @@ function createAddressBuilder(sectionCode: string) {
       )
     },
     text: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -206,7 +270,11 @@ function createAddressBuilder(sectionCode: string) {
       )
     },
     line: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       if (!person.address) {
         person.address = []
       }
@@ -221,7 +289,11 @@ function createAddressBuilder(sectionCode: string) {
       )
     },
     city: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -235,7 +307,11 @@ function createAddressBuilder(sectionCode: string) {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -245,7 +321,11 @@ function createAddressBuilder(sectionCode: string) {
       )
     },
     state: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -259,7 +339,11 @@ function createAddressBuilder(sectionCode: string) {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -273,7 +357,11 @@ function createAddressBuilder(sectionCode: string) {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(sectionCode, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
       setObjectPropInResourceArray(
         person,
         'address',
@@ -523,32 +611,56 @@ const builders: IFieldBuilders = {
   },
   mother: {
     _fhirID: (fhirBundle, fieldValue) => {
-      const mother = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       mother.id = fieldValue as string
     },
     gender: (fhirBundle, fieldValue, context) => {
-      const mother = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       mother.gender = fieldValue as string
     },
-    identifier: createIDBuilder(MOTHER_CODE),
-    name: createNameBuilder(MOTHER_CODE),
-    telecom: createTelecomBuilder(MOTHER_CODE),
+    identifier: createIDBuilder(MOTHER_CODE, MOTHER_TITLE),
+    name: createNameBuilder(MOTHER_CODE, MOTHER_TITLE),
+    telecom: createTelecomBuilder(MOTHER_CODE, MOTHER_TITLE),
     birthDate: (fhirBundle, fieldValue, context) => {
-      const mother = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       mother.birthDate = fieldValue as string
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
-      const person = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
-      const mother = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       mother.multipleBirthInteger = fieldValue as number
     },
-    address: createAddressBuilder(MOTHER_CODE),
-    photo: createPhotoBuilder(MOTHER_CODE),
+    address: createAddressBuilder(MOTHER_CODE, MOTHER_TITLE),
+    photo: createPhotoBuilder(MOTHER_CODE, MOTHER_TITLE),
     deceased: (fhirBundle, fieldValue, context) => {
-      const mother = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const mother = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       mother.deceasedBoolean = fieldValue as boolean
     },
     nationality: (
@@ -556,7 +668,11 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       return createNationalityBuilder(person, fieldValue)
     },
     dateOfMarriage: (
@@ -564,7 +680,11 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
     educationalAttainment: (
@@ -572,38 +692,66 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(MOTHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
   father: {
     _fhirID: (fhirBundle, fieldValue, context) => {
-      const father = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       father.id = fieldValue as string
     },
     gender: (fhirBundle, fieldValue, context) => {
-      const father = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       father.gender = fieldValue as string
     },
-    identifier: createIDBuilder(FATHER_CODE),
-    name: createNameBuilder(FATHER_CODE),
-    telecom: createTelecomBuilder(FATHER_CODE),
+    identifier: createIDBuilder(FATHER_CODE, FATHER_TITLE),
+    name: createNameBuilder(FATHER_CODE, FATHER_TITLE),
+    telecom: createTelecomBuilder(FATHER_CODE, FATHER_TITLE),
     birthDate: (fhirBundle, fieldValue, context) => {
-      const father = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       father.birthDate = fieldValue as string
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
-      const person = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
-      const father = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       father.multipleBirthInteger = fieldValue as number
     },
-    address: createAddressBuilder(FATHER_CODE),
-    photo: createPhotoBuilder(FATHER_CODE),
+    address: createAddressBuilder(FATHER_CODE, FATHER_TITLE),
+    photo: createPhotoBuilder(FATHER_CODE, FATHER_TITLE),
     deceased: (fhirBundle, fieldValue, context) => {
-      const father = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const father = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       father.deceasedBoolean = fieldValue as boolean
     },
 
@@ -612,7 +760,11 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       return createNationalityBuilder(person, fieldValue)
     },
     dateOfMarriage: (
@@ -620,7 +772,11 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
     educationalAttainment: (
@@ -628,38 +784,66 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(FATHER_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
   child: {
     _fhirID: (fhirBundle, fieldValue, context) => {
-      const child = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       child.id = fieldValue as string
     },
     gender: (fhirBundle, fieldValue, context) => {
-      const child = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       child.gender = fieldValue as string
     },
-    identifier: createIDBuilder(CHILD_CODE),
-    name: createNameBuilder(CHILD_CODE),
-    telecom: createTelecomBuilder(CHILD_CODE),
+    identifier: createIDBuilder(CHILD_CODE, CHILD_TITLE),
+    name: createNameBuilder(CHILD_CODE, CHILD_TITLE),
+    telecom: createTelecomBuilder(CHILD_CODE, CHILD_TITLE),
     birthDate: (fhirBundle, fieldValue, context) => {
-      const child = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       child.birthDate = fieldValue as string
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
-      const person = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
-      const child = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       child.multipleBirthInteger = fieldValue as number
     },
-    address: createAddressBuilder(CHILD_CODE),
-    photo: createPhotoBuilder(CHILD_CODE),
+    address: createAddressBuilder(CHILD_CODE, CHILD_TITLE),
+    photo: createPhotoBuilder(CHILD_CODE, CHILD_TITLE),
     deceased: (fhirBundle, fieldValue, context) => {
-      const child = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const child = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       child.deceasedBoolean = fieldValue as boolean
     },
 
@@ -668,7 +852,11 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       return createNationalityBuilder(person, fieldValue)
     },
     dateOfMarriage: (
@@ -676,7 +864,11 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
     educationalAttainment: (
@@ -684,7 +876,11 @@ const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreatePersonResource(CHILD_CODE, fhirBundle)
+      const person = selectOrCreatePersonResource(
+        CHILD_CODE,
+        CHILD_TITLE,
+        fhirBundle
+      )
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
@@ -758,7 +954,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         docRef.id = fieldValue as string
       },
@@ -771,7 +968,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         if (!docRef.identifier) {
           docRef.identifier = []
@@ -791,7 +989,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         if (!docRef.identifier) {
           docRef.identifier = []
@@ -811,7 +1010,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         docRef.docStatus = fieldValue
       },
@@ -824,7 +1024,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         docRef.type = {
           coding: [
@@ -844,7 +1045,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         docRef.created = fieldValue
         docRef.indexed = fieldValue
@@ -858,7 +1060,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         if (!docRef.content) {
           docRef.content = [
@@ -878,7 +1081,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         if (!docRef.content) {
           docRef.content = [
@@ -898,7 +1102,8 @@ const builders: IFieldBuilders = {
           ATTACHMENT_DOCS_CODE,
           ATTACHMENT_DOCS_TITLE,
           fhirBundle,
-          context
+          context,
+          ATTACHMENT_CONTEXT_KEY
         )
         if (!docRef.subject) {
           docRef.subject = {}
@@ -913,23 +1118,285 @@ const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          const relatedPersonRes = selectOrCreateRelatedPersonResource(
+          const relatedPersonResource = selectOrCreateRelatedPersonResource(
             fhirBundle,
-            context
+            context,
+            EVENT_TYPE.BIRTH
           )
+          relatedPersonResource.relationship = {
+            coding: [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: fieldValue
+              }
+            ]
+          }
+          /* if mother/father is collecting then we will just put the person ref here */
+          if (fieldValue === 'MOTHER') {
+            setCertificateCollectorReference(
+              MOTHER_CODE,
+              relatedPersonResource,
+              fhirBundle
+            )
+          } else if (fieldValue === 'FATHER') {
+            setCertificateCollectorReference(
+              FATHER_CODE,
+              relatedPersonResource,
+              fhirBundle
+            )
+          }
         },
-        individual: () => {}
+        /* expecting value for this only when other is selected as relationship */
+        individual: {
+          identifier: {
+            id: (
+              fhirBundle: ITemplatedBundle,
+              fieldValue: string,
+              context: any
+            ) => {
+              const person = selectOrCreateCollectorPersonResource(
+                fhirBundle,
+                context,
+                EVENT_TYPE.BIRTH
+              )
+              setObjectPropInResourceArray(
+                person,
+                'identifier',
+                fieldValue,
+                'id',
+                context
+              )
+            },
+            type: (
+              fhirBundle: ITemplatedBundle,
+              fieldValue: string,
+              context: any
+            ) => {
+              const person = selectOrCreateCollectorPersonResource(
+                fhirBundle,
+                context,
+                EVENT_TYPE.BIRTH
+              )
+              setObjectPropInResourceArray(
+                person,
+                'identifier',
+                fieldValue,
+                'type',
+                context
+              )
+            }
+          },
+          name: {
+            use: (
+              fhirBundle: ITemplatedBundle,
+              fieldValue: string,
+              context: any
+            ) => {
+              const person = selectOrCreateCollectorPersonResource(
+                fhirBundle,
+                context,
+                EVENT_TYPE.BIRTH
+              )
+              setObjectPropInResourceArray(
+                person,
+                'name',
+                fieldValue,
+                'use',
+                context
+              )
+            },
+            firstNames: (
+              fhirBundle: ITemplatedBundle,
+              fieldValue: string,
+              context: any
+            ) => {
+              const person = selectOrCreateCollectorPersonResource(
+                fhirBundle,
+                context,
+                EVENT_TYPE.BIRTH
+              )
+              setObjectPropInResourceArray(
+                person,
+                'name',
+                fieldValue.split(' '),
+                'given',
+                context
+              )
+            },
+            familyName: (
+              fhirBundle: ITemplatedBundle,
+              fieldValue: string,
+              context: any
+            ) => {
+              const person = selectOrCreateCollectorPersonResource(
+                fhirBundle,
+                context,
+                EVENT_TYPE.BIRTH
+              )
+              setObjectPropInResourceArray(
+                person,
+                'name',
+                [fieldValue],
+                'family',
+                context
+              )
+            }
+          }
+        }
       },
-      hasShowedVerifiedDocument: () => {},
+      hasShowedVerifiedDocument: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          EVENT_TYPE.BIRTH
+        )
+        if (!certDocResource.extension) {
+          certDocResource.extension = []
+        }
+        const hasVerifiedExt = certDocResource.extension.find(
+          extention =>
+            extention.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+        )
+        if (!hasVerifiedExt) {
+          certDocResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExt.valueString = fieldValue
+        }
+      },
       payments: {
-        paymentId: () => {},
-        type: () => {},
-        total: () => {},
-        amount: () => {},
-        outcome: () => {},
-        date: () => {}
+        paymentId: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.identifier) {
+            paymentResource.identifier = []
+          }
+          paymentResource.identifier.push({
+            system: `${OPENCRVS_SPECIFICATION_URL}id/payment-id`,
+            value: fieldValue
+          })
+        },
+        type: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              { type: fieldValue as fhir.CodeableConcept }
+            ]
+          } else {
+            paymentResource.detail[0].type = fieldValue as fhir.CodeableConcept
+          }
+        },
+        total: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          paymentResource.total = fieldValue as fhir.Money
+        },
+        amount: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                /* should be replaced when type value comes in */
+                type: 'payment' as fhir.CodeableConcept,
+                amount: fieldValue as fhir.Money
+              }
+            ]
+          } else {
+            paymentResource.detail[0].amount = fieldValue as fhir.Money
+          }
+        },
+        outcome: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          paymentResource.outcome = fieldValue as fhir.CodeableConcept
+        },
+        date: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                /* should be replaced when type value comes in */
+                type: 'payment' as fhir.CodeableConcept,
+                date: fieldValue
+              }
+            ]
+          } else {
+            paymentResource.detail[0].date = fieldValue
+          }
+        }
       },
-      data: () => {}
+      data: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          EVENT_TYPE.BIRTH
+        )
+        if (!certDocResource.content) {
+          certDocResource.content = [
+            {
+              attachment: {}
+            }
+          ]
+        }
+        certDocResource.content[0].attachment.data = fieldValue
+      }
     }
   },
   birthLocation: {
