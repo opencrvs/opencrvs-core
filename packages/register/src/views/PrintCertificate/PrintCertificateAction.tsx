@@ -177,7 +177,7 @@ const messages = defineMessages({
 })
 
 type State = {
-  formID: string
+  currentForm: string
   data: IFormSectionData
   enableConfirmButton: boolean
 }
@@ -203,7 +203,7 @@ class PrintCertificateActionComponent extends React.Component<
     this.state = {
       data: {},
       enableConfirmButton: false,
-      formID: COLLECT_CERTIFICATE
+      currentForm: COLLECT_CERTIFICATE
     }
   }
 
@@ -220,27 +220,27 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   shouldEnableConfirmButton = (documentData: IFormSectionData) => {
-    const form = this.getForm(this.state.formID)
+    const form = this.getForm(this.state.currentForm)
     return documentData && !hasFormError(form.fields, documentData)
   }
 
-  getForm = (formID: string) => {
+  getForm = (currentForm: string) => {
     const { printCertificateFormSection, paymentFormSection } = this.props
-    switch (formID) {
+    switch (currentForm) {
       case COLLECT_CERTIFICATE:
         return printCertificateFormSection
       case PAYMENT:
         return paymentFormSection
       default:
-        throw new Error(`No form found for id ${formID}`)
+        throw new Error(`No form found for id ${currentForm}`)
     }
   }
 
-  getFormAction = (formID: string) => {
+  getFormAction = (currentForm: string) => {
     const { intl } = this.props
     const { enableConfirmButton } = this.state
 
-    switch (formID) {
+    switch (currentForm) {
       case COLLECT_CERTIFICATE:
         return (
           <ButtonContainer>
@@ -282,17 +282,17 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   onConfirmForm = () => {
-    const { formID } = this.state
+    const { currentForm } = this.state
     let destForm = COLLECT_CERTIFICATE
 
-    switch (formID) {
+    switch (currentForm) {
       case COLLECT_CERTIFICATE:
         destForm = PAYMENT
         break
       default:
         break
     }
-    this.setState({ formID: destForm })
+    this.setState({ currentForm: destForm })
   }
 
   render = () => {
@@ -305,8 +305,8 @@ class PrintCertificateActionComponent extends React.Component<
       paymentFormSection
     } = this.props
 
-    const { formID } = this.state
-    const form = this.getForm(formID)
+    const { currentForm } = this.state
+    const form = this.getForm(currentForm)
 
     return (
       <ActionPageWrapper>
@@ -391,7 +391,7 @@ class PrintCertificateActionComponent extends React.Component<
                     </Box>
                     <Column>
                       {this.state.data.personCollectingCertificate &&
-                        this.getFormAction(this.state.formID)}
+                        this.getFormAction(this.state.currentForm)}
                     </Column>
                   </FormContainer>
                 )

@@ -23,7 +23,7 @@ export function calculateDays(dob: string) {
   const todaysDate = new Date()
   const dateOfBirth = parseDate(dob)
 
-  const differenceInDays = Math.round(
+  const differenceInDays = Math.floor(
     (Number(todaysDate) - Number(dateOfBirth)) / DAY
   )
 
@@ -43,8 +43,8 @@ export function timeElapsedInWords(props: ITimeInWordsProps) {
   let output: string = ''
   let pluralChar = ''
 
-  const year = Math.round(days / YEAR_IN_DAYS)
-  const month = Math.round(days / MONTH_IN_DAYS)
+  const year = Math.floor(days / YEAR_IN_DAYS)
+  const month = Math.floor(days / MONTH_IN_DAYS)
 
   if (year > 0) {
     if (year > 1 && language === 'en') {
