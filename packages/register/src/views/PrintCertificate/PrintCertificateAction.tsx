@@ -269,7 +269,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
-                onClick={this.onConfirmForm}
+                onClick={() => console.log('go to certificate print section')}
               >
                 {intl.formatMessage(messages.next)}
               </StyledPrimaryButton>

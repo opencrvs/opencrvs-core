@@ -20,11 +20,11 @@ function parseDate(dateString: string) {
 }
 
 export function calculateDays(dob: string) {
-  const todaysDate = new Date()
+  const currentDate = Date.now()
   const dateOfBirth = parseDate(dob)
 
   const differenceInDays = Math.floor(
-    (Number(todaysDate) - Number(dateOfBirth)) / DAY
+    (Number(currentDate) - Number(dateOfBirth)) / DAY
   )
 
   return differenceInDays

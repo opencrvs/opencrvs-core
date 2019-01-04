@@ -16,6 +16,8 @@ import { ReactWrapper } from 'enzyme'
 import { iDType, ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
+import { paymentFormSection } from './payment-section'
+import { calculateDays, timeElapsedInWords } from './calculatePrice'
 
 describe('when user wants to print certificate', async () => {
   const { store } = createStore()
@@ -578,6 +580,52 @@ describe('when user wants to print certificate', async () => {
           .hostNodes()
           .prop('disabled')
       ).toBe(false)
+    })
+
+    it('when user clicks confirm button, renders payment form', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: true
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+
+      component
+        .find('#print-confirm-button')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      const fields = paymentFormSection.fields
+
+      fields[2].initialValue = '50.00'
+      fields[3].initialValue = '24 years'
+      expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
+    })
+
+    it('timeElapsedInWords function returns required time duration in words', () => {
+      Date.now = jest.fn(() => new Date('2019-01-01'))
+
+      let days = calculateDays('2018-08-18')
+      const prop = {
+        days,
+        language: 'en',
+        monthString: 'month',
+        yearString: 'year'
+      }
+
+      expect(timeElapsedInWords(prop)).toBe('4 months')
+      days = calculateDays('2018-12-16')
+      prop.days = days
+      expect(timeElapsedInWords(prop)).toBe('16')
+
+      let error
+      try {
+        calculateDays('16-12-2018')
+      } catch (e) {
+        error = e
+      }
+      expect(error).toBeInstanceOf(Error)
     })
   })
 })
