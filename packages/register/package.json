@@ -12,6 +12,7 @@
     "apollo-boost": "^0.1.6",
     "apollo-client": "^2.4.5",
     "apollo-link-context": "^1.0.9",
+    "axios": "^0.18.0",
     "email-validator": "^2.0.4",
     "formik": "^1.0.3",
     "graphql": "^0.13.2",

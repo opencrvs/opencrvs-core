@@ -18,10 +18,11 @@ import * as routes from './navigation/routes'
 
 import { NotificationComponent } from './components/Notification'
 import { Page } from './components/Page'
-
+import { loadOfflineData, storeOfflineData } from 'src/offline/actions'
+import { IOfflineData } from 'src/offline/reducer'
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
-
+import { LoadingData } from './components/LoadingData'
 import { ApplicationForm } from './views/RegisterForm/ApplicationForm'
 import { ReviewForm } from './views/RegisterForm/ReviewForm'
 import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
@@ -46,6 +47,7 @@ interface IAppProps {
 }
 interface IState {
   initialDraftsLoaded: boolean
+  loadingDataModal: boolean
 }
 export const store = createStore()
 
@@ -53,13 +55,19 @@ export class App extends React.Component<IAppProps, IState> {
   constructor(props: IAppProps) {
     super(props)
     this.state = {
-      initialDraftsLoaded: false
+      initialDraftsLoaded: false,
+      loadingDataModal: false
     }
   }
-  componentWillMount() {
-    this.loadDraftsFromStorage()
+  toggleLoadingModal = () => {
+    this.setState(state => ({
+      loadingDataModal: !state.loadingDataModal
+    }))
   }
-  async loadDraftsFromStorage() {
+  componentDidMount() {
+    this.loadDataFromStorage()
+  }
+  async loadDataFromStorage() {
     const draftsString = await storage.getItem('drafts')
     const drafts = JSON.parse(draftsString ? draftsString : '[]')
     this.props.store.dispatch(setInitialDrafts(drafts))
@@ -67,6 +75,16 @@ export class App extends React.Component<IAppProps, IState> {
     const userDetailsString = await storage.getItem(USER_DETAILS)
     const userDetails = JSON.parse(userDetailsString ? userDetailsString : '[]')
     this.props.store.dispatch(setInitialUserDetails(userDetails))
+    const offlineDataString = await storage.getItem('offline')
+    const offlineData: IOfflineData = JSON.parse(
+      offlineDataString ? offlineDataString : '{}'
+    )
+    if (!offlineData.locations) {
+      this.toggleLoadingModal()
+      this.props.store.dispatch(loadOfflineData())
+    } else {
+      this.props.store.dispatch(storeOfflineData(offlineData))
+    }
   }
 
   public render() {
@@ -81,6 +99,10 @@ export class App extends React.Component<IAppProps, IState> {
                   <ScrollToTop>
                     <NotificationComponent>
                       <Page>
+                        <LoadingData
+                          show={this.state.loadingDataModal}
+                          handleClose={this.toggleLoadingModal}
+                        />
                         <Switch>
                           <ProtectedRoute
                             exact
