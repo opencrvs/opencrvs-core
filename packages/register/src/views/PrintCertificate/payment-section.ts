@@ -29,8 +29,9 @@ const messages = defineMessages({
     description: 'The label for collect payment paragraph'
   },
   service: {
-    id: 'register.workQueue.print.service',
-    defaultMessage: 'Service: Birth registration after {service} of D.o.B.',
+    id: 'register.workQueue.print.serviceMonth',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
   },
   paymentAmount: {

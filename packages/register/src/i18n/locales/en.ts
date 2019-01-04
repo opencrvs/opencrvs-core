@@ -694,13 +694,13 @@ export const ENGLISH_STATE = {
     'register.workQueue.print.manualPaymentMethod': 'Manual',
     'register.workQueue.print.collectPayment':
       'Please collect the payment, print the receipt and hand it over to the payee.',
-    'register.workQueue.print.service':
-      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
+    'register.workQueue.print.serviceMonth':
+      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
+    'register.workQueue.print.serviceYear':
+      'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
-    'print.certificate.year': 'year',
-    'print.certificate.month': 'month',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',

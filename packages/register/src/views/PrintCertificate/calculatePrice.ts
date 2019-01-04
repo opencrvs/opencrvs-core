@@ -30,34 +30,20 @@ export function calculateDays(dob: string) {
   return differenceInDays
 }
 
-interface ITimeInWordsProps {
-  days: number
-  language: string
-  monthString: string
-  yearString: string
-}
-
-export function timeElapsedInWords(props: ITimeInWordsProps) {
-  const { days, language, monthString, yearString } = props
-
-  let output: string = ''
-  let pluralChar = ''
+export function timeElapsed(days: number) {
+  const output: { unit: string; value: number } = { value: 0, unit: 'Day' }
 
   const year = Math.floor(days / YEAR_IN_DAYS)
   const month = Math.floor(days / MONTH_IN_DAYS)
 
   if (year > 0) {
-    if (year > 1 && language === 'en') {
-      pluralChar = 's'
-    }
-    output = `${year} ${yearString}${pluralChar}`
+    output.value = year
+    output.unit = 'Year'
   } else if (month > 0) {
-    if (month > 1 && language === 'en') {
-      pluralChar = 's'
-    }
-    output = `${month} ${monthString}${pluralChar}`
+    output.value = month
+    output.unit = 'Month'
   } else {
-    output = `${days}`
+    output.value = days
   }
 
   return output

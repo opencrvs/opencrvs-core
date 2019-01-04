@@ -16,11 +16,7 @@ import { PrimaryButton, IconAction } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { hasFormError } from 'src/forms/utils'
-import {
-  calculatePrice,
-  timeElapsedInWords,
-  calculateDays
-} from './calculatePrice'
+import { calculatePrice, timeElapsed, calculateDays } from './calculatePrice'
 import { Print } from '@opencrvs/components/lib/icons'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
@@ -164,15 +160,17 @@ const messages = defineMessages({
     defaultMessage: 'Next',
     description: 'The label for next button'
   },
-  year: {
-    id: 'print.certificate.year',
-    defaultMessage: 'year',
-    description: 'The label for year text in paragraph'
+  serviceYear: {
+    id: 'register.workQueue.print.serviceYear',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
+    description: 'The label for service paragraph'
   },
-  month: {
-    id: 'print.certificate.month',
-    defaultMessage: 'month',
-    description: 'The label for month text in paragraph'
+  serviceMonth: {
+    id: 'register.workQueue.print.serviceMonth',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
+    description: 'The label for service paragraph'
   }
 })
 
@@ -350,14 +348,9 @@ class PrintCertificateActionComponent extends React.Component<
                   data.fetchBirthRegistration.child.birthDate
                 )
 
-                const timeDuration = timeElapsedInWords({
-                  days: calculateDays(
-                    data.fetchBirthRegistration.child.birthDate
-                  ),
-                  yearString: intl.formatMessage(messages.year),
-                  monthString: intl.formatMessage(messages.month),
-                  language: this.props.language
-                })
+                const timeDuration = timeElapsed(
+                  calculateDays(data.fetchBirthRegistration.child.birthDate)
+                )
 
                 paymentFormSection.fields.map(field => {
                   if (
@@ -375,7 +368,8 @@ class PrintCertificateActionComponent extends React.Component<
                     field.type === PARAGRAPH &&
                     field.name === 'service'
                   ) {
-                    field.initialValue = timeDuration
+                    field.initialValue = timeDuration.value.toString()
+                    field.label = messages[`service${timeDuration.unit}`]
                   }
                 })
 

@@ -685,13 +685,13 @@ export const BENGALI_STATE = {
     'register.workQueue.print.manualPaymentMethod': 'হস্তকৃত',
     'register.workQueue.print.collectPayment':
       'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
-    'register.workQueue.print.service':
-      'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.serviceMonth':
+      'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.serviceYear':
+      'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
-    'print.certificate.year': 'বছর',
-    'print.certificate.month': 'মাস',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',
