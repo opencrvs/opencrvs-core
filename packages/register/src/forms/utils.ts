@@ -66,7 +66,6 @@ export const getFieldOptions = (
       )}`
     )
   }
-
   return options
 }
 

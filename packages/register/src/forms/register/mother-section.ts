@@ -10,7 +10,8 @@ import {
   NUMBER,
   DATE,
   SUBSECTION,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_INTEGRATED_RESOURCES
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -287,12 +288,11 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'state',
-      type: SELECT_WITH_OPTIONS,
+      type: SELECT_WITH_INTEGRATED_RESOURCES,
       label: addressMessages.state,
       required: true,
       initialValue: '',
       validate: [],
-      options: states,
       conditionals: [conditionals.country]
     },
     {

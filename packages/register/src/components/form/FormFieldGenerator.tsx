@@ -42,7 +42,8 @@ import {
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
-  WARNING
+  WARNING,
+  SELECT_WITH_INTEGRATED_RESOURCES
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -62,6 +63,20 @@ const FormItem = styled.div`
   margin-bottom: 2em;
   animation: ${fadeIn} 500ms;
 `
+let locations = [] as any[]
+
+function getLocations(inputProps: any) {
+  let states = [] as any[]
+  console.log(locations)
+  console.log(inputProps)
+  if (inputProps.id === 'state') {
+    states = locations.find(location => {
+      return location.partOf === 'Location/0'
+    })
+  }
+  console.log(states)
+  return states
+}
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
@@ -106,6 +121,22 @@ function GeneratedInputField({
     touched: Boolean(touched)
   }
 
+  if (fieldDefinition.type === SELECT_WITH_INTEGRATED_RESOURCES) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Select
+          {...inputProps}
+          value={value as string}
+          onChange={(val: string) => {
+            resetDependentSelectValues(fieldDefinition.name)
+            onSetFieldValue(fieldDefinition.name, val)
+          }}
+          options={getLocations(inputProps)}
+        />
+      </InputField>
+    )
+  }
+
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
       <InputField {...inputFieldProps}>
@@ -121,7 +152,6 @@ function GeneratedInputField({
       </InputField>
     )
   }
-
   if (fieldDefinition.type === RADIO_GROUP) {
     return (
       <InputField {...inputFieldProps}>
@@ -281,7 +311,12 @@ class FormSectionComponent extends React.Component<Props> {
       }
     }
   }
-  componentDidMount() {
+  async componentWillUpdate() {
+    const res = await fetch('/assets/locations.json')
+    locations = await res.json()
+    console.log(locations)
+  }
+  async componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
     }
