@@ -359,7 +359,7 @@ describe('WorkQueue tests', async () => {
           .find('#new_registration')
           .hostNodes()
           .text()
-      ).toContain('New birth registration')
+      ).toContain('New birth application')
 
       testComponent.component.unmount()
     })
