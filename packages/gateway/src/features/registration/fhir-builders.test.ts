@@ -552,7 +552,7 @@ test('should update a task document as rejected', async () => {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: 'DUMMY'
+            valueReference: { reference: 'DUMMY' }
           }
         ],
         lastModified: '2018-11-28T15:13:57.492Z',

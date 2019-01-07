@@ -215,14 +215,12 @@ export async function setupLastRegLocation(
       extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
     )
   })
-  if (regUserExtension) {
-    regUserExtension.valueReference = `Location/${
-      primaryOffice.id
-    }` as fhir.Reference
+  if (regUserExtension && regUserExtension.valueReference) {
+    regUserExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueReference: `Location/${primaryOffice.id}` as fhir.Reference
+      valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }
   return taskResource
@@ -240,14 +238,12 @@ export function setupLastRegUser(
       extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`
     )
   })
-  if (regUserExtension) {
-    regUserExtension.valueReference = getPractitionerRef(
-      practitioner
-    ) as fhir.Reference
+  if (regUserExtension && regUserExtension.valueReference) {
+    regUserExtension.valueReference.reference = getPractitionerRef(practitioner)
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-      valueReference: getPractitionerRef(practitioner) as fhir.Reference
+      valueReference: { reference: getPractitionerRef(practitioner) }
     })
   }
   return taskResource

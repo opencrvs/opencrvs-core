@@ -106,7 +106,7 @@ async function getCompositionsByLocation(
 ) {
   const tasksResponses = await Promise.all(
     locationIds.map(locationId => {
-      return fetchFHIR(`/Task?location=${locationId}`, authHeader)
+      return fetchFHIR(`/Task?location=Location/${locationId}`, authHeader)
     })
   )
 
