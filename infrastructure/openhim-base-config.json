@@ -86,8 +86,8 @@
         {
           "name": "Workflow",
           "secured": false,
-          "host": "10.0.0.73",
-          "port": 5050,
+          "host": "workflow",
+          "port": "5050",
           "path": "",
           "pathTransform": "",
           "primary": true,
@@ -143,7 +143,7 @@
         {
           "name": "New Declaration",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
@@ -200,7 +200,7 @@
         {
           "name": "Updated Declaration",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
@@ -257,7 +257,7 @@
         {
           "name": "New Registration",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
@@ -315,7 +315,7 @@
         {
           "name": "Registration",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
@@ -372,7 +372,7 @@
         {
           "name": "Certification",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
@@ -429,7 +429,7 @@
         {
           "name": "Voided Declaration",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
@@ -486,7 +486,7 @@
         {
           "name": "Voided Registration",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
