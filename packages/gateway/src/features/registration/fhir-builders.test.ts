@@ -408,7 +408,9 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[7].resource.extension).toEqual([
     {
       url: 'http://opencrvs.org/specs/extension/collector',
-      valueReference: fhir.entry[8].fullUrl
+      valueReference: {
+        reference: fhir.entry[8].fullUrl
+      }
     },
     {
       url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
@@ -416,7 +418,9 @@ test('should build a minimal FHIR registration document without error', async ()
     },
     {
       url: 'http://opencrvs.org/specs/extension/payment',
-      valueReference: fhir.entry[10].fullUrl
+      valueReference: {
+        reference: fhir.entry[10].fullUrl
+      }
     }
   ])
   expect(fhir.entry[7].resource.content).toEqual([
