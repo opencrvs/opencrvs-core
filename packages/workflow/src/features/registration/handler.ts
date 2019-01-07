@@ -73,7 +73,7 @@ export async function markBirthAsRegisteredHandler(
       getToken(request)
     )
     // TODO: need to send notification here
-    return postToHearth(payload)
+    return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsRegisteredHandler: error: ${error}`)
     throw new Error(error)
@@ -89,7 +89,7 @@ export async function markBirthAsCertifiedHandler(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
-    return postToHearth(payload)
+    return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
