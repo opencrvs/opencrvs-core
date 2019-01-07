@@ -361,13 +361,18 @@ export function selectOrCreateRelatedPersonResource(
     fhirBundle.entry.push(relatedPersonEntry)
     docRef.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
-      valueReference: relatedPersonEntry.fullUrl as fhir.Reference
+      valueReference: {
+        reference: relatedPersonEntry.fullUrl
+      }
     })
     return relatedPersonEntry.resource
   } else {
-    const relatedPersonEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === relatedPersonExt.valueReference
-    )
+    const relatedPersonEntry = fhirBundle.entry.find(entry => {
+      if (!relatedPersonExt.valueReference) {
+        return false
+      }
+      return entry.fullUrl === relatedPersonExt.valueReference.reference
+    })
     if (!relatedPersonEntry) {
       throw new Error('No related person entry found on bundle')
     }
@@ -450,13 +455,18 @@ export function selectOrCreatePaymentReconciliationResource(
     fhirBundle.entry.push(paymentEntry)
     docRef.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/payment`,
-      valueReference: paymentEntry.fullUrl as fhir.Reference
+      valueReference: {
+        reference: paymentEntry.fullUrl
+      }
     })
     return paymentEntry.resource
   } else {
-    const paymentEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === paymentExt.valueReference
-    )
+    const paymentEntry = fhirBundle.entry.find(entry => {
+      if (!paymentExt.valueReference) {
+        return false
+      }
+      return entry.fullUrl === paymentExt.valueReference.reference
+    })
     if (!paymentEntry) {
       throw new Error('No related payment entry found on bundle')
     }
