@@ -2,6 +2,7 @@ enum RegStatus {
   DECLARED
   REGISTERED
   CERTIFIED
+  REJECTED
 }
 
 enum BirthRegType {

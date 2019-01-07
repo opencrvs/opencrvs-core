@@ -257,7 +257,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   successfullyRegistered = () => {
+    const { draft } = this.props
     window.location.href = '/work-queue'
+    this.props.deleteDraft(draft)
   }
 
   submitForm = () => {
@@ -482,11 +484,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
         <Mutation
           mutation={patchMutation}
-          variables={{ id: draft.id /*, details: this.processSubmitData()*/ }}
+          variables={{ id: draft.id, details: this.processSubmitData() }}
         >
           {(markBirthAsRegistered, { data }) => {
             if (data && data.markBirthAsRegistered) {
-              console.log(markBirthAsRegistered, data)
               this.successfullyRegistered()
             }
 

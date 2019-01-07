@@ -434,6 +434,7 @@ export class ReviewFormView extends React.Component<IProps> {
     const documents = this.transformDocuments(reg)
 
     const reviewData = {
+      _fhirIDMap: reg._fhirIDMap,
       child,
       mother,
       father,

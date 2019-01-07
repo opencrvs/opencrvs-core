@@ -222,6 +222,7 @@ const processDraftData = (draftData: IFormData) => {
   }
 
   const draftDetails: IdraftDetails = {
+    _fhirIDMap: draftData._fhirIDMap,
     child: childDetails,
     mother: motherDetails,
     registration: registrationDetails,

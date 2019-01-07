@@ -338,16 +338,64 @@ export const typeResolvers: GQLResolver = {
   BirthRegistration: {
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       // Preparing Encounter
-      const encounterResult = await fetchFHIR(
-        `/Task?focus=Composition/${composition.id}`,
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      const encounter =
+        (encounterSection &&
+          encounterSection.entry &&
+          encounterSection.entry[0].reference) ||
+        null
+
+      const observation = {}
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounter}`,
         authHeader
       )
+      observations.entry.map(
+        (item: fhir.Observation & { resource: fhir.Observation }) => {
+          if (
+            item.resource &&
+            item.resource.code.coding &&
+            item.resource.code.coding[0] &&
+            item.resource.code.coding[0].code
+          ) {
+            if (BODY_WEIGHT_CODE === item.resource.code.coding[0].code) {
+              observation['weightAtBirth'] = item.resource.id
+            }
+            if (BIRTH_TYPE_CODE === item.resource.code.coding[0].code) {
+              observation['birthType'] = item.id
+            }
+            if (BIRTH_ATTENDANT_CODE === item.resource.code.coding[0].code) {
+              observation['attendantAtBirth'] = item.id
+            }
+
+            if (BIRTH_REG_TYPE_CODE === item.resource.code.coding[0].code) {
+              observation['birthRegistrationType'] = item.id
+            }
+            if (BIRTH_REG_PRESENT_CODE === item.resource.code.coding[0].code) {
+              observation['presentAtBirthRegistration'] = item.id
+            }
+            if (NUMBER_BORN_ALIVE_CODE === item.resource.code.coding[0].code) {
+              observation['childrenBornAliveToMother'] = item.id
+            }
+            if (
+              NUMBER_FOEATAL_DEATH_CODE === item.resource.code.coding[0].code
+            ) {
+              observation['foetalDeathsToMother'] = item.id
+            }
+            if (LAST_LIVE_BIRTH_CODE === item.resource.code.coding[0].code) {
+              observation['lastPreviousLiveBirth'] = item.id
+            }
+          }
+        }
+      )
+
       return {
         composition: composition.id,
-        encounter: encounterResult,
-        observation: {
-          birthType: 'S?OME VALUE'
-        }
+        encounter: encounter,
+        observation: observation
       }
     },
     createdAt(composition: ITemplatedComposition) {
