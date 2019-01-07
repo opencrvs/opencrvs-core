@@ -318,7 +318,7 @@ export const childSection: IFormSection = {
       label: messages.weightAtBirth,
       required: true,
       initialValue: '',
-      validate: [range(1, 6)],
+      validate: [range(0, 6)],
       postfix: 'Kg'
     },
     {
