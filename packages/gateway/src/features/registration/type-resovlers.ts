@@ -365,28 +365,28 @@ export const typeResolvers: GQLResolver = {
               observation['weightAtBirth'] = item.resource.id
             }
             if (BIRTH_TYPE_CODE === item.resource.code.coding[0].code) {
-              observation['birthType'] = item.id
+              observation['birthType'] = item.resource.id
             }
             if (BIRTH_ATTENDANT_CODE === item.resource.code.coding[0].code) {
-              observation['attendantAtBirth'] = item.id
+              observation['attendantAtBirth'] = item.resource.id
             }
 
             if (BIRTH_REG_TYPE_CODE === item.resource.code.coding[0].code) {
-              observation['birthRegistrationType'] = item.id
+              observation['birthRegistrationType'] = item.resource.id
             }
             if (BIRTH_REG_PRESENT_CODE === item.resource.code.coding[0].code) {
-              observation['presentAtBirthRegistration'] = item.id
+              observation['presentAtBirthRegistration'] = item.resource.id
             }
             if (NUMBER_BORN_ALIVE_CODE === item.resource.code.coding[0].code) {
-              observation['childrenBornAliveToMother'] = item.id
+              observation['childrenBornAliveToMother'] = item.resource.id
             }
             if (
               NUMBER_FOEATAL_DEATH_CODE === item.resource.code.coding[0].code
             ) {
-              observation['foetalDeathsToMother'] = item.id
+              observation['foetalDeathsToMother'] = item.resource.id
             }
             if (LAST_LIVE_BIRTH_CODE === item.resource.code.coding[0].code) {
-              observation['lastPreviousLiveBirth'] = item.id
+              observation['lastPreviousLiveBirth'] = item.resource.id
             }
           }
         }
@@ -394,7 +394,7 @@ export const typeResolvers: GQLResolver = {
 
       return {
         composition: composition.id,
-        encounter: encounter,
+        // encounter: encounter,
         observation: observation
       }
     },
