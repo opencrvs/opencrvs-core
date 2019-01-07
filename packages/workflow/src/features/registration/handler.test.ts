@@ -1021,12 +1021,6 @@ describe('Verify handler', () => {
         ]
       )
     })
-    const testCertificateFhirBundle = cloneDeep(testFhirBundleWithIds)
-    testCertificateFhirBundle.entry[1].resource.identifier.push({
-      system: 'http://opencrvs.org/specs/id/birth-registration-number',
-      value: '12345678'
-    })
-
     it('returns OK with full fhir bundle as payload', async () => {
       const token = jwt.sign(
         { scope: ['certify'] },
@@ -1048,6 +1042,11 @@ describe('Verify handler', () => {
           ]
         })
       )
+      const testCertificateFhirBundle = cloneDeep(testFhirBundleWithIds)
+      testCertificateFhirBundle.entry[1].resource.identifier.push({
+        system: 'http://opencrvs.org/specs/id/birth-registration-number',
+        value: '12345678'
+      })
       const res = await server.server.inject({
         method: 'POST',
         url: '/fhir',
