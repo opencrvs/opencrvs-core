@@ -99,6 +99,12 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
         },
         Cmd.run(() => storeUserDetails(userDetails))
       )
+    case actions.SET_INITIAL_USER_DETAILS:
+      return {
+        ...state,
+        userDetails: action.payload
+      }
+
     default:
       return state
   }

@@ -6,7 +6,7 @@ import {
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED
 } from './constants'
-import { fhirUrl } from 'src/constants'
+import { HEARTH_URL } from 'src/constants'
 import { getTaskResource, findPersonEntry } from './fhir-template'
 import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
 import fetch from 'node-fetch'
@@ -169,7 +169,7 @@ export function getEntryId(fhirBundle: fhir.Bundle) {
   return composition.id
 }
 export const getFromFhir = (suffix: string) => {
-  return fetch(`${fhirUrl}${suffix}`, {
+  return fetch(`${HEARTH_URL}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
     }

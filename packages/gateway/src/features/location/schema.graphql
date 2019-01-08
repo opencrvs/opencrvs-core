@@ -1,4 +1,5 @@
 input LocationInput {
+  _fhirID: ID
   identifier: [ID]
   status: String
   name: String
@@ -27,6 +28,7 @@ type Identifier {
 
 type Location { # -> Location (mostly the same property name except:)
   id: ID!
+  _fhirID: ID # -> .id
   identifier: [Identifier]
   status: String
   name: String

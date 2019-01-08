@@ -3,6 +3,14 @@ export const BENGALI_STATE = {
   messages: {
     'menu.back': 'পিছনে',
     'menu.menu': 'তালিকা',
+    'menu.items.homepage': 'হোমপেজে',
+    'menu.items.register': 'নিবন্ধন',
+    'menu.items.drafts': 'খসড়া',
+    'menu.items.settings': 'সেটিংস',
+    'menu.items.logout': 'প্রস্থান',
+    'menu.items.changeLanguage': 'ভাষা পরিবর্তন',
+    'menu.items.changeLanguage.english': 'ইংরেজি',
+    'menu.items.changeLanguage.bengali': 'বাংলা',
     'performance.hello': 'হ্যালো',
     'performance.graph.birthRegistrationBoxTitle':
       'জন্ম নিবন্ধন মূল পরিসংখ্যান',
@@ -30,6 +38,13 @@ export const BENGALI_STATE = {
       '45 দিনের মধ্যে নিবন্ধনের জন্য জন্মের হার',
     'performance.graph.birthRegistrationRatePerMonthLabel': 'ক্যালেন্ডার মাস',
     'performance.graph.birthRegistrationPercentageOfEstimateLabel':
-      'আনুমানিক জন্ম নিবন্ধন%'
+      'আনুমানিক জন্ম নিবন্ধন%',
+    'register.home.hedaer.hello': 'Hello {fullName}',
+    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
+    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
+    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar'
   }
 }

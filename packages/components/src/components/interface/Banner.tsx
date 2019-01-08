@@ -1,9 +1,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { StatusOrange } from '../icons'
+import { StatusOrange, StatusGray, StatusRejected } from '../icons'
 export interface IBannerProps {
   text: string
   count: number
+  status: string
 }
 
 const StyledBanner = styled.div`
@@ -43,12 +44,18 @@ const StyledNumber = styled.span`
   font-family: ${({ theme }) => theme.fonts.lightFont};
 `
 
-export const Banner = ({ text, count }: IBannerProps) => {
+export const Banner = ({ text, count, status }: IBannerProps) => {
   return (
     <StyledBanner>
       <StyledText>{text}</StyledText>
       <StyledStatus>
-        <StatusOrange />
+        {status === 'applications' ? (
+          <StatusOrange />
+        ) : status === 'rejected' ? (
+          <StatusRejected />
+        ) : (
+          <StatusGray />
+        )}
         <StyledNumber>{count}</StyledNumber>
       </StyledStatus>
     </StyledBanner>

@@ -1,4 +1,4 @@
-import { getTokenPayload, getToken } from './authUtils'
+import { getTokenPayload, getToken, storeToken } from './authUtils'
 
 describe('authUtils tests', () => {
   describe('getAuthorizedToken', () => {
@@ -50,11 +50,21 @@ describe('authUtils tests', () => {
 
         beforeEach(() => {
           history.replaceState({}, '', '?token=' + token)
+          Object.defineProperty(window.localStorage, 'setItem', {
+            configurable: true
+          })
+          window.localStorage.setItem = jest.fn()
         })
 
         it('returns the token', () => {
           const testToken = getToken() as string
           expect(getTokenPayload(testToken)).toMatchSnapshot()
+        })
+
+        it('saves the token', () => {
+          const testToken = getToken() as string
+          storeToken(testToken)
+          expect(window.localStorage.setItem).toHaveBeenCalled()
         })
       })
 

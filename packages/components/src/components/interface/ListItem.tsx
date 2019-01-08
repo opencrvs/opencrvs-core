@@ -22,6 +22,7 @@ export interface IListItemProps {
   index: number
   infoItems: IInfo[]
   statusItems: IStatus[]
+  icons?: JSX.Element[]
   actions?: IAction[]
   itemData: IDynamicValues
   expandedCellRenderer: (itemData: IDynamicValues, key: number) => JSX.Element
@@ -79,7 +80,7 @@ const ListContentContainer = styled.div`
   justify-content: space-between;
   flex: 1;
   align-items: center;
-  padding: 10px;
+  padding: 24px;
   font-family: ${({ theme }) => theme.fonts.regularFont};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
@@ -115,7 +116,14 @@ const StyledStatus = styled.div`
     font-size: 13px;
   }
 `
-
+const IconsStatus = styled.div`
+  border-radius: 17px;
+  padding: 5px 10px 5px 7px;
+  margin: 2px 5px 2px 0;
+  display: flex;
+  align-items: center;
+  height: 32px;
+`
 const StyledLabel = styled.label`
   font-family: ${({ theme }) => theme.fonts.boldFont};
   margin-right: 3px;
@@ -148,7 +156,14 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
   }
 
   render() {
-    const { infoItems, statusItems, index, actions, itemData } = this.props
+    const {
+      infoItems,
+      statusItems,
+      icons,
+      index,
+      actions,
+      itemData
+    } = this.props
     const { expanded } = this.state
     return (
       <Wrapper key={index} expanded={expanded}>
@@ -164,6 +179,10 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
               ))}
             </InfoDiv>
             <StatusDiv>
+              {icons &&
+                icons.map((icon: JSX.Element, iconIndex) => (
+                  <IconsStatus key={iconIndex}>{icon}</IconsStatus>
+                ))}
               {statusItems.map((status: IStatus, infoIndex) => (
                 <StyledStatus key={infoIndex}>
                   {status.icon}

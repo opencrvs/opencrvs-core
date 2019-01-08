@@ -1,11 +1,14 @@
 import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
+  HOME,
   WORK_QUEUE,
   DRAFT_BIRTH_PARENT_FORM,
   SELECT_VITAL_EVENT
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
+import { getToken } from 'src/utils/authUtils'
+import { config } from 'src/config'
 
 function formatUrl(url: string, props: { [key: string]: string }) {
   return Object.keys(props).reduce(
@@ -36,6 +39,14 @@ export function goToEvents() {
 
 export function goBack() {
   return back()
+}
+
+export function goToHome() {
+  return push(HOME)
+}
+
+export function goToPerformance() {
+  window.location.assign(`${config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
 export function goToWorkQueue() {

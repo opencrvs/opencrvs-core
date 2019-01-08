@@ -4,11 +4,12 @@ import * as decode from 'jwt-decode'
 export interface IURLParams {
   [key: string]: string | string[] | undefined
 }
+export type Scope = string[]
 export interface ITokenPayload {
-  subject: string
+  sub: string
   exp: string
   algorithm: string
-  scope: string[]
+  scope: Scope
 }
 
 export const isTokenStillValid = (decoded: ITokenPayload) => {
@@ -26,6 +27,10 @@ export function getToken(): string {
 
 export function storeToken(token: string) {
   localStorage.setItem('opencrvs', token)
+}
+
+export function removeToken() {
+  localStorage.removeItem('opencrvs')
 }
 
 export const getTokenPayload = (token: string) => {
