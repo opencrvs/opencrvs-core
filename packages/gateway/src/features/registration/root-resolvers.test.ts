@@ -703,4 +703,59 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
+  describe('markBirthAsCertified()', () => {
+    const details = {
+      child: {
+        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
+      },
+      mother: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
+      },
+      registration: {
+        contact: 'MOTHER',
+        certificates: [
+          {
+            collector: {
+              relationship: 'MOTHER'
+            },
+            hasShowedVerifiedDocument: true,
+            data: 'DUMMY'
+          }
+        ]
+      }
+    }
+    it('posts a fhir bundle', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Mutation.markBirthAsCertified(
+        {},
+        { details }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('1')
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it("throws an error when the response isn't what we expect", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        // @ts-ignore
+        resolvers.Mutation.markBirthAsCertified({}, { details })
+      ).rejects.toThrowError('FHIR did not send a valid response')
+    })
+  })
 })

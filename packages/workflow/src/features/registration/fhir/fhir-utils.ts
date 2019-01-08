@@ -118,6 +118,15 @@ export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   return brnIdentifier.value
 }
 
+export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
+  try {
+    getBirthRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 export function getPaperFormID(taskResource: fhir.Task) {
   const paperFormIdentifier =
     taskResource &&
@@ -180,4 +189,21 @@ export const getFromFhir = (suffix: string) => {
     .catch(error => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
+}
+
+export async function postToHearth(payload: any) {
+  /* hearth will do put calls if it finds id on the bundle */
+  const res = await fetch(HEARTH_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
+  if (!res.ok) {
+    throw new Error(
+      `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+  return res.json()
 }

@@ -7,7 +7,7 @@ import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
-  DOCS_CODE,
+  ATTACHMENT_DOCS_CODE,
   BIRTH_ENCOUNTER_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
@@ -129,7 +129,10 @@ export const typeResolvers: GQLResolver = {
         `/${task.focus.reference}`,
         authHeader
       )
-      const docSection = findCompositionSection(DOCS_CODE, composition)
+      const docSection = findCompositionSection(
+        ATTACHMENT_DOCS_CODE,
+        composition
+      )
       if (!docSection || !docSection.entry) {
         return null
       }
