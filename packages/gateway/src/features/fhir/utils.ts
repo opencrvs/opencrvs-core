@@ -265,7 +265,7 @@ export function selectOrCreateDocRefResource(
   sectionTitle: string,
   fhirBundle: ITemplatedBundle,
   context: any,
-  contextKey: string
+  indexKey: string
 ): fhir.DocumentReference {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
@@ -276,7 +276,7 @@ export function selectOrCreateDocRefResource(
       sectionCode,
       sectionTitle
     )
-    docSection.entry[context._index[contextKey]] = {
+    docSection.entry[context._index[indexKey]] = {
       reference: `urn:uuid:${ref}`
     }
     fhirBundle.entry[0].resource.section.push(docSection)
@@ -288,10 +288,10 @@ export function selectOrCreateDocRefResource(
         'Expected supporting documents section to have an entry property'
       )
     }
-    const docSectionEntry = section.entry[context._index[contextKey]]
+    const docSectionEntry = section.entry[context._index[indexKey]]
     if (!docSectionEntry) {
       const ref = uuid()
-      section.entry[context._index[contextKey]] = {
+      section.entry[context._index[indexKey]] = {
         reference: `urn:uuid:${ref}`
       }
       docRef = createDocRefTemplate(ref)
@@ -304,7 +304,7 @@ export function selectOrCreateDocRefResource(
         const ref = uuid()
         docRef = createDocRefTemplate(ref)
         fhirBundle.entry.push(docRef)
-        section.entry[context._index[contextKey]] = {
+        section.entry[context._index[indexKey]] = {
           reference: `urn:uuid:${ref}`
         }
       }

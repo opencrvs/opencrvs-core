@@ -83,9 +83,9 @@ export async function markBundleAsRegistered(
 }
 
 export async function markBundleAsCertified(
-  bundle: fhir.Bundle & fhir.BundleEntry,
+  bundle: fhir.Bundle,
   token: string
-): Promise<fhir.Bundle & fhir.BundleEntry> {
+): Promise<fhir.Bundle> {
   const taskResource = getTaskResource(bundle) as fhir.Task
 
   const practitioner = await getLoggedInPractitionerResource(token)

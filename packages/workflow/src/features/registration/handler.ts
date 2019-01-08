@@ -86,7 +86,7 @@ export async function markBirthAsCertifiedHandler(
 ) {
   try {
     const payload = await markBundleAsCertified(
-      request.payload as fhir.Bundle & fhir.BundleEntry,
+      request.payload as fhir.Bundle,
       getToken(request)
     )
     return await postToHearth(payload)

@@ -1303,10 +1303,16 @@ const builders: IFieldBuilders = {
           )
           if (!paymentResource.detail) {
             paymentResource.detail = [
-              { type: fieldValue as fhir.CodeableConcept }
+              {
+                type: {
+                  coding: [{ code: fieldValue }]
+                }
+              }
             ]
           } else {
-            paymentResource.detail[0].type = fieldValue as fhir.CodeableConcept
+            paymentResource.detail[0].type = {
+              coding: [{ code: fieldValue }]
+            }
           }
         },
         total: (
@@ -1335,7 +1341,9 @@ const builders: IFieldBuilders = {
             paymentResource.detail = [
               {
                 /* should be replaced when type value comes in */
-                type: 'payment' as fhir.CodeableConcept,
+                type: {
+                  coding: [{ code: 'payment' }]
+                },
                 amount: fieldValue as fhir.Money
               }
             ]
@@ -1353,7 +1361,9 @@ const builders: IFieldBuilders = {
             context,
             EVENT_TYPE.BIRTH
           )
-          paymentResource.outcome = fieldValue as fhir.CodeableConcept
+          paymentResource.outcome = {
+            coding: [{ code: fieldValue }]
+          }
         },
         date: (
           fhirBundle: ITemplatedBundle,
@@ -1369,7 +1379,9 @@ const builders: IFieldBuilders = {
             paymentResource.detail = [
               {
                 /* should be replaced when type value comes in */
-                type: 'payment' as fhir.CodeableConcept,
+                type: {
+                  coding: [{ code: 'payment' }]
+                },
                 date: fieldValue
               }
             ]
