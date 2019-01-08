@@ -26,6 +26,10 @@ docker login
 # on manger, create required directories
 mkdir -p /data/mongo
 mkdir -p /data/traefik
+mkdir -p /data/elasticsearch
+chmod g+rwx /data/elasticsearch
+chgrp 1000 /data/elasticsearch
+mkdir -p /data/influxdb
 touch /data/traefik/acme.json
 chmod 600 /data/traefik/acme.json
 
