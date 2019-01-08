@@ -187,7 +187,7 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference: 'DUMMY'
+                      valueReference: { reference: 'DUMMY' }
                     }
                   ],
                   lastModified: '2018-11-28T15:13:57.492Z',
@@ -293,7 +293,7 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference: 'DUMMY'
+                      valueReference: { reference: 'DUMMY' }
                     }
                   ],
                   lastModified: '2018-11-28T15:13:57.492Z',
@@ -403,14 +403,18 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference:
-                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                      valueReference: {
+                        reference:
+                          'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                      }
                     },
                     {
                       url:
                         'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueReference:
-                        'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
                     }
                   ],
                   lastModified: '2018-12-11T11:55:46.775Z',
@@ -611,14 +615,18 @@ describe('Registration root resolvers', () => {
                     },
                     {
                       url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference:
-                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                      valueReference: {
+                        reference:
+                          'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                      }
                     },
                     {
                       url:
                         'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueReference:
-                        'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
                     }
                   ],
                   lastModified: '2018-12-11T11:55:46.775Z',
@@ -700,6 +708,61 @@ describe('Registration root resolvers', () => {
       await expect(
         // @ts-ignore
         resolvers.Mutation.updateBirthRegistration({}, { details })
+      ).rejects.toThrowError('FHIR did not send a valid response')
+    })
+  })
+  describe('markBirthAsCertified()', () => {
+    const details = {
+      child: {
+        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
+      },
+      mother: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
+      },
+      registration: {
+        contact: 'MOTHER',
+        certificates: [
+          {
+            collector: {
+              relationship: 'MOTHER'
+            },
+            hasShowedVerifiedDocument: true,
+            data: 'DUMMY'
+          }
+        ]
+      }
+    }
+    it('posts a fhir bundle', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Mutation.markBirthAsCertified(
+        {},
+        { details }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('1')
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it("throws an error when the response isn't what we expect", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        // @ts-ignore
+        resolvers.Mutation.markBirthAsCertified({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })

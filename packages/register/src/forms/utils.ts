@@ -11,7 +11,8 @@ import {
   IRadioOption,
   ICheckboxOption,
   ISelectFormFieldWithDynamicOptions,
-  INFORMATIVE_RADIO_GROUP
+  INFORMATIVE_RADIO_GROUP,
+  PARAGRAPH
 } from './'
 import { InjectedIntl } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -22,7 +23,8 @@ export const internationaliseFieldObject = (
 ): Ii18nFormField => {
   const base = {
     ...field,
-    label: intl.formatMessage(field.label),
+    label:
+      field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
     description: field.description && intl.formatMessage(field.description)
   }
 

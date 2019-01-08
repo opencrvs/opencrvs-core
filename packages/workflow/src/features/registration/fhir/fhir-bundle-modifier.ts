@@ -8,7 +8,11 @@ import {
 import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
 import { ITokenPayload, getTokenPayload } from 'src/utils/authUtils.ts'
-import { REG_STATUS_REGISTERED } from './constants'
+import {
+  REG_STATUS_DECLARED,
+  REG_STATUS_REGISTERED,
+  REG_STATUS_CERTIFIED
+} from './constants'
 import { generateBirthRegistrationNumber } from '../brnGenerator'
 
 export async function modifyRegistrationBundle(
@@ -32,7 +36,11 @@ export async function modifyRegistrationBundle(
   setupRegistrationType(taskResource, eventType)
 
   /* setting registration workflow status here */
-  setupRegistrationWorkflow(taskResource, getTokenPayload(token))
+  setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_DECLARED
+  )
 
   const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */
@@ -63,6 +71,30 @@ export async function markBundleAsRegistered(
     taskResource,
     getTokenPayload(token),
     REG_STATUS_REGISTERED
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
+}
+
+export async function markBundleAsCertified(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting registration workflow status here */
+  setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_CERTIFIED
   )
 
   /* setting lastRegLocation here */
@@ -215,14 +247,12 @@ export async function setupLastRegLocation(
       extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
     )
   })
-  if (regUserExtension) {
-    regUserExtension.valueReference = `Location/${
-      primaryOffice.id
-    }` as fhir.Reference
+  if (regUserExtension && regUserExtension.valueReference) {
+    regUserExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueReference: `Location/${primaryOffice.id}` as fhir.Reference
+      valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }
   return taskResource
@@ -240,14 +270,12 @@ export function setupLastRegUser(
       extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`
     )
   })
-  if (regUserExtension) {
-    regUserExtension.valueReference = getPractitionerRef(
-      practitioner
-    ) as fhir.Reference
+  if (regUserExtension && regUserExtension.valueReference) {
+    regUserExtension.valueReference.reference = getPractitionerRef(practitioner)
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-      valueReference: getPractitionerRef(practitioner) as fhir.Reference
+      valueReference: { reference: getPractitionerRef(practitioner) }
     })
   }
   return taskResource
