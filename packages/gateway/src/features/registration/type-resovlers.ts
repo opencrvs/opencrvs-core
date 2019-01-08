@@ -234,10 +234,10 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
       )
-      if (!user) {
+      if (!user || !user.valueReference) {
         return null
       }
-      return await fetchFHIR(`/${user.valueReference}`, authHeader)
+      return await fetchFHIR(`/${user.valueReference.reference}`, authHeader)
     },
 
     timestamp: task => task.lastModified,
@@ -247,10 +247,13 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension
       )
-      if (!taskLocation) {
+      if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return await fetchFHIR(`/${taskLocation.valueReference}`, authHeader)
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
     }
   },
   User: {
