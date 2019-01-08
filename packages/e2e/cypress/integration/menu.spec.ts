@@ -27,11 +27,11 @@ context('Login', () => {
     cy.get('[class*=rc-menu-submenu-title]').click()
 
     //Click on change Lanuage
-    cy.get('[class*="rc-menu-submenu rc-menu-submenu-inline sc-cMljjf eKDCjU"]').click()
+    //cy.get('[class*="rc-menu-submenu rc-menu-submenu-inline sc-cMljjf eKDCjU"]').click()
     // select Bengali
-    cy.get('[class*="rc-menu-item sc-jAaTju filVPB"]').contains('Bengali').click()
+    //cy.get('[class*="rc-menu-item sc-jAaTju filVPB"]').contains('Bengali').click()
 
-    cy.get('#select_vital_event_view').should('be.visible')
+    //cy.get('#select_vital_event_view').should('be.visible')
 
     })
   })
