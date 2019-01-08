@@ -338,7 +338,7 @@ export interface GQLMutation {
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsRegistered: string
-  markBirthAsCertified?: GQLBirthRegistration
+  markBirthAsCertified: string
   markBirthAsVoided: string
   createDeathRegistration: string
   updateDeathRegistration: GQLDeathRegistration
@@ -1607,7 +1607,7 @@ export interface MutationToMarkBirthAsRegisteredResolver<
 
 export interface MutationToMarkBirthAsCertifiedArgs {
   id: string
-  details?: GQLBirthRegistrationInput
+  details: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsCertifiedResolver<
   TParent = any,

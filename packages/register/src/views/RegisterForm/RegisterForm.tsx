@@ -47,7 +47,7 @@ const FormPrimaryButton = styled(PrimaryButton)`
 export const messages = defineMessages({
   newBirthRegistration: {
     id: 'register.form.newBirthRegistration',
-    defaultMessage: 'New birth declaration',
+    defaultMessage: 'New birth application',
     description: 'The message that appears for new birth registrations'
   },
   previewBirthRegistration: {

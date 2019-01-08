@@ -15,7 +15,14 @@ services:
     ports:
       - '9200:9200'
     volumes:
-      - './elasticdata:/elasticdata'
+      - './data/elasticsearch:/usr/share/elasticsearch/data'
+
+  influxdb:
+    ports:
+      - '8086:8086'
+    volumes:
+      - './data/influxdb:/var/lib/influxdb'
+
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   hearth:
     volumes:

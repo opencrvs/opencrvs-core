@@ -7,7 +7,7 @@ import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
-  DOCS_CODE,
+  ATTACHMENT_DOCS_CODE,
   BIRTH_ENCOUNTER_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
@@ -129,7 +129,10 @@ export const typeResolvers: GQLResolver = {
         `/${task.focus.reference}`,
         authHeader
       )
-      const docSection = findCompositionSection(DOCS_CODE, composition)
+      const docSection = findCompositionSection(
+        ATTACHMENT_DOCS_CODE,
+        composition
+      )
       if (!docSection || !docSection.entry) {
         return null
       }
@@ -231,10 +234,10 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
       )
-      if (!user) {
+      if (!user || !user.valueReference) {
         return null
       }
-      return await fetchFHIR(`/${user.valueReference}`, authHeader)
+      return await fetchFHIR(`/${user.valueReference.reference}`, authHeader)
     },
 
     timestamp: task => task.lastModified,
@@ -244,10 +247,13 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension
       )
-      if (!taskLocation) {
+      if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return await fetchFHIR(`/${taskLocation.valueReference}`, authHeader)
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
     }
   },
   User: {

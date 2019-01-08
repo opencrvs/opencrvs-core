@@ -128,6 +128,7 @@ export interface IListFormField extends IFormFieldBase {
 }
 export interface IParagraphFormField extends IFormFieldBase {
   type: typeof PARAGRAPH
+  fontSize?: string
 }
 export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
@@ -212,6 +213,7 @@ export interface Ii18nFormFieldBase {
   validate: Validation[]
   required?: boolean
   prefix?: string
+  initialValue?: IFormFieldValue
   postfix?: string
   disabled?: boolean
   conditionals?: IConditional[]
@@ -281,6 +283,7 @@ export interface Ii18nListFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
   type: typeof PARAGRAPH
+  fontSize?: string
 }
 export interface Ii18nImageUploaderWithOptionsFormField
   extends Ii18nFormFieldBase {

@@ -361,7 +361,7 @@ export const testFhirTaskBundle = {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: 'DUMMY'
+            valueReference: { reference: 'DUMMY' }
           }
         ],
         note: [
