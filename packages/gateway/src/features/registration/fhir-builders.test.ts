@@ -467,10 +467,12 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[10].resource.total).toBe(50.0)
-  expect(fhir.entry[10].resource.outcome).toBe('COMPLETED')
+  expect(fhir.entry[10].resource.outcome).toEqual({
+    coding: [{ code: 'COMPLETED' }]
+  })
   expect(fhir.entry[10].resource.detail).toEqual([
     {
-      type: 'MANUAL',
+      type: { coding: [{ code: 'MANUAL' }] },
       amount: 50.0,
       date: '2018-10-22'
     }
