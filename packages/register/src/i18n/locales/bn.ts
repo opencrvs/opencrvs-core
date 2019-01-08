@@ -491,6 +491,7 @@ export const BENGALI_STATE = {
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
+    'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       'যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}',
     'validations.emailAddressFormat': 'Must be a valid email address',

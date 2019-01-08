@@ -491,6 +491,7 @@ export const ENGLISH_STATE = {
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
+    'validations.range': 'Must be within {min} and {max}',
     'validations.phoneNumberFormat':
       'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     'validations.emailAddressFormat': 'Must be a valid email address',
