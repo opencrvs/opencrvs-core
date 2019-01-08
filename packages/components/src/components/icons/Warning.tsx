@@ -7,7 +7,6 @@ export const Warning = (props: React.HTMLAttributes<SVGElement>) => (
     xmlnsXlink="http://www.w3.org/1999/xlink"
     {...props}
   >
-    <title>3CC0E8EB-009C-4703-A851-DDC810D7A91A</title>
     <defs>
       <circle id="warningB" cx={9.5} cy={9.5} r={9.5} />
       <filter

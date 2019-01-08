@@ -7,9 +7,10 @@ import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   IconAction,
   ActionTitle,
-  PrimaryButton
+  PrimaryButton,
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Plus } from '@opencrvs/components/lib/icons'
+import { Plus, Edit } from '@opencrvs/components/lib/icons'
 import {
   Banner,
   SearchInput,
@@ -33,7 +34,8 @@ import {
   StatusGray,
   StatusOrange,
   StatusGreen,
-  StatusCollected
+  StatusCollected,
+  Duplicate
 } from '@opencrvs/components/lib/icons'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { IStoreState } from 'src/store'
@@ -44,6 +46,9 @@ import { goToEvents as goToEventsAction } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
+import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
+import { IFormSection } from 'src/forms'
+import { APPLICATIONS_STATUS } from 'src/utils/constants'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -51,6 +56,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
       id
       registration {
         trackingId
+        registrationNumber
         status {
           user {
             name {
@@ -67,6 +73,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
           type
           timestamp
         }
+        duplicates
       }
       child {
         name {
@@ -208,6 +215,16 @@ const messages = defineMessages({
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
   },
+  listItemBirthRegistrationNumber: {
+    id: 'register.workQueue.labels.results.birthRegistrationNumber',
+    defaultMessage: 'BRN',
+    description: 'Label for BRN in work queue list item'
+  },
+  listItemDuplicateLabel: {
+    id: 'register.workQueue.labels.results.duplicate',
+    defaultMessage: 'Possible duplicate found',
+    description: 'Label for duplicate indication in work queue'
+  },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
     defaultMessage: 'New birth registration',
@@ -224,10 +241,32 @@ const messages = defineMessages({
     description:
       'The title of review and register button in expanded area of list item'
   },
+  reviewDuplicates: {
+    id: 'register.workQueue.buttons.reviewDuplicates',
+    defaultMessage: 'Review Duplicates',
+    description:
+      'The title of review duplicates button in expanded area of list item'
+  },
   review: {
     id: 'register.workQueue.list.buttons.review',
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
+  },
+  print: {
+    id: 'register.workQueue.list.buttons.print',
+    defaultMessage: 'Print',
+    description: 'The title of print button in list item actions'
+  },
+  certificateCollectionActionTitle: {
+    id: 'register.workQueue.title.certificateCollection',
+    defaultMessage: 'Certificate Collection',
+    description: 'The title of print certificate action'
+  },
+  printCertificate: {
+    id: 'register.workQueue.list.buttons.printCertificate',
+    defaultMessage: 'Print certificate',
+    description:
+      'The title of print certificate button in list expansion actions'
   },
   workflowStatusDateApplication: {
     id: 'register.workQueue.listItem.status.dateLabel.application',
@@ -250,6 +289,22 @@ const messages = defineMessages({
     id: 'register.workQueue.listItem.status.label.byPractitioner',
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
+  },
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
+  },
+
+  EditBtnText: {
+    id: 'review.edit.modal.editButton',
+    defaultMessage: 'Edit',
+    description: 'Edit button text'
+  },
+  printCertificateBtnText: {
+    id: 'register.workQueue.buttons.printCertificate',
+    defaultMessage: 'Print Certificate',
+    description: 'Print Certificate Button text'
   }
 })
 
@@ -308,6 +363,15 @@ const ValueContainer = styled.div`
   flex-wrap: wrap;
   line-height: 1.3em;
 `
+const DuplicateIndicatorContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  & span {
+    font-family: ${({ theme }) => theme.fonts.boldFont};
+    margin-left: 10px;
+  }
+`
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -363,6 +427,28 @@ const ExpansionContentContainer = styled.div`
   flex: 1;
   margin-left: 10px;
 `
+const StyledPrimaryButton = styled(PrimaryButton)`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+`
+
+const StyledSecondaryButton = styled(SecondaryButton)`
+  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  color: ${({ theme }) => theme.colors.primary} !important;
+  font-weight: bold;
+  svg {
+    margin-right: 15px;
+  }
+  &:hover {
+    background: inherit;
+    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  }
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.inputBackground};
+  }
+`
+const StatusIcon = styled.div`
+  margin-top: 3px;
+`
 
 interface IBaseWorkQueueProps {
   theme: ITheme
@@ -371,6 +457,7 @@ interface IBaseWorkQueueProps {
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
+  printForm: IFormSection
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -378,17 +465,43 @@ type IWorkQueueProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseWorkQueueProps
 
-export class WorkQueueView extends React.Component<IWorkQueueProps> {
+interface IWorkQueueState {
+  printCertificateModalVisible: boolean
+  regId: string | null
+}
+
+export class WorkQueueView extends React.Component<
+  IWorkQueueProps,
+  IWorkQueueState
+> {
+  state = { printCertificateModalVisible: false, regId: null }
+
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'APPLICATION':
-        return <StatusOrange />
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
       case 'REGISTERED':
-        return <StatusGreen />
+        return (
+          <StatusIcon>
+            <StatusGreen />
+          </StatusIcon>
+        )
       case 'COLLECTED':
-        return <StatusCollected />
+        return (
+          <StatusIcon>
+            <StatusCollected />
+          </StatusIcon>
+        )
       default:
-        return <StatusOrange />
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
     }
   }
 
@@ -403,6 +516,13 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       default:
         return messages.workflowStatusDateApplication
     }
+  }
+
+  togglePrintModal = (id?: string) => {
+    this.setState(prevState => ({
+      printCertificateModalVisible: !prevState.printCertificateModalVisible,
+      regId: id ? id : ''
+    }))
   }
 
   transformData = (data: GQLQuery) => {
@@ -439,6 +559,8 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           '',
         dob: (reg.child && reg.child.birthDate) || '',
         date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
+        registrationNumber:
+          (reg.registration && reg.registration.registrationNumber) || '',
         tracking_id: (reg.registration && reg.registration.trackingId) || '',
         createdAt: reg.createdAt as string,
         status:
@@ -472,6 +594,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
           reg.registration.status &&
           (reg.registration.status[0] as GQLRegWorkflow).type,
         event: 'birth',
+        duplicates: reg.registration && reg.registration.duplicates,
         location:
           (reg.registration &&
             reg.registration.status &&
@@ -493,7 +616,6 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       return (
         <ExpansionContainer key={key}>
           {this.getDeclarationStatusIcon(status.type)}
-
           <ExpansionContentContainer>
             <LabelValue
               label={this.props.intl.formatMessage(
@@ -517,6 +639,16 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                 separator={<Separator />}
               />
             </ValueContainer>
+            {item.duplicates && (
+              <DuplicateIndicatorContainer>
+                <Duplicate />
+                <span>
+                  {this.props.intl.formatMessage(
+                    messages.listItemDuplicateLabel
+                  )}
+                </span>
+              </DuplicateIndicatorContainer>
+            )}
           </ExpansionContentContainer>
         </ExpansionContainer>
       )
@@ -527,8 +659,10 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     item: { [key: string]: string & Array<{ type: string }> },
     key: number
   ): JSX.Element => {
+    const applicationIsRegistered = item.declaration_status === 'REGISTERED'
     const info = []
     const status = []
+    const icons = []
 
     info.push({
       label: this.props.intl.formatMessage(messages.listItemName),
@@ -542,10 +676,20 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
       value: item.date_of_application
     })
-    info.push({
-      label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
-      value: item.tracking_id
-    })
+    if (!applicationIsRegistered) {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
+        value: item.tracking_id
+      })
+    }
+    if (applicationIsRegistered) {
+      info.push({
+        label: this.props.intl.formatMessage(
+          messages.listItemBirthRegistrationNumber
+        ),
+        value: item.registrationNumber
+      })
+    }
 
     status.push({ icon: <StatusGray />, label: item.event })
     status.push({
@@ -553,33 +697,90 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
       label: item.declaration_status
     })
 
-    const listItemActions = [
-      {
-        label: this.props.intl.formatMessage(messages.review),
-        handler: () => {
-          this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
-        }
-      }
-    ]
+    if (item.duplicates) {
+      icons.push(<Duplicate />)
+    }
+
+    const listItemActions = []
 
     const expansionActions: JSX.Element[] = []
+    if (this.userHasCertifyScope()) {
+      if (applicationIsRegistered) {
+        listItemActions.push({
+          label: this.props.intl.formatMessage(messages.print),
+          handler: () => this.togglePrintModal(item.id)
+        })
+
+        expansionActions.push(
+          <StyledPrimaryButton
+            id={`printCertificate_${item.tracking_id}`}
+            onClick={() => this.togglePrintModal(item.id)}
+          >
+            {this.props.intl.formatMessage(messages.printCertificateBtnText)}
+          </StyledPrimaryButton>
+        )
+      }
+    }
+
     if (this.userHasRegisterScope()) {
-      expansionActions.push(
-        <PrimaryButton
-          id={`reviewAndRegisterBtn_${item.tracking_id}`}
-          onClick={() =>
+      if (!item.duplicates && !applicationIsRegistered) {
+        listItemActions.push({
+          label: this.props.intl.formatMessage(messages.review),
+          handler: () =>
             this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
-          }
+        })
+
+        expansionActions.push(
+          <StyledPrimaryButton
+            id={`reviewAndRegisterBtn_${item.tracking_id}`}
+            onClick={() =>
+              this.props.gotoTab(
+                REVIEW_BIRTH_PARENT_FORM_TAB,
+                item.id,
+                'review'
+              )
+            }
+          >
+            {this.props.intl.formatMessage(messages.reviewAndRegister)}
+          </StyledPrimaryButton>
+        )
+      }
+    }
+
+    if (item.duplicates && !applicationIsRegistered) {
+      listItemActions.push({
+        label: this.props.intl.formatMessage(messages.reviewDuplicates),
+        handler: () => console.log('TO DO')
+      })
+      expansionActions.push(
+        <StyledPrimaryButton
+          id={`reviewDuplicatesBtn_${item.tracking_id}`}
+          onClick={() => {
+            console.log('TO DO')
+          }}
         >
-          {this.props.intl.formatMessage(messages.reviewAndRegister)}
-        </PrimaryButton>
+          {this.props.intl.formatMessage(messages.reviewDuplicates)}
+        </StyledPrimaryButton>
       )
     }
+    if (applicationIsRegistered) {
+      expansionActions.push(
+        <StyledSecondaryButton
+          id={`editBtn_${item.tracking_id}`}
+          disabled={true}
+        >
+          <Edit />
+          {this.props.intl.formatMessage(messages.EditBtnText)}
+        </StyledSecondaryButton>
+      )
+    }
+
     return (
       <ListItem
         index={key}
         infoItems={info}
         statusItems={status}
+        icons={icons}
         key={key}
         itemData={{}}
         actions={listItemActions}
@@ -596,6 +797,10 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
   }
   userHasDeclareScope() {
     return this.props.scope && this.props.scope.includes('declare')
+  }
+
+  userHasCertifyScope() {
+    return this.props.scope && this.props.scope.includes('certify')
   }
 
   getLocalLocationId() {
@@ -628,7 +833,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
   }
 
   render() {
-    const { intl, theme } = this.props
+    const { intl, theme, printForm } = this.props
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -726,7 +931,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
     }
     return (
       <>
-        <HomeViewHeader>
+        <HomeViewHeader id="work_queue_header">
           <ViewHeading
             id="work_queue_view"
             title={intl.formatMessage(messages.headerTitle)}
@@ -769,6 +974,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                   <Banner
                     text={intl.formatMessage(messages.bannerTitle)}
                     count={transformedData.length}
+                    status={APPLICATIONS_STATUS}
                   />
                   <SearchInput
                     placeholder={intl.formatMessage(
@@ -794,6 +1000,17 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
             }}
           </Query>
         </Container>
+        {this.state.printCertificateModalVisible ? (
+          <PrintCertificateAction
+            title={this.props.intl.formatMessage(
+              messages.certificateCollectionActionTitle
+            )}
+            backLabel={this.props.intl.formatMessage(messages.back)}
+            registrationId={(this.state.regId && this.state.regId) || ''}
+            togglePrintCertificateSection={this.togglePrintModal}
+            printCertificateFormSection={printForm}
+          />
+        ) : null}
       </>
     )
   }
@@ -802,7 +1019,8 @@ export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: state.profile.userDetails
+    userDetails: state.profile.userDetails,
+    printForm: state.printCertificateForm.collectCertificateFrom
   }),
   { goToEvents: goToEventsAction, gotoTab: goToTabAction }
 )(injectIntl(withTheme(WorkQueueView)))

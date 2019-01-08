@@ -11,6 +11,7 @@ export const ENGLISH_STATE = {
     'menu.items.changeLanguage': 'Change Language',
     'menu.items.changeLanguage.english': 'English',
     'menu.items.changeLanguage.bengali': 'Bengali',
+    'menu.items.performance': 'Performance',
     'states.state1': 'Barishal Division',
     'states.state2': 'Dhaka Division',
     'states.state3': 'Khulna Division',
@@ -441,7 +442,10 @@ export const ENGLISH_STATE = {
     'formFields.motherEducationAttainment':
       "Mother's level of formal education attained",
     'formFields.optionalLabel': 'Optional',
-
+    'formFields.hospital': 'Hospital',
+    'formFields.otherHealthInstitution': 'Other Health Institution',
+    'formFields.privateHome': 'Private Home',
+    'formFields.otherInstitution': 'Other Institution',
     'register.form.tabs.documentsTab': 'Documents',
     'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
@@ -460,10 +464,9 @@ export const ENGLISH_STATE = {
       'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
     'register.form.section.documents.list.otherDocuments':
       'Attested copy(s) of the document as prescribed by the Registrar',
-    'register.form.tabs.registrationTab': 'Registration',
-    'register.form.section.registrationTitle': 'Registration',
-    'formFields.registration.whoIsPresent':
-      "Who's present for the registration",
+    'register.form.tabs.registrationTab': 'Application',
+    'register.form.section.registrationTitle': 'Application',
+    'formFields.registration.whoIsPresent': "Who's present for the application",
     'formFields.registration.whoIsPresent.both': 'Both Parents',
     'formFields.registration.whoIsPresent.mother': 'Mother',
     'formFields.registration.whoIsPresent.father': 'Father',
@@ -484,13 +487,7 @@ export const ENGLISH_STATE = {
     'formFields.registration.certificateLanguage.other': 'Other',
     'formFields.registration.commentsOrNotes': 'Comments or notes',
     'formFields.registration.commentsOrNotes.description':
-      'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.',
-    'login.stepOneTitle': 'Login to OpenCRVS',
-    'login.stepOneInstruction': 'Please enter your mobile number and password.',
-    'login.mobileNumberLabel': 'Mobile number',
-    'login.mobileNumberPlaceholder': 'e.g: +44-7XXX-XXXXXX',
-    'login.passwordLabel': 'Password',
-    'login.submit': 'Submit',
+      'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
@@ -504,20 +501,27 @@ export const ENGLISH_STATE = {
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
-    'register.form.newBirthRegistration': 'New birth declaration',
+    'register.form.newBirthRegistration': 'New birth application',
     'register.form.previewBirthRegistration': 'Birth Application Preview',
-    'register.form.reviewBirthRegistration': 'Birth Application Review',
+    'register.form.reviewBirthRegistration': 'Birth Registration Review',
     'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
+    'register.home.hedaer.hello': 'Hello {fullName}',
+    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
+    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
+    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
-      'As you have connectivity, we have synced {syncCount} new birth declarations.',
-    'register.savedRegistration.online.title': 'Declaration submitted',
+      'As you have connectivity, we have synced {syncCount} new birth applications.',
+    'register.savedRegistration.online.title': 'Application submitted',
     'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'Registration complete',
     'register.savedRegistration.online.desc':
@@ -544,7 +548,7 @@ export const ENGLISH_STATE = {
     'register.completeRegistration.trackingCard.title':
       'Birth Registration Number:',
     'register.savedRegistration.trackingCard.text':
-      'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.',
+      'The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their application.',
     'register.savedRegistration.registrationNumber.text':
       'The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.',
     'register.savedRegistration.nextCard.title': 'What next?',
@@ -581,9 +585,15 @@ export const ENGLISH_STATE = {
     'register.selectVitalEvent.registerNewEventTitle':
       'Declare a new vital event',
     'register.home.buttons.mydraft': 'My draft',
-    'register.home.buttons.registerNewEvent': 'Declare a new vital event',
+    'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
     'register.home.buttons.completedSumissions': 'Completed submissions',
+    'register.home.banner.notificationsToComplete':
+      'Notifications to complete in my area',
+    'register.home.banner.rejectedApplications': 'My rejected applications',
+    'register.home.button.savedDrafts': 'My saved drafts',
+    'register.home.button.records': 'My records',
+    'register.home.buttons.trackingId': 'Tracking ID',
     'register.home.logout': 'Log out',
     'register.selectVitalEvent.registerNewEventDesc':
       'Start by selecting the event you want to declare.',
@@ -638,19 +648,46 @@ export const ENGLISH_STATE = {
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
+    'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
     'register.workQueue.queryError': 'An error occurred while searching',
+    'print.certificate.queryError':
+      'An error occurred while quering for birth registration data',
+    'print.certificate.confirm': 'Confirm',
     'register.workQueue.dataTable.results': 'Results',
     'register.workQueue.dataTable.noResults': 'No result to display',
     'register.workQueue.header.title': 'Hello Registrar',
     'register.workQueue.header.description':
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
+    'register.workQueue.list.buttons.review': 'Review',
+    'register.workQueue.list.buttons.print': 'Print',
+    'register.workQueue.title.certificateCollection': 'Certificate Collection',
+    'register.workQueue.list.buttons.printCertificate': 'Print certificate',
     'register.workQueue.buttons.newApplication': 'New birth application',
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
-    'register.workQueue.listItem.status.dateLabel.registered': 'Registrated on',
+    'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',
     'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
+    'register.workQueue.print.form.name': 'Print',
+    'register.workQueue.print.form.title': 'Print certificate',
+    'formFields.print.whoToCollect': 'Who is collecting the certificate?',
+    'register.workQueue.print.collector.mother': 'Mother',
+    'register.workQueue.print.collector.father': 'Father',
+    'register.workQueue.print.collector.other': 'Other',
+    'formFields.print.confirmMotherInformation':
+      'Does their proof of ID document match the following details?',
+    'formFields.print.otherPersonGivenNames': 'Given name',
+    'formFields.print.otherPersonFamilyName': 'Family name',
+    'formFields.print.signedAffidavit': 'Do they have a signed affidavit?',
+    'formFields.print.documentNumber': 'Document number',
+    'formFields.print.warningNotVerified':
+      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
+    'formFields.print.otherPersonPrompt':
+      'Because there are no details of this person on record, we need to capture their details:',
+    'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
+    'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
+    'register.workQueue.buttons.printCertificate': 'Print Certificate',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
     'review.edit.modal.confirmationText':
@@ -675,6 +712,27 @@ export const ENGLISH_STATE = {
     'review.form.deleteApplication': 'Delete Application',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
-    'app.logout.modal.confirmationText': 'Are you sure you wish to log out?'
+    'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',
+    'certificate.parent.details.label.firstName': 'First Name(s)',
+    'certificate.parent.details.label.familyName': 'Family Name',
+    'certificate.parent.details.label.firstNameInEng':
+      'First Name(s)(in english)',
+    'certificate.parent.details.label.familyNameInEng':
+      'Family Name(in english)',
+    'certificate.parent.details.label.dateOfBirth': 'Date of Birth',
+    'certificate.parent.details.label.nationality': 'Nationality',
+    'certificate.parent.details.label.typeOfID': 'Type of ID',
+    'certificate.parent.details.label.number': 'Number',
+    'review.form.section.reviewTitle': 'Review',
+    'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
+    'validations.englishOnlyNameFormat': 'Must contain only English characters',
+    'register.home.header.hello': 'Hello {fullName}',
+    'register.form.valueYes': 'Yes',
+    'register.form.valueNo': 'No',
+    'review.birthRegistration.queryError':
+      'An error occurred while fetching birth registration',
+    'review.error.unauthorized': 'We are unable to display this page to you',
+    'register.workQueue.buttons.newRegistration': 'New birth application',
+    'register.workQueue.buttons.reviewAndRegister': 'Review and Register'
   }
 }

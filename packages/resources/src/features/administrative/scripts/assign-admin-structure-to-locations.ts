@@ -1,11 +1,12 @@
 import {
   fetchAndComposeLocations,
-  getLocationsByParentDivisions
+  getLocationsByParentDivisions,
+  generateLocationResource
 } from './service'
 import chalk from 'chalk'
-import { internal } from 'boom'
 import * as fs from 'fs'
-import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { ADMIN_STRUCTURE_SOURCE, REGISTER_SOURCE } from '../../../constants'
+import { ILocation } from 'src/features/utils/bn'
 
 export default async function importAdminStructure() {
   let divisions: fhir.Location[]
@@ -37,7 +38,10 @@ export default async function importAdminStructure() {
     )
     divisions = await fetchAndComposeLocations('division', '0', 'DIVISION')
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -47,7 +51,10 @@ export default async function importAdminStructure() {
     )
     districts = await getLocationsByParentDivisions('district', divisions)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -57,7 +64,10 @@ export default async function importAdminStructure() {
     )
     upazilas = await getLocationsByParentDivisions('upazila', districts)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -67,7 +77,10 @@ export default async function importAdminStructure() {
     )
     thanas = await getLocationsByParentDivisions('thana', districts)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -77,7 +90,10 @@ export default async function importAdminStructure() {
     )
     cities = await getLocationsByParentDivisions('citycorporation', districts)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -90,7 +106,10 @@ export default async function importAdminStructure() {
       cities
     )
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -100,7 +119,10 @@ export default async function importAdminStructure() {
     )
     unions = await getLocationsByParentDivisions('union', upazilas)
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -113,7 +135,10 @@ export default async function importAdminStructure() {
       upazilas
     )
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   try {
@@ -128,7 +153,10 @@ export default async function importAdminStructure() {
       municipalities
     )
   } catch (err) {
-    return internal(err)
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
   }
 
   fs.writeFileSync(
@@ -175,6 +203,27 @@ export default async function importAdminStructure() {
     `${ADMIN_STRUCTURE_SOURCE}locations/municipalityWards.json`,
     JSON.stringify({ municipalityWards }, null, 2)
   )
+
+  const fhirLocations: fhir.Location[] = []
+  fhirLocations.push(...divisions)
+  fhirLocations.push(...districts)
+  fhirLocations.push(...upazilas)
+  fhirLocations.push(...thanas)
+  fhirLocations.push(...cities)
+  fhirLocations.push(...cityWards)
+  fhirLocations.push(...unions)
+  fhirLocations.push(...municipalities)
+  fhirLocations.push(...municipalityWards)
+
+  const data: ILocation[] = []
+  for (const location of fhirLocations) {
+    data.push(generateLocationResource(location))
+  }
+  fs.writeFileSync(
+    `${REGISTER_SOURCE}locations.json`,
+    JSON.stringify({ data }, null, 2)
+  )
+
   return true
 }
 

@@ -1,6 +1,11 @@
 import { Response } from 'node-fetch'
 import { ORG_URL } from '../../../../constants'
-import { getUpazilaID, getFromFhir, sendToFhir } from '../../../utils/bn'
+import {
+  getLocationIDByDescription,
+  getUpazilaID,
+  getFromFhir,
+  sendToFhir
+} from '../../../utils/bn'
 import chalk from 'chalk'
 
 interface ITestPractitioner {
@@ -8,7 +13,9 @@ interface ITestPractitioner {
   district: string
   upazila: string
   union: string
+  A2IReference: string
   facilityEnglishName: string
+  facilityBengaliName: string
   givenNamesBengali: string
   givenNamesEnglish: string
   familyNameBengali: string
@@ -104,10 +111,11 @@ export async function composeAndSavePractitioners(
       locations.push({ reference: `Location/${upazilaID as string}` })
     }
     if (practitioner.union) {
-      const practitionerUnion: fhir.Location = unions.find(union => {
-        return union.name === practitioner.union.toUpperCase()
-      }) as fhir.Location
-      locations.push({ reference: `Location/${practitionerUnion.id}` })
+      const unionID = getLocationIDByDescription(
+        unions,
+        practitioner.A2IReference
+      )
+      locations.push({ reference: `Location/${unionID as string}` })
     }
     // tslint:disable-next-line:no-console
     console.log(

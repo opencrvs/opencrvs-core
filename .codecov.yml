@@ -41,3 +41,9 @@ coverage:
         paths:
           - packages/workflow
         threshold: 0.5
+ignore:
+  - 'packages/register/src/extract-translations.ts'
+  - 'packages/register/src/index.tsx'
+  - 'packages/register/src/registerServiceWorker.ts'
+  - 'packages/register/src/src-sw.js'
+  - 'packages/register/src/tests/graphql-schema-mock.ts'

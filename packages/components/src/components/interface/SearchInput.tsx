@@ -58,7 +58,9 @@ const SearchIcon = styled(Search)`
 `
 const StyledSearchButton = styled(SearchButton)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-top: 5px;
+    margin-top: 20px;
+    margin-bottom: 11px;
+    max-width: 200px;
     flex: 1;
   }
 `

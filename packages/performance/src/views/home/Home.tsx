@@ -7,14 +7,59 @@ import {
   FormattedHTMLMessage,
   defineMessages
 } from 'react-intl'
-import { Header, Box } from '@opencrvs/components/lib/interface'
+import { Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
-import Logo from 'src/components/Logo'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { getUserDetails } from 'src/profile/selectors'
+import { getLanguage } from '@opencrvs/performance/src/i18n/selectors'
+import { IUserDetails } from 'src/utils/userUtils'
 import { Page } from 'src/components/Page'
+import { IStoreState } from '@opencrvs/performance/src/store'
+import { HomeViewHeader } from 'src/components/HomeViewHeader'
 
 import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
 
 const messages = defineMessages({
+  logoutActionTitle: {
+    id: 'register.home.logout',
+    defaultMessage: 'Log out',
+    description: 'The title for log out on an action'
+  },
+  hello: {
+    id: 'register.home.header.hello',
+    defaultMessage: 'Hello {fullName}',
+    description: 'Title for the user'
+  },
+  FIELD_AGENT: {
+    id: 'register.home.hedaer.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
+  },
+  REGISTRATION_CLERK: {
+    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    defaultMessage: 'Registrar',
+    description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.hedaer.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
+  },
   birthRegistrationBoxTitle: {
     id: 'performance.graph.birthRegistrationBoxTitle',
     defaultMessage: 'Birth Registration Key Figures',
@@ -179,11 +224,6 @@ const birthRegistrationDataPerMonth = [
   { label: 'Dec', value: 8570, totalEstimate: 10000 }
 ]
 
-const StyledHeader = styled(Header)`
-  padding: 0 26px;
-  box-shadow: none;
-`
-
 const BoxTitle = styled.div`
   line-height: 25px;
   text-transform: capitalize !important;
@@ -239,65 +279,92 @@ const Label = styled.div`
     font-size: 13px;
   }
 `
-
-class HomeView extends React.Component<InjectedIntlProps> {
-  render() {
-    const { intl } = this.props
-    return (
-      <Page>
-        <StyledHeader>
-          <Logo />
-        </StyledHeader>
-        <Container>
-          <ChartContainer>
-            <BoxTitle id="box_title">
-              {intl.formatMessage(messages.birthRegistrationBoxTitle)}
-            </BoxTitle>
-            <Legend data={getData(intl)} smallestToLargest={false} />
-            <FooterText id="footer_text">
-              {intl.formatMessage(messages.birthRegistrationBoxFooter)}
-            </FooterText>
-          </ChartContainer>
-          <ChartContainer>
-            <BoxTitle id="bar_chart_box_title">
-              {intl.formatMessage(messages.birthRegistrationBarChartBoxTitle)}
-            </BoxTitle>
-            <VerticalBar
-              data={birthRegistrationData}
-              xAxisLabel={intl.formatMessage(
-                messages.birthRegistrationBarChartInAgesLabel
-              )}
-              yAxisLabel={intl.formatMessage(
-                messages.birthRegistrationPercentageLabel
-              )}
-            />
-          </ChartContainer>
-          <ChartContainer>
-            <BoxTitle id="line_chart_box_title">
-              {intl.formatMessage(
-                messages.birthRegistrationRateWithin45DaysBoxTitle
-              )}
-            </BoxTitle>
-            <LabelContainer>
-              <Label>2018 estimate = 10000</Label>
-            </LabelContainer>
-            <Line
-              data={birthRegistrationDataPerMonth}
-              xAxisLabel={intl.formatMessage(
-                messages.birthRegistrationRatePerMonthLabel
-              )}
-              yAxisLabel={intl.formatMessage(
-                messages.birthRegistrationPercentageOfEstimateLabel
-              )}
-            />
-          </ChartContainer>
-        </Container>
-      </Page>
-    )
-  }
+interface IHomeProps {
+  language: string
+  userDetails: IUserDetails
 }
 
+type FullProps = IHomeProps & InjectedIntlProps
+
+class HomeView extends React.Component<FullProps> {
+  render() {
+    const { intl, language, userDetails } = this.props
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      const fullName = `${String(nameObj.firstNames)} ${String(
+        nameObj.familyName
+      )}`
+      return (
+        <Page>
+          <HomeViewHeader
+            title={intl.formatMessage(messages.hello, {
+              fullName
+            })}
+            description={intl.formatMessage(
+              messages[userDetails.role as string]
+            )}
+            id="home_view"
+          />
+          <Container>
+            <ChartContainer>
+              <BoxTitle id="box_title">
+                {intl.formatMessage(messages.birthRegistrationBoxTitle)}
+              </BoxTitle>
+              <Legend data={getData(intl)} smallestToLargest={false} />
+              <FooterText id="footer_text">
+                {intl.formatMessage(messages.birthRegistrationBoxFooter)}
+              </FooterText>
+            </ChartContainer>
+            <ChartContainer>
+              <BoxTitle id="bar_chart_box_title">
+                {intl.formatMessage(messages.birthRegistrationBarChartBoxTitle)}
+              </BoxTitle>
+              <VerticalBar
+                data={birthRegistrationData}
+                xAxisLabel={intl.formatMessage(
+                  messages.birthRegistrationBarChartInAgesLabel
+                )}
+                yAxisLabel={intl.formatMessage(
+                  messages.birthRegistrationPercentageLabel
+                )}
+              />
+            </ChartContainer>
+            <ChartContainer>
+              <BoxTitle id="line_chart_box_title">
+                {intl.formatMessage(
+                  messages.birthRegistrationRateWithin45DaysBoxTitle
+                )}
+              </BoxTitle>
+              <LabelContainer>
+                <Label>2018 estimate = 10000</Label>
+              </LabelContainer>
+              <Line
+                data={birthRegistrationDataPerMonth}
+                xAxisLabel={intl.formatMessage(
+                  messages.birthRegistrationRatePerMonthLabel
+                )}
+                yAxisLabel={intl.formatMessage(
+                  messages.birthRegistrationPercentageOfEstimateLabel
+                )}
+              />
+            </ChartContainer>
+          </Container>
+        </Page>
+      )
+    } else {
+      return <></>
+    }
+  }
+}
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    language: getLanguage(store),
+    userDetails: getUserDetails(store)
+  }
+}
 export const Home = connect(
-  null,
+  mapStateToProps,
   null
 )(injectIntl(HomeView))

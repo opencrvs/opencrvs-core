@@ -129,10 +129,6 @@ export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
     compositionResource.identifier.value = birthTrackingId
   }
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
-  if (!taskResource.focus) {
-    taskResource.focus = { reference: '' }
-  }
-  taskResource.focus.reference = fhirBundle.entry[0].fullUrl
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
@@ -220,11 +216,13 @@ export async function setupLastRegLocation(
     )
   })
   if (regUserExtension) {
-    regUserExtension.valueString = `Location/${primaryOffice.id}`
+    regUserExtension.valueReference = `Location/${
+      primaryOffice.id
+    }` as fhir.Reference
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueString: `Location/${primaryOffice.id}`
+      valueReference: `Location/${primaryOffice.id}` as fhir.Reference
     })
   }
   return taskResource
@@ -243,11 +241,13 @@ export function setupLastRegUser(
     )
   })
   if (regUserExtension) {
-    regUserExtension.valueString = getPractitionerRef(practitioner)
+    regUserExtension.valueReference = getPractitionerRef(
+      practitioner
+    ) as fhir.Reference
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-      valueString: getPractitionerRef(practitioner)
+      valueReference: getPractitionerRef(practitioner) as fhir.Reference
     })
   }
   return taskResource
