@@ -685,6 +685,18 @@ export const ENGLISH_STATE = {
       'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
     'formFields.print.otherPersonPrompt':
       'Because there are no details of this person on record, we need to capture their details:',
+    'register.workQueue.print.payment': 'Payment',
+    'register.workQueue.print.paymentMethod': 'Payment method',
+    'register.workQueue.print.manualPaymentMethod': 'Manual',
+    'register.workQueue.print.collectPayment':
+      'Please collect the payment, print the receipt and hand it over to the payee.',
+    'register.workQueue.print.serviceMonth':
+      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
+    'register.workQueue.print.serviceYear':
+      'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
+    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.printReceipt': 'Print receipt',
+    'print.certificate.next': 'Next',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
