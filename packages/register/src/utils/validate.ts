@@ -255,7 +255,7 @@ export const isValidEnglishName = (value: string): boolean => {
 export const isValueWithinRange = (min: number, max: number) => (
   value: number
 ): boolean => {
-  return value >= min && value <= max
+  return !isNaN(value) && value >= min && value <= max
 }
 
 export const bengaliOnlyNameFormat: Validation = (value: string) => {
@@ -271,7 +271,7 @@ export const englishOnlyNameFormat: Validation = (value: string) => {
 }
 
 export const range = (min: number, max: number) => (value: string) => {
-  return isValueWithinRange(min, max)(Number.parseInt(value, 10))
+  return isValueWithinRange(min, max)(parseFloat(value))
     ? undefined
     : { message: messages.range, props: { min, max } }
 }
