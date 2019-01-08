@@ -111,7 +111,7 @@ describe('validate', () => {
 
   describe('range. Used for fields that have a range limit', () => {
     it('Should error when supplied a bad value. ', () => {
-      const badValue = '0'
+      const badValue = '9'
       const response = {
         message: {
           id: 'validations.range',
@@ -120,16 +120,16 @@ describe('validate', () => {
             'The error message that appears when an out of range value is used'
         },
         props: {
-          min: 1,
+          min: 0,
           max: 6
         }
       }
-      expect(range(1, 6)(badValue)).toEqual(response)
+      expect(range(0, 6)(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value. ', () => {
       const goodValue = '5'
       const response = undefined
-      expect(range(1, 6)(goodValue)).toEqual(response)
+      expect(range(0, 6)(goodValue)).toEqual(response)
     })
   })
 
