@@ -18,7 +18,7 @@ import {
   SubSectionDivider,
   WarningMessage
 } from '@opencrvs/components/lib/forms'
-import { Paragraph } from '@opencrvs/components/lib/typography'
+import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -48,7 +48,8 @@ import {
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
-  WARNING
+  WARNING,
+  LINK
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -239,6 +240,10 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === WARNING) {
     return <WarningMessage>{fieldDefinition.label}</WarningMessage>
+  }
+
+  if (fieldDefinition.type === LINK) {
+    return <Link>{fieldDefinition.label}</Link>
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {

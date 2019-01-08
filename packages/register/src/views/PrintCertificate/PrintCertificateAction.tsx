@@ -21,6 +21,7 @@ import { Print } from '@opencrvs/components/lib/icons'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
+const CERTIFICATE_PREVIEW = 'certificatePreview'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -188,6 +189,7 @@ type IProps = {
   togglePrintCertificateSection: () => void
   printCertificateFormSection: IFormSection
   paymentFormSection: IFormSection
+  certificatePreviewFormSection: IFormSection
 }
 
 type IFullProps = InjectedIntlProps & IProps
@@ -223,12 +225,18 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   getForm = (currentForm: string) => {
-    const { printCertificateFormSection, paymentFormSection } = this.props
+    const {
+      printCertificateFormSection,
+      paymentFormSection,
+      certificatePreviewFormSection
+    } = this.props
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
         return printCertificateFormSection
       case PAYMENT:
         return paymentFormSection
+      case CERTIFICATE_PREVIEW:
+        return certificatePreviewFormSection
       default:
         throw new Error(`No form found for id ${currentForm}`)
     }
@@ -267,7 +275,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
-                onClick={() => console.log('go to certificate print section')}
+                onClick={this.onConfirmForm}
               >
                 {intl.formatMessage(messages.next)}
               </StyledPrimaryButton>
@@ -286,6 +294,9 @@ class PrintCertificateActionComponent extends React.Component<
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
         destForm = PAYMENT
+        break
+      case PAYMENT:
+        destForm = CERTIFICATE_PREVIEW
         break
       default:
         break
@@ -409,5 +420,7 @@ class PrintCertificateActionComponent extends React.Component<
 
 export const PrintCertificateAction = connect((state: IStoreState) => ({
   language: state.i18n.language,
-  paymentFormSection: state.printCertificateForm.paymentForm
+  paymentFormSection: state.printCertificateForm.paymentForm,
+  certificatePreviewFormSection:
+    state.printCertificateForm.certificatePreviewForm
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))

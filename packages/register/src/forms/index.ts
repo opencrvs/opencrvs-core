@@ -22,6 +22,7 @@ export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
+export const LINK = 'LINK'
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
@@ -127,6 +128,10 @@ export interface IWarningField extends IFormFieldBase {
   type: typeof WARNING
 }
 
+export interface ILink extends IFormFieldBase {
+  type: typeof LINK
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -144,6 +149,7 @@ export type IFormField =
   | IParagraphFormField
   | IImageUploaderWithOptionsFormField
   | IWarningField
+  | ILink
 
 export interface IConditional {
   action: string
@@ -280,6 +286,11 @@ export interface Ii18nImageUploaderWithOptionsFormField
 export interface Ii18nWarningField extends Ii18nFormFieldBase {
   type: typeof WARNING
 }
+
+export interface Ii18nLinkField extends Ii18nFormFieldBase {
+  type: typeof LINK
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -296,6 +307,7 @@ export type Ii18nFormField =
   | Ii18nParagraphFormField
   | Ii18nImageUploaderWithOptionsFormField
   | Ii18nWarningField
+  | Ii18nLinkField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
