@@ -43,6 +43,17 @@ const processDraftData = (draftData: IFormData) => {
     return draftData
   }
 
+  if (mother.currentAddressSameAsPermanent) {
+    mother.country = mother.countryPermanent
+    mother.state = mother.statePermanent
+    mother.district = mother.districtPermanent
+    mother.postCode = mother.postCodePermanent
+    mother.addressLine1 = mother.addressLine1Permanent
+    mother.addressLine2 = mother.addressLine2Permanent
+    mother.addressLine3Options1 = mother.addressLine3Options1Permanent
+    mother.addressLine4 = mother.addressLine4Permanent
+  }
+
   const fatherPermanentAddress = father.permanentAddressSameAsMother
     ? mother
     : father

@@ -62,8 +62,8 @@ const LoadingDataComponent = ({
       title={intl.formatMessage(getLoadingText(offlineDataLoaded))}
       actions={[
         <PrimaryButton
-          key="confirm"
-          id="logout_confirm"
+          key="offline_data"
+          id="offline_data_continue"
           disabled={!offlineDataLoaded}
           onClick={handleClose}
         >

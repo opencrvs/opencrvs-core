@@ -20,8 +20,7 @@ export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
-export const SELECT_WITH_INTEGRATED_RESOURCES =
-  'SELECT_WITH_INTEGRATED_RESOURCES'
+export const SELECT_WITH_OFFLINE_RESOURCES = 'SELECT_WITH_OFFLINE_RESOURCES'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 
@@ -41,6 +40,12 @@ export interface ICheckboxOption {
 export interface IDynamicOptions {
   dependency: string
   options: { [key: string]: ISelectOption[] }
+}
+
+export interface IOfflineOptions {
+  dependency: string
+  resource: string
+  options?: { [key: string]: ISelectOption[] }
 }
 
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
@@ -73,9 +78,10 @@ export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
   dynamicOptions: IDynamicOptions
 }
-export interface ISelectFormFieldWithIntegratedResources
-  extends IFormFieldBase {
-  type: typeof SELECT_WITH_INTEGRATED_RESOURCES
+
+export interface ISelectFormFieldWithOfflineResources extends IFormFieldBase {
+  type: typeof SELECT_WITH_OFFLINE_RESOURCES
+  offlineOptions: IOfflineOptions
 }
 
 export interface IRadioGroupFormField extends IFormFieldBase {
@@ -149,7 +155,7 @@ export type IFormField =
   | IParagraphFormField
   | IImageUploaderWithOptionsFormField
   | IWarningField
-  | ISelectFormFieldWithIntegratedResources
+  | ISelectFormFieldWithOfflineResources
 
 export interface IConditional {
   action: string
@@ -175,6 +181,7 @@ export interface IConditionals {
   fatherCollectsCertificate: IConditional
   otherPersonCollectsCertificate: IConditional
   certificateCollectorNotVerified: IConditional
+  currentAddressSameAsPermanent: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
@@ -213,10 +220,6 @@ export interface Ii18nFormFieldBase {
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
   options: SelectComponentOption[]
-}
-
-export interface Ii18nSelectIntegratedResources extends Ii18nFormFieldBase {
-  type: typeof SELECT_WITH_INTEGRATED_RESOURCES
 }
 
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
@@ -304,7 +307,6 @@ export type Ii18nFormField =
   | Ii18nParagraphFormField
   | Ii18nImageUploaderWithOptionsFormField
   | Ii18nWarningField
-  | Ii18nSelectIntegratedResources
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

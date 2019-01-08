@@ -1,15 +1,14 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { resolve } from 'url'
 import { ILocation } from 'src/offline/reducer'
+import { config } from 'src/config'
 
 export interface ILocationDataResponse {
   data: ILocation[]
 }
 
-const LOCAL_ASSETS_URL = './'
-
 export const client = axios.create({
-  baseURL: LOCAL_ASSETS_URL
+  baseURL: config.REGISTER_APP_URL
 })
 
 function request<T>(options: AxiosRequestConfig) {
@@ -37,7 +36,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const loadLocations = () => {
   return request<ILocationDataResponse>({
-    url: resolve(LOCAL_ASSETS_URL, 'assets/locations.json'),
+    url: resolve(config.REGISTER_APP_URL, 'assets/locations.json'),
     method: 'GET'
   })
 }

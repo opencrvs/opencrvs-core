@@ -16,7 +16,8 @@ import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
-  getFieldOptions
+  getFieldOptions,
+  getFieldOfflineOptions
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -37,16 +38,18 @@ import {
   LIST,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
+  ISelectFormFieldWithOfflineResources,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
   WARNING,
-  SELECT_WITH_INTEGRATED_RESOURCES
+  SELECT_WITH_OFFLINE_RESOURCES
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
+import { IOfflineDataState } from 'src/offline/reducer'
 
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
@@ -63,20 +66,6 @@ const FormItem = styled.div`
   margin-bottom: 2em;
   animation: ${fadeIn} 500ms;
 `
-let locations = [] as any[]
-
-function getLocations(inputProps: any) {
-  let states = [] as any[]
-  console.log(locations)
-  console.log(inputProps)
-  if (inputProps.id === 'state') {
-    states = locations.find(location => {
-      return location.partOf === 'Location/0'
-    })
-  }
-  console.log(states)
-  return states
-}
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
@@ -119,22 +108,6 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled,
     error: Boolean(error),
     touched: Boolean(touched)
-  }
-
-  if (fieldDefinition.type === SELECT_WITH_INTEGRATED_RESOURCES) {
-    return (
-      <InputField {...inputFieldProps}>
-        <Select
-          {...inputProps}
-          value={value as string}
-          onChange={(val: string) => {
-            resetDependentSelectValues(fieldDefinition.name)
-            onSetFieldValue(fieldDefinition.name, val)
-          }}
-          options={getLocations(inputProps)}
-        />
-      </InputField>
-    )
   }
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
@@ -224,11 +197,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === SUBSECTION) {
-    return (
-      <InputField {...inputFieldProps}>
-        <SubSectionDivider label={fieldDefinition.label} />
-      </InputField>
-    )
+    return <SubSectionDivider label={fieldDefinition.label} />
   }
   if (fieldDefinition.type === PARAGRAPH) {
     return <Paragraph>{fieldDefinition.label}</Paragraph>
@@ -288,6 +257,7 @@ interface IFormSectionProps {
   fields: IFormField[]
   id: string
   setAllFieldsDirty: boolean
+  offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
 }
 
@@ -311,11 +281,6 @@ class FormSectionComponent extends React.Component<Props> {
       }
     }
   }
-  async componentWillUpdate() {
-    const res = await fetch('/assets/locations.json')
-    locations = await res.json()
-    console.log(locations)
-  }
   async componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
@@ -336,15 +301,24 @@ class FormSectionComponent extends React.Component<Props> {
     const fields = this.props.fields
     const fieldToReset = fields.find(
       field =>
-        field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-        field.dynamicOptions.dependency === fieldName
+        (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+          field.dynamicOptions.dependency === fieldName) ||
+        (field.type === SELECT_WITH_OFFLINE_RESOURCES &&
+          field.offlineOptions.dependency === fieldName)
     )
     if (fieldToReset) {
       this.props.setFieldValue(fieldToReset.name, '')
     }
   }
   render() {
-    const { values, fields, setFieldValue, touched, intl } = this.props
+    const {
+      values,
+      fields,
+      setFieldValue,
+      touched,
+      offlineResources,
+      intl
+    } = this.props
 
     const errors = (this.props.errors as any) as {
       [key: string]: IValidationResult[]
@@ -393,6 +367,16 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
                     values
+                  )
+                } as ISelectFormFieldWithOptions)
+              : field.type === SELECT_WITH_OFFLINE_RESOURCES && offlineResources
+              ? ({
+                  ...field,
+                  type: SELECT_WITH_OPTIONS,
+                  options: getFieldOfflineOptions(
+                    field as ISelectFormFieldWithOfflineResources,
+                    values,
+                    offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
               : field

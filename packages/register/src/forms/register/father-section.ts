@@ -1,15 +1,11 @@
 import { defineMessages } from 'react-intl'
-import {
-  messages as addressMessages,
-  states,
-  districtUpazilaMap,
-  upazilaUnionMap,
-  stateDistrictMap
-} from '../address'
+import { messages as addressMessages } from '../address'
 import { countries } from '../countries'
 import { messages as identityMessages } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
+import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import { config } from 'src/config'
 import {
   ViewType,
   RADIO_GROUP,
@@ -18,7 +14,7 @@ import {
   DATE,
   SUBSECTION,
   SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_OFFLINE_RESOURCES
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -339,81 +335,76 @@ export const fatherSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: 'BGD',
+      initialValue: config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother
-      ]
+      conditionals: [conditionals.addressSameAsMother]
     },
     {
       name: 'state',
-      type: SELECT_WITH_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.state,
       required: true,
       initialValue: '',
       validate: [],
-      options: states,
-      conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother,
-        conditionals.country
-      ]
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'country'
+      },
+      conditionals: [conditionals.country, conditionals.addressSameAsMother]
     },
     {
       name: 'district',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.district,
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: {
-        dependency: 'state',
-        options: stateDistrictMap
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'state'
       },
       conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother,
         conditionals.country,
-        conditionals.state
+        conditionals.state,
+        conditionals.addressSameAsMother
       ]
     },
     {
       name: 'addressLine4',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.addressLine4,
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: {
-        dependency: 'district',
-        options: districtUpazilaMap
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'district'
       },
       conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother,
         conditionals.country,
         conditionals.state,
-        conditionals.district
+        conditionals.district,
+        conditionals.addressSameAsMother
       ]
     },
     {
       name: 'addressLine3Options1',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.addressLine3Options1,
       required: false,
       initialValue: '',
       validate: [],
-      dynamicOptions: {
-        dependency: 'addressLine4',
-        options: upazilaUnionMap
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'addressLine4'
       },
       conditionals: [
-        conditionals.fathersDetailsExist,
+        conditionals.country,
         conditionals.state,
         conditionals.district,
-        conditionals.addressLine4
+        conditionals.addressLine4,
+        conditionals.addressSameAsMother
       ]
     },
     {
@@ -424,30 +415,28 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother,
         conditionals.country,
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressLine3Options1
+        conditionals.addressLine3Options1,
+        conditionals.addressSameAsMother
       ]
     },
     {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother,
         conditionals.country,
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressLine3Options1
+        conditionals.addressLine3Options1,
+        conditionals.addressSameAsMother
       ]
     },
     {
@@ -458,13 +447,12 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother,
         conditionals.country,
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressLine3Options1
+        conditionals.addressLine3Options1,
+        conditionals.addressSameAsMother
       ]
     },
     {
@@ -497,41 +485,39 @@ export const fatherSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: 'BGD',
+      initialValue: config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.permanentAddressSameAsMother
-      ]
+      conditionals: [conditionals.permanentAddressSameAsMother]
     },
     {
       name: 'statePermanent',
-      type: SELECT_WITH_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.state,
       required: true,
       initialValue: '',
       validate: [],
-      options: states,
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'countryPermanent'
+      },
       conditionals: [
-        conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent
       ]
     },
     {
       name: 'districtPermanent',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.district,
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: {
-        dependency: 'statePermanent',
-        options: stateDistrictMap
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'statePermanent'
       },
       conditionals: [
-        conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,
         conditionals.statePermanent
@@ -539,17 +525,16 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'addressLine4Permanent',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.addressLine4,
       required: true,
       initialValue: '',
       validate: [],
-      dynamicOptions: {
-        dependency: 'districtPermanent',
-        options: districtUpazilaMap
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'districtPermanent'
       },
       conditionals: [
-        conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -558,17 +543,16 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'addressLine3Options1Permanent',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      type: SELECT_WITH_OFFLINE_RESOURCES,
       label: addressMessages.addressLine3Options1,
       required: false,
       initialValue: '',
       validate: [],
-      dynamicOptions: {
-        dependency: 'addressLine4Permanent',
-        options: upazilaUnionMap
+      offlineOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'addressLine4Permanent'
       },
       conditionals: [
-        conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -584,7 +568,6 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       conditionals: [
-        conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -601,7 +584,6 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       conditionals: [
-        conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -618,7 +600,6 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [],
       conditionals: [
-        conditionals.fathersDetailsExist,
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,
         conditionals.statePermanent,

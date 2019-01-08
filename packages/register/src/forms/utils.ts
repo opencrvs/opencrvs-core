@@ -11,10 +11,17 @@ import {
   IRadioOption,
   ICheckboxOption,
   ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOfflineResources,
   INFORMATIVE_RADIO_GROUP
 } from './'
 import { InjectedIntl } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
+import {
+  IOfflineDataState,
+  OFFLINE_LOCATIONS_KEY,
+  ILocation
+} from 'src/offline/reducer'
+import { config } from 'src/config'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -49,6 +56,23 @@ export const internationaliseOptions = (
   })
 }
 
+export const generateOptionsFromLocations = (
+  locations: ILocation[]
+): ISelectOption[] => {
+  const optionsArray: ISelectOption[] = []
+  locations.forEach((location: ILocation, index: number) => {
+    optionsArray.push({
+      value: location.id,
+      label: {
+        id: `location.${location.id}`,
+        defaultMessage: location.name,
+        description: `Location select item for ${location.id}`
+      }
+    })
+  })
+  return optionsArray
+}
+
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData
@@ -67,6 +91,33 @@ export const getFieldOptions = (
     )
   }
   return options
+}
+
+export const getFieldOfflineOptions = (
+  field: ISelectFormFieldWithOfflineResources,
+  values: IFormSectionData,
+  resources: IOfflineDataState
+) => {
+  const dependencyVal = values[field.offlineOptions.dependency] as string
+  if (!dependencyVal) {
+    return []
+  }
+  if (field.offlineOptions.resource === OFFLINE_LOCATIONS_KEY) {
+    const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+    let partOf: string
+    if (dependencyVal === config.COUNTRY.toUpperCase()) {
+      partOf = 'Location/0'
+    } else {
+      partOf = `Location/${dependencyVal}`
+    }
+    return generateOptionsFromLocations(
+      locations.filter((location: ILocation) => {
+        return location.partOf === partOf
+      })
+    )
+  } else {
+    return []
+  }
 }
 
 export const getConditionalActionsForField = (
@@ -108,6 +159,10 @@ export const conditionals: IConditionals = {
   addressSameAsMother: {
     action: 'hide',
     expression: 'values.addressSameAsMother'
+  },
+  currentAddressSameAsPermanent: {
+    action: 'hide',
+    expression: 'values.currentAddressSameAsPermanent'
   },
   countryPermanent: {
     action: 'hide',

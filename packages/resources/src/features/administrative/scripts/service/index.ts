@@ -3,6 +3,15 @@ import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
 import { sendToFhir, IOISFLocation, ILocation } from '../../../utils/bn'
 import chalk from 'chalk'
 
+const titleCase = (str: string) => {
+  const stringArray = str.toLowerCase().split(' ')
+  for (let i = 0; i < stringArray.length; i++) {
+    stringArray[i] =
+      stringArray[i].charAt(0).toUpperCase() + stringArray[i].slice(1)
+  }
+  return stringArray.join(' ')
+}
+
 const composeFhirLocation = (
   location: IOISFLocation,
   jurisdictionType: string,
@@ -25,7 +34,7 @@ const composeFhirLocation = (
         value: jurisdictionType
       }
     ],
-    name: location.name, // English name
+    name: titleCase(location.name), // English name
     alias: [location.nameBn], // Bangla name in element 0
     description: oisfA2IParams as string, // Reference to the route params used internally in OISF/A2I to find this location
     status: 'active',

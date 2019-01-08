@@ -8,7 +8,16 @@ export interface IntlMessages {
   [key: string]: string
 }
 
-const languages = {
+export interface ILanguage {
+  lang: string
+  messages: IntlMessages
+}
+
+export interface ILanguageState {
+  [key: string]: ILanguage
+}
+
+export const languages: ILanguageState = {
   en: ENGLISH_STATE,
   bn: BENGALI_STATE
 }
@@ -16,7 +25,7 @@ const languages = {
 export type IntlState = {
   language: string
   messages: IntlMessages
-  languages: typeof languages
+  languages: ILanguageState
 }
 
 export const initialState: IntlState = {
@@ -41,6 +50,17 @@ export const intlReducer: LoopReducer<IntlState, actions.Action> = (
         ...state,
         language: action.payload.language,
         messages
+      }
+    case actions.ADD_OFFLINE_KEYS:
+      let updatedMessages = getNextMessages(state.language)
+      updatedMessages = {
+        ...updatedMessages,
+        ...action.payload[state.language].messages
+      }
+      return {
+        ...state,
+        messages: updatedMessages,
+        languages: action.payload
       }
     default:
       return state
