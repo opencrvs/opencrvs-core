@@ -116,7 +116,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         }
       }
       registration {
-        _fhirID
+        id
         contact
         attachments {
           data
@@ -130,6 +130,8 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
           }
         }
         paperFormID
+        trackingId
+        registrationNumber
       }
       attendantAtBirth
       weightAtBirth
@@ -249,8 +251,8 @@ export class ReviewFormView extends React.Component<IProps> {
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
     childDetails.typeOfBirth = reg.birthType
-    if (reg.id) {
-      childDetails._fhirID = reg.id
+    if (child.id) {
+      childDetails._fhirID = child.id
     }
 
     return childDetails
@@ -379,9 +381,10 @@ export class ReviewFormView extends React.Component<IProps> {
     registrationDetails.commentsOrNotes = comments && comments[0].comment
 
     registrationDetails.paperFormNumber = registration.paperFormID
-
-    if (registration._fhirID) {
-      registrationDetails._fhirID = registration._fhirID
+    registrationDetails.trackingId = registration.trackingId
+    registrationDetails.registrationNumber = registration.registrationNumber
+    if (registration.id) {
+      registrationDetails._fhirID = registration.id
     }
 
     return registrationDetails
@@ -439,8 +442,7 @@ export class ReviewFormView extends React.Component<IProps> {
       mother,
       father,
       documents,
-      registration,
-      _fhirID: reg.id
+      registration
     }
 
     return reviewData

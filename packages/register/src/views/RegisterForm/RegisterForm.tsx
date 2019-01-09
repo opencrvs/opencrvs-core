@@ -160,6 +160,7 @@ type FullProps = IFormProps &
 type State = {
   showSubmitModal: boolean
   showRegisterModal: boolean
+  isDataAltered: boolean
   rejectFormOpen: boolean
   selectedTabId: string
 }
@@ -215,6 +216,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.state = {
       showSubmitModal: false,
       selectedTabId: '',
+      isDataAltered: false,
       rejectFormOpen: false,
       showRegisterModal: false
     }
@@ -222,11 +224,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
+    if (draft.review && !this.state.isDataAltered) {
+      this.setState({ isDataAltered: true })
+    }
     this.props.modifyDraft({
       ...draft,
       data: {
         ...draft.data,
-        [activeSection.id]: sectionData
+        [activeSection.id]: { ...draft.data[activeSection.id], ...sectionData }
       }
     })
   }
@@ -294,7 +299,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  processSubmitData = () => processDraftData(this.props.draft.data)
+  processSubmitData = () => {
+    const { draft } = this.props
+    const data = processDraftData(draft.data)
+    if (!draft.review) {
+      return { details: data }
+    } else {
+      if (!this.state.isDataAltered) {
+        return { id: draft.id }
+      } else {
+        return { id: draft.id, details: data }
+      }
+    }
+  }
 
   generateSectionListForReview = (
     disabled: boolean,
@@ -442,10 +459,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation
-          mutation={postMutation}
-          variables={{ details: this.processSubmitData() }}
-        >
+        <Mutation mutation={postMutation} variables={this.processSubmitData()}>
           {(submitBirthRegistration, { data }) => {
             if (data && data.createBirthRegistration) {
               this.successfulSubmission(data.createBirthRegistration)
@@ -482,10 +496,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           }}
         </Mutation>
 
-        <Mutation
-          mutation={patchMutation}
-          variables={{ id: draft.id, details: this.processSubmitData() }}
-        >
+        <Mutation mutation={patchMutation} variables={this.processSubmitData()}>
           {(markBirthAsRegistered, { data }) => {
             if (data && data.markBirthAsRegistered) {
               this.successfullyRegistered()

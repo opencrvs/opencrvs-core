@@ -220,9 +220,14 @@ const processDraftData = (draftData: IFormData) => {
   if (registration._fhirID) {
     registrationDetails._fhirID = registration._fhirID
   }
+  if (registration.trackingId) {
+    registrationDetails.trackingId = registration.trackingId
+  }
+  if (registration.registrationNumber) {
+    registrationDetails.registrationNumber = registration.registrationNumber
+  }
 
   const draftDetails: IdraftDetails = {
-    _fhirIDMap: draftData._fhirIDMap,
     child: childDetails,
     mother: motherDetails,
     registration: registrationDetails,
@@ -233,6 +238,9 @@ const processDraftData = (draftData: IFormData) => {
     createdAt: new Date()
   }
 
+  if (draftData._fhirIDMap) {
+    draftDetails._fhirIDMap = draftData._fhirIDMap
+  }
   if (father.fathersDetailsExist) {
     draftDetails.father = fatherDetails
   }

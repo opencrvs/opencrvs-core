@@ -96,9 +96,6 @@ export const typeResolvers: GQLResolver = {
   },
 
   Registration: {
-    _fhirID: task => {
-      return task.id
-    },
     async trackingId(task: fhir.Task) {
       const foundIdentifier =
         task.identifier &&
@@ -348,60 +345,70 @@ export const typeResolvers: GQLResolver = {
         BIRTH_ENCOUNTER_CODE,
         composition
       )
-      const encounter =
-        (encounterSection &&
-          encounterSection.entry &&
-          encounterSection.entry[0].reference) ||
-        null
+      const encounterReference =
+        encounterSection &&
+        encounterSection.entry &&
+        encounterSection.entry[0].reference
+
+      if (!encounterReference) {
+        return null
+      }
 
       const observation = {}
       const observations = await fetchFHIR(
-        `/Observation?encounter=${encounter}`,
+        `/Observation?encounter=${encounterReference}`,
         authHeader
       )
-      observations.entry.map(
-        (item: fhir.Observation & { resource: fhir.Observation }) => {
-          if (
-            item.resource &&
-            item.resource.code.coding &&
-            item.resource.code.coding[0] &&
-            item.resource.code.coding[0].code
-          ) {
-            if (BODY_WEIGHT_CODE === item.resource.code.coding[0].code) {
-              observation['weightAtBirth'] = item.resource.id
-            }
-            if (BIRTH_TYPE_CODE === item.resource.code.coding[0].code) {
-              observation['birthType'] = item.resource.id
-            }
-            if (BIRTH_ATTENDANT_CODE === item.resource.code.coding[0].code) {
-              observation['attendantAtBirth'] = item.resource.id
-            }
 
-            if (BIRTH_REG_TYPE_CODE === item.resource.code.coding[0].code) {
-              observation['birthRegistrationType'] = item.resource.id
-            }
-            if (BIRTH_REG_PRESENT_CODE === item.resource.code.coding[0].code) {
-              observation['presentAtBirthRegistration'] = item.resource.id
-            }
-            if (NUMBER_BORN_ALIVE_CODE === item.resource.code.coding[0].code) {
-              observation['childrenBornAliveToMother'] = item.resource.id
-            }
+      if (observations) {
+        observations.entry.map(
+          (item: fhir.Observation & { resource: fhir.Observation }) => {
             if (
-              NUMBER_FOEATAL_DEATH_CODE === item.resource.code.coding[0].code
+              item.resource &&
+              item.resource.code.coding &&
+              item.resource.code.coding[0] &&
+              item.resource.code.coding[0].code
             ) {
-              observation['foetalDeathsToMother'] = item.resource.id
-            }
-            if (LAST_LIVE_BIRTH_CODE === item.resource.code.coding[0].code) {
-              observation['lastPreviousLiveBirth'] = item.resource.id
+              if (BODY_WEIGHT_CODE === item.resource.code.coding[0].code) {
+                observation['weightAtBirth'] = item.resource.id
+              }
+              if (BIRTH_TYPE_CODE === item.resource.code.coding[0].code) {
+                observation['birthType'] = item.resource.id
+              }
+              if (BIRTH_ATTENDANT_CODE === item.resource.code.coding[0].code) {
+                observation['attendantAtBirth'] = item.resource.id
+              }
+
+              if (BIRTH_REG_TYPE_CODE === item.resource.code.coding[0].code) {
+                observation['birthRegistrationType'] = item.resource.id
+              }
+              if (
+                BIRTH_REG_PRESENT_CODE === item.resource.code.coding[0].code
+              ) {
+                observation['presentAtBirthRegistration'] = item.resource.id
+              }
+              if (
+                NUMBER_BORN_ALIVE_CODE === item.resource.code.coding[0].code
+              ) {
+                observation['childrenBornAliveToMother'] = item.resource.id
+              }
+              if (
+                NUMBER_FOEATAL_DEATH_CODE === item.resource.code.coding[0].code
+              ) {
+                observation['foetalDeathsToMother'] = item.resource.id
+              }
+              if (LAST_LIVE_BIRTH_CODE === item.resource.code.coding[0].code) {
+                observation['lastPreviousLiveBirth'] = item.resource.id
+              }
             }
           }
-        }
-      )
+        )
+      }
 
       return {
         composition: composition.id,
-        // encounter: encounter,
-        observation: observation
+        encounter: encounterReference.split('/')[1],
+        observation
       }
     },
     createdAt(composition: ITemplatedComposition) {
