@@ -394,12 +394,26 @@
     "@types/podium" "*"
     "@types/shot" "*"
 
+"@types/hapi@^17.8.2":
+  version "17.8.2"
+  resolved "https://registry.yarnpkg.com/@types/hapi/-/hapi-17.8.2.tgz#667fbeff250c338dca9e6cc1779f5696c7c148ed"
+  integrity sha512-UP+Z+NN5c55hu96j68kx04uIsUWxElc3H2JSoFm4I7ltmOlIqtn/tZIuSVeeRABKz3NWNG6X7wHyL2N+tgm6lA==
+  dependencies:
+    "@types/boom" "*"
+    "@types/catbox" "*"
+    "@types/iron" "*"
+    "@types/joi" "*"
+    "@types/mimos" "*"
+    "@types/node" "*"
+    "@types/podium" "*"
+    "@types/shot" "*"
+
 "@types/history@*", "@types/history@^4.6.2":
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.2.tgz#0e670ea254d559241b6eeb3894f8754991e73220"
   integrity sha512-ui3WwXmjTaY73fOQ3/m3nnajU/Orhi6cEu5rzX+BrAAJxa3eITXZ5ch9suPqtM03OWhAHhPSyBGCN4UKoxO20Q==
 
-"@types/inert@^5.1.0", "@types/inert@^5.1.1":
+"@types/inert@^5.1.0", "@types/inert@^5.1.1", "@types/inert@^5.1.2":
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/@types/inert/-/inert-5.1.2.tgz#2bb8bef3b2462f904c960654c9edfa39285a85c6"
   integrity sha512-3IoSFLQWvhLfZ85kHas/F3iD/TyZPfeJbTsDjrwYljK1MgBGCB2OywAsyeA/YiJ62VbNXfXBwpD1/VbJPIZSGA==
@@ -711,7 +725,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/vision@^5.3.2", "@types/vision@^5.3.4":
+"@types/vision@^5.3.2", "@types/vision@^5.3.4", "@types/vision@^5.3.5":
   version "5.3.5"
   resolved "https://registry.yarnpkg.com/@types/vision/-/vision-5.3.5.tgz#10cd8a155f58d6ceb65c8b889b5aca8ca80ea57b"
   integrity sha512-CbGBNPBUSjyLW1bsC42mgvDffGtkHXzKIB69hGgCGwkoE90YS5DH1N8E4v+LXf/0LDepj/oc0IT3IDdnTQOOGQ==
@@ -2432,7 +2446,7 @@ boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-boom@7.x.x, boom@^7.1.0, boom@^7.1.1, boom@^7.2.0, boom@^7.2.2:
+boom@7.x.x, boom@^7.1.0, boom@^7.1.1, boom@^7.2.0:
   version "7.2.2"
   resolved "https://registry.yarnpkg.com/boom/-/boom-7.2.2.tgz#ac92101451aa5cea901aed07d881dd32b4f08345"
   integrity sha512-IFUbOa8PS7xqmhIjpeStwT3d09hGkNYQ6aj2iELSTxcVs2u0aKn1NzhkdUQSzsRg1FVkj3uit3I6mXQCBixw+A==
@@ -2445,6 +2459,13 @@ boom@^5.1.0:
   integrity sha512-Z5BTk6ZRe4tXXQlkqftmsAUANpXmuwlsF5Oov8ThoMbQRzdGTA1ngYRW160GexgOgjsFOKJz0LYhoNi+2AMBUw==
   dependencies:
     hoek "4.x.x"
+
+boom@^7.3.0:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/boom/-/boom-7.3.0.tgz#733a6d956d33b0b1999da3fe6c12996950d017b9"
+  integrity sha512-Swpoyi2t5+GhOEGw8rEsKvTxFLIDiiKoUc2gsoV6Lyr43LHBIzch3k2MvYUs8RTROrIkVJ3Al0TkaOGjnb+B6A==
+  dependencies:
+    hoek "6.x.x"
 
 bossy@4.x.x:
   version "4.0.3"
@@ -6785,7 +6806,20 @@ hapi-swagger@^9.1.1:
     json-schema-ref-parser "^4.1.0"
     swagger-parser "4.0.2"
 
-hapi@^17.4.0, hapi@^17.5.1:
+hapi-swagger@^9.3.0:
+  version "9.3.0"
+  resolved "https://registry.yarnpkg.com/hapi-swagger/-/hapi-swagger-9.3.0.tgz#e69e042e63fe1ab520322d5a3eca1fa0fba8fb5e"
+  integrity sha512-jvwqwpiOijGahy1giuE053YL3L1r4UBkJ2mgnHcUOKJnwcKr9rkxgjW9PgxVMCkvYEq6UYqKXg3I3qVxy2Ykhw==
+  dependencies:
+    boom "^7.1.1"
+    handlebars "^4.0.11"
+    hoek "^5.0.3"
+    http-status "^1.0.1"
+    joi "^13.1.2"
+    json-schema-ref-parser "^4.1.0"
+    swagger-parser "4.0.2"
+
+hapi@^17.4.0, hapi@^17.5.1, hapi@^17.8.1:
   version "17.8.1"
   resolved "https://registry.yarnpkg.com/hapi/-/hapi-17.8.1.tgz#63cc5bbc138b6ae0919e977764647a17556e4c87"
   integrity sha512-0zfkl8YtJPfkOG+1KwFnZOk7/mmO2LrExJLWIJwzmwsyxLcQXNrnfwgk205xxxg9tnOO6OdCTQLkPG8Wn+McXw==
@@ -7347,7 +7381,7 @@ indexof@0.0.1:
   resolved "https://registry.yarnpkg.com/indexof/-/indexof-0.0.1.tgz#82dc336d232b9062179d05ab3293a66059fd435d"
   integrity sha1-gtwzbSMrkGIXnQWrMpOmYFn9Q10=
 
-inert@^5.1.0:
+inert@^5.1.0, inert@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/inert/-/inert-5.1.2.tgz#0c26f15bc22aae7af9c1f1a164bf867c58c5f4a6"
   integrity sha512-5jSCKrQ7ENfdECnzLatCejXSkJwVzKFXZW30fI6TNHFbDuigT8IilRfydI2H5j9ZTnH7vXKO4WUg2qph9bItow==
@@ -15747,6 +15781,16 @@ vision@^5.3.2, vision@^5.3.3:
   version "5.4.3"
   resolved "https://registry.yarnpkg.com/vision/-/vision-5.4.3.tgz#648663667f22dc6da17a00c049c2c1a97366d72f"
   integrity sha512-4uVrdAKSjNF3WVf1Mjq//SfMclUgpHJtk0EBESyLFcZmrqJjUQ08DyCsRYqw31qEFK3bVm8UO9BlfodRwuyETg==
+  dependencies:
+    boom "7.x.x"
+    hoek "6.x.x"
+    items "2.x.x"
+    joi "14.x.x"
+
+vision@^5.4.4:
+  version "5.4.4"
+  resolved "https://registry.yarnpkg.com/vision/-/vision-5.4.4.tgz#981b2d811a6061cc14cf2d5d05ad3bbc3ee59572"
+  integrity sha512-jFeH7pU/ODYmTOpY5jutMKU/fDr+P621WYEnWgqwDikxutBWJ+koxlgGnkZQoKY6JlYdY4Awo+rPN3DNdTeDKg==
   dependencies:
     boom "7.x.x"
     hoek "6.x.x"

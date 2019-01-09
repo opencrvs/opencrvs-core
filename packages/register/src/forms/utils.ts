@@ -11,7 +11,6 @@ import {
   IRadioOption,
   ICheckboxOption,
   ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOfflineResources,
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH
 } from './'
@@ -77,34 +76,14 @@ export const generateOptionsFromLocations = (
 
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
-  values: IFormSectionData
+  values: IFormSectionData,
+  resources?: IOfflineDataState
 ) => {
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (!dependencyVal) {
     return []
   }
-
-  const options = field.dynamicOptions.options[dependencyVal]
-  if (!options) {
-    throw new Error(
-      `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object. Option keys are ${Object.keys(
-        field.dynamicOptions.options
-      )}`
-    )
-  }
-  return options
-}
-
-export const getFieldOfflineOptions = (
-  field: ISelectFormFieldWithOfflineResources,
-  values: IFormSectionData,
-  resources: IOfflineDataState
-) => {
-  const dependencyVal = values[field.offlineOptions.dependency] as string
-  if (!dependencyVal) {
-    return []
-  }
-  if (field.offlineOptions.resource === OFFLINE_LOCATIONS_KEY) {
+  if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
     const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
     let partOf: string
     if (dependencyVal === config.COUNTRY.toUpperCase()) {
@@ -118,7 +97,15 @@ export const getFieldOfflineOptions = (
       })
     )
   } else {
-    return []
+    let options
+    if (!field.dynamicOptions.options) {
+      throw new Error(
+        `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object.`
+      )
+    } else {
+      options = field.dynamicOptions.options[dependencyVal]
+    }
+    return options
   }
 }
 

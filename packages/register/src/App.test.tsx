@@ -2,7 +2,6 @@ import * as ReactApollo from 'react-apollo'
 import { createTestApp, mockUserResponse, mockOfflineData } from './tests/util'
 import { config } from '../src/config'
 import { v4 as uuid } from 'uuid'
-import { resolve as resolveUrl } from 'url'
 import {
   HOME,
   SELECT_VITAL_EVENT,
@@ -28,8 +27,6 @@ import {
   setInitialUserDetails
 } from '@opencrvs/register/src/profile/profileActions'
 import { storeOfflineData } from 'src/offline/actions'
-import * as moxios from 'moxios'
-import { client } from 'src/utils/referenceApi'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -47,11 +44,6 @@ function flushPromises() {
 beforeEach(() => {
   history.replaceState({}, '', '/')
   assign.mockClear()
-  moxios.install(client)
-})
-
-afterEach(() => {
-  moxios.uninstall(client)
 })
 
 it('renders without crashing', async () => {
@@ -106,14 +98,6 @@ describe('when user has a valid token in local storage', () => {
   describe('when loadDraftsFromStorage method is called', () => {
     beforeEach(() => {
       const instance = app.instance() as any
-      moxios.stubRequest(
-        resolveUrl(config.REGISTER_APP_URL, 'assets/locations.json'),
-        {
-          status: 200,
-          responseText:
-            '{ "data": [{  "id": "65cf62cb-864c-45e3-9c0d-5c70f0074cb4",  "name": "Barisal",  "nameBn": "বরিশাল",  "physicalType": "Jurisdiction",  "juristictionType": "DIVISION",  "type": "ADMIN_STRUCTURE",  "partOf": "Location/0"}]}'
-        }
-      )
       instance.loadDataFromStorage()
     })
     it('should retrive saved drafts from storage', () => {

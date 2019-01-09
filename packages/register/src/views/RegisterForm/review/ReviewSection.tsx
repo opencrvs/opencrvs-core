@@ -310,7 +310,8 @@ function renderSelectDynamicLabel(
 ) {
   const dependency = options.dependency ? draftData[options.dependency] : false
   const selectedOption = dependency
-    ? options.options[dependency.toString()].find(
+    ? options.options &&
+      options.options[dependency.toString()].find(
         option => option.value === value
       )
     : false

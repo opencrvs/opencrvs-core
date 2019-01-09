@@ -7,7 +7,7 @@ ENV NPM_CONFIG_LOGLEVEL warn
 # Default build env
 ENV REACT_APP_API_GATEWAY_URL=https://gateway.opencrvs-staging.jembi.org/
 ENV REACT_APP_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
-ENV REACT_APP_REGISTER_APP_URL=https://register.opencrvs-staging.jembi.org/
+ENV REACT_APP_RESOURCES_URL=https://auth.opencrvs-staging.jembi.org/
 ENV REACT_APP_PERFORMANCE_APP_URL=https://performance.opencrvs-staging.jembi.org/
 ENV REACT_APP_COUNTRY=bgd
 ENV REACT_APP_LANGUAGE=en

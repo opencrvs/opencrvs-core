@@ -22,8 +22,7 @@ import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
-  getFieldOptions,
-  getFieldOfflineOptions
+  getFieldOptions
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -44,14 +43,12 @@ import {
   LIST,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
-  ISelectFormFieldWithOfflineResources,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
-  WARNING,
-  SELECT_WITH_OFFLINE_RESOURCES
+  WARNING
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -319,10 +316,8 @@ class FormSectionComponent extends React.Component<Props> {
     const fields = this.props.fields
     const fieldToReset = fields.find(
       field =>
-        (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-          field.dynamicOptions.dependency === fieldName) ||
-        (field.type === SELECT_WITH_OFFLINE_RESOURCES &&
-          field.offlineOptions.dependency === fieldName)
+        field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+        field.dynamicOptions.dependency === fieldName
     )
     if (fieldToReset) {
       this.props.setFieldValue(fieldToReset.name, '')
@@ -384,15 +379,6 @@ class FormSectionComponent extends React.Component<Props> {
                   type: SELECT_WITH_OPTIONS,
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
-                    values
-                  )
-                } as ISelectFormFieldWithOptions)
-              : field.type === SELECT_WITH_OFFLINE_RESOURCES && offlineResources
-              ? ({
-                  ...field,
-                  type: SELECT_WITH_OPTIONS,
-                  options: getFieldOfflineOptions(
-                    field as ISelectFormFieldWithOfflineResources,
                     values,
                     offlineResources
                   )

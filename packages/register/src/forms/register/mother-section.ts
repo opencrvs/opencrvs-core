@@ -11,7 +11,7 @@ import {
   DATE,
   SUBSECTION,
   RADIO_GROUP,
-  SELECT_WITH_OFFLINE_RESOURCES
+  SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -284,12 +284,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'statePermanent',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.state,
       required: true,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'countryPermanent'
       },
@@ -297,12 +297,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'districtPermanent',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.district,
       required: true,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'statePermanent'
       },
@@ -310,12 +310,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine4Permanent',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine4,
       required: true,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'districtPermanent'
       },
@@ -327,12 +327,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine3Options1Permanent',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3Options1,
       required: false,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'addressLine4Permanent'
       },
@@ -422,12 +422,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'state',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.state,
       required: true,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
       },
@@ -438,12 +438,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'district',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.district,
       required: true,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'state'
       },
@@ -455,12 +455,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine4',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine4,
       required: true,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'district'
       },
@@ -473,12 +473,12 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'addressLine3Options1',
-      type: SELECT_WITH_OFFLINE_RESOURCES,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3Options1,
       required: false,
       initialValue: '',
       validate: [],
-      offlineOptions: {
+      dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'addressLine4'
       },

@@ -10,7 +10,7 @@ import { createDraft, storeDraft } from 'src/drafts'
 import { createStore } from '../../store'
 import {
   SELECT_WITH_OPTIONS,
-  SELECT_WITH_OFFLINE_RESOURCES,
+  SELECT_WITH_DYNAMIC_OPTIONS,
   TEL
 } from 'src/forms'
 import { countries } from 'src/forms/countries'
@@ -53,24 +53,24 @@ describe('form component', () => {
         },
         {
           name: 'statePermanent',
-          type: SELECT_WITH_OFFLINE_RESOURCES,
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
           label: addressMessages.state,
           required: true,
           initialValue: '',
           validate: [],
-          offlineOptions: {
+          dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'countryPermanent'
           }
         },
         {
           name: 'districtPermanent',
-          type: SELECT_WITH_OFFLINE_RESOURCES,
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
           label: addressMessages.district,
           required: true,
           initialValue: '',
           validate: [],
-          offlineOptions: {
+          dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'statePermanent'
           }

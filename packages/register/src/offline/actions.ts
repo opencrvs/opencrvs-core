@@ -1,5 +1,4 @@
 import { IOfflineData, ILocation } from './reducer'
-import { AxiosError } from 'axios'
 import { ILocationDataResponse } from 'src/utils/referenceApi'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
@@ -51,7 +50,7 @@ export const locationsLoaded = (
   payload: payload.data
 })
 
-export const locationsFailed = (error: AxiosError): LocationsFailedAction => ({
+export const locationsFailed = (error: Error): LocationsFailedAction => ({
   type: LOCATIONS_FAILED,
   payload: error
 })
