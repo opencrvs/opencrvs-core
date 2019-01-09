@@ -41,8 +41,8 @@ export interface ISortAndFilter {
 
 export interface ISearchResultProps {
   data: IDynamicValues[]
-  sortBy: ISortAndFilter
-  filterBy: ISortAndFilter
+  sortBy?: ISortAndFilter
+  filterBy?: ISortAndFilter
   resultLabel: string
   noResultText: string
   cellRenderer: (cellData: IDynamicValues, key: number) => JSX.Element
@@ -61,14 +61,14 @@ export interface ISearchResultProps {
 }
 
 interface ICustomState {
-  filterValues: IDynamicValues
-  sortValues: IDynamicValues
+  filterValues?: IDynamicValues
+  sortValues?: IDynamicValues
   filteredSortedItems: IDynamicValues[]
   displayItems: IDynamicValues[]
   pageSize: number
   totalPages: number
-  sortByItemsWithValues: ISortAndFilterItem
-  filterByItemsWithValues: ISortAndFilterItem
+  sortByItemsWithValues?: ISortAndFilterItem
+  filterByItemsWithValues?: ISortAndFilterItem
   initialPage: number
 }
 
@@ -168,16 +168,16 @@ export class DataTable extends React.Component<
     const { data, sortBy, filterBy, pageSize } = props
     const paginationSize = pageSize ? pageSize : defaultConfiguration.pageSize
     const initialTotalPage = getTotalPageNumber(data.length, paginationSize)
-    const sortValues = this.initializeSelectValues(sortBy)
-    const filterValues = this.initializeSelectValues(filterBy)
-    const sortByItemsWithValues = getSortAndFilterByPropsWithValues(
-      sortBy,
-      sortValues
-    )
-    const filterByItemsWithValues = getSortAndFilterByPropsWithValues(
-      filterBy,
-      filterValues
-    )
+    const sortValues = sortBy && this.initializeSelectValues(sortBy)
+    const filterValues = filterBy && this.initializeSelectValues(filterBy)
+    const sortByItemsWithValues =
+      sortBy &&
+      sortValues &&
+      getSortAndFilterByPropsWithValues(sortBy, sortValues)
+    const filterByItemsWithValues =
+      filterBy &&
+      filterValues &&
+      getSortAndFilterByPropsWithValues(filterBy, filterValues)
     const displayItems = this.getDisplayItems(
       defaultConfiguration.initialPage,
       paginationSize,
@@ -201,10 +201,9 @@ export class DataTable extends React.Component<
     changedValue: ISelectGroupValue,
     type?: SelectFieldType
   ) => {
-    const filterByItemsWithValues = getSortAndFilterByPropsWithValues(
-      this.props.filterBy,
-      values
-    )
+    const filterByItemsWithValues =
+      this.props.filterBy &&
+      getSortAndFilterByPropsWithValues(this.props.filterBy, values)
 
     this.setState(() => {
       return { filterByItemsWithValues }
@@ -234,10 +233,9 @@ export class DataTable extends React.Component<
     changedValue: ISelectGroupValue,
     type?: SelectFieldType
   ) => {
-    const sortByItemsWithValues = getSortAndFilterByPropsWithValues(
-      this.props.sortBy,
-      values
-    )
+    const sortByItemsWithValues =
+      this.props.sortBy &&
+      getSortAndFilterByPropsWithValues(this.props.sortBy, values)
 
     this.setState(() => {
       return { sortByItemsWithValues }
