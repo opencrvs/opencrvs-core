@@ -69,6 +69,9 @@ const FormItem = styled.div`
   margin-bottom: 2em;
   animation: ${fadeIn} 500ms;
 `
+const LinkFormField = styled(Link)`
+  font-size: 15px;
+`
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
@@ -243,7 +246,13 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === LINK) {
-    return <Link>{fieldDefinition.label}</Link>
+    return (
+      <LinkFormField
+        onClick={() => onSetFieldValue(fieldDefinition.name, true)}
+      >
+        {fieldDefinition.label}
+      </LinkFormField>
+    )
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {

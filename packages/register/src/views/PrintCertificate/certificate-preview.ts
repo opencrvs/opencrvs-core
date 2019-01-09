@@ -9,18 +9,37 @@ const messages = defineMessages({
   },
   selectSignature: {
     id: 'register.workQueue.print.selectSignature',
-    defaultMessage: 'Select signature',
+    defaultMessage: 'Select e-signatures',
     description: 'The label for choose signature select'
-  },
-  signature: {
-    id: 'register.workQueue.print.signature1',
-    defaultMessage: 'UP Secretary'
   },
   addAnotherSignature: {
     id: 'register.workQueue.print.addAnotherSignature',
     defaultMessage: 'Add another'
+  },
+  noLabel: {
+    id: 'register.noLabel',
+    defaultMessage: ' '
+  },
+  person1: {
+    id: 'register.workQueue.print.signature.person1',
+    defaultMessage: 'UP Secretary Shakib al hasan'
+  },
+  person2: {
+    id: 'register.workQueue.print.signature.person2',
+    defaultMessage: 'Local Registrar Mohammad Ashraful'
   }
 })
+
+const authorizedPersons = [
+  {
+    value: 'UP SECRETARY SHAKIB AL HASAN',
+    label: messages.person1
+  },
+  {
+    value: 'LOCAL REGISTRAR Mohammad Ashraful',
+    label: messages.person2
+  }
+]
 
 export const certificatePreview: IFormSection = {
   id: 'certificatePreview',
@@ -34,21 +53,30 @@ export const certificatePreview: IFormSection = {
       label: messages.selectSignature,
       initialValue: '',
       validate: [],
-      options: [{ value: 'FIRST ONE', label: messages.signature }]
+      options: authorizedPersons
     },
     {
       name: `signature2`,
       type: SELECT_WITH_OPTIONS,
-      label: messages.selectSignature,
+      label: messages.noLabel,
       initialValue: '',
       validate: [],
-      options: [{ value: 'SECOND ONE', label: messages.signature }]
+      options: authorizedPersons
+    },
+    {
+      name: `signature3`,
+      type: SELECT_WITH_OPTIONS,
+      label: messages.noLabel,
+      initialValue: '',
+      validate: [],
+      options: authorizedPersons,
+      conditionals: [{ action: 'hide', expression: '!values.addSignature' }]
     },
     {
       name: 'addSignature',
       type: LINK,
       label: messages.addAnotherSignature,
-      initialValue: '',
+      initialValue: false,
       validate: []
     }
   ]
