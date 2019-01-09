@@ -1,5 +1,17 @@
 # Metrics service
 
+A microservice that recieves events from the OpenCRVS system and create, stores and responds to queries about CRVS metrics. This service will be used in the preformance app to fetch data for the various graphs that need to be displayed.
+
+## Dev guide
+
+Start the service with `yarn start`
+
+Watch the tests with `yarn test:watch`
+
+When in dev mode swagger API docs are available at `http://localhost:9090/documentation`
+
+## Design details
+
 [Flowdock thread](https://www.flowdock.com/app/plan-international/ways-of-working/threads/3JH4c_aw6_MDyZ6nwwwDbRV_LEh)
 
 The metrics service will contain data that has already been aggregated from received events (new declaration, registration...). The metrics service will get these events from a generic **event service**, that receives events from our workflow mediator, pushing them forward to any service that's subscribed to it.
