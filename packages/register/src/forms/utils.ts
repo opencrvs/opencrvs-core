@@ -10,7 +10,9 @@ import {
   CHECKBOX_GROUP,
   IRadioOption,
   ICheckboxOption,
-  ISelectFormFieldWithDynamicOptions
+  ISelectFormFieldWithDynamicOptions,
+  INFORMATIVE_RADIO_GROUP,
+  PARAGRAPH
 } from './'
 import { InjectedIntl } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -21,13 +23,15 @@ export const internationaliseFieldObject = (
 ): Ii18nFormField => {
   const base = {
     ...field,
-    label: intl.formatMessage(field.label),
+    label:
+      field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
     description: field.description && intl.formatMessage(field.description)
   }
 
   if (
     base.type === SELECT_WITH_OPTIONS ||
     base.type === RADIO_GROUP ||
+    base.type === INFORMATIVE_RADIO_GROUP ||
     base.type === CHECKBOX_GROUP
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
@@ -151,5 +155,22 @@ export const conditionals: IConditionals = {
   uploadDocForWhom: {
     action: 'hide',
     expression: '!values.uploadDocForWhom'
+  },
+  motherCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="MOTHER"'
+  },
+  fatherCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="FATHER"'
+  },
+  otherPersonCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="OTHER"'
+  },
+  certificateCollectorNotVerified: {
+    action: 'hide',
+    expression:
+      '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
   }
 }

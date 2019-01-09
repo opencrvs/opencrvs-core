@@ -1,20 +1,22 @@
 import { COUNTRY } from 'src/constants'
 import { GQLResolver } from 'src/graphql/schema'
-import { getFromFhir } from 'src/features/fhir/utils'
+import { fetchFHIR } from 'src/features/fhir/utils'
 import { getUserMobile, convertToLocal } from './utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getUser(_, { userId }, authHeader) {
+    async getUser(_, { userId }, AuthHeader) {
       const userMgntUserID = userId as string
-      const userMobileResponse = await getUserMobile(userMgntUserID, authHeader)
+      const userMobileResponse = await getUserMobile(userMgntUserID, AuthHeader)
       const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
-      const practitionerBundle = await getFromFhir(
-        `/Practitioner?telecom=phone|${localMobile}`
+      const practitionerBundle = await fetchFHIR(
+        `/Practitioner?telecom=phone|${localMobile}`,
+        AuthHeader
       )
       const practitionerResource = practitionerBundle.entry[0].resource
-      const practitionerRoleResponse = await getFromFhir(
-        `/PractitionerRole?practitioner=${practitionerResource.id}`
+      const practitionerRoleResponse = await fetchFHIR(
+        `/PractitionerRole?practitioner=${practitionerResource.id}`,
+        AuthHeader
       )
       const roleEntry = practitionerRoleResponse.entry[0].resource
       if (
@@ -38,8 +40,9 @@ export const resolvers: GQLResolver = {
       practitionerResource.role = role
       for (const location of locations) {
         const splitRef = location.reference.split('/')
-        const locationResponse: fhir.Location = await getFromFhir(
-          `/Location/${splitRef[1]}`
+        const locationResponse: fhir.Location = await fetchFHIR(
+          `/Location/${splitRef[1]}`,
+          AuthHeader
         )
         if (
           !locationResponse ||

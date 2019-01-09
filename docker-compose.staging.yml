@@ -93,6 +93,12 @@ services:
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
 
+  deduplication:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+
   hearth:
     secrets:
       - jwt-public-key.{{ts}}

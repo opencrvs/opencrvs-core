@@ -1,7 +1,13 @@
 import * as React from 'react'
 import { withFormik, Field, FormikProps, FieldProps } from 'formik'
 import { isEqual } from 'lodash'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  InjectedIntlProps,
+  injectIntl,
+  FormattedHTMLMessage,
+  FormattedMessage,
+  MessageValue
+} from 'react-intl'
 import {
   TextInput,
   Select,
@@ -9,7 +15,8 @@ import {
   CheckboxGroup,
   DateField,
   TextArea,
-  SubSectionDivider
+  SubSectionDivider,
+  WarningMessage
 } from '@opencrvs/components/lib/forms'
 import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
@@ -39,7 +46,9 @@ import {
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
-  TEL
+  TEL,
+  INFORMATIVE_RADIO_GROUP,
+  WARNING
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -48,6 +57,7 @@ import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
+import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -107,6 +117,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <Select
           {...inputProps}
+          isDisabled={fieldDefinition.disabled}
           value={value as string}
           onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
@@ -131,6 +142,19 @@ function GeneratedInputField({
       </InputField>
     )
   }
+
+  if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
+    return (
+      <InformativeRadioGroup
+        inputProps={inputProps}
+        value={value as string}
+        onSetFieldValue={onSetFieldValue}
+        fieldDefinition={fieldDefinition}
+        inputFieldProps={inputFieldProps}
+      />
+    )
+  }
+
   if (fieldDefinition.type === CHECKBOX_GROUP) {
     return (
       <InputField {...inputFieldProps}>
@@ -184,7 +208,18 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === PARAGRAPH) {
-    return <Paragraph>{fieldDefinition.label}</Paragraph>
+    const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
+
+    return (
+      <Paragraph fontSize={fieldDefinition.fontSize}>
+        <FormattedHTMLMessage
+          {...label}
+          values={{
+            [fieldDefinition.name]: fieldDefinition.initialValue as MessageValue
+          }}
+        />
+      </Paragraph>
+    )
   }
   if (fieldDefinition.type === LIST) {
     return <FormList list={fieldDefinition.items} />
@@ -201,6 +236,11 @@ function GeneratedInputField({
       </InputField>
     )
   }
+
+  if (fieldDefinition.type === WARNING) {
+    return <WarningMessage>{fieldDefinition.label}</WarningMessage>
+  }
+
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
     return (
       <ImageUploadField

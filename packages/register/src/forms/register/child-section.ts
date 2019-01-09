@@ -10,6 +10,7 @@ import {
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
+  range,
   dateFormat
 } from 'src/utils/validate'
 
@@ -317,7 +318,7 @@ export const childSection: IFormSection = {
       label: messages.weightAtBirth,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [range(0, 6)],
       postfix: 'Kg'
     },
     {

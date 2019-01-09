@@ -1,8 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import {
-  createMotherSection,
-  createFatherSection,
-  createChildSection,
+  createPersonSection,
   createPersonEntryTemplate,
   createEncounterSection,
   createEncounter,
@@ -10,15 +8,24 @@ import {
   createObservationEntryTemplate,
   createSupportingDocumentsSection,
   createDocRefTemplate,
-  createTaskRefTemplate
+  createTaskRefTemplate,
+  createRelatedPersonTemplate,
+  createPaymentReconciliationTemplate,
+  CERTIFICATE_DOCS_CODE,
+  CERTIFICATE_DOCS_TITLE,
+  CERTIFICATE_CONTEXT_KEY
 } from 'src/features/fhir/templates'
 import {
   ITemplatedBundle,
   ITemplatedComposition
 } from '../registration/fhir-builders'
-import fetch, { Response } from 'node-fetch'
-import { fhirUrl } from 'src/constants'
-import { FHIR_OBSERVATION_CATEGORY_URL } from './constants'
+import fetch from 'node-fetch'
+import { FHIR_URL } from 'src/constants'
+import { IAuthHeader } from 'src/common-types'
+import {
+  FHIR_OBSERVATION_CATEGORY_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from './constants'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -41,6 +48,7 @@ export function findCompositionSection(
 
 export function selectOrCreatePersonResource(
   sectionCode: string,
+  sectionTitle: string,
   fhirBundle: ITemplatedBundle
 ): fhir.Patient {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
@@ -49,20 +57,7 @@ export function selectOrCreatePersonResource(
   if (!section) {
     // create person
     const ref = uuid()
-    let personSection
-    switch (sectionCode) {
-      case 'mother-details':
-        personSection = createMotherSection(ref)
-        break
-      case 'father-details':
-        personSection = createFatherSection(ref)
-        break
-      case 'child-details':
-        personSection = createChildSection(ref)
-        break
-      default:
-        throw new Error(`Unknown section code ${sectionCode}`)
-    }
+    const personSection = createPersonSection(ref, sectionCode, sectionTitle)
     const composition = fhirBundle.entry[0].resource
     composition.section.push(personSection)
     personEntry = createPersonEntryTemplate(ref)
@@ -267,16 +262,21 @@ export function selectOrCreateLocationRefResource(
 
 export function selectOrCreateDocRefResource(
   sectionCode: string,
+  sectionTitle: string,
   fhirBundle: ITemplatedBundle,
-  context: any
+  context: any,
+  indexKey: string
 ): fhir.DocumentReference {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   let docRef
   if (!section) {
     const ref = uuid()
-    const docSection = createSupportingDocumentsSection()
-    docSection.entry[context._index.attachments] = {
+    const docSection = createSupportingDocumentsSection(
+      sectionCode,
+      sectionTitle
+    )
+    docSection.entry[context._index[indexKey]] = {
       reference: `urn:uuid:${ref}`
     }
     fhirBundle.entry[0].resource.section.push(docSection)
@@ -288,10 +288,10 @@ export function selectOrCreateDocRefResource(
         'Expected supporting documents section to have an entry property'
       )
     }
-    const docSectionEntry = section.entry[context._index.attachments]
+    const docSectionEntry = section.entry[context._index[indexKey]]
     if (!docSectionEntry) {
       const ref = uuid()
-      section.entry[context._index.attachments] = {
+      section.entry[context._index[indexKey]] = {
         reference: `urn:uuid:${ref}`
       }
       docRef = createDocRefTemplate(ref)
@@ -304,7 +304,7 @@ export function selectOrCreateDocRefResource(
         const ref = uuid()
         docRef = createDocRefTemplate(ref)
         fhirBundle.entry.push(docRef)
-        section.entry[context._index.attachments] = {
+        section.entry[context._index[indexKey]] = {
           reference: `urn:uuid:${ref}`
         }
       }
@@ -312,6 +312,166 @@ export function selectOrCreateDocRefResource(
   }
 
   return docRef.resource as fhir.DocumentReference
+}
+
+export function selectOrCreateCertificateDocRefResource(
+  fhirBundle: ITemplatedBundle,
+  context: any,
+  eventType: string
+): fhir.DocumentReference {
+  const docRef = selectOrCreateDocRefResource(
+    CERTIFICATE_DOCS_CODE,
+    CERTIFICATE_DOCS_TITLE,
+    fhirBundle,
+    context,
+    CERTIFICATE_CONTEXT_KEY
+  )
+  if (!docRef.type) {
+    docRef.type = {
+      coding: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}certificate-type`,
+          code: eventType
+        }
+      ]
+    }
+  }
+  return docRef
+}
+
+export function selectOrCreateRelatedPersonResource(
+  fhirBundle: ITemplatedBundle,
+  context: any,
+  eventType: string
+): fhir.RelatedPerson {
+  const docRef = selectOrCreateCertificateDocRefResource(
+    fhirBundle,
+    context,
+    eventType
+  )
+  if (!docRef.extension) {
+    docRef.extension = []
+  }
+  const relatedPersonExt = docRef.extension.find(
+    extention =>
+      extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/collector`
+  )
+  if (!relatedPersonExt) {
+    const relatedPersonEntry = createRelatedPersonTemplate(uuid())
+    fhirBundle.entry.push(relatedPersonEntry)
+    docRef.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
+      valueReference: {
+        reference: relatedPersonEntry.fullUrl
+      }
+    })
+    return relatedPersonEntry.resource
+  } else {
+    const relatedPersonEntry = fhirBundle.entry.find(entry => {
+      if (!relatedPersonExt.valueReference) {
+        return false
+      }
+      return entry.fullUrl === relatedPersonExt.valueReference.reference
+    })
+    if (!relatedPersonEntry) {
+      throw new Error('No related person entry found on bundle')
+    }
+    return relatedPersonEntry.resource as fhir.RelatedPerson
+  }
+}
+
+export function selectOrCreateCollectorPersonResource(
+  fhirBundle: ITemplatedBundle,
+  context: any,
+  eventType: string
+): fhir.Patient {
+  const relatedPersonResource = selectOrCreateRelatedPersonResource(
+    fhirBundle,
+    context,
+    eventType
+  )
+  const patientRef =
+    relatedPersonResource.patient && relatedPersonResource.patient.reference
+  if (!patientRef) {
+    const personEntry = createPersonEntryTemplate(uuid())
+    fhirBundle.entry.push(personEntry)
+    relatedPersonResource.patient = {
+      reference: personEntry.fullUrl
+    }
+    return personEntry.resource as fhir.Patient
+  } else {
+    const personEntry = fhirBundle.entry.find(
+      entry => entry.fullUrl === patientRef
+    )
+    if (!personEntry) {
+      throw new Error(
+        'No related collector person entry not found on fhir bundle'
+      )
+    }
+    return personEntry.resource as fhir.Patient
+  }
+}
+
+export function setCertificateCollectorReference(
+  sectionCode: string,
+  relatedPerson: fhir.RelatedPerson,
+  fhirBundle: ITemplatedBundle
+) {
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+  if (!section || !section.entry || !section.entry[0]) {
+    throw new Error('Expected person section not have an entry')
+  }
+  const personSectionEntry = section.entry[0]
+  const personEntry = fhirBundle.entry.find(
+    entry => entry.fullUrl === personSectionEntry.reference
+  )
+  if (!personEntry) {
+    throw new Error('Expected person entry not found on the bundle')
+  }
+  relatedPerson.patient = {
+    reference: personEntry.fullUrl
+  }
+}
+
+export function selectOrCreatePaymentReconciliationResource(
+  fhirBundle: ITemplatedBundle,
+  context: any,
+  eventType: string
+): fhir.PaymentReconciliation {
+  const docRef = selectOrCreateCertificateDocRefResource(
+    fhirBundle,
+    context,
+    eventType
+  )
+  if (!docRef.extension) {
+    docRef.extension = []
+  }
+  const paymentExt = docRef.extension.find(
+    extention =>
+      extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/payment`
+  )
+  if (!paymentExt) {
+    const paymentEntry = createPaymentReconciliationTemplate(uuid())
+    fhirBundle.entry.push(paymentEntry)
+    docRef.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/payment`,
+      valueReference: {
+        reference: paymentEntry.fullUrl
+      }
+    })
+    return paymentEntry.resource
+  } else {
+    const paymentEntry = fhirBundle.entry.find(entry => {
+      if (!paymentExt.valueReference) {
+        return false
+      }
+      return entry.fullUrl === paymentExt.valueReference.reference
+    })
+    if (!paymentEntry) {
+      throw new Error('No related payment entry found on bundle')
+    }
+    return paymentEntry.resource as fhir.PaymentReconciliation
+  }
 }
 
 export function selectOrCreateTaskRefResource(
@@ -392,11 +552,19 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export const getFromFhir = (suffix: string) => {
-  return fetch(`${fhirUrl}${suffix}`, {
+export const fetchFHIR = (
+  suffix: string,
+  authHeader: IAuthHeader,
+  method: string = 'GET',
+  body: string | undefined = undefined
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
     headers: {
-      'Content-Type': 'application/json+fhir'
-    }
+      'Content-Type': 'application/fhir+json',
+      ...authHeader
+    },
+    body
   })
     .then(response => {
       return response.json()
@@ -406,10 +574,56 @@ export const getFromFhir = (suffix: string) => {
     })
 }
 
-export async function getCompositionIDFromFhirResponse(
-  response: Response
-): Promise<string> {
-  const resBody = await response.json()
+export async function getTrackingIdFromResponse(
+  resBody: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  const compositionBundle = await fetchFHIR(
+    `/Composition/${getIDFromResponse(resBody)}`,
+    authHeader
+  )
+  if (!compositionBundle || !compositionBundle.identifier) {
+    throw new Error(
+      'getTrackingIdFromResponse: Invalid composition or composition has no identifier'
+    )
+  }
+  return compositionBundle.identifier.value
+}
+
+export async function getBRNFromResponse(
+  resBody: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  let path
+  if (isTaskResponse(resBody)) {
+    path = `/Task/${getIDFromResponse(resBody)}`
+  } else {
+    path = `/Task?focus=Composition/${getIDFromResponse(resBody)}`
+  }
+  const taskBundle = await fetchFHIR(path, authHeader)
+
+  let taskResource
+  if (taskBundle && taskBundle.entry && taskBundle.entry[0].resource) {
+    taskResource = taskBundle.entry[0].resource
+  } else if (taskBundle.resourceType === 'Task') {
+    taskResource = taskBundle
+  } else {
+    throw new Error('getBRNFromResponse: Invalid task found')
+  }
+  const brnIdentifier =
+    taskResource.identifier &&
+    taskResource.identifier.find(
+      (identifier: fhir.Identifier) =>
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+    )
+  if (!brnIdentifier || !brnIdentifier.value) {
+    throw new Error('getBRNFromResponse: Task does not have any brn identifier')
+  }
+  return brnIdentifier.value
+}
+
+export function getIDFromResponse(resBody: fhir.Bundle): string {
   if (
     !resBody ||
     !resBody.entry ||
@@ -417,8 +631,21 @@ export async function getCompositionIDFromFhirResponse(
     !resBody.entry[0].response ||
     !resBody.entry[0].response.location
   ) {
-    throw new Error(`FHIR response did not send a valid response`)
+    throw new Error(`FHIR did not send a valid response`)
   }
   // return the Composition's id
   return resBody.entry[0].response.location.split('/')[3]
+}
+
+export function isTaskResponse(resBody: fhir.Bundle): boolean {
+  if (
+    !resBody ||
+    !resBody.entry ||
+    !resBody.entry[0] ||
+    !resBody.entry[0].response ||
+    !resBody.entry[0].response.location
+  ) {
+    throw new Error(`FHIR did not send a valid response`)
+  }
+  return resBody.entry[0].response.location.indexOf('Task') > -1
 }

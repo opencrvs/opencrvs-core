@@ -1,20 +1,23 @@
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
-import { fhirUrl } from 'src/constants'
+import { HEARTH_URL } from 'src/constants'
 import {
   modifyRegistrationBundle,
   markBundleAsRegistered,
+  markBundleAsCertified,
   setTrackingId
 } from './fhir/fhir-bundle-modifier'
 import { sendBirthNotification } from './utils'
-import { getTrackingId, getBirthRegistrationNumber } from './fhir/fhir-utils'
 import { EVENT_TYPE } from './fhir/constants'
-import { getTaskResource } from './fhir/fhir-template'
 import { getToken } from 'src/utils/authUtils'
+import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
 
-async function sendBundleToHearth(payload: fhir.Bundle, count = 1) {
-  const res = await fetch(fhirUrl, {
+async function sendBundleToHearth(
+  payload: fhir.Bundle,
+  count = 1
+): Promise<fhir.Bundle> {
+  const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
@@ -24,14 +27,15 @@ async function sendBundleToHearth(payload: fhir.Bundle, count = 1) {
   if (!res.ok) {
     if (res.status === 409 && count < 5) {
       setTrackingId(payload)
-      await sendBundleToHearth(payload, count + 1)
-      return
+      return await sendBundleToHearth(payload, count + 1)
     }
 
     throw new Error(
       `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
   }
+
+  return res.json()
 }
 
 export async function createBirthRegistrationHandler(
@@ -45,14 +49,17 @@ export async function createBirthRegistrationHandler(
       getToken(request)
     )
 
-    await sendBundleToHearth(payload)
+    const resBundle = await sendBundleToHearth(payload)
 
+    const msisdn = getSharedContactMsisdn(payload)
     /* sending notification to the contact */
-    sendBirthNotification(payload, {
-      Authorization: request.headers.authorization
-    })
-    /* returning the newly created tracking id */
-    return { trackingid: getTrackingId(payload) }
+    if (msisdn) {
+      sendBirthNotification(payload, msisdn, {
+        Authorization: request.headers.authorization
+      })
+    }
+
+    return resBundle
   } catch (error) {
     logger.error(`Workflow/createBirthRegistrationHandler: error: ${error}`)
     throw new Error(error)
@@ -68,31 +75,26 @@ export async function markBirthAsRegisteredHandler(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
-    /* hearth will do put calls if it finds id on the bundle */
-    const res = await fetch(fhirUrl, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    })
-    if (!res.ok) {
-      throw new Error(
-        `FHIR post to /fhir failed with [${
-          res.status
-        }] body: ${await res.text()}`
-      )
-    }
     // TODO: need to send notification here
-
-    /* returning the newly created birth registration number */
-    return {
-      BirthRegistrationNumber: getBirthRegistrationNumber(getTaskResource(
-        payload
-      ) as fhir.Task)
-    }
+    return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsRegisteredHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markBirthAsCertifiedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await markBundleAsCertified(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
   }
 }

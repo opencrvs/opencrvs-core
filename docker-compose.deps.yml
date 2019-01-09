@@ -16,6 +16,28 @@ services:
     image: redis
     restart: unless-stopped
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    restart: unless-stopped
+    volumes:
+      - '/data/elasticsearch:/usr/share/elasticsearch/data'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  influxdb:
+    image: influxdb
+    restart: unless-stopped
+    volumes:
+      - '/data/influxdb:/var/lib/influxdb'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
   hearth:
     image: jembi/hearth:latest
     environment:

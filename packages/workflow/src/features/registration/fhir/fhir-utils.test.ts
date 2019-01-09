@@ -30,25 +30,19 @@ describe('Verify getSharedContactMsisdn', () => {
   it('Throws error when invalid shared contact info given', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'INVALID'
-    expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
-      "Invalid Informant's shared contact information found"
-    )
+    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 
   it('Throws error when telecom is missing for shared contact', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'FATHER'
-    expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
-      "Didn't find any contact point for informant's shared contact"
-    )
+    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 
   it('Throws error when phonenumber is missing for shared contact', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[3].resource.telecom = []
-    expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
-      "Didn't find any phone number for informant's shared contact"
-    )
+    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 })
 

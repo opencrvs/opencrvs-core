@@ -11,6 +11,7 @@ export const BENGALI_STATE = {
     'menu.items.changeLanguage': 'ভাষা পরিবর্তন',
     'menu.items.changeLanguage.english': 'ইংরেজি',
     'menu.items.changeLanguage.bengali': 'বাংলা',
+    'menu.items.performance': 'Performance',
     'states.state1': 'বরিশাল',
     'states.state2': 'ঢাকা',
     'states.state3': 'খুলনা',
@@ -490,6 +491,7 @@ export const BENGALI_STATE = {
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
+    'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       'যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}',
     'validations.emailAddressFormat': 'Must be a valid email address',
@@ -645,6 +647,8 @@ export const BENGALI_STATE = {
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
     'register.workQueue.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
+    'print.certificate.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
+    'print.certificate.confirm': 'নিশ্চিত করুন',
     'register.workQueue.dataTable.results': 'ফলাফল',
     'register.workQueue.dataTable.noResults': 'প্রদর্শন ফলাফল নেই',
     'register.workQueue.header.title': 'হ্যালো নিবন্ধক',
@@ -653,14 +657,46 @@ export const BENGALI_STATE = {
     'register.workQueue.buttons.newRegistration': 'নতুন জন্ম নিবন্ধন',
     'register.workQueue.buttons.reviewAndRegister': 'পর্যালোচনা এবং নিবন্ধন',
     'register.workQueue.list.buttons.review': 'পর্যালোচনা',
+    'register.workQueue.list.buttons.print': 'মুদ্রণ',
+    'register.workQueue.title.certificateCollection': 'সার্টিফিকেট সংগ্রহ',
+    'register.workQueue.list.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
     'register.workQueue.listItem.status.dateLabel.application': 'আবেদন জমা',
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.collected': 'সংগৃহীত',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
+    'register.workQueue.print.form.name': 'মুদ্রণ',
+    'register.workQueue.print.form.title': 'সার্টিফিকেট মুদ্রণ',
+    'formFields.print.whoToCollect': 'কে সার্টিফিকেট সংগ্রহ করছে?',
+    'register.workQueue.print.collector.mother': 'মা',
+    'register.workQueue.print.collector.father': 'পিতা',
+    'register.workQueue.print.collector.other': 'অন্যান্য',
+    'formFields.print.confirmMotherInformation':
+      'আইডি নথি তাদের প্রমাণ নিম্নলিখিত বিবরণ মেলে?',
+    'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',
+    'formFields.print.otherPersonFamilyName': 'পারিবারিক নাম',
+    'formFields.print.signedAffidavit': 'তার একটি স্বাক্ষরিত হলফনামা আছে?',
+    'formFields.print.documentNumber': 'ডকুমেন্ট সংখ্যা',
+    'formFields.print.warningNotVerified':
+      'দয়া করে সচেতন থাকুন যে আপনি যদি অগ্রসর হন তবে সংগ্রাহক থেকে ID এর প্রয়োজনীয় প্রমাণ ছাড়াই আপনি একটি শংসাপত্র দেওয়ার জন্য দায়বদ্ধ হবেন।',
+    'formFields.print.otherPersonPrompt':
+      'যেহেতু রেকর্ডে এই ব্যক্তির কোন বিবরণ নেই, তাদের বিবরণ নিতে হবে:',
+    'register.workQueue.print.payment': 'মূল্যপরিশোধ',
+    'register.workQueue.print.paymentMethod': 'মূল্যপরিশোধ পদ্ধতি',
+    'register.workQueue.print.manualPaymentMethod': 'হস্তকৃত',
+    'register.workQueue.print.collectPayment':
+      'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
+    'register.workQueue.print.serviceMonth':
+      'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.serviceYear':
+      'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
+    'print.certificate.next': 'পরবর্তী',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',
+    'register.workQueue.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'review.edit.modal.preview': 'প্রিভিউ ফিরে যান',
     'review.edit.modal.editButton': 'সম্পাদন',
     'review.edit.modal.confirmationText':
@@ -685,6 +721,24 @@ export const BENGALI_STATE = {
     'review.form.deleteApplication': 'আবেদন মুছে দিন',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হাঁ',
-    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?'
+    'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
+    'certificate.parent.details.label.firstName': 'নামের প্রথম অংশ',
+    'certificate.parent.details.label.familyName': 'পরিবারের নাম',
+    'certificate.parent.details.label.firstNameInEng':
+      'নামের প্রথম অংশ(ইংরেজি)',
+    'certificate.parent.details.label.familyNameInEng': 'পরিবারের নাম(ইংরেজি)',
+    'certificate.parent.details.label.dateOfBirth': 'জন্ম তারিখ',
+    'certificate.parent.details.label.nationality': 'জাতীয়তা',
+    'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
+    'certificate.parent.details.label.number': 'সংখ্যা',
+    'review.form.section.reviewTitle': 'পর্যালোচনা',
+    'validations.bengaliOnlyNameFormat': 'শুধুমাত্র বাংলা অক্ষর থাকতে হবে',
+    'validations.englishOnlyNameFormat': 'শুধুমাত্র ইংরেজি অক্ষর থাকা আবশ্যক',
+    'register.home.header.hello': 'হ্যালো {fullName}',
+    'review.birthRegistration.queryError':
+      'জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে',
+    'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
+    'register.workQueue.labels.results.birthRegistrationNumber':
+      'জন্ম নিবন্ধন সংখ্যা'
   }
 }

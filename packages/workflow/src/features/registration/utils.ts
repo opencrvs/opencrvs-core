@@ -2,11 +2,7 @@ import * as ShortUIDGen from 'short-uid'
 import { NOTIFICATION_SERVICE_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { logger } from 'src/logger'
-import {
-  getSharedContactMsisdn,
-  getInformantName,
-  getTrackingId
-} from './fhir/fhir-utils'
+import { getInformantName, getTrackingId } from './fhir/fhir-utils'
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -22,6 +18,7 @@ function generateTrackingId(prefix: string): string {
 
 export async function sendBirthNotification(
   fhirBundle: fhir.Bundle,
+  msisdn: string,
   authHeader: { Authorization: string }
 ) {
   try {
@@ -29,7 +26,7 @@ export async function sendBirthNotification(
       method: 'POST',
       body: JSON.stringify({
         trackingid: getTrackingId(fhirBundle),
-        msisdn: getSharedContactMsisdn(fhirBundle),
+        msisdn,
         name: getInformantName(fhirBundle)
       }),
       headers: {
