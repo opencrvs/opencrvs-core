@@ -491,6 +491,7 @@ export const BENGALI_STATE = {
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
+    'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       'যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}',
     'validations.emailAddressFormat': 'Must be a valid email address',
@@ -680,7 +681,18 @@ export const BENGALI_STATE = {
       'দয়া করে সচেতন থাকুন যে আপনি যদি অগ্রসর হন তবে সংগ্রাহক থেকে ID এর প্রয়োজনীয় প্রমাণ ছাড়াই আপনি একটি শংসাপত্র দেওয়ার জন্য দায়বদ্ধ হবেন।',
     'formFields.print.otherPersonPrompt':
       'যেহেতু রেকর্ডে এই ব্যক্তির কোন বিবরণ নেই, তাদের বিবরণ নিতে হবে:',
-
+    'register.workQueue.print.payment': 'মূল্যপরিশোধ',
+    'register.workQueue.print.paymentMethod': 'মূল্যপরিশোধ পদ্ধতি',
+    'register.workQueue.print.manualPaymentMethod': 'হস্তকৃত',
+    'register.workQueue.print.collectPayment':
+      'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
+    'register.workQueue.print.serviceMonth':
+      'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.serviceYear':
+      'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
+    'print.certificate.next': 'পরবর্তী',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',

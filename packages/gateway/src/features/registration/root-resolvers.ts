@@ -96,6 +96,13 @@ export const resolvers: GQLResolver = {
       )
       // return the taskId
       return getIDFromResponse(res)
+    },
+    async markBirthAsCertified(_, { details }, authHeader) {
+      const doc = await buildFHIRBundle(details)
+
+      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+      // return composition-id
+      return getIDFromResponse(res)
     }
   }
 }
@@ -106,7 +113,7 @@ async function getCompositionsByLocation(
 ) {
   const tasksResponses = await Promise.all(
     locationIds.map(locationId => {
-      return fetchFHIR(`/Task?location=${locationId}`, authHeader)
+      return fetchFHIR(`/Task?location=Location/${locationId}`, authHeader)
     })
   )
 

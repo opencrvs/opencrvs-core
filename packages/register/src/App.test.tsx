@@ -677,7 +677,7 @@ describe('when user has a valid token in local storage', () => {
       orderOfBirth: '2',
       placeOfDelivery: 'HOSPITAL',
       typeOfBirth: 'SINGLE',
-      weightAtBirth: '10'
+      weightAtBirth: '6'
     }
 
     const fatherDetails: IPersonDetails = {
