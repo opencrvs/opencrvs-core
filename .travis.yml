@@ -19,6 +19,7 @@ jobs:
         - yarn start:prod &
         - wait-on http://localhost:3000 http://localhost:3020
         - cd packages/user-mgnt && yarn populate && cd ../..
+        - cd packages/resources && yarn populate && cd ../..
         - cd packages/e2e && yarn start --record
       env:
         - CYPRESS_LOGIN_URL=http://localhost:3020/
