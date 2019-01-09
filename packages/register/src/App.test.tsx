@@ -27,6 +27,7 @@ import {
   setInitialUserDetails
 } from '@opencrvs/register/src/profile/profileActions'
 import { storeOfflineData } from 'src/offline/actions'
+import { referenceApi } from 'src/utils/referenceApi'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -36,6 +37,22 @@ const setItem = window.localStorage.setItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
+
+const mockFetchLocations = jest.fn()
+mockFetchLocations.mockReturnValue({
+  data: [
+    {
+      id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
+      name: 'Barisal',
+      nameBn: 'বরিশাল',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    }
+  ]
+})
+referenceApi.loadLocations = mockFetchLocations
 
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
