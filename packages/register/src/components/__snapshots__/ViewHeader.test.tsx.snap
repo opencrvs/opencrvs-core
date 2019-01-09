@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`home view header component renders without crashing 1`] = `
+exports[`view header component renders without crashing 1`] = `
 ShallowWrapper {
   Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__unrendered__): <HomeViewHeader
+  Symbol(enzyme.__unrendered__): <ViewHeader
     description="Test description"
     id="test_heaader"
     title="Test title"
@@ -23,20 +23,18 @@ ShallowWrapper {
     "props": Object {
       "children": Array [
         <ConnectivityStatus />,
+        undefined,
         <Connect(InjectIntl(TopMenuComponent))
-          hideBackButton={true}
+          hideBackButton={undefined}
         />,
-        <Styled(Component) />,
         <ViewHeading
+          breadcrumb={undefined}
           description="Test description"
           id="test_heaader"
           title="Test title"
         />,
         undefined,
       ],
-      "description": "Test description",
-      "id": "test_heaader",
-      "title": "Test title",
     },
     "ref": null,
     "rendered": Array [
@@ -49,22 +47,14 @@ ShallowWrapper {
         "rendered": null,
         "type": [Function],
       },
+      undefined,
       Object {
         "instance": null,
         "key": undefined,
         "nodeType": "class",
         "props": Object {
-          "hideBackButton": true,
+          "hideBackButton": undefined,
         },
-        "ref": null,
-        "rendered": null,
-        "type": [Function],
-      },
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "class",
-        "props": Object {},
         "ref": null,
         "rendered": null,
         "type": [Function],
@@ -74,6 +64,7 @@ ShallowWrapper {
         "key": undefined,
         "nodeType": "function",
         "props": Object {
+          "breadcrumb": undefined,
           "description": "Test description",
           "id": "test_heaader",
           "title": "Test title",
@@ -94,20 +85,18 @@ ShallowWrapper {
       "props": Object {
         "children": Array [
           <ConnectivityStatus />,
+          undefined,
           <Connect(InjectIntl(TopMenuComponent))
-            hideBackButton={true}
+            hideBackButton={undefined}
           />,
-          <Styled(Component) />,
           <ViewHeading
+            breadcrumb={undefined}
             description="Test description"
             id="test_heaader"
             title="Test title"
           />,
           undefined,
         ],
-        "description": "Test description",
-        "id": "test_heaader",
-        "title": "Test title",
       },
       "ref": null,
       "rendered": Array [
@@ -120,22 +109,14 @@ ShallowWrapper {
           "rendered": null,
           "type": [Function],
         },
+        undefined,
         Object {
           "instance": null,
           "key": undefined,
           "nodeType": "class",
           "props": Object {
-            "hideBackButton": true,
+            "hideBackButton": undefined,
           },
-          "ref": null,
-          "rendered": null,
-          "type": [Function],
-        },
-        Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "class",
-          "props": Object {},
           "ref": null,
           "rendered": null,
           "type": [Function],
@@ -145,6 +126,7 @@ ShallowWrapper {
           "key": undefined,
           "nodeType": "function",
           "props": Object {
+            "breadcrumb": undefined,
             "description": "Test description",
             "id": "test_heaader",
             "title": "Test title",
