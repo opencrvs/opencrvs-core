@@ -230,12 +230,17 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
       if (menuItem.isSubMenu) {
         return (
           <StyledNestedSubMenu
+            id={`${menuItem.title.replace(/\s/g, '')}-nested-menu`}
             title={<SubMenuTitleWrapper>{menuItem.title}</SubMenuTitleWrapper>}
             key={menuItem.key}
           >
             {menuItem.menuItems &&
               menuItem.menuItems.map((item: IMenuItem) => (
-                <StyledNestedMenuItem key={item.key} onClick={item.onClick}>
+                <StyledNestedMenuItem
+                  id={`${item.title.replace(/\s/g, '')}-nested-menu-item`}
+                  key={item.key}
+                  onClick={item.onClick}
+                >
                   {item.title}
                 </StyledNestedMenuItem>
               ))}
@@ -243,7 +248,11 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
         )
       } else {
         return (
-          <MenuItem key={menuItem.key} onClick={menuItem.onClick}>
+          <MenuItem
+            id={`${menuItem.title.replace(/\s/g, '')}-menu-item`}
+            key={menuItem.key}
+            onClick={menuItem.onClick}
+          >
             {menuItem.title}
           </MenuItem>
         )
@@ -254,14 +263,16 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
       <MenuContainer>
         <Menu
           mode="inline"
+          id="hamburger-menu"
           expandIcon={this.expandIcon}
           openAnimation={animation}
           triggerSubMenuAction="click"
         >
           <StyledSubMenu
             onTitleClick={this.toggleMenu}
+            id="sub-menu"
             title={
-              <SubMenuTitleWrapper>
+              <SubMenuTitleWrapper id="sub-menu-wrapper">
                 {this.state.menuOpen ? '' : this.props.menuTitle}
               </SubMenuTitleWrapper>
             }
