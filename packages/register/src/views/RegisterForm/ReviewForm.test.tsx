@@ -88,6 +88,18 @@ describe('ReviewForm tests', async () => {
         result: {
           data: {
             fetchBirthRegistration: {
+              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+              _fhirIDMap: {
+                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                observation: {
+                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  presentAtBirthRegistration:
+                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                }
+              },
               child: {
                 name: [
                   {
@@ -102,7 +114,8 @@ describe('ReviewForm tests', async () => {
                   }
                 ],
                 birthDate: '2001-01-01',
-                gender: 'male'
+                gender: 'male',
+                id: '16025284-bae2-4b37-ae80-e16745b7a6b9'
               },
               mother: {
                 name: [
@@ -151,14 +164,18 @@ describe('ReviewForm tests', async () => {
                     system: 'email',
                     value: 'moyna@ocrvs.com'
                   }
-                ]
+                ],
+                id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
               father: null,
               registration: {
+                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123'
+                paperFormID: '123',
+                trackingId: 'B123456',
+                registrationNumber: null
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -199,6 +216,7 @@ describe('ReviewForm tests', async () => {
       .prop('draft') as IDraft
 
     expect(data.data.child).toEqual({
+      _fhirID: '16025284-bae2-4b37-ae80-e16745b7a6b9',
       attendantAtBirth: 'NURSE',
       childBirthDate: '2001-01-01',
       familyName: 'আকাশ',
@@ -264,6 +282,18 @@ describe('ReviewForm tests', async () => {
         result: {
           data: {
             fetchBirthRegistration: {
+              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+              _fhirIDMap: {
+                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                observation: {
+                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  presentAtBirthRegistration:
+                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                }
+              },
               child: null,
               mother: null,
               father: {
@@ -312,13 +342,17 @@ describe('ReviewForm tests', async () => {
                     system: 'email',
                     value: 'ajmol@ocrvs.com'
                   }
-                ]
+                ],
+                id: '526362a1-aa8e-4848-af35-41524f9e7e85'
               },
               registration: {
+                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'FATHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123'
+                paperFormID: '123',
+                trackingId: 'B123456',
+                registrationNumber: null
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -373,14 +407,29 @@ describe('ReviewForm tests', async () => {
         result: {
           data: {
             fetchBirthRegistration: {
+              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+              _fhirIDMap: {
+                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                observation: {
+                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  presentAtBirthRegistration:
+                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                }
+              },
               child: null,
               mother: null,
               father: null,
               registration: {
+                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123'
+                paperFormID: '123',
+                trackingId: 'B123456',
+                registrationNumber: null
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -437,10 +486,23 @@ describe('ReviewForm tests', async () => {
         result: {
           data: {
             fetchBirthRegistration: {
+              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+              _fhirIDMap: {
+                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                observation: {
+                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  presentAtBirthRegistration:
+                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                }
+              },
               child: null,
               mother: null,
               father: null,
               registration: {
+                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
                 attachments: [
                   {
@@ -451,7 +513,9 @@ describe('ReviewForm tests', async () => {
                   }
                 ],
                 status: null,
-                paperFormID: '123'
+                paperFormID: '123',
+                trackingId: 'B123456',
+                registrationNumber: null
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -515,6 +579,18 @@ describe('ReviewForm tests', async () => {
         result: {
           data: {
             fetchBirthRegistration: {
+              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+              _fhirIDMap: {
+                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                observation: {
+                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  presentAtBirthRegistration:
+                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                }
+              },
               child: null,
               mother: {
                 name: [
@@ -563,10 +639,12 @@ describe('ReviewForm tests', async () => {
                     system: 'email',
                     value: 'moyna@ocrvs.com'
                   }
-                ]
+                ],
+                id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
               father: null,
               registration: {
+                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
                 attachments: null,
                 status: [
@@ -578,7 +656,9 @@ describe('ReviewForm tests', async () => {
                     ]
                   }
                 ],
-                paperFormID: '123'
+                paperFormID: '123',
+                trackingId: 'B123456',
+                registrationNumber: null
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -620,12 +700,15 @@ describe('ReviewForm tests', async () => {
       .prop('draft') as IDraft
 
     expect(data.data.registration).toEqual({
+      _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
       whoseContactDetails: 'MOTHER',
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationPhone: '01711111111',
       registrationEmail: 'moyna@ocrvs.com',
       paperFormNumber: '123',
-      commentsOrNotes: 'This is a note'
+      commentsOrNotes: 'This is a note',
+      trackingId: 'B123456',
+      registrationNumber: null
     })
 
     testComponent.component.unmount()
