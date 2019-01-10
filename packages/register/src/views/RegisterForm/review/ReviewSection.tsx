@@ -21,6 +21,13 @@ import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/li
 import { documentsSection } from '../../../forms/register/documents-section'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
+import { getOfflineState } from 'src/offline/selectors'
+import {
+  IOfflineDataState,
+  OFFLINE_LOCATIONS_KEY,
+  ILocation
+} from 'src/offline/reducer'
+import { getLanguage } from 'src/i18n/selectors'
 import {
   defineMessages,
   InjectedIntlProps,
@@ -255,6 +262,8 @@ interface IProps {
   deleteApplicationClickEvent?: () => void
   goToTab: typeof goToTab
   scope: Scope
+  offlineResources: IOfflineDataState
+  language: string
 }
 
 interface ISectionExpansion {
@@ -306,23 +315,49 @@ function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
-  intl: InjectedIntl
+  intl: InjectedIntl,
+  resources: IOfflineDataState,
+  language: string
 ) {
-  const dependency = options.dependency ? draftData[options.dependency] : false
-  const selectedOption = dependency
-    ? options.options &&
-      options.options[dependency.toString()].find(
-        option => option.value === value
-      )
-    : false
-  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+  if (!options.resource) {
+    const dependency = options.dependency
+      ? draftData[options.dependency]
+      : false
+    const selectedOption = dependency
+      ? options.options &&
+        options.options[dependency.toString()].find(
+          option => option.value === value
+        )
+      : false
+    return selectedOption ? intl.formatMessage(selectedOption.label) : value
+  } else {
+    if (options.resource) {
+      const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+      const selectedLocation = locations.filter((location: ILocation) => {
+        return location.id === value
+      })[0]
+      if (selectedLocation) {
+        if (language === 'en') {
+          return selectedLocation.name
+        } else {
+          return selectedLocation.nameBn
+        }
+      } else {
+        return false
+      }
+    } else {
+      return false
+    }
+  }
 }
 
 const renderValue = (
   draft: IDraft,
   section: IFormSection,
   field: IFormField,
-  intl: InjectedIntl
+  intl: InjectedIntl,
+  offlineResources: IOfflineDataState,
+  language: string
 ) => {
   const value: IFormFieldValue = draft.data[section.id]
     ? draft.data[section.id][field.name]
@@ -336,7 +371,9 @@ const renderValue = (
       value,
       field.dynamicOptions,
       draftData,
-      intl
+      intl,
+      offlineResources,
+      language
     )
   }
   if (typeof value === 'string') {
@@ -485,6 +522,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       submitClickEvent,
       saveDraftClickEvent,
       deleteApplicationClickEvent,
+      offlineResources,
+      language,
       tabRoute
     } = this.props
 
@@ -562,7 +601,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                   {intl.formatMessage(messages.requiredField)}
                                 </RequiredFieldLink>
                               ) : (
-                                renderValue(draft, section, field, intl)
+                                renderValue(
+                                  draft,
+                                  section,
+                                  field,
+                                  intl,
+                                  offlineResources,
+                                  language
+                                )
                               )}
                             </SectionValue>
                           </SectionRow>
@@ -675,7 +721,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 export const ReviewSection = connect(
   (state: IStoreState) => ({
     registerForm: getRegisterForm(state),
-    scope: getScope(state)
+    scope: getScope(state),
+    offlineResources: getOfflineState(state),
+    language: getLanguage(state)
   }),
   { goToTab }
 )(injectIntl(ReviewSectionComp))
