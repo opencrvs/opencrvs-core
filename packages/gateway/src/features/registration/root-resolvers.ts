@@ -88,12 +88,7 @@ export const resolvers: GQLResolver = {
         reason,
         comment
       )
-      const res = await fetchFHIR(
-        '/Task',
-        authHeader,
-        'PUT',
-        JSON.stringify(newTaskBundle)
-      )
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
       return taskEntry.resource.id
     },
