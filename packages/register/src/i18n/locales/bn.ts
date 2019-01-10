@@ -693,6 +693,14 @@ export const BENGALI_STATE = {
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
+    'register.workQueue.print.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
+    'register.workQueue.print.selectSignature': 'ই-স্বাক্ষর নির্বাচন করুন',
+    'register.workQueue.print.addAnotherSignature':
+      'আরও একটি স্বাক্ষর যোগ করুন',
+    'register.noLabel': ' ',
+    'register.workQueue.print.signature.person1': 'ইউপি সচিব সাকিব আল হাসান',
+    'register.workQueue.print.signature.person2':
+      'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',

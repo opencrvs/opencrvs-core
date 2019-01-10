@@ -698,6 +698,14 @@ export const ENGLISH_STATE = {
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
+    'register.workQueue.print.certificatePreview': 'Certificate Preview',
+    'register.workQueue.print.selectSignature': 'Select e-signatures',
+    'register.workQueue.print.addAnotherSignature': 'Add another',
+    'register.noLabel': ' ',
+    'register.workQueue.print.signature.person1':
+      'UP Secretary Shakib al hasan',
+    'register.workQueue.print.signature.person2':
+      'Local Registrar Mohammad Ashraful',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
