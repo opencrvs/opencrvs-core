@@ -8,7 +8,7 @@ Start the service with `yarn start`
 
 Watch the tests with `yarn test:watch`
 
-When in dev mode swagger API docs are available at `http://localhost:9090/documentation`
+When in dev mode swagger API docs are available at `http://localhost:1050/documentation`
 
 ## Design details
 
