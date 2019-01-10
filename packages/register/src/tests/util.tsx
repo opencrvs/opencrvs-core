@@ -69,7 +69,7 @@ const intlProvider = new IntlProvider(
   { locale: 'en', messages: ENGLISH_STATE.messages },
   {}
 )
-const { intl } = intlProvider.getChildContext()
+export const { intl } = intlProvider.getChildContext()
 
 function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
   return React.cloneElement(node, { intl })

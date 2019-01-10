@@ -311,7 +311,7 @@ function renderSelectLabel(
   return selectedOption ? intl.formatMessage(selectedOption.label) : value
 }
 
-function renderSelectDynamicLabel(
+export function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
