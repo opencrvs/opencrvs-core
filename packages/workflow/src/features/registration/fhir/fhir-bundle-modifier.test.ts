@@ -144,8 +144,8 @@ describe('Verify fhir bundle modifier functions', () => {
         practitioner
       )
 
-      expect(taskResource.extension[1].valueReference).toBeDefined()
-      expect(taskResource.extension[1].valueReference).toEqual(
+      expect(taskResource.extension[1].valueReference.reference).toBeDefined()
+      expect(taskResource.extension[1].valueReference.reference).toEqual(
         'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
       )
     })
@@ -158,8 +158,8 @@ describe('Verify fhir bundle modifier functions', () => {
         practitioner
       )
 
-      expect(taskResource.extension[0].valueReference).toBeDefined()
-      expect(taskResource.extension[0].valueReference).toEqual(
+      expect(taskResource.extension[0].valueReference.reference).toBeDefined()
+      expect(taskResource.extension[0].valueReference.reference).toEqual(
         'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
       )
     })
@@ -173,7 +173,7 @@ describe('Verify fhir bundle modifier functions', () => {
       )
 
       expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
-      expect(taskResource.extension[1].valueReference).toEqual(
+      expect(taskResource.extension[1].valueReference.reference).toEqual(
         'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
       )
     })
@@ -401,7 +401,9 @@ describe('Verify fhir bundle modifier functions', () => {
       )
       expect(taskResource.extension[2]).toEqual({
         url: 'http://opencrvs.org/specs/extension/regLastLocation',
-        valueReference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdxxx'
+        valueReference: {
+          reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdxxx'
+        }
       })
     })
     it('throws error if invalid practitioner is provided', async () => {

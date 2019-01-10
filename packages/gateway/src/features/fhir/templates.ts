@@ -3,7 +3,8 @@ import { ITemplatedComposition } from '../registration/fhir-builders'
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
 export const CHILD_CODE = 'child-details'
-export const DOCS_CODE = 'supporting-documents'
+export const ATTACHMENT_DOCS_CODE = 'supporting-documents'
+export const CERTIFICATE_DOCS_CODE = 'certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 export const BODY_WEIGHT_CODE = '3141-9'
 export const BIRTH_TYPE_CODE = '57722-1'
@@ -17,58 +18,29 @@ export const OBSERVATION_CATEGORY_PROCEDURE_CODE = 'procedure'
 export const OBSERVATION_CATEGORY_PROCEDURE_DESC = 'Procedure'
 export const OBSERVATION_CATEGORY_VSIGN_CODE = 'vital-signs'
 export const OBSERVATION_CATEGORY_VSIGN_DESC = 'Vital Signs'
+export const MOTHER_TITLE = "Mother's details"
+export const FATHER_TITLE = "Father's details"
+export const CHILD_TITLE = 'Child details'
+export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
+export const CERTIFICATE_DOCS_TITLE = 'Certificates'
+export const ATTACHMENT_CONTEXT_KEY = 'attachments'
+export const CERTIFICATE_CONTEXT_KEY = 'certificates'
 
-export function createMotherSection(refUuid: string) {
+export function createPersonSection(
+  refUuid: string,
+  sectionCode: string,
+  sectionTitle: string
+) {
   return {
-    title: "Mother's details",
+    title: sectionTitle,
     code: {
       coding: [
         {
           system: 'http://opencrvs.org/doc-sections',
-          code: 'mother-details'
+          code: sectionCode
         }
       ],
-      text: "Mother's details"
-    },
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
-  }
-}
-
-export function createFatherSection(refUuid: string) {
-  return {
-    title: "Father's details",
-    code: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/doc-sections',
-          code: 'father-details'
-        }
-      ],
-      text: "Father's details"
-    },
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
-  }
-}
-
-export function createChildSection(refUuid: string) {
-  return {
-    title: 'Child details',
-    code: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/doc-sections',
-          code: 'child-details'
-        }
-      ],
-      text: 'Child details'
+      text: sectionTitle
     },
     entry: [
       {
@@ -115,6 +87,25 @@ export function createEncounter(refUuid: string) {
       resourceType: 'Encounter',
       status: 'finished'
     } as fhir.Encounter
+  }
+}
+
+export function createRelatedPersonTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'RelatedPerson'
+    } as fhir.RelatedPerson
+  }
+}
+
+export function createPaymentReconciliationTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'PaymentReconciliation',
+      status: 'active'
+    } as fhir.PaymentReconciliation
   }
 }
 
@@ -193,17 +184,20 @@ export function createPersonEntryTemplate(refUuid: string) {
   }
 }
 
-export function createSupportingDocumentsSection() {
+export function createSupportingDocumentsSection(
+  sectionCode: string,
+  sectionTitle: string
+) {
   return {
-    title: 'Supporting documents',
+    title: sectionTitle,
     code: {
       coding: [
         {
           system: 'http://opencrvs.org/specs/sections',
-          code: 'supporting-documents'
+          code: sectionCode
         }
       ],
-      text: 'Supporting documents'
+      text: sectionTitle
     },
     entry: [] as fhir.Reference[]
   }

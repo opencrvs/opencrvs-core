@@ -16,6 +16,8 @@ import { ReactWrapper } from 'enzyme'
 import { iDType, ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
+import { paymentFormSection } from './payment-section'
+import { calculateDays, timeElapsed } from './calculatePrice'
 
 describe('when user wants to print certificate', async () => {
   const { store } = createStore()
@@ -34,6 +36,9 @@ describe('when user wants to print certificate', async () => {
           data: {
             fetchBirthRegistration: {
               id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+              child: {
+                birthDate: '2014-02-15'
+              },
               mother: {
                 name: [
                   {
@@ -162,6 +167,9 @@ describe('when user wants to print certificate', async () => {
           data: {
             fetchBirthRegistration: {
               id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+              child: {
+                birthDate: '2014-02-15'
+              },
               mother: {
                 name: [
                   {
@@ -380,6 +388,9 @@ describe('when user wants to print certificate', async () => {
             data: {
               fetchBirthRegistration: {
                 id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+                child: {
+                  birthDate: '2014-02-15'
+                },
                 mother: {
                   name: [
                     {
@@ -569,6 +580,49 @@ describe('when user wants to print certificate', async () => {
           .hostNodes()
           .prop('disabled')
       ).toBe(false)
+    })
+
+    it('when user clicks confirm button, renders payment form', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: true
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+
+      component
+        .find('#print-confirm-button')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      const fields = paymentFormSection.fields
+
+      fields[2].initialValue = '50.00'
+      fields[3].initialValue = '24'
+      expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
+    })
+
+    it('timeElapsedInWords function returns required time duration in words', () => {
+      Date.now = jest.fn(() => new Date('2019-01-01'))
+
+      let days = calculateDays('2018-08-18')
+
+      let time = timeElapsed(days)
+      expect(time.value).toBe(4)
+      expect(time.unit).toBe('Month')
+      days = calculateDays('2018-12-16')
+      time = timeElapsed(days)
+      expect(time.value).toBe(16)
+      expect(time.unit).toBe('Day')
+
+      let error
+      try {
+        calculateDays('16-12-2018')
+      } catch (e) {
+        error = e
+      }
+      expect(error).toBeInstanceOf(Error)
     })
   })
 })

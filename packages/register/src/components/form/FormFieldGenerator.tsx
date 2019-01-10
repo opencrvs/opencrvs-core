@@ -1,7 +1,13 @@
 import * as React from 'react'
 import { withFormik, Field, FormikProps, FieldProps } from 'formik'
 import { isEqual } from 'lodash'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  InjectedIntlProps,
+  injectIntl,
+  FormattedHTMLMessage,
+  FormattedMessage,
+  MessageValue
+} from 'react-intl'
 import {
   TextInput,
   Select,
@@ -111,6 +117,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <Select
           {...inputProps}
+          isDisabled={fieldDefinition.disabled}
           value={value as string}
           onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
@@ -201,7 +208,18 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === PARAGRAPH) {
-    return <Paragraph>{fieldDefinition.label}</Paragraph>
+    const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
+
+    return (
+      <Paragraph fontSize={fieldDefinition.fontSize}>
+        <FormattedHTMLMessage
+          {...label}
+          values={{
+            [fieldDefinition.name]: fieldDefinition.initialValue as MessageValue
+          }}
+        />
+      </Paragraph>
+    )
   }
   if (fieldDefinition.type === LIST) {
     return <FormList list={fieldDefinition.items} />
@@ -211,6 +229,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <TextInput
           type="number"
+          pattern="[0-9]*"
           step={fieldDefinition.step}
           {...inputProps}
           value={inputProps.value as string}
