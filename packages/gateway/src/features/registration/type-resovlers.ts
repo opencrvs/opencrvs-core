@@ -361,6 +361,16 @@ export const typeResolvers: GQLResolver = {
       )
 
       if (observations) {
+        const observationKeys = {
+          weightAtBirth: BODY_WEIGHT_CODE,
+          birthType: BIRTH_TYPE_CODE,
+          attendantAtBirth: BIRTH_ATTENDANT_CODE,
+          birthRegistrationType: BIRTH_REG_TYPE_CODE,
+          presentAtBirthRegistration: BIRTH_REG_PRESENT_CODE,
+          childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
+          foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
+          lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
+        }
         observations.entry.map(
           (item: fhir.Observation & { resource: fhir.Observation }) => {
             if (
@@ -369,36 +379,12 @@ export const typeResolvers: GQLResolver = {
               item.resource.code.coding[0] &&
               item.resource.code.coding[0].code
             ) {
-              if (BODY_WEIGHT_CODE === item.resource.code.coding[0].code) {
-                observation['weightAtBirth'] = item.resource.id
-              }
-              if (BIRTH_TYPE_CODE === item.resource.code.coding[0].code) {
-                observation['birthType'] = item.resource.id
-              }
-              if (BIRTH_ATTENDANT_CODE === item.resource.code.coding[0].code) {
-                observation['attendantAtBirth'] = item.resource.id
-              }
-
-              if (BIRTH_REG_TYPE_CODE === item.resource.code.coding[0].code) {
-                observation['birthRegistrationType'] = item.resource.id
-              }
-              if (
-                BIRTH_REG_PRESENT_CODE === item.resource.code.coding[0].code
-              ) {
-                observation['presentAtBirthRegistration'] = item.resource.id
-              }
-              if (
-                NUMBER_BORN_ALIVE_CODE === item.resource.code.coding[0].code
-              ) {
-                observation['childrenBornAliveToMother'] = item.resource.id
-              }
-              if (
-                NUMBER_FOEATAL_DEATH_CODE === item.resource.code.coding[0].code
-              ) {
-                observation['foetalDeathsToMother'] = item.resource.id
-              }
-              if (LAST_LIVE_BIRTH_CODE === item.resource.code.coding[0].code) {
-                observation['lastPreviousLiveBirth'] = item.resource.id
+              const itemCode = item.resource.code.coding[0].code
+              const observationKey = Object.keys(observationKeys).find(
+                key => observationKeys[key] === itemCode
+              )
+              if (observationKey) {
+                observation[observationKey] = item.resource.id
               }
             }
           }
