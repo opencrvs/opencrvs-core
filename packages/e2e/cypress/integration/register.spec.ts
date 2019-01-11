@@ -8,9 +8,7 @@ context('Register', () => {
   it('fills in all data into the register form', () => {
     cy.visit(`${Cypress.env('REGISTER_URL')}events`)
     // CHILD DETAILS
-
     cy.get('#select_vital_event_view').should('be.visible')
-
     cy.get('#select_birth_event').click()
     cy.get('#select_parent_informant').click()
     cy.get('#firstNames').type('গায়ত্রী')
@@ -50,22 +48,40 @@ context('Register', () => {
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Mymensingh Division', 'Mymensingh Division')
     cy.selectOption('#district', 'Mymensingh District', 'Mymensingh District')
-    cy.selectOption('#addressLine4', 'Mymensingh Sadar Upazila', 'Mymensingh Sadar Upazila')
-    cy.selectOption('#addressLine3Options1', 'Akua','Akua')
-    cy.get('#addressLine2').type('Morning side, Sandton')
-    cy.get('#addressLine1').type('34 polo fields, Cullinan close')
-    cy.get('#postCode').type('2196')
 
+    // Depends on fix for bug & better approach for administrative structure:  https://jembiprojects.jira.com/browse/OCRVS-588
+
+    cy.selectOption(
+      '#addressLine4',
+      'Mymensingh Sadar Upazila',
+      'Mymensingh Sadar Upazila'
+    )
+    cy.selectOption('#addressLine3Options1', 'Akua', 'Akua')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('10024')
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#statePermanent', 'Mymensingh Division', 'Mymensingh Division')
-    cy.selectOption('#districtPermanent', 'Mymensingh District', 'Mymensingh District')
-    cy.selectOption('#addressLine4Permanent', 'Mymensingh Sadar Upazila', 'Mymensingh Sadar Upazila')
+    cy.selectOption(
+      '#statePermanent',
+      'Mymensingh Division',
+      'Mymensingh Division'
+    )
+    cy.selectOption(
+      '#districtPermanent',
+      'Mymensingh District',
+      'Mymensingh District'
+    )
+    cy.selectOption(
+      '#addressLine4Permanent',
+      'Mymensingh Sadar Upazila',
+      'Mymensingh Sadar Upazila'
+    )
     cy.selectOption('#addressLine3Options1Permanent', 'Akua', 'Akua')
-    cy.get('#addressLine2Permanent').type('34 polo fields, Cullinan close')
-    cy.get('#addressLine1Permanent').type('34 polo fields, Cullinan close, Morning side, Sandton')
-    cy.get('#postCodePermanent').type('2196')
+    cy.get('#addressLine2Permanent').type('My street')
+    cy.get('#addressLine1Permanent').type('40')
+    cy.get('#postCodePermanent').type('10024')
     cy.get('#next_section').click()
-
+    // FATHER DETAILS
     cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National ID', 'National ID')
     cy.get('#iD').type('1')
@@ -135,10 +151,9 @@ context('Register', () => {
     cy.get('#paperFormNumber').type('1')
     cy.get('#commentsOrNotes').type('note')
     cy.get('#next_section').click()
-
+    // DOCUMENTS
     cy.get('#next_section').click()
     // PREVIEW
-
     cy.get('#next_button_child').click()
     cy.get('#next_button_mother').click()
     cy.get('#next_button_father').click()
