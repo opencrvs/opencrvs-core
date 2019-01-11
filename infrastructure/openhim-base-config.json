@@ -119,7 +119,7 @@
       "requestBody": true,
       "responseBody": true,
       "name": "New Declaration",
-      "urlPattern": "^/events/new-declaration$",
+      "urlPattern": "^/events/birth/new-declaration$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
@@ -175,7 +175,7 @@
     {
       "requestBody": true,
       "responseBody": true,
-      "urlPattern": "^/events/updated-declaration$",
+      "urlPattern": "^/events/birth/updated-declaration$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
@@ -232,7 +232,7 @@
     {
       "requestBody": true,
       "responseBody": true,
-      "urlPattern": "^/events/new-registration$",
+      "urlPattern": "^/events/birth/new-registration$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
@@ -291,7 +291,7 @@
       "responseBody": true,
       "name": "Registration",
       "description": "For when an existing declaration is transitioned to a registration",
-      "urlPattern": "^/events/registration$",
+      "urlPattern": "^/events/birth/registration$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
@@ -347,7 +347,7 @@
     {
       "requestBody": true,
       "responseBody": true,
-      "urlPattern": "^/events/certification$",
+      "urlPattern": "^/events/birth/certification$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
@@ -404,7 +404,7 @@
     {
       "requestBody": true,
       "responseBody": true,
-      "urlPattern": "^/events/voided-declaration$",
+      "urlPattern": "^/events/birth/voided-declaration$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
@@ -461,7 +461,7 @@
     {
       "requestBody": true,
       "responseBody": true,
-      "urlPattern": "^/event/voided-registration$",
+      "urlPattern": "^/event/birth/voided-registration$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
