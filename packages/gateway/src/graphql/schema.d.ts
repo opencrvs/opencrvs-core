@@ -187,6 +187,7 @@ export interface GQLBirthRegistration {
   mother?: GQLPerson
   father?: GQLPerson
   informant?: GQLPerson
+  placeOfBirth?: GQLAddress
   birthLocation?: GQLLocation
   birthType?: GQLBirthType
   weightAtBirth?: number
@@ -196,7 +197,6 @@ export interface GQLBirthRegistration {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
-  birthOrder?: number
   createdAt?: GQLDate
   updatedAt?: GQLDate
 }
@@ -443,6 +443,7 @@ export interface GQLBirthRegistrationInput {
   mother?: GQLPersonInput
   father?: GQLPersonInput
   informant?: GQLPersonInput
+  placeOfBirth?: GQLAddressInput
   birthLocation?: GQLLocationInput
   birthType?: GQLBirthType
   weightAtBirth?: number
@@ -452,7 +453,6 @@ export interface GQLBirthRegistrationInput {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
-  birthOrder?: number
   createdAt?: GQLDate
   updatedAt?: GQLDate
 }
@@ -522,6 +522,7 @@ export interface GQLDeathRegistrationInput {
   father?: GQLPersonInput
   informant?: GQLPersonInput
   spouse?: Array<GQLPersonInput | null>
+  placeOfDeath?: GQLAddressInput
   deathLocation?: GQLLocationInput
   causeOfDeath?: GQLCauseOfDeath
   createdAt?: GQLDate
@@ -542,6 +543,7 @@ export interface GQLDeathRegistration {
   father?: GQLPerson
   informant?: GQLPerson
   spouse?: Array<GQLPerson | null>
+  placeOfDeath?: GQLAddress
   deathLocation?: GQLLocation
   causeOfDeath?: GQLCauseOfDeath
   createdAt?: GQLDate
@@ -1093,6 +1095,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   mother?: BirthRegistrationToMotherResolver<TParent>
   father?: BirthRegistrationToFatherResolver<TParent>
   informant?: BirthRegistrationToInformantResolver<TParent>
+  placeOfBirth?: BirthRegistrationToPlaceOfBirthResolver<TParent>
   birthLocation?: BirthRegistrationToBirthLocationResolver<TParent>
   birthType?: BirthRegistrationToBirthTypeResolver<TParent>
   weightAtBirth?: BirthRegistrationToWeightAtBirthResolver<TParent>
@@ -1112,7 +1115,6 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<
     TParent
   >
-  birthOrder?: BirthRegistrationToBirthOrderResolver<TParent>
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
 }
@@ -1157,6 +1159,13 @@ export interface BirthRegistrationToFatherResolver<
 }
 
 export interface BirthRegistrationToInformantResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationToPlaceOfBirthResolver<
   TParent = any,
   TResult = any
 > {
@@ -1220,13 +1229,6 @@ export interface BirthRegistrationToFoetalDeathsToMotherResolver<
 }
 
 export interface BirthRegistrationToLastPreviousLiveBirthResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegistrationToBirthOrderResolver<
   TParent = any,
   TResult = any
 > {
@@ -1749,6 +1751,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   father?: DeathRegistrationToFatherResolver<TParent>
   informant?: DeathRegistrationToInformantResolver<TParent>
   spouse?: DeathRegistrationToSpouseResolver<TParent>
+  placeOfDeath?: DeathRegistrationToPlaceOfDeathResolver<TParent>
   deathLocation?: DeathRegistrationToDeathLocationResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
   createdAt?: DeathRegistrationToCreatedAtResolver<TParent>
@@ -1795,6 +1798,13 @@ export interface DeathRegistrationToInformantResolver<
 }
 
 export interface DeathRegistrationToSpouseResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToPlaceOfDeathResolver<
   TParent = any,
   TResult = any
 > {

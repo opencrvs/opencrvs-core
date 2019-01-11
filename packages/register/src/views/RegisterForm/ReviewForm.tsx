@@ -246,15 +246,14 @@ export class ReviewFormView extends React.Component<IProps> {
     const childNames = child.name as GQLHumanName[]
     this.transformName(childNames, childDetails)
 
-    childDetails.childBirthDate = child.birthDate
+    childDetails.birthDate = child.birthDate
     childDetails.gender = child.gender
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
-    childDetails.typeOfBirth = reg.birthType
+    childDetails.birthType = reg.birthType
     if (child.id) {
       childDetails._fhirID = child.id
     }
-
     return childDetails
   }
 
@@ -273,7 +272,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, motherDetails)
 
     motherDetails.gender = mother.gender
-    motherDetails.motherBirthDate = mother.birthDate
+    motherDetails.birthDate = mother.birthDate
     motherDetails.dateOfMarriage = mother.dateOfMarriage
     motherDetails.maritalStatus = mother.maritalStatus
     motherDetails.educationalAttainment = mother.educationalAttainment
@@ -308,7 +307,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, fatherDetails)
 
     fatherDetails.gender = father.gender
-    fatherDetails.fatherBirthDate = father.birthDate
+    fatherDetails.birthDate = father.birthDate
     fatherDetails.dateOfMarriage = father.dateOfMarriage
     fatherDetails.maritalStatus = father.maritalStatus
     fatherDetails.educationalAttainment = father.educationalAttainment
@@ -430,7 +429,7 @@ export class ReviewFormView extends React.Component<IProps> {
     const father = this.transformFather(reg.father)
 
     this.setFatherAddressSameAsMother(father, mother)
-    child.orderOfBirth = mother.multipleBirth
+    child.multipleBirth = mother.multipleBirth
 
     const registration = this.transformRegistration(reg)
 

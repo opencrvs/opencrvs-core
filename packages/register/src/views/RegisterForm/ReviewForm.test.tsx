@@ -218,14 +218,14 @@ describe('ReviewForm tests', async () => {
     expect(data.data.child).toEqual({
       _fhirID: '16025284-bae2-4b37-ae80-e16745b7a6b9',
       attendantAtBirth: 'NURSE',
-      childBirthDate: '2001-01-01',
+      birthDate: '2001-01-01',
       familyName: 'আকাশ',
       familyNameEng: 'Akash',
       firstNames: '',
       firstNamesEng: '',
       gender: 'male',
-      orderOfBirth: 1,
-      typeOfBirth: 'SINGLE',
+      multipleBirth: 1,
+      birthType: 'SINGLE',
       weightAtBirth: 2
     })
 
@@ -718,13 +718,13 @@ describe('ReviewForm tests', async () => {
     draft.data = {
       child: {
         attendantAtBirth: 'NURSE',
-        childBirthDate: '2001-01-01',
+        birthDate: '2001-01-01',
         familyName: 'আকাশ',
         familyNameEng: 'Akash',
         firstNames: '',
         firstNamesEng: '',
         gender: 'male',
-        typeOfBirth: 'SINGLE',
+        birthType: 'SINGLE',
         weightAtBirth: '2'
       },
       registration: {
@@ -769,13 +769,13 @@ describe('ReviewForm tests', async () => {
     expect(data.data).toEqual({
       child: {
         attendantAtBirth: 'NURSE',
-        childBirthDate: '2001-01-01',
+        birthDate: '2001-01-01',
         familyName: 'আকাশ',
         familyNameEng: 'Akash',
         firstNames: '',
         firstNamesEng: '',
         gender: 'male',
-        typeOfBirth: 'SINGLE',
+        birthType: 'SINGLE',
         weightAtBirth: '2'
       },
       registration: {

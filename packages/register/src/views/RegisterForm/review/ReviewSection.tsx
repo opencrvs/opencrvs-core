@@ -13,7 +13,7 @@ import {
   Delete,
   Draft
 } from '@opencrvs/components/lib/icons'
-import { findIndex, filter, flatten, identity, isArray } from 'lodash'
+import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { DocumentViewer } from '@opencrvs/components/lib/interface'
@@ -349,7 +349,7 @@ const renderValue = (
   return value
 }
 
-const getEmptyFieldBySection = (
+const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IDraft
 ) => {
@@ -369,7 +369,8 @@ const getEmptyFieldBySection = (
           ? draft.data[section.id][field.name]
           : null
 
-        const informationMissing = validationErrors.length > 0 || value === null
+        const informationMissing =
+          validationErrors.length > 0 || value === null ? validationErrors : []
 
         return { ...fields, [field.name]: informationMissing }
       }, {})
@@ -489,7 +490,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const formSections = getViewableSection(registerForm)
 
-    const emptyFieldsBySection = getEmptyFieldBySection(formSections, draft)
+    const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
+
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
@@ -502,9 +504,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const numberOfErrors = flatten(
-      Object.values(emptyFieldsBySection).map(Object.values)
-    ).filter(identity).length
-
+      Object.values(errorsOnFields).map(Object.values)
+    ).filter(errors => errors.length > 0).length
     return (
       <>
         <Row>
@@ -539,15 +540,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           isVisibleField(field, section) && !isViewOnly(field)
                       )
                       .map((field: IFormField, key: number) => {
-                        const informationMissing =
-                          emptyFieldsBySection[section.id][field.name]
+                        const errorsOnField =
+                          errorsOnFields[section.id][field.name]
+
                         return (
                           <SectionRow key={key}>
                             <SectionLabel>
                               {intl.formatMessage(field.label)}
                             </SectionLabel>
                             <SectionValue>
-                              {informationMissing ? (
+                              {errorsOnField.length > 0 ? (
                                 <RequiredFieldLink
                                   onClick={() => {
                                     this.props.goToTab(
@@ -558,7 +560,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                     )
                                   }}
                                 >
-                                  {intl.formatMessage(messages.requiredField)}
+                                  {intl.formatMessage(errorsOnField[0].message)}
                                 </RequiredFieldLink>
                               ) : (
                                 renderValue(draft, section, field, intl)

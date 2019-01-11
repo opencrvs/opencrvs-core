@@ -139,6 +139,7 @@ input BirthRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
+  placeOfBirth: AddressInput
   birthLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
@@ -148,8 +149,6 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
-  # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
-  birthOrder: Int
   createdAt: Date
   updatedAt: Date
 }
@@ -162,6 +161,7 @@ type BirthRegistration { # -> Composition
   mother: Person # -> .section(code='mother-details').entry.reference
   father: Person # -> .section(code='father-details').entry.reference
   informant: Person # -> .section(code='informant-details').entry.reference
+  placeOfBirth: Address
   birthLocation: Location # -> .section(code='birth-encounter').entry.reference.location
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
@@ -171,8 +171,6 @@ type BirthRegistration { # -> Composition
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
-  # For order of birth 3 equals 3rd born - remember to also save to Person multipleBirth field
-  birthOrder: Int # -> Patient.multipleBirthInteger
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
 }
@@ -186,6 +184,7 @@ input DeathRegistrationInput {
   informant: PersonInput
   # need to track multiple spouses for muslim countries
   spouse: [PersonInput]
+  placeOfDeath: AddressInput
   deathLocation: LocationInput
   causeOfDeath: CauseOfDeath # need to store ICD-10? More types of cause of death
   createdAt: Date
@@ -203,6 +202,7 @@ type DeathRegistration { # -> Composition
   informant: Person # -> .section(code='informant-details').entry.reference
   # need to track multiple spouses for muslim countries
   spouse: [Person] # -> .section(code='spouse-details').entry.reference # Not in BDRIS2
+  placeOfDeath: Address
   deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
   causeOfDeath: CauseOfDeath # -> Observation.valueCodeableConcept
   createdAt: Date # -> .date($first)
