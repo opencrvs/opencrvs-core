@@ -1066,6 +1066,66 @@ describe('when user has a valid token in local storage', () => {
       await flushPromises()
       app.update()
     })
+    it('successfully submits review form after application modification', async () => {
+      jest.setMock('react-apollo', { default: ReactApollo })
+      app
+        .find('#Childsdetails_link')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#edit_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#weightAtBirth')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            id: 'weightAtBirth',
+            value: '5'
+          }
+        })
+
+      app
+        .find('#tab_review')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#next_button_child')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_mother')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_father')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#registerApplicationBtn')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#register_review')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+    })
     it('preview link will close the modal', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
       app

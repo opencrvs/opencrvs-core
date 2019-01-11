@@ -429,7 +429,7 @@ describe('ReviewForm tests', async () => {
                 status: null,
                 paperFormID: '123',
                 trackingId: 'B123456',
-                registrationNumber: null
+                registrationNumber: '12345'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
