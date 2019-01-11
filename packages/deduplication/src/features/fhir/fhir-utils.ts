@@ -57,7 +57,9 @@ export function addDuplicatesToComposition(
   if (!composition.relatesTo) {
     composition.relatesTo = []
   }
-  composition.relatesTo.concat(createDuplicateTemplate(duplicates))
+  composition.relatesTo = composition.relatesTo.concat(
+    createDuplicateTemplate(duplicates)
+  )
   return postToHearth(composition)
 }
 
@@ -88,6 +90,7 @@ export const getFromFhir = (suffix: string) => {
 
 export async function postToHearth(payload: any) {
   /* hearth will do put calls if it finds id on the bundle */
+  console.log(JSON.stringify(payload))
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),

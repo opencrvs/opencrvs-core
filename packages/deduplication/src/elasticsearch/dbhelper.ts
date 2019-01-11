@@ -1,10 +1,10 @@
 import { client } from 'src/elasticsearch/client'
 import { ICompositionBody, buildQuery } from 'src/elasticsearch/utils'
 
-export async function indexComposition(
+export const indexComposition = async (
   compositionIdentifier: string,
   body: ICompositionBody
-) {
+) => {
   const response = await client.index({
     index: 'ocrvs',
     type: 'compositions',
@@ -15,7 +15,7 @@ export async function indexComposition(
   return response
 }
 
-export async function searchComposition(body: ICompositionBody) {
+export const searchComposition = async (body: ICompositionBody) => {
   const response = client.search({
     index: 'ocrvs',
     type: 'compositions',

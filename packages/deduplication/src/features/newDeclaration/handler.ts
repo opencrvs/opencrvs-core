@@ -10,6 +10,7 @@ export async function newDeclarationHandler(
   try {
     await insertNewDeclaration(payload)
   } catch (err) {
+    console.log(err)
     return internal(err)
   }
 

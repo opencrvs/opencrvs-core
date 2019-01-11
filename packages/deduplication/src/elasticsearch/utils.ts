@@ -1,5 +1,4 @@
 import { searchComposition } from 'src/elasticsearch/dbhelper'
-
 import { SearchResponse } from 'elasticsearch'
 const MATCH_SCORE_THRESHOLD = 1.0
 
@@ -29,7 +28,17 @@ export async function detectDuplicates(
   body: ICompositionBody
 ) {
   const searchResponse = await searchComposition(body)
-  return findDuplicates(compositionIdentifier, searchResponse)
+  const duplicates = findDuplicates(compositionIdentifier, searchResponse)
+  return duplicates
+}
+
+function findDuplicates(compositionId: string, results: SearchResponse<{}>) {
+  const hits = results.hits.hits
+  return hits
+    .filter(
+      hit => hit._id !== compositionId && hit._score > MATCH_SCORE_THRESHOLD
+    )
+    .map(hit => hit._id)
 }
 
 export function buildQuery(body: ICompositionBody) {
@@ -144,13 +153,4 @@ export function buildQuery(body: ICompositionBody) {
       should
     }
   }
-}
-
-function findDuplicates(compositionId: string, results: SearchResponse<{}>) {
-  const hits = results.hits.hits
-  return hits
-    .filter(
-      hit => hit._id !== compositionId && hit._score > MATCH_SCORE_THRESHOLD
-    )
-    .map(hit => hit._id)
 }

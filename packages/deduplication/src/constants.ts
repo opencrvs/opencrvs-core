@@ -1,4 +1,4 @@
-export const HOST = process.env.AUTH_HOST || 'localhost'
+export const HOST = process.env.AUTH_HOST || '0.0.0.0'
 export const PORT = process.env.AUTH_PORT || 9090
 export const ES_HOST = process.env.ES_HOST || 'localhost:9200'
 export const fhirUrl = process.env.FHIR_URL || 'http://localhost:5001/fhir'

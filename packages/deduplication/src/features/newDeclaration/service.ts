@@ -25,12 +25,12 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
   }
 
   const body: ICompositionBody = {}
-  createChildIndex(body, composition, bundleEntries)
-  createMotherIndex(body, composition, bundleEntries)
-  createFatherIndex(body, composition, bundleEntries)
-
+  createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
   const duplicates = await detectDuplicates(compositionIdentifier, body)
+  if (!duplicates.length) {
+    return
+  }
   await addDuplicatesToComposition(duplicates, composition)
   return await updateDuplicateCompositions(
     compositionIdentifier,
@@ -39,6 +39,15 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
   )
 }
 
+function createIndexBody(
+  body: ICompositionBody,
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  createChildIndex(body, composition, bundleEntries)
+  createMotherIndex(body, composition, bundleEntries)
+  createFatherIndex(body, composition, bundleEntries)
+}
 function createChildIndex(
   body: ICompositionBody,
   composition: fhir.Composition,
