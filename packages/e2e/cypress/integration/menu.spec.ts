@@ -20,7 +20,7 @@ context('Login', () => {
 
     cy.get('#new_event_declaration').click()
 
-    cy.wait(1000);
+    cy.wait(5000);
 
     //it('fills in all data into the register form', () => {
     //  cy.visit(`${Cypress.env('REGISTER_URL')}events`)
