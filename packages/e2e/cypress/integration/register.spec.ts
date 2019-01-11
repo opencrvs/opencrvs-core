@@ -45,38 +45,11 @@ context('Register', () => {
       'Upper secondary',
       'Upper secondary'
     )
-    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#state', 'Mymensingh Division', 'Mymensingh Division')
-    cy.selectOption('#district', 'Mymensingh District', 'Mymensingh District')
-
-    // Depends on fix for bug & better approach for administrative structure:  https://jembiprojects.jira.com/browse/OCRVS-588
-
-    cy.selectOption(
-      '#addressLine4',
-      'Mymensingh Sadar Upazila',
-      'Mymensingh Sadar Upazila'
-    )
-    cy.selectOption('#addressLine3Options1', 'Akua', 'Akua')
-    cy.get('#addressLine2').type('My street')
-    cy.get('#addressLine1').type('40')
-    cy.get('#postCode').type('10024')
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
-    cy.selectOption(
-      '#statePermanent',
-      'Mymensingh Division',
-      'Mymensingh Division'
-    )
-    cy.selectOption(
-      '#districtPermanent',
-      'Mymensingh District',
-      'Mymensingh District'
-    )
-    cy.selectOption(
-      '#addressLine4Permanent',
-      'Mymensingh Sadar Upazila',
-      'Mymensingh Sadar Upazila'
-    )
-    cy.selectOption('#addressLine3Options1Permanent', 'Akua', 'Akua')
+    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
+    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('10024')
@@ -104,37 +77,19 @@ context('Register', () => {
     )
     cy.get('#addressSameAsMother_false').click()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#state', 'Mymensingh Division', 'Mymensingh Division')
-    cy.selectOption('#district', 'Mymensingh District', 'Mymensingh District')
-    // Depends on fix for bug & better approach for administrative structure:  https://jembiprojects.jira.com/browse/OCRVS-588
-
-    cy.selectOption(
-      '#addressLine4',
-      'Mymensingh Sadar Upazila',
-      'Mymensingh Sadar Upazila'
-    )
-    cy.selectOption('#addressLine3Options1', 'Akua', 'Akua')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('10024')
     cy.get('#permanentAddressSameAsMother_false').click()
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
-    cy.selectOption(
-      '#statePermanent',
-      'Mymensingh Division',
-      'Mymensingh Division'
-    )
-    cy.selectOption(
-      '#districtPermanent',
-      'Mymensingh District',
-      'Mymensingh District'
-    )
-    cy.selectOption(
-      '#addressLine4Permanent',
-      'Mymensingh Sadar Upazila',
-      'Mymensingh Sadar Upazila'
-    )
-    cy.selectOption('#addressLine3Options1Permanent', 'Akua', 'Akua')
+    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
+    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('10024')

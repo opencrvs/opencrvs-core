@@ -5,7 +5,7 @@ import {
 } from './service'
 import chalk from 'chalk'
 import * as fs from 'fs'
-import { ADMIN_STRUCTURE_SOURCE, REGISTER_SOURCE } from '../../../constants'
+import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
 import { ILocation } from 'src/features/utils/bn'
 
 export default async function importAdminStructure() {
@@ -220,7 +220,7 @@ export default async function importAdminStructure() {
     data.push(generateLocationResource(location))
   }
   fs.writeFileSync(
-    `${REGISTER_SOURCE}locations.json`,
+    `${ADMIN_STRUCTURE_SOURCE}locations.json`,
     JSON.stringify({ data }, null, 2)
   )
 

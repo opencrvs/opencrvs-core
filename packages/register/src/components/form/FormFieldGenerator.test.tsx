@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { createTestComponent, selectOption } from 'src/tests/util'
+import {
+  createTestComponent,
+  selectOption,
+  mockOfflineData
+} from 'src/tests/util'
 import { FormFieldGenerator } from './FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft } from 'src/drafts'
@@ -9,16 +13,21 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEL
 } from 'src/forms'
+import { countries } from 'src/forms/countries'
+import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import { config } from 'src/config'
 
 export interface IMotherSectionFormData {
   firstName: string
 }
 
-import {
-  messages as addressMessages,
-  states,
-  stateDistrictMap
-} from 'src/forms/address'
+const offlineResources = {
+  locations: mockOfflineData.locations,
+  offlineDataLoaded: true,
+  loadingError: false
+}
+
+import { messages as addressMessages } from 'src/forms/address'
 
 describe('form component', () => {
   const { store } = createStore()
@@ -31,44 +40,39 @@ describe('form component', () => {
       id="mother"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
+      offlineResources={offlineResources}
       fields={[
         {
-          name: 'country',
+          name: 'countryPermanent',
           type: SELECT_WITH_OPTIONS,
           label: addressMessages.country,
           required: true,
-          initialValue: 'BGD',
+          initialValue: config.COUNTRY.toUpperCase(),
           validate: [],
-          options: [
-            {
-              value: 'BGD',
-              label: {
-                id: 'countries.BGD',
-                defaultMessage: 'Bangladesh',
-                description: 'ISO Country: BGD'
-              }
-            }
-          ]
+          options: countries
         },
         {
-          name: 'state',
-          type: SELECT_WITH_OPTIONS,
+          name: 'statePermanent',
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
           label: addressMessages.state,
           required: true,
-          initialValue: 'state1',
+          initialValue: '',
           validate: [],
-          options: states
+          dynamicOptions: {
+            resource: OFFLINE_LOCATIONS_KEY,
+            dependency: 'countryPermanent'
+          }
         },
         {
-          name: 'district',
+          name: 'districtPermanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
           label: addressMessages.district,
           required: true,
           initialValue: '',
           validate: [],
           dynamicOptions: {
-            dependency: 'state',
-            options: stateDistrictMap
+            resource: OFFLINE_LOCATIONS_KEY,
+            dependency: 'statePermanent'
           }
         },
         {
@@ -86,27 +90,29 @@ describe('form component', () => {
   component = testComponent.component
   describe('when user is in the moth​​er section', () => {
     it('renders the page', () => {
-      expect(component.find('#country_label').hostNodes()).toHaveLength(1)
+      expect(
+        component.find('#countryPermanent_label').hostNodes()
+      ).toHaveLength(1)
     })
     it('changes the state select', async () => {
-      const select = selectOption(component, '#state', 'Dhaka Division')
-      expect(component.find(select).text()).toEqual('Dhaka Division')
+      const select = selectOption(component, '#statePermanent', 'Barisal')
+      expect(component.find(select).text()).toEqual('Barisal')
     })
     it('changes the district select', async () => {
-      const select = selectOption(component, '#district', 'Gazipur District')
-      expect(component.find(select).text()).toEqual('Gazipur District')
+      const select = selectOption(component, '#districtPermanent', 'BARGUNA')
+      expect(component.find(select).text()).toEqual('BARGUNA')
     })
     describe('when resetDependentSelectValues is called', () => {
       beforeEach(() => {
         const instance = component
           .find('FormSectionComponent')
           .instance() as any
-        instance.resetDependentSelectValues('state')
+        instance.resetDependentSelectValues('statePermanent')
       })
       it('resets dependent select fields', () => {
         expect(
           component
-            .find('#district')
+            .find('#districtPermanent')
             .hostNodes()
             .text()
         ).toEqual('Select...')
@@ -114,7 +120,7 @@ describe('form component', () => {
       it('doesnt reset non dependent select fields', () => {
         expect(
           component
-            .find('#country')
+            .find('#countryPermanent')
             .hostNodes()
             .text()
         ).toEqual('Bangladesh')
@@ -134,6 +140,7 @@ describe('form component registration section', () => {
       id="registration"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
+      offlineResources={offlineResources}
       fields={[
         {
           name: 'registrationPhone',

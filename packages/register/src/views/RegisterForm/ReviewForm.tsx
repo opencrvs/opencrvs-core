@@ -213,7 +213,7 @@ export class ReviewFormView extends React.Component<IProps> {
         person.districtPermanent = address.district
         person.addressLine1Permanent = address.line && address.line[0]
         person.addressLine2Permanent = address.line && address.line[1]
-        person.addressLine3Options1Permanent = address.line && address.line[2]
+        person.addressLine3Permanent = address.line && address.line[2]
         person.addressLine4Permanent = address.line && address.line[3]
         person.postalCodePermanent = address.line && address.postalCode
       }
@@ -223,7 +223,7 @@ export class ReviewFormView extends React.Component<IProps> {
         person.district = address.district
         person.addressLine1 = address.line && address.line[0]
         person.addressLine2 = address.line && address.line[1]
-        person.addressLine3Options1 = address.line && address.line[2]
+        person.addressLine3 = address.line && address.line[2]
         person.addressLine4 = address.line && address.line[3]
         person.postalCode = address.line && address.postalCode
       }
@@ -336,8 +336,7 @@ export class ReviewFormView extends React.Component<IProps> {
       father.districtPermanent === mother.districtPermanent &&
       father.addressLine1Permanent === mother.addressLine1Permanent &&
       father.addressLine2Permanent === mother.addressLine2Permanent &&
-      father.addressLine3Options1Permanent ===
-        mother.addressLine3Options1Permanent &&
+      father.addressLine3Permanent === mother.addressLine3Permanent &&
       father.addressLine4Permanent === mother.addressLine4Permanent &&
       father.postalCodePermanent === mother.postalCodePermanent
 
@@ -347,7 +346,7 @@ export class ReviewFormView extends React.Component<IProps> {
       father.district === mother.district &&
       father.addressLine1 === mother.addressLine1 &&
       father.addressLine2 === mother.addressLine2 &&
-      father.addressLine3Options1 === mother.addressLine3Options1 &&
+      father.addressLine3 === mother.addressLine3 &&
       father.addressLine4 === mother.addressLine4 &&
       father.postalCode === mother.postalCode
   }

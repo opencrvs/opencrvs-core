@@ -7,3 +7,5 @@ export const EMPLOYEES_SOURCE = `${process.cwd()}/src/features/employees/generat
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
 export const ORG_URL = 'http://opencrvs.org'
 export const REGISTER_SOURCE = `${process.cwd()}/../register/public/assets/`
+export const RESOURCES_HOST = process.env.RESOURCES_HOST || '0.0.0.0'
+export const RESOURCES_PORT = process.env.RESOURCES_PORT || 3040
