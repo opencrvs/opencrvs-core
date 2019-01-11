@@ -450,12 +450,16 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   })
 }
 
-function createPaperFormID(resource: fhir.Task, fieldValue: string) {
+function setResourceIdentifier(
+  resource: fhir.Task,
+  identifierName: string,
+  fieldValue: string
+) {
   if (!resource.identifier) {
     resource.identifier = []
   }
   resource.identifier.push({
-    system: `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`,
+    system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
     value: fieldValue
   })
 }
@@ -897,13 +901,37 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
     },
+    trackingId: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return setResourceIdentifier(
+        taskResource,
+        'birth-tracking-id',
+        fieldValue
+      )
+    },
+    registrationNumber: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return setResourceIdentifier(
+        taskResource,
+        'birth-registration-number',
+        fieldValue
+      )
+    },
     paperFormID: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return createPaperFormID(taskResource, fieldValue)
+      return setResourceIdentifier(taskResource, 'paper-form-id', fieldValue)
     },
     status: {
       comments: {

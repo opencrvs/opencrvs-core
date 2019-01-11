@@ -130,7 +130,7 @@ export const registrationSection: IFormSection = {
       name: 'presentAtBirthRegistration',
       type: SELECT_WITH_OPTIONS,
       label: messages.whoIsPresentLabel,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
@@ -156,7 +156,7 @@ export const registrationSection: IFormSection = {
       name: 'whoseContactDetails',
       type: SELECT_WITH_OPTIONS,
       label: messages.whoseContactDetailsLabel,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
@@ -178,7 +178,7 @@ export const registrationSection: IFormSection = {
       name: 'registrationEmail',
       type: TEXT,
       label: messages.registrationEmailLabel,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [emailAddressFormat]
     },
@@ -186,7 +186,7 @@ export const registrationSection: IFormSection = {
       name: 'registrationPhone',
       type: TEL,
       label: messages.registrationPhoneLabel,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [phoneNumberFormat]
     },
@@ -194,7 +194,7 @@ export const registrationSection: IFormSection = {
       name: 'paperFormNumber',
       type: NUMBER,
       label: messages.paperFormNumberLabel,
-      required: true,
+      required: false,
       initialValue: '',
       validate: []
     },

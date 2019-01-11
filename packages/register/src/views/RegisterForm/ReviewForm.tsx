@@ -44,7 +44,10 @@ import {
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
     fetchBirthRegistration(id: $id) {
+      _fhirIDMap
+      id
       child {
+        id
         name {
           use
           firstNames
@@ -54,6 +57,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         gender
       }
       mother {
+        id
         name {
           use
           firstNames
@@ -83,6 +87,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         }
       }
       father {
+        id
         name {
           use
           firstNames
@@ -111,6 +116,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         }
       }
       registration {
+        id
         contact
         attachments {
           data
@@ -124,6 +130,8 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
           }
         }
         paperFormID
+        trackingId
+        registrationNumber
       }
       attendantAtBirth
       weightAtBirth
@@ -238,12 +246,14 @@ export class ReviewFormView extends React.Component<IProps> {
     const childNames = child.name as GQLHumanName[]
     this.transformName(childNames, childDetails)
 
-    childDetails.childBirthDate = child.birthDate
+    childDetails.birthDate = child.birthDate
     childDetails.gender = child.gender
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
-    childDetails.typeOfBirth = reg.birthType
-
+    childDetails.birthType = reg.birthType
+    if (child.id) {
+      childDetails._fhirID = child.id
+    }
     return childDetails
   }
 
@@ -262,7 +272,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, motherDetails)
 
     motherDetails.gender = mother.gender
-    motherDetails.motherBirthDate = mother.birthDate
+    motherDetails.birthDate = mother.birthDate
     motherDetails.dateOfMarriage = mother.dateOfMarriage
     motherDetails.maritalStatus = mother.maritalStatus
     motherDetails.educationalAttainment = mother.educationalAttainment
@@ -274,6 +284,10 @@ export class ReviewFormView extends React.Component<IProps> {
     const addresses = mother.address as GQLAddress[]
 
     this.tramsformAddress(addresses, motherDetails)
+
+    if (mother.id) {
+      motherDetails._fhirID = mother.id
+    }
 
     return motherDetails
   }
@@ -293,7 +307,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, fatherDetails)
 
     fatherDetails.gender = father.gender
-    fatherDetails.fatherBirthDate = father.birthDate
+    fatherDetails.birthDate = father.birthDate
     fatherDetails.dateOfMarriage = father.dateOfMarriage
     fatherDetails.maritalStatus = father.maritalStatus
     fatherDetails.educationalAttainment = father.educationalAttainment
@@ -304,6 +318,10 @@ export class ReviewFormView extends React.Component<IProps> {
     const addresses = father.address as GQLAddress[]
 
     this.tramsformAddress(addresses, fatherDetails)
+
+    if (father.id) {
+      fatherDetails._fhirID = father.id
+    }
 
     return fatherDetails
   }
@@ -362,6 +380,11 @@ export class ReviewFormView extends React.Component<IProps> {
     registrationDetails.commentsOrNotes = comments && comments[0].comment
 
     registrationDetails.paperFormNumber = registration.paperFormID
+    registrationDetails.trackingId = registration.trackingId
+    registrationDetails.registrationNumber = registration.registrationNumber
+    if (registration.id) {
+      registrationDetails._fhirID = registration.id
+    }
 
     return registrationDetails
   }
@@ -406,12 +429,14 @@ export class ReviewFormView extends React.Component<IProps> {
     const father = this.transformFather(reg.father)
 
     this.setFatherAddressSameAsMother(father, mother)
-    child.orderOfBirth = mother.multipleBirth
+    child.multipleBirth = mother.multipleBirth
 
     const registration = this.transformRegistration(reg)
 
     const documents = this.transformDocuments(reg)
+
     const reviewData = {
+      _fhirIDMap: reg._fhirIDMap,
       child,
       mother,
       father,
