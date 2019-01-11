@@ -392,7 +392,7 @@ export const fatherSection: IFormSection = {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -427,7 +427,7 @@ export const fatherSection: IFormSection = {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -545,7 +545,7 @@ export const fatherSection: IFormSection = {
       name: 'addressLine3Permanent',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dynamicOptions: {
