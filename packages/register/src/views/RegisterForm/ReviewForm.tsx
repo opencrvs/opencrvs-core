@@ -44,7 +44,10 @@ import {
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
     fetchBirthRegistration(id: $id) {
+      _fhirIDMap
+      id
       child {
+        id
         name {
           use
           firstNames
@@ -54,6 +57,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         gender
       }
       mother {
+        id
         name {
           use
           firstNames
@@ -83,6 +87,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         }
       }
       father {
+        id
         name {
           use
           firstNames
@@ -111,6 +116,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         }
       }
       registration {
+        id
         contact
         attachments {
           data
@@ -124,6 +130,8 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
           }
         }
         paperFormID
+        trackingId
+        registrationNumber
       }
       attendantAtBirth
       weightAtBirth
@@ -243,6 +251,9 @@ export class ReviewFormView extends React.Component<IProps> {
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
     childDetails.typeOfBirth = reg.birthType
+    if (child.id) {
+      childDetails._fhirID = child.id
+    }
 
     return childDetails
   }
@@ -275,6 +286,10 @@ export class ReviewFormView extends React.Component<IProps> {
 
     this.tramsformAddress(addresses, motherDetails)
 
+    if (mother.id) {
+      motherDetails._fhirID = mother.id
+    }
+
     return motherDetails
   }
 
@@ -304,6 +319,10 @@ export class ReviewFormView extends React.Component<IProps> {
     const addresses = father.address as GQLAddress[]
 
     this.tramsformAddress(addresses, fatherDetails)
+
+    if (father.id) {
+      fatherDetails._fhirID = father.id
+    }
 
     return fatherDetails
   }
@@ -362,6 +381,11 @@ export class ReviewFormView extends React.Component<IProps> {
     registrationDetails.commentsOrNotes = comments && comments[0].comment
 
     registrationDetails.paperFormNumber = registration.paperFormID
+    registrationDetails.trackingId = registration.trackingId
+    registrationDetails.registrationNumber = registration.registrationNumber
+    if (registration.id) {
+      registrationDetails._fhirID = registration.id
+    }
 
     return registrationDetails
   }
@@ -411,7 +435,9 @@ export class ReviewFormView extends React.Component<IProps> {
     const registration = this.transformRegistration(reg)
 
     const documents = this.transformDocuments(reg)
+
     const reviewData = {
+      _fhirIDMap: reg._fhirIDMap,
       child,
       mother,
       father,

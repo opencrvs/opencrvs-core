@@ -159,6 +159,8 @@ type FullProps = IFormProps &
 
 type State = {
   showSubmitModal: boolean
+  showRegisterModal: boolean
+  isDataAltered: boolean
   rejectFormOpen: boolean
   selectedTabId: string
 }
@@ -166,6 +168,11 @@ type State = {
 const postMutation = gql`
   mutation submitBirthRegistration($details: BirthRegistrationInput!) {
     createBirthRegistration(details: $details)
+  }
+`
+const patchMutation = gql`
+  mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput) {
+    markBirthAsRegistered(id: $id, details: $details)
   }
 `
 const VIEW_TYPE = {
@@ -209,17 +216,22 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.state = {
       showSubmitModal: false,
       selectedTabId: '',
-      rejectFormOpen: false
+      isDataAltered: false,
+      rejectFormOpen: false,
+      showRegisterModal: false
     }
   }
 
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
+    if (draft.review && !this.state.isDataAltered) {
+      this.setState({ isDataAltered: true })
+    }
     this.props.modifyDraft({
       ...draft,
       data: {
         ...draft.data,
-        [activeSection.id]: sectionData
+        [activeSection.id]: { ...draft.data[activeSection.id], ...sectionData }
       }
     })
   }
@@ -249,13 +261,30 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.props.deleteDraft(draft)
   }
 
+  successfullyRegistered = () => {
+    const { draft } = this.props
+    window.location.href = '/work-queue'
+    this.props.deleteDraft(draft)
+  }
+
   submitForm = () => {
     this.setState({ showSubmitModal: true })
+  }
+
+  registerApplication = () => {
+    console.log(this.props.draft)
+    this.setState({ showRegisterModal: true })
   }
 
   toggleSubmitModalOpen = () => {
     this.setState((prevState: State) => ({
       showSubmitModal: !prevState.showSubmitModal
+    }))
+  }
+
+  toggleRegisterModalOpen = () => {
+    this.setState((prevState: State) => ({
+      showRegisterModal: !prevState.showRegisterModal
     }))
   }
 
@@ -270,7 +299,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  processSubmitData = () => processDraftData(this.props.draft.data)
+  processSubmitData = () => {
+    const { draft } = this.props
+    const data = processDraftData(draft.data)
+    if (!draft.review) {
+      return { details: data }
+    } else {
+      if (!this.state.isDataAltered) {
+        return { id: draft.id }
+      } else {
+        return { id: draft.id, details: data }
+      }
+    }
+  }
 
   generateSectionListForReview = (
     disabled: boolean,
@@ -372,9 +413,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 rejectApplicationClickEvent={() => {
                   this.toggleRejectForm()
                 }}
-                registerClickEvent={() => {
-                  alert('Register')
-                }}
+                registerClickEvent={this.registerApplication}
               />
             )}
             {activeSection.viewType === 'form' && (
@@ -420,15 +459,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation
-          mutation={postMutation}
-          variables={{ details: this.processSubmitData() }}
-        >
+        <Mutation mutation={postMutation} variables={this.processSubmitData()}>
           {(submitBirthRegistration, { data }) => {
             if (data && data.createBirthRegistration) {
               this.successfulSubmission(data.createBirthRegistration)
             }
-
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -454,6 +489,45 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 ]}
                 show={this.state.showSubmitModal}
                 handleClose={this.toggleSubmitModalOpen}
+              >
+                {intl.formatMessage(messages.submitDescription)}
+              </Modal>
+            )
+          }}
+        </Mutation>
+
+        <Mutation mutation={patchMutation} variables={this.processSubmitData()}>
+          {(markBirthAsRegistered, { data }) => {
+            if (data && data.markBirthAsRegistered) {
+              this.successfullyRegistered()
+            }
+
+            return (
+              <Modal
+                title="Are you ready to submit?"
+                actions={[
+                  <PrimaryButton
+                    key="register"
+                    id="register_confirm"
+                    onClick={() => markBirthAsRegistered()}
+                  >
+                    {intl.formatMessage(messages.submitButton)}
+                  </PrimaryButton>,
+                  <PreviewButton
+                    key="review"
+                    id="register_review"
+                    onClick={() => {
+                      this.toggleRegisterModalOpen()
+                      if (document.documentElement) {
+                        document.documentElement.scrollTop = 0
+                      }
+                    }}
+                  >
+                    {intl.formatMessage(messages.preview)}
+                  </PreviewButton>
+                ]}
+                show={this.state.showRegisterModal}
+                handleClose={this.toggleRegisterModalOpen}
               >
                 {intl.formatMessage(messages.submitDescription)}
               </Modal>

@@ -93,6 +93,8 @@ test('should build a minimal FHIR registration document without error', async ()
       _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
       contact: 'MOTHER',
       paperFormID: '12345678',
+      trackingId: 'B123456',
+      registrationNumber: '201923324512345671',
       status: [
         {
           comments: [
@@ -324,9 +326,14 @@ test('should build a minimal FHIR registration document without error', async ()
     time: '2018-10-31T09:45:05+10:00'
   })
   expect(fhir.entry[4].resource.identifier).toEqual([
+    { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '12345678' },
     {
-      system: 'http://opencrvs.org/specs/id/paper-form-id',
-      value: '12345678'
+      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+      value: 'B123456'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/birth-registration-number',
+      value: '201923324512345671'
     }
   ])
   // Attachment Test cases

@@ -6,6 +6,10 @@ export interface IPersonDetails {
   [key: string]: any
 }
 
+export interface IRegistrationDetails {
+  [key: string]: any
+}
+
 export interface IImage {
   data: string
   optionValues: string[]
@@ -97,6 +101,9 @@ const processDraftData = (draftData: IFormData) => {
       }
     ]
   }
+  if (mother._fhirID) {
+    motherDetails._fhirID = mother._fhirID
+  }
 
   const fatherDetails: IPersonDetails = {
     name: [
@@ -146,6 +153,9 @@ const processDraftData = (draftData: IFormData) => {
       }
     ]
   }
+  if (father._fhirID) {
+    fatherDetails._fhirID = father._fhirID
+  }
 
   const parentDetails =
     registration.whoseContactDetails === 'MOTHER'
@@ -171,40 +181,56 @@ const processDraftData = (draftData: IFormData) => {
     }
   })
 
+  const childDetails: IPersonDetails = {
+    gender: child.gender,
+    name: [
+      {
+        use: 'bn',
+        firstNames: child.firstNames,
+        familyName: child.familyName
+      },
+      {
+        use: 'en',
+        firstNames: child.firstNamesEng,
+        familyName: child.familyNameEng
+      }
+    ],
+    birthDate: child.childBirthDate
+  }
+  if (child._fhirID) {
+    childDetails._fhirID = child._fhirID
+  }
+
+  const registrationDetails: IRegistrationDetails = {
+    contact: registration.whoseContactDetails,
+    paperFormID: registration.paperFormNumber,
+    status: [
+      {
+        comments: [
+          {
+            comment: registration.commentsOrNotes,
+            createdAt: new Date()
+          }
+        ],
+        timestamp: new Date()
+      }
+    ],
+    attachments
+  }
+  if (registration._fhirID) {
+    registrationDetails._fhirID = registration._fhirID
+  }
+  if (registration.trackingId) {
+    registrationDetails.trackingId = registration.trackingId
+  }
+  if (registration.registrationNumber) {
+    registrationDetails.registrationNumber = registration.registrationNumber
+  }
+
   const draftDetails: IdraftDetails = {
-    child: {
-      gender: child.gender,
-      name: [
-        {
-          use: 'bn',
-          firstNames: child.firstNames,
-          familyName: child.familyName
-        },
-        {
-          use: 'en',
-          firstNames: child.firstNamesEng,
-          familyName: child.familyNameEng
-        }
-      ],
-      birthDate: child.childBirthDate
-    },
+    child: childDetails,
     mother: motherDetails,
-    registration: {
-      contact: registration.whoseContactDetails,
-      paperFormID: registration.paperFormNumber,
-      status: [
-        {
-          comments: [
-            {
-              comment: registration.commentsOrNotes,
-              createdAt: new Date()
-            }
-          ],
-          timestamp: new Date()
-        }
-      ],
-      attachments
-    },
+    registration: registrationDetails,
     attendantAtBirth: child.attendantAtBirth,
     birthType: child.typeOfBirth,
     weightAtBirth: child.weightAtBirth,
@@ -212,6 +238,9 @@ const processDraftData = (draftData: IFormData) => {
     createdAt: new Date()
   }
 
+  if (draftData._fhirIDMap) {
+    draftDetails._fhirIDMap = draftData._fhirIDMap
+  }
   if (father.fathersDetailsExist) {
     draftDetails.father = fatherDetails
   }

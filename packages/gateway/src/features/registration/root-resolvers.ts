@@ -88,14 +88,9 @@ export const resolvers: GQLResolver = {
         reason,
         comment
       )
-      const res = await fetchFHIR(
-        '/Task',
-        authHeader,
-        'PUT',
-        JSON.stringify(newTaskBundle)
-      )
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
-      return getIDFromResponse(res)
+      return taskEntry.resource.id
     },
     async markBirthAsCertified(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)
