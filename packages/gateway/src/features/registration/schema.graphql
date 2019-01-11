@@ -2,6 +2,7 @@ enum RegStatus {
   DECLARED
   REGISTERED
   CERTIFIED
+  REJECTED
 }
 
 enum BirthRegType {
@@ -226,6 +227,7 @@ input RegistrationInput {
 }
 
 type Registration { # -> Task
+  id: ID # -> .id
   _fhirID: ID # -> .id
   # short uuid easy to remember
   trackingId: String # -> .identifier

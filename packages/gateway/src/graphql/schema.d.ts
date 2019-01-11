@@ -204,6 +204,7 @@ export interface GQLBirthRegistration {
 export type GQLMap = any
 
 export interface GQLRegistration {
+  id?: string
   _fhirID?: string
   trackingId?: string
   registrationNumber?: string
@@ -235,7 +236,8 @@ export interface GQLRegWorkflow {
 export enum GQLRegStatus {
   DECLARED = 'DECLARED',
   REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED'
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED'
 }
 
 export interface GQLUser {
@@ -1248,6 +1250,7 @@ export interface BirthRegistrationToUpdatedAtResolver<
 }
 
 export interface GQLRegistrationTypeResolver<TParent = any> {
+  id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
@@ -1260,6 +1263,10 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   attachments?: RegistrationToAttachmentsResolver<TParent>
   certificates?: RegistrationToCertificatesResolver<TParent>
   duplicates?: RegistrationToDuplicatesResolver<TParent>
+}
+
+export interface RegistrationToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface RegistrationTo_fhirIDResolver<TParent = any, TResult = any> {

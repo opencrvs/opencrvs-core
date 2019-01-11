@@ -4,6 +4,10 @@ export interface IPersonDetails {
   [key: string]: any
 }
 
+export interface IRegistrationDetails {
+  [key: string]: any
+}
+
 export interface IImage {
   data: string
   optionValues: string[]
@@ -58,6 +62,7 @@ const customKeys = [
   'attendantAtBirth',
   'birthType',
   'weightAtBirth',
+  '_fhirID',
   'placeOfBirth'
 ]
 
@@ -111,6 +116,10 @@ const processDraftData = (draftData: IFormData) => {
     }
   ]
 
+  if (child._fhirID) {
+    draftDetails.child._fhirID = child._fhirID
+  }
+
   draftDetails.mother.name = [
     {
       use: 'bn',
@@ -128,6 +137,9 @@ const processDraftData = (draftData: IFormData) => {
   }
   if (mother.iD && mother.iDType) {
     draftDetails.mother.identifier = [{ id: mother.iD, type: mother.iDType }]
+  }
+  if (mother._fhirID) {
+    draftDetails.mother._fhirID = mother._fhirID
   }
 
   draftDetails.mother.address = [
@@ -176,6 +188,9 @@ const processDraftData = (draftData: IFormData) => {
   }
   if (father.iD && father.iDType) {
     fatherDetails.identifier = [{ id: father.iD, type: father.iDType }]
+  }
+  if (father._fhirID) {
+    fatherDetails._fhirID = father._fhirID
   }
 
   fatherDetails.address = [
@@ -257,6 +272,10 @@ const processDraftData = (draftData: IFormData) => {
     ]
   }
 
+  if (registration._fhirID) {
+    draftDetails.registration._fhirID = registration._fhirID
+  }
+
   if (child.attendantAtBirth) {
     draftDetails.attendantAtBirth = child.attendantAtBirth
   }
@@ -274,6 +293,9 @@ const processDraftData = (draftData: IFormData) => {
       registration.presentAtBirthRegistration
   }
 
+  if (draftData._fhirIDMap) {
+    draftDetails._fhirIDMap = draftData._fhirIDMap
+  }
   if (father.fathersDetailsExist) {
     draftDetails.father = fatherDetails
   }

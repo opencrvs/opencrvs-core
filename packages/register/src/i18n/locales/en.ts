@@ -668,6 +668,7 @@ export const ENGLISH_STATE = {
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
     'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',
+    'register.workQueue.listItem.status.dateLabel.rejected': 'Rejected on',
     'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.print.form.name': 'Print',
