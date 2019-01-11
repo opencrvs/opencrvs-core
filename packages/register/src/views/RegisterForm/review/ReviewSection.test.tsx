@@ -81,41 +81,28 @@ describe('return the correct label on dynamic fields', () => {
         '8cbc862a-b817-4c29-a490-4a8767ff023c',
         { resource: 'locations', dependency: 'countryPermanent' },
         {
-          iDType: '',
-          iD: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          motherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          permanentAddress: '',
           countryPermanent: 'BGD',
-          statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Options1Permanent: '',
-          addressLine2Permanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3Options1: '',
-          addressLine2: '',
-          addressLine1: '',
-          postCode: ''
+          statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
         },
         intl,
         { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
         'bn'
       )
     ).toBe('চট্টগ্রাম')
+  })
+  it('Should return the English label', () => {
+    expect(
+      renderSelectDynamicLabel(
+        '8cbc862a-b817-4c29-a490-4a8767ff023c',
+        { resource: 'locations', dependency: 'countryPermanent' },
+        {
+          countryPermanent: 'BGD',
+          statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+        },
+        intl,
+        { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
+        'en'
+      )
+    ).toBe('Chittagong')
   })
 })

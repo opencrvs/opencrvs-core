@@ -1,9 +1,6 @@
-import { GlobalWithFetchMock } from 'jest-fetch-mock'
+import * as fetch from 'jest-fetch-mock'
 
-const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
-// tslint:disable no-var-requires
-customGlobal.fetch = require('jest-fetch-mock')
-customGlobal.fetchMock = customGlobal.fetch
+jest.setMock('node-fetch', { default: fetch })
 
 const localStorageMock = {
   getItem: jest.fn(),
