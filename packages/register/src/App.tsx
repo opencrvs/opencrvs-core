@@ -34,6 +34,7 @@ import { setInitialDrafts } from 'src/drafts'
 import { setInitialUserDetails } from 'src/profile/profileActions'
 import { client } from 'src/utils/apolloClient'
 import { USER_DETAILS } from 'src/utils/userUtils'
+import { MyRecords } from './views/MyRecords/MyRecords'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -147,6 +148,10 @@ export class App extends React.Component<IAppProps, IState> {
                           <ProtectedRoute
                             path={routes.WORK_QUEUE}
                             component={WorkQueue}
+                          />
+                          <ProtectedRoute
+                            path={routes.MY_RECORDS}
+                            component={MyRecords}
                           />
                         </Switch>
                       </Page>
