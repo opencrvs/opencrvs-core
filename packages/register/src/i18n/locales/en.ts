@@ -397,7 +397,6 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.phone': 'Phone number',
     'formFields.registration.certificateLanguage':
       'Which languages does the informant want the certificate issued in?',
-    'formFields.registration.paperFormNumber': 'Paper form number',
     'formFields.registration.certificateLanguage.bn': 'Bangla',
     'formFields.registration.certificateLanguage.en': 'English',
     'formFields.registration.certificateLanguage.other': 'Other',

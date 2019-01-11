@@ -129,7 +129,6 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
             comment
           }
         }
-        paperFormID
         trackingId
         registrationNumber
       }
@@ -375,7 +374,6 @@ export class ReviewFormView extends React.Component<IProps> {
     const comments = status && (status[0].comments as GQLComment[])
     registrationDetails.commentsOrNotes = comments && comments[0].comment
 
-    registrationDetails.paperFormNumber = registration.paperFormID
     registrationDetails.trackingId = registration.trackingId
     registrationDetails.registrationNumber = registration.registrationNumber
     if (registration.id) {

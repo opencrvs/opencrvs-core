@@ -754,7 +754,6 @@ describe('when user has a valid token in local storage', () => {
 
     const registrationDetails = {
       commentsOrNotes: 'comments',
-      paperFormNumber: '423424245455',
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationCertificateLanguage: ['en'],
       registrationPhone: '01736478884',

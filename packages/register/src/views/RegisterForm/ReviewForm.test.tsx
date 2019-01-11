@@ -173,7 +173,6 @@ describe('ReviewForm tests', async () => {
                 contact: 'MOTHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -346,7 +345,6 @@ describe('ReviewForm tests', async () => {
                 contact: 'FATHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -423,7 +421,6 @@ describe('ReviewForm tests', async () => {
                 contact: 'MOTHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: '12345'
               },
@@ -509,7 +506,6 @@ describe('ReviewForm tests', async () => {
                   }
                 ],
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -648,7 +644,6 @@ describe('ReviewForm tests', async () => {
                     ]
                   }
                 ],
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -696,7 +691,6 @@ describe('ReviewForm tests', async () => {
       whoseContactDetails: 'MOTHER',
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationPhone: '01711111111',
-      paperFormNumber: '123',
       commentsOrNotes: 'This is a note',
       trackingId: 'B123456',
       registrationNumber: null
@@ -800,8 +794,7 @@ describe('ReviewForm tests', async () => {
                 registration: {
                   contact: 'MOTHER',
                   attachments: null,
-                  status: null,
-                  paperFormID: '123'
+                  status: null
                 },
                 attendantAtBirth: 'NURSE',
                 weightAtBirth: 2,

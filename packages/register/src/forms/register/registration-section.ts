@@ -1,11 +1,5 @@
 import { defineMessages } from 'react-intl'
-import {
-  IFormSection,
-  SELECT_WITH_OPTIONS,
-  TEL,
-  NUMBER,
-  TEXTAREA
-} from 'src/forms'
+import { IFormSection, SELECT_WITH_OPTIONS, TEL, TEXTAREA } from 'src/forms'
 import { phoneNumberFormat } from 'src/utils/validate'
 
 const messages = defineMessages({
@@ -80,11 +74,6 @@ const messages = defineMessages({
       'Which languages does the informant want the certificate issued in?',
     id: 'formFields.registration.certificateLanguage',
     description: 'Input label for certificate language checkboxes'
-  },
-  paperFormNumberLabel: {
-    defaultMessage: 'Paper form number',
-    id: 'formFields.registration.paperFormNumber',
-    description: 'Input label for paper form number input'
   },
   registrationCertificateBN: {
     id: 'formFields.registration.certificateLanguage.bn',
@@ -175,14 +164,6 @@ export const registrationSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [phoneNumberFormat]
-    },
-    {
-      name: 'paperFormNumber',
-      type: NUMBER,
-      label: messages.paperFormNumberLabel,
-      required: false,
-      initialValue: '',
-      validate: []
     },
     {
       name: 'commentsOrNotes',

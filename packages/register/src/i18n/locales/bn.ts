@@ -397,7 +397,6 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.phone': 'মোবাইল নম্বর',
     'formFields.registration.certificateLanguage':
       'তথ্যপ্রদানকারী কোন ভাষায় সনদপত্র চান?',
-    'formFields.registration.paperFormNumber': 'ফর্ম নম্বর',
     'formFields.registration.certificateLanguage.bn': 'বাংলা',
     'formFields.registration.certificateLanguage.en': 'ইংরেজি',
     'formFields.registration.certificateLanguage.other': 'অন্যান্য',
