@@ -1,6 +1,7 @@
 import { generateBirthRegistrationNumber } from './index'
 import { testFhirBundle } from 'src/test/utils'
 import * as fetch from 'jest-fetch-mock'
+import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
 
 describe('Verify generateBirthRegistrationNumber', () => {
   const practitioner = {
@@ -115,13 +116,23 @@ describe('Verify generateBirthRegistrationNumber', () => {
         { status: 200 }
       ]
     )
+    const birthTrackingId = 'B5WGYJE'
+    const brnChecksum = 1
+    const identifier = {
+      system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
+      value: birthTrackingId
+    }
+    testFhirBundle.entry[1].resource.identifier.push(identifier)
+
     const brn = await generateBirthRegistrationNumber(
       testFhirBundle.entry[1].resource,
       practitioner
     )
     expect(brn).toBeDefined()
     expect(brn).toMatch(
-      new RegExp(`^${new Date().getFullYear()}10342112345678`)
+      new RegExp(
+        `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+      )
     )
   })
   it('Throws error for default BRN generator', async () => {
