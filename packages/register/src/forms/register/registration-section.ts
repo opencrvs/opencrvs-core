@@ -2,12 +2,11 @@ import { defineMessages } from 'react-intl'
 import {
   IFormSection,
   SELECT_WITH_OPTIONS,
-  TEXT,
   TEL,
   NUMBER,
   TEXTAREA
 } from 'src/forms'
-import { phoneNumberFormat, emailAddressFormat } from 'src/utils/validate'
+import { phoneNumberFormat } from 'src/utils/validate'
 
 const messages = defineMessages({
   registrationTab: {
@@ -70,11 +69,6 @@ const messages = defineMessages({
     id: 'formFields.registration.whoseContactDetails.other',
     defaultMessage: 'Other',
     description: 'Label for "Other" select option'
-  },
-  registrationEmailLabel: {
-    defaultMessage: 'Email address',
-    id: 'formFields.registration.email',
-    description: 'Input label for email input'
   },
   registrationPhoneLabel: {
     defaultMessage: 'Phone number',
@@ -173,14 +167,6 @@ export const registrationSection: IFormSection = {
           label: messages.contactDetailsFather
         }
       ]
-    },
-    {
-      name: 'registrationEmail',
-      type: TEXT,
-      label: messages.registrationEmailLabel,
-      required: false,
-      initialValue: '',
-      validate: [emailAddressFormat]
     },
     {
       name: 'registrationPhone',

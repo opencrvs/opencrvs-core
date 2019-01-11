@@ -757,7 +757,6 @@ describe('when user has a valid token in local storage', () => {
       paperFormNumber: '423424245455',
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationCertificateLanguage: ['en'],
-      registrationEmail: 'arman@gmail.com',
       registrationPhone: '01736478884',
       whoseContactDetails: 'MOTHER'
     }

@@ -243,8 +243,7 @@ const processDraftData = (draftData: IFormData) => {
 
   if (parentDetails) {
     parentDetails.telecom = [
-      { system: 'phone', value: registration.registrationPhone },
-      { system: 'email', value: registration.registrationEmail }
+      { system: 'phone', value: registration.registrationPhone }
     ]
   }
 

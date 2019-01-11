@@ -366,9 +366,6 @@ export class ReviewFormView extends React.Component<IProps> {
         : reg.mother && (reg.mother.telecom as GQLContactPoint[])) || []
 
     telecom.map(tel => {
-      if (tel.system === 'email') {
-        registrationDetails.registrationEmail = tel.value
-      }
       if (tel.system === 'phone') {
         registrationDetails.registrationPhone = tel.value
       }

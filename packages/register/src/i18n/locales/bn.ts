@@ -394,7 +394,6 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.whoseContactDetails.mother': 'মা',
     'formFields.registration.whoseContactDetails.father': 'পিতা',
     'formFields.registration.whoseContactDetails.other': 'অন্যান্য',
-    'formFields.registration.email': 'ই-মেইল',
     'formFields.registration.phone': 'মোবাইল নম্বর',
     'formFields.registration.certificateLanguage':
       'তথ্যপ্রদানকারী কোন ভাষায় সনদপত্র চান?',
