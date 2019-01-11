@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { createTestComponent } from 'src/tests/util'
-import { MyRecordAction } from './MyRecord'
+import { MyRecords } from './MyRecords'
 import { createStore } from 'src/store'
 
 describe('MyRecords tests', async () => {
@@ -8,7 +8,7 @@ describe('MyRecords tests', async () => {
     const { store } = createStore()
     const testComponent = createTestComponent(
       // @ts-ignore
-      <MyRecordAction />,
+      <MyRecords />,
       store
     )
 

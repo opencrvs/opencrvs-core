@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: 15px;
 `
 const LabelText = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
@@ -24,6 +24,7 @@ const LabelText = styled.div`
 `
 const ComponentWrapper = styled.span`
   flex-direction: column;
+  margin: 0 auto;
 `
 export interface IInputLabel {
   label: string

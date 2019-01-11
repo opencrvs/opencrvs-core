@@ -12,4 +12,4 @@ export const REVIEW_BIRTH_PARENT_FORM_TAB =
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'
 export const WORK_QUEUE = '/work-queue'
-export const MY_RECORD = '/my-record'
+export const MY_RECORDS = '/my-records'
