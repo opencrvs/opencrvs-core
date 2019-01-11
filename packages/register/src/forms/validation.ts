@@ -13,10 +13,12 @@ export function getValidationErrorsForField(
     return []
   }
 
-  const validators = Array.from(field.validate)
+  let validators = Array.from(field.validate)
 
   if (field.required) {
     validators.push(required)
+  } else if (!value) {
+    validators = []
   }
 
   return validators

@@ -10,7 +10,7 @@ import {
 import { sendBirthNotification } from './utils'
 import { EVENT_TYPE } from './fhir/constants'
 import { getToken } from 'src/utils/authUtils'
-import { postToHearth } from './fhir/fhir-utils'
+import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
 
 async function sendBundleToHearth(
@@ -51,10 +51,13 @@ export async function createBirthRegistrationHandler(
 
     const resBundle = await sendBundleToHearth(payload)
 
+    const msisdn = getSharedContactMsisdn(payload)
     /* sending notification to the contact */
-    sendBirthNotification(payload, {
-      Authorization: request.headers.authorization
-    })
+    if (msisdn) {
+      sendBirthNotification(payload, msisdn, {
+        Authorization: request.headers.authorization
+      })
+    }
 
     return resBundle
   } catch (error) {
