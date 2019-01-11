@@ -15,7 +15,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: 'events/birth/new-declaration',
+      path: '/events/birth/new-declaration',
       handler: newDeclarationHandler,
       config: {
         tags: ['api'],
