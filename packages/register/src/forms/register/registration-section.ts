@@ -39,8 +39,7 @@ const messages = defineMessages({
     description: 'Label for "Other" select option'
   },
   whoseContactDetailsLabel: {
-    defaultMessage:
-      'Whose contact details would the informant want to share for communication purposes?',
+    defaultMessage: 'Who is the contact person for this application?',
     id: 'formFields.registration.whoseContactDetails',
     description: 'Input label for contact details person'
   },
