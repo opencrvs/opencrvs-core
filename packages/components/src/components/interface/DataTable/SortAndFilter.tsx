@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: 15px;
 `
 const LabelText = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
@@ -24,6 +24,7 @@ const LabelText = styled.div`
 `
 const ComponentWrapper = styled.span`
   flex-direction: column;
+  margin: 0 auto;
 `
 export interface IInputLabel {
   label: string
@@ -34,13 +35,13 @@ export interface ISortAndFilterItem {
 }
 
 interface ISortAndFilterPrpos {
-  sortBy: ISortAndFilterItem
-  filterBy: ISortAndFilterItem
-  onChangeSort: (
+  sortBy?: ISortAndFilterItem
+  filterBy?: ISortAndFilterItem
+  onChangeSort?: (
     value: ISelectGroupValue,
     changedValue: ISelectGroupValue
   ) => void
-  onChangeFilter: (
+  onChangeFilter?: (
     value: ISelectGroupValue,
     changedValue: ISelectGroupValue
   ) => void
@@ -51,14 +52,18 @@ export class SortAndFilter extends React.Component<ISortAndFilterPrpos> {
     const { sortBy, filterBy, onChangeSort, onChangeFilter } = this.props
     return (
       <Wrapper>
-        <ComponentWrapper>
-          <LabelText>{sortBy.input.label}</LabelText>
-          <SelectGroup {...sortBy.selects} onChange={onChangeSort} />
-        </ComponentWrapper>
-        <ComponentWrapper>
-          <LabelText>{filterBy.input.label}</LabelText>
-          <SelectGroup {...filterBy.selects} onChange={onChangeFilter} />
-        </ComponentWrapper>
+        {sortBy && (
+          <ComponentWrapper>
+            <LabelText>{sortBy.input.label}</LabelText>
+            <SelectGroup {...sortBy.selects} onChange={onChangeSort} />
+          </ComponentWrapper>
+        )}
+        {filterBy && (
+          <ComponentWrapper>
+            <LabelText>{filterBy.input.label}</LabelText>
+            <SelectGroup {...filterBy.selects} onChange={onChangeFilter} />
+          </ComponentWrapper>
+        )}
       </Wrapper>
     )
   }
