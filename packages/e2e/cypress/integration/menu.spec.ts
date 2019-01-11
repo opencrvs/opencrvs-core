@@ -1,12 +1,13 @@
 /// <reference types="Cypress" />
 
-context('Login', () => {
+context('Register', () => {
   beforeEach(() => {
-    cy.visit(Cypress.env('LOGIN_URL'))
+    cy.login('fieldWorker')
   })
 
   it('fills in all data into the register form', () => {
     cy.visit(`${Cypress.env('REGISTER_URL')}events`)
+    // CHILD DETAILS
 
     cy.get('#sub-menu').click()
     //Click on change Lanuage
