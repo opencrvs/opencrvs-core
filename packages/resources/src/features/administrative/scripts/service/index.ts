@@ -2,15 +2,7 @@ import fetch, { Response } from 'node-fetch'
 import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
 import { sendToFhir, IOISFLocation, ILocation } from '../../../utils/bn'
 import chalk from 'chalk'
-
-const titleCase = (str: string) => {
-  const stringArray = str.toLowerCase().split(' ')
-  for (let i = 0; i < stringArray.length; i++) {
-    stringArray[i] =
-      stringArray[i].charAt(0).toUpperCase() + stringArray[i].slice(1)
-  }
-  return stringArray.join(' ')
-}
+import { titleCase } from '../../../utils/bn'
 
 const composeFhirLocation = (
   location: IOISFLocation,
