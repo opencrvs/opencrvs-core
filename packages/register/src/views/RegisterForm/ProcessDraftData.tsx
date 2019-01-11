@@ -50,7 +50,7 @@ const processDraftData = (draftData: IFormData) => {
     mother.postCode = mother.postCodePermanent
     mother.addressLine1 = mother.addressLine1Permanent
     mother.addressLine2 = mother.addressLine2Permanent
-    mother.addressLine3Options1 = mother.addressLine3Options1Permanent
+    mother.addressLine3 = mother.addressLine3Permanent
     mother.addressLine4 = mother.addressLine4Permanent
   }
 
@@ -89,7 +89,7 @@ const processDraftData = (draftData: IFormData) => {
         line: [
           mother.addressLine1Permanent,
           mother.addressLine2Permanent,
-          mother.addressLine3Options1Permanent,
+          mother.addressLine3Permanent,
           mother.addressLine4Permanent
         ]
       },
@@ -102,7 +102,7 @@ const processDraftData = (draftData: IFormData) => {
         line: [
           mother.addressLine1,
           mother.addressLine2,
-          mother.addressLine3Options1,
+          mother.addressLine3,
           mother.addressLine4
         ]
       }
@@ -138,7 +138,7 @@ const processDraftData = (draftData: IFormData) => {
         line: [
           fatherPermanentAddress.addressLine1Permanent,
           fatherPermanentAddress.addressLine2Permanent,
-          fatherPermanentAddress.addressLine3Options1Permanent,
+          fatherPermanentAddress.addressLine3Permanent,
           fatherPermanentAddress.addressLine4Permanent
         ]
       },
@@ -151,7 +151,7 @@ const processDraftData = (draftData: IFormData) => {
         line: [
           fatherCurrentAddress.addressLine1,
           fatherCurrentAddress.addressLine2,
-          fatherCurrentAddress.addressLine3Options1,
+          fatherCurrentAddress.addressLine3,
           fatherCurrentAddress.addressLine4
         ]
       }

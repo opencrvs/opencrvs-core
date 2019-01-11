@@ -159,12 +159,12 @@ export interface IConditionals {
   statePermanent: IConditional
   districtPermanent: IConditional
   addressLine4Permanent: IConditional
-  addressLine3Options1Permanent: IConditional
+  addressLine3Permanent: IConditional
   country: IConditional
   state: IConditional
   district: IConditional
   addressLine4: IConditional
-  addressLine3Options1: IConditional
+  addressLine3: IConditional
   uploadDocForWhom: IConditional
   motherCollectsCertificate: IConditional
   fatherCollectsCertificate: IConditional

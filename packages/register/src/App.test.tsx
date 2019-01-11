@@ -737,8 +737,8 @@ describe('when user has a valid token in local storage', () => {
       addressLine1Permanent: 'Rd#10',
       addressLine2: 'Akua',
       addressLine2Permanent: 'Akua',
-      addressLine3Options1: 'union1',
-      addressLine3Options1Permanent: 'union1',
+      addressLine3: 'union1',
+      addressLine3Permanent: 'union1',
       addressLine4: 'upazila10',
       addressLine4Permanent: 'upazila10',
       countryPermanent: 'BGD',
@@ -792,8 +792,8 @@ describe('when user has a valid token in local storage', () => {
       fatherDetails.addressLine1Permanent = 'Rd#10'
       fatherDetails.addressLine2 = 'Akua'
       fatherDetails.addressLine2Permanent = 'Akua'
-      fatherDetails.addressLine3Options1 = 'union1'
-      fatherDetails.addressLine3Options1Permanent = 'union1'
+      fatherDetails.addressLine3 = 'union1'
+      fatherDetails.addressLine3Permanent = 'union1'
       fatherDetails.addressLine4 = 'upazila10'
       fatherDetails.addressLine4Permanent = 'upazila10'
       fatherDetails.countryPermanent = 'BGD'

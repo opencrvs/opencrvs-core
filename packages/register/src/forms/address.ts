@@ -26,8 +26,8 @@ export const messages = defineMessages({
     defaultMessage: 'Area / Mouja / Village',
     description: 'Title for the address line 2'
   },
-  addressLine3Options1: {
-    id: 'formFields.addressLine3Options1',
+  addressLine3: {
+    id: 'formFields.addressLine3',
     defaultMessage: 'Union / Cantonement',
     description: 'Title for the address line 3 option 1'
   },

@@ -50,7 +50,7 @@ context('Register', () => {
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.selectOption(
-      '#addressLine3Options1Permanent',
+      '#addressLine3Permanent',
       'Bahadursadi',
       'Bahadursadi'
     )
@@ -84,7 +84,7 @@ context('Register', () => {
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
-    cy.selectOption('#addressLine3Options1', 'Bahadursadi', 'Bahadursadi')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('10024')
@@ -94,7 +94,7 @@ context('Register', () => {
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.selectOption(
-      '#addressLine3Options1Permanent',
+      '#addressLine3Permanent',
       'Bahadursadi',
       'Bahadursadi'
     )

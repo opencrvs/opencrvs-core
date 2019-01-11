@@ -19,7 +19,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.district': 'জেলা',
     'formFields.addressLine1': 'রাস্তার এবং  হোল্ডিং নম্বর',
     'formFields.addressLine2': 'এলাকা / গ্রাম/পাড়া',
-    'formFields.addressLine3Options1': 'ইউনিয়ন / ক্যান্টনমেন্ট',
+    'formFields.addressLine3': 'ইউনিয়ন / ক্যান্টনমেন্ট',
     'formFields.addressLine3Options2': 'ওয়ার্ড / ক্যান্টনমেন্ট',
     'formFields.addressLine4': 'উপজেলা (থানা) / পৌরসভা / সিটি করপোরেশন',
     'formFields.postCode': 'পোস্ট কোড',

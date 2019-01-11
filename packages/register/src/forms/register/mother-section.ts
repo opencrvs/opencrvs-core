@@ -326,9 +326,9 @@ export const motherSection: IFormSection = {
       ]
     },
     {
-      name: 'addressLine3Options1Permanent',
+      name: 'addressLine3Permanent',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.addressLine3Options1,
+      label: addressMessages.addressLine3,
       required: false,
       initialValue: '',
       validate: [],
@@ -355,7 +355,7 @@ export const motherSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent,
         conditionals.addressLine4Permanent,
-        conditionals.addressLine3Options1Permanent
+        conditionals.addressLine3Permanent
       ]
     },
     {
@@ -370,7 +370,7 @@ export const motherSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent,
         conditionals.addressLine4Permanent,
-        conditionals.addressLine3Options1Permanent
+        conditionals.addressLine3Permanent
       ]
     },
     {
@@ -385,7 +385,7 @@ export const motherSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent,
         conditionals.addressLine4Permanent,
-        conditionals.addressLine3Options1Permanent
+        conditionals.addressLine3Permanent
       ]
     },
     {
@@ -472,9 +472,9 @@ export const motherSection: IFormSection = {
       ]
     },
     {
-      name: 'addressLine3Options1',
+      name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.addressLine3Options1,
+      label: addressMessages.addressLine3,
       required: false,
       initialValue: '',
       validate: [],
@@ -502,7 +502,7 @@ export const motherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressLine3Options1,
+        conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ]
     },
@@ -518,7 +518,7 @@ export const motherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressLine3Options1,
+        conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ]
     },
@@ -534,7 +534,7 @@ export const motherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressLine3Options1,
+        conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ]
     }

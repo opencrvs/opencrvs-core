@@ -169,9 +169,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.addressLine4Permanent'
   },
-  addressLine3Options1Permanent: {
+  addressLine3Permanent: {
     action: 'hide',
-    expression: '!values.addressLine3Options1Permanent'
+    expression: '!values.addressLine3Permanent'
   },
   country: {
     action: 'hide',
@@ -189,9 +189,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.addressLine4'
   },
-  addressLine3Options1: {
+  addressLine3: {
     action: 'hide',
-    expression: '!values.addressLine3Options1'
+    expression: '!values.addressLine3'
   },
   uploadDocForWhom: {
     action: 'hide',
