@@ -180,7 +180,7 @@ export const fatherSection: IFormSection = {
       name: 'nationality',
       type: SELECT_WITH_OPTIONS,
       label: messages.nationality,
-      required: true,
+      required: false,
       initialValue: 'BGD',
       validate: [],
       options: countries,
@@ -217,16 +217,16 @@ export const fatherSection: IFormSection = {
       name: 'familyNameEng',
       type: TEXT,
       label: messages.fatherFamilyNameEng,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist]
     },
     {
-      name: 'fatherBirthDate',
+      name: 'birthDate',
       type: DATE,
       label: messages.fatherDateOfBirth,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [dateFormat],
       conditionals: [conditionals.fathersDetailsExist]
@@ -235,7 +235,7 @@ export const fatherSection: IFormSection = {
       name: 'maritalStatus',
       type: SELECT_WITH_OPTIONS,
       label: maritalStatusMessages.maritalStatus,
-      required: true,
+      required: false,
       initialValue: 'MARRIED',
       validate: [],
       options: [
@@ -266,7 +266,7 @@ export const fatherSection: IFormSection = {
       name: 'educationalAttainment',
       type: SELECT_WITH_OPTIONS,
       label: messages.fatherEducationAttainment,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       options: [

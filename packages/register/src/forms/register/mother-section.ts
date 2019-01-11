@@ -148,7 +148,7 @@ export const motherSection: IFormSection = {
       name: 'nationality',
       type: SELECT_WITH_OPTIONS,
       label: messages.nationality,
-      required: true,
+      required: false,
       initialValue: 'BGD',
       validate: [],
       options: countries
@@ -181,15 +181,15 @@ export const motherSection: IFormSection = {
       name: 'familyNameEng',
       type: TEXT,
       label: messages.motherFamilyNameEng,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'motherBirthDate',
+      name: 'birthDate',
       type: DATE,
       label: messages.motherDateOfBirth,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [dateFormat]
     },
@@ -197,7 +197,7 @@ export const motherSection: IFormSection = {
       name: 'maritalStatus',
       type: SELECT_WITH_OPTIONS,
       label: maritalStatusMessages.maritalStatus,
-      required: true,
+      required: false,
       initialValue: 'MARRIED',
       validate: [],
       options: [
@@ -226,7 +226,7 @@ export const motherSection: IFormSection = {
       name: 'educationalAttainment',
       type: SELECT_WITH_OPTIONS,
       label: messages.motherEducationAttainment,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       options: [

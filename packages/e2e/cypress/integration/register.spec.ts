@@ -16,14 +16,14 @@ context('Register', () => {
     cy.get('#firstNamesEng').type('Gayatri')
     cy.get('#familyNameEng').type('Spivak')
     cy.selectOption('#gender', 'Female', 'Female')
-    cy.get('#childBirthDate-dd').type('01')
-    cy.get('#childBirthDate-mm').type('08')
-    cy.get('#childBirthDate-yyyy').type('2018')
+    cy.get('#birthDate-dd').type('01')
+    cy.get('#birthDate-mm').type('08')
+    cy.get('#birthDate-yyyy').type('2018')
     cy.selectOption('#attendantAtBirth', 'Midwife', 'Midwife')
-    cy.selectOption('#typeOfBirth', 'Single', 'Single')
-    cy.get('#orderOfBirth').type('1')
+    cy.selectOption('#birthType', 'Single', 'Single')
+    cy.get('#multipleBirth').type('1')
     cy.get('#weightAtBirth').type('1')
-    cy.selectOption('#placeOfDelivery', 'Hospital', 'Hospital')
+    cy.selectOption('#placeOfBirth', 'Hospital', 'Hospital')
     cy.get('#next_section').click()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National ID', 'National ID')
@@ -33,9 +33,9 @@ context('Register', () => {
     cy.get('#familyName').type('স্পিভক')
     cy.get('#firstNamesEng').type('Gayatri')
     cy.get('#familyNameEng').type('Spivak')
-    cy.get('#motherBirthDate-dd').type('01')
-    cy.get('#motherBirthDate-mm').type('08')
-    cy.get('#motherBirthDate-yyyy').type('2018')
+    cy.get('#birthDate-dd').type('01')
+    cy.get('#birthDate-mm').type('08')
+    cy.get('#birthDate-yyyy').type('2018')
     cy.selectOption('#maritalStatus', 'Married', 'Married')
     cy.get('#dateOfMarriage-dd').type('01')
     cy.get('#dateOfMarriage-mm').type('08')
@@ -49,11 +49,7 @@ context('Register', () => {
     cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.selectOption(
-      '#addressLine3Permanent',
-      'Bahadursadi',
-      'Bahadursadi'
-    )
+    cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('10024')
@@ -67,9 +63,9 @@ context('Register', () => {
     cy.get('#familyName').type('স্পিভক')
     cy.get('#firstNamesEng').type('Gayatri')
     cy.get('#familyNameEng').type('Spivak')
-    cy.get('#fatherBirthDate-dd').type('01')
-    cy.get('#fatherBirthDate-mm').type('08')
-    cy.get('#fatherBirthDate-yyyy').type('2018')
+    cy.get('#birthDate-dd').type('01')
+    cy.get('#birthDate-mm').type('08')
+    cy.get('#birthDate-yyyy').type('2018')
     cy.selectOption('#maritalStatus', 'Married', 'Married')
     cy.get('#dateOfMarriage-dd').type('01')
     cy.get('#dateOfMarriage-mm').type('08')
@@ -93,11 +89,7 @@ context('Register', () => {
     cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.selectOption(
-      '#addressLine3Permanent',
-      'Bahadursadi',
-      'Bahadursadi'
-    )
+    cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('10024')
@@ -122,8 +114,8 @@ context('Register', () => {
     cy.get('#next_button_father').click()
     cy.get('#submit_form').click()
     // MODAL
-    // cy.get('#submit_confirm').click()
+    cy.get('#submit_confirm').click()
     // SUCCESS
-    // cy.get('#saved_registration_view').contains('Declaration submitted')
+    cy.get('#saved_registration_view').contains('Application submitted')
   })
 })

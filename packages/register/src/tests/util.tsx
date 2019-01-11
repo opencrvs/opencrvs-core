@@ -178,11 +178,11 @@ export const mockApplicationData = {
     familyName: 'স্পিভক',
     firstNamesEng: 'Mike',
     familyNameEng: 'Test',
-    childBirthDate: '1977-09-20',
+    birthDate: '1977-09-20',
     gender: 'male',
     weightAtBirth: '3.5',
     attendantAtBirth: 'MIDWIFE',
-    typeOfBirth: 'SINGLE'
+    birthType: 'SINGLE'
   },
   mother: {
     firstNames: 'স্পিভক',
@@ -191,7 +191,7 @@ export const mockApplicationData = {
     familyNameEng: 'Test',
     iD: '654651',
     iDType: 'NATIONAL_ID',
-    motherBirthDate: '1949-05-31',
+    birthDate: '1949-05-31',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
@@ -221,7 +221,7 @@ export const mockApplicationData = {
     familyNameEng: 'Test',
     iD: '43468',
     iDType: 'NATIONAL_ID',
-    fatherBirthDate: '1950-05-19',
+    birthDate: '1950-05-19',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
