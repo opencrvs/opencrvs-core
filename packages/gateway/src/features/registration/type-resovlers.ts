@@ -351,7 +351,9 @@ export const typeResolvers: GQLResolver = {
         encounterSection.entry[0].reference
 
       if (!encounterReference) {
-        return null
+        return {
+          composition: composition.id
+        }
       }
 
       const observation = {}

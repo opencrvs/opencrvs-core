@@ -269,6 +269,15 @@ const processDraftData = (draftData: IFormData) => {
     draftDetails.registration.paperFormID = registration.paperFormNumber
   }
 
+  if (registration.trackingId) {
+    draftDetails.registration.trackingId = registration.trackingId
+  }
+
+  if (registration.registrationNumber) {
+    draftDetails.registration.registrationNumber =
+      registration.registrationNumber
+  }
+
   if (registration.commentsOrNotes) {
     draftDetails.registration.status = [
       {
