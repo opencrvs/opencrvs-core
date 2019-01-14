@@ -121,7 +121,6 @@ describe('when user wants to print certificate', async () => {
     })
 
     testComponent.component.update()
-    console.debug(testComponent.component)
     const fields = collectCertificateFormSection.fields
     ;(fields[1] as IInformativeRadioGroupFormField).information = {
       // @ts-ignore
@@ -663,6 +662,32 @@ describe('when user wants to print certificate', async () => {
         error = e
       }
       expect(error).toBeInstanceOf(Error)
+    })
+
+    it('Should generate the PDF', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: true
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+
+      component
+        .find('#print-confirm-button')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      const fields = paymentFormSection.fields
+
+      fields[2].initialValue = '50.00'
+      fields[3].initialValue = '24'
+      expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
+
+      const PrintReceiptBtn = component.find('#print-receipt').hostNodes()
+      expect(PrintReceiptBtn.length).toEqual(1)
+
+      PrintReceiptBtn.simulate('click')
     })
   })
 })

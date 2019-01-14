@@ -315,9 +315,6 @@ class PrintCertificateActionComponent extends React.Component<
                 title={intl.formatMessage(messages.printReceipt)}
                 icon={() => <StyledPrintIcon />}
                 onClick={() => {
-                  console.log(pdfFonts)
-                  console.log(pdfMake.pdfMake)
-
                   const docDefinition = {
                     info: {
                       title: 'Receipt-for-Birth-Certificate'
@@ -411,10 +408,6 @@ class PrintCertificateActionComponent extends React.Component<
 
                   pdfMake.vfs = pdfFonts.pdfMake.vfs
                   const font = fonts[this.props.language]
-
-                  console.log(fonts)
-                  console.log(pdfFonts)
-                  console.log(font)
 
                   const generatedPDF = pdfMake.createPdf(
                     docDefinition,
