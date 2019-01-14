@@ -389,16 +389,14 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.whoIsPresent.father': 'Father',
     'formFields.registration.whoIsPresent.other': 'Other',
     'formFields.registration.whoseContactDetails':
-      'Whose contact details would the informant want to share for communication purposes?',
+      'Who is the contact person for this application?',
     'formFields.registration.whoseContactDetails.both': 'Both Parents',
     'formFields.registration.whoseContactDetails.mother': 'Mother',
     'formFields.registration.whoseContactDetails.father': 'Father',
     'formFields.registration.whoseContactDetails.other': 'Other',
-    'formFields.registration.email': 'Email address',
     'formFields.registration.phone': 'Phone number',
     'formFields.registration.certificateLanguage':
       'Which languages does the informant want the certificate issued in?',
-    'formFields.registration.paperFormNumber': 'Paper form number',
     'formFields.registration.certificateLanguage.bn': 'Bangla',
     'formFields.registration.certificateLanguage.en': 'English',
     'formFields.registration.certificateLanguage.other': 'Other',

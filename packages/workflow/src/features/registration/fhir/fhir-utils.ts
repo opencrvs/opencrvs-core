@@ -98,6 +98,22 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
   return composition.identifier.value
 }
 
+export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
+  const trackingIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+      )
+    })
+  if (!trackingIdentifier || !trackingIdentifier.value) {
+    throw new Error("Didn't find any identifier for tracking id")
+  }
+  return trackingIdentifier.value
+}
+
 export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   const brnIdentifier =
     taskResource &&

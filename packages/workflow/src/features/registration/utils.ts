@@ -13,7 +13,13 @@ export function generateDeathTrackingId(): string {
 }
 
 function generateTrackingId(prefix: string): string {
-  return prefix.concat(new ShortUIDGen().randomUUID())
+  return prefix.concat(new ShortUIDGen().randomUUID()).toUpperCase()
+}
+
+export function convertStringToASCII(str: string): string {
+  return [...str]
+    .map(char => char.charCodeAt(0).toString())
+    .reduce((acc, v) => acc.concat(v))
 }
 
 export async function sendBirthNotification(

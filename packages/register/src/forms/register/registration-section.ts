@@ -1,13 +1,6 @@
 import { defineMessages } from 'react-intl'
-import {
-  IFormSection,
-  SELECT_WITH_OPTIONS,
-  TEXT,
-  TEL,
-  NUMBER,
-  TEXTAREA
-} from 'src/forms'
-import { phoneNumberFormat, emailAddressFormat } from 'src/utils/validate'
+import { IFormSection, SELECT_WITH_OPTIONS, TEL, TEXTAREA } from 'src/forms'
+import { phoneNumberFormat } from 'src/utils/validate'
 
 const messages = defineMessages({
   registrationTab: {
@@ -46,8 +39,7 @@ const messages = defineMessages({
     description: 'Label for "Other" select option'
   },
   whoseContactDetailsLabel: {
-    defaultMessage:
-      'Whose contact details would the informant want to share for communication purposes?',
+    defaultMessage: 'Who is the contact person for this application?',
     id: 'formFields.registration.whoseContactDetails',
     description: 'Input label for contact details person'
   },
@@ -71,11 +63,6 @@ const messages = defineMessages({
     defaultMessage: 'Other',
     description: 'Label for "Other" select option'
   },
-  registrationEmailLabel: {
-    defaultMessage: 'Email address',
-    id: 'formFields.registration.email',
-    description: 'Input label for email input'
-  },
   registrationPhoneLabel: {
     defaultMessage: 'Phone number',
     id: 'formFields.registration.phone',
@@ -86,11 +73,6 @@ const messages = defineMessages({
       'Which languages does the informant want the certificate issued in?',
     id: 'formFields.registration.certificateLanguage',
     description: 'Input label for certificate language checkboxes'
-  },
-  paperFormNumberLabel: {
-    defaultMessage: 'Paper form number',
-    id: 'formFields.registration.paperFormNumber',
-    description: 'Input label for paper form number input'
   },
   registrationCertificateBN: {
     id: 'formFields.registration.certificateLanguage.bn',
@@ -175,28 +157,12 @@ export const registrationSection: IFormSection = {
       ]
     },
     {
-      name: 'registrationEmail',
-      type: TEXT,
-      label: messages.registrationEmailLabel,
-      required: false,
-      initialValue: '',
-      validate: [emailAddressFormat]
-    },
-    {
       name: 'registrationPhone',
       type: TEL,
       label: messages.registrationPhoneLabel,
       required: false,
       initialValue: '',
       validate: [phoneNumberFormat]
-    },
-    {
-      name: 'paperFormNumber',
-      type: NUMBER,
-      label: messages.paperFormNumberLabel,
-      required: false,
-      initialValue: '',
-      validate: []
     },
     {
       name: 'commentsOrNotes',
