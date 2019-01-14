@@ -91,7 +91,7 @@ export function addDuplicatesToComposition(
   }
 }
 
-function createDuplicateTemplate(
+export function createDuplicateTemplate(
   duplicates: string[],
   composition: fhir.Composition
 ) {
