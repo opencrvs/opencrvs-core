@@ -6,13 +6,15 @@ export type NotificationState = {
   backgroundSyncMessageVisible: boolean
   syncCount: number
   waitingSW: ServiceWorker | null
+  sessionExpired: boolean
 }
 
 export const initialState: NotificationState = {
   newContentAvailable: false,
   backgroundSyncMessageVisible: false,
   syncCount: 0,
-  waitingSW: null
+  waitingSW: null,
+  sessionExpired: false
 }
 
 type Action =
@@ -20,6 +22,7 @@ type Action =
   | actions.HideNewContentAvailableAction
   | actions.ShowBackgroundSyncedAction
   | actions.HideBackgroundSyncedAction
+  | actions.SessionExpiredAction
 
 export const notificationReducer: LoopReducer<NotificationState, Action> = (
   state: NotificationState = initialState,
@@ -48,6 +51,11 @@ export const notificationReducer: LoopReducer<NotificationState, Action> = (
       return {
         ...state,
         backgroundSyncMessageVisible: false
+      }
+    case actions.SESSION_EXPIRED:
+      return {
+        ...state,
+        sessionExpired: true
       }
     default:
       return state

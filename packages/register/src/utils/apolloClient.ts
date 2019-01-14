@@ -4,6 +4,10 @@ import { createHttpLink } from 'apollo-link-http'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { resolve } from 'url'
 import { config } from 'src/config'
+import { onError } from 'apollo-link-error'
+import { store } from 'src'
+import { showSessionExpireConfirmation } from 'src/notification/actions'
+import { from } from 'apollo-link'
 
 const httpLink = createHttpLink({
   uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -19,7 +23,13 @@ const authLink = setContext((_, { headers }) => {
   }
 })
 
+const errorLink = onError((error: any) => {
+  if (error.networkError.statusCode === 401) {
+    store.dispatch(showSessionExpireConfirmation())
+  }
+})
+
 export const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: from([errorLink, authLink, httpLink]),
   cache: new InMemoryCache()
 })

@@ -33,6 +33,7 @@ import { setInitialDrafts } from 'src/drafts'
 import { setInitialUserDetails } from 'src/profile/profileActions'
 import { client } from 'src/utils/apolloClient'
 import { USER_DETAILS } from 'src/utils/userUtils'
+import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -79,6 +80,7 @@ export class App extends React.Component<IAppProps, IState> {
               <ThemeProvider theme={getTheme(config.COUNTRY)}>
                 <ConnectedRouter history={this.props.history}>
                   <ScrollToTop>
+                    <SessionExpireConfirmation />
                     <NotificationComponent>
                       <Page>
                         <Switch>
