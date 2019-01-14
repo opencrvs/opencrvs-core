@@ -1,5 +1,4 @@
 import * as decode from 'jwt-decode'
-import * as Hapi from 'hapi'
 
 export enum USER_SCOPE {
   DECLARE = 'declare',
