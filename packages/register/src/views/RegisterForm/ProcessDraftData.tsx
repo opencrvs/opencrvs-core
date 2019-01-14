@@ -290,6 +290,12 @@ const processDraftData = (draftData: IFormData) => {
         timestamp: new Date()
       }
     ]
+  } else {
+    draftDetails.registration.status = [
+      {
+        timestamp: new Date()
+      }
+    ]
   }
 
   if (registration._fhirID) {
