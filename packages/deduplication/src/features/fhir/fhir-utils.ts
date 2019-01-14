@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import { logger } from 'src/logger'
 import { HEARTH_URL } from 'src/constants'
 
 export interface ITemplatedComposition extends fhir.Composition {
@@ -46,21 +47,49 @@ export function findName(code: string, patient: fhir.Patient) {
 }
 
 export async function getCompositionByIdentifier(identifier: string) {
-  const response = await getFromFhir(`/Composition?identifier${identifier}`)
-  return response.entry[0]
+  try {
+    const response = await getFromFhir(`/Composition?identifier=${identifier}`)
+    return response.entry[0]
+  } catch (error) {
+    logger.error(
+      `Deduplication/fhir-utils: getting composition by identifer failed with error: ${error}`
+    )
+    throw new Error(error)
+  }
 }
 
 export function addDuplicatesToComposition(
   duplicates: string[],
-  composition: fhir.Composition
+  compositionEntry: fhir.BundleEntry
 ) {
-  if (!composition.relatesTo) {
-    composition.relatesTo = []
+  try {
+    const composition = compositionEntry.resource as fhir.Composition
+    const compositionIdentifier =
+      composition.identifier && composition.identifier.value
+
+    logger.info(
+      `Deduplication/fhir-utils: updating composition(identifier: ${compositionIdentifier}) with duplicates ${duplicates}`
+    )
+
+    if (!composition.relatesTo) {
+      composition.relatesTo = []
+    }
+    composition.relatesTo = composition.relatesTo.concat(
+      createDuplicateTemplate(duplicates)
+    )
+
+    const bundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [compositionEntry]
+    }
+    return postToHearth(bundle)
+  } catch (error) {
+    logger.error(
+      `Deduplication/fhir-utils: updating composition failed with error: ${error}`
+    )
+    throw new Error(error)
   }
-  composition.relatesTo = composition.relatesTo.concat(
-    createDuplicateTemplate(duplicates)
-  )
-  return postToHearth(composition)
 }
 
 function createDuplicateTemplate(duplicates: string[]) {
@@ -89,8 +118,6 @@ export const getFromFhir = (suffix: string) => {
 }
 
 export async function postToHearth(payload: any) {
-  /* hearth will do put calls if it finds id on the bundle */
-  console.log(JSON.stringify(payload))
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),

@@ -4,6 +4,7 @@ import {
   getCompositionByIdentifier,
   addDuplicatesToComposition
 } from 'src/features/fhir/fhir-utils'
+import { logger } from 'src/logger'
 import { ICompositionBody, detectDuplicates } from 'src/elasticsearch/utils'
 import { indexComposition } from 'src/elasticsearch/dbhelper'
 
@@ -27,16 +28,7 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
   const body: ICompositionBody = {}
   createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
-  const duplicates = await detectDuplicates(compositionIdentifier, body)
-  if (!duplicates.length) {
-    return
-  }
-  await addDuplicatesToComposition(duplicates, composition)
-  return await updateDuplicateCompositions(
-    compositionIdentifier,
-    composition,
-    duplicates
-  )
+  await detectAndUpdateDuplicates(compositionIdentifier, body)
 }
 
 function createIndexBody(
@@ -127,11 +119,24 @@ function createFatherIndex(
   body.fatherIdentifier = father.identifier && father.identifier[0].id
 }
 
-async function updateDuplicateCompositions(
+async function detectAndUpdateDuplicates(
   compositionIdentifier: string,
-  composition: fhir.Composition,
-  duplicates: string[]
+  body: ICompositionBody
 ) {
+  const duplicates = await detectDuplicates(compositionIdentifier, body)
+  if (!duplicates.length) {
+    return
+  }
+  logger.debug(
+    `Deduplication/service: ${duplicates.length} duplicate composition(s) found`
+  )
+
+  duplicates.push(compositionIdentifier)
+
+  return await updateDuplicateCompositions(duplicates)
+}
+
+async function updateDuplicateCompositions(duplicates: string[]) {
   const duplicateCompositions = await Promise.all(
     duplicates.map(duplicate => getCompositionByIdentifier(duplicate))
   )
@@ -144,8 +149,11 @@ async function updateDuplicateCompositions(
           return duplicate !== identifier
         }
       )
-      duplicatesForCurrentComposition.push(compositionIdentifier)
-      addDuplicatesToComposition(duplicatesForCurrentComposition, composition)
+
+      addDuplicatesToComposition(
+        duplicatesForCurrentComposition,
+        dupComposition
+      )
     })
   )
 }

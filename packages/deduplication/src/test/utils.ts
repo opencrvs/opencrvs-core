@@ -650,3 +650,33 @@ export const mockCompositionBody = {
   motherDoB: '1960-02-01',
   motherIdentifier: '22123123123123123'
 }
+
+export const mockCompositionEntry = {
+  resourceType: 'Bundle',
+  id: '9c0dde8d-65b2-49dd-8b7e-5dd0c7c63779',
+  meta: {
+    lastUpdated: '2019-01-14T10:58:20.694+00:00'
+  },
+  type: 'searchset',
+  total: 1,
+  link: [
+    {
+      relation: 'self',
+      url: 'http://localhost:3447/fhir/Composition?identifier=Bt40VoY'
+    }
+  ],
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Composition/7b381f4e-2864-441a-9146-faa3929eeaa8',
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'Bt40VoY'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary'
+      }
+    }
+  ]
+}

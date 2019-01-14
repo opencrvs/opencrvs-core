@@ -6,7 +6,7 @@ import {
 } from 'src/test/utils'
 import { searchComposition } from 'src/elasticsearch/dbhelper'
 
-jest.mock('./dbhelper.ts')
+jest.mock('src/elasticsearch/dbhelper.ts')
 
 describe('elastic search utils', async () => {
   it('should return an array of duplicate identifiers for a composition', async () => {
