@@ -19,7 +19,7 @@ injectGlobal`
   }
 `
 
-const { store, history } = createStore()
+export const { store, history } = createStore()
 
 function onNewConentAvailable(waitingSW: ServiceWorker) {
   const action = actions.showNewContentAvailableNotification(waitingSW)

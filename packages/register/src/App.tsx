@@ -36,6 +36,7 @@ import { client } from 'src/utils/apolloClient'
 import { USER_DETAILS } from 'src/utils/userUtils'
 import { MyRecords } from './views/MyRecords/MyRecords'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
+import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -99,6 +100,7 @@ export class App extends React.Component<IAppProps, IState> {
               <ThemeProvider theme={getTheme(config.COUNTRY)}>
                 <ConnectedRouter history={this.props.history}>
                   <ScrollToTop>
+                    <SessionExpireConfirmation />
                     <NotificationComponent>
                       <Page>
                         <LoadingData
