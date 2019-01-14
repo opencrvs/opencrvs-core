@@ -37,6 +37,18 @@ describe('when user wants to print certificate', async () => {
             fetchBirthRegistration: {
               id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
               child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Mokbul',
+                    familyName: 'Islam'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'নাম',
+                    familyName: 'নাম'
+                  }
+                ],
                 birthDate: '2014-02-15'
               },
               mother: {
@@ -94,9 +106,9 @@ describe('when user wants to print certificate', async () => {
         togglePrintCertificateSection={mock}
         printCertificateFormSection={formSection}
         IssuerDetails={{
-          name: '',
-          role: '',
-          issuedAt: ''
+          name: 'Some name',
+          role: 'Registrar',
+          issuedAt: 'some location'
         }}
       />,
       store,
@@ -109,6 +121,7 @@ describe('when user wants to print certificate', async () => {
     })
 
     testComponent.component.update()
+    console.debug(testComponent.component)
     const fields = collectCertificateFormSection.fields
     ;(fields[1] as IInformativeRadioGroupFormField).information = {
       // @ts-ignore
@@ -399,6 +412,18 @@ describe('when user wants to print certificate', async () => {
               fetchBirthRegistration: {
                 id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
                 child: {
+                  name: [
+                    {
+                      use: 'en',
+                      firstNames: 'Mokbul',
+                      familyName: 'Islam'
+                    },
+                    {
+                      use: 'bn',
+                      firstNames: 'নাম',
+                      familyName: 'নাম'
+                    }
+                  ],
                   birthDate: '2014-02-15'
                 },
                 mother: {
