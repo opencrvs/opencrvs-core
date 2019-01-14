@@ -694,6 +694,8 @@ export const ENGLISH_STATE = {
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     'register.workQueue.print.serviceYear':
       'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
+    'register.workQueue.print.service':
+      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
@@ -745,6 +747,14 @@ export const ENGLISH_STATE = {
       'An error occurred while fetching birth registration',
     'review.error.unauthorized': 'We are unable to display this page to you',
     'register.workQueue.buttons.newRegistration': 'New birth application',
-    'register.workQueue.buttons.reviewAndRegister': 'Review and Register'
+    'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
+    'register.work-queue.certificate.header':
+      'Receipt for Birth Certificate of',
+    'register.work-queue.certificate.subheader':
+      'Birth Registration after {DOBDiff} of D.o.B',
+    'register.work-queue.certificate.service': 'Service: ',
+    'register.work-queue.certificate.amount': 'Amount paid:\n\n',
+    'register.work-queue.certificate.issuer':
+      'Issued at: {issuedAt},\n By: {role}, {name}\n Date of payment: {dateOfPayment}'
   }
 }

@@ -235,7 +235,8 @@ export interface GQLRegWorkflow {
 export enum GQLRegStatus {
   DECLARED = 'DECLARED',
   REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED'
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED'
 }
 
 export interface GQLUser {

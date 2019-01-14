@@ -93,6 +93,11 @@ describe('when user wants to print certificate', async () => {
         registrationId="asdhdqe2472487jsdfsdf"
         togglePrintCertificateSection={mock}
         printCertificateFormSection={formSection}
+        IssuerDetails={{
+          name: '',
+          role: '',
+          issuedAt: ''
+        }}
       />,
       store,
       graphqlMock
@@ -224,6 +229,11 @@ describe('when user wants to print certificate', async () => {
         registrationId="asdhdqe2472487jsdfsdf"
         togglePrintCertificateSection={mock}
         printCertificateFormSection={formSection}
+        IssuerDetails={{
+          name: '',
+          role: '',
+          issuedAt: ''
+        }}
       />,
       store,
       graphqlMock
@@ -445,6 +455,11 @@ describe('when user wants to print certificate', async () => {
           registrationId="asdhdqe2472487jsdfsdf"
           togglePrintCertificateSection={mock}
           printCertificateFormSection={formSection}
+          IssuerDetails={{
+            name: '',
+            role: '',
+            issuedAt: ''
+          }}
         />,
         store,
         graphqlMock

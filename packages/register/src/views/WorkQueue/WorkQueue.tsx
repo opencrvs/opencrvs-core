@@ -49,6 +49,7 @@ import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
 import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
+import { getUserDetails } from 'src/profile/profileSelectors'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -305,6 +306,11 @@ const messages = defineMessages({
     id: 'register.workQueue.buttons.printCertificate',
     defaultMessage: 'Print Certificate',
     description: 'Print Certificate Button text'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    defaultMessage: 'Registrar',
+    description: 'The description for LOCAL_REGISTRAR role'
   }
 })
 
@@ -832,6 +838,29 @@ export class WorkQueueView extends React.Component<
     }
   }
 
+  getIssuerDetails() {
+    const { intl, userDetails, language } = this.props
+    let fullName = ''
+
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    }
+
+    return {
+      name: fullName,
+      role: userDetails.role
+        ? intl.formatMessage(messages[userDetails.role])
+        : '',
+      issuedAt:
+        userDetails.primaryOffice && userDetails.primaryOffice.name
+          ? userDetails.primaryOffice.name
+          : ''
+    }
+  }
+
   render() {
     const { intl, theme, printForm } = this.props
     const sortBy = {
@@ -929,6 +958,7 @@ export class WorkQueueView extends React.Component<
         ]
       }
     }
+
     return (
       <>
         <HomeViewHeader id="work_queue_header">
@@ -1009,6 +1039,7 @@ export class WorkQueueView extends React.Component<
             registrationId={(this.state.regId && this.state.regId) || ''}
             togglePrintCertificateSection={this.togglePrintModal}
             printCertificateFormSection={printForm}
+            IssuerDetails={this.getIssuerDetails()}
           />
         ) : null}
       </>
@@ -1019,7 +1050,7 @@ export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: state.profile.userDetails,
+    userDetails: getUserDetails(state),
     printForm: state.printCertificateForm.collectCertificateFrom
   }),
   { goToEvents: goToEventsAction, gotoTab: goToTabAction }
