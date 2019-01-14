@@ -9,7 +9,7 @@ import {
   getTrackingIdFromResponse,
   getBRNFromResponse
 } from 'src/features/fhir/utils'
-import { IAuthHeader } from 'src/common-types'
+// import { IAuthHeader } from 'src/common-types'
 
 const statusMap = {
   declared: 'preliminary',
@@ -22,9 +22,9 @@ export const resolvers: GQLResolver = {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
     async listBirthRegistrations(_, { status, locationIds }, authHeader) {
-      if (locationIds) {
+      /* if (locationIds) {
         return getCompositionsByLocation(locationIds, authHeader)
-      }
+      } */
       const bundle = await fetchFHIR(
         `/Composition${status ? `?status=${statusMap[status]}&` : '?'}_count=0`,
         authHeader
@@ -101,7 +101,7 @@ export const resolvers: GQLResolver = {
     }
   }
 }
-
+/*
 async function getCompositionsByLocation(
   locationIds: Array<string | null>,
   authHeader: IAuthHeader
@@ -141,4 +141,4 @@ async function getComposition(
       })
     ))
   )
-}
+}*/
