@@ -4,11 +4,13 @@ import { HEARTH_URL } from 'src/constants'
 import {
   modifyRegistrationBundle,
   markBundleAsRegistered,
+  markBundleAsCertified,
   setTrackingId
 } from './fhir/fhir-bundle-modifier'
 import { sendBirthNotification } from './utils'
 import { EVENT_TYPE } from './fhir/constants'
 import { getToken } from 'src/utils/authUtils'
+import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
 
 async function sendBundleToHearth(
@@ -49,10 +51,13 @@ export async function createBirthRegistrationHandler(
 
     const resBundle = await sendBundleToHearth(payload)
 
+    const msisdn = getSharedContactMsisdn(payload)
     /* sending notification to the contact */
-    sendBirthNotification(payload, {
-      Authorization: request.headers.authorization
-    })
+    if (msisdn) {
+      sendBirthNotification(payload, msisdn, {
+        Authorization: request.headers.authorization
+      })
+    }
 
     return resBundle
   } catch (error) {
@@ -70,26 +75,26 @@ export async function markBirthAsRegisteredHandler(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
-    /* hearth will do put calls if it finds id on the bundle */
-    const res = await fetch(HEARTH_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    })
-    if (!res.ok) {
-      throw new Error(
-        `FHIR post to /fhir failed with [${
-          res.status
-        }] body: ${await res.text()}`
-      )
-    }
     // TODO: need to send notification here
-
-    return res.json()
+    return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsRegisteredHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markBirthAsCertifiedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await markBundleAsCertified(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
   }
 }

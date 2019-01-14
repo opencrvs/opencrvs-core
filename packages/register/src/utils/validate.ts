@@ -69,6 +69,12 @@ export const messages = defineMessages({
     defaultMessage: 'Must contain only English characters',
     description:
       'The error message that appears when a non English character is used in an English name'
+  },
+  range: {
+    id: 'validations.range',
+    defaultMessage: 'Must be within {min} and {max}',
+    description:
+      'The error message that appears when an out of range value is used'
   }
 })
 
@@ -246,6 +252,12 @@ export const isValidEnglishName = (value: string): boolean => {
   return checkNameWords(value, isValidEnglishWord)
 }
 
+export const isValueWithinRange = (min: number, max: number) => (
+  value: number
+): boolean => {
+  return !isNaN(value) && value >= min && value <= max
+}
+
 export const bengaliOnlyNameFormat: Validation = (value: string) => {
   return isValidBengaliName(value)
     ? undefined
@@ -256,4 +268,10 @@ export const englishOnlyNameFormat: Validation = (value: string) => {
   return isValidEnglishName(value)
     ? undefined
     : { message: messages.englishOnlyNameFormat }
+}
+
+export const range = (min: number, max: number) => (value: string) => {
+  return isValueWithinRange(min, max)(parseFloat(value))
+    ? undefined
+    : { message: messages.range, props: { min, max } }
 }

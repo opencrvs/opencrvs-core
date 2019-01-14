@@ -6,6 +6,7 @@ import styled from '../styled-components'
 import { TopMenu } from '../components/TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
 import { ViewHeading, IViewHeadingProps } from '../components/ViewHeading'
+import ConnectivityStatus from './ConnectivityStatus'
 
 const StretchedHeader = styled(Header)`
   justify-content: flex-end;
@@ -31,6 +32,7 @@ export class ViewHeader extends React.Component<IViewHeadingProps> {
 
     return (
       <StretchedHeader {...otherProps}>
+        <ConnectivityStatus />
         {hideBackButton && <Logo />}
         <TopMenu hideBackButton={hideBackButton} />
         <ViewHeading {...{ title, description, breadcrumb, id }} />

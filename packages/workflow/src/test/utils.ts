@@ -276,6 +276,10 @@ export const testFhirBundleWithIds = {
           {
             system: 'http://opencrvs.org/specs/id/paper-form-id',
             value: '12345678'
+          },
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'B5WGYJE'
           }
         ],
         extension: [
@@ -361,7 +365,7 @@ export const testFhirTaskBundle = {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: 'DUMMY'
+            valueReference: { reference: 'DUMMY' }
           }
         ],
         note: [

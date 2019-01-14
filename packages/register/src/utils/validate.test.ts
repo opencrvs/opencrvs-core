@@ -9,7 +9,8 @@ import {
   dateFormat,
   emailAddressFormat,
   bengaliOnlyNameFormat,
-  englishOnlyNameFormat
+  englishOnlyNameFormat,
+  range
 } from './validate'
 
 describe('validate', () => {
@@ -105,6 +106,30 @@ describe('validate', () => {
       const goodValue = '1234567890'
       const response = undefined
       expect(minLength(10)(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('range. Used for fields that have a range limit', () => {
+    it('Should error when supplied a bad value. ', () => {
+      const badValue = '9'
+      const response = {
+        message: {
+          id: 'validations.range',
+          defaultMessage: 'Must be within {min} and {max}',
+          description:
+            'The error message that appears when an out of range value is used'
+        },
+        props: {
+          min: 0,
+          max: 6
+        }
+      }
+      expect(range(0, 6)(badValue)).toEqual(response)
+    })
+    it('should pass when supplied a good value. ', () => {
+      const goodValue = '5'
+      const response = undefined
+      expect(range(0, 6)(goodValue)).toEqual(response)
     })
   })
 

@@ -19,7 +19,7 @@ enum CONTACT {
 export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
-      'getSharedContactMsisdn: Invalid FHIR bundle found for declaration'
+      'phoneNumberExists: Invalid FHIR bundle found for declaration'
     )
   }
   const taskResource = getTaskResource(fhirBundle) as fhir.Task
@@ -38,7 +38,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
     !sharedContact.valueString ||
     Object.keys(CONTACT).indexOf(sharedContact.valueString.toUpperCase()) < 0
   ) {
-    throw new Error("Invalid Informant's shared contact information found")
+    return false
   }
 
   const contact = findPersonEntry(
@@ -46,9 +46,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
     fhirBundle
   )
   if (!contact || !contact.telecom) {
-    throw new Error(
-      "Didn't find any contact point for informant's shared contact"
-    )
+    return false
   }
   const phoneNumber = contact.telecom.find(
     (contactPoint: fhir.ContactPoint) => {
@@ -56,9 +54,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
     }
   )
   if (!phoneNumber) {
-    throw new Error(
-      "Didn't find any phone number for informant's shared contact"
-    )
+    return false
   }
   return phoneNumber.value
 }
@@ -102,6 +98,22 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
   return composition.identifier.value
 }
 
+export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
+  const trackingIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+      )
+    })
+  if (!trackingIdentifier || !trackingIdentifier.value) {
+    throw new Error("Didn't find any identifier for tracking id")
+  }
+  return trackingIdentifier.value
+}
+
 export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   const brnIdentifier =
     taskResource &&
@@ -116,6 +128,15 @@ export function getBirthRegistrationNumber(taskResource: fhir.Task) {
     throw new Error("Didn't find any identifier for birth registration number")
   }
   return brnIdentifier.value
+}
+
+export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
+  try {
+    getBirthRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
 export function getPaperFormID(taskResource: fhir.Task) {
@@ -180,4 +201,21 @@ export const getFromFhir = (suffix: string) => {
     .catch(error => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
+}
+
+export async function postToHearth(payload: any) {
+  /* hearth will do put calls if it finds id on the bundle */
+  const res = await fetch(HEARTH_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
+  if (!res.ok) {
+    throw new Error(
+      `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+  return res.json()
 }

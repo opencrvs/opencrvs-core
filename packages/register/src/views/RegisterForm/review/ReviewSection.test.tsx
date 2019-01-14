@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { ReviewSection } from './ReviewSection'
+import { ReviewSection, renderSelectDynamicLabel } from './ReviewSection'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from 'src/store'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent, mockOfflineData, intl } from 'src/tests/util'
 import { createDraft } from 'src/drafts'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 
@@ -72,5 +72,37 @@ describe('when user is in the review page', () => {
       .hostNodes()
       .simulate('click')
     expect(mockHandler).toHaveBeenCalled()
+  })
+})
+describe('return the correct label on dynamic fields', () => {
+  it('Should return the Bengali label', () => {
+    expect(
+      renderSelectDynamicLabel(
+        '8cbc862a-b817-4c29-a490-4a8767ff023c',
+        { resource: 'locations', dependency: 'countryPermanent' },
+        {
+          countryPermanent: 'BGD',
+          statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+        },
+        intl,
+        { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
+        'bn'
+      )
+    ).toBe('চট্টগ্রাম')
+  })
+  it('Should return the English label', () => {
+    expect(
+      renderSelectDynamicLabel(
+        '8cbc862a-b817-4c29-a490-4a8767ff023c',
+        { resource: 'locations', dependency: 'countryPermanent' },
+        {
+          countryPermanent: 'BGD',
+          statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+        },
+        intl,
+        { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
+        'en'
+      )
+    ).toBe('Chittagong')
   })
 })

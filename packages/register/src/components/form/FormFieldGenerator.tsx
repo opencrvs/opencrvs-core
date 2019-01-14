@@ -52,6 +52,7 @@ import {
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
+import { IOfflineDataState } from 'src/offline/reducer'
 
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
@@ -128,7 +129,6 @@ function GeneratedInputField({
       </InputField>
     )
   }
-
   if (fieldDefinition.type === RADIO_GROUP) {
     return (
       <InputField {...inputFieldProps}>
@@ -201,11 +201,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === SUBSECTION) {
-    return (
-      <InputField {...inputFieldProps}>
-        <SubSectionDivider label={fieldDefinition.label} />
-      </InputField>
-    )
+    return <SubSectionDivider label={fieldDefinition.label} />
   }
   if (fieldDefinition.type === PARAGRAPH) {
     const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
@@ -229,6 +225,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <TextInput
           type="number"
+          pattern="[0-9]*"
           step={fieldDefinition.step}
           {...inputProps}
           value={inputProps.value as string}
@@ -276,6 +273,7 @@ interface IFormSectionProps {
   fields: IFormField[]
   id: string
   setAllFieldsDirty: boolean
+  offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
 }
 
@@ -299,7 +297,7 @@ class FormSectionComponent extends React.Component<Props> {
       }
     }
   }
-  componentDidMount() {
+  async componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
     }
@@ -327,7 +325,14 @@ class FormSectionComponent extends React.Component<Props> {
     }
   }
   render() {
-    const { values, fields, setFieldValue, touched, intl } = this.props
+    const {
+      values,
+      fields,
+      setFieldValue,
+      touched,
+      offlineResources,
+      intl
+    } = this.props
 
     const errors = (this.props.errors as any) as {
       [key: string]: IValidationResult[]
@@ -375,7 +380,8 @@ class FormSectionComponent extends React.Component<Props> {
                   type: SELECT_WITH_OPTIONS,
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
-                    values
+                    values,
+                    offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
               : field

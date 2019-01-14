@@ -7,7 +7,7 @@ import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
-  DOCS_CODE,
+  ATTACHMENT_DOCS_CODE,
   BIRTH_ENCOUNTER_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
@@ -129,7 +129,10 @@ export const typeResolvers: GQLResolver = {
         `/${task.focus.reference}`,
         authHeader
       )
-      const docSection = findCompositionSection(DOCS_CODE, composition)
+      const docSection = findCompositionSection(
+        ATTACHMENT_DOCS_CODE,
+        composition
+      )
       if (!docSection || !docSection.entry) {
         return null
       }
@@ -231,10 +234,10 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
       )
-      if (!user) {
+      if (!user || !user.valueReference) {
         return null
       }
-      return await fetchFHIR(`/${user.valueReference}`, authHeader)
+      return await fetchFHIR(`/${user.valueReference.reference}`, authHeader)
     },
 
     timestamp: task => task.lastModified,
@@ -244,10 +247,13 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension
       )
-      if (!taskLocation) {
+      if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return await fetchFHIR(`/${taskLocation.valueReference}`, authHeader)
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
     }
   },
   User: {
@@ -333,6 +339,64 @@ export const typeResolvers: GQLResolver = {
   },
 
   BirthRegistration: {
+    async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+      // Preparing Encounter
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      const encounterReference =
+        encounterSection &&
+        encounterSection.entry &&
+        encounterSection.entry[0].reference
+
+      if (!encounterReference) {
+        return null
+      }
+
+      const observation = {}
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterReference}`,
+        authHeader
+      )
+
+      if (observations) {
+        const observationKeys = {
+          weightAtBirth: BODY_WEIGHT_CODE,
+          birthType: BIRTH_TYPE_CODE,
+          attendantAtBirth: BIRTH_ATTENDANT_CODE,
+          birthRegistrationType: BIRTH_REG_TYPE_CODE,
+          presentAtBirthRegistration: BIRTH_REG_PRESENT_CODE,
+          childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
+          foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
+          lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
+        }
+        observations.entry.map(
+          (item: fhir.Observation & { resource: fhir.Observation }) => {
+            if (
+              item.resource &&
+              item.resource.code.coding &&
+              item.resource.code.coding[0] &&
+              item.resource.code.coding[0].code
+            ) {
+              const itemCode = item.resource.code.coding[0].code
+              const observationKey = Object.keys(observationKeys).find(
+                key => observationKeys[key] === itemCode
+              )
+              if (observationKey) {
+                observation[observationKey] = item.resource.id
+              }
+            }
+          }
+        )
+      }
+
+      return {
+        composition: composition.id,
+        encounter: encounterReference.split('/')[1],
+        observation
+      }
+    },
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },

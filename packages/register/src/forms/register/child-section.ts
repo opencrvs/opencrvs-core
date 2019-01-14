@@ -10,6 +10,7 @@ import {
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
+  range,
   dateFormat
 } from 'src/utils/validate'
 
@@ -122,38 +123,38 @@ const messages = defineMessages({
     defaultMessage: 'Other',
     description: 'Label for form field: Attendant at birth'
   },
-  typeOfBirth: {
-    id: 'formFields.typeOfBirth',
+  birthType: {
+    id: 'formFields.birthType',
     defaultMessage: 'Type of birth',
     description: 'Label for form field: Type of birth'
   },
-  typeOfBirthSingle: {
-    id: 'formFields.typeOfBirthSingle',
+  birthTypeSingle: {
+    id: 'formFields.birthTypeSingle',
     defaultMessage: 'Single',
     description: 'Label for form field: Type of birth'
   },
-  typeOfBirthTwin: {
-    id: 'formFields.typeOfBirthTwin',
+  birthTypeTwin: {
+    id: 'formFields.birthTypeTwin',
     defaultMessage: 'Twin',
     description: 'Label for form field: Type of birth'
   },
-  typeOfBirthTriplet: {
-    id: 'formFields.typeOfBirthTriplet',
+  birthTypeTriplet: {
+    id: 'formFields.birthTypeTriplet',
     defaultMessage: 'Triplet',
     description: 'Label for form field: Type of birth'
   },
-  typeOfBirthQuadruplet: {
-    id: 'formFields.typeOfBirthQuadruplet',
+  birthTypeQuadruplet: {
+    id: 'formFields.birthTypeQuadruplet',
     defaultMessage: 'Quadruplet',
     description: 'Label for form field: Type of birth'
   },
-  typeOfBirthHigherMultipleDelivery: {
-    id: 'formFields.typeOfBirthHigherMultipleDelivery',
+  birthTypeHigherMultipleDelivery: {
+    id: 'formFields.birthTypeHigherMultipleDelivery',
     defaultMessage: 'Higher multiple delivery',
     description: 'Label for form field: Type of birth'
   },
-  orderOfBirth: {
-    id: 'formFields.orderOfBirth',
+  multipleBirth: {
+    id: 'formFields.multipleBirth',
     defaultMessage: 'Order of birth (number)',
     description: 'Label for form field: Order of birth'
   },
@@ -162,8 +163,8 @@ const messages = defineMessages({
     defaultMessage: 'Weight at birth',
     description: 'Label for form field: Weight at birth'
   },
-  placeOfDelivery: {
-    id: 'formFields.placeOfDelivery',
+  placeOfBirth: {
+    id: 'formFields.placeOfBirth',
     defaultMessage: 'Place of delivery',
     description: 'Label for form field: Place of delivery'
   },
@@ -238,7 +239,7 @@ export const childSection: IFormSection = {
       name: 'familyNameEng',
       type: TEXT,
       label: messages.childFamilyNameEng,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
@@ -257,7 +258,7 @@ export const childSection: IFormSection = {
       ]
     },
     {
-      name: 'childBirthDate',
+      name: 'birthDate',
       type: DATE,
       label: messages.childDateOfBirth,
       required: true,
@@ -268,7 +269,7 @@ export const childSection: IFormSection = {
       name: 'attendantAtBirth',
       type: SELECT_WITH_OPTIONS,
       label: messages.attendantAtBirth,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
@@ -285,27 +286,27 @@ export const childSection: IFormSection = {
       ]
     },
     {
-      name: 'typeOfBirth',
+      name: 'birthType',
       type: SELECT_WITH_OPTIONS,
-      label: messages.typeOfBirth,
-      required: true,
+      label: messages.birthType,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
-        { value: 'SINGLE', label: messages.typeOfBirthSingle },
-        { value: 'TWIN', label: messages.typeOfBirthTwin },
-        { value: 'TRIPLET', label: messages.typeOfBirthTriplet },
-        { value: 'QUADRUPLET', label: messages.typeOfBirthQuadruplet },
+        { value: 'SINGLE', label: messages.birthTypeSingle },
+        { value: 'TWIN', label: messages.birthTypeTwin },
+        { value: 'TRIPLET', label: messages.birthTypeTriplet },
+        { value: 'QUADRUPLET', label: messages.birthTypeQuadruplet },
         {
           value: 'HIGHER_MULTIPLE_DELIVERY',
-          label: messages.typeOfBirthHigherMultipleDelivery
+          label: messages.birthTypeHigherMultipleDelivery
         }
       ]
     },
     {
-      name: 'orderOfBirth',
+      name: 'multipleBirth',
       type: NUMBER,
-      label: messages.orderOfBirth,
+      label: messages.multipleBirth,
       required: true,
       initialValue: '',
       validate: []
@@ -315,15 +316,16 @@ export const childSection: IFormSection = {
       type: NUMBER,
       step: 0.01,
       label: messages.weightAtBirth,
-      required: true,
+      required: false,
       initialValue: '',
-      validate: [],
+      validate: [range(0, 6)],
       postfix: 'Kg'
     },
     {
-      name: 'placeOfDelivery',
+      name: 'placeOfBirth',
       type: SELECT_WITH_OPTIONS,
-      label: messages.placeOfDelivery,
+      label: messages.placeOfBirth,
+      required: false,
       initialValue: '',
       validate: [],
       options: [
@@ -340,6 +342,7 @@ export const childSection: IFormSection = {
       name: 'deliveryInstitution',
       type: SELECT_WITH_OPTIONS,
       label: messages.deliveryInstitution,
+      required: false,
       initialValue: '',
       validate: [],
       options: [{ value: '?', label: messages.deliveryInstitution }]
@@ -348,6 +351,7 @@ export const childSection: IFormSection = {
       name: 'deliveryAddress',
       type: TEXTAREA,
       label: messages.deliveryAddress,
+      required: false,
       initialValue: '',
       validate: [],
       disabled: true

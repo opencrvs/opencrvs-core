@@ -1,8 +1,10 @@
 import * as Hapi from 'hapi'
 import {
   createBirthRegistrationHandler,
-  markBirthAsRegisteredHandler
+  markBirthAsRegisteredHandler,
+  markBirthAsCertifiedHandler
 } from '../registration/handler'
+import { hasBirthRegistrationNumber } from '../registration/fhir/fhir-utils'
 import updateTaskHandler from '../task/handler'
 import { HEARTH_URL } from 'src/constants'
 import fetch, { RequestInit } from 'node-fetch'
@@ -33,8 +35,11 @@ function detectEvent(request: Hapi.Request): Events {
       const firstEntry = fhirBundle.entry[0].resource
       if (firstEntry.resourceType === 'Composition') {
         if (firstEntry.id) {
-          // might need to switch between mark as registered and update registration here eventually
-          return Events.BIRTH_MARK_REG
+          if (!hasBirthRegistrationNumber(fhirBundle)) {
+            return Events.BIRTH_MARK_REG
+          } else {
+            return Events.BIRTH_MARK_CERT
+          }
         } else {
           return Events.BIRTH_NEW_DEC
         }
@@ -106,6 +111,9 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.BIRTH_MARK_REG:
       response = await markBirthAsRegisteredHandler(request, h)
+      break
+    case Events.BIRTH_MARK_CERT:
+      response = await markBirthAsCertifiedHandler(request, h)
       break
     case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h)

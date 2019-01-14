@@ -35,6 +35,7 @@ import {
   StatusOrange,
   StatusGreen,
   StatusCollected,
+  StatusRejected,
   Duplicate
 } from '@opencrvs/components/lib/icons'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
@@ -281,6 +282,11 @@ const messages = defineMessages({
     description:
       'Label for the workflow timestamp when the status is registered'
   },
+  workflowStatusDateRejected: {
+    id: 'register.workQueue.listItem.status.dateLabel.rejected',
+    defaultMessage: 'Rejected on',
+    description: 'Label for the workflow timestamp when the status is rejected'
+  },
   workflowStatusDateCollected: {
     id: 'register.workQueue.listItem.status.dateLabel.collected',
     defaultMessage: 'Collected on',
@@ -496,6 +502,12 @@ export class WorkQueueView extends React.Component<
             <StatusGreen />
           </StatusIcon>
         )
+      case 'REJECTED':
+        return (
+          <StatusIcon>
+            <StatusRejected />
+          </StatusIcon>
+        )
       case 'COLLECTED':
         return (
           <StatusIcon>
@@ -517,6 +529,8 @@ export class WorkQueueView extends React.Component<
         return messages.workflowStatusDateApplication
       case 'REGISTERED':
         return messages.workflowStatusDateRegistered
+      case 'REJECTED':
+        return messages.workflowStatusDateRejected
       case 'COLLECTED':
         return messages.workflowStatusDateCollected
       default:
@@ -666,6 +680,7 @@ export class WorkQueueView extends React.Component<
     key: number
   ): JSX.Element => {
     const applicationIsRegistered = item.declaration_status === 'REGISTERED'
+    const applicationIsRejected = item.declaration_status === 'REJECTED'
     const info = []
     const status = []
     const icons = []
@@ -729,7 +744,11 @@ export class WorkQueueView extends React.Component<
     }
 
     if (this.userHasRegisterScope()) {
-      if (!item.duplicates && !applicationIsRegistered) {
+      if (
+        !item.duplicates &&
+        !applicationIsRegistered &&
+        !applicationIsRejected
+      ) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
           handler: () =>
@@ -753,7 +772,7 @@ export class WorkQueueView extends React.Component<
       }
     }
 
-    if (item.duplicates && !applicationIsRegistered) {
+    if (item.duplicates && !applicationIsRegistered && !applicationIsRejected) {
       listItemActions.push({
         label: this.props.intl.formatMessage(messages.reviewDuplicates),
         handler: () => console.log('TO DO')
