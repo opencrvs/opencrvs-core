@@ -13,7 +13,7 @@ const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-interface IPDFViewerProps {
+interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {
   pdfSource: string
 }
 
@@ -39,11 +39,11 @@ class PDFViewer extends React.Component<IPDFViewerProps, IPDFViewerState> {
   }
 
   render() {
-    const { pdfSource } = this.props
+    const { pdfSource, ...otherProps } = this.props
     const { currentPage, numPages } = this.state
 
     return (
-      <Container>
+      <Container {...otherProps}>
         <Document
           loading={<Spinner id="pdf-loader-spinner" />}
           file={pdfSource}
