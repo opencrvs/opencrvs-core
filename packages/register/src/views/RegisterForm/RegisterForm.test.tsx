@@ -93,7 +93,7 @@ describe('when user is in the register form', async () => {
     it('changes the country select', async () => {
       const select = selectOption(
         component,
-        '#country',
+        '#countryPermanent',
         'United States of America'
       )
       expect(component.find(select).text()).toEqual('United States of America')

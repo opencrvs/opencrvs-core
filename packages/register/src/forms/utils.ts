@@ -16,6 +16,12 @@ import {
 } from './'
 import { InjectedIntl } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
+import {
+  IOfflineDataState,
+  OFFLINE_LOCATIONS_KEY,
+  ILocation
+} from 'src/offline/reducer'
+import { config } from 'src/config'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -51,25 +57,56 @@ export const internationaliseOptions = (
   })
 }
 
+export const generateOptionsFromLocations = (
+  locations: ILocation[]
+): ISelectOption[] => {
+  const optionsArray: ISelectOption[] = []
+  locations.forEach((location: ILocation, index: number) => {
+    optionsArray.push({
+      value: location.id,
+      label: {
+        id: `location.${location.id}`,
+        defaultMessage: location.name,
+        description: `Location select item for ${location.id}`
+      }
+    })
+  })
+  return optionsArray
+}
+
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
-  values: IFormSectionData
+  values: IFormSectionData,
+  resources?: IOfflineDataState
 ) => {
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (!dependencyVal) {
     return []
   }
-
-  const options = field.dynamicOptions.options[dependencyVal]
-  if (!options) {
-    throw new Error(
-      `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object. Option keys are ${Object.keys(
-        field.dynamicOptions.options
-      )}`
+  if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
+    const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+    let partOf: string
+    if (dependencyVal === config.COUNTRY.toUpperCase()) {
+      partOf = 'Location/0'
+    } else {
+      partOf = `Location/${dependencyVal}`
+    }
+    return generateOptionsFromLocations(
+      locations.filter((location: ILocation) => {
+        return location.partOf === partOf
+      })
     )
+  } else {
+    let options
+    if (!field.dynamicOptions.options) {
+      throw new Error(
+        `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object.`
+      )
+    } else {
+      options = field.dynamicOptions.options[dependencyVal]
+    }
+    return options
   }
-
-  return options
 }
 
 export const getConditionalActionsForField = (
@@ -112,6 +149,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: 'values.addressSameAsMother'
   },
+  currentAddressSameAsPermanent: {
+    action: 'hide',
+    expression: 'values.currentAddressSameAsPermanent'
+  },
   countryPermanent: {
     action: 'hide',
     expression: '!values.countryPermanent'
@@ -128,9 +169,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.addressLine4Permanent'
   },
-  addressLine3Options1Permanent: {
+  addressLine3Permanent: {
     action: 'hide',
-    expression: '!values.addressLine3Options1Permanent'
+    expression: '!values.addressLine3Permanent'
   },
   country: {
     action: 'hide',
@@ -148,9 +189,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.addressLine4'
   },
-  addressLine3Options1: {
+  addressLine3: {
     action: 'hide',
-    expression: '!values.addressLine3Options1'
+    expression: '!values.addressLine3'
   },
   uploadDocForWhom: {
     action: 'hide',

@@ -333,7 +333,6 @@ type Registration {
   id: ID!
   trackingId: String
   registrationNumber: String
-  paperFormID: String
   bookId: ID
   status: [RegWorkflow]
   type: RegistrationType
@@ -345,7 +344,6 @@ type Registration {
 input RegistrationInput {
   trackingId: String
   registrationNumber: String
-  paperFormID: String
   bookId: ID
   status: [RegWorkflowInput]
   type: RegistrationType

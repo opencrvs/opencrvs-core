@@ -173,7 +173,6 @@ describe('ReviewForm tests', async () => {
                 contact: 'MOTHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -337,10 +336,6 @@ describe('ReviewForm tests', async () => {
                   {
                     system: 'phone',
                     value: '01711111111'
-                  },
-                  {
-                    system: 'email',
-                    value: 'ajmol@ocrvs.com'
                   }
                 ],
                 id: '526362a1-aa8e-4848-af35-41524f9e7e85'
@@ -350,7 +345,6 @@ describe('ReviewForm tests', async () => {
                 contact: 'FATHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -392,7 +386,7 @@ describe('ReviewForm tests', async () => {
       .find(RegisterForm)
       .prop('draft') as IDraft
 
-    expect(data.data.registration.registrationEmail).toBe('ajmol@ocrvs.com')
+    expect(data.data.registration.registrationPhone).toBe('01711111111')
     testComponent.component.unmount()
   })
 
@@ -427,7 +421,6 @@ describe('ReviewForm tests', async () => {
                 contact: 'MOTHER',
                 attachments: null,
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: '12345'
               },
@@ -470,7 +463,7 @@ describe('ReviewForm tests', async () => {
       .find(RegisterForm)
       .prop('draft') as IDraft
 
-    expect(data.data.registration.registrationEmail).toBeUndefined()
+    expect(data.data.registration.registrationPhone).toBeUndefined()
 
     testComponent.component.unmount()
   })
@@ -513,7 +506,6 @@ describe('ReviewForm tests', async () => {
                   }
                 ],
                 status: null,
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -634,10 +626,6 @@ describe('ReviewForm tests', async () => {
                   {
                     system: 'phone',
                     value: '01711111111'
-                  },
-                  {
-                    system: 'email',
-                    value: 'moyna@ocrvs.com'
                   }
                 ],
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
@@ -656,7 +644,6 @@ describe('ReviewForm tests', async () => {
                     ]
                   }
                 ],
-                paperFormID: '123',
                 trackingId: 'B123456',
                 registrationNumber: null
               },
@@ -704,8 +691,6 @@ describe('ReviewForm tests', async () => {
       whoseContactDetails: 'MOTHER',
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationPhone: '01711111111',
-      registrationEmail: 'moyna@ocrvs.com',
-      paperFormNumber: '123',
       commentsOrNotes: 'This is a note',
       trackingId: 'B123456',
       registrationNumber: null
@@ -729,7 +714,6 @@ describe('ReviewForm tests', async () => {
       },
       registration: {
         presentAtBirthRegistration: 'MOTHER_ONLY',
-        registrationEmail: 'moyna@ocrvs.com',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER'
       }
@@ -780,7 +764,6 @@ describe('ReviewForm tests', async () => {
       },
       registration: {
         presentAtBirthRegistration: 'MOTHER_ONLY',
-        registrationEmail: 'moyna@ocrvs.com',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER'
       }
@@ -811,8 +794,7 @@ describe('ReviewForm tests', async () => {
                 registration: {
                   contact: 'MOTHER',
                   attachments: null,
-                  status: null,
-                  paperFormID: '123'
+                  status: null
                 },
                 attendantAtBirth: 'NURSE',
                 weightAtBirth: 2,

@@ -210,6 +210,9 @@ describe('Verify getBirthRegistrationNumber', () => {
         { status: 200 }
       ]
     )
+    const birthTrackingId = 'B5WGYJE'
+    const brnChecksum = 1
+    testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
     const taskResource = await pushBRN(
       testFhirBundle.entry[1].resource as fhir.Task,
       practitioner
@@ -218,7 +221,9 @@ describe('Verify getBirthRegistrationNumber', () => {
 
     expect(brn).toBeDefined()
     expect(brn).toMatch(
-      new RegExp(`^${new Date().getFullYear()}10342112345678`)
+      new RegExp(
+        `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+      )
     )
   })
 

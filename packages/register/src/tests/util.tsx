@@ -69,7 +69,7 @@ const intlProvider = new IntlProvider(
   { locale: 'en', messages: ENGLISH_STATE.messages },
   {}
 )
-const { intl } = intlProvider.getChildContext()
+export const { intl } = intlProvider.getChildContext()
 
 function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
   return React.cloneElement(node, { intl })
@@ -201,7 +201,7 @@ export const mockApplicationData = {
     districtPermanent: 'district2',
     addressLine1Permanent: '',
     addressLine2Permanent: '',
-    addressLine3Options1Permanent: '',
+    addressLine3Permanent: '',
     addressLine4Permanent: 'upazila1',
     postalCodePermanent: '',
     country: 'BGD',
@@ -209,7 +209,7 @@ export const mockApplicationData = {
     district: 'district2',
     addressLine1: '',
     addressLine2: '',
-    addressLine3Options1: '',
+    addressLine3: '',
     addressLine4: 'upazila2',
     postalCode: ''
   },
@@ -231,7 +231,7 @@ export const mockApplicationData = {
     districtPermanent: 'district2',
     addressLine1Permanent: '',
     addressLine2Permanent: '',
-    addressLine3Options1Permanent: '',
+    addressLine3Permanent: '',
     addressLine4Permanent: 'upazila1',
     postalCodePermanent: '',
     country: 'BGD',
@@ -239,7 +239,7 @@ export const mockApplicationData = {
     district: 'district2',
     addressLine1: '',
     addressLine2: '',
-    addressLine3Options1: '',
+    addressLine3: '',
     addressLine4: 'upazila2',
     postalCode: '',
     permanentAddressSameAsMother: true,
@@ -248,7 +248,200 @@ export const mockApplicationData = {
   registration: {
     whoseContactDetails: 'MOTHER',
     presentAtBirthRegistration: 'BOTH_PARENTS',
-    registrationPhone: '01557394986',
-    registrationEmail: 'test@tester.com'
+    registrationPhone: '01557394986'
   }
+}
+
+export const mockOfflineData = {
+  locations: [
+    {
+      id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+      name: 'Barisal',
+      nameBn: 'বরিশাল',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
+      name: 'Chittagong',
+      nameBn: 'চট্টগ্রাম',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+      name: 'Dhaka',
+      nameBn: 'ঢাকা',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: '7304b306-1b0d-4640-b668-5bf39bc78f48',
+      name: 'Khulna',
+      nameBn: 'খুলনা',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a',
+      name: 'Rajshahi',
+      nameBn: 'রাজশাহী',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: '2b55d13f-f700-4373-8255-c0febd4733b6',
+      name: 'Rangpur',
+      nameBn: 'রংপুর',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: '59f7f044-84b8-4a6c-955d-271aa3e5af46',
+      name: 'Sylhet',
+      nameBn: 'সিলেট',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: '237f3404-d417-41fe-9130-3d049800a1e5',
+      name: 'Mymensingh',
+      nameBn: 'ময়মনসিংহ',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    },
+    {
+      id: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+      name: 'BARGUNA',
+      nameBn: 'বরগুনা',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+    },
+    {
+      id: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
+      name: 'BARISAL',
+      nameBn: 'বরিশাল',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+    },
+    {
+      id: 'a5b61fc5-f0c9-4f54-a934-eba18f9110c2',
+      name: 'BHOLA',
+      nameBn: 'ভোলা',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+    },
+    {
+      id: '5ffa5780-5ddf-4549-a391-7ad3ba2334d4',
+      name: 'JHALOKATI',
+      nameBn: 'ঝালকাঠি',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+    },
+    {
+      id: 'c8dcf1fe-bf92-404b-81c0-31d6802a1a68',
+      name: 'PATUAKHALI',
+      nameBn: 'পটুয়াখালী ',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+    },
+    {
+      id: '9c86160a-f704-464a-8b7d-9eae2b4cf1f9',
+      name: 'PIROJPUR',
+      nameBn: 'পিরোজপুর ',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+    },
+    {
+      id: '1846f07e-6f5c-4507-b5d6-126716b0856b',
+      name: 'BANDARBAN',
+      nameBn: 'বান্দরবান',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    {
+      id: 'cf141982-36a1-4308-9090-0445c311f5ae',
+      name: 'BRAHMANBARIA',
+      nameBn: 'ব্রাহ্মণবাড়িয়া',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    {
+      id: '478f518e-8d86-439d-8618-5cfa8d3bf5dd',
+      name: 'CHANDPUR',
+      nameBn: 'চাঁদপুর',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    {
+      id: 'db5faba3-8143-4924-a44a-8562ed5e0437',
+      name: 'CHITTAGONG',
+      nameBn: 'চট্টগ্রাম',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    {
+      id: '5926982b-845c-4463-80aa-cbfb86762e0a',
+      name: 'COMILLA',
+      nameBn: 'কুমিল্লা',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    {
+      id: 'a3455e64-164c-4bf4-b834-16640a85efd8',
+      name: "COX'S BAZAR",
+      nameBn: 'কক্সবাজার ',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    {
+      id: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+      name: 'FENI',
+      nameBn: 'ফেনী',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    }
+  ]
 }

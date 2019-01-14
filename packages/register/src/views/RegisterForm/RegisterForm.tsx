@@ -24,6 +24,8 @@ import processDraftData from './ProcessDraftData'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
+import { getOfflineState } from 'src/offline/selectors'
+import { IOfflineDataState } from 'src/offline/reducer'
 import {
   SAVED_REGISTRATION,
   REJECTED_REGISTRATION
@@ -149,6 +151,7 @@ type DispatchProps = {
 type Props = {
   activeSection: IFormSection
   setAllFieldsDirty: boolean
+  offlineResources: IOfflineDataState
 }
 
 type FullProps = IFormProps &
@@ -346,6 +349,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       history,
       registerForm,
+      offlineResources,
       handleSubmit
     } = this.props
     const isReviewForm = draft.review
@@ -430,6 +434,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     onChange={this.modifyDraft}
                     setAllFieldsDirty={setAllFieldsDirty}
                     fields={activeSection.fields}
+                    offlineResources={offlineResources}
                   />
                 </form>
                 <FormAction>
@@ -593,9 +598,12 @@ function mapStateToProps(
     draft.data[activeSectionId] || {}
   )
 
+  const offlineResources = getOfflineState(state)
+
   return {
     registerForm,
     setAllFieldsDirty,
+    offlineResources,
     activeSection: {
       ...activeSection,
       fields
