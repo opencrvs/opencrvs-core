@@ -662,6 +662,10 @@ export const ENGLISH_STATE: ILanguage = {
       'An error occurred while fetching birth registration',
     'review.error.unauthorized': 'We are unable to display this page to you',
     'register.workQueue.buttons.newRegistration': 'New birth application',
-    'register.workQueue.buttons.reviewAndRegister': 'Review and Register'
+    'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
+    'register.duplicates.title': 'Possible duplicates found',
+    'register.duplicates.description':
+      'The following application has been flagged as a possible duplicate of an existing registered record.',
+    'register.duplicates.pageTitle': 'Possible duplicate'
   }
 }

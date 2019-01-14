@@ -655,6 +655,10 @@ export const BENGALI_STATE: ILanguage = {
       'জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে',
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'register.workQueue.labels.results.birthRegistrationNumber':
-      'জন্ম নিবন্ধন সংখ্যা'
+      'জন্ম নিবন্ধন সংখ্যা',
+    'register.duplicates.title': 'Possible duplicates found',
+    'register.duplicates.description':
+      'The following application has been flagged as a possible duplicate of an existing registered record.',
+    'register.duplicates.pageTitle': 'Possible duplicate'
   }
 }
