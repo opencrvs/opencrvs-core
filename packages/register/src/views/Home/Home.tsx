@@ -3,7 +3,10 @@ import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { goToEvents as goToEventsAction } from 'src/navigation'
+import {
+  goToEvents as goToEventsAction,
+  goToMyRecords as goToMyRecordsAction
+} from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import {
   Banner,
@@ -151,6 +154,7 @@ interface IHomeProps {
   language: string
   userDetails: IUserDetails
   goToEvents: typeof goToEventsAction
+  goToMyRecords: typeof goToMyRecordsAction
 }
 
 type FullProps = IHomeProps & InjectedIntlProps & ISearchInputProps
@@ -201,6 +205,7 @@ class HomeView extends React.Component<FullProps> {
             <CountAction
               id="records"
               count={'10'}
+              onClick={this.props.goToMyRecords}
               title={intl.formatMessage(messages.records)}
             />
             <SearchInput
@@ -232,5 +237,8 @@ const mapStateToProps = (store: IStoreState) => {
 }
 export const Home = connect(
   mapStateToProps,
-  { goToEvents: goToEventsAction }
+  {
+    goToEvents: goToEventsAction,
+    goToMyRecords: goToMyRecordsAction
+  }
 )(injectIntl(HomeView))

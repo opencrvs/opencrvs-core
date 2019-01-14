@@ -93,3 +93,13 @@ services:
       - LANGUAGE=bn
     deploy:
       replicas: 2
+
+  resources:
+    image: jembi/ocrvs-resources:latest
+    build: packages/resources
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=DEVELOPMENT
+      - ADMINISTRATIVE_STRUCTURE_URL=http://174.136.37.245:8090/gen
+    deploy:
+      replicas: 2

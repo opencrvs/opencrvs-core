@@ -100,6 +100,7 @@ export async function getLoggedInPractitionerResource(
     Authorization: `Bearer ${token}`
   })
   const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
+  console.log(`/Practitioner?telecom=phone|${localMobile}`)
   const practitionerBundle = await getFromFhir(
     `/Practitioner?telecom=phone|${localMobile}`
   )

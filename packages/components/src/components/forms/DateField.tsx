@@ -96,9 +96,17 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
         { [segmentType]: val } as Pick<IState, 'dd' | 'mm' | 'yyyy'>,
         () => {
           if (this.props.onChange) {
-            this.props.onChange(
-              `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
-            )
+            if (
+              this.state.yyyy === '' &&
+              this.state.mm === '' &&
+              this.state.dd === ''
+            ) {
+              this.props.onChange('')
+            } else {
+              this.props.onChange(
+                `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
+              )
+            }
           }
         }
       )

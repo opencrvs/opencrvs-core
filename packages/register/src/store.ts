@@ -15,7 +15,7 @@ import {
 } from 'react-router-redux'
 
 import { profileReducer, ProfileState } from './profile/profileReducer'
-
+import { offlineDataReducer, IOfflineDataState } from './offline/reducer'
 import { intlReducer, IntlState } from './i18n/reducer'
 import { draftsReducer, IDraftsState } from 'src/drafts'
 import {
@@ -51,6 +51,7 @@ export interface IStoreState {
   reviewForm: IReviewFormState
   printCertificateForm: IPrintFormState
   reject: IRejectState
+  offline: IOfflineDataState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -63,7 +64,8 @@ const reducers = combineReducers<IStoreState>({
   notification: notificationReducer,
   reviewForm: reviewReducer,
   reject: rejectReducer,
-  printCertificateForm: printReducer
+  printCertificateForm: printReducer,
+  offline: offlineDataReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator
