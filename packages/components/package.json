@@ -9,6 +9,7 @@
     "react": "^16.3.2",
     "react-docgen-typescript": "^1.7.0",
     "react-dom": "^16.3.2",
+    "react-pdf": "^4.0.2",
     "react-select": "^2.0.0",
     "react-styleguidist": "^7.0.13",
     "recharts": "^1.4.0",
