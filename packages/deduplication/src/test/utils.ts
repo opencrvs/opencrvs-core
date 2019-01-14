@@ -83,6 +83,24 @@ export const mockFhirBundle = {
             ]
           },
           {
+            title: "Father's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'father-details'
+                }
+              ],
+              text: "Father's details"
+            },
+            text: '',
+            entry: [
+              {
+                reference: 'urn:uuid:d59fb3c1-4585-484f-9083-04088bfcdafb'
+              }
+            ]
+          },
+          {
             title: 'Birth Encounter',
             code: {
               coding: [
@@ -226,68 +244,43 @@ export const mockFhirBundle = {
             value: 'tofael.ahmed@dsinnovators.com'
           }
         ],
-        birthDate: '1960-02-01',
-        maritalStatus: {
-          coding: [
-            {
-              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
-              code: 'M'
-            }
-          ],
-          text: 'MARRIED'
-        },
-        extension: [
+        birthDate: '1960-02-01'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d59fb3c1-4585-484f-9083-04088bfcdafb',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
           {
-            url: 'http://opencrvs.org/specs/extension/date-of-marriage',
-            valueDateTime: '1985-01-01'
-          },
-          {
-            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
-            extension: [
-              {
-                url: 'code',
-                valueCodeableConcept: {
-                  coding: [
-                    {
-                      system: 'urn:iso:std:iso:3166',
-                      code: 'BGD'
-                    }
-                  ]
-                }
-              },
-              {
-                url: 'period',
-                valuePeriod: {
-                  start: '',
-                  end: ''
-                }
-              }
-            ]
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/educational-attainment',
-            valueString: 'NO_SCHOOLING'
+            id: '22123123123123123',
+            type: 'PASSPORT'
           }
         ],
-        multipleBirthInteger: 1,
-        address: [
+        name: [
           {
-            type: 'PERMANENT',
-            line: ['', '', '', 'upazila1'],
-            district: 'district2',
-            state: 'state2',
-            postalCode: '',
-            country: 'BGD'
+            use: 'bn',
+            given: ['চট্টগ্রাম'],
+            family: ['সরকার']
           },
           {
-            type: 'CURRENT',
-            line: ['', '', '', 'upazila2'],
-            district: 'district2',
-            state: 'state2',
-            postalCode: '',
-            country: 'BGD'
+            use: 'en',
+            given: [''],
+            family: ['asd']
           }
-        ]
+        ],
+        telecom: [
+          {
+            system: 'phone',
+            value: '01710278466'
+          },
+          {
+            system: 'email',
+            value: 'tofael.ahmed@dsinnovators.com'
+          }
+        ],
+        birthDate: '1960-02-01'
       }
     },
     {

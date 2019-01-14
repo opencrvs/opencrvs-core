@@ -140,19 +140,21 @@ async function updateDuplicateCompositions(duplicates: string[]) {
   const duplicateCompositions = await Promise.all(
     duplicates.map(duplicate => getCompositionByIdentifier(duplicate))
   )
+
   return Promise.all(
-    duplicateCompositions.map((dupComposition: fhir.Composition) => {
-      const duplicatesForCurrentComposition = duplicates.filter(
-        (duplicate: string) => {
-          const identifier =
-            dupComposition.identifier && dupComposition.identifier.value
-          return duplicate !== identifier
-        }
-      )
+    duplicateCompositions.map((currentComposition: fhir.BundleEntry) => {
+      const duplicatesForCurrentComposition = duplicateCompositions
+        .filter((duplicateComposition: fhir.BundleEntry) => {
+          return (
+            (currentComposition.resource && currentComposition.resource.id) !==
+            (duplicateComposition.resource && duplicateComposition.resource.id)
+          )
+        })
+        .map(dupComposition => dupComposition.resource.id)
 
       addDuplicatesToComposition(
         duplicatesForCurrentComposition,
-        dupComposition
+        currentComposition
       )
     })
   )

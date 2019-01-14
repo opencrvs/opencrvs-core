@@ -74,9 +74,8 @@ export function addDuplicatesToComposition(
     if (!composition.relatesTo) {
       composition.relatesTo = []
     }
-    composition.relatesTo = composition.relatesTo.concat(
-      createDuplicateTemplate(duplicates)
-    )
+
+    createDuplicateTemplate(duplicates, composition)
 
     const bundle = {
       resourceType: 'Bundle',
@@ -92,15 +91,38 @@ export function addDuplicatesToComposition(
   }
 }
 
-function createDuplicateTemplate(duplicates: string[]) {
-  return duplicates.map((duplicateIdentifier: string) => {
-    return {
-      code: 'duplicate',
-      targetIdentifier: {
-        value: duplicateIdentifier
-      }
+function createDuplicateTemplate(
+  duplicates: string[],
+  composition: fhir.Composition
+) {
+  return duplicates.map((duplicateReference: string) => {
+    if (
+      !existsAsDuplicate(duplicateReference, composition.relatesTo) &&
+      composition.relatesTo
+    ) {
+      composition.relatesTo.push({
+        code: 'duplicate',
+        targetReference: {
+          reference: `Composition/${duplicateReference}`
+        }
+      })
     }
   })
+}
+
+function existsAsDuplicate(
+  duplicateReference: string,
+  relatesToValues?: fhir.CompositionRelatesTo[]
+) {
+  return (
+    relatesToValues &&
+    relatesToValues.find(
+      (relatesTo: fhir.CompositionRelatesTo) =>
+        relatesTo.code === 'duplicate' &&
+        (relatesTo.targetReference && relatesTo.targetReference.reference) ===
+          `Composition/${duplicateReference}`
+    )
+  )
 }
 
 export const getFromFhir = (suffix: string) => {
