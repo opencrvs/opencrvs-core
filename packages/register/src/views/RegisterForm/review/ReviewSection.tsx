@@ -13,7 +13,7 @@ import {
   Delete,
   Draft
 } from '@opencrvs/components/lib/icons'
-import { findIndex, filter, flatten, identity, isArray } from 'lodash'
+import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { DocumentViewer } from '@opencrvs/components/lib/interface'
@@ -21,6 +21,13 @@ import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/li
 import { documentsSection } from '../../../forms/register/documents-section'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
+import { getOfflineState } from 'src/offline/selectors'
+import {
+  IOfflineDataState,
+  OFFLINE_LOCATIONS_KEY,
+  ILocation
+} from 'src/offline/reducer'
+import { getLanguage } from 'src/i18n/selectors'
 import {
   defineMessages,
   InjectedIntlProps,
@@ -255,6 +262,8 @@ interface IProps {
   deleteApplicationClickEvent?: () => void
   goToTab: typeof goToTab
   scope: Scope
+  offlineResources: IOfflineDataState
+  language: string
 }
 
 interface ISectionExpansion {
@@ -302,26 +311,53 @@ function renderSelectLabel(
   return selectedOption ? intl.formatMessage(selectedOption.label) : value
 }
 
-function renderSelectDynamicLabel(
+export function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
-  intl: InjectedIntl
+  intl: InjectedIntl,
+  resources: IOfflineDataState,
+  language: string
 ) {
-  const dependency = options.dependency ? draftData[options.dependency] : false
-  const selectedOption = dependency
-    ? options.options[dependency.toString()].find(
-        option => option.value === value
-      )
-    : false
-  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+  if (!options.resource) {
+    const dependency = options.dependency
+      ? draftData[options.dependency]
+      : false
+    const selectedOption = dependency
+      ? options.options &&
+        options.options[dependency.toString()].find(
+          option => option.value === value
+        )
+      : false
+    return selectedOption ? intl.formatMessage(selectedOption.label) : value
+  } else {
+    if (options.resource) {
+      const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+      const selectedLocation = locations.filter((location: ILocation) => {
+        return location.id === value
+      })[0]
+      if (selectedLocation) {
+        if (language === 'en') {
+          return selectedLocation.name
+        } else {
+          return selectedLocation.nameBn
+        }
+      } else {
+        return false
+      }
+    } else {
+      return false
+    }
+  }
 }
 
 const renderValue = (
   draft: IDraft,
   section: IFormSection,
   field: IFormField,
-  intl: InjectedIntl
+  intl: InjectedIntl,
+  offlineResources: IOfflineDataState,
+  language: string
 ) => {
   const value: IFormFieldValue = draft.data[section.id]
     ? draft.data[section.id][field.name]
@@ -335,7 +371,9 @@ const renderValue = (
       value,
       field.dynamicOptions,
       draftData,
-      intl
+      intl,
+      offlineResources,
+      language
     )
   }
   if (typeof value === 'string') {
@@ -349,7 +387,7 @@ const renderValue = (
   return value
 }
 
-const getEmptyFieldBySection = (
+const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IDraft
 ) => {
@@ -369,7 +407,8 @@ const getEmptyFieldBySection = (
           ? draft.data[section.id][field.name]
           : null
 
-        const informationMissing = validationErrors.length > 0 || value === null
+        const informationMissing =
+          validationErrors.length > 0 || value === null ? validationErrors : []
 
         return { ...fields, [field.name]: informationMissing }
       }, {})
@@ -484,12 +523,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       submitClickEvent,
       saveDraftClickEvent,
       deleteApplicationClickEvent,
+      offlineResources,
+      language,
       tabRoute
     } = this.props
 
     const formSections = getViewableSection(registerForm)
 
-    const emptyFieldsBySection = getEmptyFieldBySection(formSections, draft)
+    const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
+
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
@@ -502,9 +544,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const numberOfErrors = flatten(
-      Object.values(emptyFieldsBySection).map(Object.values)
-    ).filter(identity).length
-
+      Object.values(errorsOnFields).map(Object.values)
+    ).filter(errors => errors.length > 0).length
     return (
       <>
         <Row>
@@ -539,15 +580,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           isVisibleField(field, section) && !isViewOnly(field)
                       )
                       .map((field: IFormField, key: number) => {
-                        const informationMissing =
-                          emptyFieldsBySection[section.id][field.name]
+                        const errorsOnField =
+                          errorsOnFields[section.id][field.name]
+
                         return (
                           <SectionRow key={key}>
                             <SectionLabel>
                               {intl.formatMessage(field.label)}
                             </SectionLabel>
                             <SectionValue>
-                              {informationMissing ? (
+                              {errorsOnField.length > 0 ? (
                                 <RequiredFieldLink
                                   onClick={() => {
                                     this.props.goToTab(
@@ -558,10 +600,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                     )
                                   }}
                                 >
-                                  {intl.formatMessage(messages.requiredField)}
+                                  {intl.formatMessage(errorsOnField[0].message)}
                                 </RequiredFieldLink>
                               ) : (
-                                renderValue(draft, section, field, intl)
+                                renderValue(
+                                  draft,
+                                  section,
+                                  field,
+                                  intl,
+                                  offlineResources,
+                                  language
+                                )
                               )}
                             </SectionValue>
                           </SectionRow>
@@ -674,7 +723,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 export const ReviewSection = connect(
   (state: IStoreState) => ({
     registerForm: getRegisterForm(state),
-    scope: getScope(state)
+    scope: getScope(state),
+    offlineResources: getOfflineState(state),
+    language: getLanguage(state)
   }),
   { goToTab }
 )(injectIntl(ReviewSectionComp))

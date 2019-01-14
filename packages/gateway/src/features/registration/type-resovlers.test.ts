@@ -13,6 +13,7 @@ import {
   mockObservations,
   mockLocation
 } from 'src/utils/testUtils'
+import { clone } from 'lodash'
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -231,6 +232,116 @@ describe('Registration type resolvers', () => {
           method: 'GET'
         }
       )
+    })
+
+    it('returns a fhirIDMap object', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: {
+                resourceType: 'Observation',
+                context: {
+                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                },
+                code: {
+                  coding: [
+                    {
+                      system: 'http://loinc.org',
+                      code: '57722-1',
+                      display: 'Birth plurality of Pregnancy'
+                    }
+                  ]
+                },
+                valueQuantity: {
+                  value: 'SINGLE'
+                },
+                id: 'aef33762-c5a3-4642-8d03-6e21c0ef6445'
+              }
+            },
+            {
+              resource: {
+                resourceType: 'Observation',
+                context: {
+                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                },
+                code: {
+                  coding: [
+                    {
+                      system: 'http://loinc.org',
+                      code: '3141-9',
+                      display: 'Body weight Measured'
+                    }
+                  ]
+                },
+                valueQuantity: {
+                  value: 5,
+                  unit: 'kg',
+                  system: 'http://unitsofmeasure.org',
+                  code: 'kg'
+                },
+                id: '5f761077-9623-4626-8ce6-648724614485'
+              }
+            },
+            {
+              resource: {
+                resourceType: 'Observation',
+                context: {
+                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                },
+                code: {
+                  coding: [
+                    {
+                      system: 'http://loinc.org',
+                      code: '73764-3',
+                      display: 'Birth attendant title'
+                    }
+                  ]
+                },
+                valueString: 'PHYSICIAN',
+                id: '305cf792-dd96-40b7-bdad-909861faa4b4'
+              }
+            },
+            {
+              resource: {
+                resourceType: 'Observation',
+                context: {
+                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                },
+                code: {
+                  coding: [
+                    {
+                      system: 'http://loinc.org',
+                      code: 'present-at-birth-reg',
+                      display: 'Present at birth registration'
+                    }
+                  ]
+                },
+                valueString: 'MOTHER_ONLY',
+                id: '0280e498-5d70-4666-ae4e-12431dcea163'
+              }
+            }
+          ]
+        })
+      )
+      const mockCompositionCloned = clone(mockComposition)
+      mockCompositionCloned.id = '123'
+      mockCompositionCloned.section[4].entry[0].reference = 'Encounter/456'
+      // @ts-ignore
+      const idMap = await typeResolvers.BirthRegistration._fhirIDMap(
+        mockCompositionCloned
+      )
+      expect(idMap).toEqual({
+        composition: '123',
+        encounter: '456',
+        observation: {
+          birthType: 'aef33762-c5a3-4642-8d03-6e21c0ef6445',
+          weightAtBirth: '5f761077-9623-4626-8ce6-648724614485',
+          attendantAtBirth: '305cf792-dd96-40b7-bdad-909861faa4b4',
+          presentAtBirthRegistration: '0280e498-5d70-4666-ae4e-12431dcea163'
+        }
+      })
     })
 
     it('returns weightAtBirth', async () => {

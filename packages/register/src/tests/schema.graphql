@@ -57,6 +57,7 @@ type BirthRegistration {
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   presentAtBirthRegistration: BirthRegPresence
+  placeOfBirth: Address
   birthLocation: Location
   birthRegistrationType: BirthRegType
   createdAt: Date
@@ -73,6 +74,7 @@ input BirthRegistrationInput {
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   presentAtBirthRegistration: BirthRegPresence
+  placeOfBirth: AddressInput
   birthLocation: LocationInput
   birthRegistrationType: BirthRegType
   createdAt: Date
@@ -237,13 +239,9 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration
-  markBirthAsRegistered(id: ID!, location: LocationInput): BirthRegistration
-  markBirthAsCertified(id: ID!, location: LocationInput): BirthRegistration
-  markBirthAsVoided(
-    id: ID!
-    reason: String!
-    location: LocationInput
-  ): BirthRegistration
+  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
+  markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
+  markBirthAsVoided(id: String!, reason: String!, comment: String): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
   updateDeathRegistration(
     id: ID!

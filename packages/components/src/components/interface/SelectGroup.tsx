@@ -16,7 +16,7 @@ export interface ISelectGroupOption {
 export interface ISelectGroupProps {
   name: string
   values: ISelectGroupValue
-  onChange: (
+  onChange?: (
     value: ISelectGroupValue,
     changedValue: ISelectGroupValue,
     type?: SelectFieldType

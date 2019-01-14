@@ -1,5 +1,5 @@
 import * as ReactApollo from 'react-apollo'
-import { createTestApp, mockUserResponse } from './tests/util'
+import { createTestApp, mockUserResponse, mockOfflineData } from './tests/util'
 import { config } from '../src/config'
 import { v4 as uuid } from 'uuid'
 import {
@@ -26,6 +26,8 @@ import {
   checkAuth,
   setInitialUserDetails
 } from '@opencrvs/register/src/profile/profileActions'
+import { storeOfflineData } from 'src/offline/actions'
+import { referenceApi } from 'src/utils/referenceApi'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -35,6 +37,22 @@ const setItem = window.localStorage.setItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
+
+const mockFetchLocations = jest.fn()
+mockFetchLocations.mockReturnValue({
+  data: [
+    {
+      id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
+      name: 'Barisal',
+      nameBn: 'বরিশাল',
+      physicalType: 'Jurisdiction',
+      juristictionType: 'DIVISION',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    }
+  ]
+})
+referenceApi.loadLocations = mockFetchLocations
 
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
@@ -87,6 +105,7 @@ describe('when user has a valid token in local storage', () => {
     app = testApp.app
     history = testApp.history
     store = testApp.store
+    store.dispatch(storeOfflineData(mockOfflineData))
   })
 
   it("doesn't redirect user to SSO", async () => {
@@ -96,7 +115,7 @@ describe('when user has a valid token in local storage', () => {
   describe('when loadDraftsFromStorage method is called', () => {
     beforeEach(() => {
       const instance = app.instance() as any
-      instance.loadDraftsFromStorage()
+      instance.loadDataFromStorage()
     })
     it('should retrive saved drafts from storage', () => {
       expect(storage.getItem).toBeCalled()
@@ -668,15 +687,15 @@ describe('when user has a valid token in local storage', () => {
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
-      orderOfBirth: '2',
-      placeOfDelivery: 'HOSPITAL',
-      typeOfBirth: 'SINGLE',
+      multipleBirth: '2',
+      placeOfBirth: 'HOSPITAL',
+      birthType: 'SINGLE',
       weightAtBirth: '6'
     }
 
@@ -689,7 +708,7 @@ describe('when user has a valid token in local storage', () => {
       country: 'BGD',
       countryPermanent: 'BGD',
       currentAddress: '',
-      fatherBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       familyName: 'ইসলাম',
@@ -711,14 +730,15 @@ describe('when user has a valid token in local storage', () => {
       firstNamesEng: 'Rokeya',
       maritalStatus: 'MARRIED',
       dateOfMarriage: '2010-10-10',
-      motherBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
+      currentAddressSameAsPermanent: true,
       addressLine1: 'Rd #10',
       addressLine1Permanent: 'Rd#10',
       addressLine2: 'Akua',
       addressLine2Permanent: 'Akua',
-      addressLine3Options1: 'union1',
-      addressLine3Options1Permanent: 'union1',
+      addressLine3: 'union1',
+      addressLine3Permanent: 'union1',
       addressLine4: 'upazila10',
       addressLine4Permanent: 'upazila10',
       countryPermanent: 'BGD',
@@ -772,8 +792,8 @@ describe('when user has a valid token in local storage', () => {
       fatherDetails.addressLine1Permanent = 'Rd#10'
       fatherDetails.addressLine2 = 'Akua'
       fatherDetails.addressLine2Permanent = 'Akua'
-      fatherDetails.addressLine3Options1 = 'union1'
-      fatherDetails.addressLine3Options1Permanent = 'union1'
+      fatherDetails.addressLine3 = 'union1'
+      fatherDetails.addressLine3Permanent = 'union1'
       fatherDetails.addressLine4 = 'upazila10'
       fatherDetails.addressLine4Permanent = 'upazila10'
       fatherDetails.countryPermanent = 'BGD'
@@ -918,6 +938,85 @@ describe('when user has a valid token in local storage', () => {
   })
   describe('when user is in the review section', () => {
     let customDraft: IDraft
+
+    const childDetails: IPersonDetails = {
+      attendantAtBirth: 'NURSE',
+      childBirthDate: '1999-10-10',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'নাইম',
+      firstNamesEng: 'Naim',
+      gender: 'male',
+      orderOfBirth: '2',
+      placeOfDelivery: 'HOSPITAL',
+      typeOfBirth: 'SINGLE',
+      weightAtBirth: '6',
+      _fhirID: '1'
+    }
+
+    const fatherDetails: IPersonDetails = {
+      fathersDetailsExist: true,
+      iD: '234234423424234244',
+      iDType: 'NATIONAL_ID',
+      addressSameAsMother: true,
+      permanentAddressSameAsMother: true,
+      country: 'BGD',
+      countryPermanent: 'BGD',
+      currentAddress: '',
+      fatherBirthDate: '1999-10-10',
+      dateOfMarriage: '2010-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'আনোয়ার',
+      firstNamesEng: 'Anwar',
+      maritalStatus: 'MARRIED',
+      nationality: 'BGD',
+      _fhirID: '2'
+    }
+
+    const motherDetails: IPersonDetails = {
+      iD: '234243453455',
+      iDType: 'NATIONAL_ID',
+      country: 'BGD',
+      nationality: 'BGD',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'রোকেয়া',
+      firstNamesEng: 'Rokeya',
+      maritalStatus: 'MARRIED',
+      dateOfMarriage: '2010-10-10',
+      motherBirthDate: '1999-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      addressLine1: 'Rd #10',
+      addressLine1Permanent: 'Rd#10',
+      addressLine2: 'Akua',
+      addressLine2Permanent: 'Akua',
+      addressLine3: 'union1',
+      addressLine4: 'upazila10',
+      addressLine4Permanent: 'upazila10',
+      countryPermanent: 'BGD',
+      currentAddress: '',
+      district: 'district2',
+      districtPermanent: 'district2',
+      permanentAddress: '',
+      postCode: '1020',
+      postCodePermanent: '1010',
+      state: 'state4',
+      statePermanent: 'state4',
+      _fhirID: '3'
+    }
+
+    const registrationDetails = {
+      commentsOrNotes: 'comments',
+      paperFormNumber: '423424245455',
+      presentAtBirthRegistration: 'MOTHER_ONLY',
+      registrationCertificateLanguage: ['en'],
+      registrationEmail: 'arman@gmail.com',
+      registrationPhone: '01736478884',
+      whoseContactDetails: 'MOTHER',
+      _fhirID: '4'
+    }
     const registerScopeToken =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 
@@ -925,11 +1024,11 @@ describe('when user has a valid token in local storage', () => {
       getItem.mockReturnValue(registerScopeToken)
       store.dispatch(checkAuth({ '?token': registerScopeToken }))
       const data = {
-        child: {},
-        father: {},
-        mother: {},
-        registration: {},
-        documents: { image_uploader: [] }
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
       }
 
       customDraft = { id: uuid(), data, review: true }
@@ -955,6 +1054,180 @@ describe('when user has a valid token in local storage', () => {
 
     it('review tab should show up', () => {
       expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
+    })
+    it('successfully submits the review form', async () => {
+      jest.setMock('react-apollo', { default: ReactApollo })
+      app
+        .find('#next_button_child')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_mother')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_father')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#registerApplicationBtn')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#register_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+    })
+    it('successfully submits review form after application modification', async () => {
+      jest.setMock('react-apollo', { default: ReactApollo })
+      app
+        .find('#Childsdetails_link')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#edit_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#weightAtBirth')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            id: 'weightAtBirth',
+            value: '5'
+          }
+        })
+
+      app
+        .find('#tab_review')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#next_button_child')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_mother')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_father')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#registerApplicationBtn')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#register_review')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+    })
+    it('preview link will close the modal', async () => {
+      jest.setMock('react-apollo', { default: ReactApollo })
+      app
+        .find('#next_button_child')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_mother')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_father')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#registerApplicationBtn')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#register_review')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      expect(app.find('#register_review').hostNodes()).toHaveLength(0)
+    })
+    it('rejecting application redirects to reject confirmation screen', async () => {
+      jest.setMock('react-apollo', { default: ReactApollo })
+      app
+        .find('#next_button_child')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_mother')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#next_button_father')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#rejectApplicationBtn')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#rejectionReasonMisspelling')
+        .hostNodes()
+        .simulate('change')
+
+      app
+        .find('#rejectionCommentForHealthWorker')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            id: 'rejectionCommentForHealthWorker',
+            value: 'reject reason'
+          }
+        })
+
+      app
+        .find('#submit_reject_form')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      expect(
+        app
+          .find('#view_title')
+          .hostNodes()
+          .text()
+      ).toEqual('Application rejected')
     })
   })
 })
