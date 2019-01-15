@@ -1,6 +1,7 @@
 import {
   findEntry,
   findName,
+  postToHearth,
   getCompositionByIdentifier,
   addDuplicatesToComposition
 } from 'src/features/fhir/fhir-utils'
@@ -127,7 +128,7 @@ async function detectAndUpdateDuplicates(
   if (!duplicates.length) {
     return
   }
-  logger.debug(
+  logger.info(
     `Deduplication/service: ${duplicates.length} duplicate composition(s) found`
   )
 
@@ -141,21 +142,30 @@ async function updateDuplicateCompositions(duplicates: string[]) {
     duplicates.map(duplicate => getCompositionByIdentifier(duplicate))
   )
 
-  return Promise.all(
-    duplicateCompositions.map((currentComposition: fhir.BundleEntry) => {
-      const duplicatesForCurrentComposition = duplicateCompositions
-        .filter((duplicateComposition: fhir.BundleEntry) => {
-          return (
-            (currentComposition.resource && currentComposition.resource.id) !==
-            (duplicateComposition.resource && duplicateComposition.resource.id)
-          )
-        })
-        .map(dupComposition => dupComposition.resource.id)
+  const compositionEntriesWithDuplicates: fhir.BundleEntry[] = []
 
-      addDuplicatesToComposition(
-        duplicatesForCurrentComposition,
-        currentComposition
-      )
-    })
-  )
+  duplicateCompositions.map((currentComposition: fhir.BundleEntry) => {
+    const duplicatesForCurrentComposition = duplicateCompositions
+      .filter((duplicateComposition: fhir.BundleEntry) => {
+        return (
+          (currentComposition.resource && currentComposition.resource.id) !==
+          (duplicateComposition.resource && duplicateComposition.resource.id)
+        )
+      })
+      .map(dupComposition => dupComposition.resource.id)
+
+    const compositionWithDuplicate = addDuplicatesToComposition(
+      duplicatesForCurrentComposition,
+      currentComposition
+    )
+    compositionEntriesWithDuplicates.push(compositionWithDuplicate)
+  })
+
+  const bundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: compositionEntriesWithDuplicates
+  }
+
+  return postToHearth(bundle)
 }

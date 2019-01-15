@@ -1,6 +1,6 @@
 import { searchComposition } from 'src/elasticsearch/dbhelper'
 import { SearchResponse } from 'elasticsearch'
-const MATCH_SCORE_THRESHOLD = 1.0
+import { MATCH_SCORE_THRESHOLD } from 'src/constants'
 
 export interface ICompositionBody {
   childFirstNames?: string

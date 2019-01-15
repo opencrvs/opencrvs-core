@@ -10,3 +10,4 @@ export const CERT_PUBLIC_KEY_PATH =
   '../../.secrets/public-key.pem'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
+export const MATCH_SCORE_THRESHOLD = 1.0

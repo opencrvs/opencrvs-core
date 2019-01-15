@@ -76,13 +76,7 @@ export function addDuplicatesToComposition(
     }
 
     createDuplicateTemplate(duplicates, composition)
-
-    const bundle = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [compositionEntry]
-    }
-    return postToHearth(bundle)
+    return compositionEntry
   } catch (error) {
     logger.error(
       `Deduplication/fhir-utils: updating composition failed with error: ${error}`
@@ -149,7 +143,7 @@ export async function postToHearth(payload: any) {
   })
   if (!res.ok) {
     throw new Error(
-      `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
+      `FHIR put to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
   }
   return res.json()
