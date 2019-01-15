@@ -17,6 +17,7 @@ import { iDType, ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
 import { paymentFormSection } from './payment-section'
+import { certificatePreview } from './certificate-preview'
 import { calculateDays, timeElapsed } from './calculatePrice'
 
 describe('when user wants to print certificate', async () => {
@@ -603,6 +604,33 @@ describe('when user wants to print certificate', async () => {
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
     })
 
+    it('when user clicks next button, renders certificate preview form', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: true
+      }
+
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+
+      component
+        .find('#print-confirm-button')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      expect(
+        component.find('#payment-confirm-button').hostNodes()
+      ).toHaveLength(1)
+      component
+        .find('#payment-confirm-button')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+      expect(component.find(FormFieldGenerator).prop('fields')).toEqual(
+        certificatePreview.fields
+      )
+    })
     it('timeElapsedInWords function returns required time duration in words', () => {
       Date.now = jest.fn(() => new Date('2019-01-01'))
 
