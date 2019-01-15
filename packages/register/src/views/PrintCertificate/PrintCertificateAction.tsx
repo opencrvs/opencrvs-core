@@ -21,6 +21,7 @@ import { Print } from '@opencrvs/components/lib/icons'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
+const CERTIFICATE_PREVIEW = 'certificatePreview'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -171,6 +172,16 @@ const messages = defineMessages({
     defaultMessage:
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
+  },
+  printCertificate: {
+    id: 'register.workQueue.print.printCertificate',
+    defaultMessage: 'Print certificate',
+    description: 'The label for print certificate button'
+  },
+  finish: {
+    id: 'register.workQueue.print.finish',
+    defaultMessage: 'Finish',
+    description: 'The label for finish printing certificate button'
   }
 })
 
@@ -188,6 +199,7 @@ type IProps = {
   togglePrintCertificateSection: () => void
   printCertificateFormSection: IFormSection
   paymentFormSection: IFormSection
+  certificatePreviewFormSection: IFormSection
 }
 
 type IFullProps = InjectedIntlProps & IProps
@@ -223,12 +235,18 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   getForm = (currentForm: string) => {
-    const { printCertificateFormSection, paymentFormSection } = this.props
+    const {
+      printCertificateFormSection,
+      paymentFormSection,
+      certificatePreviewFormSection
+    } = this.props
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
         return printCertificateFormSection
       case PAYMENT:
         return paymentFormSection
+      case CERTIFICATE_PREVIEW:
+        return certificatePreviewFormSection
       default:
         throw new Error(`No form found for id ${currentForm}`)
     }
@@ -267,9 +285,34 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
-                onClick={() => console.log('go to certificate print section')}
+                onClick={this.onConfirmForm}
               >
                 {intl.formatMessage(messages.next)}
+              </StyledPrimaryButton>
+            </ButtonContainer>
+          </>
+        )
+      case CERTIFICATE_PREVIEW:
+        return (
+          <>
+            <ButtonContainer>
+              <StyledIconAction
+                id="print-certificate"
+                title={intl.formatMessage(messages.printCertificate)}
+                icon={() => <StyledPrintIcon />}
+                onClick={() =>
+                  console.log('to open certificate document in another window')
+                }
+              />
+            </ButtonContainer>
+
+            <ButtonContainer>
+              <StyledPrimaryButton
+                id="finish-printing-certificate"
+                disabled={!enableConfirmButton}
+                onClick={() => console.log('certifier mutation to be called')}
+              >
+                {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>
             </ButtonContainer>
           </>
@@ -286,6 +329,9 @@ class PrintCertificateActionComponent extends React.Component<
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
         destForm = PAYMENT
+        break
+      case PAYMENT:
+        destForm = CERTIFICATE_PREVIEW
         break
       default:
         break
@@ -409,5 +455,7 @@ class PrintCertificateActionComponent extends React.Component<
 
 export const PrintCertificateAction = connect((state: IStoreState) => ({
   language: state.i18n.language,
-  paymentFormSection: state.printCertificateForm.paymentForm
+  paymentFormSection: state.printCertificateForm.paymentForm,
+  certificatePreviewFormSection:
+    state.printCertificateForm.certificatePreviewForm
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))
