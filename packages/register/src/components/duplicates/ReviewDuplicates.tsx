@@ -28,8 +28,8 @@ const Container = styled.div`
   margin: 35px 250px 0px 250px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 0px;
-    margin-right: 0px;
+    margin-left: 20px;
+    margin-right: 20px;
   }
 `
 
