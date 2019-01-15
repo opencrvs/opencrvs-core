@@ -47,3 +47,4 @@ ignore:
   - 'packages/register/src/registerServiceWorker.ts'
   - 'packages/register/src/src-sw.js'
   - 'packages/register/src/tests/graphql-schema-mock.ts'
+  - 'packages/workflow/src/index.ts'
