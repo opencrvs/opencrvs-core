@@ -38,7 +38,7 @@ class SessionExpireComponent extends React.Component<
   render() {
     const { intl, sessionExpired } = this.props
     return (
-      <div>
+      <>
         {sessionExpired && (
           <StyledModal
             title={intl.formatMessage(messages.sessionExpireTxt)}
@@ -54,7 +54,7 @@ class SessionExpireComponent extends React.Component<
             show={true}
           />
         )}
-      </div>
+      </>
     )
   }
 }
