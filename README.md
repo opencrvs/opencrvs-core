@@ -16,6 +16,7 @@ On Linux you will also need to:
 
 - increase your file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
 - increase vm max heap for elasticsearch using: `echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+- run `chmod 775 data/elasticsearch` from root of the project
 
 Then:
 

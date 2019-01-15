@@ -40,12 +40,12 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    server.log('info', `Workflow server started on ${HOST}:${PORT}`)
+    server.log('info', `De-duplication server started on ${HOST}:${PORT}`)
   }
 
   async function stop() {
     await server.stop()
-    server.log('info', 'Workflow server stopped')
+    server.log('info', 'De-duplication server stopped')
   }
 
   return { server, start, stop }

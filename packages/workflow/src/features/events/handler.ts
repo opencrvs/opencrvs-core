@@ -6,7 +6,7 @@ import {
 } from '../registration/handler'
 import { hasBirthRegistrationNumber } from '../registration/fhir/fhir-utils'
 import updateTaskHandler from '../task/handler'
-import { HEARTH_URL } from 'src/constants'
+import { HEARTH_URL, OPENHIM_URL } from 'src/constants'
 import fetch, { RequestInit } from 'node-fetch'
 import { logger } from 'src/logger'
 import { isUserAuthorized } from './auth'
@@ -108,6 +108,7 @@ export async function fhirWorkflowEventHandler(
   switch (event) {
     case Events.BIRTH_NEW_DEC:
       response = await createBirthRegistrationHandler(request, h)
+      forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
       break
     case Events.BIRTH_MARK_REG:
       response = await markBirthAsRegisteredHandler(request, h)
@@ -124,6 +125,21 @@ export async function fhirWorkflowEventHandler(
   }
 
   // TODO: send to event channels here
-
   return response
+}
+
+async function forwardToOpenHim(event: Events, request: Hapi.Request) {
+  const fhirBundle = request.payload as fhir.Bundle
+  try {
+    await fetch(`${OPENHIM_URL}${event}`, {
+      method: 'POST',
+      body: JSON.stringify(fhirBundle),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: request.headers.authorization
+      }
+    })
+  } catch (err) {
+    logger.error(`Unable to forward to openhim for error : ${err}`)
+  }
 }

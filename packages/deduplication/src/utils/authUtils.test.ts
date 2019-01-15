@@ -1,4 +1,4 @@
-import { getTokenPayload, getToken } from './authUtils'
+import { getTokenPayload } from './authUtils'
 import * as Hapi from 'hapi'
 
 const token =
