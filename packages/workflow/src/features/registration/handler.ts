@@ -75,7 +75,6 @@ export async function markBirthAsRegisteredHandler(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
-    console.log(payload)
     // TODO: need to send notification here
     return await postToHearth(payload)
   } catch (error) {
