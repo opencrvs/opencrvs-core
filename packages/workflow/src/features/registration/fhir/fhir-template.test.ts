@@ -12,7 +12,7 @@ describe('Verify fhir templates', () => {
     it('successfully creates and push task entry if it is missing', () => {
       const fhirBundle = {
         resourceType: 'Bundle',
-        type: 'documet',
+        type: 'document',
         entry: [
           {
             fullUrl: '121',
