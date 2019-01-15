@@ -74,6 +74,27 @@ describe('when user has a valid token in url but an expired one in localStorage'
   })
 })
 
+describe('when session expired', () => {
+  let app: ReactWrapper
+  let store: Store
+
+  beforeEach(() => {
+    const testApp = createTestApp()
+    app = testApp.app
+    store = testApp.store
+  })
+
+  it('displays session expired confirmation dialog', () => {
+    app.debug()
+    // @ts-ignore
+    const action = actions.showSessionExpireConfirmation()
+    store.dispatch(action)
+    app.update()
+
+    expect(app.find('#login').hostNodes()).toHaveLength(1)
+  })
+})
+
 describe('when user has a valid token in local storage', () => {
   let app: ReactWrapper
   let history: History
