@@ -137,6 +137,10 @@ export const hasFormError = (
 }
 
 export const conditionals: IConditionals = {
+  iDType: {
+    action: 'hide',
+    expression: "!values.iDType || (values.iDType !== 'OTHER')"
+  },
   fathersDetailsExist: {
     action: 'hide',
     expression: '!values.fathersDetailsExist'

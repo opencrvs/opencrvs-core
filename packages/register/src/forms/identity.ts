@@ -41,6 +41,11 @@ export const messages = defineMessages({
     defaultMessage: 'Alien Number',
     description: 'Option for form field: Type of ID'
   },
+  iDTypeOther: {
+    id: 'formFields.iDTypeOther',
+    defaultMessage: 'Other',
+    description: 'Option for form field: Type of ID'
+  },
   iD: {
     id: 'formFields.iD',
     defaultMessage: 'NID number',

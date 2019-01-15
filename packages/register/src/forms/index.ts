@@ -152,6 +152,7 @@ export interface IConditional {
 }
 
 export interface IConditionals {
+  iDType: IConditional
   fathersDetailsExist: IConditional
   permanentAddressSameAsMother: IConditional
   addressSameAsMother: IConditional

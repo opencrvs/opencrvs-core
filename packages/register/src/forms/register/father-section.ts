@@ -163,9 +163,19 @@ export const fatherSection: IFormSection = {
           value: 'REFUGEE_NUMBER',
           label: identityMessages.iDTypeRefugeeNumber
         },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
+        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
+        { value: 'OTHER', label: identityMessages.iDTypeOther }
       ],
       conditionals: [conditionals.fathersDetailsExist]
+    },
+    {
+      name: 'iDTypeOther',
+      type: TEXT,
+      label: identityMessages.iDType,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.fathersDetailsExist, conditionals.iDType]
     },
     {
       name: 'iD',
