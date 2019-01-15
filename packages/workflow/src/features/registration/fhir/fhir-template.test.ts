@@ -10,7 +10,18 @@ import { cloneDeep } from 'lodash'
 describe('Verify fhir templates', () => {
   describe('SelectOrCreateTaskRefResource', () => {
     it('successfully creates and push task entry if it is missing', () => {
-      const fhirBundle = { resourceType: 'Bundle', type: 'documet' }
+      const fhirBundle = {
+        resourceType: 'Bundle',
+        type: 'document',
+        entry: [
+          {
+            fullUrl: '121',
+            resource: {
+              resourceType: 'composition'
+            }
+          }
+        ]
+      }
 
       const taskResource = selectOrCreateTaskRefResource(fhirBundle)
 
@@ -18,6 +29,9 @@ describe('Verify fhir templates', () => {
       expect(taskResource).toEqual({
         resourceType: 'Task',
         status: 'requested',
+        focus: {
+          reference: '121'
+        },
         code: {
           coding: [
             {
