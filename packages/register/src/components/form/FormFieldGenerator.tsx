@@ -16,7 +16,8 @@ import {
   DateField,
   TextArea,
   SubSectionDivider,
-  WarningMessage
+  WarningMessage,
+  PDFViewer
 } from '@opencrvs/components/lib/forms'
 import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
@@ -49,7 +50,8 @@ import {
   TEL,
   INFORMATIVE_RADIO_GROUP,
   WARNING,
-  LINK
+  LINK,
+  PDF_DOCUMENT_VIEWER
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -215,7 +217,7 @@ function GeneratedInputField({
         <FormattedHTMLMessage
           {...label}
           values={{
-            [fieldDefinition.name]: fieldDefinition.initialValue as MessageValue
+            [fieldDefinition.name]: value as MessageValue
           }}
         />
       </Paragraph>
@@ -250,6 +252,10 @@ function GeneratedInputField({
         {fieldDefinition.label}
       </LinkFormField>
     )
+  }
+
+  if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
+    return <PDFViewer id={fieldDefinition.name} pdfSource={value as string} />
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {

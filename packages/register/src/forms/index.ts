@@ -23,6 +23,7 @@ export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
+export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
@@ -133,6 +134,10 @@ export interface ILink extends IFormFieldBase {
   type: typeof LINK
 }
 
+export interface IPDFDocumentViewerFormField extends IFormFieldBase {
+  type: typeof PDF_DOCUMENT_VIEWER
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -151,6 +156,7 @@ export type IFormField =
   | IImageUploaderWithOptionsFormField
   | IWarningField
   | ILink
+  | IPDFDocumentViewerFormField
 
 export interface IConditional {
   action: string
@@ -293,6 +299,10 @@ export interface Ii18nLinkField extends Ii18nFormFieldBase {
   type: typeof LINK
 }
 
+export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
+  type: typeof PDF_DOCUMENT_VIEWER
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -310,6 +320,7 @@ export type Ii18nFormField =
   | Ii18nImageUploaderWithOptionsFormField
   | Ii18nWarningField
   | Ii18nLinkField
+  | Ii18nPDFDocumentViewerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

@@ -1,4 +1,11 @@
-import { IFormSection, ViewType, SELECT_WITH_OPTIONS, LINK } from 'src/forms'
+import {
+  IFormSection,
+  ViewType,
+  SELECT_WITH_OPTIONS,
+  LINK,
+  PDF_DOCUMENT_VIEWER,
+  CHECKBOX_GROUP
+} from 'src/forms'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
@@ -27,6 +34,11 @@ const messages = defineMessages({
   person2: {
     id: 'register.workQueue.print.signature.person2',
     defaultMessage: 'Local Registrar Mohammad Ashraful'
+  },
+  informantHasReviewedInformaiton: {
+    id: 'register.workQueue.print.userReviewed',
+    defaultMessage:
+      'The informant has reviewed and confirmed that the information on the certificate is correct.'
   }
 })
 
@@ -48,23 +60,25 @@ export const certificatePreview: IFormSection = {
   title: messages.preview,
   fields: [
     {
-      name: `signature1`,
+      name: 'signature1',
       type: SELECT_WITH_OPTIONS,
       label: messages.selectSignature,
+      required: true,
       initialValue: '',
       validate: [],
       options: authorizedPersons
     },
     {
-      name: `signature2`,
+      name: 'signature2',
       type: SELECT_WITH_OPTIONS,
       label: messages.noLabel,
       initialValue: '',
+      required: true,
       validate: [],
       options: authorizedPersons
     },
     {
-      name: `signature3`,
+      name: 'signature3',
       type: SELECT_WITH_OPTIONS,
       label: messages.noLabel,
       initialValue: '',
@@ -78,6 +92,27 @@ export const certificatePreview: IFormSection = {
       label: messages.addAnotherSignature,
       initialValue: false,
       validate: []
+    },
+    {
+      name: 'certificate',
+      type: PDF_DOCUMENT_VIEWER,
+      label: messages.noLabel,
+      initialValue: '',
+      validate: []
+    },
+    {
+      name: 'informantReviewed',
+      type: CHECKBOX_GROUP,
+      label: messages.noLabel,
+      initialValue: '',
+      required: true,
+      validate: [],
+      options: [
+        {
+          value: 'INFORMANT_REVIEWED_INFORMATION',
+          label: messages.informantHasReviewedInformaiton
+        }
+      ]
     }
   ]
 }

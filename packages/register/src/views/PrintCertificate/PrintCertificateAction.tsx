@@ -172,6 +172,16 @@ const messages = defineMessages({
     defaultMessage:
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
+  },
+  printCertificate: {
+    id: 'register.workQueue.print.printCertificate',
+    defaultMessage: 'Print certificate',
+    description: 'The label for print certificate button'
+  },
+  finish: {
+    id: 'register.workQueue.print.finish',
+    defaultMessage: 'Finish',
+    description: 'The label for finish printing certificate button'
   }
 })
 
@@ -278,6 +288,31 @@ class PrintCertificateActionComponent extends React.Component<
                 onClick={this.onConfirmForm}
               >
                 {intl.formatMessage(messages.next)}
+              </StyledPrimaryButton>
+            </ButtonContainer>
+          </>
+        )
+      case CERTIFICATE_PREVIEW:
+        return (
+          <>
+            <ButtonContainer>
+              <StyledIconAction
+                id="print-certificate"
+                title={intl.formatMessage(messages.printCertificate)}
+                icon={() => <StyledPrintIcon />}
+                onClick={() =>
+                  console.log('to open certificate document in another window')
+                }
+              />
+            </ButtonContainer>
+
+            <ButtonContainer>
+              <StyledPrimaryButton
+                id="finish-printing-certificate"
+                disabled={!enableConfirmButton}
+                onClick={() => console.log('certifier mutation to be called')}
+              >
+                {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>
             </ButtonContainer>
           </>

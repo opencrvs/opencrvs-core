@@ -609,6 +609,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
+    'register.workQueue.print.printCertificate': 'সার্টিফিকেট মুদ্রণ',
+    'register.workQueue.print.finish': 'সমাপ্ত',
     'register.workQueue.print.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
     'register.workQueue.print.selectSignature': 'ই-স্বাক্ষর নির্বাচন করুন',
     'register.workQueue.print.addAnotherSignature':
@@ -617,6 +619,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.print.signature.person1': 'ইউপি সচিব সাকিব আল হাসান',
     'register.workQueue.print.signature.person2':
       'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
+    'register.workQueue.print.userReviewed':
+      'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',
