@@ -12,9 +12,10 @@ import {
   ICheckboxOption,
   ISelectFormFieldWithDynamicOptions,
   INFORMATIVE_RADIO_GROUP,
-  PARAGRAPH
+  PARAGRAPH,
+  ITextFormFieldWithDynamicLabel
 } from './'
-import { InjectedIntl } from 'react-intl'
+import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import {
   IOfflineDataState,
@@ -22,6 +23,7 @@ import {
   ILocation
 } from 'src/offline/reducer'
 import { config } from 'src/config'
+import { iDType } from 'src/views/PrintCertificate/ParentDetails'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -72,6 +74,13 @@ export const generateOptionsFromLocations = (
     })
   })
   return optionsArray
+}
+
+export const getFieldLabel = (
+  field: ITextFormFieldWithDynamicLabel,
+  values: IFormSectionData
+): FormattedMessage.MessageDescriptor => {
+  return iDType(values[field.dynamicLabel.dependency] as string)
 }
 
 export const getFieldOptions = (

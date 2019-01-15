@@ -22,7 +22,8 @@ import { Paragraph } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
-  getFieldOptions
+  getFieldOptions,
+  getFieldLabel
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -48,7 +49,11 @@ import {
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
-  WARNING
+  WARNING,
+  TEXT_WITH_DYNAMIC_LABEL,
+  TEXT,
+  ITextFormFieldWithDynamicLabel,
+  ITextFormField
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -384,6 +389,15 @@ class FormSectionComponent extends React.Component<Props> {
                     offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
+              : field.type === TEXT_WITH_DYNAMIC_LABEL
+              ? ({
+                  ...field,
+                  type: TEXT,
+                  label: getFieldLabel(
+                    field as ITextFormFieldWithDynamicLabel,
+                    values
+                  )
+                } as ITextFormField)
               : field
 
           return (

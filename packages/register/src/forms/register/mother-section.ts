@@ -11,7 +11,8 @@ import {
   DATE,
   SUBSECTION,
   RADIO_GROUP,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  TEXT_WITH_DYNAMIC_LABEL
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -115,25 +116,16 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
         { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
         {
           value: 'BIRTH_REGISTRATION_NUMBER',
           label: identityMessages.iDTypeBRN
         },
+        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
         {
           value: 'DEATH_REGISTRATION_NUMBER',
           label: identityMessages.iDTypeDRN
         },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
         { value: 'OTHER', label: identityMessages.iDTypeOther }
       ]
     },
@@ -148,7 +140,10 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'iD',
-      type: TEXT,
+      type: TEXT_WITH_DYNAMIC_LABEL,
+      dynamicLabel: {
+        dependency: 'iDType'
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',

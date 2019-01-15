@@ -20,6 +20,7 @@ export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
+export const TEXT_WITH_DYNAMIC_LABEL = 'TEXT_WITH_DYNAMIC_LABEL'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 
@@ -40,6 +41,11 @@ export interface IDynamicOptions {
   dependency: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
+}
+
+export interface IDynamicLabel {
+  dependency: string
+  label?: string
 }
 
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
@@ -71,6 +77,11 @@ export interface ISelectFormFieldWithOptions extends IFormFieldBase {
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
   dynamicOptions: IDynamicOptions
+}
+
+export interface ITextFormFieldWithDynamicLabel extends IFormFieldBase {
+  type: typeof TEXT_WITH_DYNAMIC_LABEL
+  dynamicLabel: IDynamicLabel
 }
 
 export interface IRadioGroupFormField extends IFormFieldBase {
@@ -134,6 +145,7 @@ export type IFormField =
   | INumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
+  | ITextFormFieldWithDynamicLabel
   | IRadioGroupFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
