@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 import { createServer } from '../..'
-import { testFhirTaskBundle } from 'src/test/utils'
+import { testFhirTaskBundle } from '../../test/utils'
 
 describe('Verify handler', () => {
   let server: any
