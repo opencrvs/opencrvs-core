@@ -35,7 +35,7 @@ import { setInitialUserDetails } from 'src/profile/profileActions'
 import { client } from 'src/utils/apolloClient'
 import { USER_DETAILS } from 'src/utils/userUtils'
 import { MyRecords } from './views/MyRecords/MyRecords'
-import { ReviewDuplicates } from './components/duplicates/ReviewDuplicates'
+import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
