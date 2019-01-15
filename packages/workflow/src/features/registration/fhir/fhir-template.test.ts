@@ -10,7 +10,18 @@ import { cloneDeep } from 'lodash'
 describe('Verify fhir templates', () => {
   describe('SelectOrCreateTaskRefResource', () => {
     it('successfully creates and push task entry if it is missing', () => {
-      const fhirBundle = { resourceType: 'Bundle', type: 'documet' }
+      const fhirBundle = {
+        resourceType: 'Bundle',
+        type: 'document',
+        entry: [
+          {
+            fullUrl: '121',
+            resource: {
+              resourceType: 'composition'
+            }
+          }
+        ]
+      }
 
       const taskResource = selectOrCreateTaskRefResource(fhirBundle)
 
@@ -18,6 +29,9 @@ describe('Verify fhir templates', () => {
       expect(taskResource).toEqual({
         resourceType: 'Task',
         status: 'requested',
+        focus: {
+          reference: '121'
+        },
         code: {
           coding: [
             {
@@ -47,6 +61,10 @@ describe('Verify fhir templates', () => {
           {
             system: 'http://opencrvs.org/specs/id/paper-form-id',
             value: '12345678'
+          },
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'B5WGYJE'
           }
         ],
         extension: [

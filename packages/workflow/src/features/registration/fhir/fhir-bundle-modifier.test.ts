@@ -253,6 +253,10 @@ describe('Verify fhir bundle modifier functions', () => {
       )
     })
     it('Successfully modified the provided fhirBundle with brn', async () => {
+      const birthTrackingId = 'B5WGYJE'
+      const brnChecksum = 1
+      testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
+
       const task = await pushBRN(testFhirBundle.entry[1].resource, practitioner)
 
       expect(task.identifier[2].system).toEqual(
@@ -260,7 +264,9 @@ describe('Verify fhir bundle modifier functions', () => {
       )
       expect(task.identifier[2].value).toBeDefined()
       expect(task.identifier[2].value).toMatch(
-        new RegExp(`^${new Date().getFullYear()}10342112345678`)
+        new RegExp(
+          `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+        )
       )
     })
 
@@ -276,6 +282,10 @@ describe('Verify fhir bundle modifier functions', () => {
       const indentifierLength = oldTask.identifier.length
 
       const fhirBundle = cloneDeep(testFhirBundle)
+
+      const birthTrackingId = 'B5WGYJE'
+      const brnChecksum = 1
+      fhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
       const newTask = await pushBRN(fhirBundle.entry[1].resource, practitioner)
 
       expect(newTask.identifier.length).toBe(indentifierLength)
@@ -284,7 +294,9 @@ describe('Verify fhir bundle modifier functions', () => {
       )
       expect(newTask.identifier[2].value).toBeDefined()
       expect(newTask.identifier[2].value).toMatch(
-        new RegExp(`^${new Date().getFullYear()}10342112345678`)
+        new RegExp(
+          `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+        )
       )
       expect(newTask.identifier[2].value).not.toEqual(
         oldTask.identifier[2].value

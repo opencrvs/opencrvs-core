@@ -389,16 +389,14 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.whoIsPresent.father': 'পিতা',
     'formFields.registration.whoIsPresent.other': 'অন্যান্য',
     'formFields.registration.whoseContactDetails':
-      'যোগাযোগের মধ্যম হিসেবে  তথ্যপ্রদানকারী কাকে পরিচয় করিয়ে দিতে সাচ্ছন্দ্যবোধ করেন',
+      'যোগাযোগের মধ্যম হিসেবে তথ্যপ্রদানকারী কাকে পরিচয় করিয়ে দিতে সাচ্ছন্দ্যবোধ করেন',
     'formFields.registration.whoseContactDetails.both': 'মাতাপিতা উভয়',
     'formFields.registration.whoseContactDetails.mother': 'মা',
     'formFields.registration.whoseContactDetails.father': 'পিতা',
     'formFields.registration.whoseContactDetails.other': 'অন্যান্য',
-    'formFields.registration.email': 'ই-মেইল',
     'formFields.registration.phone': 'মোবাইল নম্বর',
     'formFields.registration.certificateLanguage':
       'তথ্যপ্রদানকারী কোন ভাষায় সনদপত্র চান?',
-    'formFields.registration.paperFormNumber': 'ফর্ম নম্বর',
     'formFields.registration.certificateLanguage.bn': 'বাংলা',
     'formFields.registration.certificateLanguage.en': 'ইংরেজি',
     'formFields.registration.certificateLanguage.other': 'অন্যান্য',
@@ -657,6 +655,10 @@ export const BENGALI_STATE: ILanguage = {
       'জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে',
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'register.workQueue.labels.results.birthRegistrationNumber':
-      'জন্ম নিবন্ধন সংখ্যা'
+      'জন্ম নিবন্ধন সংখ্যা',
+    'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
+    'register.duplicates.description':
+      'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
+    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ'
   }
 }

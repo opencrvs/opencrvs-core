@@ -248,8 +248,7 @@ export const mockApplicationData = {
   registration: {
     whoseContactDetails: 'MOTHER',
     presentAtBirthRegistration: 'BOTH_PARENTS',
-    registrationPhone: '01557394986',
-    registrationEmail: 'test@tester.com'
+    registrationPhone: '01557394986'
   }
 }
 
