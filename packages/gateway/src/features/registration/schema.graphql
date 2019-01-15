@@ -130,6 +130,7 @@ type RegWorkflow { # Task
   timestamp: Date # -> lastModified
   comments: [Comment] # -> .note
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
 }
 
 input BirthRegistrationInput {

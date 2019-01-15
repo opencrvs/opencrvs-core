@@ -406,6 +406,18 @@ describe('Verify fhir bundle modifier functions', () => {
         }
       })
     })
+    it('set regLastOffice properly', async () => {
+      const taskResource = await setupLastRegLocation(
+        testFhirBundle.entry[1].resource as fhir.Task,
+        practitioner
+      )
+      expect(taskResource.extension[2]).toEqual({
+        url: 'http://opencrvs.org/specs/extension/regLastOffice',
+        valueReference: {
+          reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdxxx'
+        }
+      })
+    })
     it('throws error if invalid practitioner is provided', async () => {
       practitioner.id = undefined
       expect(
