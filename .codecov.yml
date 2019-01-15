@@ -48,3 +48,5 @@ ignore:
   - 'packages/register/src/src-sw.js'
   - 'packages/register/src/tests/graphql-schema-mock.ts'
   - 'packages/workflow/src/index.ts'
+  - 'packages/gateway/src/index.ts'
+  - 'packages/gateway/src/routes.ts'
