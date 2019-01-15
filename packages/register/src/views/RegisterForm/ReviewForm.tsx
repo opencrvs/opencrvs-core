@@ -426,7 +426,6 @@ export class ReviewFormView extends React.Component<IProps> {
     return documents
   }
   transformData = (reg: GQLBirthRegistration) => {
-    console.log('transforming')
     if (!reg) {
       return {}
     }
