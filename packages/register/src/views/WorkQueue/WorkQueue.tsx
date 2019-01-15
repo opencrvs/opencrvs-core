@@ -562,11 +562,11 @@ export class WorkQueueView extends React.Component<
           }`.trim()
           return prevNamesMap
         }, {})
-
+      const lang = 'bn'
       return {
         id: reg.id,
         name:
-          (namesMap(childNames)[this.props.language] as string) ||
+          (namesMap(childNames)[lang] as string) ||
           /* tslint:disable:no-string-literal */
           (namesMap(childNames)['default'] as string) ||
           /* tslint:enable:no-string-literal */
