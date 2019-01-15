@@ -1,10 +1,11 @@
-import { getPaperFormID } from '../fhir/fhir-utils'
+import { getTrackingIdFromTaskResource } from '../fhir/fhir-utils'
 import {
   getPractitionerLocations,
   getJurisDictionalLocations
 } from 'src/features/user/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
 import * as Verhoeff from 'node-verhoeff'
+import { convertStringToASCII } from '../utils'
 
 export async function generateBdBRN(
   taskResource: fhir.Task,
@@ -16,11 +17,14 @@ export async function generateBdBRN(
   /* appending BBS code for district & upozila & union */
   brn = brn.concat((await getLocationBBSCode(practitioner)) as string)
 
-  /* appending paper form id */
-  brn = brn.concat(getPaperFormID(taskResource) as string)
+  let trackingId = getTrackingIdFromTaskResource(taskResource) as string
+  /* appending ascii converted tracking id */
+  let brnToGenerateChecksum = brn.concat(convertStringToASCII(trackingId))
+  /* appending tracking id */
+  brn = brn.concat(trackingId)
 
   /* appending single verhoeff checksum digit */
-  brn = brn.concat(Verhoeff.generate(brn) as string)
+  brn = brn.concat(Verhoeff.generate(brnToGenerateChecksum) as string)
 
   return brn
 }

@@ -1,7 +1,8 @@
 import {
   generateBirthTrackingId,
   generateDeathTrackingId,
-  sendBirthNotification
+  sendBirthNotification,
+  convertStringToASCII
 } from './utils'
 import { setTrackingId } from './fhir/fhir-bundle-modifier'
 import { logger } from '../../logger'
@@ -23,6 +24,13 @@ describe('Verify utility functions', () => {
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
     expect(trackingId).toMatch(/^D/)
+  })
+
+  it('Converts string to corresponding ascii successfully', async () => {
+    const ascii = convertStringToASCII('B5WGYJE')
+
+    expect(ascii).toBeDefined
+    expect(ascii).toBe('66538771897469')
   })
 
   it('send Birth notification successfully', async () => {

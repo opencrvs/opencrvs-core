@@ -25,6 +25,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', (userType, options = {}) => {
+  indexedDB.deleteDatabase('OpenCRVS')
   const users = {
     fieldWorker: {
       mobile: '+8801711111111',
@@ -32,36 +33,35 @@ Cypress.Commands.add('login', (userType, options = {}) => {
     }
   }
   const user = users[userType]
-  cy
-    .request({
-      url: `${Cypress.env('AUTH_URL')}authenticate`,
-      method: 'POST',
-      body: {
-        mobile: user.mobile,
-        password: user.password
-      }
-    })
+  cy.request({
+    url: `${Cypress.env('AUTH_URL')}authenticate`,
+    method: 'POST',
+    body: {
+      mobile: user.mobile,
+      password: user.password
+    }
+  })
     .its('body')
     .then(body => {
-      cy
-        .request({
-          url: `${Cypress.env('AUTH_URL')}verifyCode`,
-          method: 'POST',
-          body: {
-            nonce: body.nonce,
-            code: '000000'
-          }
-        })
+      cy.request({
+        url: `${Cypress.env('AUTH_URL')}verifyCode`,
+        method: 'POST',
+        body: {
+          nonce: body.nonce,
+          code: '000000'
+        }
+      })
         .its('body')
         .then(body => {
           cy.visit(`${Cypress.env('REGISTER_URL')}?token=${body.token}`)
         })
     })
+  cy.wait(1000)
+  cy.get('#offline_data_continue').click()
 })
 
 Cypress.Commands.add('selectOption', (selector, text, option) => {
-  cy
-    .get(`${selector} input`)
+  cy.get(`${selector} input`)
     .first()
     .click({ force: true })
     .type(text, { force: true })

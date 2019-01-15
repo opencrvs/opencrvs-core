@@ -7,6 +7,7 @@ import {
   sendToFhir
 } from '../../../utils/bn'
 import chalk from 'chalk'
+import { titleCase } from '../../../utils/bn'
 
 interface ITestPractitioner {
   division: string
@@ -89,20 +90,22 @@ export async function composeAndSavePractitioners(
     const locations: fhir.Reference[] = []
     if (practitioner.facilityEnglishName) {
       const facility = await getFromFhir(
-        `/Location?name=${encodeURIComponent(practitioner.facilityEnglishName)}`
+        `/Location?name=${titleCase(
+          encodeURIComponent(practitioner.facilityEnglishName)
+        )}`
       )
       const facilityResource = facility.entry[0].resource
       locations.push({ reference: `Location/${facilityResource.id}` })
     }
     if (practitioner.division) {
       const practitionerDivision: fhir.Location = divisions.find(division => {
-        return division.name === practitioner.division
+        return division.name === titleCase(practitioner.division)
       }) as fhir.Location
       locations.push({ reference: `Location/${practitionerDivision.id}` })
     }
     if (practitioner.district) {
       const practitionerDistrict: fhir.Location = districts.find(district => {
-        return district.name === practitioner.district.toUpperCase()
+        return district.name === titleCase(practitioner.district)
       }) as fhir.Location
       locations.push({ reference: `Location/${practitionerDistrict.id}` })
     }

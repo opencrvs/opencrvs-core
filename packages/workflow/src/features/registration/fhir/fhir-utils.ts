@@ -19,7 +19,7 @@ enum CONTACT {
 export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
-      'getSharedContactMsisdn: Invalid FHIR bundle found for declaration'
+      'phoneNumberExists: Invalid FHIR bundle found for declaration'
     )
   }
   const taskResource = getTaskResource(fhirBundle) as fhir.Task
@@ -38,7 +38,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
     !sharedContact.valueString ||
     Object.keys(CONTACT).indexOf(sharedContact.valueString.toUpperCase()) < 0
   ) {
-    throw new Error("Invalid Informant's shared contact information found")
+    return false
   }
 
   const contact = findPersonEntry(
@@ -46,9 +46,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
     fhirBundle
   )
   if (!contact || !contact.telecom) {
-    throw new Error(
-      "Didn't find any contact point for informant's shared contact"
-    )
+    return false
   }
   const phoneNumber = contact.telecom.find(
     (contactPoint: fhir.ContactPoint) => {
@@ -56,9 +54,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
     }
   )
   if (!phoneNumber) {
-    throw new Error(
-      "Didn't find any phone number for informant's shared contact"
-    )
+    return false
   }
   return phoneNumber.value
 }
@@ -100,6 +96,22 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
     throw new Error('getTrackingId: Invalid FHIR bundle found for declaration')
   }
   return composition.identifier.value
+}
+
+export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
+  const trackingIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+      )
+    })
+  if (!trackingIdentifier || !trackingIdentifier.value) {
+    throw new Error("Didn't find any identifier for tracking id")
+  }
+  return trackingIdentifier.value
 }
 
 export function getBirthRegistrationNumber(taskResource: fhir.Task) {

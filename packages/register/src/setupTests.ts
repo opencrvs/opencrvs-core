@@ -1,3 +1,7 @@
+import * as fetch from 'jest-fetch-mock'
+
+jest.setMock('node-fetch', { default: fetch })
+
 const localStorageMock = {
   getItem: jest.fn(),
   setItem: jest.fn(),

@@ -129,6 +129,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
             {isExpanded && <Seperator />}
             {isExpanded && (
               <EditLink
+                id={`${title.replace(/[' ]+/g, '').trim()}_link`}
                 onClick={e => {
                   e.stopPropagation()
                   linkClickHandler()

@@ -2,6 +2,7 @@ import fetch, { Response } from 'node-fetch'
 import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
 import { sendToFhir, IOISFLocation, ILocation } from '../../../utils/bn'
 import chalk from 'chalk'
+import { titleCase } from '../../../utils/bn'
 
 const composeFhirLocation = (
   location: IOISFLocation,
@@ -25,7 +26,7 @@ const composeFhirLocation = (
         value: jurisdictionType
       }
     ],
-    name: location.name, // English name
+    name: titleCase(location.name), // English name
     alias: [location.nameBn], // Bangla name in element 0
     description: oisfA2IParams as string, // Reference to the route params used internally in OISF/A2I to find this location
     status: 'active',

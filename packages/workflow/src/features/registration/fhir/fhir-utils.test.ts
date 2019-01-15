@@ -30,25 +30,19 @@ describe('Verify getSharedContactMsisdn', () => {
   it('Throws error when invalid shared contact info given', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'INVALID'
-    expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
-      "Invalid Informant's shared contact information found"
-    )
+    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 
   it('Throws error when telecom is missing for shared contact', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'FATHER'
-    expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
-      "Didn't find any contact point for informant's shared contact"
-    )
+    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 
   it('Throws error when phonenumber is missing for shared contact', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[3].resource.telecom = []
-    expect(() => getSharedContactMsisdn(fhirBundle)).toThrowError(
-      "Didn't find any phone number for informant's shared contact"
-    )
+    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 })
 
@@ -216,6 +210,9 @@ describe('Verify getBirthRegistrationNumber', () => {
         { status: 200 }
       ]
     )
+    const birthTrackingId = 'B5WGYJE'
+    const brnChecksum = 1
+    testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
     const taskResource = await pushBRN(
       testFhirBundle.entry[1].resource as fhir.Task,
       practitioner
@@ -224,7 +221,9 @@ describe('Verify getBirthRegistrationNumber', () => {
 
     expect(brn).toBeDefined()
     expect(brn).toMatch(
-      new RegExp(`^${new Date().getFullYear()}10342112345678`)
+      new RegExp(
+        `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+      )
     )
   })
 
