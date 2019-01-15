@@ -655,6 +655,10 @@ export const BENGALI_STATE: ILanguage = {
       'জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে',
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'register.workQueue.labels.results.birthRegistrationNumber':
-      'জন্ম নিবন্ধন সংখ্যা'
+      'জন্ম নিবন্ধন সংখ্যা',
+    'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
+    'register.duplicates.description':
+      'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
+    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ'
   }
 }
