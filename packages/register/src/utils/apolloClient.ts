@@ -10,6 +10,7 @@ import { from } from 'apollo-link'
 import { IStoreState } from 'src/store'
 import { AnyAction, Store } from 'redux'
 
+export let client: any
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
   const httpLink = createHttpLink({
     uri: resolve(config.API_GATEWAY_URL, 'graphql')
@@ -31,8 +32,9 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
     }
   })
 
-  return new ApolloClient({
+  client = new ApolloClient({
     link: from([errorLink, authLink, httpLink]),
     cache: new InMemoryCache()
   })
+  return client
 }
