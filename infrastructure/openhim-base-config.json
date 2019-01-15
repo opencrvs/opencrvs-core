@@ -144,7 +144,7 @@
         {
           "name": "New Declaration",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
@@ -373,7 +373,7 @@
         {
           "name": "Certification",
           "secured": false,
-          "host": "10.0.0.73",
+          "host": "deduplication",
           "port": 9090,
           "path": "",
           "pathTransform": "",
