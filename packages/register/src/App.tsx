@@ -32,7 +32,7 @@ import { Home } from 'src/views/Home/Home'
 import { storage } from 'src/storage'
 import { setInitialDrafts } from 'src/drafts'
 import { setInitialUserDetails } from 'src/profile/profileActions'
-import { client } from 'src/utils/apolloClient'
+import { createClient } from 'src/utils/apolloClient'
 import { USER_DETAILS } from 'src/utils/userUtils'
 import { MyRecords } from './views/MyRecords/MyRecords'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
@@ -94,7 +94,9 @@ export class App extends React.Component<IAppProps, IState> {
     const { initialDraftsLoaded } = this.state
     if (initialDraftsLoaded) {
       return (
-        <ApolloProvider client={this.props.client || client}>
+        <ApolloProvider
+          client={this.props.client || createClient(this.props.store)}
+        >
           <Provider store={this.props.store}>
             <I18nContainer>
               <ThemeProvider theme={getTheme(config.COUNTRY)}>
