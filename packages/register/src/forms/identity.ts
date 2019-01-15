@@ -48,7 +48,7 @@ export const messages = defineMessages({
   },
   iD: {
     id: 'formFields.iD',
-    defaultMessage: 'NID number',
-    description: 'Label for form field: NID number'
+    defaultMessage: 'ID number',
+    description: 'Label for form field: ID number'
   }
 })
