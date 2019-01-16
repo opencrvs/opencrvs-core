@@ -715,7 +715,10 @@ describe('when user wants to print certificate', async () => {
       const PrintReceiptBtn = component.find('#print-receipt').hostNodes()
       expect(PrintReceiptBtn.length).toEqual(1)
 
+      const globalAny: any = global
+      globalAny.open = jest.fn()
       PrintReceiptBtn.simulate('click')
+      expect(globalAny.open).toBeCalled()
     })
   })
 })
