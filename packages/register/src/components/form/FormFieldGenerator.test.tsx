@@ -28,10 +28,11 @@ const offlineResources = {
 }
 
 import { messages as addressMessages } from 'src/forms/address'
+import { EVENT_TYPE } from 'src/utils/constants'
 
 describe('form component', () => {
   const { store } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(EVENT_TYPE.BIRTH)
   store.dispatch(storeDraft(draft))
   const modifyDraft = jest.fn()
   let component: ReactWrapper<{}, {}>
@@ -131,7 +132,7 @@ describe('form component', () => {
 
 describe('form component registration section', () => {
   const { store } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(EVENT_TYPE.BIRTH)
   store.dispatch(storeDraft(draft))
   const modifyDraft = jest.fn()
   let component: ReactWrapper<{}, {}>

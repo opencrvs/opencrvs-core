@@ -8,6 +8,7 @@ import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistrationAsParent } from 'src/navigation'
 import { createDraft, storeDraft } from '../../drafts'
+import { EVENT_TYPE } from 'src/utils/constants'
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -113,7 +114,7 @@ export const SelectInformant = connect(
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
       goToBirthRegistrationAsParent: () => {
-        const draft = createDraft()
+        const draft = createDraft(EVENT_TYPE.BIRTH)
         dispatch(storeDraft(draft))
         dispatch(goToBirthRegistrationAsParent(draft.id))
       }

@@ -13,6 +13,8 @@ const DELETE_DRAFT = 'DRAFTS/DELETE_DRAFT'
 export interface IDraft {
   id: string
   data: IFormData
+  savedOn?: number
+  event?: string
   review?: boolean
 }
 
@@ -67,8 +69,8 @@ const initialState = {
   drafts: []
 }
 
-export function createDraft() {
-  return { id: uuid(), data: {} }
+export function createDraft(event: string) {
+  return { id: uuid(), data: {}, event }
 }
 export function createReviewDraft(
   draftId: string,
@@ -78,6 +80,7 @@ export function createReviewDraft(
 }
 
 export function storeDraft(draft: IDraft): IStoreDraftAction {
+  draft.savedOn = Date.now()
   return { type: STORE_DRAFT, payload: { draft } }
 }
 

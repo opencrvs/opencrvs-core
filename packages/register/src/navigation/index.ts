@@ -5,7 +5,8 @@ import {
   WORK_QUEUE,
   DRAFT_BIRTH_PARENT_FORM,
   SELECT_VITAL_EVENT,
-  MY_RECORDS
+  MY_RECORDS,
+  MY_DRAFTS
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -55,6 +56,9 @@ export function goToWorkQueue() {
 }
 export function goToMyRecords() {
   return push(MY_RECORDS)
+}
+export function goToMyDrafts() {
+  return push(MY_DRAFTS)
 }
 
 export function goToBirthRegistrationAsParent(draftId: string) {

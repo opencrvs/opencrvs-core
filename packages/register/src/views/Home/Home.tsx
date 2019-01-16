@@ -5,7 +5,8 @@ import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
   goToEvents as goToEventsAction,
-  goToMyRecords as goToMyRecordsAction
+  goToMyRecords as goToMyRecordsAction,
+  goToMyDrafts as goToMyDraftsAction
 } from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import {
@@ -155,6 +156,7 @@ interface IHomeProps {
   userDetails: IUserDetails
   goToEvents: typeof goToEventsAction
   goToMyRecords: typeof goToMyRecordsAction
+  goToMyDrafts: typeof goToMyDraftsAction
 }
 
 type FullProps = IHomeProps & InjectedIntlProps & ISearchInputProps
@@ -200,6 +202,7 @@ class HomeView extends React.Component<FullProps> {
             <CountAction
               id="saved_drafts"
               count={'10'}
+              onClick={this.props.goToMyDrafts}
               title={intl.formatMessage(messages.savedDrafts)}
             />
             <CountAction
@@ -239,6 +242,7 @@ export const Home = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction,
-    goToMyRecords: goToMyRecordsAction
+    goToMyRecords: goToMyRecordsAction,
+    goToMyDrafts: goToMyDraftsAction
   }
 )(injectIntl(HomeView))

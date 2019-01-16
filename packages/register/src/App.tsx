@@ -37,6 +37,7 @@ import { USER_DETAILS } from 'src/utils/userUtils'
 import { MyRecords } from './views/MyRecords/MyRecords'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
+import { MyDrafts } from './views/MyDrafts/MyDrafts'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
@@ -157,6 +158,10 @@ export class App extends React.Component<IAppProps, IState> {
                           <ProtectedRoute
                             path={routes.MY_RECORDS}
                             component={MyRecords}
+                          />
+                          <ProtectedRoute
+                            path={routes.MY_DRAFTS}
+                            component={MyDrafts}
                           />
                           <ProtectedRoute
                             path={routes.REVIEW_DUPLICATES}
