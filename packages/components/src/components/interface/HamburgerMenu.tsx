@@ -43,105 +43,88 @@ const animation = {
 }
 
 const MenuContainer = styled.div`
-  top: 0;
   right: 0;
-  height: 90px;
   width: 199px;
   background-color: ${({ theme }) => theme.colors.primary};
   z-index: 3;
   position: absolute;
 
   .rc-menu {
+    background-color: ${({ theme }) => theme.colors.primary};
     outline: none;
     margin-bottom: 0;
     padding-left: 0;
     list-style: none;
   }
+
   .rc-menu-hidden {
     display: none;
   }
+
   .rc-menu-collapse {
     overflow: hidden;
   }
+
   .rc-menu-collapse-active {
     transition: height 0.3s ease-out;
   }
+
   .rc-menu-item-active,
-  .rc-menu-item-selected {
+  .rc-menu-item-selected,
+  .rc-menu-submenu-active > .rc-menu-submenu-title {
     background-color: ${({ theme }) => theme.colors.primary};
     font-weight: bold;
   }
-  .rc-menu.rc-menu-root.rc-menu-inline {
-    margin-top: 0px;
+
+  .rc-menu-vertical.rc-menu-sub {
+    min-width: 199px;
+    margin-top: 0;
   }
-  .rc-menu.rc-menu-root.rc-menu-inline
-    > li.rc-menu-submenu
-    > div.rc-menu-submenu-title {
-    padding-top: 30px;
-  }
-  .rc-menu.rc-menu-root > li.rc-menu-submenu {
-    padding: 0 !important;
-  }
-  .rc-menu-item:hover {
-    background-color: ${({ theme }) => theme.colors.primary};
-  }
+
   .rc-menu-item,
   .rc-menu-submenu-title {
-    margin: 0;
-    cursor: pointer;
-    position: relative;
-    display: block;
-    padding: 10px 7px 7px 16px;
-    white-space: nowrap;
-    min-height: 50px;
-    color: ${({ theme }) => theme.colors.white};
     font-family: ${({ theme }) => theme.fonts.lightFont};
+    cursor: pointer;
+    padding: 18px 22px;
+    min-height: 30px;
     font-size: 16px;
-    letter-spacing: 2px;
+    letter-spacing: 0px;
     line-height: 19px;
-  }
-  .rc-menu-submenu > .rc-menu {
-    background-color: ${({ theme }) => theme.colors.primary};
-  }
-  .rc-menu-inline > .rc-menu-item {
     text-align: right;
-    padding: 18px 22px !important;
+    width: 199px;
   }
-  .rc-menu-sub.rc-menu-inline {
-    padding: 0;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
+
+  .rc-menu-submenu-popup {
+    position: absolute;
+    z-index: 1;
+    top: 93px !important;
   }
-  .rc-menu-sub.rc-menu-inline > .rc-menu-item,
-  .rc-menu-sub.rc-menu-inline > .rc-menu-submenu > .rc-menu-submenu-title {
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-right: 0;
+
+  .rc-menu-submenu-placement-leftTop {
+    position: static;
   }
-  ul.rc-menu.rc-menu-sub li {
+
+  ul.rc-menu.rc-menu-sub.rc-menu-vertical > li {
     border-top: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
   }
-`
 
+  li.rc-menu-submenu.rc-menu-submenu-vertical > div:nth-child(2) {
+    position: relative !important;
+  }
+
+  li.rc-menu-submenu.rc-menu-submenu-vertical > div:nth-child(2) > div > div {
+    position: static !important;
+  }
+`
 const StyledSubMenu = styled(SubMenu)`
   .rc-menu-submenu-open {
     width: 199px;
   }
   > div.rc-menu-submenu-title {
-    min-height: 90px;
-    font-size: 14px;
-  }
-  > div.rc-menu-submenu-title > span {
-    display: inline-block;
-    margin-top: 5px;
-    margin-left: 40px;
-    font-weight: bold;
-    font-size: 14px;
-    text-transform: uppercase;
+    min-height: 77px;
+    text-align: center;
   }
 `
-
 const StyledNestedSubMenu = styled(SubMenu)`
   span:last-child {
     display: none;
@@ -158,36 +141,26 @@ const StyledNestedSubMenu = styled(SubMenu)`
     font-weight: bold;
   }
 `
-
 const StyledNestedMenuItem = styled(MenuItem)`
   background-color: ${({ theme }) => theme.colors.secondary};
 `
-
 const SubMenuTitleWrapper = styled.span`
-  height: 20px;
-  width: 80px;
   color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 16px;
-  letter-spacing: 2px;
-  line-height: 19px;
-  padding-right: 20px;
 `
-
-const IconWrapper = styled.span`
+const IconWrapper = styled.i`
   color: ${({ theme }) => theme.colors.white};
   right: 30px;
   margin-left: 20px;
   position: absolute;
 `
-
 const IconClose = styled.div`
   font-size: 45px;
-  margin-top: 2px;
+  margin-top: 0px;
   margin-right: 2px;
   font-family: ${({ theme }) => theme.fonts.lightFont};
 `
-
 interface IMenuItem {
   title: string
   key: string
@@ -195,35 +168,16 @@ interface IMenuItem {
   menuItems?: IMenuItem[]
   onClick?: () => void
 }
-
 interface IProps {
   menuTitle: string
   menuItems: IMenuItem[]
 }
-
-interface IState {
-  menuOpen: boolean
-}
-
-export class HamburgerMenu extends React.Component<IProps, IState> {
+export class HamburgerMenu extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props)
-    this.state = {
-      menuOpen: false
-    }
   }
 
-  toggleMenu = () => {
-    this.setState(state => ({
-      menuOpen: !state.menuOpen
-    }))
-  }
-
-  expandIcon = () => (
-    <IconWrapper>
-      {this.state.menuOpen ? <IconClose>&times;</IconClose> : <Hamburger />}
-    </IconWrapper>
-  )
+  getPopupMenu = () => document.getElementById('menu-container')
 
   render() {
     const menuOptions = this.props.menuItems.map((menuItem: IMenuItem) => {
@@ -260,21 +214,21 @@ export class HamburgerMenu extends React.Component<IProps, IState> {
     })
 
     return (
-      <MenuContainer>
+      <MenuContainer id="menu-container">
         <Menu
-          mode="inline"
-          id="hamburger-menu"
-          expandIcon={this.expandIcon}
+          mode="horizontal"
           openAnimation={animation}
           triggerSubMenuAction="click"
+          getPopupContainer={this.getPopupMenu}
         >
           <StyledSubMenu
-            onTitleClick={this.toggleMenu}
-            id="sub-menu"
             title={
-              <SubMenuTitleWrapper id="sub-menu-wrapper">
-                {this.state.menuOpen ? '' : this.props.menuTitle}
-              </SubMenuTitleWrapper>
+              <>
+                <SubMenuTitleWrapper className="menu-title">
+                  {'Menu'}
+                </SubMenuTitleWrapper>
+                <IconWrapper>{<Hamburger />}</IconWrapper>
+              </>
             }
           >
             {menuOptions}
