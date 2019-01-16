@@ -29,6 +29,7 @@
     "@types/jest": "^22.2.3",
     "@types/json2csv": "^4.2.0",
     "@types/node": "^10.12.5",
+    "@types/node-fetch": "^2.1.4",
     "csv2json": "^1.4.2",
     "dotenv": "^6.1.0",
     "eslint": "^5.8.0",
