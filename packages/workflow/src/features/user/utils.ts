@@ -57,6 +57,14 @@ export async function getPractitionerPrimaryLocation(
   )
 }
 
+export async function getPractitionerUnionLocation(
+  practitionerId: string
+): Promise<fhir.Location> {
+  return getUnionLocationFromLocationList(
+    await getPractitionerLocations(practitionerId)
+  )
+}
+
 export function getPrimaryLocationFromLocationList(
   locations: [fhir.Location]
 ): fhir.Location {
@@ -80,6 +88,25 @@ export function getPrimaryLocationFromLocationList(
   return primaryOffice
 }
 
+export function getUnionLocationFromLocationList(
+  locations: [fhir.Location]
+): fhir.Location {
+  let union: fhir.Location | undefined
+  locations.forEach((location: fhir.Location) => {
+    if (location.identifier) {
+      location.identifier.forEach((identifier: fhir.Identifier) => {
+        if (identifier.value === 'UNION') {
+          union = location
+        }
+      })
+    }
+  })
+  if (!union) {
+    throw new Error('No union found')
+  }
+  return union
+}
+
 export async function getLoggedInPractitionerLocations(
   token: string
 ): Promise<[fhir.Location]> {
@@ -100,7 +127,6 @@ export async function getLoggedInPractitionerResource(
     Authorization: `Bearer ${token}`
   })
   const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
-  console.log(`/Practitioner?telecom=phone|${localMobile}`)
   const practitionerBundle = await getFromFhir(
     `/Practitioner?telecom=phone|${localMobile}`
   )
@@ -121,6 +147,7 @@ export async function getPractitionerLocations(
   const roleResponse = await getFromFhir(
     `/PractitionerRole?practitioner=${practitionerId}`
   )
+
   const roleEntry = roleResponse.entry[0].resource
   if (!roleEntry || !roleEntry.location) {
     throw new Error('PractitionerRole has no locations associated')

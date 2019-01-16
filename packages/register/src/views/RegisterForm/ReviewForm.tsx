@@ -325,6 +325,18 @@ export class ReviewFormView extends React.Component<IProps> {
     return fatherDetails
   }
 
+  setMotherCurrentAddressSameAsPermanent(mother: IReviewSectionDetails) {
+    mother.currentAddressSameAsPermanent =
+      mother.countryPermanent === mother.country &&
+      mother.statePermanent === mother.state &&
+      mother.districtPermanent === mother.district &&
+      mother.addressLine1Permanent === mother.addressLine1 &&
+      mother.addressLine2Permanent === mother.addressLine2 &&
+      mother.addressLine3Permanent === mother.addressLine3 &&
+      mother.addressLine4Permanent === mother.addressLine4 &&
+      mother.postalCodePermanent === mother.postalCode
+  }
+
   setFatherAddressSameAsMother(
     father: IReviewSectionDetails,
     mother: IReviewSectionDetails
@@ -424,6 +436,8 @@ export class ReviewFormView extends React.Component<IProps> {
 
     this.setFatherAddressSameAsMother(father, mother)
     child.multipleBirth = mother.multipleBirth
+
+    this.setMotherCurrentAddressSameAsPermanent(mother)
 
     const registration = this.transformRegistration(reg)
 

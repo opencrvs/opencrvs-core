@@ -3,6 +3,7 @@ import { getRegStatusCode } from './fhir-utils'
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
+  getPractitionerUnionLocation,
   getPractitionerRef
 } from 'src/features/user/utils'
 import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
@@ -237,21 +238,46 @@ export async function setupLastRegLocation(
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  const primaryOffice = await getPractitionerPrimaryLocation(practitioner.id)
-
+  const union = await getPractitionerUnionLocation(practitioner.id)
   if (!taskResource.extension) {
     taskResource.extension = []
   }
-  const regUserExtension = taskResource.extension.find(extension => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
-    )
-  })
-  if (regUserExtension && regUserExtension.valueReference) {
-    regUserExtension.valueReference.reference = `Location/${primaryOffice.id}`
+  const regUserLastLocationExtension = taskResource.extension.find(
+    extension => {
+      return (
+        extension.url ===
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+      )
+    }
+  )
+  if (
+    regUserLastLocationExtension &&
+    regUserLastLocationExtension.valueReference
+  ) {
+    regUserLastLocationExtension.valueReference.reference = `Location/${
+      union.id
+    }`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+      valueReference: { reference: `Location/${union.id}` }
+    })
+  }
+
+  const primaryOffice = await getPractitionerPrimaryLocation(practitioner.id)
+
+  const regUserLastOfficeExtension = taskResource.extension.find(extension => {
+    return (
+      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+    )
+  })
+  if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
+    regUserLastOfficeExtension.valueReference.reference = `Location/${
+      primaryOffice.id
+    }`
+  } else {
+    taskResource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
       valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }

@@ -17,9 +17,9 @@ export async function generateBdBRN(
   /* appending BBS code for district & upozila & union */
   brn = brn.concat((await getLocationBBSCode(practitioner)) as string)
 
-  let trackingId = getTrackingIdFromTaskResource(taskResource) as string
+  const trackingId = getTrackingIdFromTaskResource(taskResource) as string
   /* appending ascii converted tracking id */
-  let brnToGenerateChecksum = brn.concat(convertStringToASCII(trackingId))
+  const brnToGenerateChecksum = brn.concat(convertStringToASCII(trackingId))
   /* appending tracking id */
   brn = brn.concat(trackingId)
 

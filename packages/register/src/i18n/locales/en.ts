@@ -616,6 +616,18 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
+    'register.workQueue.print.printCertificate': 'Print certificate',
+    'register.workQueue.print.finish': 'Finish',
+    'register.workQueue.print.certificatePreview': 'Certificate Preview',
+    'register.workQueue.print.selectSignature': 'Select e-signatures',
+    'register.workQueue.print.addAnotherSignature': 'Add another',
+    'register.noLabel': ' ',
+    'register.workQueue.print.signature.person1':
+      'UP Secretary Shakib al hasan',
+    'register.workQueue.print.signature.person2':
+      'Local Registrar Mohammad Ashraful',
+    'register.workQueue.print.userReviewed':
+      'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
@@ -672,6 +684,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.work-queue.certificate.service': 'Service: ',
     'register.work-queue.certificate.amount': 'Amount paid:\n\n',
     'register.work-queue.certificate.issuer':
-      'Issued at: {issuedAt},\n By: {role}, {name}\n Date of payment: {dateOfPayment}'
+      'Issued at: {issuedAt},\n By: {role}, {name}\n Date of payment: {dateOfPayment}',
+    'register.duplicates.title': 'Possible duplicates found',
+    'register.duplicates.description':
+      'The following application has been flagged as a possible duplicate of an existing registered record.',
+    'register.duplicates.pageTitle': 'Possible duplicate'
   }
 }

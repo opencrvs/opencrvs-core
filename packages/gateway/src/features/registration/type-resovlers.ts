@@ -254,6 +254,19 @@ export const typeResolvers: GQLResolver = {
         `/${taskLocation.valueReference.reference}`,
         authHeader
       )
+    },
+    office: async (task, _, authHeader) => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        task.extension
+      )
+      if (!taskLocation || !taskLocation.valueReference) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
     }
   },
   User: {
@@ -351,7 +364,9 @@ export const typeResolvers: GQLResolver = {
         encounterSection.entry[0].reference
 
       if (!encounterReference) {
-        return null
+        return {
+          composition: composition.id
+        }
       }
 
       const observation = {}

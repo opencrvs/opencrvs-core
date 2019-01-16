@@ -102,9 +102,9 @@ describe('WorkQueue tests', async () => {
                 child: {
                   name: [
                     {
-                      use: null,
-                      firstNames: 'Baby',
-                      familyName: 'Doe'
+                      use: 'bn',
+                      firstNames: '',
+                      familyName: 'অনিক'
                     }
                   ],
                   birthDate: null
@@ -147,9 +147,9 @@ describe('WorkQueue tests', async () => {
                 child: {
                   name: [
                     {
-                      use: 'en',
-                      firstNames: 'Baby',
-                      familyName: 'Smith'
+                      use: 'bn',
+                      firstNames: '',
+                      familyName: 'মাসুম'
                     }
                   ],
                   birthDate: null
@@ -181,7 +181,7 @@ describe('WorkQueue tests', async () => {
     expect(data).toEqual([
       {
         id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-        name: 'Baby Doe',
+        name: 'অনিক',
         dob: '',
         date_of_application: '2018-05-23',
         registrationNumber: '',
@@ -203,7 +203,7 @@ describe('WorkQueue tests', async () => {
       },
       {
         id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-        name: 'Baby Smith',
+        name: 'মাসুম',
         dob: '',
         date_of_application: '2018-05-23',
         registrationNumber: '',

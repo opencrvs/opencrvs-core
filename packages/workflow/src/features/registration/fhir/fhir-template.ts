@@ -21,14 +21,18 @@ export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
 }
 
 export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
-  let taskResource = getTaskResourceFromFhirBundle(fhirBundle)
+  let taskResource = getTaskResourceFromFhirBundle(fhirBundle) as fhir.Task
   if (!taskResource) {
     const taskEntry = createTaskRefTemplate()
     if (!fhirBundle.entry) {
       fhirBundle.entry = []
     }
+    taskResource = taskEntry.resource as fhir.Task
+    if (!taskResource.focus) {
+      taskResource.focus = { reference: '' }
+    }
+    taskResource.focus.reference = fhirBundle.entry[0].fullUrl
     fhirBundle.entry.push(taskEntry)
-    taskResource = taskEntry.resource
   }
   return taskResource
 }

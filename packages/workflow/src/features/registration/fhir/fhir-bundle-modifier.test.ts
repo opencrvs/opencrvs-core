@@ -8,7 +8,16 @@ import {
   setupAuthorOnNotes
 } from './fhir-bundle-modifier'
 import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
-import { testFhirBundle } from 'src/test/utils'
+import {
+  testFhirBundle,
+  userMock,
+  fieldAgentPractitionerMock,
+  fieldAgentPractitionerRoleMock,
+  districtMock,
+  upazilaMock,
+  unionMock,
+  officeMock
+} from '../../../test/utils'
 import { cloneDeep } from 'lodash'
 import * as fetch from 'jest-fetch-mock'
 
@@ -231,112 +240,16 @@ describe('Verify fhir bundle modifier functions', () => {
     }
     beforeEach(() => {
       fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/PractitionerRole/9c8b8ac2-9044-4b66-8d31-07c5a4b4348d',
-                resource: {
-                  resourceType: 'PractitionerRole',
-                  practitioner: {
-                    reference:
-                      'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-                  },
-                  code: [
-                    {
-                      coding: [
-                        {
-                          system: 'http://opencrvs.org/specs/roles',
-                          code: 'FIELD_AGENT'
-                        }
-                      ]
-                    }
-                  ],
-                  location: [
-                    {
-                      reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd9173'
-                    },
-                    {
-                      reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdxxx'
-                    },
-                    {
-                      reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdyyyy'
-                    }
-                  ],
-                  meta: {
-                    lastUpdated: '2018-11-25T17:31:08.096+00:00',
-                    versionId: '2f79ee2d-3b78-4c90-91d8-278e4a28caf7'
-                  },
-                  id: '9c8b8ac2-9044-4b66-8d31-07c5a4b4348d'
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Location',
-            id: 'd33e4cb2-670e-4564-a8ed-c72baacd9173',
-            identifier: [
-              {
-                system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-                value: '165'
-              },
-              { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
-              {
-                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'UPAZILA'
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Location',
-            id: 'd33e4cb2-670e-4564-a8ed-c72baacdxxx',
-            identifier: [
-              {
-                system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-                value: '165'
-              },
-              { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
-              {
-                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'UNION'
-              }
-            ],
-            physicalType: {
-              coding: [
-                {
-                  code: 'bu',
-                  display: 'Building'
-                }
-              ]
-            }
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            resourceType: 'Location',
-            id: 'd33e4cb2-670e-4564-a8ed-c72baacdyyyy',
-            identifier: [
-              {
-                system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-                value: '165'
-              },
-              { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
-              {
-                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'DISTRICT'
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }]
       )
     })
     it('Successfully modified the provided fhirBundle with brn', async () => {
@@ -391,34 +304,32 @@ describe('Verify fhir bundle modifier functions', () => {
     })
   })
   describe('setupLastRegLocation', () => {
-    const practitioner = {
-      resourceType: 'Practitioner',
-      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
-      telecom: [{ system: 'phone', value: '01711111111' }],
-      name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
-      ],
-      gender: 'male',
-      meta: {
-        lastUpdated: '2018-11-25T17:31:08.062+00:00',
-        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-      },
-      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-    }
     it('set regLastLocation properly', async () => {
       const taskResource = await setupLastRegLocation(
         testFhirBundle.entry[1].resource as fhir.Task,
-        practitioner
+        JSON.parse(fieldAgentPractitionerMock)
       )
       expect(taskResource.extension[2]).toEqual({
         url: 'http://opencrvs.org/specs/extension/regLastLocation',
         valueReference: {
-          reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdxxx'
+          reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
+        }
+      })
+    })
+    it('set regLastOffice properly', async () => {
+      const taskResource = await setupLastRegLocation(
+        testFhirBundle.entry[1].resource as fhir.Task,
+        JSON.parse(fieldAgentPractitionerMock)
+      )
+      expect(taskResource.extension[3]).toEqual({
+        url: 'http://opencrvs.org/specs/extension/regLastOffice',
+        valueReference: {
+          reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd12yy'
         }
       })
     })
     it('throws error if invalid practitioner is provided', async () => {
+      const practitioner = JSON.parse(fieldAgentPractitionerMock)
       practitioner.id = undefined
       expect(
         setupLastRegLocation(

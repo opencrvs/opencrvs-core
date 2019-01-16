@@ -8,13 +8,13 @@ const InputHeader = styled.div`
   justify-content: space-between;
 `
 
-const Optional = styled.div.attrs<
+const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 14px;
+  font-size: 18px;
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.accent};
+    disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
 `
 
@@ -74,12 +74,12 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
           {label && (
             <InputLabel id={`${id}_label`} disabled={this.props.disabled}>
               {label}
+              {!required && (
+                <Optional disabled={this.props.disabled}>
+                  &nbsp;&nbsp;•&nbsp;{optionalLabel}
+                </Optional>
+              )}
             </InputLabel>
-          )}
-          {!required && (
-            <Optional disabled={this.props.disabled}>
-              •&nbsp;{optionalLabel}
-            </Optional>
           )}
         </InputHeader>
 
@@ -89,15 +89,14 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
           {postfix && <Padding>{postfix}</Padding>}
         </ComponentWrapper>
 
-        {error &&
-          touched && (
-            <InputError
-              id={this.props.id + '_error'}
-              centred={!this.props.maxLength}
-            >
-              {error}
-            </InputError>
-          )}
+        {error && touched && (
+          <InputError
+            id={this.props.id + '_error'}
+            centred={!this.props.maxLength}
+          >
+            {error}
+          </InputError>
+        )}
 
         {description && <InputDescription>{description}</InputDescription>}
       </div>

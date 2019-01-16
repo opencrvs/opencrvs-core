@@ -611,6 +611,18 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
+    'register.workQueue.print.printCertificate': 'সার্টিফিকেট মুদ্রণ',
+    'register.workQueue.print.finish': 'সমাপ্ত',
+    'register.workQueue.print.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
+    'register.workQueue.print.selectSignature': 'ই-স্বাক্ষর নির্বাচন করুন',
+    'register.workQueue.print.addAnotherSignature':
+      'আরও একটি স্বাক্ষর যোগ করুন',
+    'register.noLabel': ' ',
+    'register.workQueue.print.signature.person1': 'ইউপি সচিব সাকিব আল হাসান',
+    'register.workQueue.print.signature.person2':
+      'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
+    'register.workQueue.print.userReviewed':
+      'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া যায়',
     'register.workQueue.buttons.reviewDuplicates': 'সদৃশগুলো পর্যালোচনা',
@@ -664,6 +676,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.work-queue.certificate.service': 'সেবা: ',
     'register.work-queue.certificate.amount': 'পরিশোধিত মূল্য: \n\n',
     'register.work-queue.certificate.issuer':
-      'প্রদানের স্থান: {issuedAt},\n প্রদানকারী: {role}, {name}\n তারিখ: {dateOfPayment}'
+      'প্রদানের স্থান: {issuedAt},\n প্রদানকারী: {role}, {name}\n তারিখ: {dateOfPayment}',
+    'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
+    'register.duplicates.description':
+      'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
+    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ'
   }
 }
