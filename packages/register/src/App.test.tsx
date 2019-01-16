@@ -29,6 +29,7 @@ import {
 import { storeOfflineData } from 'src/offline/actions'
 import { referenceApi } from 'src/utils/referenceApi'
 import { createClient } from './utils/apolloClient'
+import { EVENT_TYPE } from './utils/constants'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -406,7 +407,7 @@ describe('when user has a valid token in local storage', () => {
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
     beforeEach(() => {
-      draft = createDraft()
+      draft = createDraft(EVENT_TYPE.BIRTH)
       store.dispatch(storeDraft(draft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())

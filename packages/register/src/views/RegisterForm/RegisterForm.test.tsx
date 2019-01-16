@@ -21,13 +21,14 @@ import {
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+import { EVENT_TYPE } from 'src/utils/constants'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
 
   const mock: any = jest.fn()
   const form = getRegisterForm(store.getState())
-  const draft = createDraft()
+  const draft = createDraft(EVENT_TYPE.BIRTH)
   it('throws error when draft not found after initial drafts load', () => {
     try {
       createTestComponent(
@@ -55,7 +56,7 @@ describe('when user is in the register form before initial draft load', () => {
 
 describe('when user is in the register form', async () => {
   const { store, history } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(EVENT_TYPE.BIRTH)
   const initalDrafts = JSON.parse('[]')
   store.dispatch(setInitialDrafts(initalDrafts))
   store.dispatch(storeDraft(draft))
@@ -110,7 +111,7 @@ describe('when user is in the register form', async () => {
 
 describe('when user is in the register form preview section', () => {
   const { store, history } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(EVENT_TYPE.BIRTH)
   const initalDrafts = JSON.parse('[]')
   store.dispatch(setInitialDrafts(initalDrafts))
   store.dispatch(storeDraft(draft))

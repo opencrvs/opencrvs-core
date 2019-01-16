@@ -7,6 +7,7 @@ import { ViewHeader } from 'src/components/ViewHeader'
 import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
 import { Dispatch } from 'redux'
 import { createDraft, storeDraft } from 'src/drafts'
+import { EVENT_TYPE } from 'src/utils/constants'
 
 export const messages = defineMessages({
   registerNewEventTitle: {
@@ -99,7 +100,7 @@ export const SelectVitalEvent = connect(
     return {
       goToBirthRegistration: () => dispatch(goToBirthRegistration()),
       goToDeathRegistration: () => {
-        const draft = createDraft()
+        const draft = createDraft(EVENT_TYPE.BIRTH)
         dispatch(storeDraft(draft))
         dispatch(goToDeathRegistration(draft.id))
       }
