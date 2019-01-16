@@ -5,10 +5,11 @@ import { createStore } from 'src/store'
 import { createTestComponent, mockOfflineData, intl } from 'src/tests/util'
 import { createDraft } from 'src/drafts'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { EVENT_TYPE } from 'src/utils/constants'
 
 const { store } = createStore()
 const mockHandler = jest.fn()
-const draft = createDraft()
+const draft = createDraft(EVENT_TYPE.BIRTH)
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: { fathersDetailsExist: true, addressSameAsMother: false },
