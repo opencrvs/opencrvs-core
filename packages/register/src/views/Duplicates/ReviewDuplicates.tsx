@@ -4,6 +4,7 @@ import { Duplicate } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { WORK_QUEUE } from 'src/navigation/routes'
+import { DuplicateDetails } from 'src/components/DuplicateDetails'
 
 const messages = defineMessages({
   title: {
@@ -48,6 +49,17 @@ const HeaderText = styled.span`
   margin-left: 14px;
 `
 
+const Grid = styled.div`
+  margin-top: 24px;
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: auto auto;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    grid-template-columns: auto;
+  }
+`
+
 class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
   render() {
     return (
@@ -67,6 +79,11 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
             </Header>
             <p>{this.props.intl.formatMessage(messages.description)}</p>
           </TitleBox>
+          <Grid>
+            <DuplicateDetails />
+            <DuplicateDetails />
+            <DuplicateDetails />
+          </Grid>
         </Container>
       </ActionPage>
     )
