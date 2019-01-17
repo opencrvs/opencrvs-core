@@ -210,6 +210,7 @@ input DeathRegistrationInput {
   otherDeathLocation: String # use for other DeathLocationType
   deathLocation: DeathLocationType
   mannerOfDeath: MannerOfDeath
+  otherMannerOfDeath: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String # need to store ICD-10? More types of cause of death
   createdAt: Date
@@ -233,6 +234,7 @@ type DeathRegistration { # -> Composition
   otherDeathLocation: String # use for other DeathLocationType
   deathLocation: DeathLocationType
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  otherMannerOfDeath: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String # -> Observation.valueCodeableConcept
   createdAt: Date # -> .date($first)
