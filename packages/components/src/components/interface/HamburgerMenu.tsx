@@ -149,6 +149,15 @@ const SubMenuTitleWrapper = styled.span`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 16px;
 `
+
+const MenuTitleWrapper = styled.span`
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding-top: 10px;
+`
 const IconWrapper = styled.i`
   color: ${({ theme }) => theme.colors.white};
   right: 30px;
@@ -226,9 +235,9 @@ export class HamburgerMenu extends React.Component<IProps> {
             id="sub-menu"
             title={
               <>
-                <SubMenuTitleWrapper id="sub-menu-wrapper">
-                  {'Menu'}
-                </SubMenuTitleWrapper>
+                <MenuTitleWrapper id="sub-menu-wrapper">
+                  {this.props.menuTitle}
+                </MenuTitleWrapper>
                 <IconWrapper>{<Hamburger />}</IconWrapper>
               </>
             }
