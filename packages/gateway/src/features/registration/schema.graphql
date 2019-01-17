@@ -53,6 +53,7 @@ enum AttachmentType {
   PASSPORT_PHOTO
   BIRTH_REGISTRATION
   SCHOOL_CERTIFICATE
+  PROOF_OF_DEATH
   OTHER
 }
 
@@ -68,10 +69,12 @@ enum RegistrationType {
   DEATH
 }
 
-enum CauseOfDeath {
-  NATURAL
+enum MannerOfDeath {
+  NATURAL_CAUSES
   ACCIDENT
-  OTHER
+  SUICIDE
+  HOMICIDE
+  UNDETERMINED
 }
 
 enum PaymentType {
@@ -82,6 +85,28 @@ enum PaymentOutcomeType {
   COMPLETED
   ERROR
   PARTIAL
+}
+
+enum DeathLocationType {
+  HOSPITAL
+  HEALTH_INSTITUTION
+  PRIVATE_HOME
+  OTHER
+}
+
+enum CauseOfDeathMethodType {
+  VERBAL_AUTOPSY
+  MEDICALLY_CERTIFIED
+}
+
+enum RelationshipType {
+  FATHER
+  MOTHER
+  SPOUSE
+  SON
+  DAUGHTER
+  EXTENDED_FAMILY
+  OTHER
 }
 
 input PaymentInput {
@@ -180,14 +205,18 @@ input DeathRegistrationInput {
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
-  mother: PersonInput
-  father: PersonInput
-  informant: PersonInput
+  mother: PersonInput # -> Only use for foetal death
+  father: PersonInput # -> Only use for foetal death
+  informant: PersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
+  informantRelationship: RelationshipType
   # need to track multiple spouses for muslim countries
   spouse: [PersonInput]
   placeOfDeath: AddressInput
-  deathLocation: LocationInput
-  causeOfDeath: CauseOfDeath # need to store ICD-10? More types of cause of death
+  deathLocation: String
+  deathLocationType: DeathLocationType
+  mannerOfDeath: MannerOfDeath
+  causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeath: String # need to store ICD-10? More types of cause of death
   createdAt: Date
   updatedAt: Date
 }
@@ -198,14 +227,18 @@ type DeathRegistration { # -> Composition
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  mother: Person # -> .section(code='mother-details').entry.reference - create link to existing?
-  father: Person # -> .section(code='fater-details').entry.reference - create link to existing?
-  informant: Person # -> .section(code='informant-details').entry.reference
+  mother: Person # -> Only use for foetal death
+  father: Person # -> Only use for foetal death
+  informant: Person # -> Use for applicant ->.section(code='informant-details').entry.reference
+  informantRelationship: RelationshipType
   # need to track multiple spouses for muslim countries
   spouse: [Person] # -> .section(code='spouse-details').entry.reference # Not in BDRIS2
   placeOfDeath: Address
-  deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
-  causeOfDeath: CauseOfDeath # -> Observation.valueCodeableConcept
+  deathLocation: String
+  deathLocationType: DeathLocationType
+  mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeath: String # -> Observation.valueCodeableConcept
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
 }
