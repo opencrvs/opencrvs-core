@@ -430,7 +430,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.hedaer.hello': 'Hello {fullName}',
     'register.home.hedaer.FIELD_AGENT': 'Field Agent',
     'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
-    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.hedaer.LOCAL_REGISTRAR': 'রেজিস্ট্রার',
     'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
     'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
     'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar',
@@ -606,6 +606,8 @@ export const BENGALI_STATE: ILanguage = {
       'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.serviceYear':
       'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.service':
+      'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
@@ -668,6 +670,13 @@ export const BENGALI_STATE: ILanguage = {
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'register.workQueue.labels.results.birthRegistrationNumber':
       'জন্ম নিবন্ধন সংখ্যা',
+    'register.work-queue.certificate.header': 'জন্ম নিবন্ধন রশিদ',
+    'register.work-queue.certificate.subheader':
+      'জন্মদিবসের {DOBDiff} পর জন্ম নিবন্ধন',
+    'register.work-queue.certificate.service': 'সেবা: ',
+    'register.work-queue.certificate.amount': 'পরিশোধিত মূল্য: \n\n',
+    'register.work-queue.certificate.issuer':
+      'প্রদানের স্থান: {issuedAt},\n প্রদানকারী: {role}, {name}\n তারিখ: {dateOfPayment}',
     'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
     'register.duplicates.description':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
