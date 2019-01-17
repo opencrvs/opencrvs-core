@@ -1,11 +1,64 @@
 import * as React from 'react'
-import { Box } from '@opencrvs/components/lib/interface'
+import { Box, Chip } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
-import { StatusGray, StatusOrange } from '@opencrvs/components/lib/icons'
+import {
+  StatusGray,
+  StatusOrange,
+  StatusGreen,
+  StatusRejected,
+  StatusCollected
+} from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
-const DetailsBox = styled(Box)`
+export enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
+
+export enum Action {
+  SUBMITTED = 'submitted',
+  REJECTED = 'rejected',
+  REGISTERED = 'registered',
+  CERTIFIED = 'certified'
+}
+
+interface IProps {
+  data: {
+    dateOfApplication: string
+    trackingId: string
+    event: Event
+    child: {
+      name: string
+      dob: string
+      gender: string
+    }
+    mother?: {
+      name: string
+      dob: string
+      gender: string
+      id: string
+    }
+    father?: {
+      name: string
+      dob: string
+      gender: string
+      id: string
+    }
+    regStatusHistory: Array<{
+      action: Action
+      date: string
+      usersName: string
+      usersRole: string
+      office: string
+      reason?: string
+    }>
+  }
+}
+
+const DetailsBox = styled(Box).attrs<{ currentStatus: string }>({})`
   border-top: ${({ theme }) => ` 4px solid ${theme.colors.expandedIndicator}`};
+  ${({ currentStatus }) =>
+    currentStatus === 'rejected' ? `box-shadow: none` : ''}
 `
 
 const Separator = styled.div`
@@ -41,108 +94,130 @@ const TagContainer = styled.div`
   display: flex;
 `
 
-const StyledStatus = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  background-color: rgba(150, 150, 150, 0.1);
-  border-radius: 17px;
-  padding: 5px 10px 5px 7px;
-  margin: 2px 16px 2px 0;
-  display: flex;
-  align-items: center;
-  height: 32px;
-  & span {
-    color: ${({ theme }) => theme.colors.placeholder};
-    text-transform: uppercase;
-    margin-left: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 0.58px;
-  }
-` // copied code, extract to new component
-
 const ListContainer = styled.div`
   display: flex;
+  flex-direction: column;
+`
+
+const ListItem = styled.div`
+  display: flex;
+  margin-bottom: 16px;
 `
 
 const ListStatusContainer = styled.span`
   margin: 4px 8px;
 `
 
-export class DuplicateDetails extends React.Component {
+export class DuplicateDetails extends React.Component<IProps> {
+  normalizeAction(action: string) {
+    if (action === 'submitted') {
+      return 'application'
+    }
+
+    return action
+  }
+
+  renderStatusIcon(action: string) {
+    switch (action) {
+      case 'submitted':
+        return <StatusOrange />
+      case 'registered':
+        return <StatusGreen />
+      case 'rejected':
+        return <StatusRejected />
+      case 'certified':
+        return <StatusCollected />
+      default:
+        return <StatusGray />
+    }
+  }
+
   render() {
+    const currentStatus = this.props.data.regStatusHistory.slice(-1)[0].action
+    const data = this.props.data
+
     return (
-      <DetailsBox>
+      <DetailsBox currentStatus={currentStatus}>
         <DetailTextContainer>
           <DetailText>
-            <b>Name:</b> Isa Annika Gomes
+            <b>Name:</b> {data.child.name}
             <br />
-            <b>D.o.B.:</b> 04.10.2018
+            <b>D.o.B.:</b> {data.child.dob}
             <br />
-            <b>Gender:</b> Female
+            <b>Gender:</b> {data.child.gender}
             <br />
-            <b>Date of application:</b> 10.10.2018
+            <b>Date of application:</b> {data.dateOfApplication}
             <br />
-            <b>Tracking ID:</b> 413276930474
+            <b>Tracking ID:</b> {data.trackingId}
             <br />
             <br />
           </DetailText>
           <Link>Not a duplicate?</Link>
         </DetailTextContainer>
         <DetailTextSplitContainer>
-          <DetailText>
-            <b>Mother</b>
-            <br />
-            <b>Name:</b> Jane Gomes
-            <br />
-            <b>D.o.B.:</b> 04.10.2018
-            <br />
-            <b>Gender:</b> Female
-            <br />
-            <b>ID:</b> 413276930474
-            <br />
-          </DetailText>
-          <DetailText>
-            <b>Father</b>
-            <br />
-            <b>Name:</b> Paul Gomes
-            <br />
-            <b>D.o.B.:</b> 04.10.2018
-            <br />
-            <b>Gender:</b> Male
-            <br />
-            <b>ID:</b> 413276930474
-            <br />
-          </DetailText>
+          {data.mother && (
+            <DetailText>
+              <b>Mother</b>
+              <br />
+              <b>Name:</b> {data.mother.name}
+              <br />
+              <b>D.o.B.:</b> {data.mother.dob}
+              <br />
+              <b>Gender:</b> {data.mother.gender}
+              <br />
+              <b>ID:</b> {data.mother.id}
+              <br />
+            </DetailText>
+          )}
+          {data.father && (
+            <DetailText>
+              <b>Father</b>
+              <br />
+              <b>Name:</b> {data.father.name}
+              <br />
+              <b>D.o.B.:</b> {data.father.dob}
+              <br />
+              <b>Gender:</b> {data.father.gender}
+              <br />
+              <b>ID:</b> {data.father.id}
+              <br />
+            </DetailText>
+          )}
         </DetailTextSplitContainer>
         <Separator />
         <TagContainer>
-          <StyledStatus key={1}>
-            <StatusGray />
-            <span>Birth</span>
-          </StyledStatus>
-          <StyledStatus key={2}>
-            <StatusOrange />
-            <span>Application</span>
-          </StyledStatus>
+          <Chip status={<StatusGray />} text={data.event} />
+          <Chip
+            status={<StatusOrange />}
+            text={this.normalizeAction(currentStatus)}
+          />
         </TagContainer>
         <Separator />
         <ListContainer>
-          <ListStatusContainer>
-            <StatusOrange />
-          </ListStatusContainer>
-          <DetailText>
-            <b>Application submitted on:</b> 10.10.2018
-            <br />
-            <b>By:</b> Riku Rouvila
-            <br />
-            Family Welfare Assistant
-            <br />
-            Gazipur Union Health Clinic
-            <br />
-          </DetailText>
+          {data.regStatusHistory.map(status => (
+            <ListItem>
+              <ListStatusContainer>
+                {this.renderStatusIcon(status.action)}
+              </ListStatusContainer>
+              <DetailText>
+                <b>Application {status.action} on:</b> {status.date}
+                <br />
+                <b>By:</b> {status.usersName}
+                <br />
+                {status.usersRole}
+                <br />
+                {status.office}
+                <br />
+              </DetailText>
+            </ListItem>
+          ))}
         </ListContainer>
-        <Separator />
-        <PrimaryButton>Review</PrimaryButton>
+        {currentStatus === 'submitted' && (
+          <>
+            <Separator />
+            <PrimaryButton>Review</PrimaryButton>
+          </>
+        )}
       </DetailsBox>
     )
   }
