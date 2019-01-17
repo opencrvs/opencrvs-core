@@ -63,8 +63,12 @@ enum AddressType {
 }
 
 enum RelationshipType {
-  MOTHER
   FATHER
+  MOTHER
+  SPOUSE
+  SON
+  DAUGHTER
+  EXTENDED_FAMILY
   OTHER
 }
 
@@ -80,11 +84,13 @@ type IdentityType { # -> Identifier
 
 input RelatedPersonInput {
   relationship: RelationshipType
+  otherRelationship: String
   individual: PersonInput
 }
 
 type RelatedPerson { # -> Related Person
   relationship: RelationshipType # -> .relationship.coding
+  otherRelationship: String # -> .relationship.coding
   individual: Person # -> .patient.reference
 }
 

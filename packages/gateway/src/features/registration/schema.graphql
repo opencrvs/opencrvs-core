@@ -99,16 +99,6 @@ enum CauseOfDeathMethodType {
   MEDICALLY_CERTIFIED
 }
 
-enum RelationshipType {
-  FATHER
-  MOTHER
-  SPOUSE
-  SON
-  DAUGHTER
-  EXTENDED_FAMILY
-  OTHER
-}
-
 input PaymentInput {
   paymentId: ID
   type: PaymentType
@@ -170,8 +160,10 @@ input BirthRegistrationInput {
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
+  otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
   presentAtBirthRegistration: BirthRegPresence # Informant in BDRIS2
+  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
@@ -192,8 +184,10 @@ type BirthRegistration { # -> Composition
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
+  otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType # -> Observation.valueString
   presentAtBirthRegistration: BirthRegPresence # -> Observation.valueString
+  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
@@ -207,13 +201,14 @@ input DeathRegistrationInput {
   deceased: PersonInput
   mother: PersonInput # -> Only use for foetal death
   father: PersonInput # -> Only use for foetal death
-  informant: PersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
+  informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType
+  otherInformantRelationship: String
   # need to track multiple spouses for muslim countries
   spouse: [PersonInput]
   placeOfDeath: AddressInput
-  deathLocation: String
-  deathLocationType: DeathLocationType
+  otherDeathLocation: String # use for other DeathLocationType
+  deathLocation: DeathLocationType
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -229,13 +224,14 @@ type DeathRegistration { # -> Composition
   deceased: Person # -> .section(code='deceased-details').entry.reference
   mother: Person # -> Only use for foetal death
   father: Person # -> Only use for foetal death
-  informant: Person # -> Use for applicant ->.section(code='informant-details').entry.reference
+  informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType
+  otherInformantRelationship: String
   # need to track multiple spouses for muslim countries
   spouse: [Person] # -> .section(code='spouse-details').entry.reference # Not in BDRIS2
   placeOfDeath: Address
-  deathLocation: String
-  deathLocationType: DeathLocationType
+  otherDeathLocation: String # use for other DeathLocationType
+  deathLocation: DeathLocationType
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String # -> Observation.valueCodeableConcept
@@ -302,6 +298,7 @@ input AttachmentInput {
   originalFileName: String
   systemFileName: String
   type: AttachmentType
+  description: String # -> use for other document type -> .description
   subject: AttachmentSubject
   createdAt: Date
 }
@@ -317,6 +314,7 @@ type Attachment { # -> DocumentReference
   originalFileName: String # -> .identifier
   systemFileName: String # -> .identifier
   type: AttachmentType # -> .type
+  description: String # -> use for other document type -> .description
   subject: AttachmentSubject # -> .subject (convert this to a reference to the person resoure in FHIR)
   createdAt: Date # -> .created
 }
