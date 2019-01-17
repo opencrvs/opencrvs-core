@@ -28,6 +28,7 @@ import {
 } from '@opencrvs/register/src/profile/profileActions'
 import { storeOfflineData } from 'src/offline/actions'
 import { referenceApi } from 'src/utils/referenceApi'
+import { createClient } from './utils/apolloClient'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -100,6 +101,11 @@ describe('when session expired', () => {
     const testApp = createTestApp()
     app = testApp.app
     store = testApp.store
+  })
+
+  it('when apolloClient is created', () => {
+    app.debug()
+    createClient(store)
   })
 
   it('displays session expired confirmation dialog', () => {

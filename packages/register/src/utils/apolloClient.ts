@@ -27,7 +27,12 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
   })
 
   const errorLink = onError((error: any) => {
-    if (error.networkError.statusCode === 401) {
+    if (
+      error &&
+      error.networkError &&
+      error.networkError.statusCode &&
+      error.networkError.statusCode === 401
+    ) {
       store.dispatch(showSessionExpireConfirmation())
     }
   })
