@@ -217,14 +217,16 @@ export class HamburgerMenu extends React.Component<IProps> {
       <MenuContainer id="menu-container">
         <Menu
           mode="horizontal"
+          id="hamburger-menu"
           openAnimation={animation}
           triggerSubMenuAction="click"
           getPopupContainer={this.getPopupMenu}
         >
           <StyledSubMenu
+            id="sub-menu"
             title={
               <>
-                <SubMenuTitleWrapper className="menu-title">
+                <SubMenuTitleWrapper id="sub-menu-wrapper">
                   {'Menu'}
                 </SubMenuTitleWrapper>
                 <IconWrapper>{<Hamburger />}</IconWrapper>

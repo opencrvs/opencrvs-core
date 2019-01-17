@@ -46,7 +46,7 @@ describe('when user is in the menu page', () => {
     }
   ]
 
-  const menuTitleTextSelector = `.menu-title`
+  const menuTitleTextSelector = `#sub-menu-wrapper`
 
   beforeEach(async () => {
     const testComponent = createTestComponent(
