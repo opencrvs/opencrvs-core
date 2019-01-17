@@ -204,8 +204,6 @@ input DeathRegistrationInput {
   informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType
   otherInformantRelationship: String
-  # need to track multiple spouses for muslim countries
-  spouse: [PersonInput]
   placeOfDeath: AddressInput
   otherDeathLocation: String # use for other DeathLocationType
   deathLocation: DeathLocationType
@@ -228,8 +226,6 @@ type DeathRegistration { # -> Composition
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType
   otherInformantRelationship: String
-  # need to track multiple spouses for muslim countries
-  spouse: [Person] # -> .section(code='spouse-details').entry.reference # Not in BDRIS2
   placeOfDeath: Address
   otherDeathLocation: String # use for other DeathLocationType
   deathLocation: DeathLocationType
