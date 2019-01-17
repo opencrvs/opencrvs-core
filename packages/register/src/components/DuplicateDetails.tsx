@@ -53,6 +53,7 @@ interface IProps {
       reason?: string
     }>
   }
+  notDuplicateHandler?: () => void
 }
 
 const DetailsBox = styled(Box).attrs<{ currentStatus: string }>({})`
@@ -152,7 +153,11 @@ export class DuplicateDetails extends React.Component<IProps> {
             <br />
             <br />
           </DetailText>
-          <Link>Not a duplicate?</Link>
+          {this.props.notDuplicateHandler && (
+            <Link onClick={this.props.notDuplicateHandler}>
+              Not a duplicate?
+            </Link>
+          )}
         </DetailTextContainer>
         <DetailTextSplitContainer>
           {data.mother && (

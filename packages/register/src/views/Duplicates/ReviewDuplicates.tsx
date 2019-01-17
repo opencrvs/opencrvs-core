@@ -198,7 +198,12 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
           </TitleBox>
           <Grid>
             {mockDupeData.map(data => (
-              <DuplicateDetails data={data} />
+              <DuplicateDetails
+                data={data}
+                notDuplicateHandler={() => {
+                  alert('Not a duplicate! (°◇°)')
+                }}
+              />
             ))}
           </Grid>
         </Container>
