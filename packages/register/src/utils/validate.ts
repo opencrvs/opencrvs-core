@@ -6,6 +6,7 @@ import { IFormFieldValue } from '@opencrvs/register/src/forms'
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
 import { isArray } from 'util'
+import { valid } from 'joi'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
@@ -305,29 +306,32 @@ export const range = (min: number, max: number) => (value: string) => {
 export const validIDNumber: ValidationInitializer = (
   typeOfID: string
 ): Validation => (value: string) => {
+  const validNationalIDLength = 17
+  const validBirthRegistrationNumberLength = 17
+  const validDeathRegistrationNumberLength = 17
   switch (typeOfID) {
     case 'NATIONAL_ID':
-      return hasValidLength(value, 17)
+      return hasValidLength(value, validNationalIDLength)
         ? undefined
         : {
             message: messages.validNationalId,
-            props: { maxLength: 17 }
+            props: { maxLength: validNationalIDLength }
           }
 
     case 'BIRTH_REGISTRATION_NUMBER':
-      return hasValidLength(value, 17)
+      return hasValidLength(value, validBirthRegistrationNumberLength)
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
-            props: { maxLength: 17 }
+            props: { maxLength: validBirthRegistrationNumberLength }
           }
 
     case 'DEATH_REGISTRATION_NUMBER':
-      return hasValidLength(value, 17)
+      return hasValidLength(value, validDeathRegistrationNumberLength)
         ? undefined
         : {
             message: messages.validDeathRegistrationNumber,
-            props: { maxLength: 17 }
+            props: { maxLength: validDeathRegistrationNumberLength }
           }
 
     default:

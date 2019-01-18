@@ -48,9 +48,14 @@ export interface IDynamicTextFieldValidators {
   dependencies: string[]
 }
 
+export type IDynamicTextFieldLabelMapper = (
+  key: string
+) => FormattedMessage.MessageDescriptor
+
 export interface IDynamicTextFieldDefinitions {
   label?: {
     dependency: string
+    labelMapper: IDynamicTextFieldLabelMapper
   }
   validate?: IDynamicTextFieldValidators[]
 }

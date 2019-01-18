@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 import { config } from 'src/config'
-import { messages as identityMessages } from '../identity'
+import { messages as identityMessages, identityOptions } from '../identity'
 import { messages as maritalStatusMessages } from '../maritalStatus'
 import { messages as educationMessages } from '../education'
 import {
@@ -29,6 +29,7 @@ import { messages as addressMessages } from '../address'
 import { countries } from '../countries'
 import { conditionals } from '../utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import { iDType } from 'src/views/PrintCertificate/ParentDetails'
 
 const messages = defineMessages({
   motherTab: {
@@ -116,19 +117,7 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        {
-          value: 'DEATH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeDRN
-        },
-        { value: 'OTHER', label: identityMessages.iDTypeOther }
-      ]
+      options: identityOptions
     },
     {
       name: 'iDTypeOther',
@@ -144,7 +133,8 @@ export const motherSection: IFormSection = {
       type: TEXT_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
-          dependency: 'iDType'
+          dependency: 'iDType',
+          labelMapper: iDType
         },
         validate: [
           {

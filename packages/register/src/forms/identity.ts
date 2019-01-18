@@ -52,3 +52,17 @@ export const messages = defineMessages({
     description: 'Label for form field: ID number'
   }
 })
+
+export const identityOptions = [
+  { value: 'NATIONAL_ID', label: messages.iDTypeNationalID },
+  {
+    value: 'BIRTH_REGISTRATION_NUMBER',
+    label: messages.iDTypeBRN
+  },
+  { value: 'PASSPORT', label: messages.iDTypePassport },
+  {
+    value: 'DEATH_REGISTRATION_NUMBER',
+    label: messages.iDTypeDRN
+  },
+  { value: 'OTHER', label: messages.iDTypeOther }
+]

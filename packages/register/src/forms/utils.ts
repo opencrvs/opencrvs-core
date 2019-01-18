@@ -24,7 +24,6 @@ import {
   ILocation
 } from 'src/offline/reducer'
 import { config } from 'src/config'
-import { iDType } from 'src/views/PrintCertificate/ParentDetails'
 import { Validation } from 'src/utils/validate'
 
 export const internationaliseFieldObject = (
@@ -85,7 +84,9 @@ export const getFieldLabel = (
   if (!field.dynamicDefinitions.label) {
     return undefined
   }
-  return iDType(values[field.dynamicDefinitions.label.dependency] as string)
+  return field.dynamicDefinitions.label.labelMapper(values[
+    field.dynamicDefinitions.label.dependency
+  ] as string)
 }
 
 export const getFieldValidation = (
