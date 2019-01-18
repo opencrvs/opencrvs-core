@@ -6,7 +6,6 @@ import { IFormFieldValue } from '@opencrvs/register/src/forms'
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
 import { isArray } from 'util'
-import { valid } from 'joi'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
