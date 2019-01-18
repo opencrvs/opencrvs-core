@@ -680,6 +680,25 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
     'register.duplicates.description':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
-    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ'
+    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ',
+    'register.duplicates.details.name': 'Name',
+    'register.duplicates.details.dob': 'D.o.B.',
+    'register.duplicates.details.gender': 'Gender',
+    'register.duplicates.details.dateOfApplication': 'Date of application',
+    'register.duplicates.details.trackingId': 'Tracking ID',
+    'register.duplicates.details.notDuplicate': 'Not a duplicate?',
+    'register.duplicates.details.mother': 'Mother',
+    'register.duplicates.details.father': 'Father',
+    'register.duplicates.details.id': 'ID',
+    'register.duplicates.details.applicationState': 'Application {action} on',
+    'register.duplicates.details.by': 'By',
+    'register.duplicates.details.review': 'Review',
+    'register.duplicates.details.birthEvent': 'Birth',
+    'register.duplicates.details.deathEvent': 'Death',
+    'register.duplicates.details.application': 'application',
+    'register.duplicates.details.submitted': 'submitted',
+    'register.duplicates.details.rejected': 'rejected',
+    'register.duplicates.details.registered': 'registered',
+    'register.duplicates.details.certified': 'certified'
   }
 }

@@ -6,6 +6,7 @@ import {
   StatusGray,
   StatusCollected
 } from '../icons'
+import { Chip } from './Chip'
 
 interface IProp {
   label: string
@@ -64,26 +65,12 @@ const StatusDiv = styled.div`
     margin-top: 10px;
   }
 `
-const StyledStatus = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  background-color: rgba(150, 150, 150, 0.1);
-  border-radius: 17px;
-  padding: 5px 10px 5px 7px;
-  margin: 2px 5px 2px 0;
-  display: flex;
-  align-items: center;
-  height: 32px;
-  & span {
-    text-transform: uppercase;
-    margin-left: 5px;
-    font-size: 13px;
-  }
-`
 
 const StyledLabel = styled.label`
   font-family: ${({ theme }) => theme.fonts.boldFont};
   margin-right: 3px;
 `
+
 const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
 `
@@ -110,15 +97,26 @@ export class ResultList extends React.Component<IList> {
               ))}
             </InfoDiv>
             <StatusDiv>
-              {item.status.map((sts: IStatus) => (
-                <StyledStatus>
-                  {sts.type === 'orange' && <StatusOrange />}
-                  {sts.type === 'gray' && <StatusGray />}
-                  {sts.type === 'green' && <StatusGreen />}
-                  {sts.type === 'collected' && <StatusCollected />}
-                  <span>{sts.label}</span>
-                </StyledStatus>
-              ))}
+              {item.status.map((sts: IStatus, i) => {
+                let status
+                switch (sts.type) {
+                  case 'orange':
+                    status = <StatusOrange />
+                    break
+                  case 'gray':
+                    status = <StatusGray />
+                    break
+                  case 'green':
+                    status = <StatusGreen />
+                    break
+                  case 'collected':
+                    status = <StatusCollected />
+                    break
+                  default:
+                    status = <StatusGray />
+                }
+                return <Chip key={i} status={status} text={sts.label} />
+              })}
             </StatusDiv>
           </ListItemContainer>
         ))}
