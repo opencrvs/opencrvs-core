@@ -59,8 +59,6 @@ class SessionExpireComponent extends React.Component<
   }
 }
 
-// export const SessionExpireConfirmation = injectIntl(SessionExpireComponent)
-
 const mapStateToProps = (store: IStoreState) => {
   return {
     sessionExpired: store.notification.sessionExpired

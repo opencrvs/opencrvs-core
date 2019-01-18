@@ -104,12 +104,11 @@ describe('when session expired', () => {
   })
 
   it('when apolloClient is created', () => {
-    app.debug()
-    createClient(store)
+    const client = createClient(store)
+    expect(client.link).toBeDefined()
   })
 
   it('displays session expired confirmation dialog', () => {
-    app.debug()
     // @ts-ignore
     const action = actions.showSessionExpireConfirmation()
     store.dispatch(action)
