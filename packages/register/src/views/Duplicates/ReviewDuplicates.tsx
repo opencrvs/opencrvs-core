@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { ActionPage, Box } from '@opencrvs/components/lib/interface'
-// import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ActionPage, Box, Modal } from '@opencrvs/components/lib/interface'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
-// import gql from 'graphql-tag'
-// import { Mutation } from 'react-apollo'
+import gql from 'graphql-tag'
+import { Mutation } from 'react-apollo'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { WORK_QUEUE } from 'src/navigation/routes'
@@ -12,6 +12,8 @@ import {
   Action as RegAction,
   Event
 } from 'src/components/DuplicateDetails'
+import { RouteComponentProps } from 'react-router'
+import { REVIEW_DUPLICATES } from 'src/navigation/routes'
 
 const messages = defineMessages({
   title: {
@@ -29,6 +31,22 @@ const messages = defineMessages({
     id: 'register.duplicates.pageTitle',
     defaultMessage: 'Possible duplicate',
     description: 'The duplicates page title'
+  },
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Title of the back link'
+  },
+  rejectButton: {
+    id: 'register.duplicates.button.reject',
+    defaultMessage: 'Reject',
+    description: 'Title of the reject button'
+  },
+  rejectDescription: {
+    id: 'register.duplicates.modal.reject',
+    defaultMessage:
+      'Are you sure you want to reject this application for being a duplicate ?',
+    description: 'Description of the reject modal'
   }
 })
 
@@ -66,15 +84,14 @@ const Grid = styled.div`
     grid-template-columns: auto;
   }
 `
-/*
-const rejectMutation = gql`
-  mutation submitBirthAsRejected($id: ID!) {
-    markBirthAsVoided(id: $id, reason: "Duplicate")
-  }
-`*/
+const BackButton = styled.a`
+  text-decoration: underline;
+  color: ${({ theme }) => theme.colors.primary};
+`
 
 const mockDupeData = [
   {
+    id: '79ec2c9b-3d48-4591-a09f-bc37dced4a49',
     dateOfApplication: '17.01.2019',
     trackingId: '1234567890',
     event: Event.BIRTH,
@@ -106,6 +123,7 @@ const mockDupeData = [
     ]
   },
   {
+    id: '2',
     dateOfApplication: '17.01.2019',
     trackingId: '1234567890',
     event: Event.BIRTH,
@@ -146,6 +164,7 @@ const mockDupeData = [
     ]
   },
   {
+    id: '3',
     dateOfApplication: '17.01.2019',
     trackingId: '1234567890',
     event: Event.BIRTH,
@@ -185,7 +204,41 @@ const mockDupeData = [
     ]
   }
 ]
-class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
+const rejectMutation = gql`
+  mutation submitBirthAsRejected($id: ID!, $reason: string) {
+    markBirthAsVoided(id: $id, reason: $reason)
+  }
+`
+
+type State = {
+  selectedCompositionID: string
+  showRejectModal: boolean
+}
+type Props = InjectedIntlProps & RouteComponentProps<{}>
+
+class ReviewDuplicatesClass extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      selectedCompositionID: '',
+      showRejectModal: false
+    }
+  }
+
+  toggleRejectModal = (id: string = '') => {
+    this.setState((prevState: State) => ({
+      selectedCompositionID: id,
+      showRejectModal: !prevState.showRejectModal
+    }))
+  }
+
+  successfulRejection = (response: string) => {
+    const { history } = this.props
+    history.push(REVIEW_DUPLICATES, {
+      applicationId: response
+    })
+  }
+
   render() {
     const { intl } = this.props
     return (
@@ -212,12 +265,52 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
                   alert('Not a duplicate! (°◇°)')
                 }}
                 rejectHandler={() => {
-                  alert('rejected')
+                  this.toggleRejectModal(data.id)
                 }}
               />
             ))}
           </Grid>
         </Container>
+        <Mutation
+          mutation={rejectMutation}
+          variables={{
+            id: this.state.selectedCompositionID,
+            reason: 'Duplicate'
+          }}
+        >
+          {(submitBirthAsRejected, { data }) => {
+            if (data && data.markBirthAsVoided) {
+              this.successfulRejection(data.markBirthAsVoided)
+            }
+            return (
+              <Modal
+                title={intl.formatMessage(messages.rejectDescription)}
+                actions={[
+                  <PrimaryButton
+                    key="reject"
+                    id="reject_confirm"
+                    onClick={() => submitBirthAsRejected()}
+                  >
+                    {intl.formatMessage(messages.rejectButton)}
+                  </PrimaryButton>,
+                  <BackButton
+                    key="back"
+                    onClick={() => {
+                      this.toggleRejectModal()
+                      if (document.documentElement) {
+                        document.documentElement.scrollTop = 0
+                      }
+                    }}
+                  >
+                    {intl.formatMessage(messages.back)}
+                  </BackButton>
+                ]}
+                show={this.state.showRejectModal}
+                handleClose={this.toggleRejectModal}
+              />
+            )
+          }}
+        </Mutation>
       </ActionPage>
     )
   }

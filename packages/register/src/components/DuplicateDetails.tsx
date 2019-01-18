@@ -248,7 +248,6 @@ class DuplicateDetailsClass extends React.Component<
   }
 
   renderStatusIcon(action: string) {
-    console.log(action)
     switch (action) {
       case 'submitted':
         return <StatusOrange />
