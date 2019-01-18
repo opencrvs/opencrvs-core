@@ -369,7 +369,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
-          breadcrumb="Informant: Parent"
           id="informant_parent_view"
           title={intl.formatMessage(title)}
         >
