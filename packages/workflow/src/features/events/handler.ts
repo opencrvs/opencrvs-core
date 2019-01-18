@@ -112,6 +112,7 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.BIRTH_MARK_REG:
       response = await markBirthAsRegisteredHandler(request, h)
+      forwardToOpenHim(Events.BIRTH_UPDATE_DEC, request)
       break
     case Events.BIRTH_MARK_CERT:
       response = await markBirthAsCertifiedHandler(request, h)
