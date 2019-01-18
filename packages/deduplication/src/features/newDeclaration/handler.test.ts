@@ -4,6 +4,7 @@ import * as fetch from 'jest-fetch-mock'
 import { createServer } from 'src/index'
 import {
   mockFhirBundle,
+  mockTaskBundle,
   mockSearchResponse,
   mockCompositionEntry
 } from 'src/test/utils'
@@ -14,97 +15,132 @@ jest.mock('src/elasticsearch/dbhelper.ts')
 describe('Verify handlers', () => {
   let server: any
 
-  beforeEach(async () => {
-    server = await createServer()
+  describe('insertNewDeclarationHandler:', () => {
+    beforeEach(async () => {
+      server = await createServer()
+    })
+
+    it('should return status code 500 if invalid payload received', async () => {
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:deduplication-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/new-declaration',
+        payload: {},
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(500)
+    })
+
+    it('should return status code 200 if the composition indexed correctly', async () => {
+      indexComposition.mockReturnValue({})
+      searchComposition.mockReturnValue(mockSearchResponse)
+      fetch.mockResponses(
+        [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify({})]
+      )
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:deduplication-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/new-declaration',
+        payload: mockFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
+    afterAll(async () => {
+      jest.clearAllMocks()
+    })
   })
 
-  it('insertNewDeclaration returns status code 500 if invalid payload received', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
+  describe('updatedDeclarationHandler:', () => {
+    beforeEach(async () => {
+      server = await createServer()
     })
 
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/events/birth/new-declaration',
-      payload: {},
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+    it('should return status code 500 if composition identifier not available in payload', async () => {
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:deduplication-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/update-declaration',
+        payload: {},
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(500)
     })
 
-    expect(res.statusCode).toBe(500)
-  })
+    it('should skip indexing if composition not updated', async () => {
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:deduplication-user'
+      })
 
-  it('insertNewDeclaration returns status code 200 if the composition indexed correctly', async () => {
-    indexComposition.mockReturnValue({})
-    searchComposition.mockReturnValue(mockSearchResponse)
-    fetch.mockResponses(
-      [JSON.stringify(mockCompositionEntry)],
-      [JSON.stringify(mockCompositionEntry)],
-      [JSON.stringify({})]
-    )
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/update-declaration',
+        payload: mockTaskBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(indexComposition.mock.calls.length).toBe(0)
     })
 
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/events/birth/new-declaration',
-      payload: mockFhirBundle,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+    it('should return status code 200 if the composition indexed correctly', async () => {
+      indexComposition.mockReturnValue({})
+      searchComposition.mockReturnValue(mockSearchResponse)
+      fetch.mockResponses(
+        [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify({})]
+      )
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:deduplication-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/update-declaration',
+        payload: mockFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
     })
 
-    expect(res.statusCode).toBe(200)
-  })
-
-  it('updatedDeclarationHandler returns status code 500 if composition not available in payload', async () => {
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
+    afterAll(async () => {
+      jest.clearAllMocks()
     })
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/events/birth/update-declaration',
-      payload: {},
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    expect(res.statusCode).toBe(500)
-  })
-
-  it('insertNewDeclaration returns status code 200 if the composition indexed correctly', async () => {
-    indexComposition.mockReturnValue({})
-    searchComposition.mockReturnValue(mockSearchResponse)
-    fetch.mockResponses(
-      [JSON.stringify(mockCompositionEntry)],
-      [JSON.stringify(mockCompositionEntry)],
-      [JSON.stringify({})]
-    )
-    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
-    })
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/events/birth/update-declaration',
-      payload: mockFhirBundle,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    expect(res.statusCode).toBe(200)
   })
 })

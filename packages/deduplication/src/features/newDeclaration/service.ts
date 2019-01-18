@@ -31,14 +31,13 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
 
 export async function insertUpdatedDeclaration(bundle: fhir.Bundle) {
   const bundleEntries = bundle.entry
-  const entry = bundleEntries && bundleEntries[0].resource
-  if (
-    bundleEntries &&
-    bundleEntries.length === 1 &&
-    entry &&
-    entry.resourceType === 'Task'
-  ) {
-    throw new Error(`Composition not found`)
+
+  if (bundleEntries && bundleEntries.length === 1) {
+    const resource = bundleEntries[0].resource
+    if (resource && resource.resourceType === 'Task') {
+      logger.info(`Composition not updated, skipping`)
+      return
+    }
   }
 
   const composition = (bundleEntries &&
@@ -61,7 +60,7 @@ async function indexAndSearchComposition(
   const body: ICompositionBody = {}
   createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
-  await detectAndUpdateDuplicates(compositionIdentifier, body)
+  await detectAndUpdateDuplicates(compositionIdentifier, composition, body)
 }
 
 function createIndexBody(
@@ -95,6 +94,7 @@ function createChildIndex(
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child.birthDate
+  body.gender = child.gender
 }
 
 function createMotherIndex(
@@ -154,6 +154,7 @@ function createFatherIndex(
 
 async function detectAndUpdateDuplicates(
   compositionIdentifier: string,
+  composition: fhir.Composition,
   body: ICompositionBody
 ) {
   const duplicates = await detectDuplicates(compositionIdentifier, body)
@@ -164,40 +165,20 @@ async function detectAndUpdateDuplicates(
     `Deduplication/service: ${duplicates.length} duplicate composition(s) found`
   )
 
-  duplicates.push(compositionIdentifier)
-
-  return await updateDuplicateCompositions(duplicates)
+  if (composition.id) {
+    return await updateCompositionWithDuplicates(composition, duplicates)
+  }
+  const compositionWithId = await getCompositionByIdentifier(
+    compositionIdentifier
+  )
+  return await updateCompositionWithDuplicates(compositionWithId, duplicates)
 }
 
-async function updateDuplicateCompositions(duplicates: string[]) {
-  const duplicateCompositions = await Promise.all(
-    duplicates.map(duplicate => getCompositionByIdentifier(duplicate))
-  )
+async function updateCompositionWithDuplicates(
+  composition: fhir.Composition,
+  duplicates: string[]
+) {
+  addDuplicatesToComposition(duplicates, composition)
 
-  const compositionEntriesWithDuplicates: fhir.BundleEntry[] = []
-
-  duplicateCompositions.map((currentComposition: fhir.BundleEntry) => {
-    const duplicatesForCurrentComposition = duplicateCompositions
-      .filter((duplicateComposition: fhir.BundleEntry) => {
-        return (
-          (currentComposition.resource && currentComposition.resource.id) !==
-          (duplicateComposition.resource && duplicateComposition.resource.id)
-        )
-      })
-      .map(dupComposition => dupComposition.resource.id)
-
-    const compositionWithDuplicate = addDuplicatesToComposition(
-      duplicatesForCurrentComposition,
-      currentComposition
-    )
-    compositionEntriesWithDuplicates.push(compositionWithDuplicate)
-  })
-
-  const bundle = {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: compositionEntriesWithDuplicates
-  }
-
-  return postToHearth(bundle)
+  return postToHearth(composition, composition.id)
 }
