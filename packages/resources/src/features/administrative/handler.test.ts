@@ -13,7 +13,7 @@ describe('administrative handler receives a request', () => {
       jest
         .spyOn(locationsService, 'getLocations')
         .mockReturnValue(
-          '{ "data": [{  "id": "ba819b89-57ec-4d8b-8b91-e8865579a40f",  "name": "Barisal",  "nameBn": "বরিশাল",  "physicalType": "Jurisdiction",  "juristictionType": "DIVISION",  "type": "ADMIN_STRUCTURE",  "partOf": "Location/0"}]}'
+          '{ "data": [{  "id": "ba819b89-57ec-4d8b-8b91-e8865579a40f",  "name": "Barisal",  "nameBn": "বরিশাল",  "physicalType": "Jurisdiction",  "jurisdictionType": "DIVISION",  "type": "ADMIN_STRUCTURE",  "partOf": "Location/0"}]}'
         )
       const res = await server.server.inject({
         method: 'GET',

@@ -259,7 +259,7 @@ export const mockOfflineData = {
       name: 'Barisal',
       nameBn: 'বরিশাল',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -268,7 +268,7 @@ export const mockOfflineData = {
       name: 'Chittagong',
       nameBn: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -277,7 +277,7 @@ export const mockOfflineData = {
       name: 'Dhaka',
       nameBn: 'ঢাকা',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -286,7 +286,7 @@ export const mockOfflineData = {
       name: 'Khulna',
       nameBn: 'খুলনা',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -295,7 +295,7 @@ export const mockOfflineData = {
       name: 'Rajshahi',
       nameBn: 'রাজশাহী',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -304,7 +304,7 @@ export const mockOfflineData = {
       name: 'Rangpur',
       nameBn: 'রংপুর',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -313,7 +313,7 @@ export const mockOfflineData = {
       name: 'Sylhet',
       nameBn: 'সিলেট',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -322,7 +322,7 @@ export const mockOfflineData = {
       name: 'Mymensingh',
       nameBn: 'ময়মনসিংহ',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
@@ -331,7 +331,7 @@ export const mockOfflineData = {
       name: 'BARGUNA',
       nameBn: 'বরগুনা',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
@@ -340,7 +340,7 @@ export const mockOfflineData = {
       name: 'BARISAL',
       nameBn: 'বরিশাল',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
@@ -349,7 +349,7 @@ export const mockOfflineData = {
       name: 'BHOLA',
       nameBn: 'ভোলা',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
@@ -358,7 +358,7 @@ export const mockOfflineData = {
       name: 'JHALOKATI',
       nameBn: 'ঝালকাঠি',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
@@ -367,7 +367,7 @@ export const mockOfflineData = {
       name: 'PATUAKHALI',
       nameBn: 'পটুয়াখালী ',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
@@ -376,7 +376,7 @@ export const mockOfflineData = {
       name: 'PIROJPUR',
       nameBn: 'পিরোজপুর ',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
@@ -385,7 +385,7 @@ export const mockOfflineData = {
       name: 'BANDARBAN',
       nameBn: 'বান্দরবান',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
@@ -394,7 +394,7 @@ export const mockOfflineData = {
       name: 'BRAHMANBARIA',
       nameBn: 'ব্রাহ্মণবাড়িয়া',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
@@ -403,7 +403,7 @@ export const mockOfflineData = {
       name: 'CHANDPUR',
       nameBn: 'চাঁদপুর',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
@@ -412,7 +412,7 @@ export const mockOfflineData = {
       name: 'CHITTAGONG',
       nameBn: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
@@ -421,7 +421,7 @@ export const mockOfflineData = {
       name: 'COMILLA',
       nameBn: 'কুমিল্লা',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
@@ -430,7 +430,7 @@ export const mockOfflineData = {
       name: "COX'S BAZAR",
       nameBn: 'কক্সবাজার ',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
@@ -439,7 +439,7 @@ export const mockOfflineData = {
       name: 'FENI',
       nameBn: 'ফেনী',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DISTRICT',
+      jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     }

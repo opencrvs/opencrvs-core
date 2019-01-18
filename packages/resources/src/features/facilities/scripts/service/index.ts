@@ -1,5 +1,8 @@
+import { Response } from 'node-fetch'
 import { ORG_URL } from '../../../../constants'
 import { getLocationIDByDescription, sendToFhir } from '../../../utils/bn'
+import { ILocation } from '../../../utils/bn'
+
 interface IDGHSFacility {
   division: string
   district: string
@@ -56,12 +59,31 @@ const composeFhirLocation = (
   }
 }
 
+export function generateLocationResource(
+  fhirLocation: fhir.Location
+): ILocation {
+  const loc = {} as ILocation
+  loc.id = fhirLocation.id
+  loc.name = fhirLocation.name
+  loc.nameBn = fhirLocation.alias && fhirLocation.alias[0]
+  loc.physicalType =
+    fhirLocation.physicalType &&
+    fhirLocation.physicalType.coding &&
+    fhirLocation.physicalType.coding[0].display
+  loc.type =
+    fhirLocation.type &&
+    fhirLocation.type.coding &&
+    fhirLocation.type.coding[0].code
+  loc.partOf = fhirLocation.partOf && fhirLocation.partOf.reference
+  return loc
+}
+
 export async function composeAndSaveFacilities(
   facilities: IDGHSFacility[],
   parentLocations: fhir.Location[]
-): Promise<boolean> {
+): Promise<fhir.Location[]> {
+  const locations: fhir.Location[] = []
   for (const facility of facilities) {
-    console.log(facility.A2IReference)
     const parentLocationID = await getLocationIDByDescription(
       parentLocations,
       facility.A2IReference
@@ -76,10 +98,18 @@ export async function composeAndSaveFacilities(
         facility.facilityNameEnglish
       }`
     )
-
-    await sendToFhir(newLocation, '/Location', 'POST').catch(err => {
-      throw Error('Cannot save location to FHIR ')
-    })
+    const savedLocationResponse = (await sendToFhir(
+      newLocation,
+      '/Location',
+      'POST'
+    ).catch(err => {
+      throw Error('Cannot save location to FHIR')
+    })) as Response
+    const locationHeader = savedLocationResponse.headers.get(
+      'location'
+    ) as string
+    newLocation.id = locationHeader.split('/')[3]
+    locations.push(newLocation)
   }
-  return true
+  return locations
 }
