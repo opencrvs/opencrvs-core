@@ -1,4 +1,7 @@
-import { newDeclarationHandler } from 'src/features/newDeclaration/handler'
+import {
+  newDeclarationHandler,
+  updatedDeclarationHandler
+} from 'src/features/newDeclaration/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -22,6 +25,29 @@ export const getRoutes = () => {
         auth: false,
         description:
           'Handles indexing a new declaration and searching for duplicates',
+        plugins: {
+          'hapi-swagger': {
+            responses: {
+              200: {
+                description: 'Successful'
+              },
+              400: {
+                description: 'Bad request'
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/update-declaration',
+      handler: updatedDeclarationHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Handles indexing an updated declaration and searching for duplicates',
         plugins: {
           'hapi-swagger': {
             responses: {

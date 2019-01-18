@@ -62,4 +62,49 @@ describe('Verify handlers', () => {
 
     expect(res.statusCode).toBe(200)
   })
+
+  it('updatedDeclarationHandler returns status code 500 if composition not available in payload', async () => {
+    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:deduplication-user'
+    })
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/update-declaration',
+      payload: {},
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(500)
+  })
+
+  it('insertNewDeclaration returns status code 200 if the composition indexed correctly', async () => {
+    indexComposition.mockReturnValue({})
+    searchComposition.mockReturnValue(mockSearchResponse)
+    fetch.mockResponses(
+      [JSON.stringify(mockCompositionEntry)],
+      [JSON.stringify(mockCompositionEntry)],
+      [JSON.stringify({})]
+    )
+    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:deduplication-user'
+    })
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/update-declaration',
+      payload: mockFhirBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+  })
 })

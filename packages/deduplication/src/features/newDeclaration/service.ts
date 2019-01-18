@@ -26,6 +26,38 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
     throw new Error(`Composition Identifier not found`)
   }
 
+  indexAndSearchComposition(compositionIdentifier, composition, bundleEntries)
+}
+
+export async function insertUpdatedDeclaration(bundle: fhir.Bundle) {
+  const bundleEntries = bundle.entry
+  const entry = bundleEntries && bundleEntries[0].resource
+  if (
+    bundleEntries &&
+    bundleEntries.length === 1 &&
+    entry &&
+    entry.resourceType === 'Task'
+  ) {
+    throw new Error(`Composition not found`)
+  }
+
+  const composition = (bundleEntries &&
+    bundleEntries[0].resource) as fhir.Composition
+  const compositionIdentifier =
+    composition.identifier && composition.identifier.value
+
+  if (!compositionIdentifier) {
+    throw new Error(`Composition Identifier not found`)
+  }
+
+  indexAndSearchComposition(compositionIdentifier, composition, bundleEntries)
+}
+
+async function indexAndSearchComposition(
+  compositionIdentifier: string,
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
+) {
   const body: ICompositionBody = {}
   createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
