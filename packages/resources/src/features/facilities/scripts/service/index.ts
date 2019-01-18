@@ -26,7 +26,7 @@ const composeFhirLocation = (
     status: 'active',
     mode: 'instance',
     partOf: {
-      reference: partOfReference // Reference to the office this office falls under, if any
+      reference: partOfReference // Reference to the location this office falls under, if any
     },
     type: {
       coding: [
@@ -58,16 +58,17 @@ const composeFhirLocation = (
 
 export async function composeAndSaveFacilities(
   facilities: IDGHSFacility[],
-  unions: fhir.Location[]
+  parentLocations: fhir.Location[]
 ): Promise<boolean> {
   for (const facility of facilities) {
-    const unionID = await getLocationIDByDescription(
-      unions,
+    console.log(facility.A2IReference)
+    const parentLocationID = await getLocationIDByDescription(
+      parentLocations,
       facility.A2IReference
     )
     const newLocation: fhir.Location = composeFhirLocation(
       facility,
-      `Location/${unionID}`
+      `Location/${parentLocationID}`
     )
     // tslint:disable-next-line:no-console
     console.log(
