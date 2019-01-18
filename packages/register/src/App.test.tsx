@@ -28,6 +28,7 @@ import {
 } from '@opencrvs/register/src/profile/profileActions'
 import { storeOfflineData } from 'src/offline/actions'
 import { referenceApi } from 'src/utils/referenceApi'
+import { createClient } from './utils/apolloClient'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -89,6 +90,31 @@ describe('when user has a valid token in url but an expired one in localStorage'
 
   it("doesn't redirect user to SSO", async () => {
     expect(assign.mock.calls).toHaveLength(0)
+  })
+})
+
+describe('when session expired', () => {
+  let app: ReactWrapper
+  let store: Store
+
+  beforeEach(() => {
+    const testApp = createTestApp()
+    app = testApp.app
+    store = testApp.store
+  })
+
+  it('when apolloClient is created', () => {
+    const client = createClient(store)
+    expect(client.link).toBeDefined()
+  })
+
+  it('displays session expired confirmation dialog', () => {
+    // @ts-ignore
+    const action = actions.showSessionExpireConfirmation()
+    store.dispatch(action)
+    app.update()
+
+    expect(app.find('#login').hostNodes()).toHaveLength(1)
   })
 })
 
