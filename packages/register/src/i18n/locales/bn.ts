@@ -680,6 +680,25 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
     'register.duplicates.description':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
-    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ'
+    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ',
+    'register.duplicates.details.name': 'নাম',
+    'register.duplicates.details.dob': 'জন্ম তারিখ',
+    'register.duplicates.details.gender': 'লিঙ্গ',
+    'register.duplicates.details.dateOfApplication': 'আবেদন তারিখ',
+    'register.duplicates.details.trackingId': 'ট্র্যাকিং আইডি',
+    'register.duplicates.details.notDuplicate': 'এটি নকল না?',
+    'register.duplicates.details.mother': 'মা',
+    'register.duplicates.details.father': 'পিতা',
+    'register.duplicates.details.id': 'আইডি',
+    'register.duplicates.details.applicationState': 'Application {action} on',
+    'register.duplicates.details.by': 'দ্বারা',
+    'register.duplicates.details.review': 'পর্যালোচনা',
+    'register.duplicates.details.birthEvent': 'জন্ম',
+    'register.duplicates.details.deathEvent': 'মরণ',
+    'register.duplicates.details.application': 'আবেদন',
+    'register.duplicates.details.submitted': 'পেশ',
+    'register.duplicates.details.rejected': 'প্রত্যাখ্যাত',
+    'register.duplicates.details.registered': 'নিবন্ধভুক্ত',
+    'register.duplicates.details.certified': 'প্রত্যয়িত'
   }
 }

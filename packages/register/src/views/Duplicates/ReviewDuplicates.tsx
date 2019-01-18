@@ -1,12 +1,17 @@
 import * as React from 'react'
-import { ActionPage, Box, Modal } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ActionPage, Box } from '@opencrvs/components/lib/interface'
+// import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
-import gql from 'graphql-tag'
-import { Mutation } from 'react-apollo'
+// import gql from 'graphql-tag'
+// import { Mutation } from 'react-apollo'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { WORK_QUEUE } from 'src/navigation/routes'
+import {
+  DuplicateDetails,
+  Action as RegAction,
+  Event
+} from 'src/components/DuplicateDetails'
 
 const messages = defineMessages({
   title: {
@@ -51,20 +56,136 @@ const HeaderText = styled.span`
   margin-left: 14px;
 `
 
+const Grid = styled.div`
+  margin-top: 24px;
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: auto auto;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    grid-template-columns: auto;
+  }
+`
+/*
 const rejectMutation = gql`
   mutation submitBirthAsRejected($id: ID!) {
     markBirthAsVoided(id: $id, reason: "Duplicate")
   }
-`
+`*/
 
-class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
-  successfulSubmission = (response: string) => {
-    const { history } = this.props
-    history.push(SAVED_REGISTRATION, {
-      ID: response
-    })
+const mockDupeData = [
+  {
+    dateOfApplication: '17.01.2019',
+    trackingId: '1234567890',
+    event: Event.BIRTH,
+    child: {
+      name: 'Isa Annika Gomes',
+      dob: '10.10.2018',
+      gender: 'Female'
+    },
+    mother: {
+      name: 'Jane Gomes',
+      dob: '01.01.1950',
+      gender: 'Female',
+      id: '321'
+    },
+    father: {
+      name: 'Jack Gomes',
+      dob: '01.02.1955',
+      gender: 'Male',
+      id: '123'
+    },
+    regStatusHistory: [
+      {
+        action: RegAction.SUBMITTED,
+        date: '17.01.2019',
+        usersName: 'Ryan Crichton',
+        usersRole: 'Family Welfare Assistant',
+        office: 'Gazipur Union Health Clinic'
+      }
+    ]
+  },
+  {
+    dateOfApplication: '17.01.2019',
+    trackingId: '1234567890',
+    event: Event.BIRTH,
+    child: {
+      name: 'Isa Annika Gomes',
+      dob: '10.10.2018',
+      gender: 'Female'
+    },
+    mother: {
+      name: 'Jane Gomes',
+      dob: '01.01.1950',
+      gender: 'Female',
+      id: '321'
+    },
+    father: {
+      name: 'Jack Gomes',
+      dob: '01.02.1955',
+      gender: 'Male',
+      id: '123'
+    },
+    regStatusHistory: [
+      {
+        action: RegAction.SUBMITTED,
+        date: '17.01.2019',
+        usersName: 'Ryan Crichton',
+        usersRole: 'Family Welfare Assistant',
+        office: 'Gazipur Union Health Clinic',
+        reason: ''
+      },
+      {
+        action: RegAction.REJECTED,
+        date: '17.01.2019',
+        usersName: 'Euan Millar',
+        usersRole: 'Registrar',
+        office: 'Gazipur Union Registration Office',
+        reason: 'Duplicate'
+      }
+    ]
+  },
+  {
+    dateOfApplication: '17.01.2019',
+    trackingId: '1234567890',
+    event: Event.BIRTH,
+    child: {
+      name: 'Isa Annika Gomes',
+      dob: '10.10.2018',
+      gender: 'Female'
+    },
+    mother: {
+      name: 'Jane Gomes',
+      dob: '01.01.1950',
+      gender: 'Female',
+      id: '321'
+    },
+    father: {
+      name: 'Jack Gomes',
+      dob: '01.02.1955',
+      gender: 'Male',
+      id: '123'
+    },
+    regStatusHistory: [
+      {
+        action: RegAction.SUBMITTED,
+        date: '17.01.2019',
+        usersName: 'Ryan Crichton',
+        usersRole: 'Family Welfare Assistant',
+        office: 'Gazipur Union Health Clinic',
+        reason: ''
+      },
+      {
+        action: RegAction.REGISTERED,
+        date: '17.01.2019',
+        usersName: 'Ryan Crichton',
+        usersRole: 'Family Welfare Assistant',
+        office: 'Gazipur Union Health Clinic'
+      }
+    ]
   }
-
+]
+class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
   render() {
     const { intl } = this.props
     return (
@@ -82,42 +203,20 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
             </Header>
             <p>{intl.formatMessage(messages.description)}</p>
           </TitleBox>
-          <Mutation mutation={rejectMutation} variables={{ id: '22' }}>
-            {(submitBirthAsRejected, { data }) => {
-              if (data && data.markBirthAsVoided) {
-                this.successfulSubmission(data.markBirthAsVoided)
-              }
-              return (
-                <Modal
-                  title="Are you ready to submit?"
-                  actions={[
-                    <PrimaryButton
-                      key="submit"
-                      id="submit_confirm"
-                      onClick={() => submitBirthAsRejected()}
-                    >
-                      {intl.formatMessage(messages.submitButton)}
-                    </PrimaryButton>,
-                    <PreviewButton
-                      key="preview"
-                      onClick={() => {
-                        this.toggleSubmitModalOpen()
-                        if (document.documentElement) {
-                          document.documentElement.scrollTop = 0
-                        }
-                      }}
-                    >
-                      {intl.formatMessage(messages.preview)}
-                    </PreviewButton>
-                  ]}
-                  show={this.state.showSubmitModal}
-                  handleClose={this.toggleSubmitModalOpen}
-                >
-                  {intl.formatMessage(messages.submitDescription)}
-                </Modal>
-              )
-            }}
-          </Mutation>
+          <Grid>
+            {mockDupeData.map((data, index) => (
+              <DuplicateDetails
+                key={index}
+                data={data}
+                notDuplicateHandler={() => {
+                  alert('Not a duplicate! (°◇°)')
+                }}
+                rejectHandler={() => {
+                  alert('rejected')
+                }}
+              />
+            ))}
+          </Grid>
         </Container>
       </ActionPage>
     )
