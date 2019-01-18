@@ -1,4 +1,4 @@
-import { Validation } from '../utils/validate'
+import { Validation, ValidationInitializer } from '../utils/validate'
 import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,
@@ -20,7 +20,7 @@ export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
-export const TEXT_WITH_DYNAMIC_LABEL = 'TEXT_WITH_DYNAMIC_LABEL'
+export const TEXT_WITH_DYNAMIC_DEFINITIONS = 'TEXT_WITH_DYNAMIC_DEFINITIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 
@@ -43,9 +43,16 @@ export interface IDynamicOptions {
   options?: { [key: string]: ISelectOption[] }
 }
 
-export interface IDynamicLabel {
-  dependency: string
-  label?: string
+export interface IDynamicTextFieldValidators {
+  validator: ValidationInitializer
+  dependencies: string[]
+}
+
+export interface IDynamicTextFieldDefinitions {
+  label?: {
+    dependency: string
+  }
+  validate?: IDynamicTextFieldValidators[]
 }
 
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
@@ -79,9 +86,9 @@ export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   dynamicOptions: IDynamicOptions
 }
 
-export interface ITextFormFieldWithDynamicLabel extends IFormFieldBase {
-  type: typeof TEXT_WITH_DYNAMIC_LABEL
-  dynamicLabel: IDynamicLabel
+export interface ITextFormFieldWithDynamicDefinitions extends IFormFieldBase {
+  type: typeof TEXT_WITH_DYNAMIC_DEFINITIONS
+  dynamicDefinitions: IDynamicTextFieldDefinitions
 }
 
 export interface IRadioGroupFormField extends IFormFieldBase {
@@ -145,7 +152,7 @@ export type IFormField =
   | INumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
-  | ITextFormFieldWithDynamicLabel
+  | ITextFormFieldWithDynamicDefinitions
   | IRadioGroupFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
@@ -157,6 +164,9 @@ export type IFormField =
   | IParagraphFormField
   | IImageUploaderWithOptionsFormField
   | IWarningField
+
+export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
+  ITextFormFieldWithDynamicDefinitions
 
 export interface IConditional {
   action: string

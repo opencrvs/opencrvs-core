@@ -42,18 +42,18 @@ import {
   NUMBER,
   SUBSECTION,
   LIST,
-  ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
   WARNING,
-  TEXT_WITH_DYNAMIC_LABEL,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions,
+  TEXT_WITH_DYNAMIC_DEFINITIONS,
   TEXT,
-  ITextFormFieldWithDynamicLabel,
-  ITextFormField
+  ITextFormField,
+  IDynamicFormField
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -389,14 +389,11 @@ class FormSectionComponent extends React.Component<Props> {
                     offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
-              : field.type === TEXT_WITH_DYNAMIC_LABEL
+              : field.type === TEXT_WITH_DYNAMIC_DEFINITIONS
               ? ({
                   ...field,
                   type: TEXT,
-                  label: getFieldLabel(
-                    field as ITextFormFieldWithDynamicLabel,
-                    values
-                  )
+                  label: getFieldLabel(field as IDynamicFormField, values)
                 } as ITextFormField)
               : field
 

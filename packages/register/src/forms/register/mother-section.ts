@@ -12,12 +12,13 @@ import {
   SUBSECTION,
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  TEXT_WITH_DYNAMIC_LABEL
+  TEXT_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat
+  dateFormat,
+  validIDNumber
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -140,9 +141,17 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'iD',
-      type: TEXT_WITH_DYNAMIC_LABEL,
-      dynamicLabel: {
-        dependency: 'iDType'
+      type: TEXT_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType'
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
       },
       label: identityMessages.iD,
       required: true,

@@ -13,7 +13,8 @@ import {
   ISelectFormFieldWithDynamicOptions,
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH,
-  ITextFormFieldWithDynamicLabel
+  IDynamicTextFieldValidators,
+  IDynamicFormField
 } from './'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -24,6 +25,7 @@ import {
 } from 'src/offline/reducer'
 import { config } from 'src/config'
 import { iDType } from 'src/views/PrintCertificate/ParentDetails'
+import { Validation } from 'src/utils/validate'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -77,10 +79,38 @@ export const generateOptionsFromLocations = (
 }
 
 export const getFieldLabel = (
-  field: ITextFormFieldWithDynamicLabel,
+  field: IDynamicFormField,
   values: IFormSectionData
-): FormattedMessage.MessageDescriptor => {
-  return iDType(values[field.dynamicLabel.dependency] as string)
+): FormattedMessage.MessageDescriptor | undefined => {
+  if (!field.dynamicDefinitions.label) {
+    return undefined
+  }
+  return iDType(values[field.dynamicDefinitions.label.dependency] as string)
+}
+
+export const getFieldValidation = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): Validation[] => {
+  const validate: Validation[] = []
+  if (
+    field.dynamicDefinitions &&
+    field.dynamicDefinitions.validate &&
+    field.dynamicDefinitions.validate.length > 0
+  ) {
+    field.dynamicDefinitions.validate.map(
+      (element: IDynamicTextFieldValidators) => {
+        const params: any[] = []
+        element.dependencies.map((dependency: string) =>
+          params.push(values[dependency])
+        )
+        const fun = element.validator(...params)
+        validate.push(fun)
+      }
+    )
+  }
+
+  return validate
 }
 
 export const getFieldOptions = (
