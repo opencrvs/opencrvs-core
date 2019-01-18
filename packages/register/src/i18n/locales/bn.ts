@@ -407,6 +407,12 @@ export const BENGALI_STATE: ILanguage = {
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
+    'validations.validNationalId':
+      'জাতীয় পরিচয় পত্র {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+    'validations.validBirthRegistrationNumber':
+      'জন্ম নিবন্ধন নম্বর {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+    'validations.validDeathRegistrationNumber':
+      'মৃত্যু নিবন্ধন সংখ্যা {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       'যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}',

@@ -16,6 +16,8 @@ export type Validation = (
   value: IFormFieldValue
 ) => IValidationResult | undefined
 
+export type ValidationInitializer = (...value: any[]) => Validation
+
 export const messages = defineMessages({
   required: {
     id: 'validations.required',
@@ -75,6 +77,26 @@ export const messages = defineMessages({
     defaultMessage: 'Must be within {min} and {max}',
     description:
       'The error message that appears when an out of range value is used'
+  },
+  validNationalId: {
+    id: 'validations.validNationalId',
+    defaultMessage: 'The National ID can be up to {maxLength} characters long',
+    description:
+      'The error message that appears when an invalid length of value is used as nid'
+  },
+  validBirthRegistrationNumber: {
+    id: 'validations.validBirthRegistrationNumber',
+    defaultMessage:
+      'The Birth Registration Number can be up to {maxLength} characters long',
+    description:
+      'The error message that appears when an invalid length of value is used as brn'
+  },
+  validDeathRegistrationNumber: {
+    id: 'validations.validDeathRegistrationNumber',
+    defaultMessage:
+      'The Death Registration Number can be up to {maxLength} characters long',
+    description:
+      'The error message that appears when an invalid length of value is used as drn'
   }
 })
 
@@ -244,6 +266,10 @@ const checkNameWords = (value: string, checker: Checker): boolean => {
   return parts.every(checker)
 }
 
+export const hasValidLength = (value: string, maxLength: number) => {
+  return value && value.length <= maxLength
+}
+
 export const isValidBengaliName = (value: string): boolean => {
   return checkNameWords(value, isValidBengaliWord)
 }
@@ -274,4 +300,37 @@ export const range = (min: number, max: number) => (value: string) => {
   return isValueWithinRange(min, max)(parseFloat(value))
     ? undefined
     : { message: messages.range, props: { min, max } }
+}
+
+export const validIDNumber: ValidationInitializer = (
+  typeOfID: string
+): Validation => (value: string) => {
+  switch (typeOfID) {
+    case 'NATIONAL_ID':
+      return hasValidLength(value, 17)
+        ? undefined
+        : {
+            message: messages.validNationalId,
+            props: { maxLength: 17 }
+          }
+
+    case 'BIRTH_REGISTRATION_NUMBER':
+      return hasValidLength(value, 17)
+        ? undefined
+        : {
+            message: messages.validBirthRegistrationNumber,
+            props: { maxLength: 17 }
+          }
+
+    case 'DEATH_REGISTRATION_NUMBER':
+      return hasValidLength(value, 17)
+        ? undefined
+        : {
+            message: messages.validDeathRegistrationNumber,
+            props: { maxLength: 17 }
+          }
+
+    default:
+      return undefined
+  }
 }

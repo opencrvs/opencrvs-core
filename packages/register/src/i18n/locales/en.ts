@@ -408,6 +408,12 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
+    'validations.validNationalId':
+      'The National ID can be up to {maxLength} characters long',
+    'validations.validBirthRegistrationNumber':
+      'The Birth Registration Number can be up to {maxLength} characters long',
+    'validations.validDeathRegistrationNumber':
+      'The Death Registration Number can be up to {maxLength} characters long',
     'validations.phoneNumberFormat':
       'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     'validations.emailAddressFormat': 'Must be a valid email address',

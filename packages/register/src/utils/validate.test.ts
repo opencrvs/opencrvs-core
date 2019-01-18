@@ -10,7 +10,8 @@ import {
   emailAddressFormat,
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  range
+  range,
+  validIDNumber
 } from './validate'
 
 describe('validate', () => {
@@ -130,6 +131,32 @@ describe('validate', () => {
       const goodValue = '5'
       const response = undefined
       expect(range(0, 6)(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('validIDNumber. User for ID number field that has a specific validation', () => {
+    it('Should error when supplied a bad value.', () => {
+      const badValue = '200847223985943928'
+      const typeOfID = 'NATIONAL_ID'
+      const response = {
+        message: {
+          id: 'validations.validNationalId',
+          defaultMessage:
+            'The National ID can be up to {maxLength} characters long',
+          description:
+            'The error message that appears when an invalid length of value is used as nid'
+        },
+        props: {
+          maxLength: 17
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
+    it('Should pass when supplied a good value.', () => {
+      const goodValue = '20088765284948575'
+      const typeOfID = 'NATIONAL_ID'
+      const response = undefined
+      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
     })
   })
 
