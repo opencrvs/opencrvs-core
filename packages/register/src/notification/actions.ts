@@ -3,6 +3,7 @@ export const HIDE_NEW_CONTENT_AVAILABLE = 'HIDE_NEW_CONTENT_AVAILABLE'
 
 export const SHOW_BACKGROUND_SYNC_TRIGGERED = 'SHOW_BACKGROUND_SYNC_TRIGGERED'
 export const HIDE_BACKGROUND_SYNC_TRIGGERED = 'HIDE_BACKGROUND_SYNC_TRIGGERED'
+export const SESSION_EXPIRED = 'AUTH/SESSION_EXPIRED'
 
 export type ShowNewContentAvailableAction = {
   type: typeof SHOW_NEW_CONTENT_AVAILABLE
@@ -37,6 +38,10 @@ export type HideBackgroundSyncedAction = {
   type: typeof HIDE_BACKGROUND_SYNC_TRIGGERED
 }
 
+export type SessionExpiredAction = {
+  type: typeof SESSION_EXPIRED
+}
+
 export const showBackgroundSyncedNotification = (
   syncCount: number
 ): ShowBackgroundSyncedAction => ({
@@ -46,4 +51,8 @@ export const showBackgroundSyncedNotification = (
 
 export const hideBackgroundSyncedNotification = (): HideBackgroundSyncedAction => ({
   type: HIDE_BACKGROUND_SYNC_TRIGGERED
+})
+
+export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
+  type: SESSION_EXPIRED
 })
