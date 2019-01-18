@@ -678,6 +678,25 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.title': 'Possible duplicates found',
     'register.duplicates.description':
       'The following application has been flagged as a possible duplicate of an existing registered record.',
-    'register.duplicates.pageTitle': 'Possible duplicate'
+    'register.duplicates.pageTitle': 'Possible duplicate',
+    'register.duplicates.details.name': 'Name',
+    'register.duplicates.details.dob': 'D.o.B.',
+    'register.duplicates.details.gender': 'Gender',
+    'register.duplicates.details.dateOfApplication': 'Date of application',
+    'register.duplicates.details.trackingId': 'Tracking ID',
+    'register.duplicates.details.notDuplicate': 'Not a duplicate?',
+    'register.duplicates.details.mother': 'Mother',
+    'register.duplicates.details.father': 'Father',
+    'register.duplicates.details.id': 'ID',
+    'register.duplicates.details.applicationState': 'Application {action} on',
+    'register.duplicates.details.by': 'By',
+    'register.duplicates.details.review': 'Review',
+    'register.duplicates.details.birthEvent': 'Birth',
+    'register.duplicates.details.deathEvent': 'Death',
+    'register.duplicates.details.application': 'application',
+    'register.duplicates.details.submitted': 'submitted',
+    'register.duplicates.details.rejected': 'rejected',
+    'register.duplicates.details.registered': 'registered',
+    'register.duplicates.details.certified': 'certified'
   }
 }

@@ -9,6 +9,7 @@ import {
   StatusCollected
 } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 
 export enum Event {
   BIRTH = 'birth',
@@ -55,6 +56,104 @@ interface IProps {
   }
   notDuplicateHandler?: () => void
 }
+
+const messages = defineMessages({
+  name: {
+    id: 'register.duplicates.details.name',
+    defaultMessage: 'Name',
+    description: 'Name label'
+  },
+  dob: {
+    id: 'register.duplicates.details.dob',
+    defaultMessage: 'D.o.B.',
+    description: 'Date of birth label'
+  },
+  gender: {
+    id: 'register.duplicates.details.gender',
+    defaultMessage: 'Gender',
+    description: 'Gender label'
+  },
+  dateOfApplication: {
+    id: 'register.duplicates.details.dateOfApplication',
+    defaultMessage: 'Date of application',
+    description: 'Date of application label'
+  },
+  trackingId: {
+    id: 'register.duplicates.details.trackingId',
+    defaultMessage: 'Tracking ID',
+    description: 'Tracking ID label'
+  },
+  notDuplicate: {
+    id: 'register.duplicates.details.notDuplicate',
+    defaultMessage: 'Not a duplicate?',
+    description: 'A Question which is a link: Not a duplicate?'
+  },
+  mother: {
+    id: 'register.duplicates.details.mother',
+    defaultMessage: 'Mother',
+    description: 'Mother section label'
+  },
+  father: {
+    id: 'register.duplicates.details.father',
+    defaultMessage: 'Father',
+    description: 'Father section label'
+  },
+  id: {
+    id: 'register.duplicates.details.id',
+    defaultMessage: 'ID',
+    description: 'ID Label'
+  },
+  applicationState: {
+    id: 'register.duplicates.details.applicationState',
+    defaultMessage: 'Application {action} on',
+    description: 'A label to describe when the application was actioned on'
+  },
+  by: {
+    id: 'register.duplicates.details.by',
+    defaultMessage: 'By',
+    description: 'Label for By (the person who performed the action)'
+  },
+  review: {
+    id: 'register.duplicates.details.review',
+    defaultMessage: 'Review',
+    description: 'A label from the review button'
+  },
+  birth: {
+    id: 'register.duplicates.details.birthEvent',
+    defaultMessage: 'Birth',
+    description: 'A label from the birth event'
+  },
+  death: {
+    id: 'register.duplicates.details.deathEvent',
+    defaultMessage: 'Death',
+    description: 'A label from the death event'
+  },
+  application: {
+    id: 'register.duplicates.details.application',
+    defaultMessage: 'application',
+    description: 'A label for application'
+  },
+  submitted: {
+    id: 'register.duplicates.details.submitted',
+    defaultMessage: 'submitted',
+    description: 'A label for submitted'
+  },
+  rejected: {
+    id: 'register.duplicates.details.rejected',
+    defaultMessage: 'rejected',
+    description: 'A label for rejected'
+  },
+  registered: {
+    id: 'register.duplicates.details.registered',
+    defaultMessage: 'registered',
+    description: 'A label for registered'
+  },
+  certified: {
+    id: 'register.duplicates.details.certified',
+    defaultMessage: 'certified',
+    description: 'A label for certified'
+  }
+})
 
 const DetailsBox = styled(Box).attrs<{ currentStatus: string }>({})`
   border-top: ${({ theme }) => ` 4px solid ${theme.colors.expandedIndicator}`};
@@ -109,7 +208,9 @@ const ListStatusContainer = styled.span`
   margin: 4px 8px;
 `
 
-export class DuplicateDetails extends React.Component<IProps> {
+class DuplicateDetailsClass extends React.Component<
+  IProps & InjectedIntlProps
+> {
   normalizeAction(action: string) {
     if (action === 'submitted') {
       return 'application'
@@ -135,63 +236,67 @@ export class DuplicateDetails extends React.Component<IProps> {
 
   render() {
     const currentStatus = this.props.data.regStatusHistory.slice(-1)[0].action
-    const data = this.props.data
+    const { data, intl } = this.props
 
     return (
       <DetailsBox currentStatus={currentStatus}>
         <DetailTextContainer>
           <DetailText>
-            <b>Name:</b> {data.child.name}
+            <b>{intl.formatMessage(messages.name)}:</b> {data.child.name}
             <br />
-            <b>D.o.B.:</b> {data.child.dob}
+            <b>{intl.formatMessage(messages.dob)}:</b> {data.child.dob}
             <br />
-            <b>Gender:</b> {data.child.gender}
+            <b>{intl.formatMessage(messages.gender)}:</b> {data.child.gender}
             <br />
-            <b>Date of application:</b> {data.dateOfApplication}
+            <b>{intl.formatMessage(messages.dateOfApplication)}:</b>{' '}
+            {data.dateOfApplication}
             <br />
-            <b>Tracking ID:</b> {data.trackingId}
+            <b>{intl.formatMessage(messages.trackingId)}:</b> {data.trackingId}
             <br />
             <br />
           </DetailText>
           {this.props.notDuplicateHandler && (
             <Link onClick={this.props.notDuplicateHandler}>
-              Not a duplicate?
+              {intl.formatMessage(messages.notDuplicate)}
             </Link>
           )}
         </DetailTextContainer>
         <DetailTextSplitContainer>
           {data.mother && (
             <DetailText>
-              <b>Mother</b>
+              <b>{intl.formatMessage(messages.mother)}</b>
               <br />
-              <b>Name:</b> {data.mother.name}
+              <b>{intl.formatMessage(messages.name)}:</b> {data.mother.name}
               <br />
-              <b>D.o.B.:</b> {data.mother.dob}
+              <b>{intl.formatMessage(messages.dob)}:</b> {data.mother.dob}
               <br />
-              <b>Gender:</b> {data.mother.gender}
+              <b>{intl.formatMessage(messages.gender)}:</b> {data.mother.gender}
               <br />
-              <b>ID:</b> {data.mother.id}
+              <b>{intl.formatMessage(messages.id)}:</b> {data.mother.id}
               <br />
             </DetailText>
           )}
           {data.father && (
             <DetailText>
-              <b>Father</b>
+              <b>{intl.formatMessage(messages.father)}</b>
               <br />
-              <b>Name:</b> {data.father.name}
+              <b>{intl.formatMessage(messages.name)}:</b> {data.father.name}
               <br />
-              <b>D.o.B.:</b> {data.father.dob}
+              <b>{intl.formatMessage(messages.dob)}:</b> {data.father.dob}
               <br />
-              <b>Gender:</b> {data.father.gender}
+              <b>{intl.formatMessage(messages.gender)}:</b> {data.father.gender}
               <br />
-              <b>ID:</b> {data.father.id}
+              <b>{intl.formatMessage(messages.id)}:</b> {data.father.id}
               <br />
             </DetailText>
           )}
         </DetailTextSplitContainer>
         <Separator />
         <TagContainer>
-          <Chip status={<StatusGray />} text={data.event} />
+          <Chip
+            status={<StatusGray />}
+            text={intl.formatHTMLMessage(messages[data.event])}
+          />
           <Chip
             status={<StatusOrange />}
             text={this.normalizeAction(currentStatus)}
@@ -205,9 +310,15 @@ export class DuplicateDetails extends React.Component<IProps> {
                 {this.renderStatusIcon(status.action)}
               </ListStatusContainer>
               <DetailText>
-                <b>Application {status.action} on:</b> {status.date}
+                <b>
+                  {intl.formatMessage(messages.applicationState, {
+                    action: intl.formatMessage(messages[status.action])
+                  })}
+                  :
+                </b>{' '}
+                {status.date}
                 <br />
-                <b>By:</b> {status.usersName}
+                <b>{intl.formatMessage(messages.by)}:</b> {status.usersName}
                 <br />
                 {status.usersRole}
                 <br />
@@ -220,10 +331,12 @@ export class DuplicateDetails extends React.Component<IProps> {
         {currentStatus === 'submitted' && (
           <>
             <Separator />
-            <PrimaryButton>Review</PrimaryButton>
+            <PrimaryButton>{intl.formatMessage(messages.review)}</PrimaryButton>
           </>
         )}
       </DetailsBox>
     )
   }
 }
+
+export const DuplicateDetails = injectIntl<IProps>(DuplicateDetailsClass)
