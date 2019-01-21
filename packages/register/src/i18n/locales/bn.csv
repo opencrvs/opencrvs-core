@@ -475,7 +475,7 @@
 "validations.required","ক্ষেত্রটি সম্পূর্ণ করতে হবে।"
 "validations.minLength","Must be {min} characters or more"
 "validations.numberRequired","Must be a number"
-"validations.phoneNumberFormat","যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}"
+"validations.phoneNumberFormat","১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়"
 "validations.emailAddressFormat","Must be a valid email address"
 "validations.dateFormat","একটি বৈধ তারিখ হওয়া আবশ্যক"
 "validations.requiredSymbol",""

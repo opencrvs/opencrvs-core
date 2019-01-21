@@ -408,7 +408,7 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
     'validations.phoneNumberFormat':
-      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
+      'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
     'validations.requiredSymbol': '',
