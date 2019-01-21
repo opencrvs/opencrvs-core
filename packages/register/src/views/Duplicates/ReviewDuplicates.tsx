@@ -13,7 +13,6 @@ import {
   Event
 } from 'src/components/DuplicateDetails'
 import { RouteComponentProps } from 'react-router'
-import { REVIEW_DUPLICATES } from 'src/navigation/routes'
 
 const messages = defineMessages({
   title: {
@@ -205,7 +204,7 @@ const mockDupeData = [
   }
 ]
 const rejectMutation = gql`
-  mutation submitBirthAsRejected($id: ID!, $reason: string) {
+  mutation submitBirthAsRejected($id: String!, $reason: String!) {
     markBirthAsVoided(id: $id, reason: $reason)
   }
 `
@@ -234,9 +233,8 @@ class ReviewDuplicatesClass extends React.Component<Props, State> {
 
   successfulRejection = (response: string) => {
     const { history } = this.props
-    history.push(REVIEW_DUPLICATES, {
-      applicationId: response
-    })
+    // TODO: need to change it
+    history.push(WORK_QUEUE)
   }
 
   render() {
