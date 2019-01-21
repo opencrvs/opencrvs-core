@@ -400,6 +400,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.certificateLanguage.bn': 'Bangla',
     'formFields.registration.certificateLanguage.en': 'English',
     'formFields.registration.certificateLanguage.other': 'Other',
+    'formFields.registration.phoneVerificationWarning':
+      'Check with the applicant that the mobile phone number you have entered is correct',
     'formFields.registration.commentsOrNotes': 'Comments or notes',
     'formFields.registration.commentsOrNotes.description':
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
