@@ -400,6 +400,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.certificateLanguage.bn': 'বাংলা',
     'formFields.registration.certificateLanguage.en': 'ইংরেজি',
     'formFields.registration.certificateLanguage.other': 'অন্যান্য',
+    'formFields.registration.phoneVerificationWarning':
+      'আবেদনকারীর ফোন নাম্বারটি যাচাই করুন',
     'formFields.registration.commentsOrNotes': 'মন্তব্য',
     'formFields.registration.commentsOrNotes.description':
       'প্রাসঙ্গিক মন্তব্য এই বিভাগে যোগ করুন।এই মন্তব্য তথ্যপ্রদানকারীর সংগে আলোচনা করা হবে না।',
@@ -408,7 +410,7 @@ export const BENGALI_STATE: ILanguage = {
     'validations.numberRequired': 'Must be a number',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
-      'যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}',
+      '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
     'validations.requiredSymbol': '',
@@ -514,6 +516,9 @@ export const BENGALI_STATE: ILanguage = {
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
     'register.selectVitalEvent.birthActionTitle': 'জন্ম',
     'register.selectVitalEvent.deathActionTitle': 'মৃত্যু',
+    'register.selectVitalEvent.marriageActionTitle': 'বিবাহ',
+    'register.selectVitalEvent.divorceActionTitle': 'বিবাহবিচ্ছেদ',
+    'register.selectVitalEvent.adoptionActionTitle': 'দত্তকগ্রহণ',
     'register.form.upload': 'আপলোড',
     'register.form.section.upload.documentsName': 'কাগজপত্র আপলোড',
     'register.form.section.upload.documentsTitle': 'সমর্থনকারী কাগজপত্র',
@@ -680,6 +685,25 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
     'register.duplicates.description':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
-    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ'
+    'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ',
+    'register.duplicates.details.name': 'Name',
+    'register.duplicates.details.dob': 'D.o.B.',
+    'register.duplicates.details.gender': 'Gender',
+    'register.duplicates.details.dateOfApplication': 'Date of application',
+    'register.duplicates.details.trackingId': 'Tracking ID',
+    'register.duplicates.details.notDuplicate': 'Not a duplicate?',
+    'register.duplicates.details.mother': 'Mother',
+    'register.duplicates.details.father': 'Father',
+    'register.duplicates.details.id': 'ID',
+    'register.duplicates.details.applicationState': 'Application {action} on',
+    'register.duplicates.details.by': 'By',
+    'register.duplicates.details.review': 'Review',
+    'register.duplicates.details.birthEvent': 'Birth',
+    'register.duplicates.details.deathEvent': 'Death',
+    'register.duplicates.details.application': 'application',
+    'register.duplicates.details.submitted': 'submitted',
+    'register.duplicates.details.rejected': 'rejected',
+    'register.duplicates.details.registered': 'registered',
+    'register.duplicates.details.certified': 'certified'
   }
 }
