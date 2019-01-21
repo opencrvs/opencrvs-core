@@ -6,6 +6,7 @@ import { motherSection } from './mother-section'
 import { fatherSection } from './father-section'
 import { registrationSection } from './registration-section'
 import { documentsSection } from './documents-section'
+import * as actions from 'src/forms/register/actions'
 
 const messages = defineMessages({
   previewTab: {
@@ -21,10 +22,18 @@ const messages = defineMessages({
 })
 
 export type IRegisterFormState = {
+  activeEvent: actions.EVENT | null
   registerForm: IForm
+  deathRegisterForm: IForm
 }
 
+type Action =
+  | actions.GetRegisterFormAction
+  | actions.GetDeathRegisterFormAction
+  | actions.SetActiveEventAction
+
 export const initialState: IRegisterFormState = {
+  activeEvent: null,
   registerForm: {
     sections: [
       childSection,
@@ -40,20 +49,22 @@ export const initialState: IRegisterFormState = {
         fields: []
       }
     ]
+  },
+  deathRegisterForm: {
+    sections: []
   }
 }
-
-const GET_REGISTER_FORM = 'REGISTER_FORM/GET_REGISTER_FORM'
-type GetRegisterFormAction = {
-  type: typeof GET_REGISTER_FORM
-}
-type Action = GetRegisterFormAction
 
 export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
   state: IRegisterFormState = initialState,
   action: Action
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
   switch (action.type) {
+    case actions.SET_ACTIVE_EVENT:
+      return {
+        ...state,
+        activeEvent: action.payload.event
+      }
     default:
       return state
   }
