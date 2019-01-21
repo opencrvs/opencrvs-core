@@ -26,6 +26,7 @@ export enum Action {
 
 interface IProps {
   data: {
+    id: string
     dateOfApplication: string
     trackingId: string
     event: Event
@@ -162,7 +163,7 @@ const messages = defineMessages({
   }
 })
 
-const DetailsBox = styled(Box).attrs<{ currentStatus: string }>({})`
+const DetailsBox = styled(Box).attrs<{ id: string; currentStatus: string }>({})`
   border-top: ${({ theme }) => ` 4px solid ${theme.colors.expandedIndicator}`};
   ${({ currentStatus }) =>
     currentStatus === 'rejected' ? `box-shadow: none` : ''}
@@ -267,7 +268,7 @@ class DuplicateDetailsClass extends React.Component<
     const { data, intl, notDuplicateHandler, rejectHandler } = this.props
 
     return (
-      <DetailsBox currentStatus={currentStatus}>
+      <DetailsBox id={`detail_box_${data.id}`} currentStatus={currentStatus}>
         <DetailTextContainer>
           <DetailText>
             <b>{intl.formatMessage(messages.name)}:</b> {data.child.name}
@@ -363,7 +364,10 @@ class DuplicateDetailsClass extends React.Component<
             {rejectHandler && (
               <>
                 <ConditionalSeparator />
-                <RejectApplication onClick={rejectHandler}>
+                <RejectApplication
+                  id={`reject_link_${data.id}`}
+                  onClick={rejectHandler}
+                >
                   <Delete />
                   {intl.formatMessage(messages.rejectLinkText)}
                 </RejectApplication>

@@ -90,7 +90,7 @@ const BackButton = styled.a`
 
 const mockDupeData = [
   {
-    id: '79ec2c9b-3d48-4591-a09f-bc37dced4a49',
+    id: '1',
     dateOfApplication: '17.01.2019',
     trackingId: '1234567890',
     event: Event.BIRTH,
@@ -293,6 +293,7 @@ class ReviewDuplicatesClass extends React.Component<Props, State> {
                   </PrimaryButton>,
                   <BackButton
                     key="back"
+                    id="back_link"
                     onClick={() => {
                       this.toggleRejectModal()
                       if (document.documentElement) {
