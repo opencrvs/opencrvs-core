@@ -6,6 +6,8 @@ export const DRAFT_BIRTH_PARENT_FORM = '/drafts/:draftId/events/birth/parent'
 export const DRAFT_BIRTH_PARENT_FORM_TAB =
   '/drafts/:draftId/events/birth/parent/:tabId'
 
+export const DRAFT_DEATH_FORM = '/drafts/:draftId/events/death'
+
 export const REVIEW_BIRTH_PARENT_FORM_TAB =
   '/reviews/:draftId/events/birth/parent/:tabId'
 

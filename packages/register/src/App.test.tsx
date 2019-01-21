@@ -361,6 +361,18 @@ describe('when user has a valid token in local storage', () => {
         expect(app.find('#select_informant_view').hostNodes()).toHaveLength(1)
       })
     })
+
+    describe('when selects "Death"', () => {
+      beforeEach(() => {
+        app
+          .find('#select_death_event')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('takses user to the death registration form', () => {
+        expect(history.location.pathname).toContain('events/death')
+      })
+    })
   })
 
   describe('when user is in informant selection view', () => {
