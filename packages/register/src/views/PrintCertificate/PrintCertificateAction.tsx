@@ -11,7 +11,9 @@ import {
   IFormSectionData,
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH,
-  IFormData
+  IFormData,
+  PDF_DOCUMENT_VIEWER,
+  IFormField
 } from 'src/forms'
 import { PrimaryButton, IconAction } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
@@ -22,7 +24,12 @@ import { Print } from '@opencrvs/components/lib/icons'
 import * as moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
-import { Registrant, Issuer, generateMoneyReceipt } from './generatePDF'
+import {
+  Registrant,
+  Issuer,
+  generateMoneyReceipt,
+  generateCertificate
+} from './generatePDF'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -220,6 +227,7 @@ type State = {
   currentForm: string
   data: IFormSectionData
   enableConfirmButton: boolean
+  certificatePdf: string
 }
 
 type IProps = {
@@ -245,7 +253,8 @@ class PrintCertificateActionComponent extends React.Component<
     this.state = {
       data: {},
       enableConfirmButton: false,
-      currentForm: COLLECT_CERTIFICATE
+      currentForm: COLLECT_CERTIFICATE,
+      certificatePdf: ''
     }
   }
 
@@ -266,6 +275,15 @@ class PrintCertificateActionComponent extends React.Component<
     return documentData && !hasFormError(form.fields, documentData)
   }
 
+  addPDFToField(form: IFormSection) {
+    form.fields.map((field: IFormField) => {
+      if (field.type === PDF_DOCUMENT_VIEWER) {
+        field.initialValue = this.state.certificatePdf
+      }
+    })
+    return form
+  }
+
   getForm = (currentForm: string) => {
     const {
       printCertificateFormSection,
@@ -278,7 +296,8 @@ class PrintCertificateActionComponent extends React.Component<
       case PAYMENT:
         return paymentFormSection
       case CERTIFICATE_PREVIEW:
-        return certificatePreviewFormSection
+        const result = this.addPDFToField(certificatePreviewFormSection)
+        return result
       default:
         throw new Error(`No form found for id ${currentForm}`)
     }
@@ -371,6 +390,18 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
+  previewCertificatePDF() {
+    generateCertificate((certificatePdf: string) => {
+      this.setState(prevState => {
+        const result = {
+          ...prevState,
+          certificatePdf
+        }
+        return result
+      })
+    })
+  }
+
   onConfirmForm = () => {
     const { currentForm } = this.state
     let destForm = COLLECT_CERTIFICATE
@@ -381,6 +412,7 @@ class PrintCertificateActionComponent extends React.Component<
         break
       case PAYMENT:
         destForm = CERTIFICATE_PREVIEW
+        this.previewCertificatePDF()
         break
       default:
         break

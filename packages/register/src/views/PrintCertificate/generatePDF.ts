@@ -132,3 +132,96 @@ export function generateMoneyReceipt(
 
   generatedPDF.open()
 }
+
+export async function generateCertificate(callBack: (pdf: string) => void) {
+  const certificateDefinition = {
+    defaultStyle: {
+      font: 'notosans'
+    },
+    content: [
+      {
+        text: 'Receipt for Birth Certificate of',
+        style: 'header'
+      },
+      {
+        text: 'Tofayel Ahmed Raju',
+        style: 'header'
+      },
+      '\n\n',
+
+      {
+        text: [
+          {
+            text: 'Service: '
+          },
+          {
+            text: 'Birth Registration after 2 years of D.o.B.',
+            style: 'subheader'
+          }
+        ]
+      },
+      'Amount paid: \n\n',
+      {
+        text: '৳ 5.00\n\n',
+        style: 'amount'
+      },
+      {
+        text: [
+          {
+            text: 'hello world'
+          },
+          {
+            text: 'dsfsdfsdf'
+          }
+        ]
+      },
+      'Issued at: Gazipur Union\nBy: Role, Name Surname\nDate of payment: 01.01.2019'
+    ],
+    styles: {
+      header: {
+        fontSize: 18,
+        bold: true
+      },
+      amount: {
+        fontSize: 25,
+        bold: true
+      },
+      subheader: {
+        bold: true
+      }
+    }
+  }
+  const fonts = {
+    bn: {
+      notosans: {
+        normal: 'NotoSansBengali-Light.ttf',
+        regular: 'NotoSansBengali-Light.ttf',
+        bold: 'NotoSansBengali-Regular.ttf'
+      },
+      notosanscurrency: {
+        normal: 'NotoSansBengali-Light.ttf',
+        regular: 'NotoSansBengali-Light.ttf',
+        bold: 'NotoSansBengali-Light.ttf'
+      }
+    },
+    en: {
+      notosanscurrency: {
+        normal: 'NotoSansBengali-Light.ttf',
+        regular: 'NotoSansBengali-Light.ttf',
+        bold: 'NotoSansBengali-Light.ttf'
+      },
+      notosans: {
+        normal: 'NotoSans-Light.ttf',
+        regular: 'NotoSans-Light.ttf',
+        bold: 'NotoSans-Regular.ttf'
+      }
+    }
+  }
+
+  pdfMake.vfs = pdfFonts.pdfMake.vfs
+  const generatedPDF = pdfMake.createPdf(certificateDefinition, null, fonts.en)
+
+  await generatedPDF.getDataUrl((pdf: string) => {
+    callBack(pdf)
+  })
+}
