@@ -400,6 +400,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.certificateLanguage.bn': 'বাংলা',
     'formFields.registration.certificateLanguage.en': 'ইংরেজি',
     'formFields.registration.certificateLanguage.other': 'অন্যান্য',
+    'formFields.registration.phoneVerificationWarning':
+      'আবেদনকারীর ফোন নাম্বারটি যাচাই করুন',
     'formFields.registration.commentsOrNotes': 'মন্তব্য',
     'formFields.registration.commentsOrNotes.description':
       'প্রাসঙ্গিক মন্তব্য এই বিভাগে যোগ করুন।এই মন্তব্য তথ্যপ্রদানকারীর সংগে আলোচনা করা হবে না।',
@@ -408,7 +410,7 @@ export const BENGALI_STATE: ILanguage = {
     'validations.numberRequired': 'Must be a number',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
-      'যথাযথ মোবাইল ফোন নাম্বার হতে হবে। শূন্য দিয় শুরু হতে হবে। যেমন: {example}',
+      '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
     'validations.requiredSymbol': '',

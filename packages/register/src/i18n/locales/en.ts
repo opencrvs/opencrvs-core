@@ -400,6 +400,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.certificateLanguage.bn': 'Bangla',
     'formFields.registration.certificateLanguage.en': 'English',
     'formFields.registration.certificateLanguage.other': 'Other',
+    'formFields.registration.phoneVerificationWarning':
+      'Check with the applicant that the mobile phone number you have entered is correct',
     'formFields.registration.commentsOrNotes': 'Comments or notes',
     'formFields.registration.commentsOrNotes.description':
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
@@ -408,7 +410,7 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
     'validations.phoneNumberFormat':
-      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
+      'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
     'validations.requiredSymbol': '',
