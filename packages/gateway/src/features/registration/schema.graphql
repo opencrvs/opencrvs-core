@@ -198,7 +198,7 @@ input DeathRegistrationInput {
   informantRelationship: RelationshipType # -> RelatedPerson.relationship
   otherInformantRelationship: String # -> RelatedPerson.relationship
   placeOfDeath: AddressInput # -> Create deathLocation
-  deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
+  deathLocation: LocationInput # -> .section(code='death-encounter').entry.reference.location
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
