@@ -97,7 +97,7 @@ const MenuContainer = styled.div`
   .rc-menu-submenu-popup {
     position: absolute;
     z-index: 1;
-    top: 93px !important;
+    top: 92px !important;
   }
 
   .rc-menu-submenu-placement-leftTop {
@@ -121,7 +121,7 @@ const StyledSubMenu = styled(SubMenu)`
     width: 199px;
   }
   > div.rc-menu-submenu-title {
-    min-height: 77px;
+    min-height: 76px;
     text-align: center;
   }
 `
@@ -148,6 +148,7 @@ const SubMenuTitleWrapper = styled.span`
   color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 16px;
+  font-weight: normal;
 `
 
 const MenuTitleWrapper = styled.span`
@@ -156,7 +157,8 @@ const MenuTitleWrapper = styled.span`
   font-size: 14px;
   text-transform: uppercase;
   font-weight: bold;
-  padding-top: 10px;
+  line-height: 25px;
+  padding-right: 40px;
 `
 const IconWrapper = styled.i`
   color: ${({ theme }) => theme.colors.white};
