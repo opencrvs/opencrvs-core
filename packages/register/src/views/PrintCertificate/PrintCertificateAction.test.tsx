@@ -37,6 +37,9 @@ describe('when user wants to print certificate', async () => {
           data: {
             fetchBirthRegistration: {
               id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+              registration: {
+                registrationNumber: '485736202837'
+              },
               child: {
                 name: [
                   {
@@ -185,6 +188,9 @@ describe('when user wants to print certificate', async () => {
           data: {
             fetchBirthRegistration: {
               id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+              registration: {
+                registrationNumber: '485736202837'
+              },
               child: {
                 birthDate: '2014-02-15'
               },
@@ -411,6 +417,9 @@ describe('when user wants to print certificate', async () => {
             data: {
               fetchBirthRegistration: {
                 id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+                registration: {
+                  registrationNumber: '485736202837'
+                },
                 child: {
                   name: [
                     {
