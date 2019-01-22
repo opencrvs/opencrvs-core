@@ -28,55 +28,73 @@ import { conditionals } from 'src/forms/utils'
 const messages = defineMessages({
   deceasedTab: {
     id: 'register.form.tabs.deceasedTab',
-    defaultMessage: 'Deceased'
+    defaultMessage: 'Deceased',
+    description: 'Tab title for Deceased'
   },
   deceasedTitle: {
     id: 'register.form.section.deceasedTitle',
-    defaultMessage: 'Deceased’s details'
+    defaultMessage: 'Deceased’s details',
+    description: 'Form section title for Deceased'
+  },
+  deceasedIdType: {
+    id: 'formFields.deceasedIdType',
+    defaultMessage: 'Existing ID',
+    description: 'Label for form field: Existing ID'
   },
   deceasedGivenNames: {
     id: 'formFields.deceasedGivenNames',
-    defaultMessage: 'Given name (s)'
+    defaultMessage: 'Given name (s)',
+    description: 'Label for form field: Given names'
   },
   deceasedFamilyName: {
     id: 'formFields.deceasedFamilyName',
-    defaultMessage: 'Family Name'
+    defaultMessage: 'Family Name',
+    description: 'Label for form field: Family name'
   },
   deceasedGivenNamesEng: {
     id: 'formFields.deceasedGivenNamesEng',
-    defaultMessage: 'Given Name (s) in English'
+    defaultMessage: 'Given Name (s) in English',
+    description: 'Label for form field: Given names in english'
   },
   deceasedFamilyNameEng: {
     id: 'formFields.deceasedFamilyNameEng',
-    defaultMessage: 'Family Name in English'
+    defaultMessage: 'Family Name in English',
+    description: 'Label for form field: Family name in english'
   },
   nationality: {
     id: 'formFields.deceased.nationality',
-    defaultMessage: 'Nationality'
+    defaultMessage: 'Nationality',
+    description: 'Label for form field: Nationality'
   },
   deceasedSex: {
     id: 'formFields.deceasedSex',
-    defaultMessage: 'Sex'
+    defaultMessage: 'Sex',
+    description: 'Label for form field: Sex name'
   },
   deceasedSexMale: {
     id: 'formFields.deceasedSexMale',
-    defaultMessage: 'Male'
+    defaultMessage: 'Male',
+    description: 'Option for form field: Sex name'
   },
   deceasedSexFemale: {
     id: 'formFields.deceasedSexFemale',
-    defaultMessage: 'Female'
+    defaultMessage: 'Female',
+    description: 'Option for form field: Sex name'
   },
   deceasedSexOther: {
     id: 'formFields.deceasedSexOther',
-    defaultMessage: 'Other'
+    defaultMessage: 'Other',
+    description: 'Option for form field: Sex name'
   },
   deceasedSexUnknown: {
     id: 'formFields.deceasedSexUnknown',
-    defaultMessage: 'Unknown'
+    defaultMessage: 'Unknown',
+    description: 'Option for form field: Sex name'
   },
   deceasedDateOfBirth: {
     id: 'formFields.deceasedDateOfBirth',
-    defaultMessage: 'Date of Birth'
+    defaultMessage: 'Date of Birth',
+    description: 'Label for form field: Date of birth'
   },
   currentAddress: {
     id: 'formFields.currentAddress',
@@ -87,11 +105,6 @@ const messages = defineMessages({
     id: 'formFields.permanentAddress',
     defaultMessage: 'Permanent Address',
     description: 'Title for the permanent address fields'
-  },
-  optionalLabel: {
-    id: 'formFields.optionalLabel',
-    defaultMessage: 'Optional',
-    description: 'Optional label'
   }
 })
 
