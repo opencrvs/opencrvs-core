@@ -2,7 +2,11 @@ import * as React from 'react'
 import { Home } from './Home'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from 'src/store'
-import { createTestComponent, mockUserResponse } from 'src/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  userDetails
+} from 'src/tests/util'
 import { queries } from 'src/profile/queries'
 import { setInitialUserDetails } from '@opencrvs/register/src/profile/profileActions'
 
@@ -17,7 +21,7 @@ describe('when user is in the home page', () => {
 
   beforeEach(async () => {
     const testComponent = createTestComponent(<Home />, store)
-    store.dispatch(setInitialUserDetails())
+    store.dispatch(setInitialUserDetails(userDetails))
     homeComponent = testComponent.component
     homeComponent.update()
   })
