@@ -125,6 +125,96 @@ export const selectOption = (
   return `${selector} .react-select__single-value`
 }
 
+export const userDetails = {
+  name: [
+    {
+      use: 'en',
+      firstNames: 'Shakib',
+      familyName: 'Al Hasan',
+      __typename: 'HumanName'
+    },
+    { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
+  ],
+  role: 'FIELD_AGENT',
+  primaryOffice: {
+    id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
+    name: 'Kaliganj Union Sub Center',
+    status: 'active'
+  },
+  catchmentArea: [
+    {
+      id: '850f50f3-2ed4-4ae6-b427-2d894d4a3329',
+      name: 'Dhaka',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '3'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'DIVISION'
+        }
+      ]
+    },
+    {
+      id: '812ed387-f8d5-4d55-ad05-936292385990',
+      name: 'GAZIPUR',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '20'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'DISTRICT'
+        }
+      ]
+    },
+    {
+      id: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
+      name: 'KALIGANJ',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '165'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UPAZILA'
+        }
+      ]
+    },
+    {
+      id: '43c17986-62cf-4551-877c-be095fb6e5d0',
+      name: 'BAKTARPUR',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '3473'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UNION'
+        }
+      ]
+    }
+  ]
+}
+
+export const mockUserResponseWithName = {
+  data: {
+    getUser: userDetails
+  }
+}
+
 export const mockUserResponse = {
   data: {
     getUser: {

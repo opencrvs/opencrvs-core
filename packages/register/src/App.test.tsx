@@ -1,5 +1,10 @@
 import * as ReactApollo from 'react-apollo'
-import { createTestApp, mockUserResponse, mockOfflineData } from './tests/util'
+import {
+  createTestApp,
+  mockUserResponseWithName,
+  mockOfflineData,
+  userDetails
+} from './tests/util'
 import { config } from '../src/config'
 import { v4 as uuid } from 'uuid'
 import {
@@ -24,9 +29,9 @@ import processDraftData, {
 } from './views/RegisterForm/ProcessDraftData'
 import {
   checkAuth,
-  setInitialUserDetails
+  getStorageUserDetailsSuccess
 } from '@opencrvs/register/src/profile/profileActions'
-import { storeOfflineData } from 'src/offline/actions'
+import { getOfflineDataSuccess } from 'src/offline/actions'
 import { referenceApi } from 'src/utils/referenceApi'
 import { createClient } from './utils/apolloClient'
 
@@ -36,7 +41,7 @@ const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
+mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 
 const mockFetchLocations = jest.fn()
@@ -131,109 +136,23 @@ describe('when user has a valid token in local storage', () => {
     app = testApp.app
     history = testApp.history
     store = testApp.store
-    store.dispatch(storeOfflineData(mockOfflineData))
+    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
   })
 
   it("doesn't redirect user to SSO", async () => {
     expect(assign.mock.calls).toHaveLength(0)
   })
 
-  describe('when loadDraftsFromStorage method is called', () => {
-    beforeEach(() => {
-      const instance = app.instance() as any
-      instance.loadDataFromStorage()
-    })
-    it('should retrive saved drafts from storage', () => {
-      expect(storage.getItem).toBeCalled()
-    })
+  it('should retrive saved drafts from storage', () => {
+    expect(storage.getItem).toBeCalled()
   })
 
   describe('when user is in home view', () => {
-    const userDetails = {
-      name: [
-        {
-          use: 'en',
-          firstNames: 'Shakib',
-          familyName: 'Al Hasan',
-          __typename: 'HumanName'
-        },
-        { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      role: 'FIELD_AGENT',
-      primaryOffice: {
-        id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
-        name: 'Kaliganj Union Sub Center',
-        status: 'active'
-      },
-      catchmentArea: [
-        {
-          id: '850f50f3-2ed4-4ae6-b427-2d894d4a3329',
-          name: 'Dhaka',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-              value: '3'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'DIVISION'
-            }
-          ]
-        },
-        {
-          id: '812ed387-f8d5-4d55-ad05-936292385990',
-          name: 'GAZIPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-              value: '20'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'DISTRICT'
-            }
-          ]
-        },
-        {
-          id: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
-          name: 'KALIGANJ',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-              value: '165'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UPAZILA'
-            }
-          ]
-        },
-        {
-          id: '43c17986-62cf-4551-877c-be095fb6e5d0',
-          name: 'BAKTARPUR',
-          status: 'active',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
-              value: '3473'
-            },
-            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UNION'
-            }
-          ]
-        }
-      ]
-    }
     beforeEach(() => {
-      store.dispatch(setInitialUserDetails(userDetails))
+      store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+      /*store.dispatch(storeDraft(draft))
+      storeUserDetails(fieldAgentDetails)
+      store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))*/
       history.replace(HOME)
       app.update()
     })

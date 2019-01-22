@@ -58,30 +58,6 @@ export const offlineDataReducer: LoopReducer<
   | Loop<IOfflineDataState, actions.Action | i18nActions.Action> => {
   let locationLanguageState: ILanguageState
   switch (action.type) {
-    case actions.STORE_OFFLINE_DATA:
-      locationLanguageState = formatLocationLanguageState(
-        action.payload.locations
-      )
-      return loop(
-        {
-          ...state,
-          locations: action.payload.locations
-        },
-        Cmd.action(i18nActions.addOfflineData(locationLanguageState))
-      )
-    case actions.LOAD_OFFLINE_DATA:
-      return loop(
-        {
-          ...state
-        },
-        Cmd.run<actions.LocationsLoadedAction | actions.LocationsFailedAction>(
-          referenceApi.loadLocations,
-          {
-            successActionCreator: actions.locationsLoaded,
-            failActionCreator: actions.locationsFailed
-          }
-        )
-      )
     case actions.LOCATIONS_FAILED:
       return { ...state, loadingError: true }
     case actions.LOCATIONS_LOADED:
@@ -96,6 +72,52 @@ export const offlineDataReducer: LoopReducer<
         },
         Cmd.action(i18nActions.addOfflineData(locationLanguageState))
       )
+    case actions.SET_OFFLINE_DATA:
+      return loop(
+        {
+          ...state
+        },
+        Cmd.run<
+          | actions.IGetOfflineDataSuccessAction
+          | actions.IGetOfflineDataFailedAction
+        >(storage.getItem, {
+          successActionCreator: actions.getOfflineDataSuccess,
+          failActionCreator: actions.getOfflineDataFailed,
+          args: ['offline']
+        })
+      )
+    case actions.GET_OFFLINE_DATA_SUCCESS:
+      const offlineDataString = action.payload
+      const offlineData: IOfflineData = JSON.parse(
+        offlineDataString ? offlineDataString : '{}'
+      )
+
+      if (!offlineData.locations) {
+        return loop(
+          {
+            ...state
+          },
+          Cmd.run<
+            actions.LocationsLoadedAction | actions.LocationsFailedAction
+          >(referenceApi.loadLocations, {
+            successActionCreator: actions.locationsLoaded,
+            failActionCreator: actions.locationsFailed
+          })
+        )
+      } else {
+        locationLanguageState = formatLocationLanguageState(
+          offlineData.locations
+        )
+        return loop(
+          {
+            ...state,
+            locations: offlineData.locations,
+            offlineDataLoaded: true
+          },
+          Cmd.action(i18nActions.addOfflineData(locationLanguageState))
+        )
+      }
+
     default:
       return state
   }
