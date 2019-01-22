@@ -686,6 +686,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.description':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
     'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ',
+    'register.duplicates.male': 'Male',
+    'register.duplicates.female': 'Female',
+    'register.duplicates.field-agent': 'Field agent',
+    'register.duplicates.registrar': 'Registrar',
     'register.duplicates.details.name': 'Name',
     'register.duplicates.details.dob': 'D.o.B.',
     'register.duplicates.details.gender': 'Gender',

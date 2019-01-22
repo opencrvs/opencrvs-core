@@ -694,6 +694,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.description':
       'The following application has been flagged as a possible duplicate of an existing registered record.',
     'register.duplicates.pageTitle': 'Possible duplicate',
+    'register.duplicates.male': 'Male',
+    'register.duplicates.female': 'Female',
+    'register.duplicates.field-agent': 'Field agent',
+    'register.duplicates.registrar': 'Registrar',
     'register.duplicates.details.name': 'Name',
     'register.duplicates.details.dob': 'D.o.B.',
     'register.duplicates.details.gender': 'Gender',

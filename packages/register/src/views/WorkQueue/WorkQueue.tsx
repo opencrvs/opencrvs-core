@@ -51,6 +51,7 @@ import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateActi
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
+import { createNamesMap } from 'src/utils/data-formating'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -552,29 +553,13 @@ export class WorkQueueView extends React.Component<
 
     return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
       const childNames = (reg.child && (reg.child.name as GQLHumanName[])) || []
-      const namesMap = (names: GQLHumanName[]) =>
-        names.filter(Boolean).reduce((prevNamesMap, name) => {
-          if (!name.use) {
-            /* tslint:disable:no-string-literal */
-            prevNamesMap['default'] = `${name.firstNames} ${
-              /* tslint:enable:no-string-literal */
-              name.familyName
-            }`.trim()
-            return prevNamesMap
-          }
-
-          prevNamesMap[name.use] = `${name.firstNames} ${
-            name.familyName
-          }`.trim()
-          return prevNamesMap
-        }, {})
       const lang = 'bn'
       return {
         id: reg.id,
         name:
-          (namesMap(childNames)[lang] as string) ||
+          (createNamesMap(childNames)[lang] as string) ||
           /* tslint:disable:no-string-literal */
-          (namesMap(childNames)['default'] as string) ||
+          (createNamesMap(childNames)['default'] as string) ||
           /* tslint:enable:no-string-literal */
           '',
         dob: (reg.child && reg.child.birthDate) || '',
@@ -592,13 +577,13 @@ export class WorkQueueView extends React.Component<
               practitionerName:
                 (status &&
                   status.user &&
-                  (namesMap(status.user.name as GQLHumanName[])[
+                  (createNamesMap(status.user.name as GQLHumanName[])[
                     this.props.language
                   ] as string)) ||
                 (status &&
                   status.user &&
                   /* tslint:disable:no-string-literal */
-                  (namesMap(status.user.name as GQLHumanName[])[
+                  (createNamesMap(status.user.name as GQLHumanName[])[
                     'default'
                   ] as string)) ||
                 /* tslint:enable:no-string-literal */
