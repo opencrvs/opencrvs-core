@@ -698,6 +698,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.female': 'Female',
     'register.duplicates.field-agent': 'Field agent',
     'register.duplicates.registrar': 'Registrar',
+    'register.duplicates.queryError': 'An error occurred while fetching data',
     'register.duplicates.details.name': 'Name',
     'register.duplicates.details.dob': 'D.o.B.',
     'register.duplicates.details.gender': 'Gender',
