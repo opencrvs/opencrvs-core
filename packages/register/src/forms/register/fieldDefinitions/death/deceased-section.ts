@@ -41,6 +41,11 @@ const messages = defineMessages({
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
   },
+  noId: {
+    id: 'formFields.idTypeNoID',
+    defaultMessage: 'No ID available',
+    description: 'Option for form field: Type of ID'
+  },
   deceasedGivenNames: {
     id: 'formFields.deceasedGivenNames',
     defaultMessage: 'Given name (s)',
@@ -140,14 +145,11 @@ export const deceasedSection: IFormSection = {
           label: identityMessages.iDTypeBRN
         },
         {
-          value: 'DEATH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeDRN
-        },
-        {
           value: 'REFUGEE_NUMBER',
           label: identityMessages.iDTypeRefugeeNumber
         },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
+        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
+        { value: 'NO_ID', label: messages.noId }
       ]
     },
     {
