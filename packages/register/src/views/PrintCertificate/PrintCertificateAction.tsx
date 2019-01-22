@@ -28,8 +28,10 @@ import {
   Registrant,
   Issuer,
   generateMoneyReceipt,
-  generateCertificate
+  generateCertificate,
+  CertificateDetails
 } from './generatePDF'
+import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -118,6 +120,9 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
     fetchBirthRegistration(id: $id) {
       id
+      registration {
+        registrationNumber
+      }
       child {
         name {
           use
@@ -303,7 +308,11 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
-  getFormAction = (currentForm: string, registrant: Registrant) => {
+  getFormAction = (
+    currentForm: string,
+    registrant: Registrant,
+    certificateDetails: CertificateDetails
+  ) => {
     const { intl, IssuerDetails, paymentFormSection } = this.props
     const { enableConfirmButton } = this.state
     const amountObj = paymentFormSection.fields.find(
@@ -337,7 +346,7 @@ class PrintCertificateActionComponent extends React.Component<
                 id="print-receipt"
                 title={intl.formatMessage(messages.printReceipt)}
                 icon={() => <StyledPrintIcon />}
-                onClick={() =>
+                onClick={() => {
                   generateMoneyReceipt(
                     intl,
                     registrant,
@@ -345,7 +354,7 @@ class PrintCertificateActionComponent extends React.Component<
                     amount,
                     this.props.language
                   )
-                }
+                }}
               />
             </ButtonContainer>
 
@@ -353,7 +362,10 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
-                onClick={this.onConfirmForm}
+                onClick={() => {
+                  this.previewCertificatePDF(certificateDetails)
+                  this.onConfirmForm()
+                }}
               >
                 {intl.formatMessage(messages.next)}
               </StyledPrimaryButton>
@@ -390,8 +402,8 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
-  previewCertificatePDF() {
-    generateCertificate((certificatePdf: string) => {
+  previewCertificatePDF(certificateDetails: CertificateDetails) {
+    generateCertificate(certificateDetails, (certificatePdf: string) => {
       this.setState(prevState => {
         const result = {
           ...prevState,
@@ -412,7 +424,6 @@ class PrintCertificateActionComponent extends React.Component<
         break
       case PAYMENT:
         destForm = CERTIFICATE_PREVIEW
-        this.previewCertificatePDF()
         break
       default:
         break
@@ -435,6 +446,31 @@ class PrintCertificateActionComponent extends React.Component<
     }
 
     return registrant
+  }
+
+  getCertificateDetails(data: IFormData): CertificateDetails {
+    const names = data.child.name as Array<{ [key: string]: {} }>
+    const NameBn = names.find(name => name.use === 'bn')
+    const NameEn = names.find(name => name.use === 'en')
+    const DOBEn = moment(data.child.birthDate as string).format(
+      CERTIFICATE_DATE_FORMAT
+    )
+    moment.locale('bn')
+    const DOBBn = moment(data.child.birthDate as string).format(
+      CERTIFICATE_DATE_FORMAT
+    )
+
+    return {
+      registrationNo: data.registration.registrationNumber as string,
+      name: {
+        bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
+        en: NameEn ? NameEn.firstNames + ' ' + NameEn.familyName : ''
+      },
+      dob: {
+        bn: DOBBn,
+        en: DOBEn
+      }
+    }
   }
 
   render = () => {
@@ -526,6 +562,10 @@ class PrintCertificateActionComponent extends React.Component<
                   data.fetchBirthRegistration
                 )
 
+                const certificateData = this.getCertificateDetails(
+                  data.fetchBirthRegistration
+                )
+
                 return (
                   <FormContainer>
                     <Box>
@@ -538,7 +578,11 @@ class PrintCertificateActionComponent extends React.Component<
                     </Box>
                     <Column>
                       {this.state.data.personCollectingCertificate &&
-                        this.getFormAction(this.state.currentForm, registrant)}
+                        this.getFormAction(
+                          this.state.currentForm,
+                          registrant,
+                          certificateData
+                        )}
                     </Column>
                   </FormContainer>
                 )
