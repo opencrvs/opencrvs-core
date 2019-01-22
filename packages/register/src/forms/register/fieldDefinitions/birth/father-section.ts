@@ -1,9 +1,9 @@
 import { defineMessages } from 'react-intl'
-import { messages as addressMessages } from '../address'
-import { countries } from '../countries'
-import { messages as identityMessages } from '../identity'
-import { messages as maritalStatusMessages } from '../maritalStatus'
-import { messages as educationMessages } from '../education'
+import { messages as addressMessages } from '../../../address'
+import { countries } from '../../../countries'
+import { messages as identityMessages } from '../../../identity'
+import { messages as maritalStatusMessages } from '../../../maritalStatus'
+import { messages as educationMessages } from '../../../education'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { config } from 'src/config'
 import {
@@ -28,8 +28,8 @@ export interface IFatherSectionFormData {
   bar: string
   baz: string
 }
-import { IFormSection } from '../index'
-import { conditionals } from '../utils'
+import { IFormSection } from '../../../index'
+import { conditionals } from '../../../utils'
 
 export const messages = defineMessages({
   fatherTab: {

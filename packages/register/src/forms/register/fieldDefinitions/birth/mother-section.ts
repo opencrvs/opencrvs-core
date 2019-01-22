@@ -1,8 +1,8 @@
 import { defineMessages } from 'react-intl'
 import { config } from 'src/config'
-import { messages as identityMessages } from '../identity'
-import { messages as maritalStatusMessages } from '../maritalStatus'
-import { messages as educationMessages } from '../education'
+import { messages as identityMessages } from '../../../identity'
+import { messages as maritalStatusMessages } from '../../../maritalStatus'
+import { messages as educationMessages } from '../../../education'
 import {
   ViewType,
   SELECT_WITH_OPTIONS,
@@ -22,10 +22,10 @@ import {
 export interface IMotherSectionFormData {
   firstName: string
 }
-import { IFormSection } from '../index'
-import { messages as addressMessages } from '../address'
-import { countries } from '../countries'
-import { conditionals } from '../utils'
+import { IFormSection } from '../../../index'
+import { messages as addressMessages } from '../../../address'
+import { countries } from '../../../countries'
+import { conditionals } from '../../../utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 
 const messages = defineMessages({
