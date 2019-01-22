@@ -65,6 +65,11 @@ const messages = defineMessages({
     id: 'register.duplicates.registrar',
     defaultMessage: 'Registrar',
     description: 'The duplicates text for registrar'
+  },
+  queryError: {
+    id: 'register.duplicates.queryError',
+    defaultMessage: 'An error occurred while fetching data',
+    description: 'The error message shown when a query fails'
   }
 })
 
@@ -107,92 +112,99 @@ const Grid = styled.div`
   }
 `
 
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
+`
+
+export const FETCH_DUPLICATES = gql`
+  query fetchDuplicates($id: ID!) {
+    fetchBirthRegistration(id: $id) {
+      id
+      registration {
+        duplicates
+      }
+    }
+  }
+`
+
+export function createDuplicateDetailsQuery(ids: string[]) {
+  const listQueryParams = () => {
+    return ids.map((id, i) => `$duplicate${i}Id: ID!`).join(', ')
+  }
+
+  const writeQueryForId = (id: string, i: number) => `
+    duplicate${i}: fetchBirthRegistration(id: $duplicate${i}Id) {
+      createdAt
+      id
+      registration {
+        trackingId
+        type
+        status {
+          type
+          timestamp
+          user {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role
+          }
+          office {
+            name
+          }
+        }
+      }
+      child {
+        name {
+          use
+          firstNames
+          familyName
+        }
+        birthDate
+        gender
+      }
+      mother {
+        name {
+          use
+          firstNames
+          familyName
+        }
+        birthDate
+        gender
+        identifier {
+          id
+          type
+        }
+      }
+      father {
+        name {
+          use
+          firstNames
+          familyName
+        }
+        birthDate
+        gender
+        identifier {
+          id
+          type
+        }
+      }
+    }`
+
+  return gql`
+    query fetchDuplicateDetails(${listQueryParams()}) {
+      ${ids.map((id, i) => writeQueryForId(id, i)).join(',\n')}
+    }
+  `
+}
+
 class ReviewDuplicatesClass extends React.Component<
   InjectedIntlProps & RouteComponentProps<IMatchParams> & { language: string }
 > {
-  FETCH_DUPLICATES = gql`
-    query fetchDuplicates($id: ID!) {
-      fetchBirthRegistration(id: $id) {
-        id
-        registration {
-          duplicates
-        }
-      }
-    }
-  `
-
-  createDuplicateDetailsQuery(ids: string[]) {
-    const listQueryParams = () => {
-      return ids.map((id, i) => `$duplicate${i}Id: ID!`).join(', ')
-    }
-
-    const writeQueryForId = (id: string, i: number) => `
-      duplicate${i}: fetchBirthRegistration(id: $duplicate${i}Id) {
-        createdAt
-        id
-        registration {
-          trackingId
-          type
-          status {
-            type
-            timestamp
-            user {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              role
-            }
-            office {
-              name
-            }
-          }
-        }
-        child {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          birthDate
-          gender
-        }
-        mother {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          birthDate
-          gender
-          identifier {
-            id
-            type
-          }
-        }
-        father {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          birthDate
-          gender
-          identifier {
-            id
-            type
-          }
-        }
-      }`
-
-    return gql`
-      query fetchDuplicateDetails(${listQueryParams()}) {
-        ${ids.map((id, i) => writeQueryForId(id, i)).join(',\n')}
-      }
-    `
-  }
-
   formatData(
     data: { [key: string]: GQLBirthRegistration },
     language: string,
@@ -319,7 +331,7 @@ class ReviewDuplicatesClass extends React.Component<
         title={this.props.intl.formatMessage(messages.pageTitle)}
       >
         <Query
-          query={this.FETCH_DUPLICATES}
+          query={FETCH_DUPLICATES}
           variables={{
             id: applicationId
           }}
@@ -334,12 +346,18 @@ class ReviewDuplicatesClass extends React.Component<
               !data.fetchBirthRegistration ||
               !data.fetchBirthRegistration.registration
             ) {
-              return <span>ERROR! :(</span>
+              console.error(error)
+
+              return (
+                <ErrorText id="duplicates-error-text">
+                  {this.props.intl.formatMessage(messages.queryError)}
+                </ErrorText>
+              )
             }
 
-            const duplicateIds = [applicationId]
+            let duplicateIds = [applicationId]
             if (data.fetchBirthRegistration.registration.duplicates) {
-              duplicateIds.concat(
+              duplicateIds = duplicateIds.concat(
                 data.fetchBirthRegistration.registration.duplicates
               )
             }
@@ -351,7 +369,7 @@ class ReviewDuplicatesClass extends React.Component<
 
             return (
               <Query
-                query={this.createDuplicateDetailsQuery(duplicateIds)}
+                query={createDuplicateDetailsQuery(duplicateIds)}
                 variables={gqlVars}
               >
                 {({
@@ -363,8 +381,14 @@ class ReviewDuplicatesClass extends React.Component<
                     return <StyledSpinner id="review-duplicates-spinner" />
                   }
 
-                  if (error) {
-                    return <span>ERROR! :(</span>
+                  if (errorDetails) {
+                    console.error(error)
+
+                    return (
+                      <ErrorText id="duplicates-error-text">
+                        {this.props.intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
                   }
 
                   return (
