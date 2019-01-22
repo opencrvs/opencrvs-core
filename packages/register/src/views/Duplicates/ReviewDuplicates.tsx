@@ -4,13 +4,26 @@ import { Duplicate } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { WORK_QUEUE } from 'src/navigation/routes'
-import { DuplicateDetails, Event } from 'src/components/DuplicateDetails'
+import {
+  DuplicateDetails,
+  Event,
+  Action
+} from 'src/components/DuplicateDetails'
 import { Query } from 'react-apollo'
 import { RouteComponentProps } from 'react-router'
 import gql from 'graphql-tag'
 import { createNamesMap } from 'src/utils/data-formating'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
+import {
+  GQLBirthRegistration,
+  GQLHumanName,
+  GQLRegWorkflow,
+  GQLUser,
+  GQLIdentityType,
+  GQLLocation,
+  GQLRegStatus
+} from '@opencrvs/gateway/src/graphql/schema'
 
 interface IMatchParams {
   applicationId: string
@@ -180,43 +193,114 @@ class ReviewDuplicatesClass extends React.Component<
     `
   }
 
-  formatData(data: any, language: string, intl: ReactIntl.InjectedIntl) {
-    return Object.keys(data).map((key: any) => {
+  formatData(
+    data: { [key: string]: GQLBirthRegistration },
+    language: string,
+    intl: ReactIntl.InjectedIntl
+  ) {
+    return Object.keys(data).map(key => {
       const rec = data[key]
 
-      const childNamesMap = createNamesMap(rec.child.name)
-      const motherNamesMap = createNamesMap(rec.mother.name)
-      const fatherNamesMap = createNamesMap(rec.father.name)
-      const userNamesMap = createNamesMap(rec.registration.status[0].user.name)
+      const childNamesMap =
+        rec.child && rec.child.name
+          ? createNamesMap(rec.child.name as GQLHumanName[])
+          : {}
+      const motherNamesMap =
+        rec.mother && rec.mother.name
+          ? createNamesMap(rec.mother.name as GQLHumanName[])
+          : {}
+      const fatherNamesMap =
+        rec.father && rec.father.name
+          ? createNamesMap(rec.father.name as GQLHumanName[])
+          : {}
+      const userNamesMap =
+        rec.registration &&
+        rec.registration.status &&
+        rec.registration.status[0] &&
+        (rec.registration.status[0] as GQLRegWorkflow).user
+          ? createNamesMap(((rec.registration.status[0] as GQLRegWorkflow)
+              .user as GQLUser).name as GQLHumanName[])
+          : {}
 
       return {
         dateOfApplication: rec.createdAt,
-        trackingId: rec.registration.trackingId,
-        event: Event[rec.registration.type],
+        trackingId: (rec.registration && rec.registration.trackingId) || '',
+        event:
+          (rec.registration &&
+            rec.registration.type &&
+            Event[rec.registration.type]) ||
+          Event.BIRTH,
         child: {
           name: childNamesMap[language],
-          dob: rec.child.birthDate,
-          gender: intl.formatMessage(messages[rec.child.gender])
+          dob: (rec.child && rec.child.birthDate) || '',
+          gender:
+            (rec.child &&
+              rec.child.gender &&
+              intl.formatMessage(messages[rec.child.gender])) ||
+            ''
         },
         mother: {
           name: motherNamesMap[language],
-          dob: rec.mother.birthDate,
-          id: rec.mother.identifier[0].id
+          dob:
+            (rec.mother && rec.mother.birthDate && rec.mother.birthDate) || '',
+          id:
+            (rec.mother &&
+              rec.mother.identifier &&
+              rec.mother.identifier[0] &&
+              (rec.mother.identifier[0] as GQLIdentityType).id) ||
+            ''
         },
         father: {
           name: fatherNamesMap[language],
-          dob: rec.father.birthDate,
-          id: rec.father.identifier[0].id
+          dob:
+            (rec.father && rec.father.birthDate && rec.father.birthDate) || '',
+          id:
+            (rec.father &&
+              rec.father.identifier &&
+              rec.father.identifier[0] &&
+              (rec.father.identifier[0] as GQLIdentityType).id) ||
+            ''
         },
         regStatusHistory: [
           {
-            action: rec.registration.status[0].type,
-            date: rec.registration.status[0].timestamp,
+            action:
+              (rec.registration &&
+                rec.registration.status &&
+                rec.registration.status[0] &&
+                Action[
+                  (rec.registration.status[0] as GQLRegWorkflow)
+                    .type as GQLRegStatus
+                ]) ||
+              Action.DECLARED,
+            date:
+              (rec.registration &&
+                rec.registration.status &&
+                rec.registration.status[0] &&
+                (rec.registration.status[0] as GQLRegWorkflow).timestamp) ||
+              '',
             usersName: userNamesMap[language],
-            usersRole: intl.formatMessage(
-              messages[rec.registration.status[0].user.role]
-            ),
-            office: rec.registration.status[0].office.name
+            usersRole:
+              (rec.registration &&
+                rec.registration.status &&
+                rec.registration.status[0] &&
+                (rec.registration.status[0] as GQLRegWorkflow).user &&
+                ((rec.registration.status[0] as GQLRegWorkflow).user as GQLUser)
+                  .role &&
+                intl.formatMessage(
+                  messages[
+                    ((rec.registration.status[0] as GQLRegWorkflow)
+                      .user as GQLUser).role as string
+                  ]
+                )) ||
+              '',
+            office:
+              (rec.registration &&
+                rec.registration.status &&
+                rec.registration.status[0] &&
+                (rec.registration.status[0] as GQLRegWorkflow).office &&
+                ((rec.registration.status[0] as GQLRegWorkflow)
+                  .office as GQLLocation).name) ||
+              ''
           }
         ]
       }
@@ -301,7 +385,7 @@ class ReviewDuplicatesClass extends React.Component<
                           dataDetails,
                           this.props.language,
                           this.props.intl
-                        ).map((duplicateData: any, i: number) => (
+                        ).map((duplicateData, i: number) => (
                           <DuplicateDetails
                             id={`duplicate-details-item-${i}`}
                             key={i}
