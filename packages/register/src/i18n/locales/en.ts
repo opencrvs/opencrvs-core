@@ -419,6 +419,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.deceasedSexOther': 'Other',
     'formFields.deceasedSexUnknown': 'Unknown',
     'formFields.deceasedDateOfBirth': 'Date of Birth',
+    'formFields.deceasedCurrentAddressSameAsPermanent':
+      'Is deceased’s current address the same as their permanent address?',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',

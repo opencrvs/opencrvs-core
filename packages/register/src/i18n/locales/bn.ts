@@ -419,6 +419,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.deceasedSexOther': 'অন্যান্য',
     'formFields.deceasedSexUnknown': 'অজানা',
     'formFields.deceasedDateOfBirth': 'জন্ম তারিখ',
+    'formFields.deceasedCurrentAddressSameAsPermanent':
+      'মৃত ব্যক্তির বর্তমান ঠিকানা এবং স্থায়ী ঠিকানা একই?',
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',

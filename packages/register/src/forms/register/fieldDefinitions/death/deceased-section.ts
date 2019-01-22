@@ -96,6 +96,13 @@ const messages = defineMessages({
     defaultMessage: 'Date of Birth',
     description: 'Label for form field: Date of birth'
   },
+  currentAddressSameAsPermanent: {
+    id: 'formFields.deceasedCurrentAddressSameAsPermanent',
+    defaultMessage:
+      'Is deceased’s current address the same as their permanent address?',
+    description:
+      'Title for the radio button to select that the deceased current address is the same as their permanent address'
+  },
   currentAddress: {
     id: 'formFields.currentAddress',
     defaultMessage: 'Current Address',
@@ -117,7 +124,7 @@ export const deceasedSection: IFormSection = {
     {
       name: 'iDType',
       type: SELECT_WITH_OPTIONS,
-      label: identityMessages.iDType,
+      label: messages.deceasedIdType,
       required: true,
       initialValue: '',
       validate: [],
@@ -359,9 +366,18 @@ export const deceasedSection: IFormSection = {
       ]
     },
     {
+      name: 'currentAddress',
+      type: SUBSECTION,
+      label: messages.currentAddress,
+      initialValue: '',
+      required: false,
+      validate: [],
+      conditionals: []
+    },
+    {
       name: 'currentAddressSameAsPermanent',
       type: RADIO_GROUP,
-      label: addressMessages.currentAddressSameAsPermanent,
+      label: messages.currentAddressSameAsPermanent,
       required: true,
       initialValue: true,
       validate: [],
@@ -370,15 +386,6 @@ export const deceasedSection: IFormSection = {
         { value: false, label: addressMessages.deny }
       ],
       conditionals: []
-    },
-    {
-      name: 'currentAddress',
-      type: SUBSECTION,
-      label: messages.currentAddress,
-      initialValue: '',
-      required: false,
-      validate: [],
-      conditionals: [conditionals.currentAddressSameAsPermanent]
     },
     {
       name: 'country',
