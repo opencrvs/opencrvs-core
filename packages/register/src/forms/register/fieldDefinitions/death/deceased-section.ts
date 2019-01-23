@@ -1,88 +1,112 @@
-import { defineMessages } from 'react-intl'
-import { config } from 'src/config'
-import { messages as identityMessages } from '../identity'
-import { messages as maritalStatusMessages } from '../maritalStatus'
-import { messages as educationMessages } from '../education'
 import {
+  IFormSection,
   ViewType,
-  SELECT_WITH_OPTIONS,
   TEXT,
-  NUMBER,
+  SELECT_WITH_OPTIONS,
   DATE,
   SUBSECTION,
-  RADIO_GROUP,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  NUMBER,
+  RADIO_GROUP
 } from 'src/forms'
+import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   dateFormat
 } from 'src/utils/validate'
+import { countries } from 'src/forms/countries'
 
-export interface IMotherSectionFormData {
-  firstName: string
-}
-import { IFormSection } from '../index'
-import { messages as addressMessages } from '../address'
-import { countries } from '../countries'
-import { conditionals } from '../utils'
+import { messages as identityMessages } from '../../../identity'
+import { messages as maritalStatusMessages } from '../../../maritalStatus'
+import { messages as addressMessages } from '../../../address'
+
+import { config } from 'src/config'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import { conditionals } from 'src/forms/utils'
 
 const messages = defineMessages({
-  motherTab: {
-    id: 'register.form.tabs.motherTab',
-    defaultMessage: 'Mother',
-    description: 'Tab title for Mother'
+  deceasedTab: {
+    id: 'register.form.tabs.deceasedTab',
+    defaultMessage: 'Deceased',
+    description: 'Tab title for Deceased'
   },
-  motherTitle: {
-    id: 'register.form.section.motherTitle',
-    defaultMessage: "Mother's details",
-    description: 'Form section title for Mother'
+  deceasedTitle: {
+    id: 'register.form.section.deceasedTitle',
+    defaultMessage: "Deceased's details",
+    description: 'Form section title for Deceased'
+  },
+  deceasedIdType: {
+    id: 'formFields.deceasedIdType',
+    defaultMessage: 'Existing ID',
+    description: 'Label for form field: Existing ID'
+  },
+  noId: {
+    id: 'formFields.idTypeNoID',
+    defaultMessage: 'No ID available',
+    description: 'Option for form field: Type of ID'
+  },
+  deceasedGivenNames: {
+    id: 'formFields.deceasedGivenNames',
+    defaultMessage: 'Given name (s)',
+    description: 'Label for form field: Given names'
+  },
+  deceasedFamilyName: {
+    id: 'formFields.deceasedFamilyName',
+    defaultMessage: 'Family Name',
+    description: 'Label for form field: Family name'
+  },
+  deceasedGivenNamesEng: {
+    id: 'formFields.deceasedGivenNamesEng',
+    defaultMessage: 'Given Name (s) in English',
+    description: 'Label for form field: Given names in english'
+  },
+  deceasedFamilyNameEng: {
+    id: 'formFields.deceasedFamilyNameEng',
+    defaultMessage: 'Family Name in English',
+    description: 'Label for form field: Family name in english'
   },
   nationality: {
-    id: 'formFields.mother.nationality',
+    id: 'formFields.deceased.nationality',
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality'
   },
-  nationalityBangladesh: {
-    id: 'formFields.mother.nationalityBangladesh',
-    defaultMessage: 'Bangladesh',
-    description: 'Option for form field: Nationality'
+  deceasedSex: {
+    id: 'formFields.deceasedSex',
+    defaultMessage: 'Sex',
+    description: 'Label for form field: Sex name'
   },
-  motherFirstNames: {
-    id: 'formFields.motherFirstNames',
-    defaultMessage: 'First name(s)',
-    description: 'Label for form field: First names'
+  deceasedSexMale: {
+    id: 'formFields.deceasedSexMale',
+    defaultMessage: 'Male',
+    description: 'Option for form field: Sex name'
   },
-  motherFamilyName: {
-    id: 'formFields.motherFamilyName',
-    defaultMessage: 'Family name',
-    description: 'Label for form field: Family name'
+  deceasedSexFemale: {
+    id: 'formFields.deceasedSexFemale',
+    defaultMessage: 'Female',
+    description: 'Option for form field: Sex name'
   },
-  motherFirstNamesEng: {
-    id: 'formFields.motherFirstNamesEng',
-    defaultMessage: 'First name(s) (in english)',
-    description: 'Label for form field: First names in english'
+  deceasedSexOther: {
+    id: 'formFields.deceasedSexOther',
+    defaultMessage: 'Other',
+    description: 'Option for form field: Sex name'
   },
-  motherFamilyNameEng: {
-    id: 'formFields.motherFamilyNameEng',
-    defaultMessage: 'Family name (in english)',
-    description: 'Label for form field: Family name in english'
+  deceasedSexUnknown: {
+    id: 'formFields.deceasedSexUnknown',
+    defaultMessage: 'Unknown',
+    description: 'Option for form field: Sex name'
   },
-  defaultLabel: {
-    id: 'formFields.defaultLabel',
-    defaultMessage: 'Label goes here',
-    description: 'default label'
-  },
-  motherDateOfBirth: {
-    id: 'formFields.motherDateOfBirth',
-    defaultMessage: 'Date of birth',
+  deceasedDateOfBirth: {
+    id: 'formFields.deceasedDateOfBirth',
+    defaultMessage: 'Date of Birth',
     description: 'Label for form field: Date of birth'
   },
-  motherEducationAttainment: {
-    id: 'formFields.motherEducationAttainment',
-    defaultMessage: "Mother's level of formal education attained",
-    description: 'Label for form field: Mother education'
+  currentAddressSameAsPermanent: {
+    id: 'formFields.deceasedCurrentAddressSameAsPermanent',
+    defaultMessage:
+      'Is deceased’s current address the same as their permanent address?',
+    description:
+      'Title for the radio button to select that the deceased current address is the same as their permanent address'
   },
   currentAddress: {
     id: 'formFields.currentAddress',
@@ -93,24 +117,19 @@ const messages = defineMessages({
     id: 'formFields.permanentAddress',
     defaultMessage: 'Permanent Address',
     description: 'Title for the permanent address fields'
-  },
-  optionalLabel: {
-    id: 'formFields.optionalLabel',
-    defaultMessage: 'Optional',
-    description: 'Optional label'
   }
 })
 
-export const motherSection: IFormSection = {
-  id: 'mother',
+export const deceasedSection: IFormSection = {
+  id: 'deceased',
   viewType: 'form' as ViewType,
-  name: messages.motherTab,
-  title: messages.motherTitle,
+  name: messages.deceasedTab,
+  title: messages.deceasedTitle,
   fields: [
     {
       name: 'iDType',
       type: SELECT_WITH_OPTIONS,
-      label: identityMessages.iDType,
+      label: messages.deceasedIdType,
       required: true,
       initialValue: '',
       validate: [],
@@ -126,14 +145,11 @@ export const motherSection: IFormSection = {
           label: identityMessages.iDTypeBRN
         },
         {
-          value: 'DEATH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeDRN
-        },
-        {
           value: 'REFUGEE_NUMBER',
           label: identityMessages.iDTypeRefugeeNumber
         },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
+        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
+        { value: 'NO_ID', label: messages.noId }
       ]
     },
     {
@@ -142,21 +158,13 @@ export const motherSection: IFormSection = {
       label: identityMessages.iD,
       required: true,
       initialValue: '',
-      validate: []
-    },
-    {
-      name: 'nationality',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.nationality,
-      required: false,
-      initialValue: 'BGD',
       validate: [],
-      options: countries
+      conditionals: [conditionals.iDAvailable]
     },
     {
       name: 'firstNames',
       type: TEXT,
-      label: messages.motherFirstNames,
+      label: messages.deceasedGivenNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
@@ -164,7 +172,7 @@ export const motherSection: IFormSection = {
     {
       name: 'familyName',
       type: TEXT,
-      label: messages.motherFamilyName,
+      label: messages.deceasedFamilyName,
       required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
@@ -172,7 +180,7 @@ export const motherSection: IFormSection = {
     {
       name: 'firstNamesEng',
       type: TEXT,
-      label: messages.motherFirstNamesEng,
+      label: messages.deceasedGivenNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
@@ -180,18 +188,33 @@ export const motherSection: IFormSection = {
     {
       name: 'familyNameEng',
       type: TEXT,
-      label: messages.motherFamilyNameEng,
+      label: messages.deceasedFamilyNameEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'birthDate',
-      type: DATE,
-      label: messages.motherDateOfBirth,
-      required: false,
+      name: 'nationality',
+      type: SELECT_WITH_OPTIONS,
+      label: messages.nationality,
+      required: true,
+      initialValue: 'BGD',
+      validate: [],
+      options: countries
+    },
+    {
+      name: 'gender',
+      type: SELECT_WITH_OPTIONS,
+      label: messages.deceasedSex,
+      required: true,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [],
+      options: [
+        { value: 'male', label: messages.deceasedSexMale },
+        { value: 'female', label: messages.deceasedSexFemale },
+        { value: 'other', label: messages.deceasedSexOther },
+        { value: 'unknown', label: messages.deceasedSexUnknown }
+      ]
     },
     {
       name: 'maritalStatus',
@@ -215,56 +238,13 @@ export const motherSection: IFormSection = {
       ]
     },
     {
-      name: 'dateOfMarriage',
+      name: 'birthDate',
       type: DATE,
-      label: maritalStatusMessages.dateOfMarriage,
+      label: messages.deceasedDateOfBirth,
       required: false,
       initialValue: '',
       validate: [dateFormat]
     },
-    {
-      name: 'educationalAttainment',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.motherEducationAttainment,
-      required: false,
-      initialValue: '',
-      validate: [],
-      options: [
-        {
-          value: 'NO_SCHOOLING',
-          label: educationMessages.educationAttainmentNone
-        },
-        {
-          value: 'PRIMARY_ISCED_1',
-          label: educationMessages.educationAttainmentISCED1
-        },
-        {
-          value: 'LOWER_SECONDARY_ISCED_2',
-          label: educationMessages.educationAttainmentISCED2
-        },
-        {
-          value: 'UPPER_SECONDARY_ISCED_3',
-          label: educationMessages.educationAttainmentISCED3
-        },
-        {
-          value: 'POST_SECONDARY_ISCED_4',
-          label: educationMessages.educationAttainmentISCED4
-        },
-        {
-          value: 'FIRST_STAGE_TERTIARY_ISCED_5',
-          label: educationMessages.educationAttainmentISCED5
-        },
-        {
-          value: 'SECOND_STAGE_TERTIARY_ISCED_6',
-          label: educationMessages.educationAttainmentISCED6
-        },
-        {
-          value: 'NOT_STATED',
-          label: educationMessages.educationAttainmentNotStated
-        }
-      ]
-    },
-
     {
       name: 'permanentAddress',
       type: SUBSECTION,
@@ -389,9 +369,18 @@ export const motherSection: IFormSection = {
       ]
     },
     {
+      name: 'currentAddress',
+      type: SUBSECTION,
+      label: messages.currentAddress,
+      initialValue: '',
+      required: false,
+      validate: [],
+      conditionals: []
+    },
+    {
       name: 'currentAddressSameAsPermanent',
       type: RADIO_GROUP,
-      label: addressMessages.currentAddressSameAsPermanent,
+      label: messages.currentAddressSameAsPermanent,
       required: true,
       initialValue: true,
       validate: [],
@@ -400,15 +389,6 @@ export const motherSection: IFormSection = {
         { value: false, label: addressMessages.deny }
       ],
       conditionals: []
-    },
-    {
-      name: 'currentAddress',
-      type: SUBSECTION,
-      label: messages.currentAddress,
-      initialValue: '',
-      required: false,
-      validate: [],
-      conditionals: [conditionals.currentAddressSameAsPermanent]
     },
     {
       name: 'country',

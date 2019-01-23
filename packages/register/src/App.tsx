@@ -139,6 +139,18 @@ export class App extends React.Component<IAppProps, IState> {
 
                           <ProtectedRoute
                             exact
+                            path={routes.DRAFT_DEATH_FORM}
+                            component={ApplicationForm}
+                          />
+
+                          <ProtectedRoute
+                            exact
+                            path={routes.DRAFT_DEATH_FORM_TAB}
+                            component={ApplicationForm}
+                          />
+
+                          <ProtectedRoute
+                            exact
                             path={routes.REVIEW_BIRTH_PARENT_FORM_TAB}
                             component={ReviewForm}
                           />

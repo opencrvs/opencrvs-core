@@ -29,6 +29,7 @@ import {
 import { storeOfflineData } from 'src/offline/actions'
 import { referenceApi } from 'src/utils/referenceApi'
 import { createClient } from './utils/apolloClient'
+import { Event } from '@opencrvs/register/src/forms'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -406,7 +407,7 @@ describe('when user has a valid token in local storage', () => {
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
     beforeEach(() => {
-      draft = createDraft()
+      draft = createDraft(Event.BIRTH)
       store.dispatch(storeDraft(draft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
@@ -807,7 +808,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: uuid(), data }
+      customDraft = { id: uuid(), data, event: Event.BIRTH }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
@@ -1067,7 +1068,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: uuid(), data, review: true }
+      customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         REVIEW_BIRTH_PARENT_FORM_TAB.replace(

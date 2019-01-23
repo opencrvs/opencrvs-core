@@ -405,6 +405,23 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.commentsOrNotes': 'Comments or notes',
     'formFields.registration.commentsOrNotes.description':
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
+    'register.form.tabs.deceasedTab': 'Deceased',
+    'register.form.section.deceasedTitle': "Deceased's details",
+    'formFields.deceasedIdType': 'Existing ID',
+    'formFields.idTypeNoID': 'No ID available',
+    'formFields.deceasedGivenNames': 'Given name (s)',
+    'formFields.deceasedFamilyName': 'Family Name',
+    'formFields.deceasedGivenNamesEng': 'Given Name (s) in English',
+    'formFields.deceasedFamilyNameEng': 'Family Name in English',
+    'formFields.deceased.nationality': 'Nationality',
+    'formFields.deceasedSex': 'Sex',
+    'formFields.deceasedSexMale': 'Male',
+    'formFields.deceasedSexFemale': 'Female',
+    'formFields.deceasedSexOther': 'Other',
+    'formFields.deceasedSexUnknown': 'Unknown',
+    'formFields.deceasedDateOfBirth': 'Date of Birth',
+    'formFields.deceasedCurrentAddressSameAsPermanent':
+      'Is deceased’s current address the same as their permanent address?',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
@@ -420,6 +437,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth application',
+    'register.form.newVitalEventRegistration':
+      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
     'register.form.previewBirthRegistration': 'Birth Application Preview',
     'register.form.reviewBirthRegistration': 'Birth Registration Review',
     'register.form.saveDraft': 'Save as draft',

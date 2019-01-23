@@ -10,11 +10,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-
-export enum Event {
-  BIRTH = 'birth',
-  DEATH = 'death'
-}
+import { Event } from 'src/forms'
 
 export enum Action {
   SUBMITTED = 'submitted',
