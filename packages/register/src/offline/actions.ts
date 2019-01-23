@@ -1,5 +1,8 @@
-import { ILocation } from './reducer'
-import { ILocationDataResponse } from 'src/utils/referenceApi'
+import { ILocation, IFacility } from './reducer'
+import {
+  ILocationDataResponse,
+  IFacilitiesDataResponse
+} from 'src/utils/referenceApi'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -18,6 +21,19 @@ export type LocationsFailedAction = {
   type: typeof LOCATIONS_FAILED
   payload: Error
 }
+
+export const FACILITIES_LOADED = 'OFFLINE/FACILITIES_LOADED'
+export type FacilitiesLoadedAction = {
+  type: typeof FACILITIES_LOADED
+  payload: IFacility[]
+}
+
+export const FACILITIES_FAILED = 'OFFLINE/FACILITIES_FAILED'
+export type FacilitiesFailedAction = {
+  type: typeof FACILITIES_FAILED
+  payload: Error
+}
+
 export const SET_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
 type SetOfflineData = {
   type: typeof SET_OFFLINE_DATA
@@ -38,11 +54,25 @@ export type Action =
   | SetOfflineData
   | IGetOfflineDataSuccessAction
   | IGetOfflineDataFailedAction
+  | FacilitiesLoadedAction
+  | FacilitiesFailedAction
 
 export const locationsLoaded = (
   payload: ILocationDataResponse
 ): LocationsLoadedAction => ({
   type: LOCATIONS_LOADED,
+  payload: payload.data
+})
+
+export const facilitiesFailed = (error: Error): FacilitiesFailedAction => ({
+  type: FACILITIES_FAILED,
+  payload: error
+})
+
+export const facilitiesLoaded = (
+  payload: IFacilitiesDataResponse
+): FacilitiesLoadedAction => ({
+  type: FACILITIES_LOADED,
   payload: payload.data
 })
 

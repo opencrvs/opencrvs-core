@@ -60,6 +60,21 @@ mockFetchLocations.mockReturnValue({
 })
 referenceApi.loadLocations = mockFetchLocations
 
+const mockFetchFacilities = jest.fn()
+mockFetchLocations.mockReturnValue({
+  data: [
+    {
+      id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
+      name: 'Shaheed Taj Uddin Ahmad Medical College',
+      nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
+      physicalType: 'Building',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
+    }
+  ]
+})
+referenceApi.loadFacilities = mockFetchFacilities
+
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
 }
@@ -69,15 +84,18 @@ beforeEach(() => {
   assign.mockClear()
 })
 
-it('renders without crashing', async () => {
-  createTestApp()
-})
+describe('when user does not have a token', () => {
+  let store: Store
+  beforeEach(() => {
+    const testApp = createTestApp()
+    store = testApp.store
+    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+  })
 
-it("redirects user to SSO if user doesn't have a token", async () => {
-  createTestApp()
-  await flushPromises()
-
-  expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
+  it("redirects user to SSO if user doesn't have a token", async () => {
+    await flushPromises()
+    expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
+  })
 })
 
 const validToken =

@@ -17,6 +17,15 @@ export interface ILocation {
   partOf: string
 }
 
+export interface IFacility {
+  id: string
+  name: string
+  nameBn: string
+  physicalType: string
+  type: string
+  partOf: string
+}
+
 export const formatLocationLanguageState = (
   locations: ILocation[]
 ): ILanguageState => {
@@ -31,18 +40,35 @@ export const formatLocationLanguageState = (
   return languages
 }
 
+export const formatFacilitiesLanguageState = (
+  facilities: IFacility[]
+): ILanguageState => {
+  const enMessages: IntlMessages = {}
+  const bnMessages: IntlMessages = {}
+  facilities.forEach((facility: IFacility) => {
+    enMessages[`facility.${facility.id}`] = facility.name
+    bnMessages[`facility.${facility.id}`] = facility.nameBn
+  })
+  languages.en.messages = { ...languages.en.messages, ...enMessages }
+  languages.bn.messages = { ...languages.bn.messages, ...bnMessages }
+  return languages
+}
+
 export interface IOfflineData {
   locations: ILocation[]
+  facilities: IFacility[]
 }
 
 export type IOfflineDataState = {
   locations: ILocation[]
+  facilities: IFacility[]
   offlineDataLoaded: boolean
   loadingError: boolean
 }
 
 export const initialState: IOfflineDataState = {
   locations: [],
+  facilities: [],
   offlineDataLoaded: false,
   loadingError: false
 }
@@ -57,20 +83,48 @@ export const offlineDataReducer: LoopReducer<
   | IOfflineDataState
   | Loop<IOfflineDataState, actions.Action | i18nActions.Action> => {
   let locationLanguageState: ILanguageState
+  let facilitesLanguageState: ILanguageState
   switch (action.type) {
     case actions.LOCATIONS_FAILED:
       return { ...state, loadingError: true }
+    case actions.FACILITIES_FAILED:
+      return { ...state, loadingError: true }
     case actions.LOCATIONS_LOADED:
-      storage.setItem('offline', JSON.stringify({ locations: action.payload }))
-      locationLanguageState = formatLocationLanguageState(action.payload)
       return loop(
         {
           ...state,
           loadingError: false,
-          locations: action.payload,
+          locations: action.payload
+        },
+        Cmd.run<
+          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
+        >(referenceApi.loadFacilities, {
+          successActionCreator: actions.facilitiesLoaded,
+          failActionCreator: actions.facilitiesFailed
+        })
+      )
+    case actions.FACILITIES_LOADED:
+      storage.setItem(
+        'offline',
+        JSON.stringify({
+          locations: state.locations,
+          facilities: action.payload
+        })
+      )
+      locationLanguageState = formatLocationLanguageState(state.locations)
+
+      facilitesLanguageState = formatFacilitiesLanguageState(action.payload)
+      return loop(
+        {
+          ...state,
+          loadingError: false,
+          facilities: action.payload,
           offlineDataLoaded: true
         },
-        Cmd.action(i18nActions.addOfflineData(locationLanguageState))
+        Cmd.list([
+          Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
+          Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
+        ])
       )
     case actions.SET_OFFLINE_DATA:
       return loop(
@@ -92,7 +146,26 @@ export const offlineDataReducer: LoopReducer<
         offlineDataString ? offlineDataString : '{}'
       )
 
-      if (!offlineData.locations) {
+      if (offlineData.locations && offlineData.facilities) {
+        locationLanguageState = formatLocationLanguageState(
+          offlineData.locations
+        )
+        facilitesLanguageState = formatFacilitiesLanguageState(
+          offlineData.facilities
+        )
+        return loop(
+          {
+            ...state,
+            locations: offlineData.locations,
+            facilities: offlineData.facilities,
+            offlineDataLoaded: true
+          },
+          Cmd.list([
+            Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
+            Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
+          ])
+        )
+      } else {
         return loop(
           {
             ...state
@@ -103,18 +176,6 @@ export const offlineDataReducer: LoopReducer<
             successActionCreator: actions.locationsLoaded,
             failActionCreator: actions.locationsFailed
           })
-        )
-      } else {
-        locationLanguageState = formatLocationLanguageState(
-          offlineData.locations
-        )
-        return loop(
-          {
-            ...state,
-            locations: offlineData.locations,
-            offlineDataLoaded: true
-          },
-          Cmd.action(i18nActions.addOfflineData(locationLanguageState))
         )
       }
 
