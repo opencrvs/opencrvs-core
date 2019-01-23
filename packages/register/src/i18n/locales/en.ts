@@ -437,6 +437,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth application',
+    'register.form.newVitalEventRegistration':
+      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
     'register.form.previewBirthRegistration': 'Birth Application Preview',
     'register.form.reviewBirthRegistration': 'Birth Registration Review',
     'register.form.saveDraft': 'Save as draft',
