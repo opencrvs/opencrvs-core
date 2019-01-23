@@ -13,6 +13,7 @@ import { v4 as uuid } from 'uuid'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
+import { Event } from '@opencrvs/register/src/forms'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -32,7 +33,7 @@ describe('ReviewForm tests', async () => {
   })
 
   it('it returns error while fetching', async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -78,7 +79,7 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it('it returns birth registration', async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -174,7 +175,8 @@ describe('ReviewForm tests', async () => {
                 attachments: null,
                 status: null,
                 trackingId: 'B123456',
-                registrationNumber: null
+                registrationNumber: null,
+                type: 'BIRTH'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -231,7 +233,7 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it('it returns empty data and checks if there is any error', async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -271,7 +273,7 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it("when registration contact is father, father's should be set", async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -346,7 +348,8 @@ describe('ReviewForm tests', async () => {
                 attachments: null,
                 status: null,
                 trackingId: 'B123456',
-                registrationNumber: null
+                registrationNumber: null,
+                type: 'BIRTH'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -391,7 +394,7 @@ describe('ReviewForm tests', async () => {
   })
 
   it('when registration contact is there but no contact information for father/mother', async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -422,7 +425,8 @@ describe('ReviewForm tests', async () => {
                 attachments: null,
                 status: null,
                 trackingId: 'B123456',
-                registrationNumber: '12345'
+                registrationNumber: '12345',
+                type: 'BIRTH'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -469,7 +473,7 @@ describe('ReviewForm tests', async () => {
   })
 
   it('when registration has attachment', async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -507,7 +511,8 @@ describe('ReviewForm tests', async () => {
                 ],
                 status: null,
                 trackingId: 'B123456',
-                registrationNumber: null
+                registrationNumber: null,
+                type: 'BIRTH'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -561,7 +566,7 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it('check registration', async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -645,7 +650,8 @@ describe('ReviewForm tests', async () => {
                   }
                 ],
                 trackingId: 'B123456',
-                registrationNumber: null
+                registrationNumber: null,
+                type: 'BIRTH'
               },
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
@@ -693,13 +699,14 @@ describe('ReviewForm tests', async () => {
       registrationPhone: '01711111111',
       commentsOrNotes: 'This is a note',
       trackingId: 'B123456',
-      registrationNumber: null
+      registrationNumber: null,
+      type: 'birth'
     })
 
     testComponent.component.unmount()
   })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
-    const draft = createReviewDraft(uuid(), {})
+    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     draft.data = {
       child: {
         attendantAtBirth: 'NURSE',
@@ -715,7 +722,8 @@ describe('ReviewForm tests', async () => {
       registration: {
         presentAtBirthRegistration: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
-        whoseContactDetails: 'MOTHER'
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
       }
     }
     const initalDrafts = JSON.parse('[]')
@@ -765,7 +773,8 @@ describe('ReviewForm tests', async () => {
       registration: {
         presentAtBirthRegistration: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
-        whoseContactDetails: 'MOTHER'
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
       }
     })
 
@@ -778,7 +787,7 @@ describe('ReviewForm tests', async () => {
     })
 
     it('shows error message for user with declare scope', async () => {
-      const draft = createReviewDraft(uuid(), {})
+      const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
       const graphqlMock = [
         {
           request: {
@@ -794,7 +803,8 @@ describe('ReviewForm tests', async () => {
                 registration: {
                   contact: 'MOTHER',
                   attachments: null,
-                  status: null
+                  status: null,
+                  type: 'BIRTH'
                 },
                 attendantAtBirth: 'NURSE',
                 weightAtBirth: 2,

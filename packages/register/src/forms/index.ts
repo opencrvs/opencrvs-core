@@ -25,6 +25,11 @@ export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 
+export enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
+
 export interface ISelectOption {
   value: SelectComponentOption['value']
   label: FormattedMessage.MessageDescriptor

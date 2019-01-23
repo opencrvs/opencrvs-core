@@ -21,25 +21,33 @@ const messages = defineMessages({
 })
 
 export type IRegisterFormState = {
-  registerForm: IForm
+  registerForm: {
+    birth: IForm
+    death: IForm
+  }
 }
 
 export const initialState: IRegisterFormState = {
   registerForm: {
-    sections: [
-      childSection,
-      motherSection,
-      fatherSection,
-      registrationSection,
-      documentsSection,
-      {
-        id: 'preview',
-        viewType: 'preview',
-        name: messages.previewTab,
-        title: messages.previewTitle,
-        fields: []
-      }
-    ]
+    birth: {
+      sections: [
+        childSection,
+        motherSection,
+        fatherSection,
+        registrationSection,
+        documentsSection,
+        {
+          id: 'preview',
+          viewType: 'preview',
+          name: messages.previewTab,
+          title: messages.previewTitle,
+          fields: []
+        }
+      ]
+    },
+    death: {
+      sections: []
+    }
   }
 }
 
