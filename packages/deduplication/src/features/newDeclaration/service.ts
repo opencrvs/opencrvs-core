@@ -1,7 +1,7 @@
 import {
   findEntry,
   findName,
-  postToHearth,
+  updateInHearth,
   getCompositionByIdentifier,
   addDuplicatesToComposition
 } from 'src/features/fhir/fhir-utils'
@@ -180,5 +180,5 @@ async function updateCompositionWithDuplicates(
 ) {
   addDuplicatesToComposition(duplicates, composition)
 
-  return postToHearth(composition, composition.id)
+  return updateInHearth(composition, composition.id)
 }

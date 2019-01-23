@@ -63,7 +63,6 @@ export function addDuplicatesToComposition(
   composition: fhir.Composition
 ) {
   try {
-    // const composition = compositionEntry.resource as fhir.Composition
     const compositionIdentifier =
       composition.identifier && composition.identifier.value
 
@@ -132,7 +131,7 @@ export const getFromFhir = (suffix: string) => {
     })
 }
 
-export async function postToHearth(payload: any, id?: string) {
+export async function updateInHearth(payload: any, id?: string) {
   const res = await fetch(`${HEARTH_URL}/Composition/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
