@@ -61,6 +61,7 @@ export function generateMoneyReceipt(
   amount: string,
   language: string
 ) {
+  moment.lang(language)
   const dateOfPayment = moment().format(CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT)
   const docDefinition = {
     info: {
@@ -152,10 +153,7 @@ export function generateMoneyReceipt(
   generatedPDF.open()
 }
 
-export async function generateCertificate(
-  certificateDetails: CertificateDetails,
-  callBack: (pdf: string) => void
-) {
+function getCertificateObject(certificateDetails: CertificateDetails) {
   moment.locale('en')
   const dateEn = moment().format(CERTIFICATE_DATE_FORMAT)
   moment.locale('bn')
@@ -253,7 +251,7 @@ export async function generateCertificate(
           margin: [0, 39, 0, 0],
           columns: [
             {
-              text: 'Was bonr on',
+              text: 'Was born on',
               alignment: 'right'
             },
             {
@@ -369,9 +367,20 @@ export async function generateCertificate(
   }
 
   pdfMake.vfs = pdfFonts.pdfMake.vfs
-  const generatedPDF = pdfMake.createPdf(certificateDefinition, null, fonts)
+  return pdfMake.createPdf(certificateDefinition, null, fonts)
+}
 
-  await generatedPDF.getDataUrl((pdf: string) => {
+export async function generateCertificateDataURL(
+  certificateDetails: CertificateDetails,
+  callBack: (pdf: string) => void
+) {
+  await getCertificateObject(certificateDetails).getDataUrl((pdf: string) => {
     callBack(pdf)
   })
+}
+
+export function generateAndPrintCertificate(
+  certificateDetails: CertificateDetails
+) {
+  getCertificateObject(certificateDetails).print()
 }

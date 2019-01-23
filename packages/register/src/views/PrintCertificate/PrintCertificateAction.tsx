@@ -15,7 +15,12 @@ import {
   PDF_DOCUMENT_VIEWER,
   IFormField
 } from 'src/forms'
-import { PrimaryButton, IconAction } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  SecondaryButton,
+  IconAction,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { hasFormError } from 'src/forms/utils'
@@ -28,10 +33,13 @@ import {
   Registrant,
   Issuer,
   generateMoneyReceipt,
-  generateCertificate,
-  CertificateDetails
+  generateCertificateDataURL,
+  CertificateDetails,
+  generateAndPrintCertificate
 } from './generatePDF'
 import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
+import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
+// import { Mutation } from 'react-apollo'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -116,6 +124,51 @@ const StyledIconAction = styled(IconAction)`
     }
   }
 `
+const ConfirmBtn = styled(PrimaryButton)`
+  font-weight: bold;
+  padding: 15px 35px 15px 20px;
+  div {
+    position: relative !important;
+    margin-right: 20px;
+    top: 2px;
+  }
+  &:disabled {
+    background: ${({ theme }) => theme.colors.disabledButton};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
+`
+
+const EditRegistration = styled(SecondaryButton)`
+  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  color: ${({ theme }) => theme.colors.primary} !important;
+  font-weight: bold;
+  margin: 0px 20px;
+  top: 3px;
+  position: relative;
+  svg {
+    margin-right: 15px;
+  }
+  &:hover {
+    background: inherit;
+    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  }
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.inputBackground};
+  }
+`
+
+const Info = styled.div`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  margin-bottom: 30px;
+`
+const B = styled.div`
+  display: block;
+  line-height: 50px;
+  font-weight: bold;
+`
+
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
     fetchBirthRegistration(id: $id) {
@@ -225,8 +278,24 @@ const messages = defineMessages({
     id: 'register.workQueue.print.finish',
     defaultMessage: 'Finish',
     description: 'The label for finish printing certificate button'
+  },
+  editRegistration: {
+    id: 'certificate.btn.editRegistration',
+    defaultMessage: 'Edit Registration'
+  },
+  certificateIsCorrect: {
+    id: 'certificate.txt.isCorrectTxt'
+  },
+  certificateConfirmationTxt: {
+    id: 'certificate.txt.confirmationTxt'
   }
 })
+
+const certifyMutation = gql`
+  mutation markBirthAsCertified($details: BirthRegistrationInput) {
+    markBirthAsCertified(details: $details)
+  }
+`
 
 type State = {
   currentForm: string
@@ -375,14 +444,40 @@ class PrintCertificateActionComponent extends React.Component<
       case CERTIFICATE_PREVIEW:
         return (
           <>
+            <Box>
+              <Info>
+                <B>{intl.formatMessage(messages.certificateIsCorrect)}</B>
+                {intl.formatMessage(messages.certificateConfirmationTxt)}
+              </Info>
+              <ConfirmBtn
+                id="registerApplicationBtn"
+                icon={() => <TickLarge />}
+                align={ICON_ALIGNMENT.LEFT}
+                onClick={() => {
+                  console.log(this.props)
+                  console.log(certifyMutation)
+                  console.log(this.state)
+                  this.setState(() => ({
+                    enableConfirmButton: true
+                  }))
+                }}
+              >
+                {intl.formatMessage(messages.confirm)}
+              </ConfirmBtn>
+              <EditRegistration id="edit" disabled={true}>
+                <Edit />
+                {this.props.intl.formatMessage(messages.editRegistration)}
+              </EditRegistration>
+            </Box>
             <ButtonContainer>
               <StyledIconAction
                 id="print-certificate"
                 title={intl.formatMessage(messages.printCertificate)}
                 icon={() => <StyledPrintIcon />}
-                onClick={() =>
-                  console.log('to open certificate document in another window')
-                }
+                disabled={!enableConfirmButton}
+                onClick={() => {
+                  generateAndPrintCertificate(certificateDetails)
+                }}
               />
             </ButtonContainer>
 
@@ -390,7 +485,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="finish-printing-certificate"
                 disabled={!enableConfirmButton}
-                onClick={() => console.log('certifier mutation to be called')}
+                onClick={() => (location.href = 'work-queue')}
               >
                 {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>
@@ -403,7 +498,7 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   previewCertificatePDF(certificateDetails: CertificateDetails) {
-    generateCertificate(certificateDetails, (certificatePdf: string) => {
+    generateCertificateDataURL(certificateDetails, (certificatePdf: string) => {
       this.setState(prevState => {
         const result = {
           ...prevState,
