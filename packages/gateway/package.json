@@ -57,7 +57,7 @@
     "@types/fhir": "^0.0.30",
     "@types/graphql": "^0.13.1",
     "@types/jest": "^22.2.3",
-    "@types/joi": "^10.4.0",
+    "@types/joi": "^14.0.0",
     "@types/nedb": "^1.8.3",
     "@types/node": "^10.12.5",
     "@types/vision": "^5.3.2",

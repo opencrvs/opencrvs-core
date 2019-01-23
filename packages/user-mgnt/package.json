@@ -19,7 +19,7 @@
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "^8.0.1",
     "@types/inert": "^5.1.1",
-    "@types/joi": "^13.3.0",
+    "@types/joi": "^14.0.0",
     "@types/mongoose": "^5.0.16",
     "@types/uuid": "^3.4.3",
     "@types/vision": "^5.3.4",

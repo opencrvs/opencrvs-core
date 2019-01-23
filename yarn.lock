@@ -447,16 +447,6 @@
   resolved "https://registry.yarnpkg.com/@types/joi/-/joi-14.0.0.tgz#7906aca6850868f39f888efcaef28bbcbbab5498"
   integrity sha512-q3r+5QfNrthJL+5Pvb9MOP7rJniTfAV+cGbsO2a3ItGSuwmp2vdjjZ/VCWKwGT5lNx4eOvZI4O3IpSIXh3f4RA==
 
-"@types/joi@^10.4.0":
-  version "10.6.5"
-  resolved "https://registry.yarnpkg.com/@types/joi/-/joi-10.6.5.tgz#4f989475568dc3ee9e4355901d489d311c1ad5e1"
-  integrity sha512-8ee0iYN7h9XJHjqWEsiKA/xp5620lv4rmDW9en2cPbNpJYacXZGqAf4JaTCVQyySDfXjE4HcqCPRl0gUFXbdbw==
-
-"@types/joi@^13.3.0":
-  version "13.6.3"
-  resolved "https://registry.yarnpkg.com/@types/joi/-/joi-13.6.3.tgz#79364839a9cc2c6d4d915ef8822e1f703e28648f"
-  integrity sha512-n5tDa0/3MUtHsA2fVH+emDfGQkPramIpWaOvWS+7C/Yq7bn2j979RAIy9pbl4F4hSE5lwjgBXhJN019DP+3ofg==
-
 "@types/jquery@*":
   version "3.3.22"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.22.tgz#cde55dc8f83207dffd16205b05f97ce824581735"
