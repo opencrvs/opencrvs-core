@@ -38,8 +38,10 @@ import { Scope } from '@opencrvs/register/src/utils/authUtils'
 import {
   IImage,
   documentForWhomFhirMapping,
-  documentTypeFhirMapping
+  documentTypeFhirMapping,
+  IRegistrationDetails
 } from './ProcessDraftData'
+import { Event } from '@opencrvs/register/src/forms'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
@@ -129,6 +131,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
             comment
           }
         }
+        type
         trackingId
         registrationNumber
       }
@@ -392,6 +395,9 @@ export class ReviewFormView extends React.Component<IProps> {
       registrationDetails._fhirID = registration.id
     }
 
+    if (registration.type && registration.type === 'BIRTH') {
+      registrationDetails.type = Event.BIRTH
+    }
     return registrationDetails
   }
 
@@ -489,8 +495,12 @@ export class ReviewFormView extends React.Component<IProps> {
               )
             }
 
-            const transData = this.transformData(data.fetchBirthRegistration)
-            const reviewDraft = createReviewDraft(draftId, transData)
+            const transData: IRegistrationDetails = this.transformData(
+              data.fetchBirthRegistration
+            )
+            const eventType =
+              transData.registration && transData.registration.type
+            const reviewDraft = createReviewDraft(draftId, transData, eventType)
             dispatch(storeDraft(reviewDraft))
 
             return <RegisterForm {...this.props} draft={reviewDraft} />

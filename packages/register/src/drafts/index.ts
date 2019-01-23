@@ -1,4 +1,4 @@
-import { IFormData } from '../forms'
+import { IFormData, Event } from '../forms'
 import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
@@ -14,6 +14,7 @@ export interface IDraft {
   id: string
   data: IFormData
   review?: boolean
+  event: Event
 }
 
 interface IStoreDraftAction {
@@ -67,14 +68,15 @@ const initialState = {
   drafts: []
 }
 
-export function createDraft() {
-  return { id: uuid(), data: {} }
+export function createDraft(event: Event) {
+  return { id: uuid(), data: {}, event }
 }
 export function createReviewDraft(
   draftId: string,
-  formData: IFormData
+  formData: IFormData,
+  event: Event
 ): IDraft {
-  return { id: draftId, data: formData, review: true }
+  return { id: draftId, data: formData, review: true, event }
 }
 
 export function storeDraft(draft: IDraft): IStoreDraftAction {

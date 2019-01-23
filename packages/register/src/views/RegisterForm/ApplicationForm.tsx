@@ -23,7 +23,6 @@ function mapStatetoProps(
   props: RouteComponentProps<{ tabId: string; draftId: string }>
 ) {
   const { match } = props
-  const registerForm = getRegisterForm(state)
   const draft = state.drafts.drafts.find(
     ({ id }) => id === match.params.draftId
   )
@@ -31,6 +30,15 @@ function mapStatetoProps(
   if (!draft) {
     throw new Error(`Draft "${match.params.draftId}" missing!`)
   }
+
+  const event = draft.event
+
+  if (!event) {
+    throw new Error(`Event is not specified in Draft`)
+  }
+
+  const registerForm = getRegisterForm(state)[event]
+
   return {
     draft,
     registerForm,
