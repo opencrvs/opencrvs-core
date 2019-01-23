@@ -145,11 +145,7 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
     this.props.goToPerformance()
   }
   goToHome = () => {
-    if (this.props.userScope.indexOf('register') > -1) {
-      this.props.goToWorkQueue()
-    } else {
-      this.props.goToHome()
-    }
+    this.props.goToHome()
   }
   render() {
     const { intl, goBack, hideBackButton, userScope } = this.props
