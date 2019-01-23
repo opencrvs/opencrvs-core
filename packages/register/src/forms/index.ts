@@ -188,6 +188,7 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
+  iDAvailable: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

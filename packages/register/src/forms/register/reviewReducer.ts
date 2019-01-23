@@ -1,11 +1,11 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import { IForm } from 'src/forms'
 import { defineMessages } from 'react-intl'
-import { childSection } from 'src/forms/register/child-section'
-import { motherSection } from 'src/forms/register/mother-section'
-import { fatherSection } from 'src/forms/register/father-section'
-import { registrationSection } from 'src/forms/register/registration-section'
-import { documentsSection } from 'src/forms/register/documents-section'
+import { childSection } from 'src/forms/register/fieldDefinitions/birth/child-section'
+import { motherSection } from 'src/forms/register/fieldDefinitions/birth/mother-section'
+import { fatherSection } from 'src/forms/register/fieldDefinitions/birth/father-section'
+import { registrationSection } from 'src/forms/register/fieldDefinitions/birth/registration-section'
+import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
 
 const messages = defineMessages({
   reviewTab: {

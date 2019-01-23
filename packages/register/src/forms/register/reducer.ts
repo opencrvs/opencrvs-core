@@ -1,11 +1,12 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import { IForm } from 'src/forms'
 import { defineMessages } from 'react-intl'
-import { childSection } from './child-section'
-import { motherSection } from './mother-section'
-import { fatherSection } from './father-section'
-import { registrationSection } from './registration-section'
-import { documentsSection } from './documents-section'
+import { childSection } from './fieldDefinitions/birth/child-section'
+import { motherSection } from './fieldDefinitions/birth/mother-section'
+import { fatherSection } from './fieldDefinitions/birth/father-section'
+import { registrationSection } from './fieldDefinitions/birth/registration-section'
+import { documentsSection } from './fieldDefinitions/birth/documents-section'
+import { deceasedSection } from './fieldDefinitions/death/deceased-section'
 
 const messages = defineMessages({
   previewTab: {
@@ -46,7 +47,7 @@ export const initialState: IRegisterFormState = {
       ]
     },
     death: {
-      sections: []
+      sections: [deceasedSection]
     }
   }
 }
