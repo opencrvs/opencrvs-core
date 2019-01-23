@@ -64,7 +64,6 @@
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.8.1",
-    "hapi-swagger": "^9.3.0",
     "inert": "^5.1.2",
     "joi": "^14.0.6",
     "lodash": "^4.17.11",

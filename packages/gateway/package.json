@@ -37,7 +37,6 @@
     "hapi": "^17.4.0",
     "hapi-auth-jwt2": "^8.1.0",
     "hapi-boom-decorators": "^3.0.0",
-    "hapi-swagger": "^9.1.1",
     "hapijs-status-monitor": "^0.6.0",
     "inert": "^5.1.0",
     "joi": "^14.0.6",
