@@ -1,6 +1,4 @@
 import * as Good from 'good'
-import * as Inert from 'inert'
-import * as Vision from 'vision'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -33,10 +31,6 @@ export default function getPlugins() {
       }
     }
   ]
-
-  if (process.env.NODE_ENV === 'DEVELOPMENT') {
-    plugins.push(Inert, Vision)
-  }
 
   return plugins
 }

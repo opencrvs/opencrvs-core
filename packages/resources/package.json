@@ -51,11 +51,9 @@
   "dependencies": {
     "@types/chalk": "^2.2.0",
     "@types/hapi": "^17.8.2",
-    "@types/inert": "^5.1.2",
     "@types/joi": "^14.0.0",
     "@types/lodash": "^4.14.117",
     "@types/uuid": "^3.4.4",
-    "@types/vision": "^5.3.5",
     "@types/winston": "^2.4.4",
     "app-module-path": "^2.2.0",
     "boom": "^7.3.0",
@@ -64,12 +62,10 @@
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.8.1",
-    "inert": "^5.1.2",
     "joi": "^14.0.6",
     "lodash": "^4.17.11",
     "node-fetch": "^2.2.1",
     "uuid": "^3.3.2",
-    "vision": "^5.4.4",
     "winston": "^3.1.0"
   },
   "lint-staged": {

@@ -1,17 +1,11 @@
 import { graphqlHapi } from 'apollo-server-hapi'
 import * as Good from 'good'
-import * as Inert from 'inert'
-import * as Vision from 'vision'
 import * as JWT from 'hapi-auth-jwt2'
 import { getExecutableSchema } from 'src/graphql/config'
 
 export const getPlugins = (env: string | undefined, schemaPath: string) => {
   const plugins: any[] = []
   const executableSchema = getExecutableSchema(schemaPath)
-
-  if (env === 'DEVELOPMENT') {
-    plugins.push(Inert, Vision)
-  }
 
   plugins.push(
     JWT,

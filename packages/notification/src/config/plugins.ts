@@ -1,6 +1,4 @@
 import * as Good from 'good'
-import * as Inert from 'inert'
-import * as Vision from 'vision'
 import * as JWT from 'hapi-auth-jwt2'
 import * as HapiI18n from 'hapi-i18n'
 import { LANGUAGE } from '../constants'
@@ -46,10 +44,6 @@ export default function getPlugins() {
       }
     }
   ]
-
-  if (process.env.NODE_ENV === 'DEVELOPMENT') {
-    plugins.push(Inert, Vision)
-  }
 
   return plugins
 }

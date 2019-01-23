@@ -17,10 +17,8 @@
   "dependencies": {
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "^8.0.1",
-    "@types/inert": "^5.1.1",
     "@types/joi": "^14.0.0",
     "@types/node-fetch": "^2.1.2",
-    "@types/vision": "^5.3.4",
     "@types/winston": "^2.3.9",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
@@ -41,14 +39,12 @@
   "devDependencies": {
     "@types/jest": "^23.3.9",
     "cross-env": "^5.2.0",
-    "inert": "^5.1.0",
     "jest": "23.6.0",
     "jest-fetch-mock": "^1.6.5",
     "nodemon": "^1.17.5",
     "prettier": "^1.15.2",
     "ts-jest": "^22.4.6",
-    "ts-node": "^6.1.1",
-    "vision": "^5.3.3"
+    "ts-node": "^6.1.1"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
