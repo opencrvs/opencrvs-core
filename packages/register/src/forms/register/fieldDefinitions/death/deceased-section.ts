@@ -158,7 +158,8 @@ export const deceasedSection: IFormSection = {
       label: identityMessages.iD,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      conditionals: [conditionals.iDAvailable]
     },
     {
       name: 'firstNames',
