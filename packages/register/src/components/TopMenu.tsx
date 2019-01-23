@@ -9,7 +9,8 @@ import styled from '../styled-components'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
-  goToPerformance as goToPerformanceAction
+  goToPerformance as goToPerformanceAction,
+  goToWorkQueue as goToWorkQueueAction
 } from 'src/navigation'
 import { redirectToAuthentication } from 'src/profile/profileActions'
 import { getLanguages } from 'src/i18n/selectors'
@@ -114,6 +115,7 @@ type Props = {
   hideBackButton?: true | false | undefined | null
   goBack: typeof goBackAction
   goToHome: typeof goToHomeAction
+  goToWorkQueue: typeof goToWorkQueueAction
   goToPerformance: typeof goToPerformanceAction
   changeLanguage: typeof changeLanguageAction
   redirectToAuthentication: typeof redirectToAuthentication
@@ -143,7 +145,11 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
     this.props.goToPerformance()
   }
   goToHome = () => {
-    this.props.goToHome()
+    if (this.props.userScope.indexOf('register') > -1) {
+      this.props.goToWorkQueue()
+    } else {
+      this.props.goToHome()
+    }
   }
   render() {
     const { intl, goBack, hideBackButton, userScope } = this.props
@@ -222,6 +228,7 @@ export const TopMenu = connect(
   {
     goToHome: goToHomeAction,
     goToPerformance: goToPerformanceAction,
+    goToWorkQueue: goToWorkQueueAction,
     goBack: goBackAction,
     changeLanguage: changeLanguageAction,
     redirectToAuthentication
