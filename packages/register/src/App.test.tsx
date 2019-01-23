@@ -7,7 +7,6 @@ import {
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  WORK_QUEUE,
   REVIEW_BIRTH_PARENT_FORM_TAB
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
