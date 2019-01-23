@@ -52,6 +52,11 @@ export type IFileValue = {
   data: string
 }
 
+export type MapFunction = (
+  transFormedData: IFormSectionData,
+  sectionData: IFormSectionData
+) => void
+
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
@@ -64,6 +69,7 @@ export interface IFormFieldBase {
   initialValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
+  mapping?: MapFunction
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
