@@ -167,7 +167,6 @@ class HomeView extends React.Component<FullProps> {
   render() {
     const { intl, language, userDetails, history } = this.props
     if (userDetails && userDetails.name && userDetails.role === 'FIELD_AGENT') {
-      console.log(userDetails.role)
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName) => storedName.use === language
       ) as GQLHumanName
@@ -228,7 +227,11 @@ class HomeView extends React.Component<FullProps> {
           </ViewFooter>
         </>
       )
-    } else if (userDetails && userDetails.role !== 'FIELD_AGENT') {
+    } else if (
+      userDetails &&
+      userDetails.role &&
+      userDetails.role !== 'FIELD_AGENT'
+    ) {
       history.push('/work-queue')
       return <></>
     } else {
