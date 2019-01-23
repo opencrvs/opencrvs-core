@@ -9,8 +9,7 @@ import styled from '../styled-components'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
-  goToPerformance as goToPerformanceAction,
-  goToWorkQueue as goToWorkQueueAction
+  goToPerformance as goToPerformanceAction
 } from 'src/navigation'
 import { redirectToAuthentication } from 'src/profile/profileActions'
 import { getLanguages } from 'src/i18n/selectors'
@@ -115,7 +114,6 @@ type Props = {
   hideBackButton?: true | false | undefined | null
   goBack: typeof goBackAction
   goToHome: typeof goToHomeAction
-  goToWorkQueue: typeof goToWorkQueueAction
   goToPerformance: typeof goToPerformanceAction
   changeLanguage: typeof changeLanguageAction
   redirectToAuthentication: typeof redirectToAuthentication
@@ -224,7 +222,6 @@ export const TopMenu = connect(
   {
     goToHome: goToHomeAction,
     goToPerformance: goToPerformanceAction,
-    goToWorkQueue: goToWorkQueueAction,
     goBack: goBackAction,
     changeLanguage: changeLanguageAction,
     redirectToAuthentication

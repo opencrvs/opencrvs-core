@@ -7,6 +7,7 @@ import {
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
+  WORK_QUEUE,
   REVIEW_BIRTH_PARENT_FORM_TAB
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
@@ -231,6 +232,8 @@ describe('when user has a valid token in local storage', () => {
         }
       ]
     }
+    const registerUserDetails = Object.assign({}, userDetails)
+    registerUserDetails.role = 'LOCAL_REGISTRAR'
     beforeEach(() => {
       store.dispatch(setInitialUserDetails(userDetails))
       history.replace(HOME)
@@ -248,6 +251,16 @@ describe('when user has a valid token in local storage', () => {
       })
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
+      })
+    })
+    describe('when user has a register scope they are redirected to the work-queue', () => {
+      beforeEach(() => {
+        store.dispatch(setInitialUserDetails(registerUserDetails))
+        app.update()
+      })
+
+      it('work queue view renders to load list', () => {
+        expect(app.find('#work-queue-spinner').hostNodes()).toHaveLength(1)
       })
     })
   })
@@ -391,7 +404,6 @@ describe('when user has a valid token in local storage', () => {
       })
     })
   })
-
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
     beforeEach(() => {
