@@ -275,7 +275,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   registerApplication = () => {
-    console.log(this.props.draft)
     this.setState({ showRegisterModal: true })
   }
 
