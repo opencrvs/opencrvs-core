@@ -406,7 +406,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.commentsOrNotes.description':
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
     'register.form.tabs.deceasedTab': 'Deceased',
-    'register.form.section.deceasedTitle': 'Deceased’s details',
+    'register.form.section.deceasedTitle': "Deceased's details",
     'formFields.deceasedIdType': 'Existing ID',
     'formFields.idTypeNoID': 'No ID available',
     'formFields.deceasedGivenNames': 'Given name (s)',
