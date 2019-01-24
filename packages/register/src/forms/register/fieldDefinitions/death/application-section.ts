@@ -7,7 +7,8 @@ import {
   SUBSECTION,
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
-  RADIO_GROUP
+  RADIO_GROUP,
+  TEL
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
@@ -18,26 +19,26 @@ import {
 import { countries } from 'src/forms/countries'
 
 import { messages as identityMessages } from '../../../identity'
-import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as addressMessages } from '../../../address'
 
 import { config } from 'src/config'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { conditionals } from 'src/forms/utils'
+import { phoneNumberFormat } from 'src/utils/validate'
 
 const messages = defineMessages({
-  deceasedTab: {
-    id: 'register.form.tabs.deceasedTab',
-    defaultMessage: 'Deceased',
-    description: 'Tab title for Deceased'
+  applicantTab: {
+    id: 'register.form.tabs.applicantTab',
+    defaultMessage: 'Applicant',
+    description: 'Tab title for Applicant'
   },
-  deceasedTitle: {
-    id: 'register.form.section.deceasedTitle',
-    defaultMessage: "Deceased's details",
-    description: 'Form section title for Deceased'
+  applicantTitle: {
+    id: 'register.form.section.applicantTitle',
+    defaultMessage: "Applicant's details",
+    description: 'Form section title for applicants'
   },
-  deceasedIdType: {
-    id: 'formFields.deceasedIdType',
+  applicantsIdType: {
+    id: 'formFields.applicantsIdType',
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
   },
@@ -46,67 +47,87 @@ const messages = defineMessages({
     defaultMessage: 'No ID available',
     description: 'Option for form field: Type of ID'
   },
-  deceasedGivenNames: {
-    id: 'formFields.deceasedGivenNames',
+  applicantsGivenNames: {
+    id: 'formFields.applicantsGivenNames',
     defaultMessage: 'Given name (s)',
     description: 'Label for form field: Given names'
   },
-  deceasedFamilyName: {
-    id: 'formFields.deceasedFamilyName',
+  applicantsFamilyName: {
+    id: 'formFields.applicantsFamilyName',
     defaultMessage: 'Family Name',
     description: 'Label for form field: Family name'
   },
-  deceasedGivenNamesEng: {
-    id: 'formFields.deceasedGivenNamesEng',
+  applicantsGivenNamesEng: {
+    id: 'formFields.applicantsGivenNamesEng',
     defaultMessage: 'Given Name (s) in English',
     description: 'Label for form field: Given names in english'
   },
-  deceasedFamilyNameEng: {
-    id: 'formFields.deceasedFamilyNameEng',
+  applicantsFamilyNameEng: {
+    id: 'formFields.applicantsFamilyNameEng',
     defaultMessage: 'Family Name in English',
     description: 'Label for form field: Family name in english'
   },
-  nationality: {
-    id: 'formFields.deceased.nationality',
+  applicantsNationality: {
+    id: 'formFields.applicants.nationality',
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality'
   },
-  deceasedSex: {
-    id: 'formFields.deceasedSex',
-    defaultMessage: 'Sex',
-    description: 'Label for form field: Sex name'
-  },
-  deceasedSexMale: {
-    id: 'formFields.deceasedSexMale',
-    defaultMessage: 'Male',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexFemale: {
-    id: 'formFields.deceasedSexFemale',
-    defaultMessage: 'Female',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexOther: {
-    id: 'formFields.deceasedSexOther',
-    defaultMessage: 'Other',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexUnknown: {
-    id: 'formFields.deceasedSexUnknown',
-    defaultMessage: 'Unknown',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedDateOfBirth: {
-    id: 'formFields.deceasedDateOfBirth',
+  applicantsDateOfBirth: {
+    id: 'formFields.applicantsDateOfBirth',
     defaultMessage: 'Date of Birth',
     description: 'Label for form field: Date of birth'
   },
-  currentAddressSameAsPermanent: {
-    id: 'formFields.deceasedCurrentAddressSameAsPermanent',
+  applicantsRelationWithDeceased: {
+    id: 'formFields.applicantsRelationWithDeceased',
+    defaultMessage: 'Relationship to Deceased',
+    description: 'Label for Relationship to Deceased select'
+  },
+  relationFather: {
+    id: 'formFields.applicantRelation.father',
+    defaultMessage: 'Father',
+    description: 'Label for option Father'
+  },
+  relationMother: {
+    id: 'formFields.applicantRelation.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for option Mother'
+  },
+  relationSpouse: {
+    id: 'formFields.applicantRelation.spouse',
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse'
+  },
+  relationSon: {
+    id: 'formFields.applicantRelation.son',
+    defaultMessage: 'Son',
+    description: 'Label for option Son'
+  },
+  relationDaughter: {
+    id: 'formFields.applicantRelation.daughter',
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter'
+  },
+  relationExtendedFamily: {
+    id: 'formFields.applicantRelation.extendedFamily',
+    defaultMessage: 'Extended Family',
+    description: 'Label for option Extended Family'
+  },
+  relationOther: {
+    id: 'formFields.applicantRelation.other',
+    defaultMessage: 'Other(Specify)',
+    description: 'Label for option Other'
+  },
+  permanentAddressSameAsCurrent: {
+    id: 'formFields.applicantsCurrentAddressSameAsPermanent',
     defaultMessage:
-      'Is deceased’s current address the same as their permanent address?',
+      'Is applicant’s permanent address the same as their current address?',
     description:
-      'Title for the radio button to select that the deceased current address is the same as their permanent address'
+      'Title for the radio button to select that the applicants current address is the same as their permanent address'
+  },
+  applicantsPhone: {
+    defaultMessage: 'Phone number',
+    id: 'formFields.applicant.phone',
+    description: 'Input label for phone input'
   },
   currentAddress: {
     id: 'formFields.currentAddress',
@@ -120,16 +141,16 @@ const messages = defineMessages({
   }
 })
 
-export const deceasedSection: IFormSection = {
-  id: 'deceased',
+export const applicantsSection: IFormSection = {
+  id: 'applicant',
   viewType: 'form' as ViewType,
-  name: messages.deceasedTab,
-  title: messages.deceasedTitle,
+  name: messages.applicantTab,
+  title: messages.applicantTitle,
   fields: [
     {
-      name: 'iDType',
+      name: 'applicantIdType',
       type: SELECT_WITH_OPTIONS,
-      label: messages.deceasedIdType,
+      label: messages.applicantsIdType,
       required: true,
       initialValue: '',
       validate: [],
@@ -153,7 +174,7 @@ export const deceasedSection: IFormSection = {
       ]
     },
     {
-      name: 'iD',
+      name: 'applicantID',
       type: TEXT,
       label: identityMessages.iD,
       required: true,
@@ -162,95 +183,99 @@ export const deceasedSection: IFormSection = {
       conditionals: [conditionals.iDAvailable]
     },
     {
-      name: 'firstNames',
+      name: 'applicantFirstNames',
       type: TEXT,
-      label: messages.deceasedGivenNames,
+      label: messages.applicantsGivenNames,
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'familyName',
+      name: 'applicantFamilyName',
       type: TEXT,
-      label: messages.deceasedFamilyName,
+      label: messages.applicantsFamilyName,
       required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat]
     },
     {
-      name: 'firstNamesEng',
+      name: 'applicantFirstNamesEng',
       type: TEXT,
-      label: messages.deceasedGivenNamesEng,
+      label: messages.applicantsGivenNamesEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'familyNameEng',
+      name: 'applicantFamilyNameEng',
       type: TEXT,
-      label: messages.deceasedFamilyNameEng,
+      label: messages.applicantsFamilyNameEng,
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat]
     },
     {
-      name: 'nationality',
+      name: 'applicantNationality',
       type: SELECT_WITH_OPTIONS,
-      label: messages.nationality,
-      required: true,
+      label: messages.applicantsNationality,
+      required: false,
       initialValue: 'BGD',
       validate: [],
       options: countries
     },
     {
-      name: 'gender',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.deceasedSex,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'male', label: messages.deceasedSexMale },
-        { value: 'female', label: messages.deceasedSexFemale },
-        { value: 'other', label: messages.deceasedSexOther },
-        { value: 'unknown', label: messages.deceasedSexUnknown }
-      ]
-    },
-    {
-      name: 'maritalStatus',
-      type: SELECT_WITH_OPTIONS,
-      label: maritalStatusMessages.maritalStatus,
-      required: false,
-      initialValue: 'MARRIED',
-      validate: [],
-      options: [
-        { value: 'SINGLE', label: maritalStatusMessages.maritalStatusSingle },
-        { value: 'MARRIED', label: maritalStatusMessages.maritalStatusMarried },
-        { value: 'WIDOWED', label: maritalStatusMessages.maritalStatusWidowed },
-        {
-          value: 'DIVORCED',
-          label: maritalStatusMessages.maritalStatusDivorced
-        },
-        {
-          value: 'NOT_STATED',
-          label: maritalStatusMessages.maritalStatusNotStated
-        }
-      ]
-    },
-    {
-      name: 'birthDate',
+      name: 'applicantBirthDate',
       type: DATE,
-      label: messages.deceasedDateOfBirth,
+      label: messages.applicantsDateOfBirth,
       required: false,
       initialValue: '',
       validate: [dateFormat]
     },
     {
-      name: 'permanentAddress',
-      type: SUBSECTION,
-      label: messages.permanentAddress,
+      name: 'applicantsRelationToDeceased',
+      type: SELECT_WITH_OPTIONS,
+      label: messages.applicantsRelationWithDeceased,
+      required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      options: [
+        { value: 'FATHER', label: messages.relationFather },
+        { value: 'MOTHER', label: messages.relationMother },
+        { value: 'SPOUSE', label: messages.relationSpouse },
+        {
+          value: 'SON',
+          label: messages.relationSon
+        },
+        {
+          value: 'DAUGHTER',
+          label: messages.relationDaughter
+        },
+        {
+          value: 'EXTENDED_FAMILY',
+          label: messages.relationExtendedFamily
+        },
+        {
+          value: 'OTHER',
+          label: messages.relationOther
+        }
+      ]
+    },
+    {
+      name: 'applicantPhone',
+      type: TEL,
+      label: messages.applicantsPhone,
+      required: true,
+      initialValue: '',
+      validate: [phoneNumberFormat]
+    },
+    {
+      name: 'currentAddress',
+      type: SUBSECTION,
+      label: messages.currentAddress,
+      initialValue: '',
+      required: true,
+      validate: [],
+      conditionals: []
     },
     {
       name: 'countryPermanent',
@@ -368,17 +393,17 @@ export const deceasedSection: IFormSection = {
       ]
     },
     {
-      name: 'currentAddress',
+      name: 'permanentAddress',
       type: SUBSECTION,
-      label: messages.currentAddress,
+      label: messages.permanentAddress,
       initialValue: '',
-      validate: [],
-      conditionals: []
+      required: false,
+      validate: []
     },
     {
-      name: 'currentAddressSameAsPermanent',
+      name: 'applicantPermanentAddressSameAsCurrent',
       type: RADIO_GROUP,
-      label: messages.currentAddressSameAsPermanent,
+      label: messages.permanentAddressSameAsCurrent,
       required: true,
       initialValue: true,
       validate: [],
@@ -396,7 +421,7 @@ export const deceasedSection: IFormSection = {
       initialValue: config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.currentAddressSameAsPermanent]
+      conditionals: [conditionals.applicantPermanentAddressSameAsCurrent]
     },
     {
       name: 'state',
@@ -411,7 +436,7 @@ export const deceasedSection: IFormSection = {
       },
       conditionals: [
         conditionals.country,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.applicantPermanentAddressSameAsCurrent
       ]
     },
     {
@@ -428,7 +453,7 @@ export const deceasedSection: IFormSection = {
       conditionals: [
         conditionals.country,
         conditionals.state,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.applicantPermanentAddressSameAsCurrent
       ]
     },
     {
@@ -446,7 +471,7 @@ export const deceasedSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.district,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.applicantPermanentAddressSameAsCurrent
       ]
     },
     {
@@ -465,7 +490,7 @@ export const deceasedSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.applicantPermanentAddressSameAsCurrent
       ]
     },
     {
@@ -481,7 +506,7 @@ export const deceasedSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.applicantPermanentAddressSameAsCurrent
       ]
     },
     {
@@ -497,7 +522,7 @@ export const deceasedSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.applicantPermanentAddressSameAsCurrent
       ]
     },
     {
@@ -513,7 +538,7 @@ export const deceasedSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.applicantPermanentAddressSameAsCurrent
       ]
     }
   ]

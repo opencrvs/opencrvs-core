@@ -188,6 +188,7 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
+  applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
 }
 

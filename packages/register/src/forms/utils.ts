@@ -217,5 +217,9 @@ export const conditionals: IConditionals = {
   iDAvailable: {
     action: 'hide',
     expression: 'values.iDType === "NO_ID"'
+  },
+  applicantPermanentAddressSameAsCurrent: {
+    action: 'hide',
+    expression: 'values.applicantPermanentAddressSameAsCurrent'
   }
 }
