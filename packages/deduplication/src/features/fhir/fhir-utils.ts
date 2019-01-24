@@ -74,7 +74,7 @@ export function addDuplicatesToComposition(
       composition.relatesTo = []
     }
 
-    createDuplicateTemplate(duplicates, composition)
+    createDuplicatesTemplate(duplicates, composition)
   } catch (error) {
     logger.error(
       `Deduplication/fhir-utils: updating composition failed with error: ${error}`
@@ -83,7 +83,7 @@ export function addDuplicatesToComposition(
   }
 }
 
-export function createDuplicateTemplate(
+export function createDuplicatesTemplate(
   duplicates: string[],
   composition: fhir.Composition
 ) {
@@ -112,7 +112,7 @@ function existsAsDuplicate(
       (relatesTo: fhir.CompositionRelatesTo) =>
         relatesTo.code === 'duplicate' &&
         (relatesTo.targetReference && relatesTo.targetReference.reference) ===
-          duplicateReference
+          `Composition/${duplicateReference}`
     )
   )
 }

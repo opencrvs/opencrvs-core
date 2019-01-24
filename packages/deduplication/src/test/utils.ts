@@ -385,13 +385,13 @@ export const mockComposition = {
     {
       code: 'duplicate',
       targetReference: {
-        reference: 'xyz'
+        reference: 'Composition/xyz'
       }
     },
     {
       code: 'duplicate',
       targetReference: {
-        reference: 'abc'
+        reference: 'Composition/abc'
       }
     }
   ]
