@@ -48,7 +48,7 @@ const messages = defineMessages({
   },
   deceasedGivenNames: {
     id: 'formFields.deceasedGivenNames',
-    defaultMessage: 'Given name (s)',
+    defaultMessage: 'Given Name (s)',
     description: 'Label for form field: Given names'
   },
   deceasedFamilyName: {

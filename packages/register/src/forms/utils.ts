@@ -217,5 +217,9 @@ export const conditionals: IConditionals = {
   iDAvailable: {
     action: 'hide',
     expression: 'values.iDType === "NO_ID"'
+  },
+  deathPlaceOther: {
+    action: 'hide',
+    expression: 'values.deathPlaceAddress !== "other"'
   }
 }

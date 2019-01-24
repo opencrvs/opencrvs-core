@@ -189,6 +189,7 @@ export interface IConditionals {
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   iDAvailable: IConditional
+  deathPlaceOther: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
