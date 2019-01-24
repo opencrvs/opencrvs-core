@@ -23,15 +23,7 @@ export async function createServer() {
     handler: locationsHandler,
     options: {
       tags: ['api'],
-      description: 'Returns locations.json',
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'Locations JSON returned' },
-            400: { description: 'Locations JSON error' }
-          }
-        }
-      }
+      description: 'Returns locations.json'
     }
   })
 
