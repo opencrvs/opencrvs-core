@@ -537,7 +537,7 @@ export const ENGLISH_STATE: ILanguage = {
       '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
     'register.selectVitalEvent.registerNewEventTitle':
-      'Declare a new vital event',
+      'New vital event application',
     'register.home.buttons.mydraft': 'My draft',
     'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
@@ -716,7 +716,7 @@ export const ENGLISH_STATE: ILanguage = {
     'review.birthRegistration.queryError':
       'An error occurred while fetching birth registration',
     'review.error.unauthorized': 'We are unable to display this page to you',
-    'register.workQueue.buttons.newRegistration': 'New birth application',
+    'register.workQueue.buttons.newRegistration': 'New birth registration',
     'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
     'register.work-queue.certificate.header':
       'Receipt for Birth Certificate of',

@@ -11,7 +11,7 @@ import {
   TickLarge,
   CrossLarge,
   Delete,
-  Draft
+  DraftSimple
 } from '@opencrvs/components/lib/icons'
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -244,14 +244,24 @@ const DeleteApplication = styled.a`
     margin-right: 15px;
   }
 `
-const SaveDraft = styled(RejectApplication)`
-  div:first-of-type {
-    height: 50px;
-    background-color: ${({ theme }) => theme.colors.saveDraftBtn};
-    padding: 0px;
-  }
+const SaveDraftText = styled.span`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 14px;
+  text-decoration: underline;
+  letter-spacing: 0px;
+  margin-left: 14px;
 `
 
+const DraftButtonContainer = styled.div`
+  background-color: ${({ theme }) => theme.colors.inputBackground};
+  min-height: 83px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 25px;
+  cursor: pointer;
+`
 interface IProps {
   draft: IDraft
   registerForm: IForm
@@ -685,14 +695,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )}
 
             {!!saveDraftClickEvent && (
-              <ButtonContainer>
-                <SaveDraft
-                  id="saveAsDraftBtn"
-                  title={intl.formatMessage(messages.valueSaveAsDraft)}
-                  icon={() => <Draft />}
-                  onClick={saveDraftClickEvent}
-                />
-              </ButtonContainer>
+              <DraftButtonContainer onClick={saveDraftClickEvent}>
+                <DraftSimple />
+                <SaveDraftText>
+                  {intl.formatMessage(messages.valueSaveAsDraft)}
+                </SaveDraftText>
+              </DraftButtonContainer>
             )}
 
             <EditConfirmation
