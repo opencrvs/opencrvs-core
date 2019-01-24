@@ -51,7 +51,7 @@ import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateActi
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
-import { ShrinkedBody } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -990,7 +990,7 @@ export class WorkQueueView extends React.Component<
           />
         </HomeViewHeader>
         <Container>
-          <ShrinkedBody>
+          <HeaderContent>
             <Query
               query={FETCH_REGISTRATION_QUERY}
               variables={{
@@ -1052,7 +1052,7 @@ export class WorkQueueView extends React.Component<
                 )
               }}
             </Query>
-          </ShrinkedBody>
+          </HeaderContent>
         </Container>
         {this.state.printCertificateModalVisible ? (
           <PrintCertificateAction

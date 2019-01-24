@@ -30,7 +30,7 @@ import {
   SAVED_REGISTRATION,
   REJECTED_REGISTRATION
 } from 'src/navigation/routes'
-import { ShrinkedBody } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -387,7 +387,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           />
         </ViewHeaderWithTabs>
         <FormContainer>
-          <ShrinkedBody>
+          <HeaderContent>
             <Swipeable
               disabled={isReviewSection}
               id="swipeable_block"
@@ -466,7 +466,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 </Box>
               )}
             </Swipeable>
-          </ShrinkedBody>
+          </HeaderContent>
         </FormContainer>
         <ViewFooter>
           <FooterAction>

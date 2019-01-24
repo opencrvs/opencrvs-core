@@ -23,7 +23,7 @@ import * as moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import { Registrant, Issuer, generateMoneyReceipt } from './generatePDF'
-import { ShrinkedBody } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -426,7 +426,7 @@ class PrintCertificateActionComponent extends React.Component<
           backLabel={backLabel}
           goBack={togglePrintCertificateSection}
         >
-          <ShrinkedBody>
+          <HeaderContent>
             <Query
               query={FETCH_BIRTH_REGISTRATION_QUERY}
               variables={{
@@ -527,7 +527,7 @@ class PrintCertificateActionComponent extends React.Component<
                 return JSON.stringify(data)
               }}
             </Query>
-          </ShrinkedBody>
+          </HeaderContent>
         </ActionPage>
       </ActionPageWrapper>
     )

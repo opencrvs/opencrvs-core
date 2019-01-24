@@ -6,7 +6,7 @@ import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { FormFieldGenerator } from 'src/components/form'
 import { IFormSection, IFormSectionData, IFileValue } from 'src/forms'
 import { hasFormError } from 'src/forms/utils'
-import { ShrinkedBody } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -87,7 +87,7 @@ export class ImageUploadOption extends React.Component<IProps, State> {
           backLabel={backLabel}
           goBack={this.props.toggleNestedSection}
         >
-          <ShrinkedBody>
+          <HeaderContent>
             <FormContainer>
               <Box>
                 <FormFieldGenerator
@@ -108,7 +108,7 @@ export class ImageUploadOption extends React.Component<IProps, State> {
                 )}
               </Box>
             </FormContainer>
-          </ShrinkedBody>
+          </HeaderContent>
         </ActionPage>
       </OverlayContainer>
     )

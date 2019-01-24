@@ -9,7 +9,7 @@ import {
   Action as RegAction
 } from 'src/components/DuplicateDetails'
 import { Event } from 'src/forms'
-import { ShrinkedBody } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const messages = defineMessages({
   title: {
@@ -188,7 +188,7 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
         title={this.props.intl.formatMessage(messages.pageTitle)}
       >
         <Container>
-          <ShrinkedBody>
+          <HeaderContent>
             <TitleBox>
               <Header>
                 <Duplicate />
@@ -208,7 +208,7 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
                 />
               ))}
             </Grid>
-          </ShrinkedBody>
+          </HeaderContent>
         </Container>
       </ActionPage>
     )

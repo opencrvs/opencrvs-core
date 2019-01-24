@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { goToHome as goToHomeAction } from 'src/navigation'
 import { IStoreState } from 'src/store'
-import { ShrinkedBody } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const Container = styled.div`
   margin: 0 ${({ theme }) => theme.grid.margin}px;
@@ -309,7 +309,7 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
         backLabel={backLabel}
         goBack={this.props.goToHome}
       >
-        <ShrinkedBody>
+        <HeaderContent>
           <Container>
             <DataTable
               data={data}
@@ -319,7 +319,7 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
               noResultText={intl.formatMessage(messages.dataTableNoResults)}
             />
           </Container>
-        </ShrinkedBody>
+        </HeaderContent>
       </ActionPage>
     )
   }

@@ -21,7 +21,7 @@ const HeaderContainer = styled.div`
   align-items: center;
   position: relative;
 `
-const ShrinkedHeader = styled.div`
+const HeaderContent = styled.div`
   max-width: 940px;
   margin: auto;
   padding: 20px 10px;
@@ -78,13 +78,13 @@ export class ActionPage extends React.Component<
     return (
       <ActionContainer>
         <HeaderContainer>
-          <ShrinkedHeader>
+          <HeaderContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
               <BackButton icon={icon || (() => <ArrowBack />)} />
               <BackButtonText>{backLabel ? backLabel : 'BACK'}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
-          </ShrinkedHeader>
+          </HeaderContent>
         </HeaderContainer>
         {this.props.children}
       </ActionContainer>

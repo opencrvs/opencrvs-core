@@ -6,9 +6,9 @@ import styled from '../styled-components'
 import { TopMenu } from './TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
 import ConnectivityStatus from './ConnectivityStatus'
-import { ShrinkedHeader } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
-const StretchedHeader = styled(Header)`
+const HeaderWrapper = styled(Header)`
   display: block;
   justify-content: flex-end;
   padding-bottom: 50px;
@@ -29,15 +29,15 @@ export class HomeViewHeader extends React.Component<IViewHeadingProps> {
   render() {
     const { title, description, id } = this.props
     return (
-      <StretchedHeader {...this.props}>
-        <ShrinkedHeader>
+      <HeaderWrapper {...this.props}>
+        <HeaderContent>
           <ConnectivityStatus />
           <TopMenu hideBackButton={true} />
           <StyledLogo />
           <ViewHeading {...{ title, description, id }} />
           {this.props.children}
-        </ShrinkedHeader>
-      </StretchedHeader>
+        </HeaderContent>
+      </HeaderWrapper>
     )
   }
 }

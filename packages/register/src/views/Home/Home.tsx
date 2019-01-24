@@ -30,7 +30,7 @@ import { IUserDetails } from '../../utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { NOTIFICATION_STATUS, REJECTED_STATUS } from 'src/utils/constants'
-import { ShrinkedBody } from 'src/App'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const messages = defineMessages({
   declareNewEventActionTitle: {
@@ -182,7 +182,7 @@ class HomeView extends React.Component<FullProps> {
             id="home_view"
           />
           <StyledActionList id="home_action_list">
-            <ShrinkedBody>
+            <HeaderContent>
               <StyledIconAction
                 id="new_event_declaration"
                 icon={() => <StyledPlusIcon />}
@@ -217,16 +217,16 @@ class HomeView extends React.Component<FullProps> {
                 )}
                 {...this.props}
               />
-            </ShrinkedBody>
+            </HeaderContent>
           </StyledActionList>
           <ViewFooter>
-            <ShrinkedBody>
+            <HeaderContent>
               <FooterAction>
                 <FooterPrimaryButton>
                   {intl.formatMessage(messages.logoutActionTitle)}
                 </FooterPrimaryButton>
               </FooterAction>
-            </ShrinkedBody>
+            </HeaderContent>
           </ViewFooter>
         </>
       )
