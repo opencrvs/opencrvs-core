@@ -3,6 +3,7 @@ import { NOTIFICATION_SERVICE_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { logger } from 'src/logger'
 import { getInformantName, getTrackingId } from './fhir/fhir-utils'
+import { EVENT_TYPE } from './fhir/constants'
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -42,5 +43,16 @@ export async function sendBirthNotification(
     })
   } catch (err) {
     logger.error(`Unable to send notification for error : ${err}`)
+  }
+}
+
+export function getEventType(entry: fhir.Composition): EVENT_TYPE {
+  const eventType =
+    entry && entry.type && entry.type.coding && entry.type.coding[0].code
+
+  if (eventType === 'birth-registration') {
+    return EVENT_TYPE.BIRTH
+  } else {
+    return EVENT_TYPE.DEATH
   }
 }

@@ -15,6 +15,7 @@ import { logger } from 'src/logger'
 
 async function sendBundleToHearth(
   payload: fhir.Bundle,
+  eventType: EVENT_TYPE,
   count = 1
 ): Promise<fhir.Bundle> {
   const res = await fetch(HEARTH_URL, {
@@ -26,8 +27,8 @@ async function sendBundleToHearth(
   })
   if (!res.ok) {
     if (res.status === 409 && count < 5) {
-      setTrackingId(payload)
-      return await sendBundleToHearth(payload, count + 1)
+      setTrackingId(payload, eventType)
+      return await sendBundleToHearth(payload, eventType, count + 1)
     }
 
     throw new Error(
@@ -38,18 +39,19 @@ async function sendBundleToHearth(
   return res.json()
 }
 
-export async function createBirthRegistrationHandler(
+export async function createRegistrationHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  eventType: EVENT_TYPE
 ) {
   try {
     const payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
-      EVENT_TYPE.BIRTH,
+      eventType,
       getToken(request)
     )
 
-    const resBundle = await sendBundleToHearth(payload)
+    const resBundle = await sendBundleToHearth(payload, eventType)
 
     const msisdn = getSharedContactMsisdn(payload)
     /* sending notification to the contact */
@@ -66,14 +68,16 @@ export async function createBirthRegistrationHandler(
   }
 }
 
-export async function markBirthAsRegisteredHandler(
+export async function markEventAsRegisteredHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  eventType: EVENT_TYPE
 ) {
   try {
     const payload = await markBundleAsRegistered(
       request.payload as fhir.Bundle & fhir.BundleEntry,
-      getToken(request)
+      getToken(request),
+      eventType
     )
     // TODO: need to send notification here
     return await postToHearth(payload)
@@ -83,7 +87,7 @@ export async function markBirthAsRegisteredHandler(
   }
 }
 
-export async function markBirthAsCertifiedHandler(
+export async function markEventAsCertifiedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
