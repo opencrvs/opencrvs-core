@@ -392,7 +392,7 @@ export const fatherSection: IFormSection = {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -404,7 +404,24 @@ export const fatherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressSameAsMother
+        conditionals.addressSameAsMother,
+        conditionals.isNotCityLocation
+      ]
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressSameAsMother,
+        conditionals.isCityLocation
       ]
     },
     {
@@ -424,10 +441,10 @@ export const fatherSection: IFormSection = {
       ]
     },
     {
-      name: 'addressLine1',
+      name: 'addressLine1CityOption',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -435,8 +452,24 @@ export const fatherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressLine3,
-        conditionals.addressSameAsMother
+        conditionals.addressSameAsMother,
+        conditionals.isCityLocation
+      ]
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressSameAsMother,
+        conditionals.isCityLocation
       ]
     },
     {
@@ -545,7 +578,7 @@ export const fatherSection: IFormSection = {
       name: 'addressLine3Permanent',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -557,7 +590,24 @@ export const fatherSection: IFormSection = {
         conditionals.countryPermanent,
         conditionals.statePermanent,
         conditionals.districtPermanent,
-        conditionals.addressLine4Permanent
+        conditionals.addressLine4Permanent,
+        conditionals.isNotCityLocationPermanent
+      ]
+    },
+    {
+      name: 'addressLine3CityOptionPermanent',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.permanentAddressSameAsMother,
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
       ]
     },
     {
@@ -577,10 +627,10 @@ export const fatherSection: IFormSection = {
       ]
     },
     {
-      name: 'addressLine1Permanent',
+      name: 'addressLine1CityOptionPermanent',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -589,7 +639,23 @@ export const fatherSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent,
         conditionals.addressLine4Permanent,
-        conditionals.addressLine3Permanent
+        conditionals.isCityLocationPermanent
+      ]
+    },
+    {
+      name: 'postCodeCityOptionPermanent',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.permanentAddressSameAsMother,
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
       ]
     },
     {

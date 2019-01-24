@@ -196,6 +196,8 @@ export interface IConditionals {
   otherPlaceOfBirth: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
+  isNotCityLocationPermanent: IConditional
+  isCityLocationPermanent: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

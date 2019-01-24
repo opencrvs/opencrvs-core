@@ -261,5 +261,15 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+  },
+  isNotCityLocationPermanent: {
+    action: 'hide',
+    expression:
+      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+  },
+  isCityLocationPermanent: {
+    action: 'hide',
+    expression:
+      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
   }
 }
