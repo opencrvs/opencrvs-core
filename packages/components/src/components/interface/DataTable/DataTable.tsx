@@ -130,8 +130,9 @@ const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
   return totalItemCount > 0 ? Math.ceil(totalItemCount / pageSize) : 0
 }
 
-const filterItems = (key: string, value: string, items: IDynamicValues[]) =>
-  items.filter(item => item[key] === value)
+const filterItems = (key: string, value: string, items: IDynamicValues[]) => {
+  return items.filter(item => item[key].toLowerCase() === value.toLowerCase())
+}
 
 export class DataTable extends React.Component<
   ISearchResultProps,
@@ -174,14 +175,24 @@ export class DataTable extends React.Component<
       sortBy &&
       sortValues &&
       getSortAndFilterByPropsWithValues(sortBy, sortValues)
+
     const filterByItemsWithValues =
       filterBy &&
       filterValues &&
       getSortAndFilterByPropsWithValues(filterBy, filterValues)
+
+    let initialSortedAndFilteredData: IDynamicValues[] = []
+    initialSortedAndFilteredData = sortBy
+      ? this.performInitialSort(data, sortBy)
+      : data
+    initialSortedAndFilteredData = filterBy
+      ? this.performInitialFiltering(initialSortedAndFilteredData, filterBy)
+      : data
+
     const displayItems = this.getDisplayItems(
       defaultConfiguration.initialPage,
       paginationSize,
-      data
+      initialSortedAndFilteredData
     )
     return {
       totalPages: initialTotalPage,
@@ -194,6 +205,35 @@ export class DataTable extends React.Component<
       filterByItemsWithValues,
       initialPage: 1
     }
+  }
+
+  performInitialSort = (
+    data: IDynamicValues[],
+    sortBy: ISortAndFilter
+  ): IDynamicValues[] => {
+    let sortedData: IDynamicValues[] = data
+    sortBy.selects.options.map((option: ISelectGroupOption) => {
+      sortedData = option.value
+        ? option.type === SelectFieldType.Date
+          ? sortByDate(option.name, option.value, data)
+          : defaultSort(option.name, option.value, data)
+        : sortedData
+    })
+
+    return sortedData
+  }
+
+  performInitialFiltering = (
+    data: IDynamicValues[],
+    filterBy: ISortAndFilter
+  ): IDynamicValues[] => {
+    let filteredData: IDynamicValues[] = data
+    filterBy.selects.options.map((option: ISelectGroupOption) => {
+      filteredData = option.value
+        ? filterItems(option.name, option.value, filteredData)
+        : filteredData
+    })
+    return filteredData
   }
 
   onFilterChange = (
@@ -213,7 +253,6 @@ export class DataTable extends React.Component<
       this.props.onFilterChange(values, changedValue, type)
     } else {
       let filteredItems = this.props.data
-
       Object.keys(values).forEach((filterKey: string) => {
         if (values[filterKey]) {
           filteredItems = filterItems(
@@ -278,7 +317,7 @@ export class DataTable extends React.Component<
     const values: IDynamicValues = {}
 
     item.selects.options.forEach((element: ISelectGroupOption) => {
-      values[element.name] = ''
+      values[element.name] = element.value ? element.value : ''
     })
     return values
   }
