@@ -13,6 +13,10 @@ import {
   range,
   dateFormat
 } from 'src/utils/validate'
+import {
+  nameTransformer,
+  sectionFieldToBundleFieldTransformer
+} from '../field-mappings'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -217,7 +221,8 @@ export const childSection: IFormSection = {
       label: messages.childFirstNames,
       required: false,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat]
+      validate: [bengaliOnlyNameFormat],
+      mapping: nameTransformer('bn')
     },
     {
       name: 'familyName',
@@ -225,7 +230,8 @@ export const childSection: IFormSection = {
       label: messages.childFamilyName,
       required: true,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat]
+      validate: [bengaliOnlyNameFormat],
+      mapping: nameTransformer('bn')
     },
     {
       name: 'firstNamesEng',
@@ -233,7 +239,8 @@ export const childSection: IFormSection = {
       label: messages.childFirstNamesEng,
       required: false,
       initialValue: '',
-      validate: [englishOnlyNameFormat]
+      validate: [englishOnlyNameFormat],
+      mapping: nameTransformer('en', 'firstNames')
     },
     {
       name: 'familyNameEng',
@@ -241,7 +248,8 @@ export const childSection: IFormSection = {
       label: messages.childFamilyNameEng,
       required: false,
       initialValue: '',
-      validate: [englishOnlyNameFormat]
+      validate: [englishOnlyNameFormat],
+      mapping: nameTransformer('en', 'familyName')
     },
     {
       name: 'gender',
@@ -283,7 +291,8 @@ export const childSection: IFormSection = {
         { value: 'LAYPERSON', label: messages.attendantAtBirthLayperson },
         { value: 'NONE', label: messages.attendantAtBirthNone },
         { value: 'OTHER', label: messages.attendantAtBirthOther }
-      ]
+      ],
+      mapping: sectionFieldToBundleFieldTransformer
     },
     {
       name: 'birthType',
@@ -301,7 +310,8 @@ export const childSection: IFormSection = {
           value: 'HIGHER_MULTIPLE_DELIVERY',
           label: messages.birthTypeHigherMultipleDelivery
         }
-      ]
+      ],
+      mapping: sectionFieldToBundleFieldTransformer
     },
     {
       name: 'multipleBirth',
@@ -319,7 +329,8 @@ export const childSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [range(0, 6)],
-      postfix: 'Kg'
+      postfix: 'Kg',
+      mapping: sectionFieldToBundleFieldTransformer
     },
     {
       name: 'placeOfBirth',

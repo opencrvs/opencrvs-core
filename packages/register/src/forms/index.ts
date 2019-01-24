@@ -58,8 +58,10 @@ export type IFileValue = {
 }
 
 export type MapFunction = (
-  transFormedData: IFormSectionData,
-  sectionData: IFormSectionData
+  transFormedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  fieldDefinition: IFormField
 ) => void
 
 export interface IFormFieldBase {
