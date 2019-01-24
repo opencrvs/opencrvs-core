@@ -43,6 +43,9 @@ export type IOfflineDataState = {
 
 export const initialState: IOfflineDataState = {
   locations: [],
+  // rejected: [],
+  // records: [],
+  // facilities: [],
   offlineDataLoaded: false,
   loadingError: false
 }

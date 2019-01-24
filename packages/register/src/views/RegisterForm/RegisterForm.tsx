@@ -50,6 +50,12 @@ export const messages = defineMessages({
     defaultMessage: 'New birth application',
     description: 'The message that appears for new birth registrations'
   },
+  newVitalEventRegistration: {
+    id: 'register.form.newVitalEventRegistration',
+    defaultMessage:
+      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
+    description: 'The message that appears for new vital event registration'
+  },
   previewBirthRegistration: {
     id: 'register.form.previewBirthRegistration',
     defaultMessage: 'Birth Application Preview',
@@ -357,7 +363,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ? messages.reviewBirthRegistration
       : activeSection.viewType === VIEW_TYPE.PREVIEW
       ? messages.previewBirthRegistration
-      : messages.newBirthRegistration
+      : messages.newVitalEventRegistration
     const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
     const sectionForReview = isReviewForm
       ? this.generateSectionListForReview(
@@ -368,9 +374,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return (
       <FormViewContainer>
         <ViewHeaderWithTabs
-          breadcrumb="Informant: Parent"
           id="informant_parent_view"
-          title={intl.formatMessage(title)}
+          title={intl.formatMessage(title, { event: draft.event })}
         >
           <StickyFormTabs
             sections={sectionForReview}

@@ -21,19 +21,7 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: false,
         description:
-          'Handles indexing a new declaration and searching for duplicates',
-        plugins: {
-          'hapi-swagger': {
-            responses: {
-              200: {
-                description: 'Successful'
-              },
-              400: {
-                description: 'Bad request'
-              }
-            }
-          }
-        }
+          'Handles indexing a new declaration and searching for duplicates'
       }
     }
   ]

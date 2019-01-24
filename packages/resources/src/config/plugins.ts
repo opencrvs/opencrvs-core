@@ -1,7 +1,4 @@
 import * as Good from 'good'
-import * as HapiSwagger from 'hapi-swagger'
-import * as Inert from 'inert'
-import * as Vision from 'vision'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -34,20 +31,6 @@ export default function getPlugins() {
       }
     }
   ]
-
-  if (process.env.NODE_ENV === 'DEVELOPMENT') {
-    plugins.push(Inert, Vision, {
-      plugin: HapiSwagger,
-      options: {
-        info: {
-          title: 'OpenCRVS Auth Service Documentation',
-          version: '1.0.0'
-        }
-      },
-      name: 'hapi-swagger',
-      version: '9.1.1'
-    })
-  }
 
   return plugins
 }

@@ -18,7 +18,7 @@ import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { DocumentViewer } from '@opencrvs/components/lib/interface'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
-import { documentsSection } from '../../../forms/register/documents-section'
+import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { getOfflineState } from 'src/offline/selectors'
@@ -52,7 +52,8 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   ISelectOption,
   IDynamicOptions,
-  IFormSectionData
+  IFormSectionData,
+  Event
 } from 'src/forms'
 
 const messages = defineMessages({
@@ -722,7 +723,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
 export const ReviewSection = connect(
   (state: IStoreState) => ({
-    registerForm: getRegisterForm(state),
+    registerForm: getRegisterForm(state)[Event.BIRTH],
     scope: getScope(state),
     offlineResources: getOfflineState(state),
     language: getLanguage(state)

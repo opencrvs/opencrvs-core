@@ -20,20 +20,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description:
-          'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.',
-        plugins: {
-          'hapi-swagger': {
-            responses: {
-              200: {
-                description: 'Successful, see standard fhir response types'
-              },
-              400: {
-                description:
-                  'Bad request, see standard fhir error response types'
-              }
-            }
-          }
-        }
+          'Mimics the fhir API, detects OpenCRVS event and calls the correct workflow handler. Else, just forwards the request to Hearth.'
       }
     }
   ]

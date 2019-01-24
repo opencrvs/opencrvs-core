@@ -4,6 +4,7 @@ import {
   HOME,
   WORK_QUEUE,
   DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
   MY_RECORDS
 } from 'src/navigation/routes'
@@ -61,6 +62,10 @@ export function goToBirthRegistrationAsParent(draftId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, { draftId: draftId.toString() })
   )
+}
+
+export function goToDeathRegistration(draftId: string) {
+  return push(formatUrl(DRAFT_DEATH_FORM, { draftId: draftId.toString() }))
 }
 
 export function goToTab(

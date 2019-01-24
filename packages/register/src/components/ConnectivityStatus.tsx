@@ -5,13 +5,13 @@ import styled from 'src/styled-components'
 const StyledOnline = styled.div`
   position: absolute;
   top: 32px;
-  right: 210px;
+  right: 245px;
 `
 
 const StyledOffline = styled.div`
   position: absolute;
   top: 32px;
-  right: 210px;
+  right: 245px;
 `
 
 const ConnectivityStatus = () => {

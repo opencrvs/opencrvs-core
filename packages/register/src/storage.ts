@@ -15,8 +15,13 @@ async function setItem(key: string, value: string) {
   return await localForage.setItem(key, value)
 }
 
+async function removeItem(key: string) {
+  return await localForage.removeItem(key)
+}
+
 export const storage = {
   configStorage,
   getItem,
-  setItem
+  setItem,
+  removeItem
 }

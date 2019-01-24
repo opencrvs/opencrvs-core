@@ -21,13 +21,14 @@ import {
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+import { Event } from '@opencrvs/register/src/forms'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
 
   const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())
-  const draft = createDraft()
+  const draft = createDraft(Event.BIRTH)
+  const form = getRegisterForm(store.getState())[Event.BIRTH]
   it('throws error when draft not found after initial drafts load', () => {
     try {
       createTestComponent(
@@ -55,13 +56,13 @@ describe('when user is in the register form before initial draft load', () => {
 
 describe('when user is in the register form', async () => {
   const { store, history } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(Event.BIRTH)
   store.dispatch(setInitialDrafts())
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())
+  const form = getRegisterForm(store.getState())[Event.BIRTH]
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
@@ -109,13 +110,13 @@ describe('when user is in the register form', async () => {
 
 describe('when user is in the register form preview section', () => {
   const { store, history } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(Event.BIRTH)
   store.dispatch(setInitialDrafts())
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())
+  const form = getRegisterForm(store.getState())[Event.BIRTH]
   const testComponent = createTestComponent(
     <RegisterForm
       location={mock}
@@ -158,7 +159,7 @@ describe('when user is in the register form review section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createReviewDraft(uuid(), mockApplicationData)
+    const draft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
     store.dispatch(setInitialDrafts())
     store.dispatch(storeDraft(draft))
     const mock: any = jest.fn()
