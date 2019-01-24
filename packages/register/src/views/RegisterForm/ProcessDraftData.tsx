@@ -39,6 +39,9 @@ const customKeys = [
   'iD',
   'iDType',
   'nationality',
+  'childBirthDate',
+  'motherBirthDate',
+  'fatherBirthDate',
   'countryPermanent',
   'statePermanent',
   'districtPermanent',
@@ -132,6 +135,10 @@ const processDraftData = (draftData: IFormData) => {
     draftDetails.child._fhirID = child._fhirID
   }
 
+  if (child.childBirthDate) {
+    draftDetails.child.birthDate = child.childBirthDate
+  }
+
   draftDetails.mother.name = [
     {
       use: 'bn',
@@ -152,6 +159,9 @@ const processDraftData = (draftData: IFormData) => {
   }
   if (mother._fhirID) {
     draftDetails.mother._fhirID = mother._fhirID
+  }
+  if (mother.motherBirthDate) {
+    draftDetails.mother.birthDate = mother.motherBirthDate
   }
 
   draftDetails.mother.address = [
@@ -203,6 +213,9 @@ const processDraftData = (draftData: IFormData) => {
   }
   if (father._fhirID) {
     fatherDetails._fhirID = father._fhirID
+  }
+  if (father.fatherBirthDate) {
+    fatherDetails.birthDate = father.fatherBirthDate
   }
 
   fatherDetails.address = [

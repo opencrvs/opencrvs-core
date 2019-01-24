@@ -271,7 +271,7 @@ export const childSection: IFormSection = {
       ]
     },
     {
-      name: 'birthDate',
+      name: 'childBirthDate',
       type: DATE,
       label: messages.childDateOfBirth,
       required: true,
