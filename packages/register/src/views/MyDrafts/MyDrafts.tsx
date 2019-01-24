@@ -4,7 +4,6 @@ import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import {
   ActionPage,
   ListItem,
-  ListItemExpansion,
   DataTable,
   SelectFieldType
 } from '@opencrvs/components/lib/interface'
@@ -184,9 +183,6 @@ class MyDraftsComponent extends React.Component<IFullProps, IDraft> {
         key={key}
         itemData={{}}
         actions={listItemActions}
-        expandedCellRenderer={() => (
-          <ListItemExpansion actions={expansionActions} />
-        )}
       />
     )
   }
@@ -194,19 +190,22 @@ class MyDraftsComponent extends React.Component<IFullProps, IDraft> {
   transformData = (drafts: IDraft[]) => {
     const data: any = []
     drafts.forEach((draft: IDraft) => {
-      data.push({
-        id: draft.id,
-        name:
-          (draft.data.child &&
-            `${draft.data.child.firstNames} ${
-              draft.data.child.familyName
-            }`.trim()) ||
-          '-',
-        dob: (draft.data.child && draft.data.child.birthDate) || '-',
-        saved_on: moment(draft.savedOn).format('YYYY-MM-DD'),
-        event: draft.eventType,
-        savedOn: draft.savedOn
-      })
+      console.log(draft.savedOn)
+      if (draft.savedOn) {
+        data.push({
+          id: draft.id,
+          name:
+            (draft.data.child &&
+              `${draft.data.child.firstNames} ${
+                draft.data.child.familyName
+              }`.trim()) ||
+            '-',
+          dob: (draft.data.child && draft.data.child.birthDate) || '-',
+          saved_on: moment(draft.savedOn).format('YYYY-MM-DD'),
+          event: draft.eventType,
+          savedOn: draft.savedOn
+        })
+      }
     })
     return data
   }
@@ -232,7 +231,7 @@ class MyDraftsComponent extends React.Component<IFullProps, IDraft> {
                 label: intl.formatMessage(messages.filtersNewestToOldest)
               }
             ],
-            value: '',
+            value: 'desc',
             type: SelectFieldType.Date
           }
         ]

@@ -157,6 +157,7 @@ interface IHomeProps {
   goToEvents: typeof goToEventsAction
   goToMyRecords: typeof goToMyRecordsAction
   goToMyDrafts: typeof goToMyDraftsAction
+  draftCount: string
 }
 
 type FullProps = IHomeProps & InjectedIntlProps & ISearchInputProps
@@ -201,7 +202,7 @@ class HomeView extends React.Component<FullProps> {
             />
             <CountAction
               id="saved_drafts"
-              count={'10'}
+              count={this.props.draftCount}
               onClick={this.props.goToMyDrafts}
               title={intl.formatMessage(messages.savedDrafts)}
             />
@@ -233,7 +234,9 @@ class HomeView extends React.Component<FullProps> {
 }
 
 const mapStateToProps = (store: IStoreState) => {
+  const draftCount = store.drafts.drafts.length.toString()
   return {
+    draftCount,
     language: getLanguage(store),
     userDetails: getUserDetails(store)
   }
