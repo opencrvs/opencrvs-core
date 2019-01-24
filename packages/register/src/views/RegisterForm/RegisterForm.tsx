@@ -240,7 +240,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   rejectSubmission = () => {
-    const { history, draft } = this.props
+    const { history } = this.props
     const childData = this.props.draft.data.child
     const fullName: IFullName = getFullName(childData)
     history.push(REJECTED_REGISTRATION, {
@@ -248,7 +248,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    this.props.deleteDraft(draft)
+    // this.props.deleteDraft(draft)
   }
 
   successfulSubmission = (response: string) => {
