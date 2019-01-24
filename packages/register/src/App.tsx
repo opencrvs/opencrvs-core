@@ -26,6 +26,7 @@ import { createClient } from 'src/utils/apolloClient'
 import { MyRecords } from './views/MyRecords/MyRecords'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
+import { MyDrafts } from './views/MyDrafts/MyDrafts'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -109,6 +110,11 @@ export class App extends React.Component<IAppProps> {
                         <ProtectedRoute
                           path={routes.MY_RECORDS}
                           component={MyRecords}
+                        />
+
+                        <ProtectedRoute
+                          path={routes.MY_DRAFTS}
+                          component={MyDrafts}
                         />
                         <ProtectedRoute
                           path={routes.REVIEW_DUPLICATES}
