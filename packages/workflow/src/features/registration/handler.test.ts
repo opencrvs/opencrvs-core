@@ -52,7 +52,7 @@ describe('Verify handler', () => {
         })
       )
       jest
-        .spyOn(require('./utils'), 'sendBirthNotification')
+        .spyOn(require('./utils'), 'sendEventNotification')
         .mockReturnValue('')
 
       const token = jwt.sign(

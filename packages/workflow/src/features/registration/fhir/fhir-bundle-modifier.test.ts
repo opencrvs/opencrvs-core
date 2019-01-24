@@ -39,7 +39,7 @@ describe('Verify fhir bundle modifier functions', () => {
     it('Throws error if invalid fhir bundle is provided', () => {
       const invalidData = { ...testFhirBundle, entry: [] }
       expect(() => setTrackingId(invalidData)).toThrowError(
-        'Invalid FHIR bundle found for declaration'
+        'Invalid FHIR bundle found'
       )
     })
 

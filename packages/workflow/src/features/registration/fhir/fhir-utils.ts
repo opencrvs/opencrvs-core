@@ -129,10 +129,33 @@ export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   }
   return brnIdentifier.value
 }
+export function getDeathRegistrationNumber(taskResource: fhir.Task) {
+  const drnIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system ===
+        `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`
+      )
+    })
+  if (!drnIdentifier || !drnIdentifier.value) {
+    throw new Error("Didn't find any identifier for death registration number")
+  }
+  return drnIdentifier.value
+}
 
 export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
   try {
     getBirthRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+export function hasDeathRegistrationNumber(fhirBundle: fhir.Bundle) {
+  try {
+    getDeathRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
     return true
   } catch (error) {
     return false
