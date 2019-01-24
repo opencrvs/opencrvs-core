@@ -64,3 +64,6 @@ export function getUserDetails(user: GQLUser): IUserDetails {
 export async function storeUserDetails(userDetails: IUserDetails) {
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
 }
+export async function removeUserDetails() {
+  storage.removeItem(USER_DETAILS)
+}
