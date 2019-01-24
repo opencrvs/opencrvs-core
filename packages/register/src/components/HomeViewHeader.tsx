@@ -22,7 +22,7 @@ const StretchedHeader = styled(Header)`
 `
 
 const StyledLogo = styled(Logo)`
-  margin: -71px auto auto;
+  margin: -71px auto auto 20px;
 `
 
 export class HomeViewHeader extends React.Component<IViewHeadingProps> {
