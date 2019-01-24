@@ -53,6 +53,10 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
     padding: 0;
     text-align: center;
   }
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 515px;
+  }
 `
 
 export class TextInput extends React.Component<ITextInputProps> {
