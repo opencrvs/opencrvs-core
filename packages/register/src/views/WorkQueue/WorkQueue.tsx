@@ -901,7 +901,7 @@ export class WorkQueueView extends React.Component<
                 label: intl.formatMessage(messages.filtersNewestToOldest)
               }
             ],
-            value: '',
+            value: 'desc',
             type: SelectFieldType.Date
           }
         ]
