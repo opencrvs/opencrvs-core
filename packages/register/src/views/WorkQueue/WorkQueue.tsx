@@ -46,7 +46,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { goToEvents as goToEventsAction } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
+import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
 import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
@@ -832,7 +832,7 @@ export class WorkQueueView extends React.Component<
     const area = this.props.userDetails && this.props.userDetails.catchmentArea
     const identifier =
       area &&
-      area.find((location: ILocation) => {
+      area.find((location: IGQLLocation) => {
         return (
           (location.identifier &&
             location.identifier.find((areaIdentifier: IIdentifier) => {

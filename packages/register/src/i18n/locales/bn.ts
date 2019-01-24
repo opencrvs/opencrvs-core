@@ -324,6 +324,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.attendantAtBirthLayperson': 'সাধারণ ব্যক্তি',
     'formFields.attendantAtBirthNone': 'কেউ না',
     'formFields.attendantAtBirthOther': 'অন্যান্য',
+    'formFields.otherOption': 'Other',
     'formFields.birthType': 'জন্মের ধরন',
     'formFields.birthTypeSingle': 'একক',
     'formFields.birthTypeTwin': 'যমজ',

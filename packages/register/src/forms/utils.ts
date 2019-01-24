@@ -5,6 +5,7 @@ import {
   IConditionals,
   IFormSectionData,
   IConditional,
+  messages,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
@@ -19,6 +20,7 @@ import { getValidationErrorsForForm } from 'src/forms/validation'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
+  OFFLINE_FACILITIES_KEY,
   ILocation
 } from 'src/offline/reducer'
 import { config } from 'src/config'
@@ -57,17 +59,18 @@ export const internationaliseOptions = (
   })
 }
 
-export const generateOptionsFromLocations = (
-  locations: ILocation[]
+export const generateOptions = (
+  options: ILocation[],
+  optionType: string
 ): ISelectOption[] => {
   const optionsArray: ISelectOption[] = []
-  locations.forEach((location: ILocation, index: number) => {
+  options.forEach((option: ILocation, index: number) => {
     optionsArray.push({
-      value: location.id,
+      value: option.id,
       label: {
-        id: `location.${location.id}`,
-        defaultMessage: location.name,
-        description: `Location select item for ${location.id}`
+        id: `${optionType}.${option.id}`,
+        defaultMessage: option.name,
+        description: `${optionType} select item for ${option.id}`
       }
     })
   })
@@ -91,27 +94,24 @@ export const getFieldOptions = (
     } else {
       partOf = `Location/${dependencyVal}`
     }
-    return generateOptionsFromLocations(
+    return generateOptions(
       locations.filter((location: ILocation) => {
         return location.partOf === partOf
-      })
+      }),
+      'location'
     )
   } else if (
     resources &&
-    field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY
+    field.dynamicOptions.resource === OFFLINE_FACILITIES_KEY
   ) {
-    const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
-    let partOf: string
-    if (dependencyVal === config.COUNTRY.toUpperCase()) {
-      partOf = 'Location/0'
-    } else {
-      partOf = `Location/${dependencyVal}`
+    const facilities = resources[OFFLINE_FACILITIES_KEY] as ILocation[]
+    const facilityOptions = generateOptions(facilities, 'facility')
+    const otherOption: ISelectOption = {
+      value: 'other',
+      label: messages.otherOption
     }
-    return generateOptionsFromLocations(
-      locations.filter((location: ILocation) => {
-        return location.partOf === partOf
-      })
-    )
+    facilityOptions.push(otherOption)
+    return facilityOptions
   } else {
     let options
     if (!field.dynamicOptions.options) {
@@ -229,5 +229,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
+  },
+  placeOfBirthHospital: {
+    action: 'hide',
+    expression:
+      'values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION"'
   }
 }

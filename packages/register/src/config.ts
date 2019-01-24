@@ -8,5 +8,6 @@ export const config = {
     process.env.REACT_APP_RESOURCES_URL || 'http://localhost:3040/',
   PERFORMANCE_URL:
     process.env.REACT_APP_PERFORMANCE_APP_URL || 'http://localhost:3001',
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel'
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
+  HEALTH_FACILITY_FILTER: 'UPAZILA'
 }

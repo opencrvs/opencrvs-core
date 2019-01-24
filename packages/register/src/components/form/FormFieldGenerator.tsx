@@ -56,7 +56,6 @@ import {
 
 import { IValidationResult } from 'src/utils/validate'
 import { IOfflineDataState } from 'src/offline/reducer'
-
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { FormList } from './FormList'

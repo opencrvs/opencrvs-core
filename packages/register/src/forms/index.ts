@@ -24,6 +24,15 @@ export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
+import { defineMessages } from 'react-intl'
+
+export const messages = defineMessages({
+  otherOption: {
+    id: 'formFields.otherOption',
+    defaultMessage: 'Other',
+    description: 'Other option for select'
+  }
+})
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
@@ -183,6 +192,7 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
+  placeOfBirthHospital: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

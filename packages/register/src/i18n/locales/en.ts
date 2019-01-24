@@ -322,6 +322,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.attendantAtBirthLayperson': 'Layperson',
     'formFields.attendantAtBirthNone': 'None',
     'formFields.attendantAtBirthOther': 'Other',
+    'formFields.otherOption': 'Other',
     'formFields.birthType': 'Type of birth',
     'formFields.birthTypeSingle': 'Single',
     'formFields.birthTypeTwin': 'Twin',

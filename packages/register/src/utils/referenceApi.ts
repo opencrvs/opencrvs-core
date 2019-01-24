@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import { resolve } from 'url'
-import { ILocation, IFacility } from 'src/offline/reducer'
+import { ILocation } from 'src/offline/reducer'
 import { config } from 'src/config'
 
 export interface ILocationDataResponse {
@@ -8,7 +8,7 @@ export interface ILocationDataResponse {
 }
 
 export interface IFacilitiesDataResponse {
-  data: IFacility[]
+  data: ILocation[]
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {

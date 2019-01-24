@@ -1,8 +1,9 @@
-import { ILocation, IFacility } from './reducer'
+import { ILocation } from './reducer'
 import {
   ILocationDataResponse,
   IFacilitiesDataResponse
 } from 'src/utils/referenceApi'
+import { IUserDetails } from 'src/utils/userUtils'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -25,7 +26,7 @@ export type LocationsFailedAction = {
 export const FACILITIES_LOADED = 'OFFLINE/FACILITIES_LOADED'
 export type FacilitiesLoadedAction = {
   type: typeof FACILITIES_LOADED
-  payload: IFacility[]
+  payload: ILocation[]
 }
 
 export const FACILITIES_FAILED = 'OFFLINE/FACILITIES_FAILED'
@@ -37,6 +38,7 @@ export type FacilitiesFailedAction = {
 export const SET_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
 type SetOfflineData = {
   type: typeof SET_OFFLINE_DATA
+  payload: IUserDetails
 }
 export const GET_OFFLINE_DATA_SUCCESS = 'OFFLINE/GET_OFFLINE_DATA_SUCCESS'
 export type IGetOfflineDataSuccessAction = {
@@ -81,8 +83,9 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
-export const setOfflineData = (): SetOfflineData => ({
-  type: SET_OFFLINE_DATA
+export const setOfflineData = (userDetails: IUserDetails): SetOfflineData => ({
+  type: SET_OFFLINE_DATA,
+  payload: userDetails
 })
 
 export const getOfflineDataSuccess = (

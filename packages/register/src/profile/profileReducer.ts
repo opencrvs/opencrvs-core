@@ -19,6 +19,7 @@ import {
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from 'src/profile/queries'
+import * as offlineActions from 'src/offline/actions'
 
 export type ProfileState = {
   authenticated: boolean
@@ -34,10 +35,15 @@ export const initialState: ProfileState = {
   userDetails: null
 }
 
-export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
+export const profileReducer: LoopReducer<
+  ProfileState,
+  actions.Action | offlineActions.Action
+> = (
   state: ProfileState = initialState,
-  action: actions.Action
-): ProfileState | Loop<ProfileState, actions.Action> => {
+  action: actions.Action | offlineActions.Action
+):
+  | ProfileState
+  | Loop<ProfileState, actions.Action | offlineActions.Action> => {
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
       return loop(
@@ -99,7 +105,10 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
           userDetailsFetched: true,
           userDetails
         },
-        Cmd.run(() => storeUserDetails(userDetails))
+        Cmd.list([
+          Cmd.run(() => storeUserDetails(userDetails)),
+          Cmd.action(offlineActions.setOfflineData(userDetails))
+        ])
       )
     case actions.SET_INITIAL_USER_DETAILS:
       return loop(
@@ -120,10 +129,13 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
       const userDetailsCollection = JSON.parse(
         userDetailsString ? userDetailsString : '[]'
       )
-      return {
-        ...state,
-        userDetails: userDetailsCollection
-      }
+      return loop(
+        {
+          ...state,
+          userDetails: userDetailsCollection
+        },
+        Cmd.action(offlineActions.setOfflineData(userDetailsCollection))
+      )
     default:
       return state
   }

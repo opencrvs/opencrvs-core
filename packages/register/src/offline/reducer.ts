@@ -4,6 +4,9 @@ import { storage } from 'src/storage'
 import { referenceApi } from 'src/utils/referenceApi'
 import * as i18nActions from 'src/i18n/actions'
 import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
+import { config } from 'src/config'
+import { getUserLocation } from 'src/utils/userUtils'
+import { filterLocations } from 'src/utils/locationUtils'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -13,16 +16,7 @@ export interface ILocation {
   name: string
   nameBn: string
   physicalType: string
-  jurisdictionType: string
-  type: string
-  partOf: string
-}
-
-export interface IFacility {
-  id: string
-  name: string
-  nameBn: string
-  physicalType: string
+  jurisdictionType?: string
   type: string
   partOf: string
 }
@@ -42,11 +36,11 @@ export const formatLocationLanguageState = (
 }
 
 export const formatFacilitiesLanguageState = (
-  facilities: IFacility[]
+  facilities: ILocation[]
 ): ILanguageState => {
   const enMessages: IntlMessages = {}
   const bnMessages: IntlMessages = {}
-  facilities.forEach((facility: IFacility) => {
+  facilities.forEach((facility: ILocation) => {
     enMessages[`facility.${facility.id}`] = facility.name
     bnMessages[`facility.${facility.id}`] = facility.nameBn
   })
@@ -57,12 +51,13 @@ export const formatFacilitiesLanguageState = (
 
 export interface IOfflineData {
   locations: ILocation[]
-  facilities: IFacility[]
+  facilities: ILocation[]
 }
 
 export type IOfflineDataState = {
   locations: ILocation[]
-  facilities: IFacility[]
+  facilities: ILocation[]
+  healthFacilityFilterLocation: string
   offlineDataLoaded: boolean
   loadingError: boolean
 }
@@ -70,6 +65,7 @@ export type IOfflineDataState = {
 export const initialState: IOfflineDataState = {
   locations: [],
   facilities: [],
+  healthFacilityFilterLocation: '',
   offlineDataLoaded: false,
   loadingError: false
 }
@@ -105,11 +101,15 @@ export const offlineDataReducer: LoopReducer<
         })
       )
     case actions.FACILITIES_LOADED:
+      const facilities = filterLocations(
+        action.payload,
+        state.healthFacilityFilterLocation
+      )
       storage.setItem(
         'offline',
         JSON.stringify({
           locations: state.locations,
-          facilities: action.payload
+          facilities
         })
       )
       locationLanguageState = formatLocationLanguageState(state.locations)
@@ -119,7 +119,7 @@ export const offlineDataReducer: LoopReducer<
         {
           ...state,
           loadingError: false,
-          facilities: action.payload,
+          facilities,
           offlineDataLoaded: true
         },
         Cmd.list([
@@ -130,7 +130,11 @@ export const offlineDataReducer: LoopReducer<
     case actions.SET_OFFLINE_DATA:
       return loop(
         {
-          ...state
+          ...state,
+          healthFacilityFilterLocation: getUserLocation(
+            action.payload,
+            config.HEALTH_FACILITY_FILTER
+          )
         },
         Cmd.run<
           | actions.IGetOfflineDataSuccessAction

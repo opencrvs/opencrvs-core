@@ -24,6 +24,7 @@ export interface IMotherSectionFormData {
 const offlineResources = {
   locations: mockOfflineData.locations,
   facilities: mockOfflineData.facilities,
+  healthFacilityFilterLocation: '',
   offlineDataLoaded: true,
   loadingError: false
 }

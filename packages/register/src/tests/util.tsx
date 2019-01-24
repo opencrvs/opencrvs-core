@@ -377,6 +377,7 @@ export const mockOfflineData = {
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     }
   ],
+  healthFacilityFilterLocation: '50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987',
   locations: [
     {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
