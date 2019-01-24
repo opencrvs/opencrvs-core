@@ -452,8 +452,24 @@ export const fatherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressSameAsMother,
-        conditionals.isCityLocation
+        conditionals.isCityLocation,
+        conditionals.addressSameAsMother
+      ]
+    },
+    {
+      name: 'addressLine1',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressLine3,
+        conditionals.addressSameAsMother
       ]
     },
     {
@@ -656,6 +672,22 @@ export const fatherSection: IFormSection = {
         conditionals.districtPermanent,
         conditionals.addressLine4Permanent,
         conditionals.isCityLocationPermanent
+      ]
+    },
+    {
+      name: 'addressLine1Permanent',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.permanentAddressSameAsMother,
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.addressLine3Permanent
       ]
     },
     {
