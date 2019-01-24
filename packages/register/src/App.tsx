@@ -43,6 +43,18 @@ const StyledSpinner = styled(Spinner)`
   top: 50%;
   left: 50%;
 `
+
+export const ShrinkedHeader = styled.div`
+  max-width: 940px;
+  margin: auto;
+  position: relative;
+`
+
+export const ShrinkedBody = styled.div`
+  max-width: 940px;
+  margin: auto;
+`
+
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore

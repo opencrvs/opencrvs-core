@@ -7,8 +7,10 @@ import { TopMenu } from '../components/TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
 import { ViewHeading, IViewHeadingProps } from '../components/ViewHeading'
 import ConnectivityStatus from './ConnectivityStatus'
+import { ShrinkedHeader } from 'src/App'
 
 const StretchedHeader = styled(Header)`
+  display: block;
   justify-content: flex-end;
   padding-bottom: 50px;
 
@@ -32,11 +34,13 @@ export class ViewHeader extends React.Component<IViewHeadingProps> {
 
     return (
       <StretchedHeader {...otherProps}>
-        <ConnectivityStatus />
-        {hideBackButton && <Logo />}
-        <TopMenu hideBackButton={hideBackButton} />
-        <ViewHeading {...{ title, description, breadcrumb, id }} />
-        {this.props.children}
+        <ShrinkedHeader>
+          <ConnectivityStatus />
+          {hideBackButton && <Logo />}
+          <TopMenu hideBackButton={hideBackButton} />
+          <ViewHeading {...{ title, description, breadcrumb, id }} />
+          {this.props.children}
+        </ShrinkedHeader>
       </StretchedHeader>
     )
   }

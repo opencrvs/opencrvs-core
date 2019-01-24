@@ -6,6 +6,7 @@ import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { FormFieldGenerator } from 'src/components/form'
 import { IFormSection, IFormSectionData, IFileValue } from 'src/forms'
 import { hasFormError } from 'src/forms/utils'
+import { ShrinkedBody } from 'src/App'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -86,26 +87,28 @@ export class ImageUploadOption extends React.Component<IProps, State> {
           backLabel={backLabel}
           goBack={this.props.toggleNestedSection}
         >
-          <FormContainer>
-            <Box>
-              <FormFieldGenerator
-                id={option.id}
-                onChange={this.storeData}
-                setAllFieldsDirty={false}
-                fields={option.fields}
-              />
-              {this.state.showUploadButton && (
-                <FormAction>
-                  <FormImageUploader
-                    id="upload_document"
-                    title={title ? title : 'Upload'}
-                    icon={() => <ArrowForward />}
-                    handleFileChange={this.handleFileChange}
-                  />
-                </FormAction>
-              )}
-            </Box>
-          </FormContainer>
+          <ShrinkedBody>
+            <FormContainer>
+              <Box>
+                <FormFieldGenerator
+                  id={option.id}
+                  onChange={this.storeData}
+                  setAllFieldsDirty={false}
+                  fields={option.fields}
+                />
+                {this.state.showUploadButton && (
+                  <FormAction>
+                    <FormImageUploader
+                      id="upload_document"
+                      title={title ? title : 'Upload'}
+                      icon={() => <ArrowForward />}
+                      handleFileChange={this.handleFileChange}
+                    />
+                  </FormAction>
+                )}
+              </Box>
+            </FormContainer>
+          </ShrinkedBody>
         </ActionPage>
       </OverlayContainer>
     )

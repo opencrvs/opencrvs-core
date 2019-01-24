@@ -6,8 +6,10 @@ import styled from '../styled-components'
 import { TopMenu } from './TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
 import ConnectivityStatus from './ConnectivityStatus'
+import { ShrinkedHeader } from 'src/App'
 
 const StretchedHeader = styled(Header)`
+  display: block;
   justify-content: flex-end;
   padding-bottom: 50px;
   min-height: 280px;
@@ -20,7 +22,7 @@ const StretchedHeader = styled(Header)`
 `
 
 const StyledLogo = styled(Logo)`
-  margin: -71px auto auto 17px;
+  margin: -71px auto auto;
 `
 
 export class HomeViewHeader extends React.Component<IViewHeadingProps> {
@@ -28,11 +30,13 @@ export class HomeViewHeader extends React.Component<IViewHeadingProps> {
     const { title, description, id } = this.props
     return (
       <StretchedHeader {...this.props}>
-        <ConnectivityStatus />
-        <TopMenu hideBackButton={true} />
-        <StyledLogo />
-        <ViewHeading {...{ title, description, id }} />
-        {this.props.children}
+        <ShrinkedHeader>
+          <ConnectivityStatus />
+          <TopMenu hideBackButton={true} />
+          <StyledLogo />
+          <ViewHeading {...{ title, description, id }} />
+          {this.props.children}
+        </ShrinkedHeader>
       </StretchedHeader>
     )
   }

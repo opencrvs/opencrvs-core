@@ -30,6 +30,7 @@ import { IUserDetails } from '../../utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { NOTIFICATION_STATUS, REJECTED_STATUS } from 'src/utils/constants'
+import { ShrinkedBody } from 'src/App'
 
 const messages = defineMessages({
   declareNewEventActionTitle: {
@@ -181,45 +182,51 @@ class HomeView extends React.Component<FullProps> {
             id="home_view"
           />
           <StyledActionList id="home_action_list">
-            <StyledIconAction
-              id="new_event_declaration"
-              icon={() => <StyledPlusIcon />}
-              onClick={this.props.goToEvents}
-              title={intl.formatMessage(messages.declareNewEventActionTitle)}
-            />
-            <Banner
-              text={intl.formatMessage(messages.notificationsToComplete)}
-              count={10}
-              status={NOTIFICATION_STATUS}
-            />
-            <Banner
-              text={intl.formatMessage(messages.rejectedApplications)}
-              count={10}
-              status={REJECTED_STATUS}
-            />
-            <CountAction
-              id="saved_drafts"
-              count={'10'}
-              title={intl.formatMessage(messages.savedDrafts)}
-            />
-            <CountAction
-              id="records"
-              count={'10'}
-              onClick={this.props.goToMyRecords}
-              title={intl.formatMessage(messages.records)}
-            />
-            <SearchInput
-              placeholder={intl.formatMessage(messages.trackingId)}
-              buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
-              {...this.props}
-            />
+            <ShrinkedBody>
+              <StyledIconAction
+                id="new_event_declaration"
+                icon={() => <StyledPlusIcon />}
+                onClick={this.props.goToEvents}
+                title={intl.formatMessage(messages.declareNewEventActionTitle)}
+              />
+              <Banner
+                text={intl.formatMessage(messages.notificationsToComplete)}
+                count={10}
+                status={NOTIFICATION_STATUS}
+              />
+              <Banner
+                text={intl.formatMessage(messages.rejectedApplications)}
+                count={10}
+                status={REJECTED_STATUS}
+              />
+              <CountAction
+                id="saved_drafts"
+                count={'10'}
+                title={intl.formatMessage(messages.savedDrafts)}
+              />
+              <CountAction
+                id="records"
+                count={'10'}
+                onClick={this.props.goToMyRecords}
+                title={intl.formatMessage(messages.records)}
+              />
+              <SearchInput
+                placeholder={intl.formatMessage(messages.trackingId)}
+                buttonLabel={intl.formatMessage(
+                  messages.searchInputButtonTitle
+                )}
+                {...this.props}
+              />
+            </ShrinkedBody>
           </StyledActionList>
           <ViewFooter>
-            <FooterAction>
-              <FooterPrimaryButton>
-                {intl.formatMessage(messages.logoutActionTitle)}
-              </FooterPrimaryButton>
-            </FooterAction>
+            <ShrinkedBody>
+              <FooterAction>
+                <FooterPrimaryButton>
+                  {intl.formatMessage(messages.logoutActionTitle)}
+                </FooterPrimaryButton>
+              </FooterAction>
+            </ShrinkedBody>
           </ViewFooter>
         </>
       )

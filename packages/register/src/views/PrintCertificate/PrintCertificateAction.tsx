@@ -23,6 +23,7 @@ import * as moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import { Registrant, Issuer, generateMoneyReceipt } from './generatePDF'
+import { ShrinkedBody } from 'src/App'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -425,103 +426,108 @@ class PrintCertificateActionComponent extends React.Component<
           backLabel={backLabel}
           goBack={togglePrintCertificateSection}
         >
-          <Query
-            query={FETCH_BIRTH_REGISTRATION_QUERY}
-            variables={{
-              id: registrationId
-            }}
-          >
-            {({ loading, error, data }) => {
-              if (loading) {
-                return <StyledSpinner id="print-certificate-spinner" />
-              }
+          <ShrinkedBody>
+            <Query
+              query={FETCH_BIRTH_REGISTRATION_QUERY}
+              variables={{
+                id: registrationId
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return <StyledSpinner id="print-certificate-spinner" />
+                }
 
-              if (data) {
-                let fields = printCertificateFormSection.fields
-                fields = fields.map(field => {
-                  if (
-                    field &&
-                    field.type === INFORMATIVE_RADIO_GROUP &&
-                    field.name === 'motherDetails'
-                  ) {
-                    field.information = data.fetchBirthRegistration.mother
-                  } else if (
-                    field &&
-                    field.type === INFORMATIVE_RADIO_GROUP &&
-                    field.name === 'fatherDetails'
-                  ) {
-                    field.information = data.fetchBirthRegistration.father
-                  }
+                if (data) {
+                  let fields = printCertificateFormSection.fields
+                  fields = fields.map(field => {
+                    if (
+                      field &&
+                      field.type === INFORMATIVE_RADIO_GROUP &&
+                      field.name === 'motherDetails'
+                    ) {
+                      field.information = data.fetchBirthRegistration.mother
+                    } else if (
+                      field &&
+                      field.type === INFORMATIVE_RADIO_GROUP &&
+                      field.name === 'fatherDetails'
+                    ) {
+                      field.information = data.fetchBirthRegistration.father
+                    }
 
-                  return field
-                })
+                    return field
+                  })
 
-                const paymentAmount = calculatePrice(
-                  data.fetchBirthRegistration.child.birthDate
-                )
+                  const paymentAmount = calculatePrice(
+                    data.fetchBirthRegistration.child.birthDate
+                  )
 
-                moment.locale(this.props.language)
-                const DOBDiff = moment(
-                  data.fetchBirthRegistration.child.birthDate,
-                  'YYYY-MM-DD'
-                )
-                  .fromNow()
-                  .replace(' ago', '')
-                  .replace(' আগে', '')
+                  moment.locale(this.props.language)
+                  const DOBDiff = moment(
+                    data.fetchBirthRegistration.child.birthDate,
+                    'YYYY-MM-DD'
+                  )
+                    .fromNow()
+                    .replace(' ago', '')
+                    .replace(' আগে', '')
 
-                paymentFormSection.fields.map(field => {
-                  if (
-                    field &&
-                    field.type === PARAGRAPH &&
-                    field.name === 'paymentAmount'
-                  ) {
-                    field.initialValue = paymentAmount
-                  }
-                })
+                  paymentFormSection.fields.map(field => {
+                    if (
+                      field &&
+                      field.type === PARAGRAPH &&
+                      field.name === 'paymentAmount'
+                    ) {
+                      field.initialValue = paymentAmount
+                    }
+                  })
 
-                paymentFormSection.fields.map(field => {
-                  if (
-                    field &&
-                    field.type === PARAGRAPH &&
-                    field.name === 'service'
-                  ) {
-                    field.initialValue = DOBDiff.toString()
-                    field.label = messages[`service`]
-                  }
-                })
+                  paymentFormSection.fields.map(field => {
+                    if (
+                      field &&
+                      field.type === PARAGRAPH &&
+                      field.name === 'service'
+                    ) {
+                      field.initialValue = DOBDiff.toString()
+                      field.label = messages[`service`]
+                    }
+                  })
 
-                const registrant: Registrant = this.setRegistrant(
-                  data.fetchBirthRegistration
-                )
+                  const registrant: Registrant = this.setRegistrant(
+                    data.fetchBirthRegistration
+                  )
 
-                return (
-                  <FormContainer>
-                    <Box>
-                      <FormFieldGenerator
-                        id={form.id}
-                        onChange={this.storeData}
-                        setAllFieldsDirty={false}
-                        fields={form.fields}
-                      />
-                    </Box>
-                    <Column>
-                      {this.state.data.personCollectingCertificate &&
-                        this.getFormAction(this.state.currentForm, registrant)}
-                    </Column>
-                  </FormContainer>
-                )
-              }
-              if (error) {
-                return (
-                  <ErrorText id="print-certificate-queue-error-text">
-                    {intl.formatMessage(messages.queryError)}
-                  </ErrorText>
-                )
-              }
+                  return (
+                    <FormContainer>
+                      <Box>
+                        <FormFieldGenerator
+                          id={form.id}
+                          onChange={this.storeData}
+                          setAllFieldsDirty={false}
+                          fields={form.fields}
+                        />
+                      </Box>
+                      <Column>
+                        {this.state.data.personCollectingCertificate &&
+                          this.getFormAction(
+                            this.state.currentForm,
+                            registrant
+                          )}
+                      </Column>
+                    </FormContainer>
+                  )
+                }
+                if (error) {
+                  return (
+                    <ErrorText id="print-certificate-queue-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
 
-              return JSON.stringify(data)
-            }}
-          </Query>
+                return JSON.stringify(data)
+              }}
+            </Query>
+          </ShrinkedBody>
         </ActionPage>
       </ActionPageWrapper>
     )
