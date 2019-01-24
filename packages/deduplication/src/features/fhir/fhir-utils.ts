@@ -95,7 +95,7 @@ export function createDuplicateTemplate(
       composition.relatesTo.push({
         code: 'duplicate',
         targetReference: {
-          reference: `${duplicateReference}`
+          reference: `Composition/${duplicateReference}`
         }
       })
     }

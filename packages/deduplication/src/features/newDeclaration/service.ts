@@ -178,7 +178,15 @@ async function updateCompositionWithDuplicates(
   composition: fhir.Composition,
   duplicates: string[]
 ) {
-  addDuplicatesToComposition(duplicates, composition)
+  const duplicateCompositions = await Promise.all(
+    duplicates.map(duplicate => getCompositionByIdentifier(duplicate))
+  )
+
+  const duplicateCompositionIds = duplicateCompositions.map(
+    dupComposition => dupComposition.id
+  )
+
+  addDuplicatesToComposition(duplicateCompositionIds, composition)
 
   return updateInHearth(composition, composition.id)
 }

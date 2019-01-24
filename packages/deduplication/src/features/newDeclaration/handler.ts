@@ -26,6 +26,7 @@ export async function updatedDeclarationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as fhir.Bundle
+
   try {
     await insertUpdatedDeclaration(payload)
   } catch (error) {

@@ -45,6 +45,7 @@ describe('Verify handlers', () => {
       fetch.mockResponses(
         [JSON.stringify(mockCompositionEntry)],
         [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify(mockCompositionEntry)],
         [JSON.stringify({})]
       )
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {

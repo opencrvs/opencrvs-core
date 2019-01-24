@@ -9,7 +9,7 @@ describe('fhir utils', () => {
   it('should add duplicates to relatesTo property of compostion', () => {
     createDuplicateTemplate(['123'], mockComposition)
     expect(mockComposition.relatesTo[2].targetReference.reference).toEqual(
-      '123'
+      'Composition/123'
     )
     expect(mockComposition.relatesTo.length).toEqual(3)
   })

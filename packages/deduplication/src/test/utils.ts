@@ -463,7 +463,8 @@ export const mockCompositionEntry = {
           value: 'Bt40VoY'
         },
         resourceType: 'Composition',
-        status: 'preliminary'
+        status: 'preliminary',
+        id: '489b76cf-6b58-4b0d-96ba-caa1271f787b'
       }
     }
   ]
