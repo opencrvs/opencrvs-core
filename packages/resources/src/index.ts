@@ -7,6 +7,7 @@ import getPlugins from './config/plugins'
 import { RESOURCES_HOST, RESOURCES_PORT } from './constants'
 
 import locationsHandler from './features/administrative/handler'
+import facilitiesHandler from './features/facilities/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -24,6 +25,24 @@ export async function createServer() {
     options: {
       tags: ['api'],
       description: 'Returns locations.json'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/facilities',
+    handler: facilitiesHandler,
+    options: {
+      tags: ['api'],
+      description: 'Returns facilities.json',
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            200: { description: 'facilities JSON returned' },
+            400: { description: 'facilities JSON error' }
+          }
+        }
+      }
     }
   })
 

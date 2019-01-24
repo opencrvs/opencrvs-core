@@ -1,19 +1,10 @@
-import { IOfflineData, ILocation } from './reducer'
+import { ILocation } from './reducer'
 import { ILocationDataResponse } from 'src/utils/referenceApi'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
   type: typeof GET_LOCATIONS
   payload: string
-}
-export const LOAD_OFFLINE_DATA = 'OFFLINE/LOAD_OFFLINE_DATA'
-type LoadOfflineData = {
-  type: typeof LOAD_OFFLINE_DATA
-}
-export const STORE_OFFLINE_DATA = 'OFFLINE/STORE_OFFLINE_DATA'
-type StoreOfflineData = {
-  type: typeof STORE_OFFLINE_DATA
-  payload: IOfflineData
 }
 
 export const LOCATIONS_LOADED = 'OFFLINE/LOCATIONS_LOADED'
@@ -27,21 +18,26 @@ export type LocationsFailedAction = {
   type: typeof LOCATIONS_FAILED
   payload: Error
 }
+export const SET_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
+type SetOfflineData = {
+  type: typeof SET_OFFLINE_DATA
+}
+export const GET_OFFLINE_DATA_SUCCESS = 'OFFLINE/GET_OFFLINE_DATA_SUCCESS'
+export type IGetOfflineDataSuccessAction = {
+  type: typeof GET_OFFLINE_DATA_SUCCESS
+  payload: string
+}
+export const GET_OFFLINE_DATA_FAILED = 'OFFLINE/GET_OFFLINE_DATA_FAILED'
+export type IGetOfflineDataFailedAction = {
+  type: typeof GET_OFFLINE_DATA_FAILED
+}
 export type Action =
   | GetLocations
-  | LoadOfflineData
-  | StoreOfflineData
   | LocationsFailedAction
   | LocationsLoadedAction
-
-export const loadOfflineData = (): LoadOfflineData => ({
-  type: LOAD_OFFLINE_DATA
-})
-
-export const storeOfflineData = (payload: IOfflineData): StoreOfflineData => ({
-  type: STORE_OFFLINE_DATA,
-  payload
-})
+  | SetOfflineData
+  | IGetOfflineDataSuccessAction
+  | IGetOfflineDataFailedAction
 
 export const locationsLoaded = (
   payload: ILocationDataResponse
@@ -53,4 +49,19 @@ export const locationsLoaded = (
 export const locationsFailed = (error: Error): LocationsFailedAction => ({
   type: LOCATIONS_FAILED,
   payload: error
+})
+
+export const setOfflineData = (): SetOfflineData => ({
+  type: SET_OFFLINE_DATA
+})
+
+export const getOfflineDataSuccess = (
+  response: string
+): IGetOfflineDataSuccessAction => ({
+  type: GET_OFFLINE_DATA_SUCCESS,
+  payload: response
+})
+
+export const getOfflineDataFailed = (): IGetOfflineDataFailedAction => ({
+  type: GET_OFFLINE_DATA_FAILED
 })
