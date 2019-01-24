@@ -537,7 +537,10 @@ export const fatherSection: IFormSection = {
       initialValue: config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.permanentAddressSameAsMother]
+      conditionals: [
+        conditionals.fathersDetailsExist,
+        conditionals.permanentAddressSameAsMother
+      ]
     },
     {
       name: 'statePermanent',

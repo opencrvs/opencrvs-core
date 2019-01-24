@@ -60,6 +60,12 @@ const customKeys = [
   'addressLine1',
   'addressLine2',
   'addressLine3',
+  'addressLine3CityOption',
+  'addressLine1CityOption',
+  'postCodeCityOption',
+  'addressLine3CityOptionPermanent',
+  'addressLine1CityOptionPermanent',
+  'postCodeCityOptionPermanent',
   'addressLine4',
   'presentAtBirthRegistration',
   'attendantAtBirth',
@@ -67,6 +73,7 @@ const customKeys = [
   'weightAtBirth',
   '_fhirID',
   'placeOfBirth',
+  'hospitals',
   'currentAddressSameAsPermanent'
 ]
 
@@ -107,9 +114,12 @@ const processDraftData = (draftData: IFormData) => {
     mother.state = mother.statePermanent
     mother.district = mother.districtPermanent
     mother.postCode = mother.postCodePermanent
+    mother.postCodeCityOption = mother.postCodeCityOptionPermanent
     mother.addressLine1 = mother.addressLine1Permanent
+    mother.addressLine1CityOption = mother.addressLine1CityOptionPermanent
     mother.addressLine2 = mother.addressLine2Permanent
     mother.addressLine3 = mother.addressLine3Permanent
+    mother.addressLine3CityOption = mother.addressLine3CityOptionPermanent
     mother.addressLine4 = mother.addressLine4Permanent
   }
 
@@ -137,6 +147,36 @@ const processDraftData = (draftData: IFormData) => {
 
   if (child.childBirthDate) {
     draftDetails.child.birthDate = child.childBirthDate
+  }
+
+  if (child.placeOfBirth) {
+    if (
+      child.placeOfBirth === 'HOSPITAL' ||
+      child.placeOfBirth === 'OTHER_HEALTH_INSTITUTION'
+    ) {
+      if (child.hospitals) {
+        draftDetails.child.birthLocation = child.hospitals
+      }
+    } else if (
+      child.placeOfBirth === 'PRIVATE_HOME' ||
+      child.placeOfBirth === 'OTHER'
+    ) {
+      draftDetails.child.placeOfBirth = {
+        type: 'BIRTH_PLACE',
+        country: child.country,
+        state: child.state,
+        district: child.district,
+        postalCode: child.postCode ? child.postCode : child.postCodeCityOption,
+        line: [
+          child.addressLine1,
+          child.addressLine1CityOption,
+          child.addressLine2,
+          child.addressLine3,
+          child.addressLine3CityOption,
+          child.addressLine4
+        ]
+      }
+    }
   }
 
   draftDetails.mother.name = [
@@ -170,11 +210,15 @@ const processDraftData = (draftData: IFormData) => {
       country: mother.countryPermanent,
       state: mother.statePermanent,
       district: mother.districtPermanent,
-      postalCode: mother.postCodePermanent,
+      postalCode: mother.postCodePermanent
+        ? mother.postCodePermanent
+        : mother.postCodeCityOptionPermanent,
       line: [
         mother.addressLine1Permanent,
+        mother.addressLine1CityOptionPermanent,
         mother.addressLine2Permanent,
-        mother.addressLine3,
+        mother.addressLine3Permanent,
+        mother.addressLine3CityOptionPermanent,
         mother.addressLine4Permanent
       ]
     },
@@ -183,11 +227,13 @@ const processDraftData = (draftData: IFormData) => {
       country: mother.country,
       state: mother.state,
       district: mother.district,
-      postalCode: mother.postCode,
+      postalCode: mother.postCode ? mother.postCode : mother.postCodeCityOption,
       line: [
         mother.addressLine1,
+        mother.addressLine1CityOption,
         mother.addressLine2,
         mother.addressLine3,
+        mother.addressLine3CityOption,
         mother.addressLine4
       ]
     }
@@ -224,11 +270,15 @@ const processDraftData = (draftData: IFormData) => {
       country: fatherPermanentAddress.countryPermanent,
       state: fatherPermanentAddress.statePermanent,
       district: fatherPermanentAddress.districtPermanent,
-      postalCode: fatherPermanentAddress.postCodePermanent,
+      postalCode: fatherPermanentAddress.postCodePermanent
+        ? fatherPermanentAddress.postCodePermanent
+        : fatherPermanentAddress.postCodeCityOptionPermanent,
       line: [
         fatherPermanentAddress.addressLine1Permanent,
+        fatherPermanentAddress.addressLine1CityOptionPermanent,
         fatherPermanentAddress.addressLine2Permanent,
-        fatherPermanentAddress.addressLine3,
+        fatherPermanentAddress.addressLine3Permanent,
+        fatherPermanentAddress.addressLine3CityOptionPermanent,
         fatherPermanentAddress.addressLine4Permanent
       ]
     },
@@ -237,12 +287,16 @@ const processDraftData = (draftData: IFormData) => {
       country: fatherCurrentAddress.country,
       state: fatherCurrentAddress.state,
       district: fatherCurrentAddress.district,
-      postalCode: fatherCurrentAddress.postCode,
+      postalCode: fatherCurrentAddress.postCodePermanent
+        ? fatherCurrentAddress.postCodePermanent
+        : fatherCurrentAddress.postCodeCityOptionPermanent,
       line: [
-        fatherCurrentAddress.addressLine1,
-        fatherCurrentAddress.addressLine2,
-        fatherCurrentAddress.addressLine3,
-        fatherCurrentAddress.addressLine4
+        fatherCurrentAddress.addressLine1Permanent,
+        fatherCurrentAddress.addressLine1CityOptionPermanent,
+        fatherCurrentAddress.addressLine2Permanent,
+        fatherCurrentAddress.addressLine3Permanent,
+        fatherCurrentAddress.addressLine3CityOptionPermanent,
+        fatherCurrentAddress.addressLine4Permanent
       ]
     }
   ]

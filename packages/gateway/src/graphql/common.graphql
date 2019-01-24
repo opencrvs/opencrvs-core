@@ -56,7 +56,7 @@ enum MaritalStatusType {
 enum AddressType {
   CURRENT
   PERMANENT
-  # BIRTH_PLACE
+  BIRTH_PLACE
   MILITARY_BASE_OR_CANTONMENT # Move the next three out to catchment areas
   IDP_CAMP # -> Disaster Camp
   UNHCR_CAMP # -> UNHCR Camp
