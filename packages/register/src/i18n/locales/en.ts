@@ -293,7 +293,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.iDTypeDRN': 'Death Registration Number',
     'formFields.iDTypeRefugeeNumber': 'Refugee Number',
     'formFields.iDTypeAlienNumber': 'Alien Number',
-    'formFields.iD': 'National ID number',
+    'formFields.iD': 'ID Number',
     'formFields.maritalStatus': 'Marital status',
     'formFields.maritalStatusSingle': 'Unmarried',
     'formFields.maritalStatusMarried': 'Married',
@@ -406,7 +406,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.commentsOrNotes.description':
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
     'register.form.tabs.deceasedTab': 'Deceased',
-    'register.form.section.deceasedTitle': 'Deceased’s details',
+    'register.form.section.deceasedTitle': "Deceased's details",
     'formFields.deceasedIdType': 'Existing ID',
     'formFields.idTypeNoID': 'No ID available',
     'formFields.deceasedGivenNames': 'Given name (s)',
@@ -437,6 +437,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth application',
+    'register.form.newVitalEventRegistration':
+      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
     'register.form.previewBirthRegistration': 'Birth Application Preview',
     'register.form.reviewBirthRegistration': 'Birth Registration Review',
     'register.form.saveDraft': 'Save as draft',

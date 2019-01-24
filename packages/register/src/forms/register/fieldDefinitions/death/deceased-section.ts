@@ -33,7 +33,7 @@ const messages = defineMessages({
   },
   deceasedTitle: {
     id: 'register.form.section.deceasedTitle',
-    defaultMessage: 'Deceased’s details',
+    defaultMessage: "Deceased's details",
     description: 'Form section title for Deceased'
   },
   deceasedIdType: {

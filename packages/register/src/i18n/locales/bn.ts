@@ -293,7 +293,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.iDTypeDRN': 'মৃত্যু নিবন্ধন সংখ্যা',
     'formFields.iDTypeRefugeeNumber': 'শরণার্থী নিবন্ধন সংখ্যা',
     'formFields.iDTypeAlienNumber': 'বিদেশী নিবন্ধন সংখ্যা',
-    'formFields.iD': 'জাতীয় পরিচয় নম্বর',
+    'formFields.iD': 'পরিচয় নম্বর',
     'formFields.maritalStatus': 'বৈবাহিক অবস্থা',
     'formFields.maritalStatusSingle': 'অবিবাহিত',
     'formFields.maritalStatusMarried': 'বিবাহিত',
@@ -438,6 +438,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
+    'register.form.newVitalEventRegistration':
+      '{event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
     'register.form.previewBirthRegistration': ' জন্ম ঘোষণাপত্র প্রদর্শন',
     'register.form.reviewBirthRegistration': ' জন্ম ঘোষণাপত্র পর্যালোচনা',
     'register.form.saveDraft': 'খসড়া সংরক্ষণ',
