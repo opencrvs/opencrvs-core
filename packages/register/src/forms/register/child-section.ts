@@ -3,7 +3,6 @@ import {
   ViewType,
   TEXT,
   NUMBER,
-  TEXTAREA,
   DATE,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS
@@ -15,7 +14,13 @@ import {
   dateFormat
 } from 'src/utils/validate'
 import { conditionals } from '../utils'
-import { OFFLINE_FACILITIES_KEY } from 'src/offline/reducer'
+import {
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
+} from 'src/offline/reducer'
+import { messages as addressMessages } from '../address'
+import { config } from 'src/config'
+import { countries } from '../countries'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -360,22 +365,129 @@ export const childSection: IFormSection = {
       conditionals: [conditionals.placeOfBirthHospital]
     },
     {
-      name: 'deliveryInstitution',
+      name: 'country',
       type: SELECT_WITH_OPTIONS,
-      label: messages.deliveryInstitution,
-      required: false,
-      initialValue: '',
+      label: addressMessages.country,
+      required: true,
+      initialValue: config.COUNTRY.toUpperCase(),
       validate: [],
-      options: [{ value: '?', label: messages.deliveryInstitution }]
+      options: countries,
+      conditionals: [conditionals.otherPlaceOfBirth]
     },
     {
-      name: 'deliveryAddress',
-      type: TEXTAREA,
-      label: messages.deliveryAddress,
+      name: 'state',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.state,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'country'
+      },
+      conditionals: [conditionals.country, conditionals.otherPlaceOfBirth]
+    },
+    {
+      name: 'district',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.district,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'state'
+      },
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.otherPlaceOfBirth
+      ]
+    },
+    {
+      name: 'addressLine4',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.addressLine4,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'district'
+      },
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.otherPlaceOfBirth
+      ]
+    },
+    {
+      name: 'addressLine3',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.addressLine3,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'addressLine4'
+      },
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth
+      ]
+    },
+    {
+      name: 'addressLine2',
+      type: TEXT,
+      label: addressMessages.addressLine2,
       required: false,
       initialValue: '',
       validate: [],
-      disabled: true
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressLine3,
+        conditionals.otherPlaceOfBirth
+      ]
+    },
+    {
+      name: 'addressLine1',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressLine3,
+        conditionals.otherPlaceOfBirth
+      ]
+    },
+    {
+      name: 'postCode',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressLine3,
+        conditionals.otherPlaceOfBirth
+      ]
     }
   ]
 }

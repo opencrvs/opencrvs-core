@@ -5,7 +5,6 @@ import {
   IConditionals,
   IFormSectionData,
   IConditional,
-  messages,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
@@ -105,13 +104,7 @@ export const getFieldOptions = (
     field.dynamicOptions.resource === OFFLINE_FACILITIES_KEY
   ) {
     const facilities = resources[OFFLINE_FACILITIES_KEY] as ILocation[]
-    const facilityOptions = generateOptions(facilities, 'facility')
-    const otherOption: ISelectOption = {
-      value: 'other',
-      label: messages.otherOption
-    }
-    facilityOptions.push(otherOption)
-    return facilityOptions
+    return generateOptions(facilities, 'facility')
   } else {
     let options
     if (!field.dynamicOptions.options) {
@@ -127,7 +120,8 @@ export const getFieldOptions = (
 
 export const getConditionalActionsForField = (
   field: IFormField,
-  values: IFormSectionData
+  values: IFormSectionData,
+  offlineResources?: IOfflineDataState
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -234,5 +228,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       'values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION"'
+  },
+  otherPlaceOfBirth: {
+    action: 'hide',
+    expression:
+      'values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME"'
   }
 }

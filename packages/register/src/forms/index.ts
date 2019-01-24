@@ -193,6 +193,7 @@ export interface IConditionals {
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
+  otherPlaceOfBirth: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
