@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import * as moment from 'moment'
-import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
+import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   IconAction,
   ActionTitle,
@@ -92,6 +92,11 @@ export const FETCH_REGISTRATION_QUERY = gql`
 `
 
 const messages = defineMessages({
+  hello: {
+    id: 'register.home.header.hello',
+    defaultMessage: 'Hello {fullName}',
+    description: 'Title for the user'
+  },
   searchInputPlaceholder: {
     id: 'register.workQueue.searchInput.placeholder',
     defaultMessage: 'Look for a record',
@@ -314,10 +319,35 @@ const messages = defineMessages({
     defaultMessage: 'Print Certificate',
     description: 'Print Certificate Button text'
   },
+  FIELD_AGENT: {
+    id: 'register.home.hedaer.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
+  },
+  REGISTRATION_CLERK: {
+    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
   LOCAL_REGISTRAR: {
     id: 'register.home.hedaer.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
     description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.hedaer.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
 
@@ -483,6 +513,14 @@ interface IWorkQueueState {
   regId: string | null
 }
 
+interface IData {
+  [key: string]: unknown
+}
+
+interface IWorkQueueListItem {
+  [key: string]: IData | string | undefined
+}
+
 export class WorkQueueView extends React.Component<
   IWorkQueueProps,
   IWorkQueueState
@@ -626,6 +664,19 @@ export class WorkQueueView extends React.Component<
       }
     })
   }
+
+  getApplicationData = (
+    applicationData: IWorkQueueListItem[]
+  ): IWorkQueueListItem[] => {
+    return applicationData.filter(application => {
+      if (application.status && application.status[0].type) {
+        return application.status[0].type === 'DECLARED'
+      } else {
+        return false
+      }
+    })
+  }
+
   renderExpansionContent = (
     item: {
       [key: string]: string & Array<{ [key: string]: string }>
@@ -871,11 +922,14 @@ export class WorkQueueView extends React.Component<
 
     return {
       name: fullName,
-      role: userDetails.role
-        ? intl.formatMessage(messages[userDetails.role])
-        : '',
+      role:
+        userDetails && userDetails.role
+          ? intl.formatMessage(messages[userDetails.role])
+          : '',
       issuedAt:
-        userDetails.primaryOffice && userDetails.primaryOffice.name
+        userDetails &&
+        userDetails.primaryOffice &&
+        userDetails.primaryOffice.name
           ? userDetails.primaryOffice.name
           : ''
     }
@@ -978,17 +1032,15 @@ export class WorkQueueView extends React.Component<
         ]
       }
     }
-
     return (
       <>
-        <HomeViewHeader id="work_queue_header">
-          <ViewHeading
-            id="work_queue_view"
-            title={intl.formatMessage(messages.headerTitle)}
-            description={intl.formatMessage(messages.headerDescription)}
-            {...this.props}
-          />
-        </HomeViewHeader>
+        <HomeViewHeader
+          title={intl.formatMessage(messages.hello, {
+            fullName: this.getIssuerDetails().name
+          })}
+          description={this.getIssuerDetails().role}
+          id="home_view"
+        />
         <Container>
           <HeaderContent>
             <Query
@@ -1014,6 +1066,7 @@ export class WorkQueueView extends React.Component<
                   )
                 }
                 const transformedData = this.transformData(data)
+                const applicationData = this.getApplicationData(transformedData)
                 return (
                   <>
                     <StyledIconAction
@@ -1024,7 +1077,7 @@ export class WorkQueueView extends React.Component<
                     />
                     <Banner
                       text={intl.formatMessage(messages.bannerTitle)}
-                      count={transformedData.length}
+                      count={applicationData.length}
                       status={APPLICATIONS_STATUS}
                     />
                     <SearchInput

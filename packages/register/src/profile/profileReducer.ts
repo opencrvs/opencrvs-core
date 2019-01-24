@@ -1,5 +1,7 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from './profileActions'
+import { storage } from 'src/storage'
+import { USER_DETAILS } from 'src/utils/userUtils'
 import {
   getTokenPayload,
   ITokenPayload,
@@ -12,7 +14,8 @@ import { config } from '../config'
 import {
   IUserDetails,
   getUserDetails,
-  storeUserDetails
+  storeUserDetails,
+  removeUserDetails
 } from 'src/utils/userUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
@@ -39,10 +42,19 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
       return loop(
-        state,
+        {
+          ...state,
+          authenticated: false,
+          userDetailsFetched: false,
+          tokenPayload: null,
+          userDetails: null
+        },
         Cmd.list([
           Cmd.run(() => {
             removeToken()
+          }),
+          Cmd.run(() => {
+            removeUserDetails()
           }),
           Cmd.run(() => {
             window.location.assign(config.LOGIN_URL)
@@ -100,11 +112,28 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
         Cmd.run(() => storeUserDetails(userDetails))
       )
     case actions.SET_INITIAL_USER_DETAILS:
+      return loop(
+        {
+          ...state
+        },
+        Cmd.run<
+          | actions.IGetStorageUserDetailsSuccessAction
+          | actions.IGetStorageUserDetailsFailedAction
+        >(storage.getItem, {
+          successActionCreator: actions.getStorageUserDetailsSuccess,
+          failActionCreator: actions.getStorageUserDetailsFailed,
+          args: [USER_DETAILS]
+        })
+      )
+    case actions.GET_USER_DETAILS_SUCCESS:
+      const userDetailsString = action.payload
+      const userDetailsCollection = JSON.parse(
+        userDetailsString ? userDetailsString : '[]'
+      )
       return {
         ...state,
-        userDetails: action.payload
+        userDetails: userDetailsCollection
       }
-
     default:
       return state
   }

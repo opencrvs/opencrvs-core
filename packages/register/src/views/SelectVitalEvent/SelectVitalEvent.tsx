@@ -13,7 +13,7 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 export const messages = defineMessages({
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'Declare a new vital event',
+    defaultMessage: 'New vital event application',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventDesc: {

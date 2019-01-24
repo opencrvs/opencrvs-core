@@ -3,11 +3,18 @@ import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import * as Swipeable from 'react-swipeable'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ArrowForward } from '@opencrvs/components/lib/icons'
+import { PrimaryButton, ButtonIcon } from '@opencrvs/components/lib/buttons'
+import {
+  ArrowForward,
+  ArrowBack,
+  DraftSimple
+} from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '../../styled-components'
-import { goToTab as goToTabAction } from '../../navigation'
+import {
+  goToTab as goToTabAction,
+  goBack as goBackAction
+} from '../../navigation'
 import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from 'src/store'
@@ -36,13 +43,65 @@ const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
 `
+const FormActionSection = styled.div`
+  background-color: ${({ theme }) => theme.colors.inputBackground};
+  margin: 0px -25px;
+`
 const FormAction = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 83px;
+  padding-left: 25px;
+`
+const FormActionDivider = styled.div`
+  border-bottom: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
 `
 
 const FormPrimaryButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
+  height: 93px;
+`
+
+const BackButtonContainer = styled.div`
+  cursor: pointer;
+`
+
+const BackButton = styled(PrimaryButton)`
+  width: 69px;
+  height: 42px;
+  background: ${({ theme }) => theme.colors.primary};
+  justify-content: center;
+  border-radius: 21px;
+  /* stylelint-disable */
+  ${ButtonIcon} {
+    /* stylelint-enable */
+    margin-left: 0em;
+  }
+`
+
+const BackButtonText = styled.span`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  color: ${({ theme }) => theme.colors.primary};
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-left: 14px;
+`
+
+const DraftButtonContainer = styled.div`
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`
+const DraftButtonText = styled.span`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 14px;
+  text-decoration: underline;
+  letter-spacing: 0px;
+  margin-left: 14px;
 `
 
 export const messages = defineMessages({
@@ -92,6 +151,16 @@ export const messages = defineMessages({
     id: 'register.form.modal.submitButton',
     defaultMessage: 'Submit',
     description: 'Submit button on submit modal'
+  },
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
+  },
+  valueSaveAsDraft: {
+    id: 'register.form.saveDraft',
+    defaultMessage: 'Save as draft',
+    description: 'Save as draft Button Text'
   }
 })
 
@@ -150,6 +219,7 @@ export interface IFormProps {
 
 type DispatchProps = {
   goToTab: typeof goToTabAction
+  goBack: typeof goBackAction
   modifyDraft: typeof modifyDraft
   deleteDraft: typeof deleteDraft
   handleSubmit: (values: unknown) => void
@@ -349,6 +419,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   render() {
     const {
       goToTab,
+      goBack,
       intl,
       activeSection,
       setAllFieldsDirty,
@@ -450,19 +521,44 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       offlineResources={offlineResources}
                     />
                   </form>
-                  <FormAction>
-                    {nextSection && (
-                      <FormPrimaryButton
-                        onClick={() =>
-                          goToTab(this.props.tabRoute, draft.id, nextSection.id)
-                        }
-                        id="next_section"
-                        icon={() => <ArrowForward />}
-                      >
-                        {intl.formatMessage(messages.next)}
-                      </FormPrimaryButton>
-                    )}
-                  </FormAction>
+                  <FormActionSection>
+                    <FormAction>
+                      {
+                        <BackButtonContainer onClick={goBack}>
+                          <BackButton icon={() => <ArrowBack />} />
+                          <BackButtonText>
+                            {intl.formatMessage(messages.back)}
+                          </BackButtonText>
+                        </BackButtonContainer>
+                      }
+                      {nextSection && (
+                        <FormPrimaryButton
+                          onClick={() =>
+                            goToTab(
+                              this.props.tabRoute,
+                              draft.id,
+                              nextSection.id
+                            )
+                          }
+                          id="next_section"
+                          icon={() => <ArrowForward />}
+                        >
+                          {intl.formatMessage(messages.next)}
+                        </FormPrimaryButton>
+                      )}
+                    </FormAction>
+                    <FormActionDivider />
+                    <FormAction>
+                      {
+                        <DraftButtonContainer onClick={() => history.push('/')}>
+                          <DraftSimple />
+                          <DraftButtonText>
+                            {intl.formatMessage(messages.valueSaveAsDraft)}
+                          </DraftButtonText>
+                        </DraftButtonContainer>
+                      }
+                    </FormAction>
+                  </FormActionSection>
                 </Box>
               )}
             </Swipeable>
@@ -632,6 +728,7 @@ export const RegisterForm = connect<Props, DispatchProps>(
     modifyDraft,
     deleteDraft,
     goToTab: goToTabAction,
+    goBack: goBackAction,
     handleSubmit: values => {
       console.log(values)
     }
