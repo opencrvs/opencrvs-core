@@ -1,15 +1,20 @@
 import * as Hapi from 'hapi'
 import {
-  createBirthRegistrationHandler,
-  markBirthAsRegisteredHandler,
-  markBirthAsCertifiedHandler
+  createRegistrationHandler,
+  markEventAsRegisteredHandler,
+  markEventAsCertifiedHandler
 } from '../registration/handler'
-import { hasBirthRegistrationNumber } from '../registration/fhir/fhir-utils'
+import {
+  hasBirthRegistrationNumber,
+  hasDeathRegistrationNumber
+} from '../registration/fhir/fhir-utils'
 import updateTaskHandler from '../task/handler'
 import { HEARTH_URL, OPENHIM_URL } from 'src/constants'
 import fetch, { RequestInit } from 'node-fetch'
 import { logger } from 'src/logger'
 import { isUserAuthorized } from './auth'
+import { EVENT_TYPE } from '../registration/fhir/constants'
+import { getEventType } from '../registration/utils'
 
 export enum Events {
   BIRTH_NEW_DEC = '/events/birth/new-declaration',
@@ -18,6 +23,12 @@ export enum Events {
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
+  DEATH_NEW_DEC = '/events/death/new-declaration',
+  DEATH_UPDATE_DEC = '/events/death/update-declaration',
+  DEATH_NEW_REG = '/events/death/new-registration',
+  DEATH_MARK_REG = '/events/death/mark-registered',
+  DEATH_MARK_CERT = '/events/death/mark-certified',
+  DEATH_MARK_VOID = '/events/death/mark-voided',
   UNKNOWN = 'unknown'
 }
 
@@ -34,14 +45,27 @@ function detectEvent(request: Hapi.Request): Events {
     ) {
       const firstEntry = fhirBundle.entry[0].resource
       if (firstEntry.resourceType === 'Composition') {
-        if (firstEntry.id) {
-          if (!hasBirthRegistrationNumber(fhirBundle)) {
-            return Events.BIRTH_MARK_REG
+        const eventType = getEventType(firstEntry as fhir.Composition)
+        if (eventType === EVENT_TYPE.BIRTH) {
+          if (firstEntry.id) {
+            if (!hasBirthRegistrationNumber(fhirBundle)) {
+              return Events.BIRTH_MARK_REG
+            } else {
+              return Events.BIRTH_MARK_CERT
+            }
           } else {
-            return Events.BIRTH_MARK_CERT
+            return Events.BIRTH_NEW_DEC
           }
         } else {
-          return Events.BIRTH_NEW_DEC
+          if (firstEntry.id) {
+            if (!hasDeathRegistrationNumber(fhirBundle)) {
+              return Events.DEATH_MARK_REG
+            } else {
+              return Events.DEATH_MARK_CERT
+            }
+          } else {
+            return Events.DEATH_NEW_DEC
+          }
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
@@ -107,14 +131,29 @@ export async function fhirWorkflowEventHandler(
 
   switch (event) {
     case Events.BIRTH_NEW_DEC:
-      response = await createBirthRegistrationHandler(request, h)
+      response = await createRegistrationHandler(request, h, EVENT_TYPE.BIRTH)
+      forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
+      break
+    case Events.DEATH_NEW_DEC:
+      response = await createRegistrationHandler(request, h, EVENT_TYPE.DEATH)
       forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
       break
     case Events.BIRTH_MARK_REG:
-      response = await markBirthAsRegisteredHandler(request, h)
+      response = await markEventAsRegisteredHandler(
+        request,
+        h,
+        EVENT_TYPE.BIRTH
+      )
+      break
+    case Events.DEATH_MARK_REG:
+      response = await markEventAsRegisteredHandler(
+        request,
+        h,
+        EVENT_TYPE.DEATH
+      )
       break
     case Events.BIRTH_MARK_CERT:
-      response = await markBirthAsCertifiedHandler(request, h)
+      response = await markEventAsCertifiedHandler(request, h)
       break
     case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h)
