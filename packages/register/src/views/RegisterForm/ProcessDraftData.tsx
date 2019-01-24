@@ -149,36 +149,6 @@ const processDraftData = (draftData: IFormData) => {
     draftDetails.child.birthDate = child.childBirthDate
   }
 
-  if (child.placeOfBirth) {
-    if (
-      child.placeOfBirth === 'HOSPITAL' ||
-      child.placeOfBirth === 'OTHER_HEALTH_INSTITUTION'
-    ) {
-      if (child.hospitals) {
-        draftDetails.child.birthLocation = child.hospitals
-      }
-    } else if (
-      child.placeOfBirth === 'PRIVATE_HOME' ||
-      child.placeOfBirth === 'OTHER'
-    ) {
-      draftDetails.child.placeOfBirth = {
-        type: 'BIRTH_PLACE',
-        country: child.country,
-        state: child.state,
-        district: child.district,
-        postalCode: child.postCode ? child.postCode : child.postCodeCityOption,
-        line: [
-          child.addressLine1,
-          child.addressLine1CityOption,
-          child.addressLine2,
-          child.addressLine3,
-          child.addressLine3CityOption,
-          child.addressLine4
-        ]
-      }
-    }
-  }
-
   draftDetails.mother.name = [
     {
       use: 'bn',
@@ -375,6 +345,37 @@ const processDraftData = (draftData: IFormData) => {
 
   if (child.birthType) {
     draftDetails.birthType = child.birthType
+  }
+
+  if (child.placeOfBirth) {
+    draftDetails.birthLocationType = child.placeOfBirth
+    if (
+      child.placeOfBirth === 'HOSPITAL' ||
+      child.placeOfBirth === 'OTHER_HEALTH_INSTITUTION'
+    ) {
+      if (child.hospitals) {
+        draftDetails.birthLocation = child.hospitals
+      }
+    } else if (
+      child.placeOfBirth === 'PRIVATE_HOME' ||
+      child.placeOfBirth === 'OTHER'
+    ) {
+      draftDetails.placeOfBirth = {
+        type: 'BIRTH_PLACE',
+        country: child.country,
+        state: child.state,
+        district: child.district,
+        postalCode: child.postCode ? child.postCode : child.postCodeCityOption,
+        line: [
+          child.addressLine1,
+          child.addressLine1CityOption,
+          child.addressLine2,
+          child.addressLine3,
+          child.addressLine3CityOption,
+          child.addressLine4
+        ]
+      }
+    }
   }
 
   if (child.weightAtBirth) {

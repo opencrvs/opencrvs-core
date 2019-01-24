@@ -135,6 +135,9 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      placeOfBirth
+      birthLocation
+      birthLocationType
       presentAtBirthRegistration
     }
   }
@@ -256,6 +259,23 @@ export class ReviewFormView extends React.Component<IProps> {
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
     childDetails.birthType = reg.birthType
+    childDetails.hospitals = reg.birthLocation
+    childDetails.placeOfBirth = reg.birthLocationType
+    if (reg.placeOfBirth && reg.placeOfBirth.country) {
+      childDetails.country = reg.placeOfBirth.country
+      childDetails.state = reg.placeOfBirth.state
+      childDetails.district = reg.placeOfBirth.district
+      if (reg.placeOfBirth.line) {
+        childDetails.addressLine1 = reg.placeOfBirth.line[0]
+        childDetails.addressLine1CityOption = reg.placeOfBirth.line[1]
+        childDetails.addressLine2 = reg.placeOfBirth.line[2]
+        childDetails.addressLine3 = reg.placeOfBirth.line[3]
+        childDetails.addressLine3CityOption = reg.placeOfBirth.line[4]
+        childDetails.addressLine4 = reg.placeOfBirth.line[5]
+      }
+      childDetails.postalCode = reg.placeOfBirth.postalCode
+      childDetails.postCodeCityOption = reg.placeOfBirth.postalCode
+    }
     if (child.id) {
       childDetails._fhirID = child.id
     }

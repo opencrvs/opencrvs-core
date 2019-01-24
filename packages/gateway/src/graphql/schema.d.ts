@@ -106,7 +106,11 @@ export enum GQLAddressType {
   BIRTH_PLACE = 'BIRTH_PLACE',
   MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
   IDP_CAMP = 'IDP_CAMP',
-  UNHCR_CAMP = 'UNHCR_CAMP'
+  UNHCR_CAMP = 'UNHCR_CAMP',
+  OTHER_HEALTH_INSTITUTION = 'OTHER_HEALTH_INSTITUTION',
+  HOSPITAL = 'HOSPITAL',
+  PRIVATE_HOME = 'PRIVATE_HOME',
+  OTHER = 'OTHER'
 }
 
 export interface GQLAttachment {
@@ -190,6 +194,7 @@ export interface GQLBirthRegistration {
   informant?: GQLPerson
   placeOfBirth?: GQLAddress
   birthLocation?: GQLLocation
+  birthLocationType?: GQLAddressType
   birthType?: GQLBirthType
   weightAtBirth?: number
   attendantAtBirth?: GQLAttendantType
@@ -447,6 +452,7 @@ export interface GQLBirthRegistrationInput {
   informant?: GQLPersonInput
   placeOfBirth?: GQLAddressInput
   birthLocation?: GQLLocationInput
+  birthLocationType?: GQLAddressType
   birthType?: GQLBirthType
   weightAtBirth?: number
   attendantAtBirth?: GQLAttendantType
@@ -1099,6 +1105,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   informant?: BirthRegistrationToInformantResolver<TParent>
   placeOfBirth?: BirthRegistrationToPlaceOfBirthResolver<TParent>
   birthLocation?: BirthRegistrationToBirthLocationResolver<TParent>
+  birthLocationType?: BirthRegistrationToBirthLocationTypeResolver<TParent>
   birthType?: BirthRegistrationToBirthTypeResolver<TParent>
   weightAtBirth?: BirthRegistrationToWeightAtBirthResolver<TParent>
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
@@ -1175,6 +1182,13 @@ export interface BirthRegistrationToPlaceOfBirthResolver<
 }
 
 export interface BirthRegistrationToBirthLocationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationToBirthLocationTypeResolver<
   TParent = any,
   TResult = any
 > {

@@ -142,6 +142,7 @@ input BirthRegistrationInput {
   informant: PersonInput
   placeOfBirth: AddressInput
   birthLocation: LocationInput
+  birthLocationType: AddressType
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
@@ -164,6 +165,7 @@ type BirthRegistration { # -> Composition
   informant: Person # -> .section(code='informant-details').entry.reference
   placeOfBirth: Address
   birthLocation: Location # -> .section(code='birth-encounter').entry.reference.location
+  birthLocationType: AddressType
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString

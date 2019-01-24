@@ -60,6 +60,10 @@ enum AddressType {
   MILITARY_BASE_OR_CANTONMENT # Move the next three out to catchment areas
   IDP_CAMP # -> Disaster Camp
   UNHCR_CAMP # -> UNHCR Camp
+  OTHER_HEALTH_INSTITUTION
+  HOSPITAL
+  PRIVATE_HOME
+  OTHER
 }
 
 enum RelationshipType {
