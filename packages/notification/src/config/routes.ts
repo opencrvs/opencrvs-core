@@ -37,14 +37,6 @@ export default function getRoutes() {
         description: 'Sends an sms to a user',
         validate: {
           payload: requestSchema
-        },
-        plugins: {
-          'hapi-swagger': {
-            responses: {
-              200: { description: 'Sms sent' },
-              400: { description: 'Bad request, check your request body' }
-            }
-          }
         }
       }
     },
@@ -60,14 +52,6 @@ export default function getRoutes() {
         },
         validate: {
           payload: declarationNotificationSchema
-        },
-        plugins: {
-          'hapi-swagger': {
-            responses: {
-              200: { description: 'Birth declaration confirmation sms sent' },
-              400: { description: 'Bad request, check your request body' }
-            }
-          }
         }
       }
     }

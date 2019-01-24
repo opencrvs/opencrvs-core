@@ -301,8 +301,8 @@ describe('when user wants to print certificate', async () => {
     })
     expect(iDType('UNKNOWN')).toEqual({
       id: 'formFields.iD',
-      defaultMessage: 'NID number',
-      description: 'Label for form field: NID number'
+      defaultMessage: 'ID Number',
+      description: 'Label for form field: ID Number'
     })
   })
 

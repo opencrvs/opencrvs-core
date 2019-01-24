@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { RouteComponentProps } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
@@ -160,12 +161,15 @@ interface IHomeProps {
   draftCount: string
 }
 
-type FullProps = IHomeProps & InjectedIntlProps & ISearchInputProps
+type FullProps = IHomeProps &
+  InjectedIntlProps &
+  ISearchInputProps &
+  RouteComponentProps<{}>
 
 class HomeView extends React.Component<FullProps> {
   render() {
-    const { intl, language, userDetails } = this.props
-    if (userDetails && userDetails.name) {
+    const { intl, language, userDetails, history } = this.props
+    if (userDetails && userDetails.name && userDetails.role === 'FIELD_AGENT') {
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName) => storedName.use === language
       ) as GQLHumanName
@@ -227,6 +231,13 @@ class HomeView extends React.Component<FullProps> {
           </ViewFooter>
         </>
       )
+    } else if (
+      userDetails &&
+      userDetails.role &&
+      userDetails.role !== 'FIELD_AGENT'
+    ) {
+      history.push('/work-queue')
+      return <></>
     } else {
       return <></>
     }

@@ -64,14 +64,6 @@ export async function createServer() {
       validate: {
         payload: reqAuthSchema
       },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'User details are correct' },
-            400: { description: 'User details are incorrect' }
-          }
-        }
-      },
       response: {
         schema: resAuthSchema
       }
@@ -102,14 +94,6 @@ export async function createServer() {
       },
       validate: {
         payload: userIdSchema
-      },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'User mobile found' },
-            400: { description: 'Bad request, check your request body' }
-          }
-        }
       },
       response: {
         schema: resMobileSchema

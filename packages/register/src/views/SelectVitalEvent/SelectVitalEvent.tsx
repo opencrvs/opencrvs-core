@@ -7,12 +7,12 @@ import { ViewHeader } from 'src/components/ViewHeader'
 import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
 import { Dispatch } from 'redux'
 import { createDraft, storeDraft } from 'src/drafts'
-import { EVENT_TYPE } from 'src/utils/constants'
+import { Event } from 'src/forms'
 
 export const messages = defineMessages({
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'Declare a new vital event',
+    defaultMessage: 'New vital event application',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventDesc: {
@@ -100,7 +100,7 @@ export const SelectVitalEvent = connect(
     return {
       goToBirthRegistration: () => dispatch(goToBirthRegistration()),
       goToDeathRegistration: () => {
-        const draft = createDraft(EVENT_TYPE.BIRTH)
+        const draft = createDraft(Event.DEATH)
         dispatch(storeDraft(draft))
         dispatch(goToDeathRegistration(draft.id))
       }
