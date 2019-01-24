@@ -1,5 +1,4 @@
 import { createTestApp, mockUserResponse, userDetails } from './tests/util'
-import { config } from '../src/config'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
 import { storage } from 'src/storage'
@@ -33,7 +32,8 @@ it("redirects user to SSO if user doesn't have a token", async () => {
   createTestApp()
   await flushPromises()
 
-  expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
+  // @ts-ignore
+  expect(assign.mock.calls[0][0]).toBe(window.window.config.LOGIN_URL)
 })
 
 const validToken =
@@ -98,7 +98,8 @@ describe('when user navigates', () => {
     app.update()
     expect(window.location.assign).toHaveBeenCalled()
     expect((window.location.assign as jest.Mock).mock.calls[0][0]).toContain(
-      `${config.REGISTER_URL}?token=`
+      // @ts-ignore
+      `${window.window.config.REGISTER_URL}?token=`
     )
   })
 })

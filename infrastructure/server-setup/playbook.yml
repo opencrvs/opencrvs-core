@@ -1,0 +1,112 @@
+---
+
+- hosts: all
+  remote_user: root
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: "Add docker repository key"
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: "add docker repository"
+    apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable' state=present
+    when: ansible_distribution == "Ubuntu"
+
+  - name: "install docker"
+    apt: name=docker-ce state=present update_cache=yes install_recommends=yes allow_unauthenticated=yes
+    when: ansible_distribution == "Ubuntu"
+    retries: 3
+    delay: 20
+
+  - name: "Restart Docker service"
+    service: name=docker state=started
+
+  - name: "get docker info"
+    shell: docker info
+    register: docker_info
+    changed_when: False
+
+  - name: "Install pip3"
+    apt:
+      name: python3-pip
+      state: present
+
+  - name: "Install docker python module for ansible docker commands"
+    pip:
+      name: docker
+
+  - name: "Log into DockerHub"
+    docker_login:
+      username: "{{dockerhub_username}}"
+      password: "{{dockerhub_password}}"
+
+  - name: "Setup crontab to clean up docker images"
+    cron:
+      name: "cleanup docker images"
+      minute: "0"
+      hour: "0"
+      job: "/usr/bin/docker system prune -f >> /var/log/docker-prune.log"
+
+- hosts: docker-manager-first
+  remote_user: root
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: "create primary swarm manager"
+    shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
+    when: "docker_info.stdout.find('Swarm: inactive') != -1"
+
+  - name: "get docker swarm manager token"
+    shell: docker swarm join-token -q manager
+    register: manager_token
+
+  - name: "get docker swarm worker token"
+    shell: docker swarm join-token -q worker
+    register: worker_token
+
+  - name: "Create mongo data directory"
+    file:
+      path: /data/mongo
+      state: directory
+
+  - name: "Create traefik data directory"
+    file:
+      path: /data/traefik
+      state: directory
+
+  - name: "Create elasticsearch data directory"
+    file:
+      path: /data/elasticsearch
+      state: directory
+      group: 1000
+      mode: g+rwx
+
+  - name: "Set higher max map count for elastic search"
+    sysctl:
+      name: vm.max_map_count
+      value: 262144
+      state: present
+
+  - name: "Create influxdb data directory"
+    file:
+      path: /data/influxdb
+      state: directory
+
+  - name: "Create acme file for traefik"
+    file:
+      path: /data/traefik/acme.json
+      state: touch
+      mode: 600
+
+- hosts: docker-workers
+  remote_user: root
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: "join as a worker"
+    shell: "docker swarm join --token {{ hostvars['manager1']['worker_token']['stdout'] }} {{ hostvars['manager1']['ansible_default_ipv4']['address'] }}:2377"
+    when: "docker_info.stdout.find('Swarm: inactive') != -1"
+    retries: 3
+    delay: 20

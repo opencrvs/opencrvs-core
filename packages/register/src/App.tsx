@@ -12,7 +12,6 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { Spinner } from '@opencrvs/components/lib/interface'
 
 import { createStore, AppStore } from './store'
-import { config } from './config'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import * as routes from './navigation/routes'
 
@@ -99,7 +98,7 @@ export class App extends React.Component<IAppProps, IState> {
         >
           <Provider store={this.props.store}>
             <I18nContainer>
-              <ThemeProvider theme={getTheme(config.COUNTRY)}>
+              <ThemeProvider theme={getTheme((window as any).config.COUNTRY)}>
                 <ConnectedRouter history={this.props.history}>
                   <ScrollToTop>
                     <SessionExpireConfirmation />
@@ -186,7 +185,7 @@ export class App extends React.Component<IAppProps, IState> {
       )
     } else {
       return (
-        <ThemeProvider theme={getTheme(config.COUNTRY)}>
+        <ThemeProvider theme={getTheme((window as any).config.COUNTRY)}>
           <StyledSpinner id="appSpinner" />
         </ThemeProvider>
       )

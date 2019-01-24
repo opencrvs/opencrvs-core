@@ -1,7 +1,6 @@
 import { AxiosError } from 'axios'
 import { RouterAction } from 'react-router-redux'
 import { convertToMSISDN } from '../utils/dataCleanse'
-import { config } from '../config'
 import {
   IAuthenticateResponse,
   IAuthenticationData,
@@ -88,7 +87,8 @@ export const authenticate = (
   values: IAuthenticationData
 ): AuthenticationDataAction => {
   const cleanedData = {
-    mobile: convertToMSISDN(values.mobile, config.COUNTRY),
+    // @ts-ignore
+    mobile: convertToMSISDN(values.mobile, window.config.COUNTRY),
     password: values.password
   }
 

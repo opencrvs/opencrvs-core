@@ -17,7 +17,6 @@ import { getSchema } from './graphql-schema-mock'
 import { ThemeProvider } from 'styled-components'
 import { ENGLISH_STATE } from '../i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { config } from '../config'
 import { I18nContainer } from '@opencrvs/register/src/i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
@@ -84,7 +83,7 @@ export function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider theme={getTheme(config.COUNTRY)}>
+          <ThemeProvider theme={getTheme((window as any).config.COUNTRY)}>
             {nodeWithIntlProp(node)}
           </ThemeProvider>
         </I18nContainer>

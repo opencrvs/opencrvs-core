@@ -4,7 +4,6 @@ import * as actions from './actions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
 import { ITokenPayload, getTokenPayload } from '../utils/authUtils'
-import { config } from '../config'
 import { REGISTER_APP } from '../navigation/routes'
 
 export type LoginState = {
@@ -137,7 +136,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           },
           Cmd.run(() => {
             window.location.assign(
-              `${config.REGISTER_APP_URL}?token=${action.payload.token}`
+              // @ts-ignore
+              `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
             )
           })
         )
@@ -145,11 +145,15 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.GOTO_APP:
       let redirectUrl: string
       if (action.payload === REGISTER_APP) {
-        redirectUrl = `${config.REGISTER_APP_URL}work-queue?token=${
+        // @ts-ignore
+        redirectUrl = `${window.config.REGISTER_APP_URL}work-queue?token=${
           state.token
         }`
       } else {
-        redirectUrl = `${config.PERFORMANCE_APP_URL}?token=${state.token}`
+        // @ts-ignore
+        redirectUrl = `${window.config.PERFORMANCE_APP_URL}?token=${
+          state.token
+        }`
       }
       return loop(
         {

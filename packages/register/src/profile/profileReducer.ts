@@ -8,7 +8,6 @@ import {
   isTokenStillValid,
   removeToken
 } from '../utils/authUtils'
-import { config } from '../config'
 import {
   IUserDetails,
   getUserDetails,
@@ -55,7 +54,8 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
             removeUserDetails()
           }),
           Cmd.run(() => {
-            window.location.assign(config.LOGIN_URL)
+            // @ts-ignore
+            window.location.assign(window.config.LOGIN_URL)
           })
         ])
       )

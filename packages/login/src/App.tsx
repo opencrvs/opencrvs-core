@@ -8,7 +8,6 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 
 import { IntlContainer } from './i18n/components/I18nContainer'
 import { createStore, history } from './store'
-import { config } from './config'
 import { PageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
 import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
@@ -21,7 +20,12 @@ export class App extends React.Component {
     return (
       <Provider store={store}>
         <IntlContainer>
-          <ThemeProvider theme={getTheme(config.COUNTRY)}>
+          <ThemeProvider
+            theme={getTheme(
+              (window as Window & { config: { [key: string]: string } }).config
+                .COUNTRY
+            )}
+          >
             <ConnectedRouter history={history}>
               <PageContainer>
                 <Switch>

@@ -3,7 +3,6 @@ import * as actions from './actions'
 import { initialState } from './reducer'
 import { createStore, AppStore } from '../store'
 import { resolve } from 'url'
-import { config } from '../config'
 import { client } from '../utils/authApi'
 
 import { getSubmissionError, getResentSMS, getsubmitting } from './selectors'
@@ -51,7 +50,8 @@ describe('reducer', () => {
     store = createStore()
 
     moxios.install(client)
-    moxios.stubRequest(resolve(config.AUTH_API_URL, 'authenticate'), {
+    // @ts-ignore
+    moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
       status: 200,
       responseText: "{ nonce: '12345' }"
     })

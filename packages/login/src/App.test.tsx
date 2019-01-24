@@ -3,7 +3,6 @@ import { createTestApp, wait } from './tests/util'
 import { client } from './utils/authApi'
 import { resolve } from 'url'
 import { ReactWrapper } from 'enzyme'
-import { config } from './config'
 
 it('renders without crashing', async () => {
   createTestApp()
@@ -43,7 +42,8 @@ describe('Login app step one', () => {
     })
 
     it('redirects user to verification code form once mobile number and password are accepted', async () => {
-      moxios.stubRequest(resolve(config.AUTH_API_URL, 'authenticate'), {
+      // @ts-ignore
+      moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 200,
         responseText: "{ nonce: '12345' }"
       })

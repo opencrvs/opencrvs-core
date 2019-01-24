@@ -10,7 +10,6 @@ import {
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
-import { config } from 'src/config'
 
 function formatUrl(url: string, props: { [key: string]: string }) {
   return Object.keys(props).reduce(
@@ -48,7 +47,8 @@ export function goToHome() {
 }
 
 export function goToPerformance() {
-  window.location.assign(`${config.PERFORMANCE_URL}?token=${getToken()}`)
+  // @ts-ignore
+  window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
 export function goToWorkQueue() {

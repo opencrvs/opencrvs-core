@@ -1,6 +1,5 @@
 import { referenceApi } from './referenceApi'
 import * as fetch from 'jest-fetch-mock'
-import { config } from 'src/config'
 
 import * as nock from 'nock'
 
@@ -18,7 +17,8 @@ const mockFetchLocations = {
   ]
 }
 
-nock(config.RESOURCES_URL)
+// @ts-ignore
+nock(window.config.RESOURCES_URL)
   .get('/locations')
   .reply(200, mockFetchLocations)
 

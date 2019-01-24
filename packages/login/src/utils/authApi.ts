@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { config } from '../config'
 import { resolve } from 'url'
 
 export interface ICodeVerifyData {
@@ -13,7 +12,8 @@ export interface IAuthenticationData {
 }
 
 export const client = axios.create({
-  baseURL: config.AUTH_API_URL
+  // @ts-ignore
+  baseURL: window.config.AUTH_API_URL
 })
 
 export interface IAuthenticateResponse {
@@ -49,7 +49,8 @@ function request<T>(options: AxiosRequestConfig) {
 
 const authenticate = (data: IAuthenticationData) => {
   return request<IAuthenticateResponse>({
-    url: resolve(config.AUTH_API_URL, 'authenticate'),
+    // @ts-ignore
+    url: resolve(window.config.AUTH_API_URL, 'authenticate'),
     method: 'POST',
     data
   })
@@ -57,7 +58,8 @@ const authenticate = (data: IAuthenticationData) => {
 
 const resendSMS = (nonce: string) => {
   return request({
-    url: resolve(config.AUTH_API_URL, '/resendSms'),
+    // @ts-ignore
+    url: resolve(window.config.AUTH_API_URL, '/resendSms'),
     method: 'POST',
     data: { nonce }
   })
@@ -65,7 +67,8 @@ const resendSMS = (nonce: string) => {
 
 const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
-    url: resolve(config.AUTH_API_URL, 'verifyCode'),
+    // @ts-ignore
+    url: resolve(window.config.AUTH_API_URL, 'verifyCode'),
     method: 'POST',
     data
   })

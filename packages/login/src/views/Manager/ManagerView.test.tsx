@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { ManagerViewContainer } from './ManagerView'
-import { config } from '../../config'
 import { createTestComponent, wait } from '../../tests/util'
 
 describe('Manager view', () => {
@@ -24,7 +23,8 @@ describe('Manager view', () => {
         .simulate('click')
       await wait()
       expect(window.location.assign).toBeCalledWith(
-        `${config.REGISTER_APP_URL}work-queue?token=`
+        // @ts-ignore
+        `${window.config.REGISTER_APP_URL}work-queue?token=`
       )
     })
     it('Should redirect the user to the performance app', async () => {
@@ -34,7 +34,8 @@ describe('Manager view', () => {
         .simulate('click')
       await wait()
       expect(window.location.assign).toBeCalledWith(
-        `${config.PERFORMANCE_APP_URL}?token=`
+        // @ts-ignore
+        `${window.config.PERFORMANCE_APP_URL}?token=`
       )
     })
   })
