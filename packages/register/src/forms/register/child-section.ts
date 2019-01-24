@@ -5,7 +5,8 @@ import {
   NUMBER,
   TEXTAREA,
   DATE,
-  SELECT_WITH_OPTIONS
+  SELECT_WITH_OPTIONS,
+  SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -13,6 +14,8 @@ import {
   range,
   dateFormat
 } from 'src/utils/validate'
+import { conditionals } from '../utils'
+import { OFFLINE_FACILITIES_KEY } from 'src/offline/reducer'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -167,6 +170,11 @@ const messages = defineMessages({
     id: 'formFields.placeOfBirth',
     defaultMessage: 'Place of delivery',
     description: 'Label for form field: Place of delivery'
+  },
+  hospitals: {
+    id: 'formFields.hospitals',
+    defaultMessage: 'Hospital / Clinic',
+    description: 'Label for form field: Hospital or Health Institution'
   },
   deliveryInstitution: {
     id: 'formFields.deliveryInstitution',
@@ -337,6 +345,19 @@ export const childSection: IFormSection = {
         { value: 'PRIVATE_HOME', label: messages.privateHome },
         { value: 'OTHER', label: messages.otherInstitution }
       ]
+    },
+    {
+      name: 'hospitals',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: messages.hospitals,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_FACILITIES_KEY,
+        dependency: 'placeOfBirth'
+      },
+      conditionals: [conditionals.placeOfBirthHospital]
     },
     {
       name: 'deliveryInstitution',

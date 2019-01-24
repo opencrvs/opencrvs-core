@@ -333,6 +333,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.multipleBirth': 'জন্ম ক্রম (number)',
     'formFields.weightAtBirth': 'জন্মের সময় ওজন',
     'formFields.placeOfBirth': 'জন্মস্থান',
+    'formFields.hospitals': 'Hospital / Clinic',
     'formFields.deliveryInstitution': 'প্রতিষ্ঠান নির্বাচন করুন',
     'formFields.deliveryAddress': 'জন্মস্থান',
     'formFields.defaultLabel': 'Label goes here',

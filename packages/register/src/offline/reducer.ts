@@ -6,6 +6,7 @@ import * as i18nActions from 'src/i18n/actions'
 import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
+export const OFFLINE_FACILITIES_KEY = 'facilities'
 
 export interface ILocation {
   id: string

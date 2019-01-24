@@ -96,6 +96,22 @@ export const getFieldOptions = (
         return location.partOf === partOf
       })
     )
+  } else if (
+    resources &&
+    field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY
+  ) {
+    const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+    let partOf: string
+    if (dependencyVal === config.COUNTRY.toUpperCase()) {
+      partOf = 'Location/0'
+    } else {
+      partOf = `Location/${dependencyVal}`
+    }
+    return generateOptionsFromLocations(
+      locations.filter((location: ILocation) => {
+        return location.partOf === partOf
+      })
+    )
   } else {
     let options
     if (!field.dynamicOptions.options) {

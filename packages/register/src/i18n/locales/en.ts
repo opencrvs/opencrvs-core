@@ -331,6 +331,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.multipleBirth': 'Order of birth (number)',
     'formFields.weightAtBirth': 'Weight at birth',
     'formFields.placeOfBirth': 'Place of delivery',
+    'formFields.hospitals': 'Hospital / Clinic',
     'formFields.deliveryInstitution': 'Type or select institution',
     'formFields.deliveryAddress': 'Address of place of delivery',
     'formFields.defaultLabel': 'Label goes here',
