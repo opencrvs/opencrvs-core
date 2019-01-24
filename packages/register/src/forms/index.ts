@@ -194,6 +194,8 @@ export interface IConditionals {
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
   otherPlaceOfBirth: IConditional
+  isNotCityLocation: IConditional
+  isCityLocation: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

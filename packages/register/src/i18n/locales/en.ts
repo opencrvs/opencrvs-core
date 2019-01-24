@@ -20,7 +20,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.addressLine1': 'Street and house number',
     'formFields.addressLine2': 'Area / Ward / Mouja / Village',
     'formFields.addressLine3': 'Union / Municipality / Cantonement',
-    'formFields.addressLine3Options2': 'Ward',
+    'formFields.addressLine3CityOption': 'Ward',
     'formFields.addressLine4': 'Upazila (Thana) / City',
     'formFields.postCode': 'Postcode',
     'formFields.permanentAddress': 'Permanent Address',

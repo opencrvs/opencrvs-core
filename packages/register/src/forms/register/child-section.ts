@@ -355,7 +355,7 @@ export const childSection: IFormSection = {
       name: 'hospitals',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: messages.hospitals,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -368,7 +368,7 @@ export const childSection: IFormSection = {
       name: 'country',
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
-      required: true,
+      required: false,
       initialValue: config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
@@ -378,7 +378,7 @@ export const childSection: IFormSection = {
       name: 'state',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.state,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -391,7 +391,7 @@ export const childSection: IFormSection = {
       name: 'district',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.district,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -408,7 +408,7 @@ export const childSection: IFormSection = {
       name: 'addressLine4',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine4,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -426,7 +426,7 @@ export const childSection: IFormSection = {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -438,7 +438,24 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherPlaceOfBirth
+        conditionals.otherPlaceOfBirth,
+        conditionals.isNotCityLocation
+      ]
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth,
+        conditionals.isCityLocation
       ]
     },
     {
@@ -458,10 +475,42 @@ export const childSection: IFormSection = {
       ]
     },
     {
+      name: 'addressLine1CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth,
+        conditionals.isCityLocation
+      ]
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth,
+        conditionals.isCityLocation
+      ]
+    },
+    {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [

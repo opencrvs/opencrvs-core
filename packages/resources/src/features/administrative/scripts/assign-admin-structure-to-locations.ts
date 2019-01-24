@@ -208,7 +208,6 @@ export default async function importAdminStructure() {
   fhirLocations.push(...divisions)
   fhirLocations.push(...districts)
   fhirLocations.push(...upazilas)
-  fhirLocations.push(...thanas)
   fhirLocations.push(...cities)
   fhirLocations.push(...cityWards)
   fhirLocations.push(...unions)

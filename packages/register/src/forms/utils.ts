@@ -118,10 +118,28 @@ export const getFieldOptions = (
   }
 }
 
+export const isCityLocation = (
+  locations: ILocation[],
+  locationId: string
+): boolean => {
+  const selectedLocation = locations.filter((location: ILocation) => {
+    return location.id === locationId
+  })[0]
+  if (selectedLocation) {
+    if (selectedLocation.jurisdictionType === 'CITYCORPORATION') {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return false
+  }
+}
+
 export const getConditionalActionsForField = (
   field: IFormField,
   values: IFormSectionData,
-  offlineResources?: IOfflineDataState
+  resources?: IOfflineDataState
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -233,5 +251,15 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       'values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME"'
+  },
+  isNotCityLocation: {
+    action: 'hide',
+    expression:
+      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+  },
+  isCityLocation: {
+    action: 'hide',
+    expression:
+      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
   }
 }

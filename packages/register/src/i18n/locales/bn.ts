@@ -20,7 +20,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.addressLine1': 'রাস্তার এবং  হোল্ডিং নম্বর',
     'formFields.addressLine2': 'এলাকা / Ward / গ্রাম/পাড়া',
     'formFields.addressLine3': 'ইউনিয়ন / পৌরসভার / ক্যান্টনমেন্ট',
-    'formFields.addressLine3Options2': 'ওয়ার্ড',
+    'formFields.addressLine3CityOption': 'ওয়ার্ড',
     'formFields.addressLine4': 'উপজেলা (থানা) / পৌরসভা / সিটি করপোরেশন',
     'formFields.postCode': 'পোস্ট কোড',
     'formFields.permanentAddress': 'স্থায়ী বসবাসের ঠিকানা',
