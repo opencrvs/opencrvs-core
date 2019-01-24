@@ -57,7 +57,6 @@ Cypress.Commands.add('login', (userType, options = {}) => {
         })
     })
   cy.wait(1000)
-  cy.get('#offline_data_continue').click()
 })
 
 Cypress.Commands.add('selectOption', (selector, text, option) => {

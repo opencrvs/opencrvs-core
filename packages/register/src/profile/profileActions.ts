@@ -2,12 +2,13 @@ import { RouterAction } from 'react-router-redux'
 import { IURLParams } from '../utils/authUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
-import { IUserDetails } from '../utils/userUtils'
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH'
 export const REDIRECT_TO_AUTHENTICATION = 'PROFILE/REDIRECT_TO_AUTHENTICATION'
 export const FETCH_USER_DETAILS = 'PROFILE/FETCH_USER_DETAILS'
 export const SET_USER_DETAILS = 'PROFILE/SET_USER_DETAILS'
 export const SET_INITIAL_USER_DETAILS = 'PROFILE/SET_INITIAL_USER_DETAILS'
+export const GET_USER_DETAILS_SUCCESS = 'PROFILE/GET_USER_DETAILS_SUCCESS'
+export const GET_USER_DETAILS_FAILED = 'PROFILE/GET_USER_DETAILS_FAILED'
 
 type RedirectToAuthenticationAction = {
   type: typeof REDIRECT_TO_AUTHENTICATION
@@ -23,17 +24,27 @@ type SetUserDetailsAction = {
   payload: ApolloQueryResult<GQLQuery>
 }
 
-type SetInitialUserDetailsAction = {
+export type IGetStorageUserDetailsSuccessAction = {
+  type: typeof GET_USER_DETAILS_SUCCESS
+  payload: string
+}
+
+export type IGetStorageUserDetailsFailedAction = {
+  type: typeof GET_USER_DETAILS_FAILED
+}
+
+export type ISetInitialUserDetails = {
   type: typeof SET_INITIAL_USER_DETAILS
-  payload: IUserDetails
 }
 
 export type Action =
   | CheckAuthAction
   | SetUserDetailsAction
-  | SetInitialUserDetailsAction
   | RedirectToAuthenticationAction
   | RouterAction
+  | ISetInitialUserDetails
+  | IGetStorageUserDetailsSuccessAction
+  | IGetStorageUserDetailsFailedAction
 
 export const checkAuth = (payload: IURLParams): CheckAuthAction => ({
   type: CHECK_AUTH,
@@ -47,11 +58,19 @@ export const setUserDetails = (
   payload
 })
 
-export const setInitialUserDetails = (
-  payload: IUserDetails
-): SetInitialUserDetailsAction => ({
-  type: SET_INITIAL_USER_DETAILS,
-  payload
+export const setInitialUserDetails = (): ISetInitialUserDetails => ({
+  type: SET_INITIAL_USER_DETAILS
+})
+
+export const getStorageUserDetailsSuccess = (
+  response: string
+): IGetStorageUserDetailsSuccessAction => ({
+  type: GET_USER_DETAILS_SUCCESS,
+  payload: response
+})
+
+export const getStorageUserDetailsFailed = (): IGetStorageUserDetailsFailedAction => ({
+  type: GET_USER_DETAILS_FAILED
 })
 
 export const redirectToAuthentication = (): RedirectToAuthenticationAction => ({
