@@ -7,7 +7,6 @@ import {
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  WORK_QUEUE,
   REVIEW_BIRTH_PARENT_FORM_TAB
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
@@ -28,6 +27,8 @@ import {
 } from '@opencrvs/register/src/profile/profileActions'
 import { storeOfflineData } from 'src/offline/actions'
 import { referenceApi } from 'src/utils/referenceApi'
+import { createClient } from './utils/apolloClient'
+import { Event } from '@opencrvs/register/src/forms'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -89,6 +90,31 @@ describe('when user has a valid token in url but an expired one in localStorage'
 
   it("doesn't redirect user to SSO", async () => {
     expect(assign.mock.calls).toHaveLength(0)
+  })
+})
+
+describe('when session expired', () => {
+  let app: ReactWrapper
+  let store: Store
+
+  beforeEach(() => {
+    const testApp = createTestApp()
+    app = testApp.app
+    store = testApp.store
+  })
+
+  it('when apolloClient is created', () => {
+    const client = createClient(store)
+    expect(client.link).toBeDefined()
+  })
+
+  it('displays session expired confirmation dialog', () => {
+    // @ts-ignore
+    const action = actions.showSessionExpireConfirmation()
+    store.dispatch(action)
+    app.update()
+
+    expect(app.find('#login').hostNodes()).toHaveLength(1)
   })
 })
 
@@ -206,6 +232,8 @@ describe('when user has a valid token in local storage', () => {
         }
       ]
     }
+    const registerUserDetails = Object.assign({}, userDetails)
+    registerUserDetails.role = 'LOCAL_REGISTRAR'
     beforeEach(() => {
       store.dispatch(setInitialUserDetails(userDetails))
       history.replace(HOME)
@@ -223,6 +251,16 @@ describe('when user has a valid token in local storage', () => {
       })
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
+      })
+    })
+    describe('when user has a register scope they are redirected to the work-queue', () => {
+      beforeEach(() => {
+        store.dispatch(setInitialUserDetails(registerUserDetails))
+        app.update()
+      })
+
+      it('work queue view renders to load list', () => {
+        expect(app.find('#work-queue-spinner').hostNodes()).toHaveLength(1)
       })
     })
   })
@@ -335,6 +373,18 @@ describe('when user has a valid token in local storage', () => {
         expect(app.find('#select_informant_view').hostNodes()).toHaveLength(1)
       })
     })
+
+    describe('when selects "Death"', () => {
+      beforeEach(() => {
+        app
+          .find('#select_death_event')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('takses user to the death registration form', () => {
+        expect(history.location.pathname).toContain('events/death')
+      })
+    })
   })
 
   describe('when user is in informant selection view', () => {
@@ -354,21 +404,10 @@ describe('when user has a valid token in local storage', () => {
       })
     })
   })
-
-  describe('when user is in work queue view', () => {
-    beforeEach(() => {
-      history.replace(WORK_QUEUE)
-      app.update()
-    })
-
-    it('work queue view renders without crashing', () => {
-      expect(app.find('#work_queue_view').hostNodes()).toHaveLength(1)
-    })
-  })
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
     beforeEach(() => {
-      draft = createDraft()
+      draft = createDraft(Event.BIRTH)
       store.dispatch(storeDraft(draft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
@@ -769,7 +808,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: uuid(), data }
+      customDraft = { id: uuid(), data, event: Event.BIRTH }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
@@ -1029,7 +1068,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: uuid(), data, review: true }
+      customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
       store.dispatch(storeDraft(customDraft))
       history.replace(
         REVIEW_BIRTH_PARENT_FORM_TAB.replace(

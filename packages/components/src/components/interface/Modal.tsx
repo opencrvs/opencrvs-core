@@ -6,7 +6,7 @@ interface IProps {
   title: string
   actions: JSX.Element[]
   show: boolean
-  handleClose: () => void
+  handleClose?: () => void
   className?: string
 }
 
@@ -80,9 +80,11 @@ export class Modal extends React.Component<IProps> {
       <Backdrop className={className}>
         <ModalContent>
           {title && <Heading>{title}</Heading>}
-          <TopRight onClick={handleClose}>
-            <Cross />
-          </TopRight>
+          {handleClose && (
+            <TopRight onClick={handleClose}>
+              <Cross />
+            </TopRight>
+          )}
           {this.props.children}
           <Actions>
             {actions.map((action, i) => (
