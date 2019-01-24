@@ -6,7 +6,8 @@ import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
   goToEvents as goToEventsAction,
-  goToMyRecords as goToMyRecordsAction
+  goToMyRecords as goToMyRecordsAction,
+  goToMyDrafts as goToMyDraftsAction
 } from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import {
@@ -157,6 +158,8 @@ interface IHomeProps {
   userDetails: IUserDetails
   goToEvents: typeof goToEventsAction
   goToMyRecords: typeof goToMyRecordsAction
+  goToMyDrafts: typeof goToMyDraftsAction
+  draftCount: string
 }
 
 type FullProps = IHomeProps &
@@ -205,7 +208,8 @@ class HomeView extends React.Component<FullProps> {
               />
               <CountAction
                 id="saved_drafts"
-                count={'10'}
+                count={this.props.draftCount}
+                onClick={this.props.goToMyDrafts}
                 title={intl.formatMessage(messages.savedDrafts)}
               />
               <CountAction
@@ -248,7 +252,9 @@ class HomeView extends React.Component<FullProps> {
 }
 
 const mapStateToProps = (store: IStoreState) => {
+  const draftCount = store.drafts.drafts.length.toString()
   return {
+    draftCount,
     language: getLanguage(store),
     userDetails: getUserDetails(store)
   }
@@ -257,6 +263,7 @@ export const Home = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction,
-    goToMyRecords: goToMyRecordsAction
+    goToMyRecords: goToMyRecordsAction,
+    goToMyDrafts: goToMyDraftsAction
   }
 )(injectIntl(HomeView))

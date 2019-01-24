@@ -15,6 +15,8 @@ const GET_DRAFTS_FAILED = 'DRAFTS/GET_DRAFTS_FAILED'
 export interface IDraft {
   id: string
   data: IFormData
+  savedOn?: number
+  eventType?: string
   review?: boolean
   event: Event
 }
@@ -90,6 +92,7 @@ export function createReviewDraft(
 }
 
 export function storeDraft(draft: IDraft): IStoreDraftAction {
+  draft.savedOn = Date.now()
   return { type: STORE_DRAFT, payload: { draft } }
 }
 

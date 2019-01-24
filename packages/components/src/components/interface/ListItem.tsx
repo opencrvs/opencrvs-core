@@ -26,7 +26,7 @@ export interface IListItemProps {
   icons?: JSX.Element[]
   actions?: IAction[]
   itemData: IDynamicValues
-  expandedCellRenderer: (itemData: IDynamicValues, key: number) => JSX.Element
+  expandedCellRenderer?: (itemData: IDynamicValues, key: number) => JSX.Element
 }
 
 interface IListItemState {
@@ -191,7 +191,8 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
         <ExpandedCellContainer expanded={expanded}>
           {expanded && (
             <ExpandedCellContent>
-              {this.props.expandedCellRenderer(itemData, index)}
+              {this.props.expandedCellRenderer &&
+                this.props.expandedCellRenderer(itemData, index)}
             </ExpandedCellContent>
           )}
         </ExpandedCellContainer>
