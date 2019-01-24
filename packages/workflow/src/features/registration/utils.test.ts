@@ -2,7 +2,8 @@ import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   sendBirthNotification,
-  convertStringToASCII
+  convertStringToASCII,
+  sendEventNotification
 } from './utils'
 import { setTrackingId } from './fhir/fhir-bundle-modifier'
 import { logger } from '../../logger'
@@ -36,7 +37,9 @@ describe('Verify utility functions', () => {
   it('send Birth notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
-      sendBirthNotification(fhirBundle, { Authorization: 'bearer acd ' })
+      sendEventNotification(fhirBundle, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Birth notification logs an error in case of invalid data', async () => {
@@ -44,7 +47,9 @@ describe('Verify utility functions', () => {
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
-    sendBirthNotification(testFhirBundle, { Authorization: 'bearer acd ' })
+    sendEventNotification(testFhirBundle, '01711111111', {
+      Authorization: 'bearer acd '
+    })
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
     )
