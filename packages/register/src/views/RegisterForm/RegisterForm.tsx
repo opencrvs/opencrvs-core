@@ -309,6 +309,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   processSubmitData = () => {
     const { draft, registerForm } = this.props
+    const { showSubmitModal, showRegisterModal } = this.state
+    if (!showRegisterModal && !showSubmitModal) {
+      return
+    }
     const data = draftToMutationTransformer(registerForm, draft.data)
     if (!draft.review) {
       return { details: data }

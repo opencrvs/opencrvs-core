@@ -57,7 +57,7 @@ export type IFileValue = {
   data: string
 }
 
-export type MapFunction = (
+export type IFormFieldMapFunction = (
   transFormedData: any,
   draftData: IFormData,
   sectionId: string,
@@ -76,7 +76,7 @@ export interface IFormFieldBase {
   initialValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
-  mapping?: MapFunction
+  mapping?: IFormFieldMapFunction
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -201,6 +201,11 @@ export interface IConditionals {
 
 export type ViewType = 'form' | 'preview' | 'review'
 
+export type IFormSectionMapFunction = (
+  transFormedData: any,
+  draftData: IFormData,
+  sectionId: string
+) => void
 export interface IFormSection {
   id: string
   viewType: ViewType
@@ -208,6 +213,7 @@ export interface IFormSection {
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
   disabled?: boolean
+  mapping?: IFormSectionMapFunction
 }
 
 export interface IForm {
@@ -342,4 +348,12 @@ export interface IFormSectionData {
 
 export interface IFormData {
   [key: string]: IFormSectionData
+}
+
+export interface IAttachment {
+  data: string
+  optionValues: string[]
+  type: string
+  title?: string
+  description?: string
 }

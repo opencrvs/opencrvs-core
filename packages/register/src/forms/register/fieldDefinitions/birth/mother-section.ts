@@ -427,10 +427,10 @@ export const motherSection: IFormSection = {
       ],
       conditionals: [],
       mapping: copyAddressTransformer(
-        'mother',
         'PERMANENT',
         'mother',
-        'CURRENT'
+        'CURRENT',
+        'mother'
       )
     },
     {
@@ -576,7 +576,7 @@ export const motherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT')
+      mapping: addressTransformer('CURRENT', 0, 'postalCode')
     }
   ]
 }

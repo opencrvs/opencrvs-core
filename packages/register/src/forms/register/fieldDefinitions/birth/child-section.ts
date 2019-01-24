@@ -15,7 +15,8 @@ import {
 } from 'src/utils/validate'
 import {
   nameTransformer,
-  sectionFieldToBundleFieldTransformer
+  sectionFieldToBundleFieldTransformer,
+  ignoreValueTransformer
 } from '../field-mappings'
 
 export interface IChildSectionFormData {
@@ -347,7 +348,8 @@ export const childSection: IFormSection = {
         },
         { value: 'PRIVATE_HOME', label: messages.privateHome },
         { value: 'OTHER', label: messages.otherInstitution }
-      ]
+      ],
+      mapping: ignoreValueTransformer // TODO: once placeOfBirth issue is resolved remove this
     },
     {
       name: 'deliveryInstitution',

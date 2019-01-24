@@ -8,7 +8,7 @@ export const draftToMutationTransformer = (
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
-  const transformedData = {}
+  const transformedData: any = { createdAt: new Date() }
   formDefinition.sections.forEach(section => {
     if (!draftData[section.id]) {
       return
@@ -17,21 +17,24 @@ export const draftToMutationTransformer = (
     section.fields.forEach(fieldDef => {
       const conditionalActions: string[] = getConditionalActionsForField(
         fieldDef,
-        {}
+        draftData[section.id]
       )
       if (
         fieldDef.required &&
         !conditionalActions.includes('hide') &&
-        (!draftData[section.id][fieldDef.name] ||
-          draftData[section.id][fieldDef.name] === fieldDef.initialValue)
+        (draftData[section.id][fieldDef.name] === undefined ||
+          draftData[section.id][fieldDef.name] === '')
       ) {
         throw new Error(
-          `Data is missing for a required field: ${fieldDef.name}`
+          `Data is missing for a required field: ${fieldDef.name} on section ${
+            section.id
+          }`
         )
       }
       if (
-        draftData[section.id][fieldDef.name] &&
-        draftData[section.id][fieldDef.name] !== fieldDef.initialValue
+        draftData[section.id][fieldDef.name] !== undefined &&
+        draftData[section.id][fieldDef.name] !== '' &&
+        !conditionalActions.includes('hide')
       ) {
         if (!fieldDef.mapping) {
           transformedData[section.id][fieldDef.name] =
@@ -41,6 +44,22 @@ export const draftToMutationTransformer = (
         }
       }
     })
+    if (
+      transformedData[section.id] &&
+      Object.keys(transformedData[section.id]).length < 1
+    ) {
+      delete transformedData[section.id]
+    } else {
+      if (draftData[section.id]._fhirID) {
+        transformedData[section.id]._fhirID = draftData[section.id]._fhirID
+      }
+      if (section.mapping) {
+        section.mapping(transformedData, draftData, section.id)
+      }
+    }
   })
+  if (draftData._fhirIDMap) {
+    transformedData._fhirIDMap = draftData._fhirIDMap
+  }
   return transformedData
 }
