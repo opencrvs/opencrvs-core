@@ -241,7 +241,7 @@ export const deceasedSection: IFormSection = {
       name: 'birthDate',
       type: DATE,
       label: messages.deceasedDateOfBirth,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [dateFormat]
     },

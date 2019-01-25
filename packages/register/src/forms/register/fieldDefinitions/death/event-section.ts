@@ -159,7 +159,7 @@ export const eventSection: IFormSection = {
       type: SUBSECTION,
       label: messages.deathPlace,
       initialValue: '',
-      required: false,
+      required: true,
       validate: []
     },
     {
