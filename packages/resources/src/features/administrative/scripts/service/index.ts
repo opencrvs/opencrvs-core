@@ -130,7 +130,7 @@ export function generateLocationResource(
     fhirLocation.physicalType &&
     fhirLocation.physicalType.coding &&
     fhirLocation.physicalType.coding[0].display
-  loc.juristictionType =
+  loc.jurisdictionType =
     fhirLocation.identifier && fhirLocation.identifier[2].value
   loc.type =
     fhirLocation.type &&
