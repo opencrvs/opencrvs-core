@@ -1,6 +1,6 @@
 import * as React from 'react'
 import gql from 'graphql-tag'
-import { Query } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner } from '@opencrvs/components/lib/interface'
@@ -39,7 +39,15 @@ import {
 } from './generatePDF'
 import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
 import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
-// import { Mutation } from 'react-apollo'
+import { FETCH_BIRTH_REGISTRATION_QUERY } from 'src/views/RegisterForm/ReviewForm'
+import {
+  storeDraft,
+  createReviewDraft,
+  IDraftsState
+} from '@opencrvs/register/src/drafts'
+import { Dispatch } from 'redux'
+import StoreTransformer from 'src/utils/transformData'
+import { processCertificateDraftData } from 'src/views/RegisterForm/ProcessDraftData'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -169,49 +177,7 @@ const B = styled.div`
   font-weight: bold;
 `
 
-export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
-  query data($id: ID!) {
-    fetchBirthRegistration(id: $id) {
-      id
-      registration {
-        registrationNumber
-      }
-      child {
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-      }
-      mother {
-        name {
-          firstNames
-          familyName
-        }
-        identifier {
-          id
-          type
-        }
-        birthDate
-        nationality
-      }
-      father {
-        name {
-          firstNames
-          familyName
-        }
-        identifier {
-          id
-          type
-        }
-        birthDate
-        nationality
-      }
-      createdAt
-    }
-  }
-`
+export { FETCH_BIRTH_REGISTRATION_QUERY }
 
 const messages = defineMessages({
   queryError: {
@@ -292,8 +258,8 @@ const messages = defineMessages({
 })
 
 const certifyMutation = gql`
-  mutation markBirthAsCertified($details: BirthRegistrationInput) {
-    markBirthAsCertified(details: $details)
+  mutation markBirthAsCertified($id: ID!, $details: BirthRegistrationInput!) {
+    markBirthAsCertified(id: $id, details: $details)
   }
 `
 
@@ -316,7 +282,8 @@ type IProps = {
   certificatePreviewFormSection: IFormSection
 }
 
-type IFullProps = InjectedIntlProps & IProps
+type IFullProps = InjectedIntlProps &
+  IProps & { dispatch: Dispatch; drafts: IDraftsState }
 
 class PrintCertificateActionComponent extends React.Component<
   IFullProps,
@@ -375,6 +342,24 @@ class PrintCertificateActionComponent extends React.Component<
       default:
         throw new Error(`No form found for id ${currentForm}`)
     }
+  }
+
+  processSubmitData() {
+    const {
+      registrationId,
+      drafts: { drafts }
+    } = this.props
+    const { data } = this.state
+    const draft = drafts.find(draftItem => draftItem.id === registrationId) || {
+      data: {}
+    }
+
+    // return {
+    //   id: registrationId,
+    //   details: processCertificateDraftData(registrationId, draft.data, data)
+    // }
+
+    return processCertificateDraftData(registrationId, draft.data, data)
   }
 
   getFormAction = (
@@ -449,21 +434,28 @@ class PrintCertificateActionComponent extends React.Component<
                 <B>{intl.formatMessage(messages.certificateIsCorrect)}</B>
                 {intl.formatMessage(messages.certificateConfirmationTxt)}
               </Info>
-              <ConfirmBtn
-                id="registerApplicationBtn"
-                icon={() => <TickLarge />}
-                align={ICON_ALIGNMENT.LEFT}
-                onClick={() => {
-                  console.log(this.props)
-                  console.log(certifyMutation)
-                  console.log(this.state)
-                  this.setState(() => ({
-                    enableConfirmButton: true
-                  }))
-                }}
+              <Mutation
+                mutation={certifyMutation}
+                variables={this.processSubmitData()}
               >
-                {intl.formatMessage(messages.confirm)}
-              </ConfirmBtn>
+                {(markBirthAsCertified, { data }) => {
+                  return (
+                    <ConfirmBtn
+                      id="registerApplicationBtn"
+                      icon={() => <TickLarge />}
+                      align={ICON_ALIGNMENT.LEFT}
+                      onClick={() => {
+                        markBirthAsCertified()
+                        this.setState(() => ({
+                          enableConfirmButton: true
+                        }))
+                      }}
+                    >
+                      {intl.formatMessage(messages.confirm)}
+                    </ConfirmBtn>
+                  )
+                }}
+              </Mutation>
               <EditRegistration id="edit" disabled={true}>
                 <Edit />
                 {this.props.intl.formatMessage(messages.editRegistration)}
@@ -575,7 +567,9 @@ class PrintCertificateActionComponent extends React.Component<
       registrationId,
       togglePrintCertificateSection,
       printCertificateFormSection,
-      paymentFormSection
+      paymentFormSection,
+      drafts: { drafts },
+      dispatch
     } = this.props
 
     const { currentForm } = this.state
@@ -661,6 +655,17 @@ class PrintCertificateActionComponent extends React.Component<
                   data.fetchBirthRegistration
                 )
 
+                const transData = StoreTransformer.transformData(
+                  data.fetchBirthRegistration
+                )
+                const reviewDraft = createReviewDraft(registrationId, transData)
+                const draftExist = !!drafts.find(
+                  draft => draft.id === registrationId
+                )
+                if (!draftExist) {
+                  dispatch(storeDraft(reviewDraft))
+                }
+
                 return (
                   <FormContainer>
                     <Box>
@@ -703,5 +708,6 @@ export const PrintCertificateAction = connect((state: IStoreState) => ({
   language: state.i18n.language,
   paymentFormSection: state.printCertificateForm.paymentForm,
   certificatePreviewFormSection:
-    state.printCertificateForm.certificatePreviewForm
+    state.printCertificateForm.certificatePreviewForm,
+  drafts: state.drafts
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))

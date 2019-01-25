@@ -329,4 +329,54 @@ const processDraftData = (draftData: IFormData) => {
   return draftDetails
 }
 
+export const processCertificateDraftData = (
+  id: string,
+  draftData: IFormData,
+  data: IFormSectionData
+) => {
+  const result = {
+    id,
+    details: processDraftData(draftData)
+  }
+
+  let individual = null
+  if (data.personCollectingCertificate === documentForWhomFhirMapping.Other) {
+    individual = {
+      name: [
+        {
+          use: 'en',
+          firstNames: data.otherPersonGivenNames,
+          familyName: data.otherPersonFamilyName
+        }
+      ],
+      identifier: [{ id: data.documentNumber, type: data.otherPersonIDType }]
+    }
+  }
+
+  const certificates = {
+    collector: {
+      relationship: data.personCollectingCertificate,
+      individual
+    },
+    payments: {
+      paymentId: '1',
+      type: data.paymentMethod,
+      total: data.paymentAmount,
+      amount: data.paymentAmount,
+      outcome: 'COMPLETED',
+      date: Date.now()
+    },
+    hasShowedVerifiedDocument:
+      data.otherPersonSignedAffidavit ||
+      data.motherDetails ||
+      data.fatherDetails
+  }
+
+  result.details.registration.certificates =
+    result.details.registration.certificates || []
+  result.details.registration.certificates.push(certificates)
+
+  return result
+}
+
 export default processDraftData

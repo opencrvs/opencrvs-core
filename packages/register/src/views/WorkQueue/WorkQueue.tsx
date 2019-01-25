@@ -680,6 +680,7 @@ export class WorkQueueView extends React.Component<
     key: number
   ): JSX.Element => {
     const applicationIsRegistered = item.declaration_status === 'REGISTERED'
+    const applicationIsCertified = item.declaration_status === 'CERTIFIED'
     const applicationIsRejected = item.declaration_status === 'REJECTED'
     const info = []
     const status = []
@@ -697,13 +698,13 @@ export class WorkQueueView extends React.Component<
       label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
       value: item.date_of_application
     })
-    if (!applicationIsRegistered) {
+    if (!applicationIsRegistered || !applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
         value: item.tracking_id
       })
     }
-    if (applicationIsRegistered) {
+    if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
           messages.listItemBirthRegistrationNumber
@@ -726,7 +727,7 @@ export class WorkQueueView extends React.Component<
 
     const expansionActions: JSX.Element[] = []
     if (this.userHasCertifyScope()) {
-      if (applicationIsRegistered) {
+      if (applicationIsRegistered || applicationIsCertified) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.print),
           handler: () => this.togglePrintModal(item.id)
@@ -747,7 +748,8 @@ export class WorkQueueView extends React.Component<
       if (
         !item.duplicates &&
         !applicationIsRegistered &&
-        !applicationIsRejected
+        !applicationIsRejected &&
+        !applicationIsCertified
       ) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
