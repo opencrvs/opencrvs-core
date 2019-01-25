@@ -140,8 +140,8 @@ input BirthRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  placeOfBirth: AddressInput
-  birthLocation: LocationInput
+  placeOfBirth: LocationInput
+  birthLocation: String
   birthLocationType: AddressType
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
@@ -163,8 +163,8 @@ type BirthRegistration { # -> Composition
   mother: Person # -> .section(code='mother-details').entry.reference
   father: Person # -> .section(code='father-details').entry.reference
   informant: Person # -> .section(code='informant-details').entry.reference
-  placeOfBirth: Address
-  birthLocation: Location # -> .section(code='birth-encounter').entry.reference.location
+  placeOfBirth: Location
+  birthLocation: String # -> .section(code='birth-encounter').entry.reference.location
   birthLocationType: AddressType
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
@@ -187,8 +187,8 @@ input DeathRegistrationInput {
   informant: PersonInput
   # need to track multiple spouses for muslim countries
   spouse: [PersonInput]
-  placeOfDeath: AddressInput
-  deathLocation: LocationInput
+  placeOfDeath: LocationInput
+  deathLocation: String
   causeOfDeath: CauseOfDeath # need to store ICD-10? More types of cause of death
   createdAt: Date
   updatedAt: Date
@@ -205,8 +205,8 @@ type DeathRegistration { # -> Composition
   informant: Person # -> .section(code='informant-details').entry.reference
   # need to track multiple spouses for muslim countries
   spouse: [Person] # -> .section(code='spouse-details').entry.reference # Not in BDRIS2
-  placeOfDeath: Address
-  deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
+  placeOfDeath: Location
+  deathLocation: String # -> .section(code='death-encounter').entry.reference.location
   causeOfDeath: CauseOfDeath # -> Observation.valueCodeableConcept
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date

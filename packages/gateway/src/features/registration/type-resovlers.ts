@@ -16,7 +16,9 @@ import {
   BIRTH_REG_TYPE_CODE,
   LAST_LIVE_BIRTH_CODE,
   NUMBER_BORN_ALIVE_CODE,
-  NUMBER_FOEATAL_DEATH_CODE
+  NUMBER_FOEATAL_DEATH_CODE,
+  HEALTH_FACILITY_BIRTH_CODE,
+  BIRTH_LOCATION_TYPE_CODE
 } from 'src/features/fhir/templates'
 import { GQLResolver } from 'src/graphql/schema'
 import {
@@ -348,7 +350,12 @@ export const typeResolvers: GQLResolver = {
     status: location => location.status,
     identifier: location => location.identifier,
     longitude: location => location.position.longitude,
-    latitude: location => location.position.latitude
+    latitude: location => location.position.latitude,
+    alias: location => location.alias,
+    description: location => location.description,
+    partOf: location => location.partOf,
+    type: location => location.partOf,
+    address: location => location.address
   },
 
   BirthRegistration: {
@@ -486,7 +493,61 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_TYPE_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueQuantity.value
+      return observations.entry[0].resource.valueString
+    },
+    async birthLocation(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${HEALTH_FACILITY_BIRTH_CODE}`,
+        authHeader
+      )
+      return observations.entry[0].resource.valueStringe.split('/')[1]
+    },
+    async birthLocationType(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${BIRTH_LOCATION_TYPE_CODE}`,
+        authHeader
+      )
+      return observations.entry[0].resource.valueString
+    },
+    async placeOfBirth(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const data = await fetchFHIR(
+        `/${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+
+      if (!data || !data.location || !data.location[0].location) {
+        return null
+      }
+
+      return await fetchFHIR(
+        `/${data.location[0].location.reference}`,
+        authHeader
+      )
     },
     async attendantAtBirth(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
@@ -603,28 +664,6 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
       return observations.resource.valueDateTime
-    },
-    async birthLocation(composition: ITemplatedComposition, _, authHeader) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const data = await fetchFHIR(
-        `/${encounterSection.entry[0].reference}`,
-        authHeader
-      )
-
-      if (!data || !data.location || !data.location[0].location) {
-        return null
-      }
-
-      return await fetchFHIR(
-        `/${data.location[0].location.reference}`,
-        authHeader
-      )
     }
   }
 }

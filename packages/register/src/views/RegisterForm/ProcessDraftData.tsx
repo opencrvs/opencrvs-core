@@ -361,19 +361,25 @@ const processDraftData = (draftData: IFormData) => {
       child.placeOfBirth === 'OTHER'
     ) {
       draftDetails.placeOfBirth = {
-        type: 'BIRTH_PLACE',
-        country: child.country,
-        state: child.state,
-        district: child.district,
-        postalCode: child.postCode ? child.postCode : child.postCodeCityOption,
-        line: [
-          child.addressLine1,
-          child.addressLine1CityOption,
-          child.addressLine2,
-          child.addressLine3,
-          child.addressLine3CityOption,
-          child.addressLine4
-        ]
+        type: child.placeOfBirth,
+        partOf: `Location/${child.addressLine4}`,
+        address: {
+          type: 'BIRTH_PLACE',
+          country: child.country,
+          state: child.state,
+          district: child.district,
+          postalCode: child.postCode
+            ? child.postCode
+            : child.postCodeCityOption,
+          line: [
+            child.addressLine1,
+            child.addressLine1CityOption,
+            child.addressLine2,
+            child.addressLine3,
+            child.addressLine3CityOption,
+            child.addressLine4
+          ]
+        }
       }
     }
   }

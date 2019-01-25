@@ -135,7 +135,16 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
       attendantAtBirth
       weightAtBirth
       birthType
-      placeOfBirth
+      placeOfBirth {
+        address {
+          type
+          line
+          district
+          state
+          postalCode
+          country
+        }
+      }
       birthLocation
       birthLocationType
       presentAtBirthRegistration
@@ -261,20 +270,20 @@ export class ReviewFormView extends React.Component<IProps> {
     childDetails.birthType = reg.birthType
     childDetails.hospitals = reg.birthLocation
     childDetails.placeOfBirth = reg.birthLocationType
-    if (reg.placeOfBirth && reg.placeOfBirth.country) {
-      childDetails.country = reg.placeOfBirth.country
-      childDetails.state = reg.placeOfBirth.state
-      childDetails.district = reg.placeOfBirth.district
-      if (reg.placeOfBirth.line) {
-        childDetails.addressLine1 = reg.placeOfBirth.line[0]
-        childDetails.addressLine1CityOption = reg.placeOfBirth.line[1]
-        childDetails.addressLine2 = reg.placeOfBirth.line[2]
-        childDetails.addressLine3 = reg.placeOfBirth.line[3]
-        childDetails.addressLine3CityOption = reg.placeOfBirth.line[4]
-        childDetails.addressLine4 = reg.placeOfBirth.line[5]
+    if (reg.placeOfBirth && reg.placeOfBirth.address) {
+      childDetails.country = reg.placeOfBirth.address.country
+      childDetails.state = reg.placeOfBirth.address.state
+      childDetails.district = reg.placeOfBirth.address.district
+      if (reg.placeOfBirth.address.line) {
+        childDetails.addressLine1 = reg.placeOfBirth.address.line[0]
+        childDetails.addressLine1CityOption = reg.placeOfBirth.address.line[1]
+        childDetails.addressLine2 = reg.placeOfBirth.address.line[2]
+        childDetails.addressLine3 = reg.placeOfBirth.address.line[3]
+        childDetails.addressLine3CityOption = reg.placeOfBirth.address.line[4]
+        childDetails.addressLine4 = reg.placeOfBirth.address.line[5]
       }
-      childDetails.postalCode = reg.placeOfBirth.postalCode
-      childDetails.postCodeCityOption = reg.placeOfBirth.postalCode
+      childDetails.postCode = reg.placeOfBirth.address.postalCode
+      childDetails.postCodeCityOption = reg.placeOfBirth.address.postalCode
     }
     if (child.id) {
       childDetails._fhirID = child.id

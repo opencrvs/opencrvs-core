@@ -163,6 +163,7 @@ export interface GQLLocation {
   name?: string
   alias?: Array<string | null>
   description?: string
+  partOf?: string
   type?: GQLLocationType
   telecom?: Array<GQLContactPoint | null>
   address?: GQLAddress
@@ -181,6 +182,7 @@ export enum GQLLocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   CRVS_OFFICE = 'CRVS_OFFICE',
+  PRIVATE_HOME = 'PRIVATE_HOME',
   OTHER = 'OTHER'
 }
 
@@ -192,8 +194,8 @@ export interface GQLBirthRegistration {
   mother?: GQLPerson
   father?: GQLPerson
   informant?: GQLPerson
-  placeOfBirth?: GQLAddress
-  birthLocation?: GQLLocation
+  placeOfBirth?: GQLLocation
+  birthLocation?: string
   birthLocationType?: GQLAddressType
   birthType?: GQLBirthType
   weightAtBirth?: number
@@ -434,6 +436,7 @@ export interface GQLLocationInput {
   name?: string
   alias?: Array<string | null>
   description?: string
+  partOf?: string
   type?: GQLLocationType
   telecom?: Array<GQLContactPointInput | null>
   address?: GQLAddressInput
@@ -450,8 +453,8 @@ export interface GQLBirthRegistrationInput {
   mother?: GQLPersonInput
   father?: GQLPersonInput
   informant?: GQLPersonInput
-  placeOfBirth?: GQLAddressInput
-  birthLocation?: GQLLocationInput
+  placeOfBirth?: GQLLocationInput
+  birthLocation?: string
   birthLocationType?: GQLAddressType
   birthType?: GQLBirthType
   weightAtBirth?: number
@@ -530,8 +533,8 @@ export interface GQLDeathRegistrationInput {
   father?: GQLPersonInput
   informant?: GQLPersonInput
   spouse?: Array<GQLPersonInput | null>
-  placeOfDeath?: GQLAddressInput
-  deathLocation?: GQLLocationInput
+  placeOfDeath?: GQLLocationInput
+  deathLocation?: string
   causeOfDeath?: GQLCauseOfDeath
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -551,8 +554,8 @@ export interface GQLDeathRegistration {
   father?: GQLPerson
   informant?: GQLPerson
   spouse?: Array<GQLPerson | null>
-  placeOfDeath?: GQLAddress
-  deathLocation?: GQLLocation
+  placeOfDeath?: GQLLocation
+  deathLocation?: string
   causeOfDeath?: GQLCauseOfDeath
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -1017,6 +1020,7 @@ export interface GQLLocationTypeResolver<TParent = any> {
   name?: LocationToNameResolver<TParent>
   alias?: LocationToAliasResolver<TParent>
   description?: LocationToDescriptionResolver<TParent>
+  partOf?: LocationToPartOfResolver<TParent>
   type?: LocationToTypeResolver<TParent>
   telecom?: LocationToTelecomResolver<TParent>
   address?: LocationToAddressResolver<TParent>
@@ -1051,6 +1055,10 @@ export interface LocationToAliasResolver<TParent = any, TResult = any> {
 }
 
 export interface LocationToDescriptionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LocationToPartOfResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
