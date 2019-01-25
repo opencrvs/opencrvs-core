@@ -23,12 +23,12 @@ export const messages = defineMessages({
   },
   addressLine2: {
     id: 'formFields.addressLine2',
-    defaultMessage: 'Area / Mouja / Village',
+    defaultMessage: 'Area / Ward / Mouja / Village',
     description: 'Title for the address line 2'
   },
   addressLine3: {
     id: 'formFields.addressLine3',
-    defaultMessage: 'Union / Cantonement',
+    defaultMessage: 'Union / Municipality / Cantonement',
     description: 'Title for the address line 3 option 1'
   },
   addressLine3Options2: {

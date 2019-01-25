@@ -8,7 +8,7 @@ import {
   userDetails
 } from 'src/tests/util'
 import { queries } from 'src/profile/queries'
-import { setInitialUserDetails } from '@opencrvs/register/src/profile/profileActions'
+import { setInitialUserDetails } from '@opencrvs/performance/src/profile/actions'
 
 const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponse)

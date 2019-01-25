@@ -21,64 +21,21 @@ ShallowWrapper {
     "key": undefined,
     "nodeType": "class",
     "props": Object {
-      "children": Array [
-        <ConnectivityStatus />,
-        undefined,
+      "children": <styled.div>
+        <ConnectivityStatus />
         <Connect(InjectIntl(TopMenuComponent))
           hideBackButton={undefined}
-        />,
+        />
         <ViewHeading
           breadcrumb={undefined}
           description="Test description"
           id="test_heaader"
           title="Test title"
-        />,
-        undefined,
-      ],
+        />
+      </styled.div>,
     },
     "ref": null,
-    "rendered": Array [
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "function",
-        "props": Object {},
-        "ref": null,
-        "rendered": null,
-        "type": [Function],
-      },
-      undefined,
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "class",
-        "props": Object {
-          "hideBackButton": undefined,
-        },
-        "ref": null,
-        "rendered": null,
-        "type": [Function],
-      },
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "function",
-        "props": Object {
-          "breadcrumb": undefined,
-          "description": "Test description",
-          "id": "test_heaader",
-          "title": "Test title",
-        },
-        "ref": null,
-        "rendered": null,
-        "type": [Function],
-      },
-      undefined,
-    ],
-    "type": [Function],
-  },
-  Symbol(enzyme.__nodes__): Array [
-    Object {
+    "rendered": Object {
       "instance": null,
       "key": undefined,
       "nodeType": "class",
@@ -137,6 +94,91 @@ ShallowWrapper {
         },
         undefined,
       ],
+      "type": [Function],
+    },
+    "type": [Function],
+  },
+  Symbol(enzyme.__nodes__): Array [
+    Object {
+      "instance": null,
+      "key": undefined,
+      "nodeType": "class",
+      "props": Object {
+        "children": <styled.div>
+          <ConnectivityStatus />
+          <Connect(InjectIntl(TopMenuComponent))
+            hideBackButton={undefined}
+          />
+          <ViewHeading
+            breadcrumb={undefined}
+            description="Test description"
+            id="test_heaader"
+            title="Test title"
+          />
+        </styled.div>,
+      },
+      "ref": null,
+      "rendered": Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "class",
+        "props": Object {
+          "children": Array [
+            <ConnectivityStatus />,
+            undefined,
+            <Connect(InjectIntl(TopMenuComponent))
+              hideBackButton={undefined}
+            />,
+            <ViewHeading
+              breadcrumb={undefined}
+              description="Test description"
+              id="test_heaader"
+              title="Test title"
+            />,
+            undefined,
+          ],
+        },
+        "ref": null,
+        "rendered": Array [
+          Object {
+            "instance": null,
+            "key": undefined,
+            "nodeType": "function",
+            "props": Object {},
+            "ref": null,
+            "rendered": null,
+            "type": [Function],
+          },
+          undefined,
+          Object {
+            "instance": null,
+            "key": undefined,
+            "nodeType": "class",
+            "props": Object {
+              "hideBackButton": undefined,
+            },
+            "ref": null,
+            "rendered": null,
+            "type": [Function],
+          },
+          Object {
+            "instance": null,
+            "key": undefined,
+            "nodeType": "function",
+            "props": Object {
+              "breadcrumb": undefined,
+              "description": "Test description",
+              "id": "test_heaader",
+              "title": "Test title",
+            },
+            "ref": null,
+            "rendered": null,
+            "type": [Function],
+          },
+          undefined,
+        ],
+        "type": [Function],
+      },
       "type": [Function],
     },
   ],
