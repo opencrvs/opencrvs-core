@@ -50,14 +50,6 @@ export async function createServer() {
       validate: {
         payload: reqAuthSchema
       },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'User details are correct' },
-            400: { description: 'User details are incorrect' }
-          }
-        }
-      },
       response: {
         schema: resAuthSchema
       }
@@ -76,14 +68,6 @@ export async function createServer() {
         'Sends a new SMS code to the user based on the phone number associated with the nonce',
       validate: {
         payload: reqResendSmsSchema
-      },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'Nonce is valid' },
-            400: { description: 'Nonce is invalid' }
-          }
-        }
       },
       response: {
         schema: resResendSmsSchema
@@ -104,14 +88,6 @@ export async function createServer() {
       validate: {
         payload: reqVerifySchema
       },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'Code is valid' },
-            400: { description: 'Code is invalid' }
-          }
-        }
-      },
       response: {
         schema: resVerifySchema
       }
@@ -130,14 +106,6 @@ export async function createServer() {
         'Verifies the expired client token as true and returns a refreshed JWT API token for future requests',
       validate: {
         payload: reqRefreshSchema
-      },
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'Token is valid' },
-            400: { description: 'Token is invalid' }
-          }
-        }
       },
       response: {
         schema: resRefreshSchema

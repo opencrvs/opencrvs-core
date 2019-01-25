@@ -3,13 +3,14 @@ import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-
-interface IPageProps {
-  language?: string
-}
+import { setInitialDrafts } from 'src/drafts'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { getInitialDraftsLoaded } from 'src/drafts/selectors'
+import { setInitialUserDetails } from 'src/profile/profileActions'
+import { setOfflineData } from 'src/offline/actions'
+import { getOfflineDataLoaded } from 'src/offline/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -81,7 +82,37 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 `
 
-class Component extends React.Component<RouteComponentProps<{}> & IPageProps> {
+const StyledSpinner = styled(Spinner)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+`
+
+interface IPageProps {
+  language?: string
+  initialDraftsLoaded: boolean
+  offlineDataLoaded: boolean
+}
+
+interface IDispatchProps {
+  setInitialDrafts: () => void
+  setInitialUserDetails: () => void
+  setOfflineData: () => void
+}
+interface IState {
+  loadingDataModal: boolean
+}
+
+class Component extends React.Component<
+  RouteComponentProps<{}> & IPageProps & IDispatchProps,
+  IState
+> {
+  constructor(props: RouteComponentProps<{}> & IPageProps & IDispatchProps) {
+    super(props)
+    this.state = {
+      loadingDataModal: false
+    }
+  }
   componentWillReceiveProps(nextProps: RouteComponentProps<{}>) {
     const { hash } = nextProps.location
     const hashChanged = hash && hash !== this.props.location.hash
@@ -98,22 +129,50 @@ class Component extends React.Component<RouteComponentProps<{}> & IPageProps> {
       }, 0)
     }
   }
+
+  componentDidMount() {
+    this.props.setInitialDrafts()
+    this.props.setInitialUserDetails()
+    this.props.setOfflineData()
+  }
+
+  closeLoadingModal = () => {
+    this.setState(state => ({
+      loadingDataModal: false
+    }))
+  }
   render() {
-    const { children } = this.props
-    return (
-      <div>
-        <StyledPage {...this.props}>{children}</StyledPage>
-      </div>
-    )
+    const { initialDraftsLoaded, offlineDataLoaded, children } = this.props
+
+    if (initialDraftsLoaded && offlineDataLoaded) {
+      return (
+        <div>
+          <StyledPage {...this.props}>{children}</StyledPage>
+        </div>
+      )
+    } else {
+      return <StyledSpinner id="appSpinner" />
+    }
   }
 }
 
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
-    language: getLanguage(store)
+    language: getLanguage(store),
+    initialDraftsLoaded: getInitialDraftsLoaded(store),
+    offlineDataLoaded: getOfflineDataLoaded(store)
   }
 }
 
+const mapDispatchToProps = {
+  setInitialDrafts,
+  setInitialUserDetails,
+  setOfflineData
+}
+
 export const Page = withRouter(
-  connect<IPageProps, {}>(mapStateToProps)(Component)
+  connect<IPageProps, IDispatchProps>(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Component)
 )
