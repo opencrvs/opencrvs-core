@@ -34,7 +34,7 @@ const localRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'Local Registrar',
-  scope: ['register', 'certify', 'demo']
+  scope: ['register', 'performance', 'certify', 'demo']
 })
 
 const districtRegistrar = new User({

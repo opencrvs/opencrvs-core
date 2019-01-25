@@ -20,7 +20,7 @@ export interface IChildSectionFormData {
   bar: string
   baz: string
 }
-import { IFormSection } from '../index'
+import { IFormSection } from '../../../index'
 
 const messages = defineMessages({
   childTab: {

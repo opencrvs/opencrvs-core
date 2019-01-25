@@ -9,10 +9,10 @@ import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { WORK_QUEUE } from 'src/navigation/routes'
 import {
   DuplicateDetails,
-  Action as RegAction,
-  Event
+  Action as RegAction
 } from 'src/components/DuplicateDetails'
 import { RouteComponentProps } from 'react-router'
+import { Event } from 'src/forms'
 
 const messages = defineMessages({
   title: {
