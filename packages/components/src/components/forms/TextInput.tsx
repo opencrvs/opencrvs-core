@@ -5,6 +5,7 @@ export interface ICustomProps {
   error?: boolean
   touched?: boolean
   focusInput?: boolean
+  ignoreMediaQuery?: boolean
 }
 
 export type ITextInputProps = ICustomProps &
@@ -55,7 +56,7 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   }
 
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 515px;
+    ${({ ignoreMediaQuery }) => (ignoreMediaQuery ? '' : 'width: 515px')};
   }
 `
 
