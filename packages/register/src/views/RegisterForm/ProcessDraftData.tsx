@@ -64,7 +64,9 @@ const customKeys = [
   'weightAtBirth',
   '_fhirID',
   'placeOfBirth',
-  'currentAddressSameAsPermanent'
+  'currentAddressSameAsPermanent',
+  'postalCode',
+  'postalCodePermanent'
 ]
 
 const removeEmpty = (sectionData: IFormSectionData): IPersonDetails => {

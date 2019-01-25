@@ -47,7 +47,10 @@ import {
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
 import StoreTransformer from 'src/utils/transformData'
-import { processCertificateDraftData } from 'src/views/RegisterForm/ProcessDraftData'
+import {
+  processCertificateDraftData,
+  IRegistrationDetails
+} from 'src/views/RegisterForm/ProcessDraftData'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -354,11 +357,6 @@ class PrintCertificateActionComponent extends React.Component<
       data: {}
     }
 
-    // return {
-    //   id: registrationId,
-    //   details: processCertificateDraftData(registrationId, draft.data, data)
-    // }
-
     return processCertificateDraftData(registrationId, draft.data, data)
   }
 
@@ -655,10 +653,16 @@ class PrintCertificateActionComponent extends React.Component<
                   data.fetchBirthRegistration
                 )
 
-                const transData = StoreTransformer.transformData(
+                const transData: IRegistrationDetails = StoreTransformer.transformData(
                   data.fetchBirthRegistration
                 )
-                const reviewDraft = createReviewDraft(registrationId, transData)
+                const eventType =
+                  transData.registration && transData.registration.type
+                const reviewDraft = createReviewDraft(
+                  registrationId,
+                  transData,
+                  eventType
+                )
                 const draftExist = !!drafts.find(
                   draft => draft.id === registrationId
                 )
