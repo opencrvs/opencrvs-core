@@ -203,19 +203,19 @@ const mockDupeData = [
     ]
   }
 ]
-const rejectMutation = gql`
+export const rejectMutation = gql`
   mutation submitBirthAsRejected($id: String!, $reason: String!) {
     markBirthAsVoided(id: $id, reason: $reason)
   }
 `
 
-type State = {
+interface IState {
   selectedCompositionID: string
   showRejectModal: boolean
 }
 type Props = InjectedIntlProps & RouteComponentProps<{}>
 
-class ReviewDuplicatesClass extends React.Component<Props, State> {
+class ReviewDuplicatesClass extends React.Component<Props, IState> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -225,16 +225,14 @@ class ReviewDuplicatesClass extends React.Component<Props, State> {
   }
 
   toggleRejectModal = (id: string = '') => {
-    this.setState((prevState: State) => ({
+    this.setState((prevState: IState) => ({
       selectedCompositionID: id,
       showRejectModal: !prevState.showRejectModal
     }))
   }
-
   successfulRejection = (response: string) => {
-    const { history } = this.props
-    // TODO: need to change it
-    history.push(WORK_QUEUE)
+    this.toggleRejectModal()
+    window.location.reload()
   }
 
   render() {
@@ -275,11 +273,9 @@ class ReviewDuplicatesClass extends React.Component<Props, State> {
             id: this.state.selectedCompositionID,
             reason: 'Duplicate'
           }}
+          onCompleted={data => this.successfulRejection(data.markBirthAsVoided)}
         >
           {(submitBirthAsRejected, { data }) => {
-            if (data && data.markBirthAsVoided) {
-              this.successfulRejection(data.markBirthAsVoided)
-            }
             return (
               <Modal
                 title={intl.formatMessage(messages.rejectDescription)}

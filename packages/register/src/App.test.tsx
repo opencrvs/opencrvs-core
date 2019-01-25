@@ -12,8 +12,7 @@ import {
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  REVIEW_BIRTH_PARENT_FORM_TAB,
-  REVIEW_DUPLICATES
+  REVIEW_BIRTH_PARENT_FORM_TAB
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -889,58 +888,6 @@ describe('when user has a valid token in local storage', () => {
             expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
           })
         })
-      })
-    })
-    /* Need to change the test cases once the actuall page moves to 
-    real gql queries instead of mock data */
-    describe('when user is in vital event selection view', () => {
-      beforeEach(() => {
-        history.replace(REVIEW_DUPLICATES, { applicationId: 1 })
-        app.update()
-      })
-      it('detail boxes are loaded properly', () => {
-        expect(app.find('#detail_box_1').hostNodes()).toHaveLength(1)
-        expect(app.find('#detail_box_2').hostNodes()).toHaveLength(1)
-        expect(app.find('#detail_box_3').hostNodes()).toHaveLength(1)
-      })
-      it('reject confirmation shows up if reject link is clicked', () => {
-        app
-          .find('#reject_link_1')
-          .hostNodes()
-          .simulate('click')
-
-        app.update()
-        expect(app.find('#reject_confirm').hostNodes()).toHaveLength(1)
-      })
-      it('back link on reject confirm modal hides the confirm modal', () => {
-        app
-          .find('#reject_link_1')
-          .hostNodes()
-          .simulate('click')
-
-        app
-          .find('#back_link')
-          .hostNodes()
-          .simulate('click')
-        app.update()
-
-        expect(app.find('#reject_confirm').hostNodes()).toHaveLength(0)
-      })
-      /* TODO: need to change this */
-      it('successfuly rejects the application', async () => {
-        app
-          .find('#reject_link_1')
-          .hostNodes()
-          .simulate('click')
-
-        app
-          .find('#reject_confirm')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-
-        expect(app.find('#reject_confirm').hostNodes()).toHaveLength(0)
       })
     })
   })
