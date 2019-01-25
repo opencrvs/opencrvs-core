@@ -37,6 +37,7 @@ import {
   SAVED_REGISTRATION,
   REJECTED_REGISTRATION
 } from 'src/navigation/routes'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -457,98 +458,111 @@ class RegisterFormView extends React.Component<FullProps, State> {
           />
         </ViewHeaderWithTabs>
         <FormContainer>
-          <Swipeable
-            disabled={isReviewSection}
-            id="swipeable_block"
-            trackMouse
-            onSwipedLeft={() =>
-              this.onSwiped(draft.id, nextSection, this.props.tabRoute, goToTab)
-            }
-            onSwipedRight={() =>
-              this.onSwiped(
-                draft.id,
-                getPreviousSection(registerForm.sections, activeSection),
-                this.props.tabRoute,
-                goToTab
-              )
-            }
-          >
-            {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-              <ReviewSection
-                tabRoute={this.props.tabRoute}
-                draft={draft}
-                submitClickEvent={this.submitForm}
-                saveDraftClickEvent={() => history.push('/')}
-                deleteApplicationClickEvent={() => {
-                  this.props.deleteDraft(draft)
-                  history.push('/')
-                }}
-              />
-            )}
-            {activeSection.viewType === VIEW_TYPE.REVIEW && (
-              <ReviewSection
-                tabRoute={this.props.tabRoute}
-                draft={draft}
-                rejectApplicationClickEvent={() => {
-                  this.toggleRejectForm()
-                }}
-                registerClickEvent={this.registerApplication}
-              />
-            )}
-            {activeSection.viewType === 'form' && (
-              <Box>
-                <FormSectionTitle id={`form_section_title_${activeSection.id}`}>
-                  {intl.formatMessage(activeSection.title)}
-                </FormSectionTitle>
-                <form
-                  id={`form_section_id_${activeSection.id}`}
-                  onSubmit={handleSubmit}
-                >
-                  <FormFieldGenerator
-                    id={activeSection.id}
-                    onChange={this.modifyDraft}
-                    setAllFieldsDirty={setAllFieldsDirty}
-                    fields={activeSection.fields}
-                    offlineResources={offlineResources}
-                  />
-                </form>
-                <FormActionSection>
-                  <FormAction>
-                    {
-                      <BackButtonContainer onClick={goBack}>
-                        <BackButton icon={() => <ArrowBack />} />
-                        <BackButtonText>
-                          {intl.formatMessage(messages.back)}
-                        </BackButtonText>
-                      </BackButtonContainer>
-                    }
-                    {nextSection && (
-                      <FormPrimaryButton
-                        onClick={() =>
-                          goToTab(this.props.tabRoute, draft.id, nextSection.id)
-                        }
-                        id="next_section"
-                        icon={() => <ArrowForward />}
-                      >
-                        {intl.formatMessage(messages.next)}
-                      </FormPrimaryButton>
-                    )}
-                  </FormAction>
-                  <FormActionDivider />
-                  <FormAction>
-                    {
-                      <DraftButtonContainer onClick={() => history.push('/')}>
-                        <DraftSimple />
-                        <DraftButtonText>
-                          {intl.formatMessage(messages.valueSaveAsDraft)}
-                        </DraftButtonText>
-                      </DraftButtonContainer>
-                    }
-                  </FormAction>
-                </FormActionSection>
-              </Box>
-            )}
-          </Swipeable>
+          <HeaderContent>
+            <Swipeable
+              disabled={isReviewSection}
+              id="swipeable_block"
+              trackMouse
+              onSwipedLeft={() =>
+                this.onSwiped(
+                  draft.id,
+                  nextSection,
+                  this.props.tabRoute,
+                  goToTab
+                )
+              }
+              onSwipedRight={() =>
+                this.onSwiped(
+                  draft.id,
+                  getPreviousSection(registerForm.sections, activeSection),
+                  this.props.tabRoute,
+                  goToTab
+                )
+              }
+            >
+              {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+                <ReviewSection
+                  tabRoute={this.props.tabRoute}
+                  draft={draft}
+                  submitClickEvent={this.submitForm}
+                  saveDraftClickEvent={() => history.push('/')}
+                  deleteApplicationClickEvent={() => {
+                    this.props.deleteDraft(draft)
+                    history.push('/')
+                  }}
+                />
+              )}
+              {activeSection.viewType === VIEW_TYPE.REVIEW && (
+                <ReviewSection
+                  tabRoute={this.props.tabRoute}
+                  draft={draft}
+                  rejectApplicationClickEvent={() => {
+                    this.toggleRejectForm()
+                  }}
+                  registerClickEvent={this.registerApplication}
+                />
+              )}
+              {activeSection.viewType === 'form' && (
+                <Box>
+                  <FormSectionTitle
+                    id={`form_section_title_${activeSection.id}`}
+                  >
+                    {intl.formatMessage(activeSection.title)}
+                  </FormSectionTitle>
+                  <form
+                    id={`form_section_id_${activeSection.id}`}
+                    onSubmit={handleSubmit}
+                  >
+                    <FormFieldGenerator
+                      id={activeSection.id}
+                      onChange={this.modifyDraft}
+                      setAllFieldsDirty={setAllFieldsDirty}
+                      fields={activeSection.fields}
+                      offlineResources={offlineResources}
+                    />
+                  </form>
+                  <FormActionSection>
+                    <FormAction>
+                      {
+                        <BackButtonContainer onClick={goBack}>
+                          <BackButton icon={() => <ArrowBack />} />
+                          <BackButtonText>
+                            {intl.formatMessage(messages.back)}
+                          </BackButtonText>
+                        </BackButtonContainer>
+                      }
+                      {nextSection && (
+                        <FormPrimaryButton
+                          onClick={() =>
+                            goToTab(
+                              this.props.tabRoute,
+                              draft.id,
+                              nextSection.id
+                            )
+                          }
+                          id="next_section"
+                          icon={() => <ArrowForward />}
+                        >
+                          {intl.formatMessage(messages.next)}
+                        </FormPrimaryButton>
+                      )}
+                    </FormAction>
+                    <FormActionDivider />
+                    <FormAction>
+                      {
+                        <DraftButtonContainer onClick={() => history.push('/')}>
+                          <DraftSimple />
+                          <DraftButtonText>
+                            {intl.formatMessage(messages.valueSaveAsDraft)}
+                          </DraftButtonText>
+                        </DraftButtonContainer>
+                      }
+                    </FormAction>
+                  </FormActionSection>
+                </Box>
+              )}
+            </Swipeable>
+          </HeaderContent>
         </FormContainer>
         <ViewFooter>
           <FooterAction>
