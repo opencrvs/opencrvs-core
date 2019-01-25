@@ -23,6 +23,10 @@ export function birthAttachmentTransformer(
   field: IFormField
 ) {
   return attachmentTransformer(
+    transformedData,
+    draftData,
+    sectionId,
+    field,
     'registration',
     documentForWhomFhirMapping,
     documentTypeFhirMapping

@@ -217,16 +217,15 @@ export function ignoreValueTransformer(
   return transformedData
 }
 
-export const attachmentTransformer = (
-  alternateSectionId?: string,
-  subjectMapper?: any,
-  typeMapper?: any
-) => (
+export function attachmentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
-  field: IFormField
-) => {
+  field: IFormField,
+  alternateSectionId?: string,
+  subjectMapper?: any,
+  typeMapper?: any
+) {
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     attachment => {
       return {
