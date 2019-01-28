@@ -221,5 +221,9 @@ export const conditionals: IConditionals = {
   applicantPermanentAddressSameAsCurrent: {
     action: 'hide',
     expression: 'values.applicantPermanentAddressSameAsCurrent'
+  },
+  deathPlaceOther: {
+    action: 'hide',
+    expression: 'values.deathPlaceAddress !== "other"'
   }
 }

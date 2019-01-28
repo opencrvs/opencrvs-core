@@ -57,8 +57,7 @@ describe('when user is in the register form before initial draft load', () => {
 describe('when user is in the register form', async () => {
   const { store, history } = createStore()
   const draft = createDraft(Event.BIRTH)
-  const initalDrafts = JSON.parse('[]')
-  store.dispatch(setInitialDrafts(initalDrafts))
+  store.dispatch(setInitialDrafts())
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
 
@@ -112,8 +111,7 @@ describe('when user is in the register form', async () => {
 describe('when user is in the register form preview section', () => {
   const { store, history } = createStore()
   const draft = createDraft(Event.BIRTH)
-  const initalDrafts = JSON.parse('[]')
-  store.dispatch(setInitialDrafts(initalDrafts))
+  store.dispatch(setInitialDrafts())
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
 
@@ -162,8 +160,7 @@ describe('when user is in the register form review section', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
     const draft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
-    const initalDrafts = JSON.parse('[]')
-    store.dispatch(setInitialDrafts(initalDrafts))
+    store.dispatch(setInitialDrafts())
     store.dispatch(storeDraft(draft))
     const mock: any = jest.fn()
     const form = getReviewForm(store.getState())

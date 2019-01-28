@@ -6,7 +6,8 @@ import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
   goToEvents as goToEventsAction,
-  goToMyRecords as goToMyRecordsAction
+  goToMyRecords as goToMyRecordsAction,
+  goToMyDrafts as goToMyDraftsAction
 } from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import {
@@ -31,6 +32,7 @@ import { IUserDetails } from '../../utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { NOTIFICATION_STATUS, REJECTED_STATUS } from 'src/utils/constants'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const messages = defineMessages({
   declareNewEventActionTitle: {
@@ -156,6 +158,8 @@ interface IHomeProps {
   userDetails: IUserDetails
   goToEvents: typeof goToEventsAction
   goToMyRecords: typeof goToMyRecordsAction
+  goToMyDrafts: typeof goToMyDraftsAction
+  draftCount: string
 }
 
 type FullProps = IHomeProps &
@@ -185,45 +189,52 @@ class HomeView extends React.Component<FullProps> {
             id="home_view"
           />
           <StyledActionList id="home_action_list">
-            <StyledIconAction
-              id="new_event_declaration"
-              icon={() => <StyledPlusIcon />}
-              onClick={this.props.goToEvents}
-              title={intl.formatMessage(messages.declareNewEventActionTitle)}
-            />
-            <Banner
-              text={intl.formatMessage(messages.notificationsToComplete)}
-              count={10}
-              status={NOTIFICATION_STATUS}
-            />
-            <Banner
-              text={intl.formatMessage(messages.rejectedApplications)}
-              count={10}
-              status={REJECTED_STATUS}
-            />
-            <CountAction
-              id="saved_drafts"
-              count={'10'}
-              title={intl.formatMessage(messages.savedDrafts)}
-            />
-            <CountAction
-              id="records"
-              count={'10'}
-              onClick={this.props.goToMyRecords}
-              title={intl.formatMessage(messages.records)}
-            />
-            <SearchInput
-              placeholder={intl.formatMessage(messages.trackingId)}
-              buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
-              {...this.props}
-            />
+            <HeaderContent>
+              <StyledIconAction
+                id="new_event_declaration"
+                icon={() => <StyledPlusIcon />}
+                onClick={this.props.goToEvents}
+                title={intl.formatMessage(messages.declareNewEventActionTitle)}
+              />
+              <Banner
+                text={intl.formatMessage(messages.notificationsToComplete)}
+                count={10}
+                status={NOTIFICATION_STATUS}
+              />
+              <Banner
+                text={intl.formatMessage(messages.rejectedApplications)}
+                count={10}
+                status={REJECTED_STATUS}
+              />
+              <CountAction
+                id="saved_drafts"
+                count={this.props.draftCount}
+                onClick={this.props.goToMyDrafts}
+                title={intl.formatMessage(messages.savedDrafts)}
+              />
+              <CountAction
+                id="records"
+                count={'10'}
+                onClick={this.props.goToMyRecords}
+                title={intl.formatMessage(messages.records)}
+              />
+              <SearchInput
+                placeholder={intl.formatMessage(messages.trackingId)}
+                buttonLabel={intl.formatMessage(
+                  messages.searchInputButtonTitle
+                )}
+                {...this.props}
+              />
+            </HeaderContent>
           </StyledActionList>
           <ViewFooter>
-            <FooterAction>
-              <FooterPrimaryButton>
-                {intl.formatMessage(messages.logoutActionTitle)}
-              </FooterPrimaryButton>
-            </FooterAction>
+            <HeaderContent>
+              <FooterAction>
+                <FooterPrimaryButton>
+                  {intl.formatMessage(messages.logoutActionTitle)}
+                </FooterPrimaryButton>
+              </FooterAction>
+            </HeaderContent>
           </ViewFooter>
         </>
       )
@@ -241,7 +252,9 @@ class HomeView extends React.Component<FullProps> {
 }
 
 const mapStateToProps = (store: IStoreState) => {
+  const draftCount = store.drafts.drafts.length.toString()
   return {
+    draftCount,
     language: getLanguage(store),
     userDetails: getUserDetails(store)
   }
@@ -250,6 +263,7 @@ export const Home = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction,
-    goToMyRecords: goToMyRecordsAction
+    goToMyRecords: goToMyRecordsAction,
+    goToMyDrafts: goToMyDraftsAction
   }
 )(injectIntl(HomeView))
