@@ -10,6 +10,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import { getInitialDraftsLoaded } from 'src/drafts/selectors'
 import { setInitialUserDetails } from 'src/profile/profileActions'
 import { setOfflineData } from 'src/offline/actions'
+import { getMyRecords } from 'src/records/actions'
 import { getOfflineDataLoaded } from 'src/offline/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
@@ -98,6 +99,7 @@ interface IDispatchProps {
   setInitialDrafts: () => void
   setInitialUserDetails: () => void
   setOfflineData: () => void
+  getMyRecords: () => void
 }
 interface IState {
   loadingDataModal: boolean
@@ -134,6 +136,7 @@ class Component extends React.Component<
     this.props.setInitialDrafts()
     this.props.setInitialUserDetails()
     this.props.setOfflineData()
+    this.props.getMyRecords()
   }
 
   closeLoadingModal = () => {
@@ -167,7 +170,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
 const mapDispatchToProps = {
   setInitialDrafts,
   setInitialUserDetails,
-  setOfflineData
+  setOfflineData,
+  getMyRecords
 }
 
 export const Page = withRouter(

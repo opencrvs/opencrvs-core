@@ -160,6 +160,7 @@ interface IHomeProps {
   goToMyRecords: typeof goToMyRecordsAction
   goToMyDrafts: typeof goToMyDraftsAction
   draftCount: string
+  recordCount: string
 }
 
 type FullProps = IHomeProps &
@@ -214,7 +215,7 @@ class HomeView extends React.Component<FullProps> {
               />
               <CountAction
                 id="records"
-                count={'10'}
+                count={this.props.recordCount}
                 onClick={this.props.goToMyRecords}
                 title={intl.formatMessage(messages.records)}
               />
@@ -253,8 +254,10 @@ class HomeView extends React.Component<FullProps> {
 
 const mapStateToProps = (store: IStoreState) => {
   const draftCount = store.drafts.drafts.length.toString()
+  const recordCount = store.records.data.length.toString()
   return {
     draftCount,
+    recordCount,
     language: getLanguage(store),
     userDetails: getUserDetails(store)
   }

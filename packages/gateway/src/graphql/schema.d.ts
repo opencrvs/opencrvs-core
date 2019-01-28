@@ -14,6 +14,7 @@ export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
   fetchBirthRegistration?: GQLBirthRegistration
   listBirthRegistrations?: Array<GQLBirthRegistration | null>
+  listUserRecentRecords?: Array<GQLBirthRegistration | null>
   listDeathRegistrations?: Array<GQLBirthRegistration | null>
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
@@ -625,6 +626,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
+  listUserRecentRecords?: QueryToListUserRecentRecordsResolver<TParent>
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
@@ -679,6 +681,21 @@ export interface QueryToListBirthRegistrationsResolver<
   (
     parent: TParent,
     args: QueryToListBirthRegistrationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToListUserRecentRecordsArgs {
+  userId?: string
+}
+export interface QueryToListUserRecentRecordsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToListUserRecentRecordsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

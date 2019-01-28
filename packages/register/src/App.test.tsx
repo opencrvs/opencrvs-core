@@ -3,7 +3,8 @@ import {
   createTestApp,
   mockUserResponseWithName,
   mockOfflineData,
-  userDetails
+  userDetails,
+  mockMyRecords
 } from './tests/util'
 import { config } from '../src/config'
 import { v4 as uuid } from 'uuid'
@@ -46,6 +47,10 @@ const setItem = window.localStorage.setItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
+
+const mockFetchUserRecords = jest.fn()
+mockFetchUserRecords.mockReturnValue(mockMyRecords)
+queries.fetchUserRecords = mockFetchUserRecords
 
 const mockFetchLocations = jest.fn()
 mockFetchLocations.mockReturnValue({

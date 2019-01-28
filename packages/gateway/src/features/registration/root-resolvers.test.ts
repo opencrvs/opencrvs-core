@@ -54,6 +54,39 @@ describe('Registration root resolvers', () => {
       expect(compositions).toHaveLength(2)
     })
   })
+
+  describe('listUserRecentRecords()', () => {
+    it('returns an array of composition results', async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ mobile: '+880711111111' })],
+        [JSON.stringify({ entry: [{ resource: {} }] })],
+        [
+          JSON.stringify({
+            entry: [
+              {
+                resource: {
+                  focus: {
+                    reference:
+                      'Composition/5adbd1a1-806c-4abd-af9a-5844f6a005a0'
+                  }
+                }
+              }
+            ]
+          })
+        ],
+        [JSON.stringify({ entry: [{}] })]
+      )
+      // @ts-ignore
+      const compositions = await resolvers.Query.listUserRecentRecords(
+        {},
+        { userId: '123' }
+      )
+
+      expect(compositions).toBeDefined()
+      expect(compositions).toBeInstanceOf(Array)
+      expect(compositions).toHaveLength(1)
+    })
+  })
   describe('createBirthRegistration()', () => {
     const details = {
       child: {

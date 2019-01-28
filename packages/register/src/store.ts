@@ -39,6 +39,7 @@ import {
   IPrintFormState,
   printReducer
 } from './views/PrintCertificate/printReducer'
+import { myRecordsReducer, IMyRecordsState } from './records/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -52,6 +53,7 @@ export interface IStoreState {
   printCertificateForm: IPrintFormState
   reject: IRejectState
   offline: IOfflineDataState
+  records: IMyRecordsState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -65,7 +67,8 @@ const reducers = combineReducers<IStoreState>({
   reviewForm: reviewReducer,
   reject: rejectReducer,
   printCertificateForm: printReducer,
-  offline: offlineDataReducer
+  offline: offlineDataReducer,
+  records: myRecordsReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

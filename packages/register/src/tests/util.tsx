@@ -535,3 +535,125 @@ export const mockOfflineData = {
     }
   ]
 }
+export const mockMyRecords = {
+  data: {
+    listUserRecentRecords: [
+      {
+        id: '5adbd1a1-806c-4abd-af9a-5844f6a005a0',
+        registration: {
+          trackingId: 'BXWQEK2',
+          registrationNumber: null,
+          status: [
+            {
+              user: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Shakib',
+                    familyName: 'Al Hasan',
+                    __typename: 'HumanName'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: '',
+                    __typename: 'HumanName'
+                  }
+                ],
+                role: 'FIELD_AGENT',
+                __typename: 'User'
+              },
+              location: {
+                name: 'Moktarpur',
+                alias: ['মোক্তারপুর'],
+                __typename: 'Location'
+              },
+              type: 'DECLARED',
+              timestamp: '2019-01-22T03:31:05.948Z',
+              __typename: 'RegWorkflow'
+            }
+          ],
+          __typename: 'Registration'
+        },
+        child: {
+          name: [
+            {
+              use: 'bn',
+              firstNames: 'নাইম',
+              familyName: 'ইসলাম',
+              __typename: 'HumanName'
+            },
+            {
+              use: 'en',
+              firstNames: '',
+              familyName: '',
+              __typename: 'HumanName'
+            }
+          ],
+          birthDate: '2012-01-01',
+          __typename: 'Person'
+        },
+        createdAt: '2019-01-22T03:31:05.948Z',
+        __typename: 'BirthRegistration'
+      },
+      {
+        id: '9823859c-8277-4aa1-88d9-7529a7527e87',
+        registration: {
+          trackingId: 'BLUMYS2',
+          registrationNumber: null,
+          status: [
+            {
+              user: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Shakib',
+                    familyName: 'Al Hasan',
+                    __typename: 'HumanName'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: '',
+                    __typename: 'HumanName'
+                  }
+                ],
+                role: 'FIELD_AGENT',
+                __typename: 'User'
+              },
+              location: {
+                name: 'Moktarpur',
+                alias: ['মোক্তারপুর'],
+                __typename: 'Location'
+              },
+              type: 'DECLARED',
+              timestamp: '2019-01-24T10:38:28.688Z',
+              __typename: 'RegWorkflow'
+            }
+          ],
+          __typename: 'Registration'
+        },
+        child: {
+          name: [
+            {
+              use: 'bn',
+              firstNames: 'নাইম',
+              familyName: 'ইসলাম',
+              __typename: 'HumanName'
+            },
+            {
+              use: 'en',
+              firstNames: '',
+              familyName: '',
+              __typename: 'HumanName'
+            }
+          ],
+          birthDate: '2002-02-02',
+          __typename: 'Person'
+        },
+        createdAt: '2019-01-24T10:38:28.688Z',
+        __typename: 'BirthRegistration'
+      }
+    ]
+  }
+}

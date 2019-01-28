@@ -11,6 +11,8 @@ import {
   removeDuplicatesFromComposition
 } from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
+import { getUserMobile, convertToLocal } from 'src/features/user/utils'
+import { COUNTRY } from 'src/constants'
 
 const statusMap = {
   declared: 'preliminary',
@@ -32,6 +34,13 @@ export const resolvers: GQLResolver = {
       )
 
       return bundle.entry.map((entry: { resource: {} }) => entry.resource)
+    },
+    async listUserRecentRecords(_, { userId }, authHeader) {
+      if (userId) {
+        return getCompositionsByUser(userId, authHeader)
+      } else {
+        throw new Error('User ID does not exist')
+      }
     }
   },
 
@@ -138,6 +147,50 @@ async function getCompositionsByLocation(
 
   const filteredComposition =
     flattened && flattened.filter(composition => composition !== undefined)
+  return filteredComposition
+}
+
+async function getPractitionerResource(
+  userId: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Practitioner> {
+  const userMobileResponse = await getUserMobile(userId, authHeader)
+  const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
+  const practitionerBundle = await fetchFHIR(
+    `/Practitioner?telecom=phone|${localMobile}`,
+    authHeader
+  )
+  if (
+    !practitionerBundle ||
+    !practitionerBundle.entry ||
+    !practitionerBundle.entry[0] ||
+    !practitionerBundle.entry[0].resource
+  ) {
+    throw new Error('Practitioner resource not found')
+  }
+  return practitionerBundle.entry[0].resource
+}
+
+async function getCompositionsByUser(userId: string, authHeader: IAuthHeader) {
+  const practitionerResource = (await getPractitionerResource(
+    userId,
+    authHeader
+  )) as fhir.Practitioner
+
+  const tasksResponses = (await fetchFHIR(
+    `/Task?user=Practitioner/${
+      practitionerResource.id
+    }&business-status=DECLARED&_count=50`,
+    authHeader
+  )) as fhir.Bundle
+  const compositions =
+    (await getComposition(tasksResponses, authHeader)) || ([] as fhir.Bundle[])
+
+  const flattened = compositions.reduce((a, b) => a && a.concat(b), [])
+
+  const filteredComposition =
+    flattened &&
+    flattened.filter((composition: fhir.Bundle) => composition !== undefined)
   return filteredComposition
 }
 

@@ -315,6 +315,7 @@ type Query {
     from: Date
     to: Date
   ): [BirthRegistration]
+  listUserRecentRecords(userId: String): [BirthRegistration]
   listDeathRegistrations(
     locationIds: [String]
     status: String
