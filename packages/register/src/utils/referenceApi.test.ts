@@ -10,7 +10,7 @@ const mockFetchLocations = {
       name: 'Barisal',
       nameBn: 'বরিশাল',
       physicalType: 'Jurisdiction',
-      juristictionType: 'DIVISION',
+      jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     }

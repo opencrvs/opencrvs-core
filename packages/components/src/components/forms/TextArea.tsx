@@ -19,6 +19,10 @@ const StyledTextArea = styled.textarea`
   &:-ms-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholder};
   }
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 515px;
+  }
 `
 
 export class TextArea extends React.Component {

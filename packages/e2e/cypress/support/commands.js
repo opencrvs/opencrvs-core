@@ -56,8 +56,7 @@ Cypress.Commands.add('login', (userType, options = {}) => {
           cy.visit(`${Cypress.env('REGISTER_URL')}?token=${body.token}`)
         })
     })
-  cy.wait(5000)
-  cy.get('#offline_data_continue').click()
+  cy.wait(1000)
 })
 
 Cypress.Commands.add('selectOption', (selector, text, option) => {

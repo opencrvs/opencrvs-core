@@ -6,7 +6,7 @@ import { getReviewForm } from '@opencrvs/register/src/forms/register/review-sele
 import {
   createReviewDraft,
   IDraft,
-  setInitialDrafts,
+  getStorageDraftsSuccess,
   storeDraft
 } from '@opencrvs/register/src/drafts'
 import { v4 as uuid } from 'uuid'
@@ -726,8 +726,7 @@ describe('ReviewForm tests', async () => {
         type: 'BIRTH'
       }
     }
-    const initalDrafts = JSON.parse('[]')
-    store.dispatch(setInitialDrafts(initalDrafts))
+    store.dispatch(getStorageDraftsSuccess(JSON.stringify([draft])))
     store.dispatch(storeDraft(draft))
 
     const testComponent = createTestComponent(

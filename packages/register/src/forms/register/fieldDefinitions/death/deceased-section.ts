@@ -47,7 +47,7 @@ const messages = defineMessages({
   },
   deceasedGivenNames: {
     id: 'formFields.deceasedGivenNames',
-    defaultMessage: 'Given name (s)',
+    defaultMessage: 'Given Name (s)',
     description: 'Label for form field: Given names'
   },
   deceasedFamilyName: {
@@ -240,7 +240,7 @@ export const deceasedSection: IFormSection = {
       name: 'birthDate',
       type: DATE,
       label: messages.deceasedDateOfBirth,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [dateFormat]
     },

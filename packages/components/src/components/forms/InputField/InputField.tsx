@@ -35,6 +35,10 @@ const InputDescription = styled.p`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
   color: ${({ theme }) => theme.colors.copy};
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 515px;
+  }
 `
 
 export interface IInputFieldProps {
