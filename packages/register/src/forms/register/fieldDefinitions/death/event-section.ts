@@ -13,7 +13,6 @@ import { defineMessages } from 'react-intl'
 import { dateFormat } from 'src/utils/validate'
 
 import { messages as addressMessages } from '../../../address'
-import { config } from 'src/config'
 import { countries } from 'src/forms/countries'
 import { conditionals } from 'src/forms/utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
@@ -205,7 +204,7 @@ export const eventSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: (window as any).config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       conditionals: [conditionals.deathPlaceOther]

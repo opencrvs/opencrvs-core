@@ -12,8 +12,8 @@ export function goToHome() {
 
 export function goToRegister() {
   // @ts-ignore
-  window.config.location.assign(
+  window.location.assign(
     // @ts-ignore
-    `${window.window.config.REGISTER_URL}?token=${getToken()}`
+    `${window.config.REGISTER_URL}?token=${getToken()}`
   )
 }

@@ -45,7 +45,7 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
           }),
           Cmd.run(() => {
             // @ts-ignore
-            window.config.location.assign(window.config.LOGIN_URL)
+            window.location.assign(window.config.LOGIN_URL)
           })
         ])
       )

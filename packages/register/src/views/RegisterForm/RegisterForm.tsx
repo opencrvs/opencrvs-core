@@ -37,7 +37,6 @@ import {
   SAVED_REGISTRATION,
   REJECTED_REGISTRATION
 } from 'src/navigation/routes'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};

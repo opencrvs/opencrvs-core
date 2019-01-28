@@ -6,7 +6,7 @@ import { resolve } from 'url'
 
 const httpLink = createHttpLink({
   // @ts-ignore
-  uri: resolve(window.window.config.API_GATEWAY_URL, 'graphql')
+  uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
 })
 
 const authLink = setContext((_, { headers }) => {

@@ -56,8 +56,7 @@ export function createTestComponent(
   const component = mount(
     <Provider store={store}>
       <I18nContainer>
-        // @ts-ignore
-        <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
+        <ThemeProvider theme={getTheme((window as any).config.COUNTRY)}>
           {nodeWithIntlProp(node)}
         </ThemeProvider>
       </I18nContainer>

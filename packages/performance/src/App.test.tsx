@@ -33,7 +33,7 @@ it("redirects user to SSO if user doesn't have a token", async () => {
   await flushPromises()
 
   // @ts-ignore
-  expect(assign.mock.calls[0][0]).toBe(window.window.config.LOGIN_URL)
+  expect(assign.mock.calls[0][0]).toBe(window.config.LOGIN_URL)
 })
 
 const validToken =
@@ -99,7 +99,7 @@ describe('when user navigates', () => {
     expect(window.location.assign).toHaveBeenCalled()
     expect((window.location.assign as jest.Mock).mock.calls[0][0]).toContain(
       // @ts-ignore
-      `${window.window.config.REGISTER_URL}?token=`
+      `${window.config.REGISTER_URL}?token=`
     )
   })
 })
