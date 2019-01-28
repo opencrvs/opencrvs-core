@@ -336,6 +336,7 @@ type Mutation {
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markBirthAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
+  notADuplicate(id: ID!, duplicateId: ID!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): ID!
   updateDeathRegistration(
