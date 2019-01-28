@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ActionPage, Box, Modal } from '@opencrvs/components/lib/interface'
+import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
@@ -10,7 +10,7 @@ import {
 } from 'src/components/DuplicateDetails'
 import { Event } from 'src/forms'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { NotDuplicateConfirmation } from 'src/views/Duplicates/NotDuplicateConfirmation'
 
 const messages = defineMessages({
   title: {
@@ -31,7 +31,7 @@ const messages = defineMessages({
   },
   rejectButton: {
     id: 'duplicate.modal.rejectButton',
-    defaultMessage: 'Reject',
+    defaultMessage: 'Yes',
     description: 'Reject button on reject modal'
   }
 })
@@ -237,22 +237,11 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps, State> {
           </Container>
         </ActionPage>
 
-        <Modal
-          title="Are you sure this is not a duplicate?"
-          actions={[
-            <PrimaryButton
-              key="reject"
-              id="reject_duplicate"
-              onClick={() => console.log('Duplicate rejected')}
-            >
-              {this.props.intl.formatMessage(messages.rejectButton)}
-            </PrimaryButton>
-          ]}
+        <NotDuplicateConfirmation
+          handleYes={() => console.log('Not a duplicate mutation submitted')}
           show={this.state.showNonDuplicateModal}
           handleClose={this.toggleNonDuplicateModal}
-        >
-          {this.props.intl.formatMessage(messages.description)}
-        </Modal>
+        />
       </>
     )
   }
