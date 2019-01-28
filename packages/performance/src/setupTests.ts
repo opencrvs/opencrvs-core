@@ -17,3 +17,12 @@ Object.defineProperty(window, 'localStorage', {
 ;(window as any).location.reload = jest.fn()
 // tslint:disable-next-line no-empty
 ;(window as any).scrollTo = () => {}
+
+// tslint:disable-next-line:no-any
+;(window as any).config = {
+  API_GATEWAY_URL: 'http://localhost:7070/',
+  COUNTRY: 'bgd',
+  LANGUAGE: 'en',
+  LOGIN_URL: 'http://localhost:3020',
+  REGISTER_URL: 'http://localhost:3000'
+}
