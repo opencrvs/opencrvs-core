@@ -1,8 +1,9 @@
 import {
   selectOrCreateDocRefResource,
-  selectOrCreateCollectorPersonResource
+  selectOrCreateCollectorPersonResource,
+  removeDuplicatesFromComposition
 } from './utils'
-import { mockFhirBundle } from '../../utils/testUtils'
+import { mockFhirBundle, mockComposition } from '../../utils/testUtils'
 import * as fetch from 'jest-fetch-mock'
 import { ITemplatedBundle } from '../registration/fhir-builders'
 import { clone } from 'lodash'
@@ -63,5 +64,39 @@ describe('Fhir util function testing', () => {
         'No related collector person entry not found on fhir bundle'
       )
     })
+  })
+  describe('removeDuplicatesFromComposition()', () => {
+    it('should remove only specific duplicate entry', () => {
+      const mockCompositionCloned = clone(mockComposition)
+      const composition = removeDuplicatesFromComposition(
+        // @ts-ignore
+        mockCompositionCloned,
+        '123',
+        'abc'
+      )
+      expect(composition.relatesTo.length).toEqual(1)
+    })
+
+    it('should remove all duplicates', () => {
+      const mockCompositionCloned = clone(mockComposition)
+      const composition = removeDuplicatesFromComposition(
+        // @ts-ignore
+        mockCompositionCloned,
+        '123',
+        '123'
+      )
+      expect(composition.relatesTo.length).toEqual(0)
+    })
+
+    // it('should not remove any item from relatesTo if its not with a duplicate code', () => {
+    //   const mockCompositionCloned = clone(mockComposition)
+    //   const composition = removeDuplicatesFromComposition(
+    //     // @ts-ignore
+    //     mockCompositionCloned,
+    //     '123',
+    //     '123'
+    //   )
+    //   expect(composition.relatesTo.length).toEqual(1)
+    // })
   })
 })

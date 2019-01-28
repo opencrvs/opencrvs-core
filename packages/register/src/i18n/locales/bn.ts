@@ -759,6 +759,10 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantRelation.other': 'অন্যান্য (উল্লেখ করুন)',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
-    'formFields.applicant.phone': 'ফোন নম্বর'
+    'formFields.applicant.phone': 'ফোন নম্বর',
+    'register.duplicates.notDuplicate.modal.back': 'পিছনে',
+    'register.duplicates.notDuplicate.modal.yes': 'হাঁ',
+    'register.duplicates.notDuplicate.modal.confirmationText':
+      'আপনি কি নিশ্চিত এই আবেদন নকল না?'
   }
 }

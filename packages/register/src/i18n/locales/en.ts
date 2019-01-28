@@ -768,6 +768,10 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantRelation.other': 'Other(Specify)',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
-    'formFields.applicant.phone': 'Phone number'
+    'formFields.applicant.phone': 'Phone number',
+    'register.duplicates.notDuplicate.modal.back': 'Back',
+    'register.duplicates.notDuplicate.modal.yes': 'Yes',
+    'register.duplicates.notDuplicate.modal.confirmationText':
+      'Are you sure this is not a duplicate application?'
   }
 }

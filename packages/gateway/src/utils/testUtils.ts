@@ -385,6 +385,7 @@ export const mockComposition = {
       ]
     }
   ],
+  id: '123',
   relatesTo: [
     {
       code: 'duplicate',
