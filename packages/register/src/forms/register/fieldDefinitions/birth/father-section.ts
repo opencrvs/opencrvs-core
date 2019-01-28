@@ -323,7 +323,6 @@ export const fatherSection: IFormSection = {
       type: SUBSECTION,
       label: messages.currentAddress,
       initialValue: '',
-      required: false,
       validate: [],
       conditionals: [
         conditionals.fathersDetailsExist,
@@ -473,7 +472,6 @@ export const fatherSection: IFormSection = {
       type: SUBSECTION,
       label: messages.permanentAddress,
       initialValue: '',
-      required: false,
       validate: [],
       conditionals: [
         conditionals.fathersDetailsExist,
