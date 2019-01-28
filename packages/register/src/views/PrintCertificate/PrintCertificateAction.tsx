@@ -39,7 +39,6 @@ import {
 } from './generatePDF'
 import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
 import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
-import { FETCH_BIRTH_REGISTRATION_QUERY } from 'src/views/RegisterForm/ReviewForm'
 import {
   storeDraft,
   createReviewDraft,
@@ -180,7 +179,104 @@ const B = styled.div`
   font-weight: bold;
 `
 
-export { FETCH_BIRTH_REGISTRATION_QUERY }
+export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
+  query data($id: ID!) {
+    fetchBirthRegistration(id: $id) {
+      _fhirIDMap
+      id
+      child {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+        birthDate
+        gender
+      }
+      mother {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+        birthDate
+        maritalStatus
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        multipleBirth
+        identifier {
+          id
+          type
+        }
+        address {
+          type
+          line
+          district
+          state
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
+      }
+      father {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+        birthDate
+        maritalStatus
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        identifier {
+          id
+          type
+        }
+        address {
+          type
+          line
+          district
+          state
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
+      }
+      registration {
+        id
+        contact
+        attachments {
+          data
+          type
+          contentType
+          subject
+        }
+        status {
+          comments {
+            comment
+          }
+        }
+        trackingId
+        registrationNumber
+      }
+      attendantAtBirth
+      weightAtBirth
+      birthType
+      presentAtBirthRegistration
+    }
+  }
+`
 
 const messages = defineMessages({
   queryError: {
