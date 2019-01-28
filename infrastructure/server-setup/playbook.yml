@@ -81,6 +81,7 @@
       path: /data/elasticsearch
       state: directory
       group: 1000
+      owner: 1000
       mode: g+rwx
 
   - name: "Set higher max map count for elastic search"
@@ -98,7 +99,7 @@
     file:
       path: /data/traefik/acme.json
       state: touch
-      mode: 600
+      mode: '600'
 
 - hosts: docker-workers
   remote_user: root

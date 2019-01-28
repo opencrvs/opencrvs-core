@@ -29,7 +29,7 @@
     "compose:push": "docker-compose build && docker-compose push && export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
     "deploy:staging": "./deploy.sh",
-    "deploy:qa": "./deploy.sh 209.97.179.239"
+    "deploy:qa": "./deploy.sh opencrvs.qa1.jembi.org"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

@@ -14,7 +14,7 @@ sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/login-config.js
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/performance-config.js
 
 # Set hostname in compose file
-sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/docker-compose.staging.yml
+sed -i "s/{{hostname}}/$1/g" /tmp/compose/docker-compose.staging.yml
 
 echo "DONE - `date --iso-8601=ns`"
 echo
