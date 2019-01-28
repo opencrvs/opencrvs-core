@@ -427,23 +427,14 @@ describe('Registration type resolvers', () => {
       expect(foetalDeathsToMother).toEqual(0)
     })
     it('returns birthLocation', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          location: [
-            {
-              location: {
-                reference: 'Location/123'
-              }
-            }
-          ]
-        })
-      )
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocation))
+      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
       // @ts-ignore
       const birthLocation = await typeResolvers.BirthRegistration.birthLocation(
         mockComposition
       )
       expect(birthLocation).toBeDefined()
+      expect(birthLocation).toEqual('123')
     })
   })
 

@@ -383,13 +383,11 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'use',
-        context
-      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.use = fieldValue
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const location = selectOrCreateLocationRefResource(
@@ -397,13 +395,10 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'type',
-        context
-      )
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.type = fieldValue
     },
     text: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const location = selectOrCreateLocationRefResource(
@@ -411,13 +406,10 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'text',
-        context
-      )
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.text = fieldValue
     },
     line: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const location = selectOrCreateLocationRefResource(
@@ -439,13 +431,11 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'city',
-        context
-      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.city = fieldValue
     },
     district: (
       fhirBundle: ITemplatedBundle,
@@ -457,13 +447,11 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'district',
-        context
-      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.district = fieldValue
     },
     state: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const location = selectOrCreateLocationRefResource(
@@ -471,13 +459,11 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'state',
-        context
-      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.state = fieldValue
     },
     postalCode: (
       fhirBundle: ITemplatedBundle,
@@ -489,13 +475,11 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'postalCode',
-        context
-      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.postalCode = fieldValue
     },
     country: (
       fhirBundle: ITemplatedBundle,
@@ -507,13 +491,11 @@ function createLocationAddressBuilder(sectionCode: string) {
         fhirBundle,
         context
       )
-      setObjectPropInResourceArray(
-        location,
-        'address',
-        fieldValue,
-        'country',
-        context
-      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.country = fieldValue
     }
   }
 }

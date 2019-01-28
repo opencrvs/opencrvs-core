@@ -362,7 +362,7 @@ const processDraftData = (draftData: IFormData) => {
     ) {
       draftDetails.placeOfBirth = {
         type: child.placeOfBirth,
-        partOf: `Location/${child.addressLine4}`,
+        partOf: child.addressLine4,
         address: {
           type: 'BIRTH_PLACE',
           country: child.country,

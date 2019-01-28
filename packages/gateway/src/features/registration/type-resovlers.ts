@@ -493,7 +493,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_TYPE_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueString
+      return observations.entry[0].resource.valueQuantity.value
     },
     async birthLocation(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
@@ -509,7 +509,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${HEALTH_FACILITY_BIRTH_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueStringe.split('/')[1]
+      return observations.entry[0].resource.valueString.split('/')[1]
     },
     async birthLocationType(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(

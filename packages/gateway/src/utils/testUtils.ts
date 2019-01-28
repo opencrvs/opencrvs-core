@@ -697,6 +697,45 @@ export const mockObservations = {
       }
     ]
   },
+  birthLocation: {
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
+          },
+          category: [
+            {
+              coding: [
+                {
+                  system: 'http://hl7.org/fhir/observation-category',
+                  code: 'procedure',
+                  display: 'Procedure'
+                }
+              ]
+            }
+          ],
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: 'health-facility-birth',
+                display: 'Health facility birth location'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference mother by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as birthdate
+          valueString: 'Location/123'
+        }
+      }
+    ]
+  },
   birthAttendant: {
     entry: [
       {
