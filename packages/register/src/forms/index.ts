@@ -201,6 +201,8 @@ export interface IFormSection {
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
   disabled?: boolean
+  optional?: boolean
+  notice?: FormattedMessage.MessageDescriptor
 }
 
 export interface IForm {
