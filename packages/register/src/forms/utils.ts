@@ -146,10 +146,10 @@ export const getConditionalActionsForField = (
   }
 
   return field.conditionals
-    .filter(conditional => {
+    .filter(conditional =>
       /* tslint:disable-next-line: no-eval */
       eval(conditional.expression)
-    })
+    )
     .map((conditional: IConditional) => conditional.action)
 }
 
@@ -246,12 +246,12 @@ export const conditionals: IConditionals = {
   placeOfBirthHospital: {
     action: 'hide',
     expression:
-      'values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION"'
+      '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
   otherPlaceOfBirth: {
     action: 'hide',
     expression:
-      'values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME"'
+      '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
   },
   isNotCityLocation: {
     action: 'hide',

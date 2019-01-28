@@ -25,6 +25,7 @@ import { getOfflineState } from 'src/offline/selectors'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
+  OFFLINE_FACILITIES_KEY,
   ILocation
 } from 'src/offline/reducer'
 import { getLanguage } from 'src/i18n/selectors'
@@ -343,7 +344,13 @@ export function renderSelectDynamicLabel(
     return selectedOption ? intl.formatMessage(selectedOption.label) : value
   } else {
     if (options.resource) {
-      const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+      let locations: ILocation[]
+      if (options.resource === 'locations') {
+        locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+      } else {
+        locations = resources[OFFLINE_FACILITIES_KEY] as ILocation[]
+      }
+
       const selectedLocation = locations.filter((location: ILocation) => {
         return location.id === value
       })[0]
