@@ -266,7 +266,7 @@ export class ReviewFormView extends React.Component<IProps> {
     const childNames = child.name as GQLHumanName[]
     this.transformName(childNames, childDetails)
 
-    childDetails.birthDate = child.birthDate
+    childDetails.childBirthDate = child.birthDate
     childDetails.gender = child.gender
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
@@ -309,7 +309,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, motherDetails)
 
     motherDetails.gender = mother.gender
-    motherDetails.birthDate = mother.birthDate
+    motherDetails.motherBirthDate = mother.birthDate
     motherDetails.dateOfMarriage = mother.dateOfMarriage
     motherDetails.maritalStatus = mother.maritalStatus
     motherDetails.educationalAttainment = mother.educationalAttainment
@@ -344,7 +344,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, fatherDetails)
 
     fatherDetails.gender = father.gender
-    fatherDetails.birthDate = father.birthDate
+    fatherDetails.fatherBirthDate = father.birthDate
     fatherDetails.dateOfMarriage = father.dateOfMarriage
     fatherDetails.maritalStatus = father.maritalStatus
     fatherDetails.educationalAttainment = father.educationalAttainment
