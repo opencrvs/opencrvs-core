@@ -218,6 +218,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: 'values.iDType === "NO_ID"'
   },
+  applicantPermanentAddressSameAsCurrent: {
+    action: 'hide',
+    expression: 'values.applicantPermanentAddressSameAsCurrent'
+  },
   deathPlaceOther: {
     action: 'hide',
     expression: 'values.deathPlaceAddress !== "other"'
