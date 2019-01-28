@@ -17,6 +17,7 @@ import { iDType, ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
 import { paymentFormSection } from './payment-section'
+import { certificatePreview } from './certificate-preview'
 import { calculateDays, timeElapsed } from './calculatePrice'
 
 describe('when user wants to print certificate', async () => {
@@ -37,6 +38,18 @@ describe('when user wants to print certificate', async () => {
             fetchBirthRegistration: {
               id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
               child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Mokbul',
+                    familyName: 'Islam'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'নাম',
+                    familyName: 'নাম'
+                  }
+                ],
                 birthDate: '2014-02-15'
               },
               mother: {
@@ -93,6 +106,11 @@ describe('when user wants to print certificate', async () => {
         registrationId="asdhdqe2472487jsdfsdf"
         togglePrintCertificateSection={mock}
         printCertificateFormSection={formSection}
+        IssuerDetails={{
+          name: 'Some name',
+          role: 'Registrar',
+          issuedAt: 'some location'
+        }}
       />,
       store,
       graphqlMock
@@ -224,6 +242,11 @@ describe('when user wants to print certificate', async () => {
         registrationId="asdhdqe2472487jsdfsdf"
         togglePrintCertificateSection={mock}
         printCertificateFormSection={formSection}
+        IssuerDetails={{
+          name: '',
+          role: '',
+          issuedAt: ''
+        }}
       />,
       store,
       graphqlMock
@@ -278,8 +301,8 @@ describe('when user wants to print certificate', async () => {
     })
     expect(iDType('UNKNOWN')).toEqual({
       id: 'formFields.iD',
-      defaultMessage: 'ID number',
-      description: 'Label for form field: ID number'
+      defaultMessage: 'ID Number',
+      description: 'Label for form field: ID Number'
     })
   })
 
@@ -389,6 +412,18 @@ describe('when user wants to print certificate', async () => {
               fetchBirthRegistration: {
                 id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
                 child: {
+                  name: [
+                    {
+                      use: 'en',
+                      firstNames: 'Mokbul',
+                      familyName: 'Islam'
+                    },
+                    {
+                      use: 'bn',
+                      firstNames: 'নাম',
+                      familyName: 'নাম'
+                    }
+                  ],
                   birthDate: '2014-02-15'
                 },
                 mother: {
@@ -445,6 +480,11 @@ describe('when user wants to print certificate', async () => {
           registrationId="asdhdqe2472487jsdfsdf"
           togglePrintCertificateSection={mock}
           printCertificateFormSection={formSection}
+          IssuerDetails={{
+            name: '',
+            role: '',
+            issuedAt: ''
+          }}
         />,
         store,
         graphqlMock
@@ -603,6 +643,33 @@ describe('when user wants to print certificate', async () => {
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
     })
 
+    it('when user clicks next button, renders certificate preview form', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: true
+      }
+
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+
+      component
+        .find('#print-confirm-button')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      expect(
+        component.find('#payment-confirm-button').hostNodes()
+      ).toHaveLength(1)
+      component
+        .find('#payment-confirm-button')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+      expect(component.find(FormFieldGenerator).prop('fields')).toEqual(
+        certificatePreview.fields
+      )
+    })
     it('timeElapsedInWords function returns required time duration in words', () => {
       Date.now = jest.fn(() => new Date('2019-01-01'))
 
@@ -623,6 +690,35 @@ describe('when user wants to print certificate', async () => {
         error = e
       }
       expect(error).toBeInstanceOf(Error)
+    })
+
+    it('Should generate the PDF', () => {
+      const documentData = {
+        personCollectingCertificate: 'MOTHER',
+        motherDetails: true
+      }
+      component.find(FormFieldGenerator).prop('onChange')(documentData)
+      component.update()
+
+      component
+        .find('#print-confirm-button')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      const fields = paymentFormSection.fields
+
+      fields[2].initialValue = '50.00'
+      fields[3].initialValue = '24'
+      expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
+
+      const PrintReceiptBtn = component.find('#print-receipt').hostNodes()
+      expect(PrintReceiptBtn.length).toEqual(1)
+
+      const globalAny: any = global
+      globalAny.open = jest.fn()
+      PrintReceiptBtn.simulate('click')
+      expect(globalAny.open).toBeCalled()
     })
   })
 })

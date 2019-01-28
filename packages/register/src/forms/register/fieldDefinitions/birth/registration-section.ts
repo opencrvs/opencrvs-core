@@ -1,5 +1,11 @@
 import { defineMessages } from 'react-intl'
-import { IFormSection, SELECT_WITH_OPTIONS, TEL, TEXTAREA } from 'src/forms'
+import {
+  IFormSection,
+  SELECT_WITH_OPTIONS,
+  TEL,
+  TEXTAREA,
+  WARNING
+} from 'src/forms'
 import { phoneNumberFormat } from 'src/utils/validate'
 
 const messages = defineMessages({
@@ -89,6 +95,12 @@ const messages = defineMessages({
     description: 'Selection label for "other" option',
     defaultMessage: 'Other'
   },
+  phoneVerificationWarning: {
+    id: 'formFields.registration.phoneVerificationWarning',
+    defaultMessage:
+      'Check with the applicant that the mobile phone number you have entered is correct',
+    description: 'Warning message to verify applicant phone number '
+  },
   commentsOrNotesLabel: {
     defaultMessage: 'Comments or notes',
     id: 'formFields.registration.commentsOrNotes',
@@ -163,6 +175,13 @@ export const registrationSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [phoneNumberFormat]
+    },
+    {
+      name: 'phoneVerificationWarning',
+      type: WARNING,
+      label: messages.phoneVerificationWarning,
+      initialValue: '',
+      validate: []
     },
     {
       name: 'commentsOrNotes',

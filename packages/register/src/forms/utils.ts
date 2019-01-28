@@ -257,5 +257,13 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
+  },
+  iDAvailable: {
+    action: 'hide',
+    expression: 'values.iDType === "NO_ID"'
+  },
+  deathPlaceOther: {
+    action: 'hide',
+    expression: 'values.deathPlaceAddress !== "other"'
   }
 }

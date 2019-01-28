@@ -19,7 +19,7 @@ export interface ILocation {
   name?: string
   nameBn?: string
   physicalType?: string
-  juristictionType?: string
+  jurisdictionType?: string
   type?: string
   partOf?: string
 }

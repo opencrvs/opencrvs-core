@@ -216,6 +216,10 @@ export const mockTask = {
       valueReference: { reference: 'Location/123' }
     },
     {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: 'Location/123' }
+    },
+    {
       url: 'http://opencrvs.org/specs/extension/contact-person',
       valueString: 'MOTHER'
     }

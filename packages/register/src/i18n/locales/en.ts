@@ -18,8 +18,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.state': 'Division',
     'formFields.district': 'District',
     'formFields.addressLine1': 'Street and house number',
-    'formFields.addressLine2': 'Area / Mouja / Village',
-    'formFields.addressLine3': 'Union / Cantonement',
+    'formFields.addressLine2': 'Area / Ward / Mouja / Village',
+    'formFields.addressLine3': 'Union / Municipality / Cantonement',
     'formFields.addressLine3Options2': 'Ward / Cantonement',
     'formFields.addressLine4': 'Upazila (Thana) / City',
     'formFields.postCode': 'Postcode',
@@ -401,9 +401,45 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.certificateLanguage.bn': 'Bangla',
     'formFields.registration.certificateLanguage.en': 'English',
     'formFields.registration.certificateLanguage.other': 'Other',
+    'formFields.registration.phoneVerificationWarning':
+      'Check with the applicant that the mobile phone number you have entered is correct',
     'formFields.registration.commentsOrNotes': 'Comments or notes',
     'formFields.registration.commentsOrNotes.description':
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
+    'register.form.tabs.deceasedTab': 'Deceased',
+    'register.form.section.deceasedTitle': "Deceased's details",
+    'formFields.deceasedIdType': 'Existing ID',
+    'formFields.idTypeNoID': 'No ID available',
+    'formFields.deceasedGivenNames': 'Given Name (s)',
+    'formFields.deceasedFamilyName': 'Family Name',
+    'formFields.deceasedGivenNamesEng': 'Given Name (s) in English',
+    'formFields.deceasedFamilyNameEng': 'Family Name in English',
+    'formFields.deceased.nationality': 'Nationality',
+    'formFields.deceasedSex': 'Sex',
+    'formFields.deceasedSexMale': 'Male',
+    'formFields.deceasedSexFemale': 'Female',
+    'formFields.deceasedSexOther': 'Other',
+    'formFields.deceasedSexUnknown': 'Unknown',
+    'formFields.deceasedDateOfBirth': 'Date of Birth',
+    'formFields.deceasedCurrentAddressSameAsPermanent':
+      'Is deceased’s current address the same as their permanent address?',
+    'register.form.tabs.deathEventTab': 'Event',
+    'register.form.section.deathEventTitle': 'Event details',
+    'formFields.deathDate': 'Date of Occurrence',
+    'formFields.manner': 'Manner of Death',
+    'formFields.mannerNatural': 'Natural causes',
+    'formFields.mannerAccident': 'Accident',
+    'formFields.mannerSuicide': 'Suicide',
+    'formFields.mannerHomicide': 'Homicide',
+    'formFields.mannerUndetermined': 'Manner undetermined',
+    'formFields.deathPlace': 'Place of Occurrence of Death',
+    'formFields.deathPlaceAddress': 'Where did the death occur?',
+    'formFields.deathPlaceAddressSameAsPermanent':
+      'Permanent address of the deceased',
+    'formFields.deathPlaceAddressSameAsCurrent':
+      'Current address of the deceased',
+    'formFields.deathPlaceAddressOther': 'Different Address',
+    'formFields.deathPlaceAddressType': 'Type of Place',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be a number',
@@ -415,7 +451,7 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.validDeathRegistrationNumber':
       'The Death Registration Number can be up to {maxLength} characters long',
     'validations.phoneNumberFormat':
-      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
+      'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
     'validations.requiredSymbol': '',
@@ -425,6 +461,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.newBirthRegistration': 'New birth application',
+    'register.form.newVitalEventRegistration':
+      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
     'register.form.previewBirthRegistration': 'Birth Application Preview',
     'register.form.reviewBirthRegistration': 'Birth Registration Review',
     'register.form.saveDraft': 'Save as draft',
@@ -506,7 +544,7 @@ export const ENGLISH_STATE: ILanguage = {
       '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
     'register.selectVitalEvent.registerNewEventTitle':
-      'Declare a new vital event',
+      'New vital event application',
     'register.home.buttons.mydraft': 'My draft',
     'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
@@ -522,6 +560,9 @@ export const ENGLISH_STATE: ILanguage = {
       'Start by selecting the event you want to declare.',
     'register.selectVitalEvent.birthActionTitle': 'Birth',
     'register.selectVitalEvent.deathActionTitle': 'Death',
+    'register.selectVitalEvent.marriageActionTitle': 'Marriage',
+    'register.selectVitalEvent.divorceActionTitle': 'Divorce',
+    'register.selectVitalEvent.adoptionActionTitle': 'Adoption',
     'register.form.upload': 'Upload',
     'register.form.section.upload.documentsName': 'Documents Upload',
     'register.form.section.upload.documentsTitle': 'Supporting documents',
@@ -618,9 +659,23 @@ export const ENGLISH_STATE: ILanguage = {
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     'register.workQueue.print.serviceYear':
       'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
+    'register.workQueue.print.service':
+      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
+    'register.workQueue.print.printCertificate': 'Print certificate',
+    'register.workQueue.print.finish': 'Finish',
+    'register.workQueue.print.certificatePreview': 'Certificate Preview',
+    'register.workQueue.print.selectSignature': 'Select e-signatures',
+    'register.workQueue.print.addAnotherSignature': 'Add another',
+    'register.noLabel': ' ',
+    'register.workQueue.print.signature.person1':
+      'UP Secretary Shakib al hasan',
+    'register.workQueue.print.signature.person2':
+      'Local Registrar Mohammad Ashraful',
+    'register.workQueue.print.userReviewed':
+      'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
@@ -668,7 +723,38 @@ export const ENGLISH_STATE: ILanguage = {
     'review.birthRegistration.queryError':
       'An error occurred while fetching birth registration',
     'review.error.unauthorized': 'We are unable to display this page to you',
-    'register.workQueue.buttons.newRegistration': 'New birth application',
-    'register.workQueue.buttons.reviewAndRegister': 'Review and Register'
+    'register.workQueue.buttons.newRegistration': 'New birth registration',
+    'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
+    'register.work-queue.certificate.header':
+      'Receipt for Birth Certificate of',
+    'register.work-queue.certificate.subheader':
+      'Birth Registration after {DOBDiff} of D.o.B',
+    'register.work-queue.certificate.service': 'Service: ',
+    'register.work-queue.certificate.amount': 'Amount paid:\n\n',
+    'register.work-queue.certificate.issuer':
+      'Issued at: {issuedAt},\n By: {role}, {name}\n Date of payment: {dateOfPayment}',
+    'register.duplicates.title': 'Possible duplicates found',
+    'register.duplicates.description':
+      'The following application has been flagged as a possible duplicate of an existing registered record.',
+    'register.duplicates.pageTitle': 'Possible duplicate',
+    'register.duplicates.details.name': 'Name',
+    'register.duplicates.details.dob': 'D.o.B.',
+    'register.duplicates.details.gender': 'Gender',
+    'register.duplicates.details.dateOfApplication': 'Date of application',
+    'register.duplicates.details.trackingId': 'Tracking ID',
+    'register.duplicates.details.notDuplicate': 'Not a duplicate?',
+    'register.duplicates.details.mother': 'Mother',
+    'register.duplicates.details.father': 'Father',
+    'register.duplicates.details.id': 'ID',
+    'register.duplicates.details.applicationState': 'Application {action} on',
+    'register.duplicates.details.by': 'By',
+    'register.duplicates.details.review': 'Review',
+    'register.duplicates.details.birthEvent': 'Birth',
+    'register.duplicates.details.deathEvent': 'Death',
+    'register.duplicates.details.application': 'application',
+    'register.duplicates.details.submitted': 'submitted',
+    'register.duplicates.details.rejected': 'rejected',
+    'register.duplicates.details.registered': 'registered',
+    'register.duplicates.details.certified': 'certified'
   }
 }

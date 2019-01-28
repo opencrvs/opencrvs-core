@@ -8,6 +8,8 @@ import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistrationAsParent } from 'src/navigation'
 import { createDraft, storeDraft } from '../../drafts'
+import { Event } from 'src/forms'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -82,26 +84,32 @@ export class SelectInformantView extends React.Component<
           id="select_informant_view"
         />
         <ActionList>
-          <Action
-            id="select_parent_informant"
-            title={intl.formatMessage(messages.parentInformantTitle)}
-            description={intl.formatMessage(
-              messages.parentInformantDescription
-            )}
-            onClick={this.props.goToBirthRegistrationAsParent}
-          />
-          <Action
-            id="select_someone_else_informant"
-            title={intl.formatMessage(messages.otherInformantTitle)}
-            description={intl.formatMessage(messages.otherInformantDescription)}
-            disabled
-          />
-          <Action
-            id="select_self_informant"
-            title={intl.formatMessage(messages.selfInformantTitle)}
-            description={intl.formatMessage(messages.selfInformantDescription)}
-            disabled
-          />
+          <HeaderContent>
+            <Action
+              id="select_parent_informant"
+              title={intl.formatMessage(messages.parentInformantTitle)}
+              description={intl.formatMessage(
+                messages.parentInformantDescription
+              )}
+              onClick={this.props.goToBirthRegistrationAsParent}
+            />
+            <Action
+              id="select_someone_else_informant"
+              title={intl.formatMessage(messages.otherInformantTitle)}
+              description={intl.formatMessage(
+                messages.otherInformantDescription
+              )}
+              disabled
+            />
+            <Action
+              id="select_self_informant"
+              title={intl.formatMessage(messages.selfInformantTitle)}
+              description={intl.formatMessage(
+                messages.selfInformantDescription
+              )}
+              disabled
+            />
+          </HeaderContent>
         </ActionList>
       </>
     )
@@ -113,7 +121,7 @@ export const SelectInformant = connect(
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
       goToBirthRegistrationAsParent: () => {
-        const draft = createDraft()
+        const draft = createDraft(Event.BIRTH)
         dispatch(storeDraft(draft))
         dispatch(goToBirthRegistrationAsParent(draft.id))
       }

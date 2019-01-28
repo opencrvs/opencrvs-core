@@ -10,17 +10,24 @@ import {
   IFormSection,
   IFormSectionData,
   INFORMATIVE_RADIO_GROUP,
-  PARAGRAPH
+  PARAGRAPH,
+  IFormData
 } from 'src/forms'
 import { PrimaryButton, IconAction } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { hasFormError } from 'src/forms/utils'
-import { calculatePrice, timeElapsed, calculateDays } from './calculatePrice'
+import { calculatePrice } from './calculatePrice'
 import { Print } from '@opencrvs/components/lib/icons'
+import * as moment from 'moment'
+import 'moment/locale/bn'
+import 'moment/locale/en-ie'
+import { Registrant, Issuer, generateMoneyReceipt } from './generatePDF'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
+const CERTIFICATE_PREVIEW = 'certificatePreview'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -106,6 +113,11 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
     fetchBirthRegistration(id: $id) {
       id
       child {
+        name {
+          use
+          firstNames
+          familyName
+        }
         birthDate
       }
       mother {
@@ -171,6 +183,37 @@ const messages = defineMessages({
     defaultMessage:
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
+  },
+  service: {
+    id: 'register.workQueue.print.service',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
+    description: 'The label for service paragraph'
+  },
+  certificateHeader: {
+    id: 'register.work-queue.certificate.header'
+  },
+  certificateSubHeader: {
+    id: 'register.work-queue.certificate.subheader'
+  },
+  certificateIssuer: {
+    id: 'register.work-queue.certificate.issuer'
+  },
+  certificatePaidAmount: {
+    id: 'register.work-queue.certificate.amount'
+  },
+  certificateService: {
+    id: 'register.work-queue.certificate.service'
+  },
+  printCertificate: {
+    id: 'register.workQueue.print.printCertificate',
+    defaultMessage: 'Print certificate',
+    description: 'The label for print certificate button'
+  },
+  finish: {
+    id: 'register.workQueue.print.finish',
+    defaultMessage: 'Finish',
+    description: 'The label for finish printing certificate button'
   }
 })
 
@@ -188,6 +231,8 @@ type IProps = {
   togglePrintCertificateSection: () => void
   printCertificateFormSection: IFormSection
   paymentFormSection: IFormSection
+  IssuerDetails: Issuer
+  certificatePreviewFormSection: IFormSection
 }
 
 type IFullProps = InjectedIntlProps & IProps
@@ -223,20 +268,35 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   getForm = (currentForm: string) => {
-    const { printCertificateFormSection, paymentFormSection } = this.props
+    const {
+      printCertificateFormSection,
+      paymentFormSection,
+      certificatePreviewFormSection
+    } = this.props
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
         return printCertificateFormSection
       case PAYMENT:
         return paymentFormSection
+      case CERTIFICATE_PREVIEW:
+        return certificatePreviewFormSection
       default:
         throw new Error(`No form found for id ${currentForm}`)
     }
   }
 
-  getFormAction = (currentForm: string) => {
-    const { intl } = this.props
+  getFormAction = (currentForm: string, registrant: Registrant) => {
+    const { intl, IssuerDetails, paymentFormSection } = this.props
     const { enableConfirmButton } = this.state
+    const amountObj = paymentFormSection.fields.find(
+      i => i.name === 'paymentAmount'
+    )
+    let amount = ''
+    if (amountObj && amountObj.label && amountObj.initialValue) {
+      amount = intl.formatMessage(amountObj.label, {
+        paymentAmount: amountObj.initialValue.toString()
+      })
+    }
 
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
@@ -259,7 +319,15 @@ class PrintCertificateActionComponent extends React.Component<
                 id="print-receipt"
                 title={intl.formatMessage(messages.printReceipt)}
                 icon={() => <StyledPrintIcon />}
-                onClick={() => console.log('clicked')}
+                onClick={() =>
+                  generateMoneyReceipt(
+                    intl,
+                    registrant,
+                    IssuerDetails,
+                    amount,
+                    this.props.language
+                  )
+                }
               />
             </ButtonContainer>
 
@@ -267,9 +335,34 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
-                onClick={() => console.log('go to certificate print section')}
+                onClick={this.onConfirmForm}
               >
                 {intl.formatMessage(messages.next)}
+              </StyledPrimaryButton>
+            </ButtonContainer>
+          </>
+        )
+      case CERTIFICATE_PREVIEW:
+        return (
+          <>
+            <ButtonContainer>
+              <StyledIconAction
+                id="print-certificate"
+                title={intl.formatMessage(messages.printCertificate)}
+                icon={() => <StyledPrintIcon />}
+                onClick={() =>
+                  console.log('to open certificate document in another window')
+                }
+              />
+            </ButtonContainer>
+
+            <ButtonContainer>
+              <StyledPrimaryButton
+                id="finish-printing-certificate"
+                disabled={!enableConfirmButton}
+                onClick={() => console.log('certifier mutation to be called')}
+              >
+                {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>
             </ButtonContainer>
           </>
@@ -287,10 +380,30 @@ class PrintCertificateActionComponent extends React.Component<
       case COLLECT_CERTIFICATE:
         destForm = PAYMENT
         break
+      case PAYMENT:
+        destForm = CERTIFICATE_PREVIEW
+        break
       default:
         break
     }
     this.setState({ currentForm: destForm })
+  }
+
+  setRegistrant(data: IFormData): Registrant {
+    const names = data.child.name as Array<{ [key: string]: {} }>
+    const nameObj = names.find(name => name.use === this.props.language)
+    const registrant = { name: '', DOBDiff: '' }
+    moment.locale(this.props.language)
+
+    if (nameObj) {
+      registrant.name = nameObj.firstNames + ' ' + nameObj.familyName
+      registrant.DOBDiff = moment(data.child.birthDate.toString(), 'YYYY-MM-DD')
+        .fromNow()
+        .replace(' ago', '')
+        .replace(' আগে', '')
+    }
+
+    return registrant
   }
 
   render = () => {
@@ -313,94 +426,108 @@ class PrintCertificateActionComponent extends React.Component<
           backLabel={backLabel}
           goBack={togglePrintCertificateSection}
         >
-          <Query
-            query={FETCH_BIRTH_REGISTRATION_QUERY}
-            variables={{
-              id: registrationId
-            }}
-          >
-            {({ loading, error, data }) => {
-              if (loading) {
-                return <StyledSpinner id="print-certificate-spinner" />
-              }
+          <HeaderContent>
+            <Query
+              query={FETCH_BIRTH_REGISTRATION_QUERY}
+              variables={{
+                id: registrationId
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return <StyledSpinner id="print-certificate-spinner" />
+                }
 
-              if (data) {
-                let fields = printCertificateFormSection.fields
-                fields = fields.map(field => {
-                  if (
-                    field &&
-                    field.type === INFORMATIVE_RADIO_GROUP &&
-                    field.name === 'motherDetails'
-                  ) {
-                    field.information = data.fetchBirthRegistration.mother
-                  } else if (
-                    field &&
-                    field.type === INFORMATIVE_RADIO_GROUP &&
-                    field.name === 'fatherDetails'
-                  ) {
-                    field.information = data.fetchBirthRegistration.father
-                  }
+                if (data) {
+                  let fields = printCertificateFormSection.fields
+                  fields = fields.map(field => {
+                    if (
+                      field &&
+                      field.type === INFORMATIVE_RADIO_GROUP &&
+                      field.name === 'motherDetails'
+                    ) {
+                      field.information = data.fetchBirthRegistration.mother
+                    } else if (
+                      field &&
+                      field.type === INFORMATIVE_RADIO_GROUP &&
+                      field.name === 'fatherDetails'
+                    ) {
+                      field.information = data.fetchBirthRegistration.father
+                    }
 
-                  return field
-                })
+                    return field
+                  })
 
-                const paymentAmount = calculatePrice(
-                  data.fetchBirthRegistration.child.birthDate
-                )
+                  const paymentAmount = calculatePrice(
+                    data.fetchBirthRegistration.child.birthDate
+                  )
 
-                const timeDuration = timeElapsed(
-                  calculateDays(data.fetchBirthRegistration.child.birthDate)
-                )
+                  moment.locale(this.props.language)
+                  const DOBDiff = moment(
+                    data.fetchBirthRegistration.child.birthDate,
+                    'YYYY-MM-DD'
+                  )
+                    .fromNow()
+                    .replace(' ago', '')
+                    .replace(' আগে', '')
 
-                paymentFormSection.fields.map(field => {
-                  if (
-                    field &&
-                    field.type === PARAGRAPH &&
-                    field.name === 'paymentAmount'
-                  ) {
-                    field.initialValue = paymentAmount
-                  }
-                })
+                  paymentFormSection.fields.map(field => {
+                    if (
+                      field &&
+                      field.type === PARAGRAPH &&
+                      field.name === 'paymentAmount'
+                    ) {
+                      field.initialValue = paymentAmount
+                    }
+                  })
 
-                paymentFormSection.fields.map(field => {
-                  if (
-                    field &&
-                    field.type === PARAGRAPH &&
-                    field.name === 'service'
-                  ) {
-                    field.initialValue = timeDuration.value.toString()
-                    field.label = messages[`service${timeDuration.unit}`]
-                  }
-                })
+                  paymentFormSection.fields.map(field => {
+                    if (
+                      field &&
+                      field.type === PARAGRAPH &&
+                      field.name === 'service'
+                    ) {
+                      field.initialValue = DOBDiff.toString()
+                      field.label = messages[`service`]
+                    }
+                  })
 
-                return (
-                  <FormContainer>
-                    <Box>
-                      <FormFieldGenerator
-                        id={form.id}
-                        onChange={this.storeData}
-                        setAllFieldsDirty={false}
-                        fields={form.fields}
-                      />
-                    </Box>
-                    <Column>
-                      {this.state.data.personCollectingCertificate &&
-                        this.getFormAction(this.state.currentForm)}
-                    </Column>
-                  </FormContainer>
-                )
-              }
-              if (error) {
-                return (
-                  <ErrorText id="print-certificate-queue-error-text">
-                    {intl.formatMessage(messages.queryError)}
-                  </ErrorText>
-                )
-              }
+                  const registrant: Registrant = this.setRegistrant(
+                    data.fetchBirthRegistration
+                  )
 
-              return JSON.stringify(data)
-            }}
-          </Query>
+                  return (
+                    <FormContainer>
+                      <Box>
+                        <FormFieldGenerator
+                          id={form.id}
+                          onChange={this.storeData}
+                          setAllFieldsDirty={false}
+                          fields={form.fields}
+                        />
+                      </Box>
+                      <Column>
+                        {this.state.data.personCollectingCertificate &&
+                          this.getFormAction(
+                            this.state.currentForm,
+                            registrant
+                          )}
+                      </Column>
+                    </FormContainer>
+                  )
+                }
+                if (error) {
+                  return (
+                    <ErrorText id="print-certificate-queue-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+
+                return JSON.stringify(data)
+              }}
+            </Query>
+          </HeaderContent>
         </ActionPage>
       </ActionPageWrapper>
     )
@@ -409,5 +536,7 @@ class PrintCertificateActionComponent extends React.Component<
 
 export const PrintCertificateAction = connect((state: IStoreState) => ({
   language: state.i18n.language,
-  paymentFormSection: state.printCertificateForm.paymentForm
+  paymentFormSection: state.printCertificateForm.paymentForm,
+  certificatePreviewFormSection:
+    state.printCertificateForm.certificatePreviewForm
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))

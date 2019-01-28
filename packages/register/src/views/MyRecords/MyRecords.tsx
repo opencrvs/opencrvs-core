@@ -20,6 +20,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { goToHome as goToHomeAction } from 'src/navigation'
 import { IStoreState } from 'src/store'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const Container = styled.div`
   margin: 0 ${({ theme }) => theme.grid.margin}px;
@@ -308,15 +309,17 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
         backLabel={backLabel}
         goBack={this.props.goToHome}
       >
-        <Container>
-          <DataTable
-            data={data}
-            filterBy={filterBy}
-            cellRenderer={this.renderCell}
-            resultLabel={intl.formatMessage(messages.dataTableResults)}
-            noResultText={intl.formatMessage(messages.dataTableNoResults)}
-          />
-        </Container>
+        <HeaderContent>
+          <Container>
+            <DataTable
+              data={data}
+              filterBy={filterBy}
+              cellRenderer={this.renderCell}
+              resultLabel={intl.formatMessage(messages.dataTableResults)}
+              noResultText={intl.formatMessage(messages.dataTableNoResults)}
+            />
+          </Container>
+        </HeaderContent>
       </ActionPage>
     )
   }

@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { IDynamicValues } from '../common-types'
 import { ListItemAction } from '../buttons'
+import { Chip } from '.'
 
 export interface IInfo {
   label: string
@@ -25,7 +26,7 @@ export interface IListItemProps {
   icons?: JSX.Element[]
   actions?: IAction[]
   itemData: IDynamicValues
-  expandedCellRenderer: (itemData: IDynamicValues, key: number) => JSX.Element
+  expandedCellRenderer?: (itemData: IDynamicValues, key: number) => JSX.Element
 }
 
 interface IListItemState {
@@ -101,21 +102,7 @@ const StatusDiv = styled.div`
     margin-top: 10px;
   }
 `
-const StyledStatus = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  background-color: rgba(150, 150, 150, 0.1);
-  border-radius: 17px;
-  padding: 5px 10px 5px 7px;
-  margin: 2px 5px 2px 0;
-  display: flex;
-  align-items: center;
-  height: 32px;
-  & span {
-    text-transform: uppercase;
-    margin-left: 5px;
-    font-size: 13px;
-  }
-`
+
 const IconsStatus = styled.div`
   border-radius: 17px;
   padding: 5px 10px 5px 7px;
@@ -184,10 +171,11 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
                   <IconsStatus key={iconIndex}>{icon}</IconsStatus>
                 ))}
               {statusItems.map((status: IStatus, infoIndex) => (
-                <StyledStatus key={infoIndex}>
-                  {status.icon}
-                  <span>{status.label}</span>
-                </StyledStatus>
+                <Chip
+                  key={infoIndex}
+                  status={status.icon}
+                  text={status.label}
+                />
               ))}
             </StatusDiv>
           </ListContentContainer>
@@ -203,7 +191,8 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
         <ExpandedCellContainer expanded={expanded}>
           {expanded && (
             <ExpandedCellContent>
-              {this.props.expandedCellRenderer(itemData, index)}
+              {this.props.expandedCellRenderer &&
+                this.props.expandedCellRenderer(itemData, index)}
             </ExpandedCellContent>
           )}
         </ExpandedCellContainer>

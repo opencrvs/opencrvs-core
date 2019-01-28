@@ -10,7 +10,7 @@ export interface IViewHeadingProps {
 }
 
 const ViewHeadingContainer = styled.div`
-  padding: ${({ theme }) => theme.grid.margin}px 50px;
+  padding: ${({ theme }) => theme.grid.margin}px 30px;
 `
 
 const Breadcrumb = styled.div`

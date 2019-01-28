@@ -16,9 +16,10 @@ import {
   DateField,
   TextArea,
   SubSectionDivider,
-  WarningMessage
+  WarningMessage,
+  PDFViewer
 } from '@opencrvs/components/lib/forms'
-import { Paragraph } from '@opencrvs/components/lib/typography'
+import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -53,7 +54,9 @@ import {
   TEXT_WITH_DYNAMIC_DEFINITIONS,
   TEXT,
   ITextFormField,
-  IDynamicFormField
+  IDynamicFormField,
+  LINK,
+  PDF_DOCUMENT_VIEWER
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -73,6 +76,9 @@ const fadeIn = keyframes`
 const FormItem = styled.div`
   margin-bottom: 2em;
   animation: ${fadeIn} 500ms;
+`
+const LinkFormField = styled(Link)`
+  font-size: 15px;
 `
 
 type GeneratedInputFieldProps = {
@@ -216,7 +222,7 @@ function GeneratedInputField({
         <FormattedHTMLMessage
           {...label}
           values={{
-            [fieldDefinition.name]: fieldDefinition.initialValue as MessageValue
+            [fieldDefinition.name]: value as MessageValue
           }}
         />
       </Paragraph>
@@ -241,6 +247,20 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === WARNING) {
     return <WarningMessage>{fieldDefinition.label}</WarningMessage>
+  }
+
+  if (fieldDefinition.type === LINK) {
+    return (
+      <LinkFormField
+        onClick={() => onSetFieldValue(fieldDefinition.name, true)}
+      >
+        {fieldDefinition.label}
+      </LinkFormField>
+    )
+  }
+
+  if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
+    return <PDFViewer id={fieldDefinition.name} pdfSource={value as string} />
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {

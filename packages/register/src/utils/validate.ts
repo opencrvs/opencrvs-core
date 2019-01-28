@@ -39,9 +39,9 @@ export const messages = defineMessages({
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
     defaultMessage:
-      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
+      'Must be 11 digit valid mobile phone number that stars with 01',
     description:
-      'The error message that appears on phone numbers where the first character must be a 0'
+      'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
   },
   dateFormat: {
     id: 'validations.dateFormat',

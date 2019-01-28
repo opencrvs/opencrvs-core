@@ -319,6 +319,13 @@ describe('Registration root resolvers', () => {
                         reference:
                           'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
                       }
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
                     }
                   ],
                   lastModified: '2018-12-11T11:55:46.775Z',
@@ -396,11 +403,21 @@ describe('Registration root resolvers', () => {
               },
               {
                 url: 'http://opencrvs.org/specs/extension/regLastUser',
-                valueString: 'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                valueReference: {
+                  reference: 'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                }
               },
               {
                 url: 'http://opencrvs.org/specs/extension/regLastLocation',
-                valueString: 'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                valueReference: {
+                  reference: 'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                }
+              },
+              {
+                url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                valueReference: {
+                  reference: 'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                }
               }
             ],
             lastModified: '2018-12-11T11:55:46.775Z',
@@ -527,6 +544,13 @@ describe('Registration root resolvers', () => {
                     {
                       url:
                         'http://opencrvs.org/specs/extension/regLastLocation',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastOffice',
                       valueReference: {
                         reference:
                           'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'

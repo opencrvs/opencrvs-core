@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import * as moment from 'moment'
-import { ViewHeading, IViewHeadingProps } from 'src/components/ViewHeading'
+import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   IconAction,
   ActionTitle,
@@ -50,6 +50,8 @@ import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
 import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
+import { getUserDetails } from 'src/profile/profileSelectors'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -90,6 +92,11 @@ export const FETCH_REGISTRATION_QUERY = gql`
 `
 
 const messages = defineMessages({
+  hello: {
+    id: 'register.home.header.hello',
+    defaultMessage: 'Hello {fullName}',
+    description: 'Title for the user'
+  },
   searchInputPlaceholder: {
     id: 'register.workQueue.searchInput.placeholder',
     defaultMessage: 'Look for a record',
@@ -311,6 +318,36 @@ const messages = defineMessages({
     id: 'register.workQueue.buttons.printCertificate',
     defaultMessage: 'Print Certificate',
     description: 'Print Certificate Button text'
+  },
+  FIELD_AGENT: {
+    id: 'register.home.hedaer.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
+  },
+  REGISTRATION_CLERK: {
+    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    defaultMessage: 'Registrar',
+    description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.hedaer.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
 
@@ -476,6 +513,14 @@ interface IWorkQueueState {
   regId: string | null
 }
 
+interface IData {
+  [key: string]: unknown
+}
+
+interface IWorkQueueListItem {
+  [key: string]: IData | string | undefined
+}
+
 export class WorkQueueView extends React.Component<
   IWorkQueueProps,
   IWorkQueueState
@@ -562,11 +607,11 @@ export class WorkQueueView extends React.Component<
           }`.trim()
           return prevNamesMap
         }, {})
-
+      const lang = 'bn'
       return {
         id: reg.id,
         name:
-          (namesMap(childNames)[this.props.language] as string) ||
+          (namesMap(childNames)[lang] as string) ||
           /* tslint:disable:no-string-literal */
           (namesMap(childNames)['default'] as string) ||
           /* tslint:enable:no-string-literal */
@@ -619,6 +664,19 @@ export class WorkQueueView extends React.Component<
       }
     })
   }
+
+  getApplicationData = (
+    applicationData: IWorkQueueListItem[]
+  ): IWorkQueueListItem[] => {
+    return applicationData.filter(application => {
+      if (application.status && application.status[0].type) {
+        return application.status[0].type === 'DECLARED'
+      } else {
+        return false
+      }
+    })
+  }
+
   renderExpansionContent = (
     item: {
       [key: string]: string & Array<{ [key: string]: string }>
@@ -851,6 +909,32 @@ export class WorkQueueView extends React.Component<
     }
   }
 
+  getIssuerDetails() {
+    const { intl, userDetails, language } = this.props
+    let fullName = ''
+
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    }
+
+    return {
+      name: fullName,
+      role:
+        userDetails && userDetails.role
+          ? intl.formatMessage(messages[userDetails.role])
+          : '',
+      issuedAt:
+        userDetails &&
+        userDetails.primaryOffice &&
+        userDetails.primaryOffice.name
+          ? userDetails.primaryOffice.name
+          : ''
+    }
+  }
+
   render() {
     const { intl, theme, printForm } = this.props
     const sortBy = {
@@ -872,7 +956,7 @@ export class WorkQueueView extends React.Component<
                 label: intl.formatMessage(messages.filtersNewestToOldest)
               }
             ],
-            value: '',
+            value: 'desc',
             type: SelectFieldType.Date
           }
         ]
@@ -950,74 +1034,78 @@ export class WorkQueueView extends React.Component<
     }
     return (
       <>
-        <HomeViewHeader id="work_queue_header">
-          <ViewHeading
-            id="work_queue_view"
-            title={intl.formatMessage(messages.headerTitle)}
-            description={intl.formatMessage(messages.headerDescription)}
-            {...this.props}
-          />
-        </HomeViewHeader>
+        <HomeViewHeader
+          title={intl.formatMessage(messages.hello, {
+            fullName: this.getIssuerDetails().name
+          })}
+          description={this.getIssuerDetails().role}
+          id="home_view"
+        />
         <Container>
-          <Query
-            query={FETCH_REGISTRATION_QUERY}
-            variables={{
-              locationIds: [this.getLocalLocationId()]
-            }}
-          >
-            {({ loading, error, data }) => {
-              if (loading) {
+          <HeaderContent>
+            <Query
+              query={FETCH_REGISTRATION_QUERY}
+              variables={{
+                locationIds: [this.getLocalLocationId()]
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return (
+                    <StyledSpinner
+                      id="work-queue-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
+                }
+                if (error) {
+                  return (
+                    <ErrorText id="work-queue-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+                const transformedData = this.transformData(data)
+                const applicationData = this.getApplicationData(transformedData)
                 return (
-                  <StyledSpinner
-                    id="work-queue-spinner"
-                    baseColor={theme.colors.background}
-                  />
+                  <>
+                    <StyledIconAction
+                      id="new_registration"
+                      icon={() => <StyledPlusIcon />}
+                      onClick={this.props.goToEvents}
+                      title={intl.formatMessage(this.getNewEventButtonText())}
+                    />
+                    <Banner
+                      text={intl.formatMessage(messages.bannerTitle)}
+                      count={applicationData.length}
+                      status={APPLICATIONS_STATUS}
+                    />
+                    <SearchInput
+                      placeholder={intl.formatMessage(
+                        messages.searchInputPlaceholder
+                      )}
+                      buttonLabel={intl.formatMessage(
+                        messages.searchInputButtonTitle
+                      )}
+                      {...this.props}
+                    />
+                    <DataTable
+                      data={transformedData}
+                      sortBy={sortBy}
+                      filterBy={filterBy}
+                      cellRenderer={this.renderCell}
+                      resultLabel={intl.formatMessage(
+                        messages.dataTableResults
+                      )}
+                      noResultText={intl.formatMessage(
+                        messages.dataTableNoResults
+                      )}
+                    />
+                  </>
                 )
-              }
-              if (error) {
-                return (
-                  <ErrorText id="work-queue-error-text">
-                    {intl.formatMessage(messages.queryError)}
-                  </ErrorText>
-                )
-              }
-              const transformedData = this.transformData(data)
-              return (
-                <>
-                  <StyledIconAction
-                    id="new_registration"
-                    icon={() => <StyledPlusIcon />}
-                    onClick={this.props.goToEvents}
-                    title={intl.formatMessage(this.getNewEventButtonText())}
-                  />
-                  <Banner
-                    text={intl.formatMessage(messages.bannerTitle)}
-                    count={transformedData.length}
-                    status={APPLICATIONS_STATUS}
-                  />
-                  <SearchInput
-                    placeholder={intl.formatMessage(
-                      messages.searchInputPlaceholder
-                    )}
-                    buttonLabel={intl.formatMessage(
-                      messages.searchInputButtonTitle
-                    )}
-                    {...this.props}
-                  />
-                  <DataTable
-                    data={transformedData}
-                    sortBy={sortBy}
-                    filterBy={filterBy}
-                    cellRenderer={this.renderCell}
-                    resultLabel={intl.formatMessage(messages.dataTableResults)}
-                    noResultText={intl.formatMessage(
-                      messages.dataTableNoResults
-                    )}
-                  />
-                </>
-              )
-            }}
-          </Query>
+              }}
+            </Query>
+          </HeaderContent>
         </Container>
         {this.state.printCertificateModalVisible ? (
           <PrintCertificateAction
@@ -1028,6 +1116,7 @@ export class WorkQueueView extends React.Component<
             registrationId={(this.state.regId && this.state.regId) || ''}
             togglePrintCertificateSection={this.togglePrintModal}
             printCertificateFormSection={printForm}
+            IssuerDetails={this.getIssuerDetails()}
           />
         ) : null}
       </>
@@ -1038,7 +1127,7 @@ export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: state.profile.userDetails,
+    userDetails: getUserDetails(state),
     printForm: state.printCertificateForm.collectCertificateFrom
   }),
   { goToEvents: goToEventsAction, gotoTab: goToTabAction }

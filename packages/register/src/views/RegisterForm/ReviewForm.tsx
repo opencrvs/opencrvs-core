@@ -38,8 +38,10 @@ import { Scope } from '@opencrvs/register/src/utils/authUtils'
 import {
   IImage,
   documentForWhomFhirMapping,
-  documentTypeFhirMapping
+  documentTypeFhirMapping,
+  IRegistrationDetails
 } from './ProcessDraftData'
+import { Event } from '@opencrvs/register/src/forms'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
@@ -129,6 +131,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
             comment
           }
         }
+        type
         trackingId
         registrationNumber
       }
@@ -325,6 +328,18 @@ export class ReviewFormView extends React.Component<IProps> {
     return fatherDetails
   }
 
+  setMotherCurrentAddressSameAsPermanent(mother: IReviewSectionDetails) {
+    mother.currentAddressSameAsPermanent =
+      mother.countryPermanent === mother.country &&
+      mother.statePermanent === mother.state &&
+      mother.districtPermanent === mother.district &&
+      mother.addressLine1Permanent === mother.addressLine1 &&
+      mother.addressLine2Permanent === mother.addressLine2 &&
+      mother.addressLine3Permanent === mother.addressLine3 &&
+      mother.addressLine4Permanent === mother.addressLine4 &&
+      mother.postalCodePermanent === mother.postalCode
+  }
+
   setFatherAddressSameAsMother(
     father: IReviewSectionDetails,
     mother: IReviewSectionDetails
@@ -380,6 +395,9 @@ export class ReviewFormView extends React.Component<IProps> {
       registrationDetails._fhirID = registration.id
     }
 
+    if (registration.type && registration.type === 'BIRTH') {
+      registrationDetails.type = Event.BIRTH
+    }
     return registrationDetails
   }
 
@@ -424,6 +442,8 @@ export class ReviewFormView extends React.Component<IProps> {
 
     this.setFatherAddressSameAsMother(father, mother)
     child.multipleBirth = mother.multipleBirth
+
+    this.setMotherCurrentAddressSameAsPermanent(mother)
 
     const registration = this.transformRegistration(reg)
 
@@ -475,8 +495,12 @@ export class ReviewFormView extends React.Component<IProps> {
               )
             }
 
-            const transData = this.transformData(data.fetchBirthRegistration)
-            const reviewDraft = createReviewDraft(draftId, transData)
+            const transData: IRegistrationDetails = this.transformData(
+              data.fetchBirthRegistration
+            )
+            const eventType =
+              transData.registration && transData.registration.type
+            const reviewDraft = createReviewDraft(draftId, transData, eventType)
             dispatch(storeDraft(reviewDraft))
 
             return <RegisterForm {...this.props} draft={reviewDraft} />

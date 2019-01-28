@@ -1,19 +1,19 @@
 import { defineMessages } from 'react-intl'
-import { messages as addressMessages } from '../address'
-import { countries } from '../countries'
-import { messages as identityMessages, identityOptions } from '../identity'
-import { messages as maritalStatusMessages } from '../maritalStatus'
-import { messages as educationMessages } from '../education'
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { config } from 'src/config'
 import {
+  messages as identityMessages,
+  identityOptions
+} from '../../../identity'
+import { messages as maritalStatusMessages } from '../../../maritalStatus'
+import { messages as educationMessages } from '../../../education'
+import {
   ViewType,
-  RADIO_GROUP,
+  SELECT_WITH_OPTIONS,
   TEXT,
   NUMBER,
   DATE,
   SUBSECTION,
-  SELECT_WITH_OPTIONS,
+  RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEXT_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
@@ -24,69 +24,54 @@ import {
   validIDNumber
 } from 'src/utils/validate'
 
-export interface IFatherSectionFormData {
+export interface IMotherSectionFormData {
   firstName: string
-  foo: string
-  bar: string
-  baz: string
 }
-import { IFormSection } from '../index'
-import { conditionals } from '../utils'
+import { IFormSection } from '../../../index'
+import { messages as addressMessages } from '../../../address'
+import { countries } from '../../../countries'
+import { conditionals } from '../../../utils'
+import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { iDType } from 'src/views/PrintCertificate/ParentDetails'
 
-export const messages = defineMessages({
-  fatherTab: {
-    id: 'register.form.tabs.fatherTab',
-    defaultMessage: 'Father',
-    description: 'Tab title for Father'
+const messages = defineMessages({
+  motherTab: {
+    id: 'register.form.tabs.motherTab',
+    defaultMessage: 'Mother',
+    description: 'Tab title for Mother'
   },
-  fatherTitle: {
-    id: 'register.form.section.fatherTitle',
-    defaultMessage: "Father's details",
-    description: 'Form section title for Father'
-  },
-  fathersDetailsExist: {
-    id: 'formFields.fathersDetailsExist',
-    defaultMessage: "Do you have the father's details?",
-    description: "Question to ask the user if they have the father's details"
-  },
-  confirm: {
-    id: 'formFields.confirm',
-    defaultMessage: 'Yes',
-    description: 'confirmation label for yes / no radio button'
-  },
-  deny: {
-    id: 'formFields.deny',
-    defaultMessage: 'No',
-    description: 'deny label for yes / no radio button'
+  motherTitle: {
+    id: 'register.form.section.motherTitle',
+    defaultMessage: "Mother's details",
+    description: 'Form section title for Mother'
   },
   nationality: {
-    id: 'formFields.father.nationality',
+    id: 'formFields.mother.nationality',
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality'
   },
   nationalityBangladesh: {
-    id: 'formFields.father.nationalityBangladesh',
+    id: 'formFields.mother.nationalityBangladesh',
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality'
   },
-  fatherFirstNames: {
-    id: 'formFields.fatherFirstNames',
+  motherFirstNames: {
+    id: 'formFields.motherFirstNames',
     defaultMessage: 'First name(s)',
-    description: 'Label for form field: First name'
+    description: 'Label for form field: First names'
   },
-  fatherFamilyName: {
-    id: 'formFields.fatherFamilyName',
+  motherFamilyName: {
+    id: 'formFields.motherFamilyName',
     defaultMessage: 'Family name',
     description: 'Label for form field: Family name'
   },
-  fatherFirstNamesEng: {
-    id: 'formFields.fatherFirstNamesEng',
+  motherFirstNamesEng: {
+    id: 'formFields.motherFirstNamesEng',
     defaultMessage: 'First name(s) (in english)',
     description: 'Label for form field: First names in english'
   },
-  fatherFamilyNameEng: {
-    id: 'formFields.fatherFamilyNameEng',
+  motherFamilyNameEng: {
+    id: 'formFields.motherFamilyNameEng',
     defaultMessage: 'Family name (in english)',
     description: 'Label for form field: Family name in english'
   },
@@ -95,15 +80,15 @@ export const messages = defineMessages({
     defaultMessage: 'Label goes here',
     description: 'default label'
   },
-  fatherDateOfBirth: {
-    id: 'formFields.fatherDateOfBirth',
+  motherDateOfBirth: {
+    id: 'formFields.motherDateOfBirth',
     defaultMessage: 'Date of birth',
     description: 'Label for form field: Date of birth'
   },
-  fatherEducationAttainment: {
-    id: 'formFields.fatherEducationAttainment',
-    defaultMessage: "Father's level of formal education attained",
-    description: 'Label for form field: Father education'
+  motherEducationAttainment: {
+    id: 'formFields.motherEducationAttainment',
+    defaultMessage: "Mother's level of formal education attained",
+    description: 'Label for form field: Mother education'
   },
   currentAddress: {
     id: 'formFields.currentAddress',
@@ -122,24 +107,12 @@ export const messages = defineMessages({
   }
 })
 
-export const fatherSection: IFormSection = {
-  id: 'father',
+export const motherSection: IFormSection = {
+  id: 'mother',
   viewType: 'form' as ViewType,
-  name: messages.fatherTab,
-  title: messages.fatherTitle,
+  name: messages.motherTab,
+  title: messages.motherTitle,
   fields: [
-    {
-      name: 'fathersDetailsExist',
-      type: RADIO_GROUP,
-      label: messages.fathersDetailsExist,
-      required: true,
-      initialValue: true,
-      validate: [],
-      options: [
-        { value: true, label: messages.confirm },
-        { value: false, label: messages.deny }
-      ]
-    },
     {
       name: 'iDType',
       type: SELECT_WITH_OPTIONS,
@@ -147,8 +120,7 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: identityOptions,
-      conditionals: [conditionals.fathersDetailsExist]
+      options: identityOptions
     },
     {
       name: 'iDTypeOther',
@@ -157,7 +129,7 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      conditionals: [conditionals.fathersDetailsExist, conditionals.iDType]
+      conditionals: [conditionals.iDType]
     },
     {
       name: 'iD',
@@ -177,8 +149,7 @@ export const fatherSection: IFormSection = {
       label: identityMessages.iD,
       required: true,
       initialValue: '',
-      validate: [],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: []
     },
     {
       name: 'nationality',
@@ -187,53 +158,47 @@ export const fatherSection: IFormSection = {
       required: false,
       initialValue: 'BGD',
       validate: [],
-      options: countries,
-      conditionals: [conditionals.fathersDetailsExist]
+      options: countries
     },
     {
       name: 'firstNames',
       type: TEXT,
-      label: messages.fatherFirstNames,
+      label: messages.motherFirstNames,
       required: false,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'familyName',
       type: TEXT,
-      label: messages.fatherFamilyName,
+      label: messages.motherFamilyName,
       required: true,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'firstNamesEng',
       type: TEXT,
-      label: messages.fatherFirstNamesEng,
+      label: messages.motherFirstNamesEng,
       required: false,
       initialValue: '',
-      validate: [englishOnlyNameFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'familyNameEng',
       type: TEXT,
-      label: messages.fatherFamilyNameEng,
+      label: messages.motherFamilyNameEng,
       required: false,
       initialValue: '',
-      validate: [englishOnlyNameFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'birthDate',
       type: DATE,
-      label: messages.fatherDateOfBirth,
+      label: messages.motherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: [dateFormat]
     },
     {
       name: 'maritalStatus',
@@ -254,8 +219,7 @@ export const fatherSection: IFormSection = {
           value: 'NOT_STATED',
           label: maritalStatusMessages.maritalStatusNotStated
         }
-      ],
-      conditionals: [conditionals.fathersDetailsExist]
+      ]
     },
     {
       name: 'dateOfMarriage',
@@ -263,13 +227,12 @@ export const fatherSection: IFormSection = {
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: [dateFormat]
     },
     {
       name: 'educationalAttainment',
       type: SELECT_WITH_OPTIONS,
-      label: messages.fatherEducationAttainment,
+      label: messages.motherEducationAttainment,
       required: false,
       initialValue: '',
       validate: [],
@@ -306,13 +269,136 @@ export const fatherSection: IFormSection = {
           value: 'NOT_STATED',
           label: educationMessages.educationAttainmentNotStated
         }
-      ],
-      conditionals: [conditionals.fathersDetailsExist]
+      ]
+    },
+
+    {
+      name: 'permanentAddress',
+      type: SUBSECTION,
+      label: messages.permanentAddress,
+      initialValue: '',
+      required: false,
+      validate: []
     },
     {
-      name: 'addressSameAsMother',
+      name: 'countryPermanent',
+      type: SELECT_WITH_OPTIONS,
+      label: addressMessages.country,
+      required: true,
+      initialValue: config.COUNTRY.toUpperCase(),
+      validate: [],
+      options: countries
+    },
+    {
+      name: 'statePermanent',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.state,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'countryPermanent'
+      },
+      conditionals: [conditionals.countryPermanent]
+    },
+    {
+      name: 'districtPermanent',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.district,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'statePermanent'
+      },
+      conditionals: [conditionals.countryPermanent, conditionals.statePermanent]
+    },
+    {
+      name: 'addressLine4Permanent',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.addressLine4,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'districtPermanent'
+      },
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent
+      ]
+    },
+    {
+      name: 'addressLine3Permanent',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.addressLine3,
+      required: true,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'addressLine4Permanent'
+      },
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent
+      ]
+    },
+    {
+      name: 'addressLine2Permanent',
+      type: TEXT,
+      label: addressMessages.addressLine2,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.addressLine3Permanent
+      ]
+    },
+    {
+      name: 'addressLine1Permanent',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.addressLine3Permanent
+      ]
+    },
+    {
+      name: 'postCodePermanent',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.addressLine3Permanent
+      ]
+    },
+    {
+      name: 'currentAddressSameAsPermanent',
       type: RADIO_GROUP,
-      label: addressMessages.addressSameAsMother,
+      label: addressMessages.currentAddressSameAsPermanent,
       required: true,
       initialValue: true,
       validate: [],
@@ -320,7 +406,7 @@ export const fatherSection: IFormSection = {
         { value: true, label: addressMessages.confirm },
         { value: false, label: addressMessages.deny }
       ],
-      conditionals: [conditionals.fathersDetailsExist]
+      conditionals: []
     },
     {
       name: 'currentAddress',
@@ -329,10 +415,7 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       required: false,
       validate: [],
-      conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.addressSameAsMother
-      ]
+      conditionals: [conditionals.currentAddressSameAsPermanent]
     },
     {
       name: 'country',
@@ -342,7 +425,7 @@ export const fatherSection: IFormSection = {
       initialValue: config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.addressSameAsMother]
+      conditionals: [conditionals.currentAddressSameAsPermanent]
     },
     {
       name: 'state',
@@ -355,7 +438,10 @@ export const fatherSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
       },
-      conditionals: [conditionals.country, conditionals.addressSameAsMother]
+      conditionals: [
+        conditionals.country,
+        conditionals.currentAddressSameAsPermanent
+      ]
     },
     {
       name: 'district',
@@ -371,7 +457,7 @@ export const fatherSection: IFormSection = {
       conditionals: [
         conditionals.country,
         conditionals.state,
-        conditionals.addressSameAsMother
+        conditionals.currentAddressSameAsPermanent
       ]
     },
     {
@@ -389,7 +475,7 @@ export const fatherSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.district,
-        conditionals.addressSameAsMother
+        conditionals.currentAddressSameAsPermanent
       ]
     },
     {
@@ -408,7 +494,7 @@ export const fatherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressSameAsMother
+        conditionals.currentAddressSameAsPermanent
       ]
     },
     {
@@ -424,7 +510,7 @@ export const fatherSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.addressSameAsMother
+        conditionals.currentAddressSameAsPermanent
       ]
     },
     {
@@ -440,7 +526,7 @@ export const fatherSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.addressSameAsMother
+        conditionals.currentAddressSameAsPermanent
       ]
     },
     {
@@ -456,160 +542,7 @@ export const fatherSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.addressSameAsMother
-      ]
-    },
-    {
-      name: 'permanentAddressSameAsMother',
-      type: RADIO_GROUP,
-      label: addressMessages.permanentAddressSameAsMother,
-      required: true,
-      initialValue: true,
-      validate: [],
-      options: [
-        { value: true, label: messages.confirm },
-        { value: false, label: messages.deny }
-      ],
-      conditionals: [conditionals.fathersDetailsExist]
-    },
-    {
-      name: 'permanentAddress',
-      type: SUBSECTION,
-      label: messages.permanentAddress,
-      initialValue: '',
-      required: false,
-      validate: [],
-      conditionals: [
-        conditionals.fathersDetailsExist,
-        conditionals.permanentAddressSameAsMother
-      ]
-    },
-    {
-      name: 'countryPermanent',
-      type: SELECT_WITH_OPTIONS,
-      label: addressMessages.country,
-      required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
-      validate: [],
-      options: countries,
-      conditionals: [conditionals.permanentAddressSameAsMother]
-    },
-    {
-      name: 'statePermanent',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.state,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'countryPermanent'
-      },
-      conditionals: [
-        conditionals.permanentAddressSameAsMother,
-        conditionals.countryPermanent
-      ]
-    },
-    {
-      name: 'districtPermanent',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.district,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'statePermanent'
-      },
-      conditionals: [
-        conditionals.permanentAddressSameAsMother,
-        conditionals.countryPermanent,
-        conditionals.statePermanent
-      ]
-    },
-    {
-      name: 'addressLine4Permanent',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.addressLine4,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'districtPermanent'
-      },
-      conditionals: [
-        conditionals.permanentAddressSameAsMother,
-        conditionals.countryPermanent,
-        conditionals.statePermanent,
-        conditionals.districtPermanent
-      ]
-    },
-    {
-      name: 'addressLine3Permanent',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.addressLine3,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'addressLine4Permanent'
-      },
-      conditionals: [
-        conditionals.permanentAddressSameAsMother,
-        conditionals.countryPermanent,
-        conditionals.statePermanent,
-        conditionals.districtPermanent,
-        conditionals.addressLine4Permanent
-      ]
-    },
-    {
-      name: 'addressLine2Permanent',
-      type: TEXT,
-      label: addressMessages.addressLine2,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.permanentAddressSameAsMother,
-        conditionals.countryPermanent,
-        conditionals.statePermanent,
-        conditionals.districtPermanent,
-        conditionals.addressLine4Permanent,
-        conditionals.addressLine3Permanent
-      ]
-    },
-    {
-      name: 'addressLine1Permanent',
-      type: TEXT,
-      label: addressMessages.addressLine1,
-      required: true,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.permanentAddressSameAsMother,
-        conditionals.countryPermanent,
-        conditionals.statePermanent,
-        conditionals.districtPermanent,
-        conditionals.addressLine4Permanent,
-        conditionals.addressLine3Permanent
-      ]
-    },
-    {
-      name: 'postCodePermanent',
-      type: NUMBER,
-      label: addressMessages.postCode,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.permanentAddressSameAsMother,
-        conditionals.countryPermanent,
-        conditionals.statePermanent,
-        conditionals.districtPermanent,
-        conditionals.addressLine4Permanent,
-        conditionals.addressLine3Permanent
+        conditionals.currentAddressSameAsPermanent
       ]
     }
   ]

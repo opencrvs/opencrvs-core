@@ -20,7 +20,12 @@
     "noUnusedLocals": true,
     "types": ["fhir"]
   },
-  "include": ["src/**/*.ts", "typings", "tslint-rules"],
+  "include": [
+    "src/**/*.ts",
+    "typings",
+    "tslint-rules",
+    "__mocks__/elasticsearch.ts"
+  ],
   "exclude": [
     "node_modules",
     "build",
