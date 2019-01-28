@@ -748,6 +748,26 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.details.submitted': 'submitted',
     'register.duplicates.details.rejected': 'rejected',
     'register.duplicates.details.registered': 'registered',
-    'register.duplicates.details.certified': 'certified'
+    'register.duplicates.details.certified': 'certified',
+    'register.form.tabs.applicantTab': 'Applicant',
+    'register.form.section.applicantTitle': "Applicant's details",
+    'formFields.applicantsIdType': 'Existing ID',
+    'formFields.applicantsGivenNames': 'Given name (s)',
+    'formFields.applicantsFamilyName': 'Family Name',
+    'formFields.applicantsGivenNamesEng': 'Given Name (s) in English',
+    'formFields.applicantsFamilyNameEng': 'Family Name in English',
+    'formFields.applicants.nationality': 'Nationality',
+    'formFields.applicantsDateOfBirth': 'Date of Birth',
+    'formFields.applicantsRelationWithDeceased': 'Relationship to Deceased',
+    'formFields.applicantRelation.father': 'Father',
+    'formFields.applicantRelation.mother': 'Mother',
+    'formFields.applicantRelation.spouse': 'Spouse',
+    'formFields.applicantRelation.son': 'Son',
+    'formFields.applicantRelation.daughter': 'Daughter',
+    'formFields.applicantRelation.extendedFamily': 'Extended Family',
+    'formFields.applicantRelation.other': 'Other(Specify)',
+    'formFields.applicantsCurrentAddressSameAsPermanent':
+      'Is applicant’s permanent address the same as their current address?',
+    'formFields.applicant.phone': 'Phone number'
   }
 }
