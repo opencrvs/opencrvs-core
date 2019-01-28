@@ -47,8 +47,7 @@ describe('form component', () => {
           type: SELECT_WITH_OPTIONS,
           label: addressMessages.country,
           required: true,
-          // @ts-ignore
-          initialValue: window.config.COUNTRY.toUpperCase(),
+          initialValue: (window as any).config.COUNTRY.toUpperCase(),
           validate: [],
           options: countries
         },
