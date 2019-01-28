@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ActionPage, Box } from '@opencrvs/components/lib/interface'
+import { ActionPage, Box, Modal } from '@opencrvs/components/lib/interface'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
@@ -10,6 +10,7 @@ import {
 } from 'src/components/DuplicateDetails'
 import { Event } from 'src/forms'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const messages = defineMessages({
   title: {
@@ -27,6 +28,11 @@ const messages = defineMessages({
     id: 'register.duplicates.pageTitle',
     defaultMessage: 'Possible duplicate',
     description: 'The duplicates page title'
+  },
+  rejectButton: {
+    id: 'duplicate.modal.rejectButton',
+    defaultMessage: 'Reject',
+    description: 'Reject button on reject modal'
   }
 })
 
@@ -178,39 +184,76 @@ const mockDupeData = [
   }
 ]
 
-class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
+type State = {
+  showNonDuplicateModal: boolean
+}
+
+class ReviewDuplicatesClass extends React.Component<InjectedIntlProps, State> {
+  constructor(props: InjectedIntlProps) {
+    super(props)
+
+    this.state = {
+      showNonDuplicateModal: false
+    }
+  }
+
+  toggleNonDuplicateModal = () => {
+    this.setState((prevState: State) => ({
+      showNonDuplicateModal: !prevState.showNonDuplicateModal
+    }))
+  }
+
   render() {
+    // const { intl } = this.props
+
     return (
-      <ActionPage
-        goBack={() => {
-          window.location.href = WORK_QUEUE
-        }}
-        title={this.props.intl.formatMessage(messages.pageTitle)}
-      >
-        <Container>
-          <HeaderContent>
-            <TitleBox>
-              <Header>
-                <Duplicate />
-                <HeaderText>
-                  {this.props.intl.formatMessage(messages.title)}
-                </HeaderText>
-              </Header>
-              <p>{this.props.intl.formatMessage(messages.description)}</p>
-            </TitleBox>
-            <Grid>
-              {mockDupeData.map(data => (
-                <DuplicateDetails
-                  data={data}
-                  notDuplicateHandler={() => {
-                    alert('Not a duplicate! (°◇°)')
-                  }}
-                />
-              ))}
-            </Grid>
-          </HeaderContent>
-        </Container>
-      </ActionPage>
+      <>
+        <ActionPage
+          goBack={() => {
+            window.location.href = WORK_QUEUE
+          }}
+          title={this.props.intl.formatMessage(messages.pageTitle)}
+        >
+          <Container>
+            <HeaderContent>
+              <TitleBox>
+                <Header>
+                  <Duplicate />
+                  <HeaderText>
+                    {this.props.intl.formatMessage(messages.title)}
+                  </HeaderText>
+                </Header>
+                <p>{this.props.intl.formatMessage(messages.description)}</p>
+              </TitleBox>
+              <Grid>
+                {mockDupeData.map(data => (
+                  <DuplicateDetails
+                    data={data}
+                    notDuplicateHandler={this.toggleNonDuplicateModal}
+                  />
+                ))}
+              </Grid>
+            </HeaderContent>
+          </Container>
+        </ActionPage>
+
+        <Modal
+          title="Are you sure this is not a duplicate?"
+          actions={[
+            <PrimaryButton
+              key="reject"
+              id="reject_duplicate"
+              onClick={() => console.log('Duplicate rejected')}
+            >
+              {this.props.intl.formatMessage(messages.rejectButton)}
+            </PrimaryButton>
+          ]}
+          show={this.state.showNonDuplicateModal}
+          handleClose={this.toggleNonDuplicateModal}
+        >
+          {this.props.intl.formatMessage(messages.description)}
+        </Modal>
+      </>
     )
   }
 }
