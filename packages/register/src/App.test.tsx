@@ -786,7 +786,6 @@ describe('when user has a valid token in local storage', () => {
         registration: registrationDetails,
         documents: { image_uploader: '' }
       }
-
       expect(processDraftData(data).father.address[1].line[0]).toBe('Rd #10')
     })
 
@@ -870,6 +869,7 @@ describe('when user has a valid token in local storage', () => {
         })
 
         it('Should be able to click SEND FOR REVIEW Button', () => {
+          // console.log(app.debug())
           expect(
             app
               .find('#submit_form')

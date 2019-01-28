@@ -136,9 +136,6 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === RADIO_GROUP) {
-    console.log(inputFieldProps.label)
-    console.log(fieldDefinition.initialValue)
-    console.log(value as string)
     return (
       <InputField {...inputFieldProps}>
         <RadioGroup

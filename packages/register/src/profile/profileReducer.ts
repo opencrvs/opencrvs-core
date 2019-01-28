@@ -92,10 +92,7 @@ export const profileReducer: LoopReducer<
               storeToken(token)
             }
           }),
-          Cmd.run(queries.fetchUserDetails, {
-            successActionCreator: actions.setUserDetails,
-            args: [payload.sub]
-          })
+          Cmd.action(actions.setInitialUserDetails())
         ])
       )
     case actions.SET_USER_DETAILS:
@@ -109,7 +106,6 @@ export const profileReducer: LoopReducer<
       }
 
       const userDetails = getUserDetails(data.getUser)
-      console.log('hi', JSON.stringify(action.payload))
       return loop(
         {
           ...state,
@@ -137,17 +133,30 @@ export const profileReducer: LoopReducer<
       )
     case actions.GET_USER_DETAILS_SUCCESS:
       const userDetailsString = action.payload
-      console.log(userDetailsString)
       const userDetailsCollection = JSON.parse(
         userDetailsString ? userDetailsString : '[]'
       )
-      return loop(
-        {
-          ...state,
-          userDetails: userDetailsCollection
-        },
-        Cmd.action(offlineActions.setOfflineData(userDetailsCollection))
-      )
+      if (userDetailsCollection.length === 0 && state.tokenPayload) {
+        return loop(
+          {
+            ...state,
+            userDetails: userDetailsCollection
+          },
+          Cmd.run(queries.fetchUserDetails, {
+            successActionCreator: actions.setUserDetails,
+            args: [state.tokenPayload.sub]
+          })
+        )
+      } else {
+        return loop(
+          {
+            ...state,
+            userDetails: userDetailsCollection
+          },
+          Cmd.action(offlineActions.setOfflineData(userDetailsCollection))
+        )
+      }
+
     default:
       return state
   }

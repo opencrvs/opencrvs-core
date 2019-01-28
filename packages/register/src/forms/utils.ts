@@ -118,10 +118,10 @@ export const getFieldOptions = (
   }
 }
 
-export const isCityLocation = (
+export function isCityLocation(
   locations: ILocation[],
   locationId: string
-): boolean => {
+): boolean {
   const selectedLocation = locations.filter((location: ILocation) => {
     return location.id === locationId
   })[0]
@@ -144,11 +144,12 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
-    .filter(conditional =>
+    .filter(conditional => {
       /* tslint:disable-next-line: no-eval */
       eval(conditional.expression)
-    )
+    })
     .map((conditional: IConditional) => conditional.action)
 }
 

@@ -122,7 +122,6 @@ const processDraftData = (draftData: IFormData) => {
     mother.addressLine3CityOption = mother.addressLine3CityOptionPermanent
     mother.addressLine4 = mother.addressLine4Permanent
   }
-
   const fatherPermanentAddress = father.permanentAddressSameAsMother
     ? mother
     : father
@@ -257,16 +256,16 @@ const processDraftData = (draftData: IFormData) => {
       country: fatherCurrentAddress.country,
       state: fatherCurrentAddress.state,
       district: fatherCurrentAddress.district,
-      postalCode: fatherCurrentAddress.postCodePermanent
-        ? fatherCurrentAddress.postCodePermanent
-        : fatherCurrentAddress.postCodeCityOptionPermanent,
+      postalCode: fatherCurrentAddress.postCode
+        ? fatherCurrentAddress.postCode
+        : fatherCurrentAddress.postCodeCityOption,
       line: [
-        fatherCurrentAddress.addressLine1Permanent,
-        fatherCurrentAddress.addressLine1CityOptionPermanent,
-        fatherCurrentAddress.addressLine2Permanent,
-        fatherCurrentAddress.addressLine3Permanent,
-        fatherCurrentAddress.addressLine3CityOptionPermanent,
-        fatherCurrentAddress.addressLine4Permanent
+        fatherCurrentAddress.addressLine1,
+        fatherCurrentAddress.addressLine1CityOption,
+        fatherCurrentAddress.addressLine2,
+        fatherCurrentAddress.addressLine3,
+        fatherCurrentAddress.addressLine3CityOption,
+        fatherCurrentAddress.addressLine4
       ]
     }
   ]

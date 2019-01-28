@@ -65,7 +65,6 @@ export function getUserLocation(
   userDetails: IUserDetails,
   locationKey: string
 ): string {
-  console.log(JSON.stringify(userDetails))
   if (!userDetails.catchmentArea) {
     throw Error('The user has no catchment area')
   }
