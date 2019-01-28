@@ -500,7 +500,6 @@ describe('when user has a valid token in local storage', () => {
         })
       })
     })
-
     describe('when user clicks "next" button', () => {
       beforeEach(async () => {
         app
