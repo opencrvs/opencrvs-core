@@ -264,7 +264,7 @@ export const applicantsSection: IFormSection = {
       name: 'applicantPhone',
       type: TEL,
       label: messages.applicantsPhone,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [phoneNumberFormat]
     },
