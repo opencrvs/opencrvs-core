@@ -11,14 +11,14 @@ import {
   TickLarge,
   CrossLarge,
   Delete,
-  Draft
+  DraftSimple
 } from '@opencrvs/components/lib/icons'
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
 import { DocumentViewer } from '@opencrvs/components/lib/interface'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
-import { documentsSection } from '../../../forms/register/documents-section'
+import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { getOfflineState } from 'src/offline/selectors'
@@ -52,7 +52,8 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   ISelectOption,
   IDynamicOptions,
-  IFormSectionData
+  IFormSectionData,
+  Event
 } from 'src/forms'
 
 const messages = defineMessages({
@@ -243,14 +244,24 @@ const DeleteApplication = styled.a`
     margin-right: 15px;
   }
 `
-const SaveDraft = styled(RejectApplication)`
-  div:first-of-type {
-    height: 50px;
-    background-color: ${({ theme }) => theme.colors.saveDraftBtn};
-    padding: 0px;
-  }
+const SaveDraftText = styled.span`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 14px;
+  text-decoration: underline;
+  letter-spacing: 0px;
+  margin-left: 14px;
 `
 
+const DraftButtonContainer = styled.div`
+  background-color: ${({ theme }) => theme.colors.inputBackground};
+  min-height: 83px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 25px;
+  cursor: pointer;
+`
 interface IProps {
   draft: IDraft
   registerForm: IForm
@@ -684,14 +695,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )}
 
             {!!saveDraftClickEvent && (
-              <ButtonContainer>
-                <SaveDraft
-                  id="saveAsDraftBtn"
-                  title={intl.formatMessage(messages.valueSaveAsDraft)}
-                  icon={() => <Draft />}
-                  onClick={saveDraftClickEvent}
-                />
-              </ButtonContainer>
+              <DraftButtonContainer onClick={saveDraftClickEvent}>
+                <DraftSimple />
+                <SaveDraftText>
+                  {intl.formatMessage(messages.valueSaveAsDraft)}
+                </SaveDraftText>
+              </DraftButtonContainer>
             )}
 
             <EditConfirmation
@@ -722,7 +731,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
 export const ReviewSection = connect(
   (state: IStoreState) => ({
-    registerForm: getRegisterForm(state),
+    registerForm: getRegisterForm(state)[Event.BIRTH],
     scope: getScope(state),
     offlineResources: getOfflineState(state),
     language: getLanguage(state)

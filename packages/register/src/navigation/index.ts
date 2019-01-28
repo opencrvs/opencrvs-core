@@ -6,7 +6,9 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
-  MY_RECORDS
+  MY_RECORDS,
+  MY_DRAFTS,
+  REVIEW_DUPLICATES
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -57,10 +59,19 @@ export function goToWorkQueue() {
 export function goToMyRecords() {
   return push(MY_RECORDS)
 }
+export function goToMyDrafts() {
+  return push(MY_DRAFTS)
+}
 
 export function goToBirthRegistrationAsParent(draftId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, { draftId: draftId.toString() })
+  )
+}
+
+export function goToReviewDuplicate(applicationId: string) {
+  return push(
+    formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })
   )
 }
 

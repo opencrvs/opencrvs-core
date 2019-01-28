@@ -1,4 +1,4 @@
-import { IFormData } from '../forms'
+import { IFormData, Event } from '../forms'
 import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
@@ -9,11 +9,16 @@ const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
 const MODIFY_DRAFT = 'DRAFTS/MODIFY_DRAFT'
 const WRITE_DRAFT = 'DRAFTS/WRITE_DRAFT'
 const DELETE_DRAFT = 'DRAFTS/DELETE_DRAFT'
+const GET_DRAFTS_SUCCESS = 'DRAFTS/GET_DRAFTS_SUCCESS'
+const GET_DRAFTS_FAILED = 'DRAFTS/GET_DRAFTS_FAILED'
 
 export interface IDraft {
   id: string
   data: IFormData
+  savedOn?: number
+  eventType?: string
   review?: boolean
+  event: Event
 }
 
 interface IStoreDraftAction {
@@ -37,9 +42,6 @@ interface IWriteDraftAction {
 
 interface ISetInitialDraftsAction {
   type: typeof SET_INITIAL_DRAFTS
-  payload: {
-    drafts: IDraft[]
-  }
 }
 
 interface IDeleteDraftAction {
@@ -49,6 +51,15 @@ interface IDeleteDraftAction {
   }
 }
 
+interface IGetStorageDraftsSuccessAction {
+  type: typeof GET_DRAFTS_SUCCESS
+  payload: string
+}
+
+interface IGetStorageDraftsFailedAction {
+  type: typeof GET_DRAFTS_FAILED
+}
+
 type Action =
   | IStoreDraftAction
   | IModifyDraftAction
@@ -56,6 +67,8 @@ type Action =
   | IWriteDraftAction
   | NavigationAction
   | IDeleteDraftAction
+  | IGetStorageDraftsSuccessAction
+  | IGetStorageDraftsFailedAction
 
 export interface IDraftsState {
   initialDraftsLoaded: boolean
@@ -67,26 +80,39 @@ const initialState = {
   drafts: []
 }
 
-export function createDraft() {
-  return { id: uuid(), data: {} }
+export function createDraft(event: Event) {
+  return { id: uuid(), data: {}, event }
 }
 export function createReviewDraft(
   draftId: string,
-  formData: IFormData
+  formData: IFormData,
+  event: Event
 ): IDraft {
-  return { id: draftId, data: formData, review: true }
+  return { id: draftId, data: formData, review: true, event }
 }
 
 export function storeDraft(draft: IDraft): IStoreDraftAction {
+  draft.savedOn = Date.now()
   return { type: STORE_DRAFT, payload: { draft } }
 }
 
 export function modifyDraft(draft: IDraft): IModifyDraftAction {
   return { type: MODIFY_DRAFT, payload: { draft } }
 }
-export function setInitialDrafts(drafts: IDraftsState) {
-  return { type: SET_INITIAL_DRAFTS, payload: { drafts } }
+export function setInitialDrafts() {
+  return { type: SET_INITIAL_DRAFTS }
 }
+
+export const getStorageDraftsSuccess = (
+  response: string
+): IGetStorageDraftsSuccessAction => ({
+  type: GET_DRAFTS_SUCCESS,
+  payload: response
+})
+
+export const getStorageDraftsFailed = (): IGetStorageDraftsFailedAction => ({
+  type: GET_DRAFTS_FAILED
+})
 
 export function deleteDraft(draft: IDraft): IDeleteDraftAction {
   return { type: DELETE_DRAFT, payload: { draft } }
@@ -160,10 +186,26 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       }
       return state
     case SET_INITIAL_DRAFTS:
+      return loop(
+        {
+          ...state
+        },
+        Cmd.run<IGetStorageDraftsSuccessAction | IGetStorageDraftsFailedAction>(
+          storage.getItem,
+          {
+            successActionCreator: getStorageDraftsSuccess,
+            failActionCreator: getStorageDraftsFailed,
+            args: ['drafts']
+          }
+        )
+      )
+    case GET_DRAFTS_SUCCESS:
+      const draftsString = action.payload
+      const drafts = JSON.parse(draftsString ? draftsString : '[]')
       return {
         ...state,
-        initialDraftsLoaded: true,
-        drafts: action.payload.drafts
+        drafts,
+        initialDraftsLoaded: true
       }
     default:
       return state

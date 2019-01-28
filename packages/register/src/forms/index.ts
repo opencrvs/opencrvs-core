@@ -25,6 +25,11 @@ export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 
+export enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
+
 export interface ISelectOption {
   value: SelectComponentOption['value']
   label: FormattedMessage.MessageDescriptor
@@ -183,6 +188,8 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
+  iDAvailable: IConditional
+  deathPlaceOther: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

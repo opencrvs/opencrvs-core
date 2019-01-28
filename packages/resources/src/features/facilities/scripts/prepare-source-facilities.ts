@@ -1,7 +1,8 @@
 import * as fs from 'fs'
 import { FACILITIES_SOURCE } from '../../../constants'
 import * as csv2json from 'csv2json'
-const sourceJSON = `${FACILITIES_SOURCE}crvs-facilities.json`
+const crvsOfficeSourceJSON = `${FACILITIES_SOURCE}crvs-facilities.json`
+const healthFacilitySourceJSON = `${FACILITIES_SOURCE}health-facilities.json`
 import chalk from 'chalk'
 
 export default async function prepareSourceJSON() {
@@ -13,7 +14,10 @@ export default async function prepareSourceJSON() {
   )
   fs.createReadStream(`${FACILITIES_SOURCE}crvs-facilities.csv`)
     .pipe(csv2json())
-    .pipe(fs.createWriteStream(sourceJSON))
+    .pipe(fs.createWriteStream(crvsOfficeSourceJSON))
+  fs.createReadStream(`${FACILITIES_SOURCE}health-facilities.csv`)
+    .pipe(csv2json())
+    .pipe(fs.createWriteStream(healthFacilitySourceJSON))
 
   return true
 }

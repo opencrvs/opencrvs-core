@@ -322,7 +322,6 @@ class ReviewDuplicatesClass extends React.Component<
   render() {
     const match = this.props.match
     const applicationId = match.params.applicationId
-
     return (
       <ActionPage
         goBack={() => {
@@ -366,7 +365,6 @@ class ReviewDuplicatesClass extends React.Component<
               vars[`duplicate${i}Id`] = id
               return vars
             }, {})
-
             return (
               <Query
                 query={createDuplicateDetailsQuery(duplicateIds)}
