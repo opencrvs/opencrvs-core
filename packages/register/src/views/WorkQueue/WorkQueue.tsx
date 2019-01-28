@@ -51,6 +51,7 @@ import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateActi
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -1043,66 +1044,70 @@ export class WorkQueueView extends React.Component<
           id="home_view"
         />
         <Container>
-          <Query
-            query={FETCH_REGISTRATION_QUERY}
-            variables={{
-              locationIds: [this.getLocalLocationId()]
-            }}
-          >
-            {({ loading, error, data }) => {
-              if (loading) {
+          <HeaderContent>
+            <Query
+              query={FETCH_REGISTRATION_QUERY}
+              variables={{
+                locationIds: [this.getLocalLocationId()]
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return (
+                    <StyledSpinner
+                      id="work-queue-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
+                }
+                if (error) {
+                  return (
+                    <ErrorText id="work-queue-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+                const transformedData = this.transformData(data)
+                const applicationData = this.getApplicationData(transformedData)
                 return (
-                  <StyledSpinner
-                    id="work-queue-spinner"
-                    baseColor={theme.colors.background}
-                  />
+                  <>
+                    <StyledIconAction
+                      id="new_registration"
+                      icon={() => <StyledPlusIcon />}
+                      onClick={this.props.goToEvents}
+                      title={intl.formatMessage(this.getNewEventButtonText())}
+                    />
+                    <Banner
+                      text={intl.formatMessage(messages.bannerTitle)}
+                      count={applicationData.length}
+                      status={APPLICATIONS_STATUS}
+                    />
+                    <SearchInput
+                      placeholder={intl.formatMessage(
+                        messages.searchInputPlaceholder
+                      )}
+                      buttonLabel={intl.formatMessage(
+                        messages.searchInputButtonTitle
+                      )}
+                      {...this.props}
+                    />
+                    <DataTable
+                      data={transformedData}
+                      sortBy={sortBy}
+                      filterBy={filterBy}
+                      cellRenderer={this.renderCell}
+                      resultLabel={intl.formatMessage(
+                        messages.dataTableResults
+                      )}
+                      noResultText={intl.formatMessage(
+                        messages.dataTableNoResults
+                      )}
+                    />
+                  </>
                 )
-              }
-              if (error) {
-                return (
-                  <ErrorText id="work-queue-error-text">
-                    {intl.formatMessage(messages.queryError)}
-                  </ErrorText>
-                )
-              }
-              const transformedData = this.transformData(data)
-              const applicationData = this.getApplicationData(transformedData)
-              return (
-                <>
-                  <StyledIconAction
-                    id="new_registration"
-                    icon={() => <StyledPlusIcon />}
-                    onClick={this.props.goToEvents}
-                    title={intl.formatMessage(this.getNewEventButtonText())}
-                  />
-                  <Banner
-                    text={intl.formatMessage(messages.bannerTitle)}
-                    count={applicationData.length}
-                    status={APPLICATIONS_STATUS}
-                  />
-                  <SearchInput
-                    placeholder={intl.formatMessage(
-                      messages.searchInputPlaceholder
-                    )}
-                    buttonLabel={intl.formatMessage(
-                      messages.searchInputButtonTitle
-                    )}
-                    {...this.props}
-                  />
-                  <DataTable
-                    data={transformedData}
-                    sortBy={sortBy}
-                    filterBy={filterBy}
-                    cellRenderer={this.renderCell}
-                    resultLabel={intl.formatMessage(messages.dataTableResults)}
-                    noResultText={intl.formatMessage(
-                      messages.dataTableNoResults
-                    )}
-                  />
-                </>
-              )
-            }}
-          </Query>
+              }}
+            </Query>
+          </HeaderContent>
         </Container>
         {this.state.printCertificateModalVisible ? (
           <PrintCertificateAction

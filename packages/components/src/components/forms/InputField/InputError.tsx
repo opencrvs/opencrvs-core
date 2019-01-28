@@ -15,6 +15,10 @@ const InputErrorWrapper = styledErrorWrapper`
   ${({ theme }) => theme.fonts.infoFontStyle}
   color: ${({ theme }) => theme.colors.error};
   text-align: ${({ centred }) => (!centred ? 'center' : 'left')};
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 515px;
+  }
 `
 
 export class InputError extends React.Component<IInputError> {

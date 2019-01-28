@@ -50,6 +50,7 @@ import {
   processCertificateDraftData,
   IRegistrationDetails
 } from 'src/views/RegisterForm/ProcessDraftData'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -676,128 +677,130 @@ class PrintCertificateActionComponent extends React.Component<
           backLabel={backLabel}
           goBack={togglePrintCertificateSection}
         >
-          <Query
-            query={FETCH_BIRTH_REGISTRATION_QUERY}
-            variables={{
-              id: registrationId
-            }}
-          >
-            {({ loading, error, data }) => {
-              if (loading) {
-                return <StyledSpinner id="print-certificate-spinner" />
-              }
-
-              if (data) {
-                let fields = printCertificateFormSection.fields
-                fields = fields.map(field => {
-                  if (
-                    field &&
-                    field.type === INFORMATIVE_RADIO_GROUP &&
-                    field.name === 'motherDetails'
-                  ) {
-                    field.information = data.fetchBirthRegistration.mother
-                  } else if (
-                    field &&
-                    field.type === INFORMATIVE_RADIO_GROUP &&
-                    field.name === 'fatherDetails'
-                  ) {
-                    field.information = data.fetchBirthRegistration.father
-                  }
-
-                  return field
-                })
-
-                const paymentAmount = calculatePrice(
-                  data.fetchBirthRegistration.child.birthDate
-                )
-
-                moment.locale(this.props.language)
-                const DOBDiff = moment(
-                  data.fetchBirthRegistration.child.birthDate,
-                  'YYYY-MM-DD'
-                )
-                  .fromNow()
-                  .replace(' ago', '')
-                  .replace(' আগে', '')
-
-                paymentFormSection.fields.map(field => {
-                  if (
-                    field &&
-                    field.type === PARAGRAPH &&
-                    field.name === 'paymentAmount'
-                  ) {
-                    field.initialValue = paymentAmount
-                  }
-                })
-
-                paymentFormSection.fields.map(field => {
-                  if (
-                    field &&
-                    field.type === PARAGRAPH &&
-                    field.name === 'service'
-                  ) {
-                    field.initialValue = DOBDiff.toString()
-                    field.label = messages[`service`]
-                  }
-                })
-
-                const registrant: Registrant = this.setRegistrant(
-                  data.fetchBirthRegistration
-                )
-
-                const certificateData = this.getCertificateDetails(
-                  data.fetchBirthRegistration
-                )
-
-                const transData: IRegistrationDetails = StoreTransformer.transformData(
-                  data.fetchBirthRegistration
-                )
-                const eventType =
-                  transData.registration && transData.registration.type
-                const reviewDraft = createReviewDraft(
-                  registrationId,
-                  transData,
-                  eventType
-                )
-                const draftExist = !!drafts.find(
-                  draft => draft.id === registrationId
-                )
-                if (!draftExist) {
-                  dispatch(storeDraft(reviewDraft))
+          <HeaderContent>
+            <Query
+              query={FETCH_BIRTH_REGISTRATION_QUERY}
+              variables={{
+                id: registrationId
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return <StyledSpinner id="print-certificate-spinner" />
                 }
 
-                return (
-                  <FormContainer>
-                    <Box>
-                      <FormFieldGenerator
-                        id={form.id}
-                        onChange={this.storeData}
-                        setAllFieldsDirty={false}
-                        fields={form.fields}
-                      />
-                    </Box>
-                    <Column>
-                      {this.state.data.personCollectingCertificate &&
-                        this.getFormAction(
-                          this.state.currentForm,
-                          registrant,
-                          certificateData
-                        )}
-                    </Column>
-                  </FormContainer>
-                )
-              }
-              if (error) {
-                return (
-                  <ErrorText id="print-certificate-queue-error-text">
-                    {intl.formatMessage(messages.queryError)}
-                  </ErrorText>
-                )
-              }
+                if (data) {
+                  let fields = printCertificateFormSection.fields
+                  fields = fields.map(field => {
+                    if (
+                      field &&
+                      field.type === INFORMATIVE_RADIO_GROUP &&
+                      field.name === 'motherDetails'
+                    ) {
+                      field.information = data.fetchBirthRegistration.mother
+                    } else if (
+                      field &&
+                      field.type === INFORMATIVE_RADIO_GROUP &&
+                      field.name === 'fatherDetails'
+                    ) {
+                      field.information = data.fetchBirthRegistration.father
+                    }
 
-              return JSON.stringify(data)
-            }}
-          </Query>
+                    return field
+                  })
+
+                  const paymentAmount = calculatePrice(
+                    data.fetchBirthRegistration.child.birthDate
+                  )
+
+                  moment.locale(this.props.language)
+                  const DOBDiff = moment(
+                    data.fetchBirthRegistration.child.birthDate,
+                    'YYYY-MM-DD'
+                  )
+                    .fromNow()
+                    .replace(' ago', '')
+                    .replace(' আগে', '')
+
+                  paymentFormSection.fields.map(field => {
+                    if (
+                      field &&
+                      field.type === PARAGRAPH &&
+                      field.name === 'paymentAmount'
+                    ) {
+                      field.initialValue = paymentAmount
+                    }
+                  })
+
+                  paymentFormSection.fields.map(field => {
+                    if (
+                      field &&
+                      field.type === PARAGRAPH &&
+                      field.name === 'service'
+                    ) {
+                      field.initialValue = DOBDiff.toString()
+                      field.label = messages[`service`]
+                    }
+                  })
+
+                  const registrant: Registrant = this.setRegistrant(
+                    data.fetchBirthRegistration
+                  )
+
+                  const certificateData = this.getCertificateDetails(
+                    data.fetchBirthRegistration
+                  )
+
+                  const transData: IRegistrationDetails = StoreTransformer.transformData(
+                    data.fetchBirthRegistration
+                  )
+                  const eventType =
+                    transData.registration && transData.registration.type
+                  const reviewDraft = createReviewDraft(
+                    registrationId,
+                    transData,
+                    eventType
+                  )
+                  const draftExist = !!drafts.find(
+                    draft => draft.id === registrationId
+                  )
+                  if (!draftExist) {
+                    dispatch(storeDraft(reviewDraft))
+                  }
+
+                  return (
+                    <FormContainer>
+                      <Box>
+                        <FormFieldGenerator
+                          id={form.id}
+                          onChange={this.storeData}
+                          setAllFieldsDirty={false}
+                          fields={form.fields}
+                        />
+                      </Box>
+                      <Column>
+                        {this.state.data.personCollectingCertificate &&
+                          this.getFormAction(
+                            this.state.currentForm,
+                            registrant,
+                            certificateData
+                          )}
+                      </Column>
+                    </FormContainer>
+                  )
+                }
+                if (error) {
+                  return (
+                    <ErrorText id="print-certificate-queue-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+
+                return JSON.stringify(data)
+              }}
+            </Query>
+          </HeaderContent>
         </ActionPage>
       </ActionPageWrapper>
     )
