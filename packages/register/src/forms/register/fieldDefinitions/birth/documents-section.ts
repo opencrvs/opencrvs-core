@@ -7,6 +7,7 @@ import {
   RADIO_GROUP
 } from 'src/forms'
 import { conditionals } from '../../../utils'
+import { birthAttachmentTransformer } from './mappings/documents-mappings'
 
 const messages = defineMessages({
   documentsTab: {
@@ -174,7 +175,8 @@ export const documentsSection: IFormSection = {
             conditionals: [conditionals.uploadDocForWhom]
           }
         ]
-      }
+      },
+      mapping: birthAttachmentTransformer
     },
     {
       name: 'paragraph',
