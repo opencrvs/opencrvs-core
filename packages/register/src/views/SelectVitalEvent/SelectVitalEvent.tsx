@@ -8,6 +8,7 @@ import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
 import { Dispatch } from 'redux'
 import { createDraft, storeDraft } from 'src/drafts'
 import { Event } from 'src/forms'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const messages = defineMessages({
   registerNewEventTitle: {
@@ -63,31 +64,33 @@ class SelectVitalEventView extends React.Component<
           id="select_vital_event_view"
         />
         <ActionList>
-          <Action
-            id="select_birth_event"
-            title={intl.formatMessage(messages.birthActionTitle)}
-            onClick={this.props.goToBirthRegistration}
-          />
-          <Action
-            id="select_death_event"
-            title={intl.formatMessage(messages.deathActionTitle)}
-            onClick={this.props.goToDeathRegistration}
-          />
-          <Action
-            id="select_marriage_event"
-            title={intl.formatMessage(messages.marriageActionTitle)}
-            disabled
-          />
-          <Action
-            id="select_divorce_event"
-            title={intl.formatMessage(messages.divorceActionTitle)}
-            disabled
-          />
-          <Action
-            id="select_adoption_event"
-            title={intl.formatMessage(messages.adoptionActionTitle)}
-            disabled
-          />
+          <HeaderContent>
+            <Action
+              id="select_birth_event"
+              title={intl.formatMessage(messages.birthActionTitle)}
+              onClick={this.props.goToBirthRegistration}
+            />
+            <Action
+              id="select_death_event"
+              title={intl.formatMessage(messages.deathActionTitle)}
+              onClick={this.props.goToDeathRegistration}
+            />
+            <Action
+              id="select_marriage_event"
+              title={intl.formatMessage(messages.marriageActionTitle)}
+              disabled
+            />
+            <Action
+              id="select_divorce_event"
+              title={intl.formatMessage(messages.divorceActionTitle)}
+              disabled
+            />
+            <Action
+              id="select_adoption_event"
+              title={intl.formatMessage(messages.adoptionActionTitle)}
+              disabled
+            />
+          </HeaderContent>
         </ActionList>
       </>
     )

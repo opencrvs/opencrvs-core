@@ -11,16 +11,22 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { Event } from 'src/forms'
+import Moment from 'react-moment'
+
+export enum Event {
+  BIRTH = 'BIRTH',
+  DEATH = 'DEATH'
+}
 
 export enum Action {
-  SUBMITTED = 'submitted',
-  REJECTED = 'rejected',
-  REGISTERED = 'registered',
-  CERTIFIED = 'certified'
+  DECLARED = 'DECLARED',
+  REJECTED = 'REJECTED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED'
 }
 
 interface IProps {
+  id: string
   data: {
     id: string
     dateOfApplication: string
@@ -34,13 +40,11 @@ interface IProps {
     mother?: {
       name: string
       dob: string
-      gender: string
       id: string
     }
     father?: {
       name: string
       dob: string
-      gender: string
       id: string
     }
     regStatusHistory: Array<{
@@ -117,12 +121,12 @@ const messages = defineMessages({
     defaultMessage: 'Review',
     description: 'A label from the review button'
   },
-  birth: {
+  BIRTH: {
     id: 'register.duplicates.details.birthEvent',
     defaultMessage: 'Birth',
     description: 'A label from the birth event'
   },
-  death: {
+  DEATH: {
     id: 'register.duplicates.details.deathEvent',
     defaultMessage: 'Death',
     description: 'A label from the death event'
@@ -132,22 +136,22 @@ const messages = defineMessages({
     defaultMessage: 'application',
     description: 'A label for application'
   },
-  submitted: {
+  DECLARED: {
     id: 'register.duplicates.details.submitted',
     defaultMessage: 'submitted',
     description: 'A label for submitted'
   },
-  rejected: {
+  REJECTED: {
     id: 'register.duplicates.details.rejected',
     defaultMessage: 'rejected',
     description: 'A label for rejected'
   },
-  registered: {
+  REGISTERED: {
     id: 'register.duplicates.details.registered',
     defaultMessage: 'registered',
     description: 'A label for registered'
   },
-  certified: {
+  CERTIFIED: {
     id: 'register.duplicates.details.certified',
     defaultMessage: 'certified',
     description: 'A label for certified'
@@ -237,7 +241,7 @@ class DuplicateDetailsClass extends React.Component<
   IProps & InjectedIntlProps
 > {
   normalizeAction(action: string) {
-    if (action === 'submitted') {
+    if (action === 'DECLARED') {
       return 'application'
     }
 
@@ -246,13 +250,13 @@ class DuplicateDetailsClass extends React.Component<
 
   renderStatusIcon(action: string) {
     switch (action) {
-      case 'submitted':
+      case 'DECLARED':
         return <StatusOrange />
-      case 'registered':
+      case 'REGISTERED':
         return <StatusGreen />
-      case 'rejected':
+      case 'REJECTED':
         return <StatusRejected />
-      case 'certified':
+      case 'CERTIFIED':
         return <StatusCollected />
       default:
         return <StatusGray />
@@ -274,7 +278,7 @@ class DuplicateDetailsClass extends React.Component<
             <b>{intl.formatMessage(messages.gender)}:</b> {data.child.gender}
             <br />
             <b>{intl.formatMessage(messages.dateOfApplication)}:</b>{' '}
-            {data.dateOfApplication}
+            <Moment format="YYYY-MM-DD">{data.dateOfApplication}</Moment>
             <br />
             <b>{intl.formatMessage(messages.trackingId)}:</b> {data.trackingId}
             <br />
@@ -295,8 +299,6 @@ class DuplicateDetailsClass extends React.Component<
               <br />
               <b>{intl.formatMessage(messages.dob)}:</b> {data.mother.dob}
               <br />
-              <b>{intl.formatMessage(messages.gender)}:</b> {data.mother.gender}
-              <br />
               <b>{intl.formatMessage(messages.id)}:</b> {data.mother.id}
               <br />
             </DetailText>
@@ -308,8 +310,6 @@ class DuplicateDetailsClass extends React.Component<
               <b>{intl.formatMessage(messages.name)}:</b> {data.father.name}
               <br />
               <b>{intl.formatMessage(messages.dob)}:</b> {data.father.dob}
-              <br />
-              <b>{intl.formatMessage(messages.gender)}:</b> {data.father.gender}
               <br />
               <b>{intl.formatMessage(messages.id)}:</b> {data.father.id}
               <br />
@@ -329,8 +329,8 @@ class DuplicateDetailsClass extends React.Component<
         </TagContainer>
         <Separator />
         <ListContainer>
-          {data.regStatusHistory.map((status, index) => (
-            <ListItem key={index}>
+          {data.regStatusHistory.map((status, i) => (
+            <ListItem key={i}>
               <ListStatusContainer>
                 {this.renderStatusIcon(status.action)}
               </ListStatusContainer>
@@ -353,7 +353,7 @@ class DuplicateDetailsClass extends React.Component<
             </ListItem>
           ))}
         </ListContainer>
-        {currentStatus === 'submitted' && (
+        {currentStatus === Action.DECLARED && (
           <>
             <Separator />
             <PrimaryButton>{intl.formatMessage(messages.review)}</PrimaryButton>

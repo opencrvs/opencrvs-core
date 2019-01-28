@@ -16,12 +16,18 @@ const HeaderContainer = styled.div`
   font-weight: bold;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
   height: 90px;
-  display: flex;
+  display: block;
   justify-content: space-between;
   align-items: center;
   position: relative;
 `
+const HeaderContent = styled.div`
+  max-width: 940px;
+  margin: auto;
+  padding: 20px 10px;
+`
 const BackButtonContainer = styled.div`
+  float: left;
   cursor: pointer;
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
@@ -72,11 +78,13 @@ export class ActionPage extends React.Component<
     return (
       <ActionContainer>
         <HeaderContainer>
-          <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-            <BackButton icon={icon || (() => <ArrowBack />)} />
-            <BackButtonText>{backLabel ? backLabel : 'BACK'}</BackButtonText>
-          </BackButtonContainer>
-          {title && <MenuTitle>{title}</MenuTitle>}
+          <HeaderContent>
+            <BackButtonContainer id="action_page_back_button" onClick={goBack}>
+              <BackButton icon={icon || (() => <ArrowBack />)} />
+              <BackButtonText>{backLabel ? backLabel : 'BACK'}</BackButtonText>
+            </BackButtonContainer>
+            {title && <MenuTitle>{title}</MenuTitle>}
+          </HeaderContent>
         </HeaderContainer>
         {this.props.children}
       </ActionContainer>

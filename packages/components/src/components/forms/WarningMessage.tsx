@@ -10,6 +10,10 @@ interface IWarningProps {
 const Container = styled.div`
   flex-direction: row;
   display: flex;
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 515px;
+  }
 `
 const StyledParagraph = styled(Paragraph)`
   margin: 3px 10px;

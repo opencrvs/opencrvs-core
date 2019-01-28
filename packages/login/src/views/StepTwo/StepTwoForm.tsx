@@ -148,6 +148,7 @@ const CodeInput = injectIntl(
           error={Boolean(meta.error)}
           focusInput={props.isFocused}
           placeholder="0"
+          ignoreMediaQuery
         />
       </InputField>
     )
