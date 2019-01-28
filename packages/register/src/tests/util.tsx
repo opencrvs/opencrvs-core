@@ -223,18 +223,51 @@ export const mockUserResponse = {
           id: 'ddab090d-040e-4bef-9475-314a448a576a',
           name: 'Dhaka',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'DIVISION'
+            }
+          ],
           __typename: 'Location'
         },
         {
           id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
           name: 'GAZIPUR',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '20'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'DISTRICT'
+            }
+          ],
           __typename: 'Location'
         },
         {
           id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
           name: 'KALIGANJ',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '165'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UPAZILA'
+            }
+          ],
           __typename: 'Location'
         },
         {
@@ -243,9 +276,13 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3473'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+            {
               system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UNION',
-              __typename: 'Identifier'
+              value: 'UNION'
             }
           ],
           __typename: 'Location'

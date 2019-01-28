@@ -30,7 +30,8 @@ const nameObj = {
           __typename: 'HumanName'
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ]
+      ],
+      role: 'DISTRICT_REGISTRAR'
     }
   }
 }
@@ -250,7 +251,7 @@ describe('WorkQueue tests', async () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 0)
+      setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
@@ -342,7 +343,7 @@ describe('WorkQueue tests', async () => {
 
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
-        setTimeout(resolve, 0)
+        setTimeout(resolve, 100)
       })
 
       testComponent.component.update()
@@ -691,7 +692,7 @@ describe('WorkQueue tests', async () => {
 
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
-        setTimeout(resolve, 0)
+        setTimeout(resolve, 100)
       })
 
       testComponent.component.update()
@@ -798,7 +799,7 @@ describe('WorkQueue tests', async () => {
 
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
-        setTimeout(resolve, 0)
+        setTimeout(resolve, 100)
       })
 
       testComponent.component.update()
@@ -897,7 +898,7 @@ describe('WorkQueue tests', async () => {
 
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
-        setTimeout(resolve, 0)
+        setTimeout(resolve, 100)
       })
 
       testComponent.component.update()

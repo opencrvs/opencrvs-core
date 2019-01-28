@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReviewForm, FETCH_BIRTH_REGISTRATION_QUERY } from './ReviewForm'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import {
@@ -14,6 +14,7 @@ import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { Event } from '@opencrvs/register/src/forms'
+import { queries } from 'src/profile/queries'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -21,6 +22,10 @@ const declareScope =
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 const getItem = window.localStorage.getItem as jest.Mock
+
+const mockFetchUserDetails = jest.fn()
+mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
+queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', async () => {
   const { store, history } = createStore()
   const scope = ['register']
@@ -94,6 +99,8 @@ describe('ReviewForm tests', async () => {
                 composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
                 encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
                 observation: {
+                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
+                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
@@ -181,6 +188,9 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
+              placeOfBirth: null,
+              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -219,12 +229,14 @@ describe('ReviewForm tests', async () => {
     expect(data.data.child).toEqual({
       _fhirID: '16025284-bae2-4b37-ae80-e16745b7a6b9',
       attendantAtBirth: 'NURSE',
-      birthDate: '2001-01-01',
+      childBirthDate: '2001-01-01',
       familyName: 'আকাশ',
       familyNameEng: 'Akash',
       firstNames: '',
       firstNamesEng: '',
       gender: 'male',
+      hospitals: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+      placeOfBirth: 'HOSPITAL',
       multipleBirth: 1,
       birthType: 'SINGLE',
       weightAtBirth: 2
@@ -291,6 +303,8 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
+                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -354,6 +368,9 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
+              placeOfBirth: null,
+              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -412,6 +429,8 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
+                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -431,6 +450,9 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
+              placeOfBirth: null,
+              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -491,6 +513,8 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
+                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -517,6 +541,9 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
+              placeOfBirth: null,
+              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -584,6 +611,8 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
+                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -656,6 +685,9 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
+              placeOfBirth: null,
+              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -710,7 +742,7 @@ describe('ReviewForm tests', async () => {
     draft.data = {
       child: {
         attendantAtBirth: 'NURSE',
-        birthDate: '2001-01-01',
+        childBirthDate: '2001-01-01',
         familyName: 'আকাশ',
         familyNameEng: 'Akash',
         firstNames: '',
@@ -760,7 +792,7 @@ describe('ReviewForm tests', async () => {
     expect(data.data).toEqual({
       child: {
         attendantAtBirth: 'NURSE',
-        birthDate: '2001-01-01',
+        childBirthDate: '2001-01-01',
         familyName: 'আকাশ',
         familyNameEng: 'Akash',
         firstNames: '',
@@ -808,6 +840,9 @@ describe('ReviewForm tests', async () => {
                 attendantAtBirth: 'NURSE',
                 weightAtBirth: 2,
                 birthType: 'SINGLE',
+                placeOfBirth: null,
+                birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+                birthLocationType: 'HOSPITAL',
                 presentAtBirthRegistration: 'MOTHER_ONLY'
               }
             }

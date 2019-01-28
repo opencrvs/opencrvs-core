@@ -513,7 +513,6 @@ export class ReviewFormView extends React.Component<IProps> {
   }
   render() {
     const { intl, theme, draft, draftId, dispatch } = this.props
-    console.log(draft)
     if (!this.userHasRegisterScope()) {
       return (
         <ErrorText id="review-unauthorized-error-text">
