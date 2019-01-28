@@ -391,7 +391,9 @@ export const typeResolvers: GQLResolver = {
           presentAtBirthRegistration: BIRTH_REG_PRESENT_CODE,
           childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
           foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
-          lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
+          lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE,
+          birthLocation: HEALTH_FACILITY_BIRTH_CODE,
+          birthLocationType: BIRTH_LOCATION_TYPE_CODE
         }
         observations.entry.map(
           (item: fhir.Observation & { resource: fhir.Observation }) => {
@@ -477,6 +479,9 @@ export const typeResolvers: GQLResolver = {
         }&code=${BODY_WEIGHT_CODE}`,
         authHeader
       )
+      if (!observations.entry[0]) {
+        return null
+      }
       return observations.entry[0].resource.valueQuantity.value
     },
     async birthType(composition: ITemplatedComposition, _, authHeader) {
@@ -493,6 +498,9 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_TYPE_CODE}`,
         authHeader
       )
+      if (!observations.entry[0]) {
+        return null
+      }
       return observations.entry[0].resource.valueQuantity.value
     },
     async birthLocation(composition: ITemplatedComposition, _, authHeader) {
@@ -509,6 +517,9 @@ export const typeResolvers: GQLResolver = {
         }&code=${HEALTH_FACILITY_BIRTH_CODE}`,
         authHeader
       )
+      if (!observations.entry[0]) {
+        return null
+      }
       return observations.entry[0].resource.valueString.split('/')[1]
     },
     async birthLocationType(composition: ITemplatedComposition, _, authHeader) {
@@ -525,6 +536,9 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_LOCATION_TYPE_CODE}`,
         authHeader
       )
+      if (!observations.entry[0]) {
+        return null
+      }
       return observations.entry[0].resource.valueString
     },
     async placeOfBirth(composition: ITemplatedComposition, _, authHeader) {
@@ -563,6 +577,9 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_ATTENDANT_CODE}`,
         authHeader
       )
+      if (!observations.entry[0]) {
+        return null
+      }
       return observations.entry[0].resource.valueString
     },
     async birthRegistrationType(
@@ -583,6 +600,9 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_TYPE_CODE}`,
         authHeader
       )
+      if (!observations.entry[0]) {
+        return null
+      }
       return observations.entry[0].resource.valueString
     },
     async presentAtBirthRegistration(
@@ -603,6 +623,9 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_PRESENT_CODE}`,
         authHeader
       )
+      if (!observations.entry[0]) {
+        return null
+      }
       return observations.entry[0].resource.valueString
     },
     async childrenBornAliveToMother(
@@ -623,7 +646,10 @@ export const typeResolvers: GQLResolver = {
         }&code=${NUMBER_BORN_ALIVE_CODE}`,
         authHeader
       )
-      return observations.resource.valueInteger
+      if (!observations.entry[0]) {
+        return null
+      }
+      return observations.entry[0].resource.valueInteger
     },
     async foetalDeathsToMother(
       composition: ITemplatedComposition,
@@ -643,7 +669,10 @@ export const typeResolvers: GQLResolver = {
         }&code=${NUMBER_FOEATAL_DEATH_CODE}`,
         authHeader
       )
-      return observations.resource.valueInteger
+      if (!observations.entry[0]) {
+        return null
+      }
+      return observations.entry[0].resource.valueInteger
     },
     async lastPreviousLiveBirth(
       composition: ITemplatedComposition,
@@ -663,7 +692,10 @@ export const typeResolvers: GQLResolver = {
         }&code=${LAST_LIVE_BIRTH_CODE}`,
         authHeader
       )
-      return observations.resource.valueDateTime
+      if (!observations.entry[0]) {
+        return null
+      }
+      return observations.entry[0].resource.valueDateTime
     }
   }
 }

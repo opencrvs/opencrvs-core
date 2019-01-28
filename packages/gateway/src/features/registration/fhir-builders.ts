@@ -635,6 +635,38 @@ const builders: IFieldBuilders = {
       encounter.id = fieldValue as string
     },
     observation: {
+      birthLocation: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const observation = selectOrCreateObservationResource(
+          BIRTH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          HEALTH_FACILITY_BIRTH_CODE,
+          'Health facility birth location',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      birthLocationType: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const observation = selectOrCreateObservationResource(
+          BIRTH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          BIRTH_LOCATION_TYPE_CODE,
+          'Type of birth location',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
       birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
