@@ -131,12 +131,14 @@ const MobileInput = injectIntl((props: Props) => {
       error={meta.error && localiseValidationError(intl, meta.error)}
       label={intl.formatMessage(mobileField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
+      ignoreMediaQuery
     >
       <TextInput
         {...mobileField}
         {...input}
         type="tel"
         placeholder={intl.formatMessage(mobileField.placeholder)}
+        ignoreMediaQuery
       />
     </InputField>
   )
@@ -153,8 +155,14 @@ const PasswordInput = injectIntl((props: Props) => {
       error={meta.error && localiseValidationError(intl, meta.error)}
       label={intl.formatMessage(passwordField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
+      ignoreMediaQuery
     >
-      <TextInput {...passwordField} {...input} type="password" />
+      <TextInput
+        {...passwordField}
+        {...input}
+        type="password"
+        ignoreMediaQuery
+      />
     </InputField>
   )
 })

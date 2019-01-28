@@ -1,9 +1,10 @@
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
 
-export type IInputLabel = { disabled?: boolean } & React.LabelHTMLAttributes<
-  HTMLLabelElement
->
+export type IInputLabel = {
+  disabled?: boolean
+  ignoreMediaQuery?: boolean
+} & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const styledInputLabel = styled.label.attrs<IInputLabel>({})
 
@@ -17,9 +18,13 @@ const StyledInputLabel = styledInputLabel`
   margin-bottom: 5px;
   display: inline-block;
 
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 515px;
-  }
+  ${({ ignoreMediaQuery, theme }) => {
+    return !ignoreMediaQuery
+      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 515px;
+      }`
+      : ''
+  }}
 `
 
 export class InputLabel extends React.Component<IInputLabel> {
