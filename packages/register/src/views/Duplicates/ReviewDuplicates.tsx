@@ -6,9 +6,10 @@ import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { WORK_QUEUE } from 'src/navigation/routes'
 import {
   DuplicateDetails,
-  Action as RegAction,
-  Event
+  Action as RegAction
 } from 'src/components/DuplicateDetails'
+import { Event } from 'src/forms'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const messages = defineMessages({
   title: {
@@ -187,25 +188,27 @@ class ReviewDuplicatesClass extends React.Component<InjectedIntlProps> {
         title={this.props.intl.formatMessage(messages.pageTitle)}
       >
         <Container>
-          <TitleBox>
-            <Header>
-              <Duplicate />
-              <HeaderText>
-                {this.props.intl.formatMessage(messages.title)}
-              </HeaderText>
-            </Header>
-            <p>{this.props.intl.formatMessage(messages.description)}</p>
-          </TitleBox>
-          <Grid>
-            {mockDupeData.map(data => (
-              <DuplicateDetails
-                data={data}
-                notDuplicateHandler={() => {
-                  alert('Not a duplicate! (°◇°)')
-                }}
-              />
-            ))}
-          </Grid>
+          <HeaderContent>
+            <TitleBox>
+              <Header>
+                <Duplicate />
+                <HeaderText>
+                  {this.props.intl.formatMessage(messages.title)}
+                </HeaderText>
+              </Header>
+              <p>{this.props.intl.formatMessage(messages.description)}</p>
+            </TitleBox>
+            <Grid>
+              {mockDupeData.map(data => (
+                <DuplicateDetails
+                  data={data}
+                  notDuplicateHandler={() => {
+                    alert('Not a duplicate! (°◇°)')
+                  }}
+                />
+              ))}
+            </Grid>
+          </HeaderContent>
         </Container>
       </ActionPage>
     )

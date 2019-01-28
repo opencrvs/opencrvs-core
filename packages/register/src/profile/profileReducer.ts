@@ -14,7 +14,8 @@ import { config } from '../config'
 import {
   IUserDetails,
   getUserDetails,
-  storeUserDetails
+  storeUserDetails,
+  removeUserDetails
 } from 'src/utils/userUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
@@ -47,10 +48,19 @@ export const profileReducer: LoopReducer<
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
       return loop(
-        state,
+        {
+          ...state,
+          authenticated: false,
+          userDetailsFetched: false,
+          tokenPayload: null,
+          userDetails: null
+        },
         Cmd.list([
           Cmd.run(() => {
             removeToken()
+          }),
+          Cmd.run(() => {
+            removeUserDetails()
           }),
           Cmd.run(() => {
             window.location.assign(config.LOGIN_URL)
@@ -99,6 +109,7 @@ export const profileReducer: LoopReducer<
       }
 
       const userDetails = getUserDetails(data.getUser)
+      console.log('hi', JSON.stringify(action.payload))
       return loop(
         {
           ...state,
@@ -126,6 +137,7 @@ export const profileReducer: LoopReducer<
       )
     case actions.GET_USER_DETAILS_SUCCESS:
       const userDetailsString = action.payload
+      console.log(userDetailsString)
       const userDetailsCollection = JSON.parse(
         userDetailsString ? userDetailsString : '[]'
       )

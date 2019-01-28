@@ -34,6 +34,11 @@ export const messages = defineMessages({
   }
 })
 
+export enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
+
 export interface ISelectOption {
   value: SelectComponentOption['value']
   label: FormattedMessage.MessageDescriptor
@@ -198,6 +203,9 @@ export interface IConditionals {
   isCityLocation: IConditional
   isNotCityLocationPermanent: IConditional
   isCityLocationPermanent: IConditional
+  applicantPermanentAddressSameAsCurrent: IConditional
+  iDAvailable: IConditional
+  deathPlaceOther: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

@@ -271,5 +271,17 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+  },
+  iDAvailable: {
+    action: 'hide',
+    expression: 'values.iDType === "NO_ID"'
+  },
+  applicantPermanentAddressSameAsCurrent: {
+    action: 'hide',
+    expression: 'values.applicantPermanentAddressSameAsCurrent'
+  },
+  deathPlaceOther: {
+    action: 'hide',
+    expression: 'values.deathPlaceAddress !== "other"'
   }
 }

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { IntlProvider } from 'react-intl'
 import { createShallowRenderedComponent } from 'src/tests/util'
 import { ImageUploadField } from './ImageUploadField'
-import { documentsSection } from 'src/forms/register/documents-section'
+import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
 import { IImageUploaderWithOptionsFormField } from '@opencrvs/register/src/forms'
 
 describe('image upload component', () => {

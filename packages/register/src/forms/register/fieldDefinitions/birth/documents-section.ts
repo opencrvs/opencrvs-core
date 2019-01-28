@@ -6,7 +6,7 @@ import {
   IMAGE_UPLOADER_WITH_OPTIONS,
   RADIO_GROUP
 } from 'src/forms'
-import { conditionals } from '../utils'
+import { conditionals } from '../../../utils'
 
 const messages = defineMessages({
   documentsTab: {

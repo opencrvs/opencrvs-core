@@ -16,6 +16,10 @@ const StyledInputLabel = styledInputLabel`
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 515px;
+  }
 `
 
 export class InputLabel extends React.Component<IInputLabel> {

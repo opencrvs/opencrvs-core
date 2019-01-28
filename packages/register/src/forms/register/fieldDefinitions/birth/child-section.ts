@@ -13,14 +13,14 @@ import {
   range,
   dateFormat
 } from 'src/utils/validate'
-import { conditionals } from '../utils'
+import { conditionals } from '../../../utils'
 import {
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from 'src/offline/reducer'
-import { messages as addressMessages } from '../address'
+import { messages as addressMessages } from '../../../address'
 import { config } from 'src/config'
-import { countries } from '../countries'
+import { countries } from '../../../countries'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -28,7 +28,7 @@ export interface IChildSectionFormData {
   bar: string
   baz: string
 }
-import { IFormSection } from '../index'
+import { IFormSection } from '../../../index'
 
 const messages = defineMessages({
   childTab: {

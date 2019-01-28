@@ -90,3 +90,6 @@ export function getUserLocation(
 export async function storeUserDetails(userDetails: IUserDetails) {
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
 }
+export async function removeUserDetails() {
+  storage.removeItem(USER_DETAILS)
+}

@@ -65,9 +65,11 @@ export type IOfflineDataState = {
 export const initialState: IOfflineDataState = {
   locations: [],
   facilities: [],
-  healthFacilityFilterLocation: '',
+  // rejected: [],
+  // records: [],
   offlineDataLoaded: false,
-  loadingError: false
+  loadingError: false,
+  healthFacilityFilterLocation: ''
 }
 
 export const offlineDataReducer: LoopReducer<

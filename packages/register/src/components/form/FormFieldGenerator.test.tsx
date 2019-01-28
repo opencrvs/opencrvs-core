@@ -11,7 +11,8 @@ import { createStore } from '../../store'
 import {
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  TEL
+  TEL,
+  Event
 } from 'src/forms'
 import { countries } from 'src/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
@@ -33,7 +34,7 @@ import { messages as addressMessages } from 'src/forms/address'
 
 describe('form component', () => {
   const { store } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(Event.BIRTH)
   store.dispatch(storeDraft(draft))
   const modifyDraft = jest.fn()
   let component: ReactWrapper<{}, {}>
@@ -133,7 +134,7 @@ describe('form component', () => {
 
 describe('form component registration section', () => {
   const { store } = createStore()
-  const draft = createDraft()
+  const draft = createDraft(Event.BIRTH)
   store.dispatch(storeDraft(draft))
   const modifyDraft = jest.fn()
   let component: ReactWrapper<{}, {}>

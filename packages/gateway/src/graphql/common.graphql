@@ -62,13 +62,18 @@ enum AddressType {
   UNHCR_CAMP # -> UNHCR Camp
   OTHER_HEALTH_INSTITUTION
   HOSPITAL
+  HEALTH_INSTITUTION
   PRIVATE_HOME
   OTHER
 }
 
 enum RelationshipType {
-  MOTHER
   FATHER
+  MOTHER
+  SPOUSE
+  SON
+  DAUGHTER
+  EXTENDED_FAMILY
   OTHER
 }
 
@@ -84,11 +89,13 @@ type IdentityType { # -> Identifier
 
 input RelatedPersonInput {
   relationship: RelationshipType
+  otherRelationship: String
   individual: PersonInput
 }
 
 type RelatedPerson { # -> Related Person
   relationship: RelationshipType # -> .relationship.coding
+  otherRelationship: String # -> .relationship.coding
   individual: Person # -> .patient.reference
 }
 
