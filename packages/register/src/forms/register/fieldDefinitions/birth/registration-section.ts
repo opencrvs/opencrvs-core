@@ -7,6 +7,15 @@ import {
   WARNING
 } from 'src/forms'
 import { phoneNumberFormat } from 'src/utils/validate'
+import {
+  fieldNameTransformer,
+  commentTransformer,
+  sectionFieldToBundleFieldTransformer
+} from '../field-mappings'
+import {
+  phoneNumberTransformer,
+  registrationSectionTransformer
+} from './mappings/registration-mappings'
 
 const messages = defineMessages({
   registrationTab: {
@@ -144,7 +153,8 @@ export const registrationSection: IFormSection = {
           value: 'OTHER',
           label: messages.presentOther
         }
-      ]
+      ],
+      mapping: sectionFieldToBundleFieldTransformer
     },
     {
       name: 'whoseContactDetails',
@@ -166,7 +176,8 @@ export const registrationSection: IFormSection = {
           value: 'FATHER',
           label: messages.contactDetailsFather
         }
-      ]
+      ],
+      mapping: fieldNameTransformer('contact')
     },
     {
       name: 'registrationPhone',
@@ -174,7 +185,8 @@ export const registrationSection: IFormSection = {
       label: messages.registrationPhoneLabel,
       required: false,
       initialValue: '',
-      validate: [phoneNumberFormat]
+      validate: [phoneNumberFormat],
+      mapping: phoneNumberTransformer('whoseContactDetails')
     },
     {
       name: 'phoneVerificationWarning',
@@ -190,7 +202,9 @@ export const registrationSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [],
-      description: messages.commentsOrNotesDescription
+      description: messages.commentsOrNotesDescription,
+      mapping: commentTransformer
     }
-  ]
+  ],
+  mapping: registrationSectionTransformer
 }
