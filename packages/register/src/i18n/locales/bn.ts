@@ -721,6 +721,11 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.description':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
     'register.duplicates.pageTitle': 'সম্ভাব্য সদৃশ',
+    'register.duplicates.male': 'Male',
+    'register.duplicates.female': 'Female',
+    'register.duplicates.field-agent': 'Field agent',
+    'register.duplicates.registrar': 'Registrar',
+    'register.duplicates.queryError': 'An error occurred while fetching data',
     'register.duplicates.details.name': 'Name',
     'register.duplicates.details.dob': 'D.o.B.',
     'register.duplicates.details.gender': 'Gender',
@@ -739,6 +744,26 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.details.submitted': 'submitted',
     'register.duplicates.details.rejected': 'rejected',
     'register.duplicates.details.registered': 'registered',
-    'register.duplicates.details.certified': 'certified'
+    'register.duplicates.details.certified': 'certified',
+    'register.form.tabs.applicantTab': 'আবেদনকারী',
+    'register.form.section.applicantTitle': 'আবেদনকারীর বিবরণ',
+    'formFields.applicantsIdType': 'বিদ্যমান আইডি',
+    'formFields.applicantsGivenNames': 'প্রদত্ত নাম',
+    'formFields.applicantsFamilyName': 'পারিবারিক নাম',
+    'formFields.applicantsGivenNamesEng': 'প্রদত্ত নাম (in english)',
+    'formFields.applicantsFamilyNameEng': 'পারিবারিক নাম (in english)',
+    'formFields.applicants.nationality': 'জাতীয়তা',
+    'formFields.applicantsDateOfBirth': 'জন্ম তারিখ',
+    'formFields.applicantsRelationWithDeceased': 'মৃত ব্যক্তির সঙ্গে সম্পর্ক',
+    'formFields.applicantRelation.father': 'পিতা',
+    'formFields.applicantRelation.mother': 'মা',
+    'formFields.applicantRelation.spouse': 'স্বামী / স্ত্রী',
+    'formFields.applicantRelation.son': 'ছেলে',
+    'formFields.applicantRelation.daughter': 'কন্যা',
+    'formFields.applicantRelation.extendedFamily': 'বর্ধিত পরিবার',
+    'formFields.applicantRelation.other': 'অন্যান্য (উল্লেখ করুন)',
+    'formFields.applicantsCurrentAddressSameAsPermanent':
+      'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
+    'formFields.applicant.phone': 'ফোন নম্বর'
   }
 }

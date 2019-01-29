@@ -27,7 +27,7 @@ import {
 import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
-import processDraftData from './ProcessDraftData'
+import { draftToMutationTransformer } from '../../transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
@@ -403,8 +403,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   processSubmitData = () => {
-    const { draft } = this.props
-    const data = processDraftData(draft.data)
+    const { draft, registerForm } = this.props
+    const { showSubmitModal, showRegisterModal } = this.state
+    if (!showRegisterModal && !showSubmitModal) {
+      return
+    }
+    const data = draftToMutationTransformer(registerForm, draft.data)
     if (!draft.review) {
       return { details: data }
     } else {
