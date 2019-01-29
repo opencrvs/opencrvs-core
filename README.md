@@ -68,7 +68,7 @@ For each of the above there are:
 
 ## Deploying to staging
 
-To deploy to staging we use the same docker-compose files that are used in the docker setup above with a few minor tweaks to configure the stack for staging. The deployment uses Docker Swarm and sets up an OpenCRVS stack containing each service with a number of replicas defined in the docker compose files.
+To deploy to staging we use the same docker-compose files that are used in the docker setup above with a few minor tweaks to configure the stack for staging. The deployment uses Docker Swarm and sets up an OpenCRVS stack containing each service with a number of replicas defined in the docker compose files. **Note:** This deployment is currently automated so that every time we push to master the build will be deployed during the CI process.
 
 The deploy is easily executed by just running: `yarn deploy:staging` - you will need ssh access to the server for this to work.
 
@@ -86,3 +86,22 @@ Some useful commands to manage the swarm:
 - `ssh root@opencrvs-staging.jembi.org docker stack ps opencrvs` - view all tasks (containers) running in the opencrvs stack
 
 To scale a service change the deploy->replicas setting in the corresponding compose file and run the deploy again.
+
+## Deploying to QA
+
+Deploying to QA is much the same as above, however you may specify a version to deploy. The version can be any docker image tag. Each time master is build on CI docker images are created for that commit hash. Any of these hashes may be used as the version. In addition any time a git tag is created and pushed all the docker images will automatically build. Once complete the name of this tag can be used to deploy to the QA environemt as well.
+
+```
+yarn deploy:qa VERSION
+```
+
+The applications will be available here:
+
+- [Register app](https://register.opencrvs.qa1.jembi.org/)
+- [Login app](https://login.opencrvs.qa1.jembi.org/)
+- [GraphQl gateway](https://gateway.opencrvs.qa1.jembi.org/)
+- [Auth service](https://auth.opencrvs.qa1.jembi.org/)
+
+## Setting up a new cluster of servers for OpenCRVS
+
+[See the documentation here](infrastructure/server-setup/README.md)

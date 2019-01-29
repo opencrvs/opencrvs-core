@@ -1,7 +1,25 @@
-HOST=${1:-opencrvs-staging.jembi.org}
-VERSION=${2:-latest}
+if [ -z "$1" ] ; then
+    echo 'Error: Argument HOST is required.'
+    echo 'Usage: ./deploy.sh HOST VERSION'
+    echo '  HOST    is the server to deploy to'
+    echo "  VERSION can be any docker image tag or 'latest'"
+    exit 1
+fi
 
-echo "\nDeploying version $VERSION to $HOST...\n"
+if [ -z "$2" ] ; then
+    echo 'Error: Argument VERSION is required.'
+    echo 'Usage: ./deploy.sh HOST VERSION'
+    echo '  HOST    is the server to deploy to'
+    echo "  VERSION can be any docker image tag or 'latest'"
+    exit 1
+fi
+
+HOST=$1
+VERSION=$2
+
+echo
+echo "Deploying version $VERSION to $HOST..."
+echo
 
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure root@$HOST:/tmp/compose/

@@ -27,7 +27,8 @@
     "compose:all:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.yml build",
     "compose:push": "docker-compose build && docker-compose push && export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
-    "deploy:staging": "./deploy.sh",
+    "deploy": "./deploy.sh",
+    "deploy:staging": "./deploy.sh opencrvs-staging.jembi.org latest",
     "deploy:qa": "./deploy.sh opencrvs.qa1.jembi.org"
   },
   "devDependencies": {

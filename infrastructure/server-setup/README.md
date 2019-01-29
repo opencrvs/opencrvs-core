@@ -1,6 +1,6 @@
 # OpenCRVS server setup
 
-This folder contains script to setup a new set of server for OpenCRVS. It sets up docker swarm and configures the severs to prepare them for a deployment for OpenCRVS.
+This folder contains script to setup a new set of servers for OpenCRVS. It sets up docker swarm and configures the servers to prepare them for a deployment for OpenCRVS.
 
 Ansible is required to run the server setup. This should be installed on your local machine. Also ensure that you have ssh access with the root user to all the server that you are trying to configure.
 

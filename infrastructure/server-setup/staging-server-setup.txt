@@ -1,3 +1,5 @@
+# Manual server setup notes
+
 # add users
 curl https://github.com/rcrichton.keys >> ~/.ssh/authorized_keys
 curl https://github.com/euanmillar.keys >> ~/.ssh/authorized_keys
