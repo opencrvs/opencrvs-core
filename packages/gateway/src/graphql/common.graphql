@@ -32,6 +32,7 @@ enum IdentityIDType {
   DEATH_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
+  OTHER
 }
 
 enum EducationType {
@@ -79,11 +80,13 @@ enum RelationshipType {
 input IdentityInput {
   id: ID
   type: IdentityIDType
+  otherType: String
 }
 
 type IdentityType { # -> Identifier
   id: ID # -> .value
   type: IdentityIDType # -> .system
+  otherType: String
 }
 
 input RelatedPersonInput {

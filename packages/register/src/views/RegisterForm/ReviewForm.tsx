@@ -72,6 +72,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -101,6 +102,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -236,6 +238,7 @@ export class ReviewFormView extends React.Component<IProps> {
   ) => {
     person.iD = identifier[0].id
     person.iDType = identifier[0].type
+    person.iDTypeOther = identifier[0].otherType
   }
 
   transformChild = (reg: GQLBirthRegistration) => {

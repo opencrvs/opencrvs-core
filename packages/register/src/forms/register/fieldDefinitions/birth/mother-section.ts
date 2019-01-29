@@ -39,7 +39,8 @@ import {
   identifierTransformer,
   identifierTypeTransformer,
   addressTransformer,
-  copyAddressTransformer
+  copyAddressTransformer,
+  identifierOtherTypeTransformer
 } from '../field-mappings'
 
 const messages = defineMessages({
@@ -138,7 +139,8 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      conditionals: [conditionals.iDType]
+      conditionals: [conditionals.iDType],
+      mapping: identifierOtherTypeTransformer
     },
     {
       name: 'iD',
