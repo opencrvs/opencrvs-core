@@ -137,10 +137,10 @@ function ParentDetailsComponent({
       <Text>{information.name[0].familyName}</Text>
       <br />
       <Label>{intl.formatMessage(messages.firstNameInEng)}:</Label>
-      <Text>{information.name[1].firstNames}</Text>
+      <Text>{information.name[1] ? information.name[1].firstNames : ''}</Text>
       <Divider />
       <Label>{intl.formatMessage(messages.familyNameInEng)}:</Label>
-      <Text>{information.name[1].familyName}</Text>
+      <Text>{information.name[1] ? information.name[1].familyName : ''}</Text>
       <br />
       <Label>{intl.formatMessage(messages.dateOfBirth)}:</Label>
       <Text>{information.birthDate}</Text>

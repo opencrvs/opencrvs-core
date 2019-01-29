@@ -43,8 +43,4 @@ export function registrationSectionTransformer(
       }
     ]
   }
-
-  if (draftData[sectionId].certificates) {
-    transformedData[sectionId].certificates = draftData[sectionId].certificates
-  }
 }

@@ -13,7 +13,8 @@ import {
   PARAGRAPH,
   IFormData,
   PDF_DOCUMENT_VIEWER,
-  IFormField
+  IFormField,
+  IForm
 } from 'src/forms'
 import {
   PrimaryButton,
@@ -45,12 +46,12 @@ import {
   IDraftsState
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
-import StoreTransformer from 'src/utils/transformData'
-import {
-  processCertificateDraftData,
-  IRegistrationDetails
-} from 'src/views/RegisterForm/ProcessDraftData'
+import StoreTransformer, {
+  IReviewSectionDetails
+} from 'src/utils/transformData'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { draftToMutationTransformer } from '../../transformer'
+import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -380,6 +381,7 @@ type IProps = {
   paymentFormSection: IFormSection
   IssuerDetails: Issuer
   certificatePreviewFormSection: IFormSection
+  registerForm: IForm
 }
 
 type IFullProps = InjectedIntlProps &
@@ -447,14 +449,56 @@ class PrintCertificateActionComponent extends React.Component<
   processSubmitData() {
     const {
       registrationId,
-      drafts: { drafts }
+      drafts: { drafts },
+      registerForm
     } = this.props
     const { data } = this.state
     const draft = drafts.find(draftItem => draftItem.id === registrationId) || {
       data: {}
     }
 
-    return processCertificateDraftData(registrationId, draft.data, data)
+    const result = {
+      id: registrationId,
+      details: draftToMutationTransformer(registerForm, draft.data)
+    }
+    let individual = null
+    if (data.personCollectingCertificate === documentForWhomFhirMapping.Other) {
+      individual = {
+        name: [
+          {
+            use: 'en',
+            firstNames: data.otherPersonGivenNames,
+            familyName: data.otherPersonFamilyName
+          }
+        ],
+        identifier: [{ id: data.documentNumber, type: data.otherPersonIDType }]
+      }
+    }
+
+    const certificates = {
+      collector: {
+        relationship: data.personCollectingCertificate,
+        individual
+      },
+      payments: {
+        paymentId: '1',
+        type: data.paymentMethod,
+        total: data.paymentAmount,
+        amount: data.paymentAmount,
+        outcome: 'COMPLETED',
+        date: Date.now()
+      },
+      hasShowedVerifiedDocument:
+        data.otherPersonSignedAffidavit ||
+        data.motherDetails ||
+        data.fatherDetails
+    }
+
+    result.details.registration.certificates =
+      result.details.registration.certificates || []
+    result.details.registration.certificates.push(certificates)
+
+    return result
   }
 
   getFormAction = (
@@ -532,6 +576,11 @@ class PrintCertificateActionComponent extends React.Component<
               <Mutation
                 mutation={certifyMutation}
                 variables={this.processSubmitData()}
+                onCompleted={() => {
+                  this.setState(() => ({
+                    enableConfirmButton: true
+                  }))
+                }}
               >
                 {(markBirthAsCertified, { data }) => {
                   return (
@@ -541,9 +590,6 @@ class PrintCertificateActionComponent extends React.Component<
                       align={ICON_ALIGNMENT.LEFT}
                       onClick={() => {
                         markBirthAsCertified()
-                        this.setState(() => ({
-                          enableConfirmButton: true
-                        }))
                       }}
                     >
                       {intl.formatMessage(messages.confirm)}
@@ -602,6 +648,13 @@ class PrintCertificateActionComponent extends React.Component<
 
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
+        const { paymentFormSection } = this.props
+        const paymentAmountField = paymentFormSection.fields.find(
+          field => field.name === 'paymentAmount'
+        )
+        paymentAmountField && Number(paymentAmountField.initialValue) > 0
+          ? (destForm = PAYMENT)
+          : (destForm = CERTIFICATE_PREVIEW)
         destForm = PAYMENT
         break
       case PAYMENT:
@@ -610,6 +663,7 @@ class PrintCertificateActionComponent extends React.Component<
       default:
         break
     }
+
     this.setState({ currentForm: destForm })
   }
 
@@ -751,7 +805,7 @@ class PrintCertificateActionComponent extends React.Component<
                     data.fetchBirthRegistration
                   )
 
-                  const transData: IRegistrationDetails = StoreTransformer.transformData(
+                  const transData: IReviewSectionDetails = StoreTransformer.transformData(
                     data.fetchBirthRegistration
                   )
                   const eventType =
@@ -807,10 +861,12 @@ class PrintCertificateActionComponent extends React.Component<
   }
 }
 
+const event = 'birth'
 export const PrintCertificateAction = connect((state: IStoreState) => ({
   language: state.i18n.language,
   paymentFormSection: state.printCertificateForm.paymentForm,
   certificatePreviewFormSection:
     state.printCertificateForm.certificatePreviewForm,
-  drafts: state.drafts
+  drafts: state.drafts,
+  registerForm: state.registerForm.registerForm[event]
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))

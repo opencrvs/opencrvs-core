@@ -11,10 +11,17 @@ import {
   GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
-  IImage,
   documentForWhomFhirMapping,
   documentTypeFhirMapping
-} from 'src/views/RegisterForm/ProcessDraftData'
+} from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
+
+export interface IImage {
+  data: string
+  optionValues: string[]
+  type: string
+  title?: string
+  description?: string
+}
 
 export interface IReviewSectionDetails {
   [key: string]: any

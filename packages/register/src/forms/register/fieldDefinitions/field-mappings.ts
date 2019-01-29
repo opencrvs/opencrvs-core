@@ -197,7 +197,7 @@ export function commentTransformer(
     {
       comments: [
         {
-          comment: draftData[sectionId][field.name],
+          comment: draftData[sectionId][field.name] || '',
           createdAt: new Date()
         }
       ],
