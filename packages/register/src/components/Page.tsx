@@ -142,9 +142,9 @@ class Component extends React.Component<
     }))
   }
   render() {
-    const { initialDraftsLoaded, offlineDataLoaded, children } = this.props
+    const { initialDraftsLoaded, children } = this.props
 
-    if (initialDraftsLoaded && offlineDataLoaded) {
+    if (initialDraftsLoaded) {
       return (
         <div>
           <StyledPage {...this.props}>{children}</StyledPage>
