@@ -37,7 +37,8 @@ import {
   identifierTypeTransformer,
   addressTransformer,
   copyAddressTransformer,
-  sectionRemoveTransformer
+  sectionRemoveTransformer,
+  fieldNameTransformer
 } from '../field-mappings'
 
 export const messages = defineMessages({
@@ -246,7 +247,8 @@ export const fatherSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [dateFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      conditionals: [conditionals.fathersDetailsExist],
+      mapping: fieldNameTransformer('birthDate')
     },
     {
       name: 'maritalStatus',

@@ -286,7 +286,8 @@ export const childSection: IFormSection = {
       label: messages.childDateOfBirth,
       required: true,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      mapping: fieldNameTransformer('birthDate')
     },
     {
       name: 'attendantAtBirth',

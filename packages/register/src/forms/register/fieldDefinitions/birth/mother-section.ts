@@ -33,6 +33,7 @@ import {
   identifierTransformer,
   identifierTypeTransformer,
   addressTransformer,
+  fieldNameTransformer,
   copyAddressTransformer
 } from '../field-mappings'
 
@@ -206,7 +207,8 @@ export const motherSection: IFormSection = {
       label: messages.motherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      mapping: fieldNameTransformer('birthDate')
     },
     {
       name: 'maritalStatus',
