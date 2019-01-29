@@ -6,9 +6,8 @@ context('Register', () => {
   })
 
   it('fills in all data into the register form', () => {
-    cy.wait(10000)
     // CHILD DETAILS
-    cy.get('#new_event_declaration').should('be.visible')
+    cy.get('#new_event_declaration', { timeout: 60000 }).should('be.visible')
     cy.get('#new_event_declaration').click()
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
