@@ -21,10 +21,8 @@ import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import { storage } from 'src/storage'
 import { queries } from 'src/profile/queries'
-
-import processDraftData, {
-  IPersonDetails
-} from './views/RegisterForm/ProcessDraftData'
+import { draftToMutationTransformer } from 'src/transformer'
+import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import {
   checkAuth,
   getStorageUserDetailsSuccess
@@ -32,7 +30,12 @@ import {
 import { getOfflineDataSuccess } from 'src/offline/actions'
 import { referenceApi } from 'src/utils/referenceApi'
 import { createClient } from './utils/apolloClient'
-import { Event } from '@opencrvs/register/src/forms'
+import { Event, IForm } from '@opencrvs/register/src/forms'
+import { clone } from 'lodash'
+
+interface IPersonDetails {
+  [key: string]: any
+}
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -641,6 +644,7 @@ describe('when user has a valid token in local storage', () => {
 
   describe('when user is in the preview section', () => {
     let customDraft: IDraft
+    let form: IForm
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
@@ -653,7 +657,7 @@ describe('when user has a valid token in local storage', () => {
       multipleBirth: '2',
       placeOfBirth: 'HOSPITAL',
       birthType: 'SINGLE',
-      weightAtBirth: '6'
+      weightAtBirth: '5'
     }
 
     const fatherDetails: IPersonDetails = {
@@ -728,6 +732,7 @@ describe('when user has a valid token in local storage', () => {
 
       customDraft = { id: uuid(), data, event: Event.BIRTH }
       store.dispatch(storeDraft(customDraft))
+      form = getRegisterForm(store.getState())[Event.BIRTH]
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
       )
@@ -735,83 +740,92 @@ describe('when user has a valid token in local storage', () => {
       app.update()
     })
 
-    it('Checks empty draft', () => {
+    it('Throws error for invalid formDefinition', () => {
       const emptyObj = {}
-      expect(processDraftData(emptyObj)).toBe(emptyObj)
+      expect(() =>
+        draftToMutationTransformer({} as IForm, emptyObj)
+      ).toThrowError('Sections are missing in form definition')
     })
 
     it('Check if father addresses are parsed properly', () => {
-      fatherDetails.addressSameAsMother = false
-      fatherDetails.permanentAddressSameAsMother = false
-      fatherDetails.addressLine1 = 'Rd #10'
-      fatherDetails.addressLine1Permanent = 'Rd#10'
-      fatherDetails.addressLine2 = 'Akua'
-      fatherDetails.addressLine2Permanent = 'Akua'
-      fatherDetails.addressLine3 = 'union1'
-      fatherDetails.addressLine3Permanent = 'union1'
-      fatherDetails.addressLine4 = 'upazila10'
-      fatherDetails.addressLine4Permanent = 'upazila10'
-      fatherDetails.countryPermanent = 'BGD'
-      fatherDetails.currentAddress = ''
-      fatherDetails.district = 'district2'
-      fatherDetails.districtPermanent = 'district2'
-      fatherDetails.permanentAddress = ''
-      fatherDetails.postCode = '1020'
-      fatherDetails.postCodePermanent = '1010'
-      fatherDetails.state = 'state4'
-      fatherDetails.statePermanent = 'state4'
+      const clonedFather = clone(fatherDetails)
+      clonedFather.addressSameAsMother = false
+      clonedFather.permanentAddressSameAsMother = false
+      clonedFather.addressLine1 = 'Rd #10'
+      clonedFather.addressLine1Permanent = 'Rd#10'
+      clonedFather.addressLine2 = 'Akua'
+      clonedFather.addressLine2Permanent = 'Akua'
+      clonedFather.addressLine3 = 'union1'
+      clonedFather.addressLine3Permanent = 'union1'
+      clonedFather.addressLine4 = 'upazila10'
+      clonedFather.addressLine4Permanent = 'upazila10'
+      clonedFather.countryPermanent = 'BGD'
+      clonedFather.currentAddress = ''
+      clonedFather.district = 'district2'
+      clonedFather.districtPermanent = 'district2'
+      clonedFather.permanentAddress = ''
+      clonedFather.postCode = '1020'
+      clonedFather.postCodePermanent = '1010'
+      clonedFather.state = 'state4'
+      clonedFather.statePermanent = 'state4'
 
       const data = {
         child: childDetails,
-        father: fatherDetails,
+        father: clonedFather,
         mother: motherDetails,
         registration: registrationDetails,
         documents: { image_uploader: '' }
       }
 
-      expect(processDraftData(data).father.address[1].line[0]).toBe('Rd #10')
+      expect(
+        draftToMutationTransformer(form, data).father.address[1].line[0]
+      ).toBe('Rd#10')
     })
-
     it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
-      registrationDetails.whoseContactDetails = 'BOTH_PARENTS'
+      const registration = clone(registrationDetails)
+      registration.whoseContactDetails = 'BOTH_PARENTS'
 
       const data = {
         child: childDetails,
         father: fatherDetails,
         mother: motherDetails,
-        registration: registrationDetails,
+        registration,
         documents: { image_uploader: '' }
       }
 
-      expect(processDraftData(data).father.telecom).toBeFalsy()
+      expect(draftToMutationTransformer(form, data).father.telecom).toBeFalsy()
     })
 
     it('Pass FATHER as whoseContactDetails value', () => {
-      registrationDetails.whoseContactDetails = 'FATHER'
+      const registration = clone(registrationDetails)
+      registration.whoseContactDetails = 'FATHER'
 
       const data = {
         child: childDetails,
         father: fatherDetails,
         mother: motherDetails,
-        registration: registrationDetails,
+        registration,
         documents: { image_uploader: '' }
       }
 
-      expect(processDraftData(data).father.telecom[0].value).toBe('01736478884')
+      expect(
+        draftToMutationTransformer(form, data).father.telecom[0].value
+      ).toBe('01736478884')
     })
 
-    it('Pass false as fathersDetailsExist value', () => {
-      fatherDetails.fathersDetailsExist = false
+    it('Pass false as fathersDetailsExist on father section', () => {
+      const clonedFather = clone(fatherDetails)
+      clonedFather.fathersDetailsExist = false
 
       const data = {
         child: childDetails,
-        father: fatherDetails,
+        father: clonedFather,
         mother: motherDetails,
         registration: registrationDetails,
         documents: { image_uploader: '' }
       }
 
-      expect(processDraftData(data).father).toBeFalsy()
+      expect(draftToMutationTransformer(form, data).father).toBeUndefined()
     })
 
     describe('when user clicks the "submit" button', () => {
@@ -896,15 +910,15 @@ describe('when user has a valid token in local storage', () => {
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
-      orderOfBirth: '2',
-      placeOfDelivery: 'HOSPITAL',
-      typeOfBirth: 'SINGLE',
+      multipleBirth: '2',
+      placeOfBirth: 'HOSPITAL',
+      birthType: 'SINGLE',
       weightAtBirth: '6',
       _fhirID: '1'
     }
@@ -918,7 +932,7 @@ describe('when user has a valid token in local storage', () => {
       country: 'BGD',
       countryPermanent: 'BGD',
       currentAddress: '',
-      fatherBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       familyName: 'ইসলাম',
@@ -941,13 +955,14 @@ describe('when user has a valid token in local storage', () => {
       firstNamesEng: 'Rokeya',
       maritalStatus: 'MARRIED',
       dateOfMarriage: '2010-10-10',
-      motherBirthDate: '1999-10-10',
+      birthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       addressLine1: 'Rd #10',
       addressLine1Permanent: 'Rd#10',
       addressLine2: 'Akua',
       addressLine2Permanent: 'Akua',
       addressLine3: 'union1',
+      addressLine3Permanent: 'union1',
       addressLine4: 'upazila10',
       addressLine4Permanent: 'upazila10',
       countryPermanent: 'BGD',
@@ -955,6 +970,7 @@ describe('when user has a valid token in local storage', () => {
       district: 'district2',
       districtPermanent: 'district2',
       permanentAddress: '',
+      currentAddressSameAsPermanent: true,
       postCode: '1020',
       postCodePermanent: '1010',
       state: 'state4',
@@ -970,6 +986,8 @@ describe('when user has a valid token in local storage', () => {
       registrationEmail: 'arman@gmail.com',
       registrationPhone: '01736478884',
       whoseContactDetails: 'MOTHER',
+      trackingId: 'B123456',
+      registrationNumber: '2019121525B1234568',
       _fhirID: '4'
     }
     const registerScopeToken =
@@ -983,7 +1001,17 @@ describe('when user has a valid token in local storage', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
-        documents: { image_uploader: '' }
+        documents: {
+          image_uploader: [
+            {
+              data: 'base64-data',
+              type: 'image/jpeg',
+              optionValues: ['Mother', 'NID'],
+              title: 'Mother',
+              description: 'NID'
+            }
+          ]
+        }
       }
 
       customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }

@@ -730,6 +730,11 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.description':
       'The following application has been flagged as a possible duplicate of an existing registered record.',
     'register.duplicates.pageTitle': 'Possible duplicate',
+    'register.duplicates.male': 'Male',
+    'register.duplicates.female': 'Female',
+    'register.duplicates.field-agent': 'Field agent',
+    'register.duplicates.registrar': 'Registrar',
+    'register.duplicates.queryError': 'An error occurred while fetching data',
     'register.duplicates.details.name': 'Name',
     'register.duplicates.details.dob': 'D.o.B.',
     'register.duplicates.details.gender': 'Gender',
@@ -748,6 +753,29 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.details.submitted': 'submitted',
     'register.duplicates.details.rejected': 'rejected',
     'register.duplicates.details.registered': 'registered',
-    'register.duplicates.details.certified': 'certified'
+    'register.duplicates.details.certified': 'certified',
+    'register.duplicates.button.reject': 'Reject',
+    'register.duplicates.modal.reject':
+      'Are you sure you want to reject this application for being a duplicate ?',
+    'register.form.tabs.applicantTab': 'Applicant',
+    'register.form.section.applicantTitle': "Applicant's details",
+    'formFields.applicantsIdType': 'Existing ID',
+    'formFields.applicantsGivenNames': 'Given name (s)',
+    'formFields.applicantsFamilyName': 'Family Name',
+    'formFields.applicantsGivenNamesEng': 'Given Name (s) in English',
+    'formFields.applicantsFamilyNameEng': 'Family Name in English',
+    'formFields.applicants.nationality': 'Nationality',
+    'formFields.applicantsDateOfBirth': 'Date of Birth',
+    'formFields.applicantsRelationWithDeceased': 'Relationship to Deceased',
+    'formFields.applicantRelation.father': 'Father',
+    'formFields.applicantRelation.mother': 'Mother',
+    'formFields.applicantRelation.spouse': 'Spouse',
+    'formFields.applicantRelation.son': 'Son',
+    'formFields.applicantRelation.daughter': 'Daughter',
+    'formFields.applicantRelation.extendedFamily': 'Extended Family',
+    'formFields.applicantRelation.other': 'Other(Specify)',
+    'formFields.applicantsCurrentAddressSameAsPermanent':
+      'Is applicant’s permanent address the same as their current address?',
+    'formFields.applicant.phone': 'Phone number'
   }
 }

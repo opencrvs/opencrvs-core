@@ -28,15 +28,22 @@ export async function detectDuplicates(
   body: ICompositionBody
 ) {
   const searchResponse = await searchComposition(body)
-  const duplicates = findDuplicates(compositionIdentifier, searchResponse)
+  const duplicates = findDuplicateIdentifers(
+    compositionIdentifier,
+    searchResponse
+  )
   return duplicates
 }
 
-function findDuplicates(compositionId: string, results: SearchResponse<{}>) {
+function findDuplicateIdentifers(
+  compositionIdentifier: string,
+  results: SearchResponse<{}>
+) {
   const hits = results.hits.hits
   return hits
     .filter(
-      hit => hit._id !== compositionId && hit._score > MATCH_SCORE_THRESHOLD
+      hit =>
+        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
     .map(hit => hit._id)
 }

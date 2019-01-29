@@ -3,7 +3,6 @@ import { createTestComponent } from 'src/tests/util'
 import { MyDrafts } from './MyDrafts'
 import { v4 as uuid } from 'uuid'
 import { IDraft, storeDraft } from 'src/drafts'
-import { IPersonDetails } from '../RegisterForm/ProcessDraftData'
 import { createStore } from 'src/store'
 import { DataTable } from '@opencrvs/components/lib/interface'
 import { Event } from 'src/forms'
@@ -13,7 +12,7 @@ describe('MyRecords tests', () => {
   it('it loads my drafts page', () => {
     let customDraft: IDraft
 
-    const childDetails: IPersonDetails = {
+    const childDetails = {
       attendantAtBirth: 'NURSE',
       birthDate: '1999-10-10',
       familyName: 'ইসলাম',
@@ -64,7 +63,7 @@ describe('MyRecords tests', () => {
   it('it tests with empty birthDate', () => {
     let customDraft: IDraft
 
-    const childDetails: IPersonDetails = {
+    const childDetails = {
       attendantAtBirth: 'NURSE',
       birthDate: '',
       familyName: 'ইসলাম',
