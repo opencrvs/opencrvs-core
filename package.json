@@ -5,8 +5,7 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --parallel precommit",
-      "pre-push": "yarn test"
+      "pre-commit": "lerna run --parallel precommit"
     }
   },
   "scripts": {
