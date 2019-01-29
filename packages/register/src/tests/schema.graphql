@@ -241,7 +241,7 @@ type Mutation {
   markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
-  notADuplicate(id: string!, duplicateId: string!): ID!
+  notADuplicate(id: String!, duplicateId: String!): ID!
   markBirthAsVoided(id: String!, reason: String!, comment: String): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
   updateDeathRegistration(
