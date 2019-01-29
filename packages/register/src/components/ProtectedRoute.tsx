@@ -18,9 +18,6 @@ class ProtectedRouteWrapper extends Route<
   IProps & RouteProps & RouteComponentProps<{}>
 > {
   public render() {
-    if (!this.props.authenticated && !this.props.userDetailsFetched) {
-      return <div />
-    }
     return <Route {...this.props} />
   }
 }
