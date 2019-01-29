@@ -1142,7 +1142,7 @@ const builders: IFieldBuilders = {
     },
     certificates: {
       collector: {
-        relationship: (
+        relationship: async (
           fhirBundle: ITemplatedBundle,
           fieldValue: string,
           context: any
@@ -1163,14 +1163,14 @@ const builders: IFieldBuilders = {
           }
           /* if mother/father is collecting then we will just put the person ref here */
           if (fieldValue === 'MOTHER') {
-            setCertificateCollectorReference(
+            await setCertificateCollectorReference(
               MOTHER_CODE,
               relatedPersonResource,
               fhirBundle,
               context
             )
           } else if (fieldValue === 'FATHER') {
-            setCertificateCollectorReference(
+            await setCertificateCollectorReference(
               FATHER_CODE,
               relatedPersonResource,
               fhirBundle,
