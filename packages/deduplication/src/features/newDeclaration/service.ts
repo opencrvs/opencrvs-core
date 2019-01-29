@@ -1,7 +1,7 @@
 import {
   findEntry,
   findName,
-  postToHearth,
+  updateInHearth,
   getCompositionByIdentifier,
   addDuplicatesToComposition
 } from 'src/features/fhir/fhir-utils'
@@ -26,10 +26,41 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
     throw new Error(`Composition Identifier not found`)
   }
 
+  indexAndSearchComposition(compositionIdentifier, composition, bundleEntries)
+}
+
+export async function insertUpdatedDeclaration(bundle: fhir.Bundle) {
+  const bundleEntries = bundle.entry
+
+  if (bundleEntries && bundleEntries.length === 1) {
+    const resource = bundleEntries[0].resource
+    if (resource && resource.resourceType === 'Task') {
+      logger.info(`Composition not updated, skipping`)
+      return
+    }
+  }
+
+  const composition = (bundleEntries &&
+    bundleEntries[0].resource) as fhir.Composition
+  const compositionIdentifier =
+    composition.identifier && composition.identifier.value
+
+  if (!compositionIdentifier) {
+    throw new Error(`Composition Identifier not found`)
+  }
+
+  indexAndSearchComposition(compositionIdentifier, composition, bundleEntries)
+}
+
+async function indexAndSearchComposition(
+  compositionIdentifier: string,
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
+) {
   const body: ICompositionBody = {}
   createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
-  await detectAndUpdateDuplicates(compositionIdentifier, body)
+  await detectAndUpdateDuplicates(compositionIdentifier, composition, body)
 }
 
 function createIndexBody(
@@ -63,6 +94,7 @@ function createChildIndex(
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child.birthDate
+  body.gender = child.gender
 }
 
 function createMotherIndex(
@@ -122,6 +154,7 @@ function createFatherIndex(
 
 async function detectAndUpdateDuplicates(
   compositionIdentifier: string,
+  composition: fhir.Composition,
   body: ICompositionBody
 ) {
   const duplicates = await detectDuplicates(compositionIdentifier, body)
@@ -132,40 +165,28 @@ async function detectAndUpdateDuplicates(
     `Deduplication/service: ${duplicates.length} duplicate composition(s) found`
   )
 
-  duplicates.push(compositionIdentifier)
-
-  return await updateDuplicateCompositions(duplicates)
+  if (composition.id) {
+    return await updateCompositionWithDuplicates(composition, duplicates)
+  }
+  const compositionWithId = await getCompositionByIdentifier(
+    compositionIdentifier
+  )
+  return await updateCompositionWithDuplicates(compositionWithId, duplicates)
 }
 
-async function updateDuplicateCompositions(duplicates: string[]) {
+async function updateCompositionWithDuplicates(
+  composition: fhir.Composition,
+  duplicates: string[]
+) {
   const duplicateCompositions = await Promise.all(
     duplicates.map(duplicate => getCompositionByIdentifier(duplicate))
   )
 
-  const compositionEntriesWithDuplicates: fhir.BundleEntry[] = []
+  const duplicateCompositionIds = duplicateCompositions.map(
+    dupComposition => dupComposition.id
+  )
 
-  duplicateCompositions.map((currentComposition: fhir.BundleEntry) => {
-    const duplicatesForCurrentComposition = duplicateCompositions
-      .filter((duplicateComposition: fhir.BundleEntry) => {
-        return (
-          (currentComposition.resource && currentComposition.resource.id) !==
-          (duplicateComposition.resource && duplicateComposition.resource.id)
-        )
-      })
-      .map(dupComposition => dupComposition.resource.id)
+  addDuplicatesToComposition(duplicateCompositionIds, composition)
 
-    const compositionWithDuplicate = addDuplicatesToComposition(
-      duplicatesForCurrentComposition,
-      currentComposition
-    )
-    compositionEntriesWithDuplicates.push(compositionWithDuplicate)
-  })
-
-  const bundle = {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: compositionEntriesWithDuplicates
-  }
-
-  return postToHearth(bundle)
+  return updateInHearth(composition, composition.id)
 }

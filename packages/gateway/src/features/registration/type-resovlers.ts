@@ -209,10 +209,17 @@ export const typeResolvers: GQLResolver = {
       )
       return (
         composition.relatesTo &&
-        composition.relatesTo.map(
-          (duplicate: fhir.CompositionRelatesTo) =>
-            duplicate.targetReference && duplicate.targetReference.reference
-        )
+        composition.relatesTo.map((duplicate: fhir.CompositionRelatesTo) => {
+          if (
+            duplicate.code &&
+            duplicate.code === 'duplicate' &&
+            duplicate.targetReference &&
+            duplicate.targetReference.reference
+          ) {
+            return duplicate.targetReference.reference.split('/')[1]
+          }
+          return null
+        })
       )
     }
   },

@@ -57,6 +57,10 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
     border: 0;
     border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
   }
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 275px;
+  }
 `
 
 function getSelectedOption(
