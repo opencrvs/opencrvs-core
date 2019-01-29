@@ -286,7 +286,10 @@ class DuplicateDetailsClass extends React.Component<
             <br />
           </DetailText>
           {notDuplicateHandler && (
-            <Link onClick={notDuplicateHandler}>
+            <Link
+              id={`not_duplicate_link_${data.id}`}
+              onClick={notDuplicateHandler}
+            >
               {intl.formatMessage(messages.notDuplicate)}
             </Link>
           )}
@@ -321,7 +324,7 @@ class DuplicateDetailsClass extends React.Component<
         <TagContainer>
           <Chip
             status={<StatusGray />}
-            text={intl.formatHTMLMessage(messages[data.event])}
+            text={intl.formatHTMLMessage(messages[data.event.toUpperCase()])}
           />
           <Chip
             status={this.renderStatusIcon(currentStatus)}
