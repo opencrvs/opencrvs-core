@@ -235,7 +235,7 @@ describe('ReviewForm tests', async () => {
       firstNames: '',
       firstNamesEng: '',
       gender: 'male',
-      hospitals: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+      birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
       placeOfBirth: 'HOSPITAL',
       multipleBirth: 1,
       birthType: 'SINGLE',

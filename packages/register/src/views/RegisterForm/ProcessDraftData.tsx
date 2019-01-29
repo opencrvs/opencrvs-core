@@ -73,7 +73,7 @@ const customKeys = [
   'weightAtBirth',
   '_fhirID',
   'placeOfBirth',
-  'hospitals',
+  'birthLocation',
   'currentAddressSameAsPermanent'
 ]
 
@@ -352,8 +352,8 @@ const processDraftData = (draftData: IFormData) => {
       child.placeOfBirth === 'HOSPITAL' ||
       child.placeOfBirth === 'OTHER_HEALTH_INSTITUTION'
     ) {
-      if (child.hospitals) {
-        draftDetails.birthLocation = child.hospitals
+      if (child.birthLocation) {
+        draftDetails.birthLocation = child.birthLocation
       }
     } else if (
       child.placeOfBirth === 'PRIVATE_HOME' ||

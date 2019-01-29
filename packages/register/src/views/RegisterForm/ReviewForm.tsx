@@ -36,12 +36,10 @@ import { Dispatch } from 'redux'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from '@opencrvs/register/src/utils/authUtils'
 import {
-  IImage,
   documentForWhomFhirMapping,
-  documentTypeFhirMapping,
-  IRegistrationDetails
-} from './ProcessDraftData'
-import { Event } from '@opencrvs/register/src/forms'
+  documentTypeFhirMapping
+} from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
+import { Event, IAttachment } from '@opencrvs/register/src/forms'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
@@ -271,7 +269,7 @@ export class ReviewFormView extends React.Component<IProps> {
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
     childDetails.birthType = reg.birthType
-    childDetails.hospitals = reg.birthLocation
+    childDetails.birthLocation = reg.birthLocation
     childDetails.placeOfBirth = reg.birthLocationType
     if (reg.placeOfBirth && reg.placeOfBirth.address) {
       childDetails.country = reg.placeOfBirth.address.country
@@ -475,7 +473,7 @@ export class ReviewFormView extends React.Component<IProps> {
         title,
         description
       }
-    }) as IImage[]
+    }) as IAttachment[]
 
     return documents
   }
@@ -543,7 +541,7 @@ export class ReviewFormView extends React.Component<IProps> {
               )
             }
 
-            const transData: IRegistrationDetails = this.transformData(
+            const transData: any = this.transformData(
               data.fetchBirthRegistration
             )
             const eventType =

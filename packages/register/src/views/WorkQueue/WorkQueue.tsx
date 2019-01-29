@@ -43,7 +43,10 @@ import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { goToEvents as goToEventsAction } from 'src/navigation'
+import {
+  goToEvents as goToEventsAction,
+  goToReviewDuplicate as goToReviewDuplicateAction
+} from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
@@ -51,6 +54,7 @@ import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateActi
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
+import { createNamesMap } from 'src/utils/data-formating'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const FETCH_REGISTRATION_QUERY = gql`
@@ -500,6 +504,7 @@ interface IBaseWorkQueueProps {
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
+  goToReviewDuplicate: typeof goToReviewDuplicateAction
   printForm: IFormSection
 }
 
@@ -591,29 +596,13 @@ export class WorkQueueView extends React.Component<
 
     return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
       const childNames = (reg.child && (reg.child.name as GQLHumanName[])) || []
-      const namesMap = (names: GQLHumanName[]) =>
-        names.filter(Boolean).reduce((prevNamesMap, name) => {
-          if (!name.use) {
-            /* tslint:disable:no-string-literal */
-            prevNamesMap['default'] = `${name.firstNames} ${
-              /* tslint:enable:no-string-literal */
-              name.familyName
-            }`.trim()
-            return prevNamesMap
-          }
-
-          prevNamesMap[name.use] = `${name.firstNames} ${
-            name.familyName
-          }`.trim()
-          return prevNamesMap
-        }, {})
       const lang = 'bn'
       return {
         id: reg.id,
         name:
-          (namesMap(childNames)[lang] as string) ||
+          (createNamesMap(childNames)[lang] as string) ||
           /* tslint:disable:no-string-literal */
-          (namesMap(childNames)['default'] as string) ||
+          (createNamesMap(childNames)['default'] as string) ||
           /* tslint:enable:no-string-literal */
           '',
         dob: (reg.child && reg.child.birthDate) || '',
@@ -631,13 +620,13 @@ export class WorkQueueView extends React.Component<
               practitionerName:
                 (status &&
                   status.user &&
-                  (namesMap(status.user.name as GQLHumanName[])[
+                  (createNamesMap(status.user.name as GQLHumanName[])[
                     this.props.language
                   ] as string)) ||
                 (status &&
                   status.user &&
                   /* tslint:disable:no-string-literal */
-                  (namesMap(status.user.name as GQLHumanName[])[
+                  (createNamesMap(status.user.name as GQLHumanName[])[
                     'default'
                   ] as string)) ||
                 /* tslint:enable:no-string-literal */
@@ -827,13 +816,13 @@ export class WorkQueueView extends React.Component<
     if (item.duplicates && !applicationIsRegistered && !applicationIsRejected) {
       listItemActions.push({
         label: this.props.intl.formatMessage(messages.reviewDuplicates),
-        handler: () => console.log('TO DO')
+        handler: () => this.props.goToReviewDuplicate(item.id)
       })
       expansionActions.push(
         <StyledPrimaryButton
           id={`reviewDuplicatesBtn_${item.tracking_id}`}
           onClick={() => {
-            console.log('TO DO')
+            this.props.goToReviewDuplicate(item.id)
           }}
         >
           {this.props.intl.formatMessage(messages.reviewDuplicates)}
@@ -1130,5 +1119,9 @@ export const WorkQueue = connect(
     userDetails: getUserDetails(state),
     printForm: state.printCertificateForm.collectCertificateFrom
   }),
-  { goToEvents: goToEventsAction, gotoTab: goToTabAction }
+  {
+    goToEvents: goToEventsAction,
+    gotoTab: goToTabAction,
+    goToReviewDuplicate: goToReviewDuplicateAction
+  }
 )(injectIntl(withTheme(WorkQueueView)))
