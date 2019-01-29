@@ -6,6 +6,8 @@ context('Menu', () => {
   })
 
   it('Opens menu and selects Bengali', () => {
+    cy.wait(60000)
+    cy.get('#appSpinner').should('be.visible')
     cy.get('#sub-menu', { timeout: 60000 }).click()
     //Click on change Language
     cy.get('#ChangeLanguage-nested-menu').click()
