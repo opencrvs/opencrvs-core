@@ -25,7 +25,7 @@
     "compose:all:up": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml up",
     "compose:all:down": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml down",
     "compose:all:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.yml build",
-    "compose:push": "docker-compose build && docker-compose push && export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
+    "compose:push": "docker-compose build && docker-compose push && yarn compose:push:version",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
     "deploy": "./deploy.sh",
     "deploy:staging": "./deploy.sh opencrvs-staging.jembi.org latest",
