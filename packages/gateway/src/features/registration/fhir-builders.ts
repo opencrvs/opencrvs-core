@@ -46,6 +46,7 @@ import {
   FHIR_SPECIFICATION_URL,
   EVENT_TYPE
 } from '../fhir/constants'
+import { IAuthHeader } from 'src/common-types'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -1165,13 +1166,15 @@ const builders: IFieldBuilders = {
             setCertificateCollectorReference(
               MOTHER_CODE,
               relatedPersonResource,
-              fhirBundle
+              fhirBundle,
+              context
             )
           } else if (fieldValue === 'FATHER') {
             setCertificateCollectorReference(
               FATHER_CODE,
               relatedPersonResource,
-              fhirBundle
+              fhirBundle,
+              context
             )
           }
         },
@@ -1649,15 +1652,20 @@ const builders: IFieldBuilders = {
   }
 }
 
-export async function buildFHIRBundle(reg: object) {
+export async function buildFHIRBundle(reg: object, authHeader?: IAuthHeader) {
   const ref = uuid()
   const fhirBundle: ITemplatedBundle = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [createCompositionTemplate(ref)]
   }
-
-  await transformObj(reg, fhirBundle, builders)
+  let context = {}
+  if (authHeader) {
+    context = {
+      authHeader
+    }
+  }
+  await transformObj(reg, fhirBundle, builders, context)
   return fhirBundle
 }
 
