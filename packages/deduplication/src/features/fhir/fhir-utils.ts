@@ -49,7 +49,7 @@ export function findName(code: string, patient: fhir.Patient) {
 export async function getCompositionByIdentifier(identifier: string) {
   try {
     const response = await getFromFhir(`/Composition?identifier=${identifier}`)
-    return response.entry[0]
+    return response.entry[0].resource
   } catch (error) {
     logger.error(
       `Deduplication/fhir-utils: getting composition by identifer failed with error: ${error}`
@@ -60,10 +60,9 @@ export async function getCompositionByIdentifier(identifier: string) {
 
 export function addDuplicatesToComposition(
   duplicates: string[],
-  compositionEntry: fhir.BundleEntry
+  composition: fhir.Composition
 ) {
   try {
-    const composition = compositionEntry.resource as fhir.Composition
     const compositionIdentifier =
       composition.identifier && composition.identifier.value
 
@@ -75,8 +74,7 @@ export function addDuplicatesToComposition(
       composition.relatesTo = []
     }
 
-    createDuplicateTemplate(duplicates, composition)
-    return compositionEntry
+    createDuplicatesTemplate(duplicates, composition)
   } catch (error) {
     logger.error(
       `Deduplication/fhir-utils: updating composition failed with error: ${error}`
@@ -85,7 +83,7 @@ export function addDuplicatesToComposition(
   }
 }
 
-export function createDuplicateTemplate(
+export function createDuplicatesTemplate(
   duplicates: string[],
   composition: fhir.Composition
 ) {
@@ -133,9 +131,9 @@ export const getFromFhir = (suffix: string) => {
     })
 }
 
-export async function postToHearth(payload: any) {
-  const res = await fetch(HEARTH_URL, {
-    method: 'POST',
+export async function updateInHearth(payload: any, id?: string) {
+  const res = await fetch(`${HEARTH_URL}/Composition/${id}`, {
+    method: 'PUT',
     body: JSON.stringify(payload),
     headers: {
       'Content-Type': 'application/fhir+json'
@@ -146,5 +144,7 @@ export async function postToHearth(payload: any) {
       `FHIR put to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
   }
-  return res.json()
+
+  const text = await res.text()
+  return typeof text === 'string' ? text : JSON.parse(text)
 }
