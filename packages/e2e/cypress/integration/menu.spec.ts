@@ -6,7 +6,7 @@ context('Menu', () => {
   })
 
   it('Opens menu and selects Bengali', () => {
-    cy.wait(5000)
+    cy.wait(10000)
     // CHILD DETAILS
 
     cy.get('#sub-menu').click()

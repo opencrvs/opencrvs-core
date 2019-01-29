@@ -53,11 +53,7 @@ Cypress.Commands.add('login', (userType, options = {}) => {
       })
         .its('body')
         .then(body => {
-          cy.visit(`${Cypress.env('REGISTER_URL')}?token=${body.token}`, {
-            onBeforeLoad: win => {
-              win.fetch = null
-            }
-          })
+          cy.visit(`${Cypress.env('REGISTER_URL')}?token=${body.token}`)
         })
     })
   cy.wait(1000)

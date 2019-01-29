@@ -6,7 +6,7 @@ context('Register', () => {
   })
 
   it('fills in all data into the register form', () => {
-    cy.wait(5000)
+    cy.wait(10000)
     // CHILD DETAILS
     cy.get('#new_event_declaration').should('be.visible')
     cy.get('#new_event_declaration').click()
