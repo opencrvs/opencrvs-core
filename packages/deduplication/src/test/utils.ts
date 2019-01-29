@@ -124,73 +124,6 @@ export const mockFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:f6b08f54-669b-49a6-bf56-e974be8c05cf',
-      resource: {
-        resourceType: 'Task',
-        status: 'requested',
-        code: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: 'birth-registration'
-            }
-          ]
-        },
-        focus: {
-          reference: 'urn:uuid:ce9e8d62-335e-458d-9fcc-45ec5836c404'
-        },
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/paper-form-id',
-            value: '12'
-          }
-        ],
-        extension: [
-          {
-            url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'MOTHER'
-          }
-        ],
-        lastModified: '2019-01-07T12:27:38.918Z',
-        note: [
-          {
-            text: '',
-            time: '2019-01-07T12:27:38.918Z'
-          }
-        ]
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:5e63d942-b948-4274-9219-65b501074220',
-      resource: {
-        resourceType: 'DocumentReference',
-        masterIdentifier: {
-          system: 'urn:ietf:rfc:3986',
-          value: '5e63d942-b948-4274-9219-65b501074220'
-        },
-        status: 'current',
-        content: [
-          {
-            attachment: {
-              contentType: 'image/png',
-              data: 'asd'
-            }
-          }
-        ],
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/supporting-doc-type',
-              code: 'NATIONAL_ID'
-            }
-          ]
-        },
-        subject: {
-          display: 'MOTHER'
-        }
-      }
-    },
-    {
       fullUrl: 'urn:uuid:847f0c22-0327-4b9c-94f5-b7eae5df124f',
       resource: {
         resourceType: 'Patient',
@@ -203,7 +136,7 @@ export const mockFhirBundle = {
           },
           {
             use: 'en',
-            given: [''],
+            given: ['আনিস'],
             family: ['asd']
           }
         ],
@@ -230,7 +163,7 @@ export const mockFhirBundle = {
           },
           {
             use: 'en',
-            given: [''],
+            given: ['test'],
             family: ['asd']
           }
         ],
@@ -266,7 +199,7 @@ export const mockFhirBundle = {
           },
           {
             use: 'en',
-            given: [''],
+            given: ['test'],
             family: ['asd']
           }
         ],
@@ -281,144 +214,6 @@ export const mockFhirBundle = {
           }
         ],
         birthDate: '1960-02-01'
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:74fa59b6-ee75-41f1-af30-4edb73b73a00',
-      resource: {
-        resourceType: 'Encounter',
-        status: 'finished'
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:150a23c6-a949-4d08-be0e-f8c1ec40df61',
-      resource: {
-        resourceType: 'Observation',
-        status: 'final',
-        context: {
-          reference: 'urn:uuid:74fa59b6-ee75-41f1-af30-4edb73b73a00'
-        },
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://hl7.org/fhir/observation-category',
-                code: 'procedure',
-                display: 'Procedure'
-              }
-            ]
-          }
-        ],
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '57722-1',
-              display: 'Birth plurality of Pregnancy'
-            }
-          ]
-        },
-        valueQuantity: {
-          value: 'SINGLE'
-        }
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:7b5c9ac0-dd8d-42bc-b907-7280f53b3898',
-      resource: {
-        resourceType: 'Observation',
-        status: 'final',
-        context: {
-          reference: 'urn:uuid:74fa59b6-ee75-41f1-af30-4edb73b73a00'
-        },
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://hl7.org/fhir/observation-category',
-                code: 'vital-signs',
-                display: 'Vital Signs'
-              }
-            ]
-          }
-        ],
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '3141-9',
-              display: 'Body weight Measured'
-            }
-          ]
-        },
-        valueQuantity: {
-          value: 1,
-          unit: 'kg',
-          system: 'http://unitsofmeasure.org',
-          code: 'kg'
-        }
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:682c3456-ecc9-4757-b74c-44d4cecb38ac',
-      resource: {
-        resourceType: 'Observation',
-        status: 'final',
-        context: {
-          reference: 'urn:uuid:74fa59b6-ee75-41f1-af30-4edb73b73a00'
-        },
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://hl7.org/fhir/observation-category',
-                code: 'procedure',
-                display: 'Procedure'
-              }
-            ]
-          }
-        ],
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '73764-3',
-              display: 'Birth attendant title'
-            }
-          ]
-        },
-        valueString: 'OTHER'
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:620d9795-fc3f-4661-b600-fcce30d4d6f0',
-      resource: {
-        resourceType: 'Observation',
-        status: 'final',
-        context: {
-          reference: 'urn:uuid:74fa59b6-ee75-41f1-af30-4edb73b73a00'
-        },
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://hl7.org/fhir/observation-category',
-                code: 'procedure',
-                display: 'Procedure'
-              }
-            ]
-          }
-        ],
-        code: {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'present-at-birth-reg',
-              display: 'Present at birth registration'
-            }
-          ]
-        },
-        valueString: 'MOTHER_ONLY'
       }
     }
   ],
@@ -668,7 +463,32 @@ export const mockCompositionEntry = {
           value: 'Bt40VoY'
         },
         resourceType: 'Composition',
-        status: 'preliminary'
+        status: 'preliminary',
+        id: '489b76cf-6b58-4b0d-96ba-caa1271f787b'
+      }
+    }
+  ]
+}
+
+export const mockTaskBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        id: 'e849ceb4-0adc-4be2-8fc8-8a4c41781bb5'
       }
     }
   ]
