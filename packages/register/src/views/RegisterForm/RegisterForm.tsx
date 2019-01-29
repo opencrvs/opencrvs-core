@@ -33,11 +33,9 @@ import { merge } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
-import {
-  SAVED_REGISTRATION,
-  REJECTED_REGISTRATION
-} from 'src/navigation/routes'
+import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { DECLARATION, SUBMISSION, REJECTION } from 'src/utils/constants'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -320,8 +318,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName: IFullName = getFullName(childData)
-    history.push(REJECTED_REGISTRATION, {
-      rejection: true,
+    history.push(CONFIRMATION_SCREEN, {
+      eventName: DECLARATION,
+      actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
@@ -332,9 +331,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    history.push(SAVED_REGISTRATION, {
-      trackingId: response,
-      declaration: true,
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      nextSection: true,
+      trackingSection: true,
+      eventName: DECLARATION,
+      actionName: SUBMISSION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
@@ -572,7 +574,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <FooterAction>
             <FooterPrimaryButton
               id="save_draft"
-              onClick={() => history.push(SAVED_REGISTRATION)}
+              onClick={() => history.push(CONFIRMATION_SCREEN)}
             >
               {intl.formatMessage(messages.saveDraft)}
             </FooterPrimaryButton>

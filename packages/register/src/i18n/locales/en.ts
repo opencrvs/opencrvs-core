@@ -776,6 +776,36 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantRelation.other': 'Other(Specify)',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
-    'formFields.applicant.phone': 'Phone number'
+    'formFields.applicant.phone': 'Phone number',
+    'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Registration} duplication {Duplication}
+      certificate {Certificate} offlineEvent {Application connectivity}} {action, select, completed {completed}
+      submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending}}`,
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {The application} registration {The birth application} duplication {} certificate {} offlineEvent {The application}} 
+      {action, select, submitted {is now on its way for validation} completed {} rejected {rejected} approved {approved} registered {registered}
+      offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
+    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All Done} submitted {All Done} rejected {Application rejected} 
+      approved {Application approved} registered {Application registered} offlineAction {Almost there}}`,
+    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {The birth application of {fullName}} registration {The birth of {fullName}}
+      duplication {The birth duplication of {fullName}} certificate {The birth certificate of {fullName}} 
+      offlineEvent {The birth application of {fullName}}} {action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.}
+      approved {has been approved.} registered {has been registered} offlineAction {is pending due to internet connection.}}`,
+    'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.} 
+      registration {The registration process is complete.} duplication {} certificate {}
+      offlineEvent {All you need to do is login once you have internet connectivity on your device within the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.}}`,
+    'register.confirmationScreen.nextSectionDescDetails': `{event, select, 
+      declaration {The informant has given their contact details and will also be informed when the registration is complete.} 
+      registration {The certificate should only be printed once the informant goes to collect it.} duplication {} certificate {} 
+      offlineEvent {Once the application is succesfully submited, you and the informant will be notified when the registration is complete.}}`,
+    'register.confirmationScreen.nextCard.title': 'What next?',
+    'register.confirmationScreen.rejectedNoticeCardText2':
+      'has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.',
+    'register.confirmationScreen.buttons.back': 'Back to homescreen',
+    'register.confirmationScreen.buttons.newDeclaration': 'New application',
+    'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
+    duplication {duplication}  duplication {duplication rejected} certificate {...} offlineEvent {pending}}`,
+    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
+      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
+      duplication{} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`
   }
 }

@@ -1,27 +1,31 @@
 import * as React from 'react'
 import { createTestComponent } from '../../tests/util'
-import { SavedRegistration } from './SavedRegistration'
+import { ConfirmationScreen } from './ConfirmationScreen'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '../../store'
+import { DECLARATION, SUBMISSION } from 'src/utils/constants'
 
 const fullNameInBn = 'টম ব্র্যাডি'
 const fullNameInEng = 'Tom Brady'
 
-describe('when user is in the saved registration page', () => {
+describe('when user is in the confirmation screen page', () => {
   const { store, history } = createStore()
 
   const mock: any = jest.fn()
-  let savedRegistrationComponent: ReactWrapper<{}, {}>
-  history.push('/saved', {
-    trackingId: '1245lsajd',
-    declaration: true,
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '1245lsajd',
+    nextSection: true,
+    trackingSection: true,
+    eventName: DECLARATION,
+    actionName: SUBMISSION,
     fullNameInBn,
     fullNameInEng
   })
   describe('when the application is online', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
-        <SavedRegistration
+        <ConfirmationScreen
           location={mock}
           history={history}
           staticContext={mock}
@@ -34,29 +38,27 @@ describe('when user is in the saved registration page', () => {
         />,
         store
       )
-      savedRegistrationComponent = testComponent.component
+      confirmationScreenComponent = testComponent.component
     })
     it('should show the online title', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#submission_title')
           .first()
           .text()
-      ).toEqual('All done!')
+      ).toEqual('All Done')
     })
     it('should show the online text', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#submission_text')
           .first()
           .text()
-      ).toEqual(
-        `The birth application of ${fullNameInEng} has been successfully submitted to the registration office.`
-      )
+      ).toEqual(`The birth application of ${fullNameInEng} has been submitted.`)
     })
     it('should show the online whats next title', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#whats_next_title')
           .first()
           .text()
@@ -66,7 +68,7 @@ describe('when user is in the saved registration page', () => {
     })
     it('should show the online whats next text', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#whats_next_text')
           .first()
           .text()
@@ -79,7 +81,7 @@ describe('when user is in the saved registration page', () => {
     beforeEach(async () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
       const testComponent = createTestComponent(
-        <SavedRegistration
+        <ConfirmationScreen
           location={mock}
           history={history}
           staticContext={mock}
@@ -92,11 +94,11 @@ describe('when user is in the saved registration page', () => {
         />,
         store
       )
-      savedRegistrationComponent = testComponent.component
+      confirmationScreenComponent = testComponent.component
     })
     it('should show the offline title', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#submission_title')
           .first()
           .text()
@@ -104,17 +106,17 @@ describe('when user is in the saved registration page', () => {
     })
     it('should show the offline text', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#submission_text')
           .first()
           .text()
       ).toEqual(
-        `The birth application of ${fullNameInEng} is pending due to no internet connection.`
+        `The birth application of ${fullNameInEng} is pending due to internet connection.`
       )
     })
     it('should show the offline whats next title', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#whats_next_title')
           .first()
           .text()
@@ -124,7 +126,7 @@ describe('when user is in the saved registration page', () => {
     })
     it('should show the offline whats next text', () => {
       expect(
-        savedRegistrationComponent
+        confirmationScreenComponent
           .find('#whats_next_text')
           .first()
           .text()
@@ -132,87 +134,5 @@ describe('when user is in the saved registration page', () => {
         'Once the application is succesfully submited, you and the informant will be notified when the registration is complete.'
       )
     })
-  })
-})
-
-describe('when user is in complete registration page', () => {
-  const { store, history } = createStore()
-
-  const mock: any = jest.fn()
-  let savedRegistrationComponent: ReactWrapper<{}, {}>
-  history.push('/saved', {
-    trackingId: '123456789',
-    declaration: false,
-    fullNameInBn,
-    fullNameInEng
-  })
-
-  beforeEach(async () => {
-    const testComponent = createTestComponent(
-      <SavedRegistration
-        location={mock}
-        history={history}
-        staticContext={mock}
-        match={{
-          params: {},
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-    savedRegistrationComponent = testComponent.component
-  })
-
-  it('should show the notice card text', () => {
-    expect(
-      savedRegistrationComponent
-        .find('#submission_text')
-        .first()
-        .text()
-    ).toEqual(`The birth of ${fullNameInEng} has been registered.`)
-  })
-})
-
-describe('when user is in reject registration page', () => {
-  const { store, history } = createStore()
-
-  const mock: any = jest.fn()
-  let savedRegistrationComponent: ReactWrapper<{}, {}>
-  history.push('/rejected', {
-    trackingId: '123456789',
-    rejection: true,
-    fullNameInBn,
-    fullNameInEng
-  })
-
-  beforeEach(async () => {
-    const testComponent = createTestComponent(
-      <SavedRegistration
-        location={mock}
-        history={history}
-        staticContext={mock}
-        match={{
-          params: {},
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-    savedRegistrationComponent = testComponent.component
-  })
-
-  it('should show the rejection card text', () => {
-    expect(
-      savedRegistrationComponent
-        .find('#submission_text')
-        .first()
-        .text()
-    ).toEqual(
-      `The birth application of Tom Brady has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.`
-    )
   })
 })
