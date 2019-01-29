@@ -671,6 +671,8 @@ describe('when user has a valid token in local storage', () => {
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
+      placeOfBirth: 'HOSPITAL',
+      birthLocation: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
       multipleBirth: '2',
       birthType: 'SINGLE',
       weightAtBirth: '5'
@@ -796,6 +798,78 @@ describe('when user has a valid token in local storage', () => {
       expect(
         draftToMutationTransformer(form, data).father.address[1].line[0]
       ).toBe('Rd#10')
+    })
+    it('Check if existing place of birth location is parsed properly', () => {
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(draftToMutationTransformer(form, data).birthLocationType).toBe(
+        'HOSPITAL'
+      )
+
+      expect(draftToMutationTransformer(form, data).birthLocation).toBe(
+        '90d39759-7f02-4646-aca3-9272b4b5ce5a'
+      )
+    })
+    it('Check if new place of birth location address is parsed properly', () => {
+      const clonedChild = clone(childDetails)
+      clonedChild.placeOfBirth = 'PRIVATE_HOME'
+      clonedChild.addressLine1 = 'Rd #10'
+      clonedChild.addressLine2 = 'Akua'
+      clonedChild.addressLine3 = 'union1'
+      clonedChild.addressLine4 = 'upazila10'
+      clonedChild.country = 'BGD'
+      clonedChild.district = 'district2'
+      clonedChild.postCode = '1020'
+      clonedChild.state = 'state4'
+      const data = {
+        child: clonedChild,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(draftToMutationTransformer(form, data).birthLocationType).toBe(
+        'PRIVATE_HOME'
+      )
+
+      expect(draftToMutationTransformer(form, data).placeOfBirth.type).toBe(
+        'PRIVATE_HOME'
+      )
+      expect(draftToMutationTransformer(form, data).placeOfBirth.partOf).toBe(
+        'upazila10'
+      )
+
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.type
+      ).toBe('BIRTH_PLACE')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.state
+      ).toBe('state4')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.postalCode
+      ).toBe('1020')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.district
+      ).toBe('district2')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[0]
+      ).toBe('Rd #10')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[2]
+      ).toBe('Akua')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[3]
+      ).toBe('union1')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[5]
+      ).toBe('upazila10')
     })
     it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
       const registration = clone(registrationDetails)
