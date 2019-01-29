@@ -6,8 +6,6 @@ context('Menu', () => {
   })
 
   it('Opens menu and selects Bengali', () => {
-    cy.visit(`${Cypress.env('REGISTER_URL')}events`)
-
     cy.wait(5000)
     // CHILD DETAILS
 
@@ -19,6 +17,6 @@ context('Menu', () => {
       .contains('Bengali')
       .click()
 
-    cy.get('#select_vital_event_view').should('be.visible')
+    cy.get('#new_event_declaration').should('be.visible')
   })
 })
