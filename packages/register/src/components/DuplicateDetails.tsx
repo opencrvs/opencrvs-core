@@ -189,6 +189,7 @@ const DetailText = styled.div`
 const DetailTextSplitContainer = styled(DetailText)`
   display: flex;
   justify-content: stretch;
+  cursor: pointer;
 `
 
 const Link = styled.a`
