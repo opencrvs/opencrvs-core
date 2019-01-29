@@ -32,9 +32,15 @@ import { ITemplatedComposition } from './fhir-builders'
 export const typeResolvers: GQLResolver = {
   HumanName: {
     firstNames(name) {
+      if (!name.given) {
+        return null
+      }
       return name.given.join(' ')
     },
     familyName(name) {
+      if (!name.family) {
+        return null
+      }
       return name.family.join(' ')
     }
   },

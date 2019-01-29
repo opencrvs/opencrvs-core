@@ -7,6 +7,8 @@ context('Menu', () => {
 
   it('Opens menu and selects Bengali', () => {
     cy.visit(`${Cypress.env('REGISTER_URL')}events`)
+
+    cy.wait(2000)
     // CHILD DETAILS
 
     cy.get('#sub-menu').click()
