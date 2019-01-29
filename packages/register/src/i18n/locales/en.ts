@@ -730,6 +730,11 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.description':
       'The following application has been flagged as a possible duplicate of an existing registered record.',
     'register.duplicates.pageTitle': 'Possible duplicate',
+    'register.duplicates.male': 'Male',
+    'register.duplicates.female': 'Female',
+    'register.duplicates.field-agent': 'Field agent',
+    'register.duplicates.registrar': 'Registrar',
+    'register.duplicates.queryError': 'An error occurred while fetching data',
     'register.duplicates.details.name': 'Name',
     'register.duplicates.details.dob': 'D.o.B.',
     'register.duplicates.details.gender': 'Gender',
@@ -749,6 +754,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.details.rejected': 'rejected',
     'register.duplicates.details.registered': 'registered',
     'register.duplicates.details.certified': 'certified',
+    'register.duplicates.button.reject': 'Reject',
+    'register.duplicates.modal.reject':
+      'Are you sure you want to reject this application for being a duplicate ?',
     'register.form.tabs.applicantTab': 'Applicant',
     'register.form.section.applicantTitle': "Applicant's details",
     'formFields.applicantsIdType': 'Existing ID',
