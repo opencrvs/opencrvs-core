@@ -121,9 +121,8 @@ export const vitalEventAddressTransformer = (
       `Vital event: ${eventType} not supported in vitalEventAddressTransformer.`
     )
   }
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.placeOfBirth) {
-    sectionData.placeOfBirth = {
+  if (!transformedData.placeOfBirth) {
+    transformedData.placeOfBirth = {
       type: draftData[sectionId].placeOfBirth
         ? draftData[sectionId].placeOfBirth
         : '',
@@ -141,10 +140,10 @@ export const vitalEventAddressTransformer = (
     }
   }
   if (lineNumber > 0) {
-    sectionData.placeOfBirth.address.line[lineNumber - 1] =
+    transformedData.placeOfBirth.address.line[lineNumber - 1] =
       draftData[sectionId][field.name]
   } else {
-    sectionData.placeOfBirth.address[
+    transformedData.placeOfBirth.address[
       !transformedFieldName ? field.name : transformedFieldName
     ] = draftData[sectionId][field.name]
   }
@@ -161,14 +160,19 @@ export const fieldNameTransformer = (transformedFieldName: string) => (
     draftData[sectionId][field.name]
   return transformedData
 }
-
-export function sectionFieldToBundleFieldTransformer(
+export const sectionFieldToBundleFieldTransformer = (
+  transformedFieldName?: string
+) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
-) {
-  transformedData[field.name] = draftData[sectionId][field.name]
+) => {
+  if (transformedFieldName) {
+    transformedData[transformedFieldName] = draftData[sectionId][field.name]
+  } else {
+    transformedData[field.name] = draftData[sectionId][field.name]
+  }
   return transformedData
 }
 

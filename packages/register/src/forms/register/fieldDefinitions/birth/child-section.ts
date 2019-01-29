@@ -364,7 +364,7 @@ export const childSection: IFormSection = {
         { value: 'PRIVATE_HOME', label: messages.privateHome },
         { value: 'OTHER', label: messages.otherInstitution }
       ],
-      mapping: fieldNameTransformer('birthLocationType')
+      mapping: sectionFieldToBundleFieldTransformer('birthLocationType')
     },
     {
       name: 'birthLocation',
@@ -377,7 +377,8 @@ export const childSection: IFormSection = {
         resource: OFFLINE_FACILITIES_KEY,
         dependency: 'placeOfBirth'
       },
-      conditionals: [conditionals.placeOfBirthHospital]
+      conditionals: [conditionals.placeOfBirthHospital],
+      mapping: sectionFieldToBundleFieldTransformer('birthLocation')
     },
     {
       name: 'country',
