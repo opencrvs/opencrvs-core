@@ -6,11 +6,8 @@ context('Menu', () => {
   })
 
   it('Opens menu and selects Bengali', () => {
-    cy.wait(10000)
-    // CHILD DETAILS
-
-    cy.get('#sub-menu').click()
-    //Click on change Lanuage
+    cy.get('#sub-menu', { timeout: 60000 }).click()
+    //Click on change Language
     cy.get('#ChangeLanguage-nested-menu').click()
     // select Bengali
     cy.get('#Bengali-nested-menu-item')
