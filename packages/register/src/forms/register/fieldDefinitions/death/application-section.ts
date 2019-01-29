@@ -281,7 +281,7 @@ export const applicantsSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: (window as any).config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries
     },
@@ -417,7 +417,7 @@ export const applicantsSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: (window as any).config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       conditionals: [conditionals.applicantPermanentAddressSameAsCurrent]

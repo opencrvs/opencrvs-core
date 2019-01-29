@@ -42,7 +42,6 @@ describe('Login app step one', () => {
     })
 
     it('redirects user to verification code form once mobile number and password are accepted', async () => {
-      // @ts-ignore
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 200,
         responseText: "{ nonce: '12345' }"

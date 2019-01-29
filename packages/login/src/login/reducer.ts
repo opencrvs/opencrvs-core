@@ -136,7 +136,6 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           },
           Cmd.run(() => {
             window.location.assign(
-              // @ts-ignore
               `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
             )
           })
@@ -145,12 +144,10 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.GOTO_APP:
       let redirectUrl: string
       if (action.payload === REGISTER_APP) {
-        // @ts-ignore
         redirectUrl = `${window.config.REGISTER_APP_URL}work-queue?token=${
           state.token
         }`
       } else {
-        // @ts-ignore
         redirectUrl = `${window.config.PERFORMANCE_APP_URL}?token=${
           state.token
         }`

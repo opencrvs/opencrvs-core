@@ -79,7 +79,6 @@ it("redirects user to SSO if user doesn't have a token", async () => {
   createTestApp()
   await flushPromises()
 
-  // @ts-ignore
   expect(assign.mock.calls[0][0]).toBe(window.config.LOGIN_URL)
 })
 

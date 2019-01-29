@@ -7,7 +7,7 @@ export interface ILocationDataResponse {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = resolve((window as any).config.RESOURCES_URL, 'locations')
+  const url = resolve(window.config.RESOURCES_URL, 'locations')
 
   const res = await fetch(url, {
     method: 'GET'

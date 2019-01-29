@@ -44,7 +44,6 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
             removeToken()
           }),
           Cmd.run(() => {
-            // @ts-ignore
             window.location.assign(window.config.LOGIN_URL)
           })
         ])

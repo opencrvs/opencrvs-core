@@ -27,7 +27,6 @@ function onNewConentAvailable(waitingSW: ServiceWorker) {
 
 function onBackGroundSync() {
   const channel = new BroadcastChannel(
-    // @ts-ignore
     window.config.BACKGROUND_SYNC_BROADCAST_CHANNEL
   )
   channel.onmessage = e => {

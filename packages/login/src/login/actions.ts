@@ -87,7 +87,6 @@ export const authenticate = (
   values: IAuthenticationData
 ): AuthenticationDataAction => {
   const cleanedData = {
-    // @ts-ignore
     mobile: convertToMSISDN(values.mobile, window.config.COUNTRY),
     password: values.password
   }

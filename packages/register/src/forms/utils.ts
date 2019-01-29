@@ -85,7 +85,6 @@ export const getFieldOptions = (
   if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
     const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
     let partOf: string
-    // @ts-ignore
     if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
     } else {

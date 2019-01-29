@@ -77,7 +77,6 @@ export const messages = defineMessages({
   }
 })
 
-// @ts-ignore
 const fallbackCountry = window.config.COUNTRY
 
 const mobilePhonePatternTable = {
@@ -156,7 +155,6 @@ export const isNumber: Validation = (value: string) =>
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  // @ts-ignore
   const country = window.config.COUNTRY
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]

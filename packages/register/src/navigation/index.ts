@@ -49,7 +49,6 @@ export function goToHome() {
 }
 
 export function goToPerformance() {
-  // @ts-ignore
   window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 

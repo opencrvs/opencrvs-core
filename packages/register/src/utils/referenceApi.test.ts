@@ -17,7 +17,6 @@ const mockFetchLocations = {
   ]
 }
 
-// @ts-ignore
 nock(window.config.RESOURCES_URL)
   .get('/locations')
   .reply(200, mockFetchLocations)

@@ -5,7 +5,6 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { resolve } from 'url'
 
 const httpLink = createHttpLink({
-  // @ts-ignore
   uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
 })
 

@@ -23,7 +23,6 @@ describe('Manager view', () => {
         .simulate('click')
       await wait()
       expect(window.location.assign).toBeCalledWith(
-        // @ts-ignore
         `${window.config.REGISTER_APP_URL}work-queue?token=`
       )
     })
@@ -34,7 +33,6 @@ describe('Manager view', () => {
         .simulate('click')
       await wait()
       expect(window.location.assign).toBeCalledWith(
-        // @ts-ignore
         `${window.config.PERFORMANCE_APP_URL}?token=`
       )
     })

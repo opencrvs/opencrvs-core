@@ -83,7 +83,7 @@ export function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider theme={getTheme((window as any).config.COUNTRY)}>
+          <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
             {nodeWithIntlProp(node)}
           </ThemeProvider>
         </I18nContainer>

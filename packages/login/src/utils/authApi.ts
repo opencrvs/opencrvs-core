@@ -12,7 +12,6 @@ export interface IAuthenticationData {
 }
 
 export const client = axios.create({
-  // @ts-ignore
   baseURL: window.config.AUTH_API_URL
 })
 
@@ -49,7 +48,6 @@ function request<T>(options: AxiosRequestConfig) {
 
 const authenticate = (data: IAuthenticationData) => {
   return request<IAuthenticateResponse>({
-    // @ts-ignore
     url: resolve(window.config.AUTH_API_URL, 'authenticate'),
     method: 'POST',
     data
@@ -58,7 +56,6 @@ const authenticate = (data: IAuthenticationData) => {
 
 const resendSMS = (nonce: string) => {
   return request({
-    // @ts-ignore
     url: resolve(window.config.AUTH_API_URL, '/resendSms'),
     method: 'POST',
     data: { nonce }
@@ -67,7 +64,6 @@ const resendSMS = (nonce: string) => {
 
 const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
-    // @ts-ignore
     url: resolve(window.config.AUTH_API_URL, 'verifyCode'),
     method: 'POST',
     data

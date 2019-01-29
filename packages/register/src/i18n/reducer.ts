@@ -28,9 +28,7 @@ export type IntlState = {
 }
 
 export const initialState: IntlState = {
-  // @ts-ignore
   language: window.config.LANGUAGE,
-  // @ts-ignore
   messages: languages[window.config.LANGUAGE].messages,
   languages
 }

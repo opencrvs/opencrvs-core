@@ -12,7 +12,6 @@ import { AnyAction, Store } from 'redux'
 export let client: any
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
   const httpLink = createHttpLink({
-    // @ts-ignore
     uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
   })
 

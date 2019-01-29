@@ -56,7 +56,6 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
             removeUserDetails()
           }),
           Cmd.run(() => {
-            // @ts-ignore
             window.location.assign(window.config.LOGIN_URL)
           })
         ])
