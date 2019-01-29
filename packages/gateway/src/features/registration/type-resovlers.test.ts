@@ -109,6 +109,15 @@ describe('Registration type resolvers', () => {
     expect(given).toBe('John')
   })
 
+  it('returns first names part with empty first name', () => {
+    // @ts-ignore
+    const given = typeResolvers.HumanName.firstNames({
+      use: 'test',
+      given: undefined
+    })
+    expect(given).toBe('')
+  })
+
   it('returns first names part with multiple naems', () => {
     // @ts-ignore
     const given = typeResolvers.HumanName.firstNames({
