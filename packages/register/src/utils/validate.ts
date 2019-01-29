@@ -28,6 +28,12 @@ export const messages = defineMessages({
     description:
       'The error message that appears on fields with a minimum length'
   },
+  maxLength: {
+    id: 'validations.maxLength',
+    defaultMessage: 'Must not be more than {max} characters',
+    description:
+      'The error message that appears on fields with a maximum length'
+  },
   numberRequired: {
     id: 'validations.numberRequired',
     defaultMessage: 'Must be a number',
@@ -147,6 +153,12 @@ export const required: Validation = (value: string | boolean | string[]) => {
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
     ? { message: messages.minLength, props: { min } }
+    : undefined
+}
+
+export const maxLength = (max: number) => (value: string) => {
+  return value && value.length > max
+    ? { message: messages.maxLength, props: { max } }
     : undefined
 }
 

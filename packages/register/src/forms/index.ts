@@ -199,6 +199,7 @@ export interface IConditionals {
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
+  causeOfDeathEstablished: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

@@ -225,5 +225,9 @@ export const conditionals: IConditionals = {
   deathPlaceOther: {
     action: 'hide',
     expression: 'values.deathPlaceAddress !== "other"'
+  },
+  causeOfDeathEstablished: {
+    action: 'hide',
+    expression: '!values.causeOfDeathEstablished'
   }
 }
