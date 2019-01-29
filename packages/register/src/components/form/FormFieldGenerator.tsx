@@ -15,7 +15,6 @@ import {
   CheckboxGroup,
   DateField,
   TextArea,
-  SubSectionDivider,
   WarningMessage,
   PDFViewer
 } from '@opencrvs/components/lib/forms'
@@ -64,6 +63,8 @@ import { IOfflineDataState } from 'src/offline/reducer'
 
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
+import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
+
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
@@ -212,7 +213,12 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === SUBSECTION) {
-    return <SubSectionDivider label={fieldDefinition.label} />
+    return (
+      <SubSectionDivider
+        label={fieldDefinition.label}
+        required={inputFieldProps.required}
+      />
+    )
   }
   if (fieldDefinition.type === PARAGRAPH) {
     const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
