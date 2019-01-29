@@ -6,7 +6,6 @@ import { withRouter } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { setInitialDrafts } from 'src/drafts'
-import { Spinner } from '@opencrvs/components/lib/interface'
 import { getInitialDraftsLoaded } from 'src/drafts/selectors'
 import { getOfflineDataLoaded } from 'src/offline/selectors'
 import { parse } from 'querystring'
@@ -83,12 +82,6 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 `
 
-const StyledSpinner = styled(Spinner)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-`
-
 interface IPageProps {
   language?: string
   initialDraftsLoaded: boolean
@@ -142,17 +135,13 @@ class Component extends React.Component<
     }))
   }
   render() {
-    const { initialDraftsLoaded, children } = this.props
+    const { children } = this.props
 
-    if (initialDraftsLoaded) {
-      return (
-        <div>
-          <StyledPage {...this.props}>{children}</StyledPage>
-        </div>
-      )
-    } else {
-      return <StyledSpinner id="appSpinner" />
-    }
+    return (
+      <div>
+        <StyledPage {...this.props}>{children}</StyledPage>
+      </div>
+    )
   }
 }
 
