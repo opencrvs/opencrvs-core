@@ -761,6 +761,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.details.rejected': 'rejected',
     'register.duplicates.details.registered': 'registered',
     'register.duplicates.details.certified': 'certified',
+    'register.duplicates.button.reject': 'Reject',
+    'register.duplicates.modal.reject':
+      'Are you sure you want to reject this application for being a duplicate ?',
     'register.form.tabs.applicantTab': 'Applicant',
     'register.form.section.applicantTitle': "Applicant's details",
     'formFields.applicantsIdType': 'Existing ID',

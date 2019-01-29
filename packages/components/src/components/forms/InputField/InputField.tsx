@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
+import { ITheme } from 'src/components/theme'
 
 const InputHeader = styled.div`
   display: flex;
@@ -31,14 +32,20 @@ const Padding = styled.span`
   color: ${({ theme }) => theme.colors.accent};
 `
 
-const InputDescription = styled.p`
+const InputDescription = styled.p<{
+  ignoreMediaQuery?: boolean
+}>`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
   color: ${({ theme }) => theme.colors.copy};
 
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 515px;
-  }
+  ${({ ignoreMediaQuery, theme }) => {
+    return !ignoreMediaQuery
+      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 515px;
+      }`
+      : ''
+  }}
 `
 
 export interface IInputFieldProps {
@@ -54,6 +61,7 @@ export interface IInputFieldProps {
   postfix?: string | JSX.Element
   optionalLabel: string
   children: React.ReactNode
+  ignoreMediaQuery?: boolean
 }
 
 export class InputField extends React.Component<IInputFieldProps, {}> {
@@ -65,7 +73,8 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       required = true,
       description,
       error,
-      touched
+      touched,
+      ignoreMediaQuery
     } = this.props
 
     const postfix = this.props.postfix as React.ComponentClass<any> | string
@@ -76,7 +85,11 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       <div>
         <InputHeader>
           {label && (
-            <InputLabel id={`${id}_label`} disabled={this.props.disabled}>
+            <InputLabel
+              id={`${id}_label`}
+              disabled={this.props.disabled}
+              ignoreMediaQuery={ignoreMediaQuery}
+            >
               {label}
               {!required && (
                 <Optional disabled={this.props.disabled}>
@@ -97,12 +110,17 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
           <InputError
             id={this.props.id + '_error'}
             centred={!this.props.maxLength}
+            ignoreMediaQuery={ignoreMediaQuery}
           >
             {error}
           </InputError>
         )}
 
-        {description && <InputDescription>{description}</InputDescription>}
+        {description && (
+          <InputDescription ignoreMediaQuery={ignoreMediaQuery}>
+            {description}
+          </InputDescription>
+        )}
       </div>
     )
   }

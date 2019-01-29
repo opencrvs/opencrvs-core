@@ -16,6 +16,7 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   error?: boolean
   touched?: boolean
   options: ISelectOption[]
+  ignoreMediaQuery?: boolean
 }
 
 const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
@@ -58,9 +59,13 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
     border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
   }
 
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 275px;
-  }
+  ${({ ignoreMediaQuery, theme }) => {
+    return !ignoreMediaQuery
+      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 515px;
+      }`
+      : ''
+  }}
 `
 
 function getSelectedOption(
