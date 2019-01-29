@@ -211,6 +211,8 @@ export const typeResolvers: GQLResolver = {
         composition.relatesTo &&
         composition.relatesTo.map((duplicate: fhir.CompositionRelatesTo) => {
           if (
+            duplicate.code &&
+            duplicate.code === 'duplicate' &&
             duplicate.targetReference &&
             duplicate.targetReference.reference
           ) {
