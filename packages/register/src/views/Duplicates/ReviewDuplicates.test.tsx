@@ -404,14 +404,6 @@ describe('Review Duplicates component', () => {
       component.update()
       expect(component.find('#reject_confirm').hostNodes()).toHaveLength(1)
     })
-    it('review screen shows up if review link is clicked', async () => {
-      component
-        .find('#review_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
-        .hostNodes()
-        .simulate('click')
-
-      component.update()
-    })
     it('back link on reject confirm modal hides the confirm modal', () => {
       component
         .find('#reject_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')

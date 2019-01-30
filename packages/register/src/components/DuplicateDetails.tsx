@@ -374,7 +374,6 @@ class DuplicateDetailsClass extends React.Component<
             <PrimaryButton
               id={`review_link_${data.id}`}
               onClick={() => {
-                console.log('review link clicked')
                 this.props.gotoTab(
                   REVIEW_BIRTH_PARENT_FORM_TAB,
                   data.id,
