@@ -642,6 +642,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     {intl.formatMessage(messages.submitButton)}
                   </PrimaryButton>,
                   <PreviewButton
+                    id="preview-btn"
                     key="preview"
                     onClick={() => {
                       this.toggleSubmitModalOpen()
