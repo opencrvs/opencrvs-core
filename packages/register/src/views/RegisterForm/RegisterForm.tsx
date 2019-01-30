@@ -38,6 +38,8 @@ import {
   REJECTED_REGISTRATION
 } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { getScope } from 'src/profile/profileSelectors'
+import { Scope } from 'src/utils/authUtils'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -258,8 +260,7 @@ type Props = {
 type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps &
-  RouteComponentProps<{}>
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
 
 type State = {
   showSubmitModal: boolean
@@ -326,6 +327,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     if (draft.review && !this.state.isDataAltered) {
@@ -356,18 +361,35 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    history.push(SAVED_REGISTRATION, {
-      trackingId: response,
-      declaration: true,
+    const payload = {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
-    })
+    }
+    if (this.userHasRegisterScope()) {
+      // @ts-ignore
+      payload.registrationNumber = response
+      // @ts-ignore
+      payload.declaration = false
+    } else {
+      // @ts-ignore
+      payload.trackingId = response
+      // @ts-ignore
+      payload.declaration = true
+    }
+    history.push(SAVED_REGISTRATION, payload)
     this.props.deleteDraft(draft)
   }
 
-  successfullyRegistered = () => {
-    const { draft } = this.props
-    window.location.href = '/work-queue'
+  successfullyRegistered = (response: string) => {
+    const { history, draft } = this.props
+    const childData = this.props.draft.data.child
+    const fullName = getFullName(childData)
+    history.push(SAVED_REGISTRATION, {
+      registrationNumber: response,
+      declaration: false,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
+    })
     this.props.deleteDraft(draft)
   }
 
@@ -616,11 +638,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation mutation={postMutation} variables={this.processSubmitData()}>
-          {(submitBirthRegistration, { data }) => {
-            if (data && data.createBirthRegistration) {
-              this.successfulSubmission(data.createBirthRegistration)
-            }
+        <Mutation
+          mutation={postMutation}
+          variables={this.processSubmitData()}
+          onCompleted={data =>
+            this.successfulSubmission(data.createBirthRegistration)
+          }
+        >
+          {submitBirthRegistration => {
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -654,12 +679,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
           }}
         </Mutation>
 
-        <Mutation mutation={patchMutation} variables={this.processSubmitData()}>
-          {(markBirthAsRegistered, { data }) => {
-            if (data && data.markBirthAsRegistered) {
-              this.successfullyRegistered()
-            }
-
+        <Mutation
+          mutation={patchMutation}
+          variables={this.processSubmitData()}
+          onCompleted={data =>
+            this.successfullyRegistered(data.markBirthAsRegistered)
+          }
+        >
+          {markBirthAsRegistered => {
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -755,6 +782,7 @@ function mapStateToProps(
 
   return {
     registerForm,
+    scope: getScope(state),
     setAllFieldsDirty,
     offlineResources,
     activeSection: {

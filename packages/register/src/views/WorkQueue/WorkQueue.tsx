@@ -239,7 +239,7 @@ const messages = defineMessages({
   },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New birth registration',
+    defaultMessage: 'New registration',
     description: 'The title of new registration button'
   },
   newApplication: {

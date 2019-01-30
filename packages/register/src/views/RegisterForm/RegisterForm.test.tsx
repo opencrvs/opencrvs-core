@@ -35,6 +35,7 @@ describe('when user is in the register form before initial draft load', () => {
       createTestComponent(
         <RegisterForm
           location={mock}
+          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -70,6 +71,7 @@ describe('when user is in the register form for birth event', async () => {
       const testComponent = createTestComponent(
         <RegisterForm
           location={mock}
+          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -124,6 +126,7 @@ describe('when user is in the register form for death event', async () => {
       const testComponent = createTestComponent(
         <RegisterForm
           location={mock}
+          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -166,6 +169,7 @@ describe('when user is in the register form preview section', () => {
   const testComponent = createTestComponent(
     <RegisterForm
       location={mock}
+      scope={mock}
       history={history}
       staticContext={mock}
       registerForm={form}
@@ -309,6 +313,7 @@ describe('when user is in the register form review section', () => {
     const testComponent = createTestComponent(
       <RegisterForm
         location={mock}
+        scope={mock}
         history={history}
         staticContext={mock}
         registerForm={form}
