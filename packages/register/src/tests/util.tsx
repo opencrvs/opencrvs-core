@@ -271,7 +271,8 @@ export const mockApplicationData = {
     gender: 'male',
     weightAtBirth: '3.5',
     attendantAtBirth: 'MIDWIFE',
-    birthType: 'SINGLE'
+    birthType: 'SINGLE',
+    multipleBirth: 1
   },
   mother: {
     firstNames: 'স্পিভক',
@@ -288,9 +289,9 @@ export const mockApplicationData = {
     countryPermanent: 'BGD',
     statePermanent: 'state2',
     districtPermanent: 'district2',
-    addressLine1Permanent: '',
-    addressLine2Permanent: '',
-    addressLine3Permanent: '',
+    addressLine1Permanent: 'some road',
+    addressLine2Permanent: 'some more',
+    addressLine3Permanent: 'some more',
     addressLine4Permanent: 'upazila1',
     postalCodePermanent: '',
     country: 'BGD',
@@ -300,7 +301,8 @@ export const mockApplicationData = {
     addressLine2: '',
     addressLine3: '',
     addressLine4: 'upazila2',
-    postalCode: ''
+    postalCode: '',
+    currentAddressSameAsPermanent: true
   },
   father: {
     fathersDetailsExist: true,

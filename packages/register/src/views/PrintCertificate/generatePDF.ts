@@ -150,7 +150,7 @@ export function generateMoneyReceipt(
   pdfMake.vfs = pdfFonts.pdfMake.vfs
   const generatedPDF = pdfMake.createPdf(docDefinition, null, font)
 
-  generatedPDF.open()
+  generatedPDF.print()
 }
 
 function getCertificateObject(certificateDetails: CertificateDetails) {

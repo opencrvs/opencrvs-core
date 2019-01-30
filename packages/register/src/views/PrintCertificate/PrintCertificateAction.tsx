@@ -149,8 +149,6 @@ const ConfirmBtn = styled(PrimaryButton)`
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }
-    position: relative;
-    top: 7px;
   }
 `
 
@@ -189,8 +187,8 @@ const B = styled.div`
 `
 
 const ButtonSpinner = styled(Spinner)`
-  width: 25px;
-  height: 25px;
+  width: 15px;
+  height: 15px;
   top: 0px !important;
 `
 
@@ -595,7 +593,7 @@ class PrintCertificateActionComponent extends React.Component<
                   }))
                 }}
               >
-                {(markBirthAsCertified, { loading, error }) => {
+                {(markBirthAsCertified, { loading, error, data }) => {
                   return (
                     <ConfirmBtn
                       id="registerApplicationBtn"
@@ -614,7 +612,7 @@ class PrintCertificateActionComponent extends React.Component<
                         )
                       }}
                       align={ICON_ALIGNMENT.LEFT}
-                      disabled={loading}
+                      disabled={loading || data}
                       onClick={() => {
                         markBirthAsCertified()
                       }}
