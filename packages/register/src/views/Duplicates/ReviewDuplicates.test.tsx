@@ -143,7 +143,7 @@ describe('Review Duplicates component', () => {
               type: 'BIRTH',
               status: [
                 {
-                  type: 'DECLARED',
+                  type: 'REGISTERED',
                   timestamp: '2019-01-22T09:46:02.547Z',
                   user: {
                     name: [
