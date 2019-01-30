@@ -294,7 +294,11 @@ export class ReviewFormView extends React.Component<IProps> {
 
   transformFather = (father: GQLPerson | undefined) => {
     if (!father) {
-      return {}
+      return {
+        fathersDetailsExist: false,
+        permanentAddressSameAsMother: true,
+        addressSameAsMother: true
+      }
     }
     const fatherDetails = {} as IReviewSectionDetails
     fatherDetails.fathersDetailsExist = true
@@ -438,7 +442,9 @@ export class ReviewFormView extends React.Component<IProps> {
     const mother = this.transformMother(reg.mother)
     const father = this.transformFather(reg.father)
 
-    this.setFatherAddressSameAsMother(father, mother)
+    if (father.fathersDetailsExist) {
+      this.setFatherAddressSameAsMother(father, mother)
+    }
     child.multipleBirth = mother.multipleBirth
 
     this.setMotherCurrentAddressSameAsPermanent(mother)
@@ -455,7 +461,6 @@ export class ReviewFormView extends React.Component<IProps> {
       documents,
       registration
     }
-
     return reviewData
   }
   userHasRegisterScope() {

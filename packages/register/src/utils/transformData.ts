@@ -136,7 +136,7 @@ class StoreTransformer {
 
   transformFather = (father: GQLPerson | undefined) => {
     if (!father) {
-      return {}
+      return null
     }
     const fatherDetails = {} as IReviewSectionDetails
     fatherDetails.fathersDetailsExist = true
@@ -277,8 +277,6 @@ class StoreTransformer {
     const child = this.transformChild(reg)
     const mother = this.transformMother(reg.mother)
     const father = this.transformFather(reg.father)
-
-    this.setFatherAddressSameAsMother(father, mother)
     child.multipleBirth = mother.multipleBirth
 
     this.setMotherCurrentAddressSameAsPermanent(mother)
@@ -291,9 +289,14 @@ class StoreTransformer {
       _fhirIDMap: reg._fhirIDMap,
       child,
       mother,
-      father,
       documents,
       registration
+    }
+
+    if (father) {
+      this.setFatherAddressSameAsMother(father, mother)
+      // @ts-ignore
+      reviewData.father = father
     }
 
     return reviewData

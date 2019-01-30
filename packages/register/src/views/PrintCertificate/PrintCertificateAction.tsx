@@ -456,7 +456,6 @@ class PrintCertificateActionComponent extends React.Component<
     const draft = drafts.find(draftItem => draftItem.id === registrationId) || {
       data: {}
     }
-
     const result = {
       id: registrationId,
       details: draftToMutationTransformer(registerForm, draft.data)
@@ -481,7 +480,6 @@ class PrintCertificateActionComponent extends React.Component<
         individual
       },
       payments: {
-        paymentId: '1',
         type: data.paymentMethod,
         total: data.paymentAmount,
         amount: data.paymentAmount,
@@ -497,7 +495,6 @@ class PrintCertificateActionComponent extends React.Component<
     result.details.registration.certificates =
       result.details.registration.certificates || []
     result.details.registration.certificates.push(certificates)
-
     return result
   }
 
