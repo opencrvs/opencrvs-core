@@ -38,6 +38,7 @@ import {
   identifierTransformer,
   identifierTypeTransformer,
   addressTransformer,
+  fieldNameTransformer,
   copyAddressTransformer,
   identifierOtherTypeTransformer
 } from 'src/forms/field-mappings'
@@ -209,12 +210,13 @@ export const motherSection: IFormSection = {
       mapping: nameTransformer('en', 'familyName')
     },
     {
-      name: 'birthDate',
+      name: 'motherBirthDate',
       type: DATE,
       label: messages.motherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      mapping: fieldNameTransformer('birthDate')
     },
     {
       name: 'maritalStatus',
@@ -352,13 +354,13 @@ export const motherSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 4)
+      mapping: addressTransformer('PERMANENT', 6)
     },
     {
       name: 'addressLine3Permanent',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -369,9 +371,26 @@ export const motherSection: IFormSection = {
         conditionals.countryPermanent,
         conditionals.statePermanent,
         conditionals.districtPermanent,
-        conditionals.addressLine4Permanent
+        conditionals.addressLine4Permanent,
+        conditionals.isNotCityLocationPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 3)
+      mapping: addressTransformer('PERMANENT', 4)
+    },
+    {
+      name: 'addressLine3CityOptionPermanent',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: addressTransformer('PERMANENT', 5)
     },
     {
       name: 'addressLine2Permanent',
@@ -387,13 +406,45 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent
       ],
+      mapping: addressTransformer('PERMANENT', 3)
+    },
+    {
+      name: 'addressLine1CityOptionPermanent',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
       mapping: addressTransformer('PERMANENT', 2)
+    },
+    {
+      name: 'postCodeCityOptionPermanent',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: addressTransformer('PERMANENT', 0, 'postalCode')
     },
     {
       name: 'addressLine1Permanent',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -511,13 +562,13 @@ export const motherSection: IFormSection = {
         conditionals.district,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT', 4)
+      mapping: addressTransformer('CURRENT', 6)
     },
     {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -529,9 +580,27 @@ export const motherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.currentAddressSameAsPermanent
+        conditionals.currentAddressSameAsPermanent,
+        conditionals.isNotCityLocation
       ],
-      mapping: addressTransformer('CURRENT', 3)
+      mapping: addressTransformer('CURRENT', 4)
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.currentAddressSameAsPermanent,
+        conditionals.isCityLocation
+      ],
+      mapping: addressTransformer('CURRENT', 5)
     },
     {
       name: 'addressLine2',
@@ -548,13 +617,47 @@ export const motherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ],
+      mapping: addressTransformer('CURRENT', 3)
+    },
+    {
+      name: 'addressLine1CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.currentAddressSameAsPermanent,
+        conditionals.isCityLocation
+      ],
       mapping: addressTransformer('CURRENT', 2)
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.currentAddressSameAsPermanent,
+        conditionals.isCityLocation
+      ],
+      mapping: addressTransformer('CURRENT', 0, 'postalCode')
     },
     {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [

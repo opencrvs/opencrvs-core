@@ -148,8 +148,9 @@ input BirthRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  placeOfBirth: AddressInput
-  birthLocation: LocationInput
+  placeOfBirth: LocationInput
+  birthLocation: String
+  birthLocationType: AddressType
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
@@ -172,8 +173,9 @@ type BirthRegistration { # -> Composition
   mother: Person # -> .section(code='mother-details').entry.reference
   father: Person # -> .section(code='father-details').entry.reference
   informant: Person # -> .section(code='informant-details').entry.reference
-  placeOfBirth: Address # -> Create birthLocation
-  birthLocation: Location # -> .section(code='birth-encounter').entry.reference.location
+  placeOfBirth: Location
+  birthLocation: String # -> .section(code='birth-encounter').entry.reference.location
+  birthLocationType: AddressType
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
@@ -197,8 +199,8 @@ input DeathRegistrationInput {
   informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType # -> RelatedPerson.relationship
   otherInformantRelationship: String # -> RelatedPerson.relationship
-  placeOfDeath: AddressInput # -> Create deathLocation
-  deathLocation: LocationInput # -> .section(code='death-encounter').entry.reference.location
+  placeOfDeath: LocationInput
+  deathLocation: String
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -217,8 +219,8 @@ type DeathRegistration { # -> Composition
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType # -> RelatedPerson.relationship
   otherInformantRelationship: String # -> RelatedPerson.relationship
-  placeOfDeath: Address # -> Create deathLocation
-  deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
+  placeOfDeath: Location
+  deathLocation: String
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept

@@ -5,6 +5,7 @@ input LocationInput {
   name: String
   alias: [String]
   description: String
+  partOf: String
   type: LocationType
   telecom: [ContactPointInput]
   address: AddressInput
@@ -18,6 +19,7 @@ enum LocationType {
   HEALTH_FACILITY
   ADMIN_STRUCTURE
   CRVS_OFFICE
+  PRIVATE_HOME
   OTHER
 }
 
@@ -34,6 +36,7 @@ type Location { # -> Location (mostly the same property name except:)
   name: String
   alias: [String]
   description: String
+  partOf: String
   type: LocationType
   telecom: [ContactPoint]
   address: Address

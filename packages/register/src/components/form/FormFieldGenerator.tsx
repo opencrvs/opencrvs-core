@@ -60,7 +60,6 @@ import {
 
 import { IValidationResult } from 'src/utils/validate'
 import { IOfflineDataState } from 'src/offline/reducer'
-
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
@@ -402,7 +401,8 @@ class FormSectionComponent extends React.Component<Props> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            values
+            values,
+            offlineResources
           )
 
           if (conditionalActions.includes('hide')) {
@@ -462,5 +462,5 @@ export const FormFieldGenerator = withFormik<
     console.log(values)
   },
   validate: (values, props: IFormSectionProps) =>
-    getValidationErrorsForForm(props.fields, values)
+    getValidationErrorsForForm(props.fields, values, props.offlineResources)
 })(injectIntl(FormSectionComponent))

@@ -25,6 +25,15 @@ export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
+import { defineMessages } from 'react-intl'
+
+export const messages = defineMessages({
+  otherOption: {
+    id: 'formFields.otherOption',
+    defaultMessage: 'Other',
+    description: 'Other option for select'
+  }
+})
 
 export enum Event {
   BIRTH = 'birth',
@@ -224,6 +233,12 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
+  placeOfBirthHospital: IConditional
+  otherPlaceOfBirth: IConditional
+  isNotCityLocation: IConditional
+  isCityLocation: IConditional
+  isNotCityLocationPermanent: IConditional
+  isCityLocationPermanent: IConditional
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
