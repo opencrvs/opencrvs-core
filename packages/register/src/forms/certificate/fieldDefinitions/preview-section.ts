@@ -3,8 +3,7 @@ import {
   ViewType,
   SELECT_WITH_OPTIONS,
   LINK,
-  PDF_DOCUMENT_VIEWER,
-  CHECKBOX_GROUP
+  PDF_DOCUMENT_VIEWER
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 
@@ -99,20 +98,6 @@ export const certificatePreview: IFormSection = {
       label: messages.noLabel,
       initialValue: '',
       validate: []
-    },
-    {
-      name: 'informantReviewed',
-      type: CHECKBOX_GROUP,
-      label: messages.noLabel,
-      initialValue: '',
-      required: true,
-      validate: [],
-      options: [
-        {
-          value: 'INFORMANT_REVIEWED_INFORMATION',
-          label: messages.informantHasReviewedInformaiton
-        }
-      ]
     }
   ]
 }

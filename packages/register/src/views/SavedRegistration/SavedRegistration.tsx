@@ -369,7 +369,7 @@ class SavedRegistrationView extends React.Component<
       noticeCardText1 = intl.formatMessage(messages.registrationNoticeCardText1)
       noticeCardText2 = intl.formatMessage(messages.registrationNoticeCardText2)
       trackingCardTitle = intl.formatMessage(messages.registrationCardTitle)
-      trackingNumber = history.location.state.registrationId || ''
+      trackingNumber = history.location.state.registrationNumber || ''
       nextCardText1 = intl.formatMessage(messages.registrationNextCardText1)
       nextCardText2 = intl.formatMessage(messages.registrationNextCardText2)
       trackingCardText = intl.formatMessage(messages.registrationCardText)
@@ -410,7 +410,10 @@ class SavedRegistrationView extends React.Component<
             <SubmissionText id="submission_text">
               {language === 'en' ? (
                 <span>
-                  {noticeCardText1} <strong>{fullNameInEng}</strong>{' '}
+                  {noticeCardText1}{' '}
+                  <strong>
+                    {fullNameInEng ? fullNameInEng : fullNameInBn}
+                  </strong>{' '}
                   {noticeCardText2}
                 </span>
               ) : (
@@ -440,23 +443,16 @@ class SavedRegistrationView extends React.Component<
           )}
         </Container>
         <Footer>
-          {!isRejection &&
-            (isDeclaration ? (
-              <FooterAction>
-                <FooterPrimaryButton onClick={() => history.push('/')}>
-                  {intl.formatMessage(messages.newButton)}
-                </FooterPrimaryButton>
-              </FooterAction>
-            ) : (
-              <FooterAction>
-                <FooterPrimaryButton onClick={() => history.push('/')}>
-                  {intl.formatMessage(messages.duplicationButton)}
-                </FooterPrimaryButton>
-              </FooterAction>
-            ))}
+          {!isRejection && isDeclaration && (
+            <FooterAction>
+              <FooterPrimaryButton onClick={() => (location.href = '/')}>
+                {intl.formatMessage(messages.newButton)}
+              </FooterPrimaryButton>
+            </FooterAction>
+          )}
 
           <FooterAction>
-            <FooterPrimaryButton onClick={() => history.push('/')}>
+            <FooterPrimaryButton onClick={() => (location.href = '/')}>
               {intl.formatMessage(messages.backButton)}
             </FooterPrimaryButton>
           </FooterAction>

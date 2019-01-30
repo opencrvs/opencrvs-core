@@ -1,6 +1,9 @@
 import { required, IValidationResult } from '../utils/validate'
-import { IFormField, IFormSectionData } from './'
-import { getConditionalActionsForField } from '@opencrvs/register/src/forms/utils'
+import { IFormField, IFormSectionData, IDynamicFormField } from './'
+import {
+  getConditionalActionsForField,
+  getFieldValidation
+} from '@opencrvs/register/src/forms/utils'
 import { IOfflineDataState } from 'src/offline/reducer'
 
 export function getValidationErrorsForField(
@@ -20,6 +23,8 @@ export function getValidationErrorsForField(
   }
 
   let validators = Array.from(field.validate)
+
+  validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
   if (field.required) {
     validators.push(required)

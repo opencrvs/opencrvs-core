@@ -9,8 +9,6 @@ export const ENGLISH_STATE: ILanguage = {
     'app.loading.data.continueButton': 'Continue',
     'login.stepOneTitle': 'Login',
     'session.expire.text': 'Your session has expired. Please login again.',
-    'formFields.currentAddressSameAsPermanent':
-      'Is her current address the same as her permanent address?',
     'myDrafts.title': 'My drafts',
     'myDrafts.labels.results.name': 'Name',
     'myDrafts.labels.results.dob': 'D.o.B.',
@@ -306,6 +304,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.iDTypeDRN': 'Death Registration Number',
     'formFields.iDTypeRefugeeNumber': 'Refugee Number',
     'formFields.iDTypeAlienNumber': 'Alien Number',
+    'formFields.iDTypeOther': 'Other',
+    'formFields.iDTypeOtherLabel': 'Other type of ID',
     'formFields.iD': 'ID Number',
     'formFields.maritalStatus': 'Marital status',
     'formFields.maritalStatusSingle': 'Unmarried',
@@ -362,6 +362,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.fatherEducationAttainment':
       "Father's level of formal education attained",
     'formFields.currentAddress': 'Current Address',
+    'formFields.currentAddressSameAsPermanent':
+      'Is her current address the same as her permanent address?',
     'register.form.tabs.motherTab': 'Mother',
     'register.form.section.motherTitle': "Mother's details",
     'formFields.mother.nationality': 'Nationality',
@@ -454,10 +456,27 @@ export const ENGLISH_STATE: ILanguage = {
       'Current address of the deceased',
     'formFields.deathPlaceAddressOther': 'Different Address',
     'formFields.deathPlaceAddressType': 'Type of Place',
+    'register.form.tabs.causeOfDeathTab': 'Cause of Death',
+    'register.form.section.causeOfDeathTitle': 'Cause of Death',
+    'register.form.section.causeOfDeathNotice':
+      'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
+    'formFields.causeOfDeathEstablished':
+      'Has a Cause of Death been established ?',
+    'formFields.methodOfCauseOfDeath': 'Method of Cause of Death',
+    'formFields.causeOfDeathCode': 'Cause of Death Code',
+    'formFields.verbalAutopsy': 'Verbal autopsy',
+    'formFields.medicallyCertified': 'Medically Certified Cause of Death',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
+    'validations.maxLength': 'Must not be more than {max} characters',
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
+    'validations.validNationalId':
+      'The National ID can be up to {maxLength} characters long',
+    'validations.validBirthRegistrationNumber':
+      'The Birth Registration Number can be up to {maxLength} characters long',
+    'validations.validDeathRegistrationNumber':
+      'The Death Registration Number can be up to {maxLength} characters long',
     'validations.phoneNumberFormat':
       'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
@@ -726,6 +745,10 @@ export const ENGLISH_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'Nationality',
     'certificate.parent.details.label.typeOfID': 'Type of ID',
     'certificate.parent.details.label.number': 'Number',
+    'certificate.btn.editRegistration': 'Edit Registration',
+    'certificate.txt.isCorrectTxt': 'Is the birth certificate correct?',
+    'certificate.txt.confirmationTxt':
+      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that you are ready to print.',
     'review.form.section.reviewTitle': 'Review',
     'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
     'validations.englishOnlyNameFormat': 'Must contain only English characters',
@@ -735,7 +758,7 @@ export const ENGLISH_STATE: ILanguage = {
     'review.birthRegistration.queryError':
       'An error occurred while fetching birth registration',
     'review.error.unauthorized': 'We are unable to display this page to you',
-    'register.workQueue.buttons.newRegistration': 'New birth registration',
+    'register.workQueue.buttons.newRegistration': 'New registration',
     'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
     'register.work-queue.certificate.header':
       'Receipt for Birth Certificate of',
@@ -773,6 +796,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.details.rejected': 'rejected',
     'register.duplicates.details.registered': 'registered',
     'register.duplicates.details.certified': 'certified',
+    'register.duplicates.button.reject': 'Reject',
+    'register.duplicates.modal.reject':
+      'Are you sure you want to reject this application for being a duplicate ?',
     'register.form.tabs.applicantTab': 'Applicant',
     'register.form.section.applicantTitle': "Applicant's details",
     'formFields.applicantsIdType': 'Existing ID',
@@ -792,6 +818,10 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantRelation.other': 'Other(Specify)',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
-    'formFields.applicant.phone': 'Phone number'
+    'formFields.applicant.phone': 'Phone number',
+    'register.duplicates.notDuplicate.modal.back': 'Back',
+    'register.duplicates.notDuplicate.modal.yes': 'Yes',
+    'register.duplicates.notDuplicate.modal.confirmationText':
+      'Are you sure this is not a duplicate application?'
   }
 }

@@ -41,9 +41,33 @@ export const messages = defineMessages({
     defaultMessage: 'Alien Number',
     description: 'Option for form field: Type of ID'
   },
+  iDTypeOther: {
+    id: 'formFields.iDTypeOther',
+    defaultMessage: 'Other',
+    description: 'Option for form field: Type of ID'
+  },
+  iDTypeOtherLabel: {
+    id: 'formFields.iDTypeOtherLabel',
+    defaultMessage: 'Other type of ID',
+    description: 'Label for form field: Other type of ID'
+  },
   iD: {
     id: 'formFields.iD',
     defaultMessage: 'ID Number',
     description: 'Label for form field: ID Number'
   }
 })
+
+export const identityOptions = [
+  { value: 'NATIONAL_ID', label: messages.iDTypeNationalID },
+  {
+    value: 'BIRTH_REGISTRATION_NUMBER',
+    label: messages.iDTypeBRN
+  },
+  { value: 'PASSPORT', label: messages.iDTypePassport },
+  {
+    value: 'DEATH_REGISTRATION_NUMBER',
+    label: messages.iDTypeDRN
+  },
+  { value: 'OTHER', label: messages.iDTypeOther }
+]

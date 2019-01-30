@@ -25,7 +25,7 @@ test('should build a minimal FHIR registration document without error', async ()
   const fhir = await buildFHIRBundle({
     mother: {
       _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
-      identifier: [{ id: '123456', type: 'PASSPORT' }],
+      identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
       gender: 'female',
       birthDate: '2000-01-28',
       maritalStatus: 'MARRIED',
@@ -217,7 +217,8 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[1].resource.name[0].family[0]).toBe('Doe')
   expect(fhir.entry[1].resource.name[0].use).toBe('en')
   expect(fhir.entry[1].resource.identifier[0].id).toBe('123456')
-  expect(fhir.entry[1].resource.identifier[0].type).toBe('PASSPORT')
+  expect(fhir.entry[1].resource.identifier[0].type).toBe('OTHER')
+  expect(fhir.entry[1].resource.identifier[0].otherType).toBe('Custom type')
   expect(fhir.entry[1].resource.birthDate).toBe('2000-01-28')
   expect(fhir.entry[1].resource.maritalStatus.text).toBe('MARRIED')
   expect(fhir.entry[1].resource.maritalStatus.coding[0].code).toBe('M')

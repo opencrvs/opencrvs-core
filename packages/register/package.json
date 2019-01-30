@@ -28,6 +28,7 @@
     "react-apollo": "^2.1.4",
     "react-dom": "^16.3.2",
     "react-intl": "^2.4.0",
+    "react-moment": "^0.8.4",
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",
     "react-router-redux": "next",
@@ -42,8 +43,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3000 react-scripts-ts start",
-    "verify-build-config": "ts-node -O '{\"module\": \"commonjs\"}' src/config.ts",
-    "build": "yarn verify-build-config && react-scripts-ts build && yarn gen:sw",
+    "build": "react-scripts-ts build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",

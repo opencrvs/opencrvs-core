@@ -239,7 +239,7 @@ const messages = defineMessages({
   },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New birth registration',
+    defaultMessage: 'New registration',
     description: 'The title of new registration button'
   },
   newApplication: {
@@ -749,7 +749,7 @@ export class WorkQueueView extends React.Component<
                 separator={<Separator />}
               />
             </ValueContainer>
-            {item.duplicates && (
+            {item.duplicates && item.duplicates.length > 0 && (
               <DuplicateIndicatorContainer>
                 <Duplicate />
                 <span>
@@ -770,6 +770,7 @@ export class WorkQueueView extends React.Component<
     key: number
   ): JSX.Element => {
     const applicationIsRegistered = item.declaration_status === 'REGISTERED'
+    const applicationIsCertified = item.declaration_status === 'CERTIFIED'
     const applicationIsRejected = item.declaration_status === 'REJECTED'
     const info = []
     const status = []
@@ -787,13 +788,13 @@ export class WorkQueueView extends React.Component<
       label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
       value: item.date_of_application
     })
-    if (!applicationIsRegistered) {
+    if (!applicationIsRegistered || !applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
         value: item.tracking_id
       })
     }
-    if (applicationIsRegistered) {
+    if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
           messages.listItemBirthRegistrationNumber
@@ -811,7 +812,7 @@ export class WorkQueueView extends React.Component<
       label: this.getDeclarationStatusLabel(item.declaration_status)
     })
 
-    if (item.duplicates) {
+    if (item.duplicates && item.duplicates.length > 0) {
       icons.push(<Duplicate />)
     }
 
@@ -819,7 +820,7 @@ export class WorkQueueView extends React.Component<
 
     const expansionActions: JSX.Element[] = []
     if (this.userHasCertifyScope()) {
-      if (applicationIsRegistered) {
+      if (applicationIsRegistered || applicationIsCertified) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.print),
           handler: () => this.togglePrintModal(item.id)
@@ -840,7 +841,8 @@ export class WorkQueueView extends React.Component<
       if (
         !item.duplicates &&
         !applicationIsRegistered &&
-        !applicationIsRejected
+        !applicationIsRejected &&
+        !applicationIsCertified
       ) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
@@ -865,7 +867,12 @@ export class WorkQueueView extends React.Component<
       }
     }
 
-    if (item.duplicates && !applicationIsRegistered && !applicationIsRejected) {
+    if (
+      item.duplicates &&
+      item.duplicates.length > 0 &&
+      !applicationIsRegistered &&
+      !applicationIsRejected
+    ) {
       listItemActions.push({
         label: this.props.intl.formatMessage(messages.reviewDuplicates),
         handler: () => this.props.goToReviewDuplicate(item.id)

@@ -72,6 +72,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -101,6 +102,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -254,6 +256,7 @@ export class ReviewFormView extends React.Component<IProps> {
   ) => {
     person.iD = identifier[0].id
     person.iDType = identifier[0].type
+    person.iDTypeOther = identifier[0].otherType
   }
 
   transformChild = (reg: GQLBirthRegistration) => {
@@ -329,7 +332,11 @@ export class ReviewFormView extends React.Component<IProps> {
 
   transformFather = (father: GQLPerson | undefined) => {
     if (!father) {
-      return {}
+      return {
+        fathersDetailsExist: false,
+        permanentAddressSameAsMother: true,
+        addressSameAsMother: true
+      }
     }
     const fatherDetails = {} as IReviewSectionDetails
     fatherDetails.fathersDetailsExist = true
@@ -486,7 +493,9 @@ export class ReviewFormView extends React.Component<IProps> {
     const mother = this.transformMother(reg.mother)
     const father = this.transformFather(reg.father)
 
-    this.setFatherAddressSameAsMother(father, mother)
+    if (father.fathersDetailsExist) {
+      this.setFatherAddressSameAsMother(father, mother)
+    }
     child.multipleBirth = mother.multipleBirth
 
     this.setMotherCurrentAddressSameAsPermanent(mother)
@@ -503,7 +512,6 @@ export class ReviewFormView extends React.Component<IProps> {
       documents,
       registration
     }
-
     return reviewData
   }
   userHasRegisterScope() {

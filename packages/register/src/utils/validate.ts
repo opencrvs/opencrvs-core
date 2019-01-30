@@ -1,5 +1,4 @@
 import { defineMessages } from 'react-intl'
-import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
 import { IFormFieldValue } from '@opencrvs/register/src/forms'
 
@@ -16,6 +15,8 @@ export type Validation = (
   value: IFormFieldValue
 ) => IValidationResult | undefined
 
+export type ValidationInitializer = (...value: any[]) => Validation
+
 export const messages = defineMessages({
   required: {
     id: 'validations.required',
@@ -27,6 +28,12 @@ export const messages = defineMessages({
     defaultMessage: 'Must be {min} characters or more',
     description:
       'The error message that appears on fields with a minimum length'
+  },
+  maxLength: {
+    id: 'validations.maxLength',
+    defaultMessage: 'Must not be more than {max} characters',
+    description:
+      'The error message that appears on fields with a maximum length'
   },
   numberRequired: {
     id: 'validations.numberRequired',
@@ -75,10 +82,31 @@ export const messages = defineMessages({
     defaultMessage: 'Must be within {min} and {max}',
     description:
       'The error message that appears when an out of range value is used'
+  },
+  validNationalId: {
+    id: 'validations.validNationalId',
+    defaultMessage:
+      'The National ID can be up to {maxCharLength} characters long',
+    description:
+      'The error message that appears when an invalid length of value is used as nid'
+  },
+  validBirthRegistrationNumber: {
+    id: 'validations.validBirthRegistrationNumber',
+    defaultMessage:
+      'The Birth Registration Number can be up to {maxCharLength} characters long',
+    description:
+      'The error message that appears when an invalid length of value is used as brn'
+  },
+  validDeathRegistrationNumber: {
+    id: 'validations.validDeathRegistrationNumber',
+    defaultMessage:
+      'The Death Registration Number can be up to {maxCharLength} characters long',
+    description:
+      'The error message that appears when an invalid length of value is used as drn'
   }
 })
 
-const fallbackCountry = config.COUNTRY
+const fallbackCountry = window.config.COUNTRY
 
 const mobilePhonePatternTable = {
   gbr: {
@@ -150,13 +178,19 @@ export const minLength = (min: number) => (value: string) => {
     : undefined
 }
 
+export const maxLength = (max: number) => (value: string) => {
+  return isLessOrEqual(value, max)
+    ? undefined
+    : { message: messages.maxLength, props: { max } }
+}
+
 export const isNumber: Validation = (value: string) =>
   value && isNaN(Number(value))
     ? { message: messages.numberRequired }
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  const country = config.COUNTRY
+  const country = window.config.COUNTRY
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
   const { example } = countryMobileTable
@@ -244,6 +278,10 @@ const checkNameWords = (value: string, checker: Checker): boolean => {
   return parts.every(checker)
 }
 
+const isLessOrEqual = (value: string, max: number) => {
+  return value && value.length <= max
+}
+
 export const isValidBengaliName = (value: string): boolean => {
   return checkNameWords(value, isValidBengaliWord)
 }
@@ -274,4 +312,40 @@ export const range = (min: number, max: number) => (value: string) => {
   return isValueWithinRange(min, max)(parseFloat(value))
     ? undefined
     : { message: messages.range, props: { min, max } }
+}
+
+export const validIDNumber: ValidationInitializer = (
+  typeOfID: string
+): Validation => (value: string) => {
+  const validNationalIDLength = 17
+  const validBirthRegistrationNumberLength = 17
+  const validDeathRegistrationNumberLength = 17
+  switch (typeOfID) {
+    case 'NATIONAL_ID':
+      return isLessOrEqual(value, validNationalIDLength)
+        ? undefined
+        : {
+            message: messages.validNationalId,
+            props: { maxCharLength: validNationalIDLength }
+          }
+
+    case 'BIRTH_REGISTRATION_NUMBER':
+      return isLessOrEqual(value, validBirthRegistrationNumberLength)
+        ? undefined
+        : {
+            message: messages.validBirthRegistrationNumber,
+            props: { maxCharLength: validBirthRegistrationNumberLength }
+          }
+
+    case 'DEATH_REGISTRATION_NUMBER':
+      return isLessOrEqual(value, validDeathRegistrationNumberLength)
+        ? undefined
+        : {
+            message: messages.validDeathRegistrationNumber,
+            props: { maxCharLength: validDeathRegistrationNumberLength }
+          }
+
+    default:
+      return undefined
+  }
 }

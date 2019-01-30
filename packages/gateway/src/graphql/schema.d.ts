@@ -54,6 +54,7 @@ export interface GQLPerson {
 export interface GQLIdentityType {
   id?: string
   type?: GQLIdentityIDType
+  otherType?: string
 }
 
 export enum GQLIdentityIDType {
@@ -63,7 +64,8 @@ export enum GQLIdentityIDType {
   BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER',
   DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
   REFUGEE_NUMBER = 'REFUGEE_NUMBER',
-  ALIEN_NUMBER = 'ALIEN_NUMBER'
+  ALIEN_NUMBER = 'ALIEN_NUMBER',
+  OTHER = 'OTHER'
 }
 
 export interface GQLHumanName {
@@ -361,6 +363,7 @@ export interface GQLMutation {
   markBirthAsRegistered: string
   markBirthAsCertified: string
   markBirthAsVoided: string
+  notADuplicate: string
   createDeathRegistration: string
   updateDeathRegistration: GQLDeathRegistration
   markDeathAsVerified?: GQLDeathRegistration
@@ -399,6 +402,7 @@ export interface GQLPersonInput {
 export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
+  otherType?: string
 }
 
 export interface GQLHumanNameInput {
@@ -876,6 +880,7 @@ export interface PersonToEducationalAttainmentResolver<
 export interface GQLIdentityTypeTypeResolver<TParent = any> {
   id?: IdentityTypeToIdResolver<TParent>
   type?: IdentityTypeToTypeResolver<TParent>
+  otherType?: IdentityTypeToOtherTypeResolver<TParent>
 }
 
 export interface IdentityTypeToIdResolver<TParent = any, TResult = any> {
@@ -883,6 +888,10 @@ export interface IdentityTypeToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface IdentityTypeToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IdentityTypeToOtherTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1602,6 +1611,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   markBirthAsVoided?: MutationToMarkBirthAsVoidedResolver<TParent>
+  notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
   updateDeathRegistration?: MutationToUpdateDeathRegistrationResolver<TParent>
   markDeathAsVerified?: MutationToMarkDeathAsVerifiedResolver<TParent>
@@ -1731,6 +1741,19 @@ export interface MutationToMarkBirthAsVoidedResolver<
   (
     parent: TParent,
     args: MutationToMarkBirthAsVoidedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToNotADuplicateArgs {
+  id: string
+  duplicateId: string
+}
+export interface MutationToNotADuplicateResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToNotADuplicateArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

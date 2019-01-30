@@ -121,6 +121,7 @@ function ParentDetailsComponent({
   intl,
   information
 }: IProps & InjectedIntlProps) {
+  information = information || { nationality: '', name: [] }
   const nationalities = countries.filter(country =>
     information.nationality.includes(country.value)
   )
@@ -131,16 +132,16 @@ function ParentDetailsComponent({
   return (
     <Wrapper id="parent_details">
       <Label>{intl.formatMessage(messages.firstName)}:</Label>
-      <Text>{information.name[0].firstNames}</Text>
+      <Text>{information.name[0] ? information.name[0].firstNames : ''}</Text>
       <Divider />
       <Label>{intl.formatMessage(messages.familyName)}:</Label>
-      <Text>{information.name[0].familyName}</Text>
+      <Text>{information.name[0] ? information.name[0].familyName : ''}</Text>
       <br />
       <Label>{intl.formatMessage(messages.firstNameInEng)}:</Label>
-      <Text>{information.name[1].firstNames}</Text>
+      <Text>{information.name[1] ? information.name[1].firstNames : ''}</Text>
       <Divider />
       <Label>{intl.formatMessage(messages.familyNameInEng)}:</Label>
-      <Text>{information.name[1].familyName}</Text>
+      <Text>{information.name[1] ? information.name[1].familyName : ''}</Text>
       <br />
       <Label>{intl.formatMessage(messages.dateOfBirth)}:</Label>
       <Text>{information.birthDate}</Text>

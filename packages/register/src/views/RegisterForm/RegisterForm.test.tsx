@@ -17,7 +17,8 @@ import { v4 as uuid } from 'uuid'
 import { createStore } from '../../store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
-  REVIEW_BIRTH_PARENT_FORM_TAB
+  REVIEW_BIRTH_PARENT_FORM_TAB,
+  DRAFT_DEATH_FORM_TAB
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -34,6 +35,7 @@ describe('when user is in the register form before initial draft load', () => {
       createTestComponent(
         <RegisterForm
           location={mock}
+          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -54,7 +56,7 @@ describe('when user is in the register form before initial draft load', () => {
   })
 })
 
-describe('when user is in the register form', async () => {
+describe('when user is in the register form for birth event', async () => {
   const { store, history } = createStore()
   const draft = createDraft(Event.BIRTH)
   store.dispatch(setInitialDrafts())
@@ -69,6 +71,7 @@ describe('when user is in the register form', async () => {
       const testComponent = createTestComponent(
         <RegisterForm
           location={mock}
+          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -108,6 +111,52 @@ describe('when user is in the register form', async () => {
   })
 })
 
+describe('when user is in the register form for death event', async () => {
+  const { store, history } = createStore()
+  const draft = createDraft(Event.DEATH)
+  store.dispatch(setInitialDrafts())
+  store.dispatch(storeDraft(draft))
+  let component: ReactWrapper<{}, {}>
+
+  const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())[Event.DEATH]
+
+  describe('when user is in optional cause of death section', () => {
+    beforeEach(async () => {
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'causeOfDeath' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+    })
+    it('renders the optional label', () => {
+      expect(
+        component.find('#form_section_optional_label_causeOfDeath').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('renders the notice component', () => {
+      expect(
+        component.find('#form_section_notice_causeOfDeath').hostNodes()
+      ).toHaveLength(1)
+    })
+  })
+})
+
 describe('when user is in the register form preview section', () => {
   const { store, history } = createStore()
   const draft = createDraft(Event.BIRTH)
@@ -120,6 +169,7 @@ describe('when user is in the register form preview section', () => {
   const testComponent = createTestComponent(
     <RegisterForm
       location={mock}
+      scope={mock}
       history={history}
       staticContext={mock}
       registerForm={form}
@@ -153,12 +203,109 @@ describe('when user is in the register form preview section', () => {
 
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(0)
   })
+
+  it('Should be able to click the Delete application button', () => {
+    // @ts-ignore
+    global.window = { location: { pathname: null } }
+
+    // @ts-ignore
+    expect(global.window.location.pathname).toMatch('/saved')
+
+    const deleteBtn = component.find('#delete-application').hostNodes()
+    deleteBtn.simulate('click')
+    component.update()
+
+    // @ts-ignore
+    expect(global.window.location.pathname).toEqual('/')
+  })
+
+  describe('User in the Preview section for submitting the Form', () => {
+    beforeEach(async () => {
+      // @ts-ignore
+      const nDraft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
+      store.dispatch(setInitialDrafts())
+      store.dispatch(storeDraft(nDraft))
+
+      const nform = getRegisterForm(store.getState())[Event.BIRTH]
+      const nTestComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={nform}
+          draft={nDraft}
+          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+          match={{
+            params: { draftId: nDraft.id, tabId: 'preview' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          scope={[]}
+        />,
+        store
+      )
+      component = nTestComponent.component
+    })
+
+    it('Should be able to click the Save Draft button', () => {
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      // @ts-ignore
+      global.window = { location: { pathname: null } }
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toMatch('/')
+
+      const deleteBtn = component.find('#delete-draft').hostNodes()
+      deleteBtn.simulate('click')
+      component.update()
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toEqual('/')
+    })
+
+    it('should be able to submit the form', () => {
+      const nextForChildSectionBtn = component
+        .find('#next_button_child')
+        .hostNodes()
+      const nextForMotherSectionBtn = component
+        .find('#next_button_mother')
+        .hostNodes()
+      const nextForFatherSectionBtn = component
+        .find('#next_button_father')
+        .hostNodes()
+
+      nextForChildSectionBtn.simulate('click')
+      nextForMotherSectionBtn.simulate('click')
+      nextForFatherSectionBtn.simulate('click')
+
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      const previewBtn = component.find('#preview-btn').hostNodes()
+      expect(previewBtn.length).toEqual(1)
+
+      previewBtn.simulate('click')
+      component.update()
+
+      expect(component.find('#preview-btn').hostNodes().length).toEqual(0)
+    })
+  })
 })
 
 describe('when user is in the register form review section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const { store, history } = createStore()
+    // @ts-ignore
     const draft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
     store.dispatch(setInitialDrafts())
     store.dispatch(storeDraft(draft))
@@ -167,6 +314,7 @@ describe('when user is in the register form review section', () => {
     const testComponent = createTestComponent(
       <RegisterForm
         location={mock}
+        scope={mock}
         history={history}
         staticContext={mock}
         registerForm={form}

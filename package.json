@@ -5,8 +5,7 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --parallel precommit",
-      "pre-push": "yarn test"
+      "pre-commit": "lerna run --parallel precommit"
     }
   },
   "scripts": {
@@ -26,8 +25,11 @@
     "compose:all:up": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml up",
     "compose:all:down": "docker-compose -p ocrvs -f docker-compose.deps.yml -f docker-compose.yml down",
     "compose:all:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.yml build",
-    "compose:push": "docker-compose build && docker-compose push",
-    "deploy:staging": "rsync -rP docker-compose* infrastructure root@opencrvs-staging.jembi.org:/tmp/compose/ && ssh root@opencrvs-staging.jembi.org '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.staging.yml | tee -a /var/log/rotate-secrets.log' && ssh root@opencrvs-staging.jembi.org 'cd /tmp/compose && docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.staging.yml --with-registry-auth opencrvs'"
+    "compose:push": "docker-compose build && docker-compose push && yarn compose:push:version",
+    "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
+    "deploy": "./deploy.sh",
+    "deploy:staging": "./deploy.sh opencrvs-staging.jembi.org latest",
+    "deploy:qa": "./deploy.sh opencrvs.qa1.jembi.org"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

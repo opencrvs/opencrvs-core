@@ -696,13 +696,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   onClick={submitClickEvent}
                   disabled={numberOfErrors > 0 || !this.state.allSectionVisited}
                 >
-                  {intl.formatMessage(messages.valueSendForReview)}
+                  {intl.formatMessage(
+                    this.userHasRegisterScope()
+                      ? messages.valueRegister
+                      : messages.valueSendForReview
+                  )}
                 </RegisterApplication>
               </ButtonContainer>
             )}
 
             {!!saveDraftClickEvent && (
-              <DraftButtonContainer onClick={saveDraftClickEvent}>
+              <DraftButtonContainer
+                onClick={saveDraftClickEvent}
+                id="delete-draft"
+              >
                 <DraftSimple />
                 <SaveDraftText>
                   {intl.formatMessage(messages.valueSaveAsDraft)}
@@ -725,7 +732,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         </Row>
         {deleteApplicationClickEvent && (
           <DButtonContainer>
-            <DeleteApplication onClick={deleteApplicationClickEvent}>
+            <DeleteApplication
+              onClick={deleteApplicationClickEvent}
+              id="delete-application"
+            >
               <Delete />
               {intl.formatMessage(messages.deleteApplicationBtnTxt)}
             </DeleteApplication>

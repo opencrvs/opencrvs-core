@@ -1,5 +1,5 @@
 import { IFormField, IFormData } from 'src/forms'
-import { attachmentTransformer } from '../../field-mappings'
+import { attachmentTransformer } from 'src/forms/field-mappings'
 
 export const documentForWhomFhirMapping = {
   Child: 'CHILD',

@@ -12,9 +12,11 @@ import {
   ICheckboxOption,
   ISelectFormFieldWithDynamicOptions,
   INFORMATIVE_RADIO_GROUP,
-  PARAGRAPH
+  PARAGRAPH,
+  IDynamicTextFieldValidators,
+  IDynamicFormField
 } from './'
-import { InjectedIntl } from 'react-intl'
+import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import {
   IOfflineDataState,
@@ -22,7 +24,7 @@ import {
   OFFLINE_FACILITIES_KEY,
   ILocation
 } from 'src/offline/reducer'
-import { config } from 'src/config'
+import { Validation } from 'src/utils/validate'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -76,6 +78,43 @@ export const generateOptions = (
   return optionsArray
 }
 
+export const getFieldLabel = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): FormattedMessage.MessageDescriptor | undefined => {
+  if (!field.dynamicDefinitions.label) {
+    return undefined
+  }
+  return field.dynamicDefinitions.label.labelMapper(values[
+    field.dynamicDefinitions.label.dependency
+  ] as string)
+}
+
+export const getFieldValidation = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): Validation[] => {
+  const validate: Validation[] = []
+  if (
+    field.dynamicDefinitions &&
+    field.dynamicDefinitions.validate &&
+    field.dynamicDefinitions.validate.length > 0
+  ) {
+    field.dynamicDefinitions.validate.map(
+      (element: IDynamicTextFieldValidators) => {
+        const params: any[] = []
+        element.dependencies.map((dependency: string) =>
+          params.push(values[dependency])
+        )
+        const fun = element.validator(...params)
+        validate.push(fun)
+      }
+    )
+  }
+
+  return validate
+}
+
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
@@ -88,7 +127,7 @@ export const getFieldOptions = (
   if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
     const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
     let partOf: string
-    if (dependencyVal === config.COUNTRY.toUpperCase()) {
+    if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
     } else {
       partOf = `Location/${dependencyVal}`
@@ -166,6 +205,10 @@ export const hasFormError = (
 }
 
 export const conditionals: IConditionals = {
+  iDType: {
+    action: 'hide',
+    expression: "!values.iDType || (values.iDType !== 'OTHER')"
+  },
   fathersDetailsExist: {
     action: 'hide',
     expression: '!values.fathersDetailsExist'
@@ -284,5 +327,9 @@ export const conditionals: IConditionals = {
   deathPlaceOther: {
     action: 'hide',
     expression: 'values.deathPlaceAddress !== "other"'
+  },
+  causeOfDeathEstablished: {
+    action: 'hide',
+    expression: '!values.causeOfDeathEstablished'
   }
 }

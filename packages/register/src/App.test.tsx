@@ -5,7 +5,6 @@ import {
   mockOfflineData,
   userDetails
 } from './tests/util'
-import { config } from '../src/config'
 import { v4 as uuid } from 'uuid'
 import {
   HOME,
@@ -87,7 +86,7 @@ beforeEach(() => {
   assign.mockClear()
 })
 
-describe('when user does not have a token', () => {
+/*describe('when user does not have a token', () => {
   let store: Store
   beforeEach(() => {
     const testApp = createTestApp()
@@ -99,6 +98,17 @@ describe('when user does not have a token', () => {
     await flushPromises()
     expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
   })
+})*/
+
+it('renders without crashing', async () => {
+  createTestApp()
+})
+
+it("redirects user to SSO if user doesn't have a token", async () => {
+  createTestApp()
+  await flushPromises()
+
+  expect(assign.mock.calls[0][0]).toBe(window.config.LOGIN_URL)
 })
 
 const validToken =
@@ -680,8 +690,9 @@ describe('when user has a valid token in local storage', () => {
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '234234423424234244',
-      iDType: 'NATIONAL_ID',
+      iD: '23423442342423424',
+      iDType: 'OTHER',
+      iDTypeOther: 'Custom type',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
       country: 'BGD',

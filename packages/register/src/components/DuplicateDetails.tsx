@@ -6,10 +6,13 @@ import {
   StatusOrange,
   StatusGreen,
   StatusRejected,
-  StatusCollected
+  StatusCollected,
+  Delete
 } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import Moment from 'react-moment'
+
 export enum Event {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
@@ -25,6 +28,7 @@ export enum Action {
 interface IProps {
   id: string
   data: {
+    id: string
     dateOfApplication: string
     trackingId: string
     event: Event
@@ -53,6 +57,7 @@ interface IProps {
     }>
   }
   notDuplicateHandler?: () => void
+  rejectHandler?: () => void
 }
 
 const messages = defineMessages({
@@ -150,10 +155,15 @@ const messages = defineMessages({
     id: 'register.duplicates.details.certified',
     defaultMessage: 'certified',
     description: 'A label for certified'
+  },
+  rejectLinkText: {
+    id: 'register.duplicates.details.reject',
+    defaultMessage: 'Reject',
+    description: 'A label for reject link'
   }
 })
 
-const DetailsBox = styled(Box).attrs<{ currentStatus: string }>({})`
+const DetailsBox = styled(Box).attrs<{ id: string; currentStatus: string }>({})`
   border-top: ${({ theme }) => ` 4px solid ${theme.colors.expandedIndicator}`};
   ${({ currentStatus }) =>
     currentStatus === 'rejected' ? `box-shadow: none` : ''}
@@ -179,6 +189,7 @@ const DetailText = styled.div`
 const DetailTextSplitContainer = styled(DetailText)`
   display: flex;
   justify-content: stretch;
+  cursor: pointer;
 `
 
 const Link = styled.a`
@@ -206,11 +217,32 @@ const ListStatusContainer = styled.span`
   margin: 4px 8px;
 `
 
+const RejectApplication = styled.a`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.danger};
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 60px;
+  svg {
+    margin-right: 15px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    margin-left: 30px;
+  }
+`
+const ConditionalSeparator = styled(Separator)`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    border: 0px;
+    display: block;
+  }
+`
+
 class DuplicateDetailsClass extends React.Component<
   IProps & InjectedIntlProps
 > {
   normalizeAction(action: string) {
-    if (action === 'submitted') {
+    if (action === 'DECLARED') {
       return 'application'
     }
 
@@ -219,13 +251,13 @@ class DuplicateDetailsClass extends React.Component<
 
   renderStatusIcon(action: string) {
     switch (action) {
-      case 'submitted':
+      case 'DECLARED':
         return <StatusOrange />
-      case 'registered':
+      case 'REGISTERED':
         return <StatusGreen />
-      case 'rejected':
+      case 'REJECTED':
         return <StatusRejected />
-      case 'certified':
+      case 'CERTIFIED':
         return <StatusCollected />
       default:
         return <StatusGray />
@@ -234,10 +266,10 @@ class DuplicateDetailsClass extends React.Component<
 
   render() {
     const currentStatus = this.props.data.regStatusHistory.slice(-1)[0].action
-    const { data, intl } = this.props
+    const { data, intl, notDuplicateHandler, rejectHandler } = this.props
 
     return (
-      <DetailsBox currentStatus={currentStatus}>
+      <DetailsBox id={`detail_box_${data.id}`} currentStatus={currentStatus}>
         <DetailTextContainer>
           <DetailText>
             <b>{intl.formatMessage(messages.name)}:</b> {data.child.name}
@@ -247,14 +279,17 @@ class DuplicateDetailsClass extends React.Component<
             <b>{intl.formatMessage(messages.gender)}:</b> {data.child.gender}
             <br />
             <b>{intl.formatMessage(messages.dateOfApplication)}:</b>{' '}
-            {data.dateOfApplication}
+            <Moment format="YYYY-MM-DD">{data.dateOfApplication}</Moment>
             <br />
             <b>{intl.formatMessage(messages.trackingId)}:</b> {data.trackingId}
             <br />
             <br />
           </DetailText>
-          {this.props.notDuplicateHandler && (
-            <Link onClick={this.props.notDuplicateHandler}>
+          {notDuplicateHandler && (
+            <Link
+              id={`not_duplicate_link_${data.id}`}
+              onClick={notDuplicateHandler}
+            >
               {intl.formatMessage(messages.notDuplicate)}
             </Link>
           )}
@@ -289,10 +324,10 @@ class DuplicateDetailsClass extends React.Component<
         <TagContainer>
           <Chip
             status={<StatusGray />}
-            text={intl.formatHTMLMessage(messages[data.event])}
+            text={intl.formatHTMLMessage(messages[data.event.toUpperCase()])}
           />
           <Chip
-            status={<StatusOrange />}
+            status={this.renderStatusIcon(currentStatus)}
             text={this.normalizeAction(currentStatus)}
           />
         </TagContainer>
@@ -326,6 +361,18 @@ class DuplicateDetailsClass extends React.Component<
           <>
             <Separator />
             <PrimaryButton>{intl.formatMessage(messages.review)}</PrimaryButton>
+            {rejectHandler && (
+              <>
+                <ConditionalSeparator />
+                <RejectApplication
+                  id={`reject_link_${data.id}`}
+                  onClick={rejectHandler}
+                >
+                  <Delete />
+                  {intl.formatMessage(messages.rejectLinkText)}
+                </RejectApplication>
+              </>
+            )}
           </>
         )}
       </DetailsBox>

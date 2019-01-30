@@ -379,7 +379,7 @@ describe('WorkQueue tests', async () => {
           .find('#new_registration')
           .hostNodes()
           .text()
-      ).toContain('New birth registration')
+      ).toContain('New registration')
 
       testComponent.component.unmount()
     })
@@ -527,6 +527,78 @@ describe('WorkQueue tests', async () => {
                           alias: ['']
                         },
                         type: 'REGISTERED'
+                      },
+                      {
+                        timestamp: null,
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'APPLICATION'
+                      },
+                      {
+                        timestamp: null,
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'COLLECTED'
+                      },
+                      {
+                        timestamp: null,
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'REJECTED'
                       }
                     ]
                   },

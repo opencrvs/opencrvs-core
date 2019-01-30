@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { ILocation } from 'src/offline/reducer'
-import { config } from 'src/config'
 
 export interface ILocationDataResponse {
   data: ILocation[]
@@ -12,7 +11,7 @@ export interface IFacilitiesDataResponse {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = resolve(config.RESOURCES_URL, 'locations')
+  const url = resolve(window.config.RESOURCES_URL, 'locations')
 
   const res = await fetch(url, {
     method: 'GET'
@@ -29,7 +28,7 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 async function loadFacilities(): Promise<ILocationDataResponse> {
-  const url = resolve(config.RESOURCES_URL, 'facilities')
+  const url = resolve(window.config.RESOURCES_URL, 'facilities')
 
   const res = await fetch(url, {
     method: 'GET'

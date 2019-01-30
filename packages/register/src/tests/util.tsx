@@ -17,7 +17,6 @@ import { getSchema } from './graphql-schema-mock'
 import { ThemeProvider } from 'styled-components'
 import { ENGLISH_STATE } from '../i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { config } from '../config'
 import { I18nContainer } from '@opencrvs/register/src/i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
@@ -84,7 +83,7 @@ export function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider theme={getTheme(config.COUNTRY)}>
+          <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
             {nodeWithIntlProp(node)}
           </ThemeProvider>
         </I18nContainer>
@@ -305,11 +304,12 @@ export const mockApplicationData = {
     familyName: 'স্পিভক',
     firstNamesEng: 'Mike',
     familyNameEng: 'Test',
-    birthDate: '1977-09-20',
+    childBirthDate: '1977-09-20',
     gender: 'male',
     weightAtBirth: '3.5',
     attendantAtBirth: 'MIDWIFE',
-    birthType: 'SINGLE'
+    birthType: 'SINGLE',
+    multipleBirth: 1
   },
   mother: {
     firstNames: 'স্পিভক',
@@ -318,7 +318,7 @@ export const mockApplicationData = {
     familyNameEng: 'Test',
     iD: '654651',
     iDType: 'NATIONAL_ID',
-    birthDate: '1949-05-31',
+    motherBirthDate: '1949-05-31',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
@@ -326,9 +326,9 @@ export const mockApplicationData = {
     countryPermanent: 'BGD',
     statePermanent: 'state2',
     districtPermanent: 'district2',
-    addressLine1Permanent: '',
-    addressLine2Permanent: '',
-    addressLine3Permanent: '',
+    addressLine1Permanent: 'some road',
+    addressLine2Permanent: 'some more',
+    addressLine3Permanent: 'some more',
     addressLine4Permanent: 'upazila1',
     postalCodePermanent: '',
     country: 'BGD',
@@ -338,7 +338,8 @@ export const mockApplicationData = {
     addressLine2: '',
     addressLine3: '',
     addressLine4: 'upazila2',
-    postalCode: ''
+    postalCode: '',
+    currentAddressSameAsPermanent: true
   },
   father: {
     fathersDetailsExist: true,
@@ -348,7 +349,7 @@ export const mockApplicationData = {
     familyNameEng: 'Test',
     iD: '43468',
     iDType: 'NATIONAL_ID',
-    birthDate: '1950-05-19',
+    fatherBirthDate: '1950-05-19',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',

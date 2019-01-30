@@ -1,6 +1,8 @@
 import { defineMessages } from 'react-intl'
-import { config } from 'src/config'
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  identityOptions
+} from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
 import {
@@ -11,12 +13,14 @@ import {
   DATE,
   SUBSECTION,
   RADIO_GROUP,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  TEXT_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat
+  dateFormat,
+  validIDNumber
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -27,6 +31,7 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import { conditionals } from '../../../utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import { iDType } from 'src/views/PrintCertificate/ParentDetails'
 import {
   nameTransformer,
   fieldToArrayTransformer,
@@ -34,8 +39,9 @@ import {
   identifierTypeTransformer,
   addressTransformer,
   fieldNameTransformer,
-  copyAddressTransformer
-} from '../field-mappings'
+  copyAddressTransformer,
+  identifierOtherTypeTransformer
+} from 'src/forms/field-mappings'
 
 const messages = defineMessages({
   motherTab: {
@@ -123,32 +129,34 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        {
-          value: 'DEATH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeDRN
-        },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
-      ],
+      options: identityOptions,
       mapping: identifierTypeTransformer
     },
     {
-      name: 'iD',
+      name: 'iDTypeOther',
       type: TEXT,
+      label: identityMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.iDType],
+      mapping: identifierOtherTypeTransformer
+    },
+    {
+      name: 'iD',
+      type: TEXT_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: iDType
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',
@@ -294,7 +302,7 @@ export const motherSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       mapping: addressTransformer('PERMANENT', 0, 'country')
@@ -496,7 +504,7 @@ export const motherSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       conditionals: [conditionals.currentAddressSameAsPermanent],

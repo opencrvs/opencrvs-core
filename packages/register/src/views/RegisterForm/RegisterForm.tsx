@@ -38,6 +38,8 @@ import {
   REJECTED_REGISTRATION
 } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { getScope } from 'src/profile/profileSelectors'
+import { Scope } from 'src/utils/authUtils'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -103,6 +105,16 @@ const DraftButtonText = styled.span`
   letter-spacing: 0px;
   margin-left: 14px;
 `
+const Notice = styled.div`
+  background: ${({ theme }) => theme.colors.primary};
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
+  padding: 25px;
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  line-height: 24px;
+  margin: 30px -25px;
+`
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -161,6 +173,11 @@ export const messages = defineMessages({
     id: 'register.form.saveDraft',
     defaultMessage: 'Save as draft',
     description: 'Save as draft Button Text'
+  },
+  optionalLabel: {
+    id: 'formFields.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
   }
 })
 
@@ -178,6 +195,15 @@ const FormViewContainer = styled.div`
 const PreviewButton = styled.a`
   text-decoration: underline;
   color: ${({ theme }) => theme.colors.primary};
+`
+const Optional = styled.span.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.placeholder};
+  flex-grow: 0;
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -234,8 +260,7 @@ type Props = {
 type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps &
-  RouteComponentProps<{}>
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
 
 type State = {
   showSubmitModal: boolean
@@ -302,6 +327,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     if (draft.review && !this.state.isDataAltered) {
@@ -332,18 +361,35 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    history.push(SAVED_REGISTRATION, {
-      trackingId: response,
-      declaration: true,
+    const payload = {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
-    })
+    }
+    if (this.userHasRegisterScope()) {
+      // @ts-ignore
+      payload.registrationNumber = response
+      // @ts-ignore
+      payload.declaration = false
+    } else {
+      // @ts-ignore
+      payload.trackingId = response
+      // @ts-ignore
+      payload.declaration = true
+    }
+    history.push(SAVED_REGISTRATION, payload)
     this.props.deleteDraft(draft)
   }
 
-  successfullyRegistered = () => {
-    const { draft } = this.props
-    window.location.href = '/work-queue'
+  successfullyRegistered = (response: string) => {
+    const { history, draft } = this.props
+    const childData = this.props.draft.data.child
+    const fullName = getFullName(childData)
+    history.push(SAVED_REGISTRATION, {
+      registrationNumber: response,
+      declaration: false,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
+    })
     this.props.deleteDraft(draft)
   }
 
@@ -512,7 +558,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     id={`form_section_title_${activeSection.id}`}
                   >
                     {intl.formatMessage(activeSection.title)}
+                    {activeSection.optional && (
+                      <Optional
+                        id={`form_section_optional_label_${activeSection.id}`}
+                        disabled={activeSection.disabled}
+                      >
+                        &nbsp;&nbsp;•&nbsp;
+                        {intl.formatMessage(messages.optionalLabel)}
+                      </Optional>
+                    )}
                   </FormSectionTitle>
+                  {activeSection.notice && (
+                    <Notice id={`form_section_notice_${activeSection.id}`}>
+                      {intl.formatMessage(activeSection.notice)}
+                    </Notice>
+                  )}
                   <form
                     id={`form_section_id_${activeSection.id}`}
                     onSubmit={handleSubmit}
@@ -578,11 +638,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation mutation={postMutation} variables={this.processSubmitData()}>
-          {(submitBirthRegistration, { data }) => {
-            if (data && data.createBirthRegistration) {
-              this.successfulSubmission(data.createBirthRegistration)
-            }
+        <Mutation
+          mutation={postMutation}
+          variables={this.processSubmitData()}
+          onCompleted={data =>
+            this.successfulSubmission(data.createBirthRegistration)
+          }
+        >
+          {submitBirthRegistration => {
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -595,6 +658,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     {intl.formatMessage(messages.submitButton)}
                   </PrimaryButton>,
                   <PreviewButton
+                    id="preview-btn"
                     key="preview"
                     onClick={() => {
                       this.toggleSubmitModalOpen()
@@ -615,12 +679,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
           }}
         </Mutation>
 
-        <Mutation mutation={patchMutation} variables={this.processSubmitData()}>
-          {(markBirthAsRegistered, { data }) => {
-            if (data && data.markBirthAsRegistered) {
-              this.successfullyRegistered()
-            }
-
+        <Mutation
+          mutation={patchMutation}
+          variables={this.processSubmitData()}
+          onCompleted={data =>
+            this.successfullyRegistered(data.markBirthAsRegistered)
+          }
+        >
+          {markBirthAsRegistered => {
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -716,6 +782,7 @@ function mapStateToProps(
 
   return {
     registerForm,
+    scope: getScope(state),
     setAllFieldsDirty,
     offlineResources,
     activeSection: {

@@ -1,4 +1,8 @@
-import { generateBirthTrackingId } from '../utils'
+import {
+  generateBirthTrackingId,
+  generateDeathTrackingId,
+  getEventType
+} from '../utils'
 import { getRegStatusCode } from './fhir-utils'
 import {
   getLoggedInPractitionerResource,
@@ -18,7 +22,6 @@ import { generateBirthRegistrationNumber } from '../brnGenerator'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
-  eventType: EVENT_TYPE,
   token: string
 ): Promise<fhir.Bundle> {
   if (
@@ -33,6 +36,7 @@ export async function modifyRegistrationBundle(
   fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
+  const eventType = getEventType(fhirBundle)
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
 
@@ -64,8 +68,11 @@ export async function markBundleAsRegistered(
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
+  const eventType = getEventType(bundle)
   /* Setting birth registration number here */
-  await pushBRN(taskResource, practitioner)
+  if (eventType === EVENT_TYPE.BIRTH) {
+    await pushBRN(taskResource, practitioner)
+  }
 
   /* setting registration workflow status here */
   setupRegistrationWorkflow(
@@ -141,7 +148,16 @@ export async function pushBRN(
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
-  const birthTrackingId = generateBirthTrackingId()
+  let trackingId = generateBirthTrackingId()
+  let trackingIdFhirName: string
+  const eventType = getEventType(fhirBundle)
+  if (eventType === EVENT_TYPE.BIRTH) {
+    trackingId = generateBirthTrackingId()
+    trackingIdFhirName = 'birth-tracking-id'
+  } else {
+    trackingId = generateDeathTrackingId()
+    trackingIdFhirName = 'death-tracking-id'
+  }
 
   if (
     !fhirBundle ||
@@ -156,10 +172,10 @@ export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   if (!compositionResource.identifier) {
     compositionResource.identifier = {
       system: 'urn:ietf:rfc:3986',
-      value: birthTrackingId
+      value: trackingId
     }
   } else {
-    compositionResource.identifier.value = birthTrackingId
+    compositionResource.identifier.value = trackingId
   }
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
   if (!taskResource.identifier) {
@@ -167,15 +183,16 @@ export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   }
   const existingTrackingId = taskResource.identifier.find(
     identifier =>
-      identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+      identifier.system ===
+      `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`
   )
 
   if (existingTrackingId) {
-    existingTrackingId.value = birthTrackingId
+    existingTrackingId.value = trackingId
   } else {
     taskResource.identifier.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
-      value: birthTrackingId
+      system: `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`,
+      value: trackingId
     })
   }
 

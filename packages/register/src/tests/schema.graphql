@@ -1,5 +1,10 @@
 # source: http://localhost:7070/graphql
-# timestamp: Tue Jan 29 2019 15:14:53 GMT+0000 (Greenwich Mean Time)
+# timestamp: Wed Jan 30 2019 18:56:39 GMT+0000 (Greenwich Mean Time)
+
+# graphql get-schema \
+# --endpoint http://localhost:7070/graphql \
+# --header Authorization=token \
+# --output schema.graphql
 
 type Address {
   use: String
@@ -294,16 +299,19 @@ enum IdentityIDType {
   DEATH_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
+  OTHER
 }
 
 input IdentityInput {
   id: ID
   type: IdentityIDType
+  otherType: String
 }
 
 type IdentityType {
   id: ID
   type: IdentityIDType
+  otherType: String
 }
 
 type Location {
@@ -372,16 +380,27 @@ type Mutation {
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): ID!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsVerified(id: ID!, details: BirthRegistrationInput): BirthRegistration
+  markBirthAsVerified(
+    id: ID!
+    details: BirthRegistrationInput
+  ): BirthRegistration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVoided(id: String!, reason: String!, comment: String): ID!
+  notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
-  updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): DeathRegistration!
+  updateDeathRegistration(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): DeathRegistration!
   markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration
   markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration
   markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsVoided(id: ID!, reason: String!, location: LocationInput): DeathRegistration
+  markDeathAsVoided(
+    id: ID!
+    reason: String!
+    location: LocationInput
+  ): DeathRegistration
 }
 
 type Notification {
@@ -469,10 +488,28 @@ input PersonInput {
 }
 
 type Query {
-  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
+  listNotifications(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
-  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [BirthRegistration]
-  listDeathRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date): [BirthRegistration]
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
+  listDeathRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [BirthRegistration]
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   getUser(userId: String): User

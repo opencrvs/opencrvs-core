@@ -4,7 +4,6 @@ import { storage } from 'src/storage'
 import { referenceApi } from 'src/utils/referenceApi'
 import * as i18nActions from 'src/i18n/actions'
 import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
-import { config } from 'src/config'
 import { getUserLocation } from 'src/utils/userUtils'
 import { filterLocations } from 'src/utils/locationUtils'
 
@@ -135,7 +134,7 @@ export const offlineDataReducer: LoopReducer<
           ...state,
           healthFacilityFilterLocation: getUserLocation(
             action.payload,
-            config.HEALTH_FACILITY_FILTER
+            window.config.HEALTH_FACILITY_FILTER
           )
         },
         Cmd.run<

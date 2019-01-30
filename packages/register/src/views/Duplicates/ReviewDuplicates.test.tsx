@@ -2,233 +2,237 @@ import * as React from 'react'
 import { createTestComponent } from '../../tests/util'
 import {
   ReviewDuplicates,
+  rejectMutation,
+  notADuplicateMutation,
   FETCH_DUPLICATES,
   createDuplicateDetailsQuery
 } from './ReviewDuplicates'
 import { createStore } from 'src/store'
+import { ReactWrapper } from 'enzyme'
 import { DuplicateDetails } from 'src/components/DuplicateDetails'
+import { clone } from 'lodash'
 
-describe('Review duplicates component', () => {
-  it('query gateway correctly and displays the returned duplicates correctly', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_DUPLICATES,
-          variables: {
-            id: '123'
-          }
-        },
-        result: {
-          data: {
-            fetchBirthRegistration: {
-              id: '123',
-              registration: {
-                duplicates: ['111']
-              }
-            }
-          }
+describe('Review Duplicates component', () => {
+  const graphqlMock = [
+    {
+      request: {
+        query: FETCH_DUPLICATES,
+        variables: {
+          id: '123'
         }
       },
-
-      {
-        request: {
-          query: createDuplicateDetailsQuery(['123', '111']),
-          variables: {
-            duplicate0Id: '123',
-            duplicate1Id: '111'
-          }
-        },
-        result: {
-          data: {
-            duplicate0: {
-              createdAt: '2019-01-22T09:46:02.547Z',
-              id: '450ce5e3-b495-4868-bb6a-1183ffd0fdd1',
-              registration: {
-                trackingId: 'BFCJ02U',
-                type: 'BIRTH',
-                status: [
-                  {
-                    type: 'DECLARED',
-                    timestamp: '2019-01-22T09:46:02.547Z',
-                    user: {
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Shakib',
-                          familyName: 'Al Hasan'
-                        },
-                        {
-                          use: 'bn',
-                          firstNames: '',
-                          familyName: ''
-                        }
-                      ],
-                      role: 'FIELD_AGENT'
-                    },
-                    office: {
-                      name: 'Moktarpur Union Parishad'
-                    }
-                  }
-                ]
-              },
-              child: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                birthDate: '2018-08-01',
-                gender: 'female'
-              },
-              mother: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                birthDate: null,
-                gender: null,
-                identifier: [
-                  {
-                    id: '1',
-                    type: 'NATIONAL_ID'
-                  }
-                ]
-              },
-              father: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                birthDate: '2018-08-01',
-                gender: null,
-                identifier: [
-                  {
-                    id: '1',
-                    type: 'NATIONAL_ID'
-                  }
-                ]
-              }
-            },
-            duplicate1: {
-              createdAt: '2019-01-22T09:46:02.547Z',
-              id: '450ce5e3-b495-4868-bb6a-1183ffd0fdd1',
-              registration: {
-                trackingId: 'BFCJ02U',
-                type: 'BIRTH',
-                status: [
-                  {
-                    type: 'DECLARED',
-                    timestamp: '2019-01-22T09:46:02.547Z',
-                    user: {
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Shakib',
-                          familyName: 'Al Hasan'
-                        },
-                        {
-                          use: 'bn',
-                          firstNames: '',
-                          familyName: ''
-                        }
-                      ],
-                      role: 'FIELD_AGENT'
-                    },
-                    office: {
-                      name: 'Moktarpur Union Parishad'
-                    }
-                  }
-                ]
-              },
-              child: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                birthDate: '2018-08-01',
-                gender: 'female'
-              },
-              mother: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                birthDate: null,
-                gender: null,
-                identifier: [
-                  {
-                    id: '1',
-                    type: 'NATIONAL_ID'
-                  }
-                ]
-              },
-              father: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                birthDate: '2018-08-01',
-                gender: null,
-                identifier: [
-                  {
-                    id: '1',
-                    type: 'NATIONAL_ID'
-                  }
-                ]
-              }
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            id: '123',
+            registration: {
+              duplicates: ['111']
             }
           }
         }
       }
-    ]
+    },
 
+    {
+      request: {
+        query: createDuplicateDetailsQuery(['123', '111']),
+        variables: {
+          duplicate0Id: '123',
+          duplicate1Id: '111'
+        }
+      },
+      result: {
+        data: {
+          duplicate0: {
+            createdAt: '2019-01-22T09:46:02.547Z',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              trackingId: 'BFCJ02U',
+              type: 'BIRTH',
+              status: [
+                {
+                  type: 'DECLARED',
+                  timestamp: '2019-01-22T09:46:02.547Z',
+                  user: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Shakib',
+                        familyName: 'Al Hasan'
+                      },
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    role: 'FIELD_AGENT'
+                  },
+                  office: {
+                    name: 'Moktarpur Union Parishad'
+                  }
+                }
+              ]
+            },
+            child: {
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: '2018-08-01',
+              gender: 'female'
+            },
+            mother: {
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            },
+            father: {
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: '2018-08-01',
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            }
+          },
+          duplicate1: {
+            createdAt: '2019-01-22T09:46:02.547Z',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1',
+            registration: {
+              trackingId: 'BFCJ02U',
+              type: 'BIRTH',
+              status: [
+                {
+                  type: 'DECLARED',
+                  timestamp: '2019-01-22T09:46:02.547Z',
+                  user: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Shakib',
+                        familyName: 'Al Hasan'
+                      },
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    role: 'FIELD_AGENT'
+                  },
+                  office: {
+                    name: 'Moktarpur Union Parishad'
+                  }
+                }
+              ]
+            },
+            child: {
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: '2018-08-01',
+              gender: 'female'
+            },
+            mother: {
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            },
+            father: {
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: '2018-08-01',
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+
+  it('query gateway correctly and displays the returned duplicates correctly', async () => {
     const { store } = createStore()
     const testComponent = createTestComponent(
       <ReviewDuplicates
@@ -245,7 +249,7 @@ describe('Review duplicates component', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 200)
     })
 
     testComponent.component.update()
@@ -254,7 +258,7 @@ describe('Review duplicates component', () => {
   })
 
   it('displays error text when the query to fetch duplicates fails', async () => {
-    const graphqlMock = [
+    const graphqlErrorMock = [
       {
         request: {
           query: FETCH_DUPLICATES,
@@ -297,7 +301,7 @@ describe('Review duplicates component', () => {
         }}
       />,
       store,
-      graphqlMock
+      graphqlErrorMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -316,7 +320,7 @@ describe('Review duplicates component', () => {
   })
 
   it('displays error text when the query to fetch the duplicates DETAILS fails', async () => {
-    const graphqlMock = [
+    const graphqlErrorMock = [
       {
         request: {
           query: FETCH_DUPLICATES,
@@ -339,7 +343,7 @@ describe('Review duplicates component', () => {
         }}
       />,
       store,
-      graphqlMock
+      graphqlErrorMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -355,5 +359,233 @@ describe('Review duplicates component', () => {
         .children()
         .text()
     ).toBe('An error occurred while fetching data')
+  })
+  describe('reject for duplication', () => {
+    let component: ReactWrapper<{}, {}>
+    beforeEach(async () => {
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '123'
+            }
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      component = testComponent.component
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+    })
+    it('detail boxes are loaded properly', () => {
+      expect(
+        component
+          .find('#detail_box_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+          .hostNodes()
+      ).toHaveLength(1)
+      expect(
+        component
+          .find('#detail_box_450ce5e3-b495-4868-bb6a-1183ffd0fff1')
+          .hostNodes()
+      ).toHaveLength(1)
+    })
+    it('reject confirmation shows up if reject link is clicked', () => {
+      component
+        .find('#reject_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      expect(component.find('#reject_confirm').hostNodes()).toHaveLength(1)
+    })
+    it('back link on reject confirm modal hides the confirm modal', () => {
+      component
+        .find('#reject_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+
+      component
+        .find('#back_link')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+
+      expect(component.find('#reject_confirm').hostNodes()).toHaveLength(0)
+    })
+
+    it('successfuly rejects the application', async () => {
+      const mock = clone(graphqlMock)
+      mock.push({
+        request: {
+          query: rejectMutation,
+          variables: {
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            reason: 'Duplicate'
+          }
+        },
+        result: {
+          data: {
+            // @ts-ignore
+            markBirthAsVoided: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }
+      })
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '123'
+            }
+          }}
+        />,
+        store,
+        mock
+      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#reject_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#reject_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(
+        testComponent.component.find('#reject_confirm').hostNodes()
+      ).toHaveLength(0)
+    })
+  })
+  describe('remove duplication mark', () => {
+    let component: ReactWrapper<{}, {}>
+    beforeEach(async () => {
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '123'
+            }
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      component = testComponent.component
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+    })
+
+    it('reject confirmation shows up if reject link is clicked', () => {
+      component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      expect(component.find('#not_duplicate_confirm').hostNodes()).toHaveLength(
+        1
+      )
+    })
+    it('back link on reject confirm modal hides the confirm modal', () => {
+      component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+
+      component
+        .find('#not_duplicate_close')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+
+      expect(component.find('#not_duplicate_confirm').hostNodes()).toHaveLength(
+        0
+      )
+    })
+
+    it('successfuly rejects the application', async () => {
+      const mock = clone(graphqlMock)
+      // @ts-ignore
+      mock.push({
+        request: {
+          query: notADuplicateMutation,
+          variables: {
+            id: '123',
+            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        },
+        result: {
+          data: {
+            // @ts-ignore
+            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }
+      })
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '123'
+            }
+          }}
+        />,
+        store,
+        mock
+      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(
+        testComponent.component.find('#not_duplicate_confirm').hostNodes()
+      ).toHaveLength(0)
+    })
   })
 })

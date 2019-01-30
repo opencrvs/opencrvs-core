@@ -156,7 +156,6 @@ export function updateTaskTemplate(
 ): fhir.Task {
   if (
     !task ||
-    !task.note ||
     !task.businessStatus ||
     !task.businessStatus.coding ||
     !task.businessStatus.coding[0] ||
@@ -170,6 +169,9 @@ export function updateTaskTemplate(
       text: `reason=${reason}&comment=${comment}`,
       time: new Date().toUTCString(),
       authorString: ''
+    }
+    if (!task.note) {
+      task.note = []
     }
     task.note.push(newNote)
   }

@@ -19,14 +19,13 @@ import {
   OFFLINE_LOCATIONS_KEY
 } from 'src/offline/reducer'
 import { messages as addressMessages } from '../../../address'
-import { config } from 'src/config'
 import { countries } from '../../../countries'
 import {
   nameTransformer,
   sectionFieldToBundleFieldTransformer,
   fieldNameTransformer,
   vitalEventAddressTransformer
-} from '../field-mappings'
+} from 'src/forms/field-mappings'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -385,7 +384,7 @@ export const childSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: false,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       conditionals: [conditionals.otherPlaceOfBirth],
