@@ -87,16 +87,5 @@ describe('Fhir util function testing', () => {
       )
       expect(composition.relatesTo.length).toEqual(0)
     })
-
-    // it('should not remove any item from relatesTo if its not with a duplicate code', () => {
-    //   const mockCompositionCloned = clone(mockComposition)
-    //   const composition = removeDuplicatesFromComposition(
-    //     // @ts-ignore
-    //     mockCompositionCloned,
-    //     '123',
-    //     '123'
-    //   )
-    //   expect(composition.relatesTo.length).toEqual(1)
-    // })
   })
 })
