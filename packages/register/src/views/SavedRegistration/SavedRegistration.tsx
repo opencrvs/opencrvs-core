@@ -369,7 +369,7 @@ class SavedRegistrationView extends React.Component<
       noticeCardText1 = intl.formatMessage(messages.registrationNoticeCardText1)
       noticeCardText2 = intl.formatMessage(messages.registrationNoticeCardText2)
       trackingCardTitle = intl.formatMessage(messages.registrationCardTitle)
-      trackingNumber = history.location.state.registrationId || ''
+      trackingNumber = history.location.state.registrationNumber || ''
       nextCardText1 = intl.formatMessage(messages.registrationNextCardText1)
       nextCardText2 = intl.formatMessage(messages.registrationNextCardText2)
       trackingCardText = intl.formatMessage(messages.registrationCardText)
