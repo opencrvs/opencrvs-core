@@ -17,7 +17,8 @@ jobs:
         - yarn compose -d
         - sleep 10
         - yarn start:prod &
-        - wait-on http://localhost:3000 http://localhost:3020
+        - wait-on http://localhost:3000 http://localhost:3020 http://localhost:3040
+        - cd packages/resources && yarn save:testData && cd ../..
         - cd packages/user-mgnt && yarn populate && cd ../..
         - cd packages/e2e && yarn start --record
       env:
