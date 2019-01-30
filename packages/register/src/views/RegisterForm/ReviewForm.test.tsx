@@ -136,7 +136,7 @@ describe('ReviewForm tests', async () => {
                 dateOfMarriage: '2001-01-01',
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
-                identifier: [{ id: '1233', type: 'PASSPORT' }],
+                identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
                 multipleBirth: 1,
                 address: [
                   {
@@ -315,7 +315,7 @@ describe('ReviewForm tests', async () => {
                 dateOfMarriage: '2001-01-01',
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
-                identifier: [{ id: '1233', type: 'PASSPORT' }],
+                identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
                 address: [
                   {
                     type: 'PERMANENT',
@@ -607,7 +607,7 @@ describe('ReviewForm tests', async () => {
                 dateOfMarriage: '2001-01-01',
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
-                identifier: [{ id: '1233', type: 'PASSPORT' }],
+                identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
                 multipleBirth: 1,
                 address: [
                   {

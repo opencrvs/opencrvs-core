@@ -293,6 +293,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.iDTypeDRN': 'মৃত্যু নিবন্ধন সংখ্যা',
     'formFields.iDTypeRefugeeNumber': 'শরণার্থী নিবন্ধন সংখ্যা',
     'formFields.iDTypeAlienNumber': 'বিদেশী নিবন্ধন সংখ্যা',
+    'formFields.iDTypeOther': 'অন্যান্য',
+    'formFields.iDTypeOtherLabel': 'অন্যান্য আইডি',
     'formFields.iD': 'আইডি নম্বর',
     'formFields.maritalStatus': 'বৈবাহিক অবস্থা',
     'formFields.maritalStatusSingle': 'অবিবাহিত',
@@ -454,6 +456,12 @@ export const BENGALI_STATE: ILanguage = {
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
     'validations.numberRequired': 'Must be a number',
+    'validations.validNationalId':
+      'জাতীয় পরিচয় পত্র {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+    'validations.validBirthRegistrationNumber':
+      'জন্ম নিবন্ধন নম্বর {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+    'validations.validDeathRegistrationNumber':
+      'মৃত্যু নিবন্ধন সংখ্যা {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',

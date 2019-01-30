@@ -293,6 +293,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.iDTypeDRN': 'Death Registration Number',
     'formFields.iDTypeRefugeeNumber': 'Refugee Number',
     'formFields.iDTypeAlienNumber': 'Alien Number',
+    'formFields.iDTypeOther': 'Other',
+    'formFields.iDTypeOtherLabel': 'Other type of ID',
     'formFields.iD': 'ID Number',
     'formFields.maritalStatus': 'Marital status',
     'formFields.maritalStatusSingle': 'Unmarried',
@@ -456,6 +458,12 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.maxLength': 'Must not be more than {max} characters',
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
+    'validations.validNationalId':
+      'The National ID can be up to {maxLength} characters long',
+    'validations.validBirthRegistrationNumber':
+      'The Birth Registration Number can be up to {maxLength} characters long',
+    'validations.validDeathRegistrationNumber':
+      'The Death Registration Number can be up to {maxLength} characters long',
     'validations.phoneNumberFormat':
       'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',

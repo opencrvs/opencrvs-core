@@ -1,4 +1,4 @@
-import { Validation } from '../utils/validate'
+import { Validation, ValidationInitializer } from '../utils/validate'
 import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,
@@ -20,6 +20,7 @@ export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
+export const TEXT_WITH_DYNAMIC_DEFINITIONS = 'TEXT_WITH_DYNAMIC_DEFINITIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
@@ -47,6 +48,23 @@ export interface IDynamicOptions {
   dependency: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
+}
+
+export interface IDynamicTextFieldValidators {
+  validator: ValidationInitializer
+  dependencies: string[]
+}
+
+export type IDynamicTextFieldLabelMapper = (
+  key: string
+) => FormattedMessage.MessageDescriptor
+
+export interface IDynamicTextFieldDefinitions {
+  label?: {
+    dependency: string
+    labelMapper: IDynamicTextFieldLabelMapper
+  }
+  validate?: IDynamicTextFieldValidators[]
 }
 
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
@@ -86,6 +104,11 @@ export interface ISelectFormFieldWithOptions extends IFormFieldBase {
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
   dynamicOptions: IDynamicOptions
+}
+
+export interface ITextFormFieldWithDynamicDefinitions extends IFormFieldBase {
+  type: typeof TEXT_WITH_DYNAMIC_DEFINITIONS
+  dynamicDefinitions: IDynamicTextFieldDefinitions
 }
 
 export interface IRadioGroupFormField extends IFormFieldBase {
@@ -157,6 +180,7 @@ export type IFormField =
   | INumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
+  | ITextFormFieldWithDynamicDefinitions
   | IRadioGroupFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
@@ -171,12 +195,16 @@ export type IFormField =
   | ILink
   | IPDFDocumentViewerFormField
 
+export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
+  ITextFormFieldWithDynamicDefinitions
+
 export interface IConditional {
   action: string
   expression: string
 }
 
 export interface IConditionals {
+  iDType: IConditional
   fathersDetailsExist: IConditional
   permanentAddressSameAsMother: IConditional
   addressSameAsMother: IConditional

@@ -68,6 +68,20 @@ export function identifierTypeTransformer(
   return transformedData
 }
 
+export function identifierOtherTypeTransformer(
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) {
+  const sectionData = transformedData[sectionId]
+  if (!sectionData.identifier) {
+    sectionData.identifier = [{}]
+  }
+  sectionData.identifier[0].otherType = draftData[sectionId][field.name]
+  return transformedData
+}
+
 export const addressTransformer = (
   addressType: string,
   lineNumber: number = 0,

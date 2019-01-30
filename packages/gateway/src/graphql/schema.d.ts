@@ -54,6 +54,7 @@ export interface GQLPerson {
 export interface GQLIdentityType {
   id?: string
   type?: GQLIdentityIDType
+  otherType?: string
 }
 
 export enum GQLIdentityIDType {
@@ -63,7 +64,8 @@ export enum GQLIdentityIDType {
   BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER',
   DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
   REFUGEE_NUMBER = 'REFUGEE_NUMBER',
-  ALIEN_NUMBER = 'ALIEN_NUMBER'
+  ALIEN_NUMBER = 'ALIEN_NUMBER',
+  OTHER = 'OTHER'
 }
 
 export interface GQLHumanName {
@@ -395,6 +397,7 @@ export interface GQLPersonInput {
 export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
+  otherType?: string
 }
 
 export interface GQLHumanNameInput {
@@ -870,6 +873,7 @@ export interface PersonToEducationalAttainmentResolver<
 export interface GQLIdentityTypeTypeResolver<TParent = any> {
   id?: IdentityTypeToIdResolver<TParent>
   type?: IdentityTypeToTypeResolver<TParent>
+  otherType?: IdentityTypeToOtherTypeResolver<TParent>
 }
 
 export interface IdentityTypeToIdResolver<TParent = any, TResult = any> {
@@ -877,6 +881,10 @@ export interface IdentityTypeToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface IdentityTypeToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IdentityTypeToOtherTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

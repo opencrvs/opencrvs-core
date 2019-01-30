@@ -126,6 +126,24 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'type',
         context
       )
+    },
+    otherType: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+      setObjectPropInResourceArray(
+        person,
+        'identifier',
+        fieldValue,
+        'otherType',
+        context
+      )
     }
   }
 }

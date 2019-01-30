@@ -12,15 +12,18 @@ import {
   ICheckboxOption,
   ISelectFormFieldWithDynamicOptions,
   INFORMATIVE_RADIO_GROUP,
-  PARAGRAPH
+  PARAGRAPH,
+  IDynamicTextFieldValidators,
+  IDynamicFormField
 } from './'
-import { InjectedIntl } from 'react-intl'
+import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   ILocation
 } from 'src/offline/reducer'
+import { Validation } from 'src/utils/validate'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -71,6 +74,43 @@ export const generateOptionsFromLocations = (
     })
   })
   return optionsArray
+}
+
+export const getFieldLabel = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): FormattedMessage.MessageDescriptor | undefined => {
+  if (!field.dynamicDefinitions.label) {
+    return undefined
+  }
+  return field.dynamicDefinitions.label.labelMapper(values[
+    field.dynamicDefinitions.label.dependency
+  ] as string)
+}
+
+export const getFieldValidation = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): Validation[] => {
+  const validate: Validation[] = []
+  if (
+    field.dynamicDefinitions &&
+    field.dynamicDefinitions.validate &&
+    field.dynamicDefinitions.validate.length > 0
+  ) {
+    field.dynamicDefinitions.validate.map(
+      (element: IDynamicTextFieldValidators) => {
+        const params: any[] = []
+        element.dependencies.map((dependency: string) =>
+          params.push(values[dependency])
+        )
+        const fun = element.validator(...params)
+        validate.push(fun)
+      }
+    )
+  }
+
+  return validate
 }
 
 export const getFieldOptions = (
@@ -136,6 +176,10 @@ export const hasFormError = (
 }
 
 export const conditionals: IConditionals = {
+  iDType: {
+    action: 'hide',
+    expression: "!values.iDType || (values.iDType !== 'OTHER')"
+  },
   fathersDetailsExist: {
     action: 'hide',
     expression: '!values.fathersDetailsExist'

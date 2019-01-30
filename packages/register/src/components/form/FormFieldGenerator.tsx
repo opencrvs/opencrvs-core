@@ -22,7 +22,8 @@ import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
-  getFieldOptions
+  getFieldOptions,
+  getFieldLabel
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -41,14 +42,18 @@ import {
   NUMBER,
   SUBSECTION,
   LIST,
-  ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
   WARNING,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions,
+  TEXT_WITH_DYNAMIC_DEFINITIONS,
+  TEXT,
+  ITextFormField,
+  IDynamicFormField,
   LINK,
   PDF_DOCUMENT_VIEWER
 } from 'src/forms'
@@ -415,6 +420,12 @@ class FormSectionComponent extends React.Component<Props> {
                     offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
+              : field.type === TEXT_WITH_DYNAMIC_DEFINITIONS
+              ? ({
+                  ...field,
+                  type: TEXT,
+                  label: getFieldLabel(field as IDynamicFormField, values)
+                } as ITextFormField)
               : field
 
           return (

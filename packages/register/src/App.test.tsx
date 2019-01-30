@@ -661,8 +661,9 @@ describe('when user has a valid token in local storage', () => {
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '234234423424234244',
-      iDType: 'NATIONAL_ID',
+      iD: '23423442342423424',
+      iDType: 'OTHER',
+      iDTypeOther: 'Custom type',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
       country: 'BGD',
