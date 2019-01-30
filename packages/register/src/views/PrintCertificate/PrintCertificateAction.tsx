@@ -522,7 +522,10 @@ class PrintCertificateActionComponent extends React.Component<
             <StyledPrimaryButton
               id="print-confirm-button"
               disabled={!enableConfirmButton}
-              onClick={this.onConfirmForm}
+              onClick={() => {
+                this.previewCertificatePDF(certificateDetails)
+                this.onConfirmForm()
+              }}
             >
               {intl.formatMessage(messages.confirm)}
             </StyledPrimaryButton>
@@ -652,7 +655,6 @@ class PrintCertificateActionComponent extends React.Component<
         paymentAmountField && Number(paymentAmountField.initialValue) > 0
           ? (destForm = PAYMENT)
           : (destForm = CERTIFICATE_PREVIEW)
-        destForm = PAYMENT
         break
       case PAYMENT:
         destForm = CERTIFICATE_PREVIEW
