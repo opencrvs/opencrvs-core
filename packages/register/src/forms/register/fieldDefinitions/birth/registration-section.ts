@@ -11,7 +11,7 @@ import {
   fieldNameTransformer,
   commentTransformer,
   sectionFieldToBundleFieldTransformer
-} from '../field-mappings'
+} from 'src/forms/field-mappings'
 import {
   phoneNumberTransformer,
   registrationSectionTransformer

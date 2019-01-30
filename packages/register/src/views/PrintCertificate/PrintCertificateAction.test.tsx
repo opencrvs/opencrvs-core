@@ -7,7 +7,7 @@ import { createStore } from 'src/store'
 import * as React from 'react'
 
 import { FormFieldGenerator } from 'src/components/form'
-import { collectCertificateFormSection } from './print-certificate'
+import { collectCertificateFormSection } from 'src/forms/certificate/fieldDefinitions/collector-section'
 import {
   IInformativeRadioGroupFormField,
   INFORMATIVE_RADIO_GROUP
@@ -16,8 +16,8 @@ import { ReactWrapper } from 'enzyme'
 import { iDType, ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
-import { paymentFormSection } from './payment-section'
-import { certificatePreview } from './certificate-preview'
+import { paymentFormSection } from 'src/forms/certificate/fieldDefinitions/payment-section'
+import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/preview-section'
 import { calculateDays, timeElapsed } from './calculatePrice'
 
 describe('when user wants to print certificate', async () => {

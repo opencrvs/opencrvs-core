@@ -17,7 +17,7 @@ import {
   nameTransformer,
   sectionFieldToBundleFieldTransformer,
   ignoreValueTransformer
-} from '../field-mappings'
+} from 'src/forms/field-mappings'
 
 export interface IChildSectionFormData {
   firstName: string
