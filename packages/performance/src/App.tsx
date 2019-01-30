@@ -8,7 +8,6 @@ import { Provider } from 'react-redux'
 import { Page } from 'src/components/Page'
 import { History } from 'history'
 import { ThemeProvider } from './styled-components'
-import { config } from './config'
 import { I18nContainer } from 'src/i18n/components/I18nContainer'
 import { createStore, AppStore } from 'src/store'
 import { Switch } from 'react-router'
@@ -40,7 +39,7 @@ export class App extends React.Component<IAppProps, {}> {
       <ApolloProvider client={this.props.client || client}>
         <Provider store={this.props.store}>
           <I18nContainer>
-            <ThemeProvider theme={getTheme(config.COUNTRY)}>
+            <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
               <ConnectedRouter history={this.props.history}>
                 <Page>
                   <Switch>

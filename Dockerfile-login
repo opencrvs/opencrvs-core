@@ -19,7 +19,7 @@ EXPOSE 5000
 # Copy all local files into the image (including all packages in the repo)
 COPY . .
 
-# Install all dependencies of the current project (for all packages so dependant pacakges are built and linked)
+# Install all dependencies of the current project (for all packages so dependant packages are built and linked)
 COPY package.json package.json
 COPY yarn.lock yarn.lock
 COPY lerna.json lerna.json
