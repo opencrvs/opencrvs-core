@@ -215,6 +215,7 @@ export interface IFormProps {
   draft: IDraft
   registerForm: IForm
   tabRoute: string
+  duplicate?: boolean
 }
 
 type DispatchProps = {
@@ -323,7 +324,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     history.push(REJECTED_REGISTRATION, {
       rejection: true,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      duplicate: history.location.state && history.location.state.duplicate,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
     this.props.deleteDraft(draft)
   }
@@ -336,7 +340,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
       trackingId: response,
       declaration: true,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      duplicate: history.location.state && history.location.state.duplicate,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
     this.props.deleteDraft(draft)
   }
@@ -431,8 +438,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
       history,
       registerForm,
       offlineResources,
-      handleSubmit
+      handleSubmit,
+      duplicate
     } = this.props
+
     const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
@@ -660,6 +669,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             confirmRejectionEvent={() => {
               this.rejectSubmission()
             }}
+            duplicate={duplicate}
             draftId={draft.id}
           />
         )}
