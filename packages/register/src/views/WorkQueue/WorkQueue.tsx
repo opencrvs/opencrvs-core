@@ -700,7 +700,7 @@ export class WorkQueueView extends React.Component<
                 separator={<Separator />}
               />
             </ValueContainer>
-            {item.duplicates && (
+            {item.duplicates && item.duplicates.length > 0 && (
               <DuplicateIndicatorContainer>
                 <Duplicate />
                 <span>
@@ -759,7 +759,7 @@ export class WorkQueueView extends React.Component<
       label: item.declaration_status
     })
 
-    if (item.duplicates) {
+    if (item.duplicates && item.duplicates.length > 0) {
       icons.push(<Duplicate />)
     }
 
@@ -813,7 +813,12 @@ export class WorkQueueView extends React.Component<
       }
     }
 
-    if (item.duplicates && !applicationIsRegistered && !applicationIsRejected) {
+    if (
+      item.duplicates &&
+      item.duplicates.length > 0 &&
+      !applicationIsRegistered &&
+      !applicationIsRejected
+    ) {
       listItemActions.push({
         label: this.props.intl.formatMessage(messages.reviewDuplicates),
         handler: () => this.props.goToReviewDuplicate(item.id)

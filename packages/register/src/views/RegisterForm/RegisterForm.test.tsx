@@ -17,7 +17,8 @@ import { v4 as uuid } from 'uuid'
 import { createStore } from '../../store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
-  REVIEW_BIRTH_PARENT_FORM_TAB
+  REVIEW_BIRTH_PARENT_FORM_TAB,
+  DRAFT_DEATH_FORM_TAB
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -55,7 +56,7 @@ describe('when user is in the register form before initial draft load', () => {
   })
 })
 
-describe('when user is in the register form', async () => {
+describe('when user is in the register form for birth event', async () => {
   const { store, history } = createStore()
   const draft = createDraft(Event.BIRTH)
   store.dispatch(setInitialDrafts())
@@ -106,6 +107,52 @@ describe('when user is in the register form', async () => {
         .hostNodes()
         .simulate('click')
       expect(history.location.pathname).toEqual('/saved')
+    })
+  })
+})
+
+describe('when user is in the register form for death event', async () => {
+  const { store, history } = createStore()
+  const draft = createDraft(Event.DEATH)
+  store.dispatch(setInitialDrafts())
+  store.dispatch(storeDraft(draft))
+  let component: ReactWrapper<{}, {}>
+
+  const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())[Event.DEATH]
+
+  describe('when user is in optional cause of death section', () => {
+    beforeEach(async () => {
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'causeOfDeath' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+    })
+    it('renders the optional label', () => {
+      expect(
+        component.find('#form_section_optional_label_causeOfDeath').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('renders the notice component', () => {
+      expect(
+        component.find('#form_section_notice_causeOfDeath').hostNodes()
+      ).toHaveLength(1)
     })
   })
 })

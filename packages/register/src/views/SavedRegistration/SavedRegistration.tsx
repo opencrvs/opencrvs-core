@@ -410,7 +410,10 @@ class SavedRegistrationView extends React.Component<
             <SubmissionText id="submission_text">
               {language === 'en' ? (
                 <span>
-                  {noticeCardText1} <strong>{fullNameInEng}</strong>{' '}
+                  {noticeCardText1}{' '}
+                  <strong>
+                    {fullNameInEng ? fullNameInEng : fullNameInBn}
+                  </strong>{' '}
                   {noticeCardText2}
                 </span>
               ) : (

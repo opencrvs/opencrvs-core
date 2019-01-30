@@ -7,9 +7,8 @@ import {
   markBundleAsCertified,
   setTrackingId
 } from './fhir/fhir-bundle-modifier'
-import { sendBirthNotification } from './utils'
-import { EVENT_TYPE } from './fhir/constants'
 import { getToken, hasScope } from 'src/utils/authUtils'
+import { sendEventNotification } from './utils'
 import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
 
@@ -38,14 +37,13 @@ async function sendBundleToHearth(
   return res.json()
 }
 
-export async function createBirthRegistrationHandler(
+export async function createRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
     let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
-      EVENT_TYPE.BIRTH,
       getToken(request)
     )
     if (hasScope(request, 'register')) {
@@ -59,7 +57,7 @@ export async function createBirthRegistrationHandler(
     const msisdn = getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      sendBirthNotification(payload, msisdn, {
+      sendEventNotification(payload, msisdn, {
         Authorization: request.headers.authorization
       })
     }
@@ -71,7 +69,7 @@ export async function createBirthRegistrationHandler(
   }
 }
 
-export async function markBirthAsRegisteredHandler(
+export async function markEventAsRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -88,7 +86,7 @@ export async function markBirthAsRegisteredHandler(
   }
 }
 
-export async function markBirthAsCertifiedHandler(
+export async function markEventAsCertifiedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

@@ -3,6 +3,7 @@ import { createTestComponent } from '../../tests/util'
 import {
   ReviewDuplicates,
   rejectMutation,
+  notADuplicateMutation,
   FETCH_DUPLICATES,
   createDuplicateDetailsQuery
 } from './ReviewDuplicates'
@@ -248,7 +249,7 @@ describe('Review Duplicates component', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 200)
     })
 
     testComponent.component.update()
@@ -473,6 +474,117 @@ describe('Review Duplicates component', () => {
 
       expect(
         testComponent.component.find('#reject_confirm').hostNodes()
+      ).toHaveLength(0)
+    })
+  })
+  describe('remove duplication mark', () => {
+    let component: ReactWrapper<{}, {}>
+    beforeEach(async () => {
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '123'
+            }
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      component = testComponent.component
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+    })
+
+    it('reject confirmation shows up if reject link is clicked', () => {
+      component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+      expect(component.find('#not_duplicate_confirm').hostNodes()).toHaveLength(
+        1
+      )
+    })
+    it('back link on reject confirm modal hides the confirm modal', () => {
+      component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+
+      component
+        .find('#not_duplicate_close')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+
+      expect(component.find('#not_duplicate_confirm').hostNodes()).toHaveLength(
+        0
+      )
+    })
+
+    it('successfuly rejects the application', async () => {
+      const mock = clone(graphqlMock)
+      // @ts-ignore
+      mock.push({
+        request: {
+          query: notADuplicateMutation,
+          variables: {
+            id: '123',
+            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        },
+        result: {
+          data: {
+            // @ts-ignore
+            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }
+      })
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '123'
+            }
+          }}
+        />,
+        store,
+        mock
+      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(
+        testComponent.component.find('#not_duplicate_confirm').hostNodes()
       ).toHaveLength(0)
     })
   })

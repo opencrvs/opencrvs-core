@@ -1,14 +1,13 @@
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { ILocation } from 'src/offline/reducer'
-import { config } from 'src/config'
 
 export interface ILocationDataResponse {
   data: ILocation[]
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = resolve(config.RESOURCES_URL, 'locations')
+  const url = resolve(window.config.RESOURCES_URL, 'locations')
 
   const res = await fetch(url, {
     method: 'GET'

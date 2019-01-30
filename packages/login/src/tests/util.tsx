@@ -10,7 +10,6 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 
 import { App, store } from '../App'
 import { IStoreState, createStore } from '../store'
-import { config } from '../config'
 import { IntlContainer } from '../i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
@@ -26,7 +25,14 @@ export function createTestComponent(node: React.ReactElement<object>) {
   return mount(
     <Provider store={store}>
       <IntlContainer>
-        <ThemeProvider theme={getTheme(config.COUNTRY)}>{node}</ThemeProvider>
+        <ThemeProvider
+          theme={getTheme(
+            (window as Window & { config: { [key: string]: string } }).config
+              .COUNTRY
+          )}
+        >
+          {node}
+        </ThemeProvider>
       </IntlContainer>
     </Provider>
   )

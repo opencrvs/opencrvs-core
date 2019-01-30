@@ -7,7 +7,8 @@ import {
   fetchFHIR,
   getIDFromResponse,
   getTrackingIdFromResponse,
-  getBRNFromResponse
+  getBRNFromResponse,
+  removeDuplicatesFromComposition
 } from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
 import { hasScope } from 'src/features/user/utils'
@@ -104,6 +105,21 @@ export const resolvers: GQLResolver = {
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       // return composition-id
       return getIDFromResponse(res)
+    },
+    async notADuplicate(_, { id, duplicateId }, authHeader) {
+      const composition = await fetchFHIR(
+        `/Composition/${id}`,
+        authHeader,
+        'GET'
+      )
+      removeDuplicatesFromComposition(composition, id, duplicateId)
+      await fetchFHIR(
+        `/Composition/${id}`,
+        authHeader,
+        'PUT',
+        JSON.stringify(composition)
+      )
+      return composition.id
     }
   }
 }
