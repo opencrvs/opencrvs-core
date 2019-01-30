@@ -3,6 +3,19 @@ import { ILanguage } from '../reducer'
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
   messages: {
+    'app.loading.data.loadingOfflineData':
+      'We are loading some essential data, so that you can submit applications offline.  Please wait ...',
+    'app.loading.data.offlineDataLoaded': 'OpenCRVS is ready for use.',
+    'app.loading.data.continueButton': 'Continue',
+    'login.stepOneTitle': 'Login',
+    'session.expire.text': 'Your session has expired. Please login again.',
+    'formFields.currentAddressSameAsPermanent':
+      'Is her current address the same as her permanent address?',
+    'myDrafts.title': 'My drafts',
+    'myDrafts.labels.results.name': 'Name',
+    'myDrafts.labels.results.dob': 'D.o.B.',
+    'myDrafts.labels.results.savedOn': 'Saved on',
+    'myDrafts.labels.results.trackingID': 'Tracking ID',
     'menu.back': 'Back',
     'menu.menu': 'Menu',
     'menu.items.homepage': 'Homepage',
@@ -372,7 +385,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
-      'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
+      'For birth registration of children below 5 years old, one of the documents listed bellow is required:',
     'register.form.section.documents.list.informantAttestation':
       'Attestation of the informant, or',
     'register.form.section.documents.list.attestedVaccination':
@@ -584,7 +597,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.buttons.search': 'Search',
     'register.workQueue.selects.sort.item0': 'Oldest to newest',
     'register.workQueue.selects.sort.item1': 'Newest to oldest',
-    'register.workQueue.labels.statuses.all': 'All statues',
+    'register.workQueue.labels.statuses.all': 'All statuses',
     'register.workQueue.labels.statuses.application': 'Application',
     'register.workQueue.labels.statuses.registered': 'Registered',
     'register.workQueue.labels.statuses.collected': 'Collected',
