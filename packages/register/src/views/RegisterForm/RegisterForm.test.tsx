@@ -241,6 +241,7 @@ describe('when user is in the register form preview section', () => {
             path: '',
             url: ''
           }}
+          scope={[]}
         />,
         store
       )
