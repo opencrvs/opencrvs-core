@@ -1,7 +1,78 @@
 version: '3.3'
 
-# Expose ports locally for dev
 services:
+  # Setup our apps to run in dev mode with under the default user
+  register:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './node_modules:/usr/src/app/node_modules'
+      - './packages:/usr/src/app/packages'
+
+  performance:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './node_modules:/usr/src/app/node_modules'
+      - './packages:/usr/src/app/packages'
+
+  login:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './node_modules:/usr/src/app/node_modules'
+      - './packages:/usr/src/app/packages'
+
+  gateway:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './packages/gateway:/usr/src/app'
+      - './node_modules:/usr/src/app/node_modules'
+
+  workflow:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './packages/workflow:/usr/src/app'
+      - './node_modules:/usr/src/app/node_modules'
+
+  deduplication:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './packages/deduplication:/usr/src/app'
+      - './node_modules:/usr/src/app/node_modules'
+
+  auth:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './packages/auth:/usr/src/app'
+      - './node_modules:/usr/src/app/node_modules'
+
+  user-mgnt:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './packages/user-mgnt:/usr/src/app'
+      - './node_modules:/usr/src/app/node_modules'
+
+  notification:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './packages/notification:/usr/src/app'
+      - './node_modules:/usr/src/app/node_modules'
+
+  resources:
+    command: yarn start
+    user: '1000'
+    volumes:
+      - './packages/resources:/usr/src/app'
+      - './node_modules:/usr/src/app/node_modules'
+
+# For dependencies, expose ports locally for dev
   mongo:
     ports:
       - '27017:27017'
