@@ -349,6 +349,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.fatherEducationAttainment':
       "Father's level of formal education attained",
     'formFields.currentAddress': 'Current Address',
+    'formFields.currentAddressSameAsPermanent':
+      'Is her current address the same as her permanent address?',
     'register.form.tabs.motherTab': 'Mother',
     'register.form.section.motherTitle': "Mother's details",
     'formFields.mother.nationality': 'Nationality',
