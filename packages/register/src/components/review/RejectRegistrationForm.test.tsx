@@ -13,6 +13,7 @@ describe('reject registration form', () => {
     const testComponent = createTestComponent(
       <RejectRegistrationForm
         onBack={mockHandler}
+        duplicate={true}
         confirmRejectionEvent={mockHandler}
         draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
       />,
