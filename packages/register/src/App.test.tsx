@@ -5,7 +5,6 @@ import {
   mockOfflineData,
   userDetails
 } from './tests/util'
-import { config } from '../src/config'
 import { v4 as uuid } from 'uuid'
 import {
   HOME,
@@ -80,7 +79,7 @@ it("redirects user to SSO if user doesn't have a token", async () => {
   createTestApp()
   await flushPromises()
 
-  expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
+  expect(assign.mock.calls[0][0]).toBe(window.config.LOGIN_URL)
 })
 
 const validToken =

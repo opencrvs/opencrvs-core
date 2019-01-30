@@ -17,7 +17,6 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { ENGLISH_STATE } from '@opencrvs/performance/src/i18n/locales/en'
 import { IntlProvider, intlShape } from 'react-intl'
 import { I18nContainer } from '@opencrvs/performance/src/i18n/components/I18nContainer'
-import { config } from '../config'
 import { App } from '../App'
 
 configure({ adapter: new Adapter() })
@@ -57,7 +56,7 @@ export function createTestComponent(
   const component = mount(
     <Provider store={store}>
       <I18nContainer>
-        <ThemeProvider theme={getTheme(config.COUNTRY)}>
+        <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
           {nodeWithIntlProp(node)}
         </ThemeProvider>
       </I18nContainer>

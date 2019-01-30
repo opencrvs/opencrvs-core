@@ -23,7 +23,6 @@ import {
   OFFLINE_LOCATIONS_KEY,
   ILocation
 } from 'src/offline/reducer'
-import { config } from 'src/config'
 import { Validation } from 'src/utils/validate'
 
 export const internationaliseFieldObject = (
@@ -126,7 +125,7 @@ export const getFieldOptions = (
   if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
     const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
     let partOf: string
-    if (dependencyVal === config.COUNTRY.toUpperCase()) {
+    if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
     } else {
       partOf = `Location/${dependencyVal}`
@@ -269,5 +268,9 @@ export const conditionals: IConditionals = {
   deathPlaceOther: {
     action: 'hide',
     expression: 'values.deathPlaceAddress !== "other"'
+  },
+  causeOfDeathEstablished: {
+    action: 'hide',
+    expression: '!values.causeOfDeathEstablished'
   }
 }
