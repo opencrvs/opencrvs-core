@@ -40,7 +40,7 @@ import {
   addressTransformer,
   copyAddressTransformer,
   identifierOtherTypeTransformer
-} from '../field-mappings'
+} from 'src/forms/field-mappings'
 
 const messages = defineMessages({
   motherTab: {

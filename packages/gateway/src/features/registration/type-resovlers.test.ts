@@ -433,7 +433,7 @@ describe('Registration type resolvers', () => {
       const foetalDeathsToMother = await typeResolvers.BirthRegistration.foetalDeathsToMother(
         mockComposition
       )
-      expect(foetalDeathsToMother).toEqual(0)
+      expect(foetalDeathsToMother).toEqual(null)
     })
     it('returns birthLocation', async () => {
       fetch.mockResponseOnce(

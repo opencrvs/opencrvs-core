@@ -412,24 +412,36 @@ export function selectOrCreateCollectorPersonResource(
   }
 }
 
-export function setCertificateCollectorReference(
+export async function setCertificateCollectorReference(
   sectionCode: string,
   relatedPerson: fhir.RelatedPerson,
-  fhirBundle: ITemplatedBundle
+  fhirBundle: ITemplatedBundle,
+  context: any
 ) {
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (!section || !section.entry || !section.entry[0]) {
-    throw new Error('Expected person section not have an entry')
-  }
-  const personSectionEntry = section.entry[0]
-  const personEntry = fhirBundle.entry.find(
-    entry => entry.fullUrl === personSectionEntry.reference
-  )
-  if (!personEntry) {
-    throw new Error('Expected person entry not found on the bundle')
-  }
-  relatedPerson.patient = {
-    reference: personEntry.fullUrl
+  if (section && section.entry) {
+    const personSectionEntry = section.entry[0]
+    const personEntry = fhirBundle.entry.find(
+      entry => entry.fullUrl === personSectionEntry.reference
+    )
+    if (!personEntry) {
+      throw new Error('Expected person entry not found on the bundle')
+    }
+    relatedPerson.patient = {
+      reference: personEntry.fullUrl
+    }
+  } else {
+    const composition = await fetchFHIR(
+      `/Composition/${fhirBundle.entry[0].resource.id}`,
+      context.authHeader
+    )
+
+    const sec = findCompositionSection(sectionCode, composition)
+    if (sec && sec.entry) {
+      relatedPerson.patient = {
+        reference: sec.entry[0].reference
+      }
+    }
   }
 }
 

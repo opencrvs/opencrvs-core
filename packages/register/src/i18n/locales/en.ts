@@ -726,6 +726,10 @@ export const ENGLISH_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'Nationality',
     'certificate.parent.details.label.typeOfID': 'Type of ID',
     'certificate.parent.details.label.number': 'Number',
+    'certificate.btn.editRegistration': 'Edit Registration',
+    'certificate.txt.isCorrectTxt': 'Is the birth certificate correct?',
+    'certificate.txt.confirmationTxt':
+      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that you are ready to print.',
     'review.form.section.reviewTitle': 'Review',
     'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
     'validations.englishOnlyNameFormat': 'Must contain only English characters',

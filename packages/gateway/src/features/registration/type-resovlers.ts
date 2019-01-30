@@ -477,7 +477,13 @@ export const typeResolvers: GQLResolver = {
         }&code=${BODY_WEIGHT_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueQuantity.value
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueQuantity.value) ||
+        null
+      )
     },
     async birthType(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
@@ -493,7 +499,13 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_TYPE_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueQuantity.value
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueQuantity.value) ||
+        null
+      )
     },
     async attendantAtBirth(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
@@ -509,7 +521,13 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_ATTENDANT_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueString
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
     },
     async birthRegistrationType(
       composition: ITemplatedComposition,
@@ -529,7 +547,13 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_TYPE_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueString
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
     },
     async presentAtBirthRegistration(
       composition: ITemplatedComposition,
@@ -549,7 +573,13 @@ export const typeResolvers: GQLResolver = {
         }&code=${BIRTH_REG_PRESENT_CODE}`,
         authHeader
       )
-      return observations.entry[0].resource.valueString
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
     },
     async childrenBornAliveToMother(
       composition: ITemplatedComposition,
@@ -569,7 +599,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${NUMBER_BORN_ALIVE_CODE}`,
         authHeader
       )
-      return observations.resource.valueInteger
+      return (observations && observations.resource.valueInteger) || null
     },
     async foetalDeathsToMother(
       composition: ITemplatedComposition,
@@ -589,7 +619,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${NUMBER_FOEATAL_DEATH_CODE}`,
         authHeader
       )
-      return observations.resource.valueInteger
+      return (observations && observations.resource.valueInteger) || null
     },
     async lastPreviousLiveBirth(
       composition: ITemplatedComposition,
@@ -609,7 +639,7 @@ export const typeResolvers: GQLResolver = {
         }&code=${LAST_LIVE_BIRTH_CODE}`,
         authHeader
       )
-      return observations.resource.valueDateTime
+      return (observations && observations.resource.valueDateTime) || null
     },
     async birthLocation(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(

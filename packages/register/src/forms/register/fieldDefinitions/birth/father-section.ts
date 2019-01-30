@@ -44,7 +44,7 @@ import {
   copyAddressTransformer,
   sectionRemoveTransformer,
   identifierOtherTypeTransformer
-} from '../field-mappings'
+} from 'src/forms/field-mappings'
 
 export const messages = defineMessages({
   fatherTab: {
