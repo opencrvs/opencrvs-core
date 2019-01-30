@@ -470,6 +470,7 @@ class SavedRegistrationView extends React.Component<
           {isDuplicate && (
             <FooterAction>
               <FooterPrimaryButton
+                id="go_to_duplicate_button"
                 onClick={() => {
                   window.location.assign(`/duplicates/${duplicateContextId}`)
                 }}

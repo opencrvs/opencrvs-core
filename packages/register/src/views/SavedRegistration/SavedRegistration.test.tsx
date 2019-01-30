@@ -216,3 +216,43 @@ describe('when user is in reject registration page', () => {
     )
   })
 })
+
+describe('when user is in reject registration page from duplicates', () => {
+  const { store, history } = createStore()
+
+  const mock: any = jest.fn()
+  let savedRegistrationComponent: ReactWrapper<{}, {}>
+  history.push('/rejected', {
+    trackingId: '123456789',
+    rejection: true,
+    fullNameInBn,
+    fullNameInEng,
+    duplicate: true,
+    duplicateContextId: '123'
+  })
+
+  beforeEach(async () => {
+    const testComponent = createTestComponent(
+      <SavedRegistration
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    savedRegistrationComponent = testComponent.component
+  })
+
+  it('should show the rejection card text', () => {
+    expect(
+      savedRegistrationComponent.find('#go_to_duplicate_button').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+})
