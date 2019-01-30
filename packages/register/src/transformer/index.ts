@@ -32,7 +32,7 @@ export const draftToMutationTransformer = (
         )
       }
       if (
-        draftData[section.id][fieldDef.name] !== undefined &&
+        draftData[section.id][fieldDef.name] &&
         draftData[section.id][fieldDef.name] !== '' &&
         !conditionalActions.includes('hide')
       ) {
@@ -44,18 +44,17 @@ export const draftToMutationTransformer = (
         }
       }
     })
+    if (draftData[section.id]._fhirID) {
+      transformedData[section.id]._fhirID = draftData[section.id]._fhirID
+    }
+    if (section.mapping) {
+      section.mapping(transformedData, draftData, section.id)
+    }
     if (
       transformedData[section.id] &&
       Object.keys(transformedData[section.id]).length < 1
     ) {
       delete transformedData[section.id]
-    } else {
-      if (draftData[section.id]._fhirID) {
-        transformedData[section.id]._fhirID = draftData[section.id]._fhirID
-      }
-      if (section.mapping) {
-        section.mapping(transformedData, draftData, section.id)
-      }
     }
   })
   if (draftData._fhirIDMap) {

@@ -347,6 +347,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.fatherEducationAttainment':
       "Father's level of formal education attained",
     'formFields.currentAddress': 'Current Address',
+    'formFields.currentAddressSameAsPermanent':
+      'Is her current address the same as her permanent address?',
     'register.form.tabs.motherTab': 'Mother',
     'register.form.section.motherTitle': "Mother's details",
     'formFields.mother.nationality': 'Nationality',
@@ -718,6 +720,10 @@ export const ENGLISH_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'Nationality',
     'certificate.parent.details.label.typeOfID': 'Type of ID',
     'certificate.parent.details.label.number': 'Number',
+    'certificate.btn.editRegistration': 'Edit Registration',
+    'certificate.txt.isCorrectTxt': 'Is the birth certificate correct?',
+    'certificate.txt.confirmationTxt':
+      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that you are ready to print.',
     'review.form.section.reviewTitle': 'Review',
     'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
     'validations.englishOnlyNameFormat': 'Must contain only English characters',

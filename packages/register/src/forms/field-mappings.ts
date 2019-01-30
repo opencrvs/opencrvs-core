@@ -1,9 +1,4 @@
-import {
-  IFormField,
-  IFormData,
-  IFormFieldValue,
-  IAttachment
-} from '../../../forms'
+import { IFormField, IFormData, IFormFieldValue, IAttachment } from '.'
 
 export const nameTransformer = (
   language: string,
@@ -197,7 +192,7 @@ export function commentTransformer(
     {
       comments: [
         {
-          comment: draftData[sectionId][field.name],
+          comment: draftData[sectionId][field.name] || '',
           createdAt: new Date()
         }
       ],
@@ -226,6 +221,9 @@ export function attachmentTransformer(
   subjectMapper?: any,
   typeMapper?: any
 ) {
+  if (draftData[sectionId][field.name] === []) {
+    return transformedData
+  }
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     attachment => {
       return {
@@ -241,9 +239,13 @@ export function attachmentTransformer(
     }
   )
   if (attachments) {
-    transformedData[
-      alternateSectionId ? alternateSectionId : sectionId
-    ].attachments = attachments
+    const selectedSectionId = alternateSectionId
+      ? alternateSectionId
+      : sectionId
+    if (!transformedData[selectedSectionId]) {
+      transformedData[selectedSectionId] = {}
+    }
+    transformedData[selectedSectionId].attachments = attachments
   }
   return transformedData
 }

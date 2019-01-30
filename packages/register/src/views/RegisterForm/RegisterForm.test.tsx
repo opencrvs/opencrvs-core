@@ -203,12 +203,109 @@ describe('when user is in the register form preview section', () => {
 
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(0)
   })
+
+  it('Should be able to click the Delete application button', () => {
+    // @ts-ignore
+    global.window = { location: { pathname: null } }
+
+    // @ts-ignore
+    expect(global.window.location.pathname).toMatch('/saved')
+
+    const deleteBtn = component.find('#delete-application').hostNodes()
+    deleteBtn.simulate('click')
+    component.update()
+
+    // @ts-ignore
+    expect(global.window.location.pathname).toEqual('/')
+  })
+
+  describe('User in the Preview section for submitting the Form', () => {
+    beforeEach(async () => {
+      // @ts-ignore
+      const nDraft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
+      store.dispatch(setInitialDrafts())
+      store.dispatch(storeDraft(nDraft))
+
+      const nform = getRegisterForm(store.getState())[Event.BIRTH]
+      const nTestComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={nform}
+          draft={nDraft}
+          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+          match={{
+            params: { draftId: nDraft.id, tabId: 'preview' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          scope={[]}
+        />,
+        store
+      )
+      component = nTestComponent.component
+    })
+
+    it('Should be able to click the Save Draft button', () => {
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      // @ts-ignore
+      global.window = { location: { pathname: null } }
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toMatch('/')
+
+      const deleteBtn = component.find('#delete-draft').hostNodes()
+      deleteBtn.simulate('click')
+      component.update()
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toEqual('/')
+    })
+
+    it('should be able to submit the form', () => {
+      const nextForChildSectionBtn = component
+        .find('#next_button_child')
+        .hostNodes()
+      const nextForMotherSectionBtn = component
+        .find('#next_button_mother')
+        .hostNodes()
+      const nextForFatherSectionBtn = component
+        .find('#next_button_father')
+        .hostNodes()
+
+      nextForChildSectionBtn.simulate('click')
+      nextForMotherSectionBtn.simulate('click')
+      nextForFatherSectionBtn.simulate('click')
+
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      const previewBtn = component.find('#preview-btn').hostNodes()
+      expect(previewBtn.length).toEqual(1)
+
+      previewBtn.simulate('click')
+      component.update()
+
+      expect(component.find('#preview-btn').hostNodes().length).toEqual(0)
+    })
+  })
 })
 
 describe('when user is in the register form review section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const { store, history } = createStore()
+    // @ts-ignore
     const draft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
     store.dispatch(setInitialDrafts())
     store.dispatch(storeDraft(draft))
