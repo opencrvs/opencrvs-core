@@ -5,15 +5,20 @@ import { Paragraph } from '../typography'
 
 interface IWarningProps {
   children: string
+  ignoreMediaQuery?: boolean
 }
 
-const Container = styled.div`
+const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   flex-direction: row;
   display: flex;
 
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 515px;
-  }
+  ${({ ignoreMediaQuery, theme }) => {
+    return !ignoreMediaQuery
+      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 515px;
+      }`
+      : ''
+  }}
 `
 const StyledParagraph = styled(Paragraph)`
   margin: 3px 10px;
@@ -22,7 +27,7 @@ const StyledParagraph = styled(Paragraph)`
 
 export function WarningMessage(props: IWarningProps) {
   return (
-    <Container>
+    <Container ignoreMediaQuery={props.ignoreMediaQuery}>
       <Warning />
       <StyledParagraph>{props.children}</StyledParagraph>
     </Container>

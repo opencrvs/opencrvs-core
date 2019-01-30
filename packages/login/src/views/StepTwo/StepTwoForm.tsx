@@ -140,6 +140,7 @@ const CodeInput = injectIntl(
         error={meta.error && localiseValidationError(intl, meta.error)}
         optionalLabel={intl.formatMessage(messages.optionalLabel)}
         label=""
+        ignoreMediaQuery
       >
         <TextInput
           {...field}

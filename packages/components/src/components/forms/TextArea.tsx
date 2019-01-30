@@ -1,7 +1,11 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-const StyledTextArea = styled.textarea`
+interface ITextAreaProps {
+  ignoreMediaQuery?: boolean
+}
+
+const StyledTextArea = styled.textarea<ITextAreaProps>`
   width: 100%;
   padding: 10px;
   min-height: 80px;
@@ -20,9 +24,13 @@ const StyledTextArea = styled.textarea`
     color: ${({ theme }) => theme.colors.placeholder};
   }
 
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 515px;
-  }
+  ${({ ignoreMediaQuery, theme }) => {
+    return !ignoreMediaQuery
+      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 515px;
+      }`
+      : ''
+  }}
 `
 
 export class TextArea extends React.Component {
