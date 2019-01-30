@@ -1,6 +1,6 @@
 import * as React from 'react'
 import gql from 'graphql-tag'
-import { Query } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner } from '@opencrvs/components/lib/interface'
@@ -11,9 +11,17 @@ import {
   IFormSectionData,
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH,
-  IFormData
+  IFormData,
+  PDF_DOCUMENT_VIEWER,
+  IFormField,
+  IForm
 } from 'src/forms'
-import { PrimaryButton, IconAction } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  SecondaryButton,
+  IconAction,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { hasFormError } from 'src/forms/utils'
@@ -22,8 +30,28 @@ import { Print } from '@opencrvs/components/lib/icons'
 import * as moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
-import { Registrant, Issuer, generateMoneyReceipt } from './generatePDF'
+import {
+  Registrant,
+  Issuer,
+  generateMoneyReceipt,
+  generateCertificateDataURL,
+  CertificateDetails,
+  generateAndPrintCertificate
+} from './generatePDF'
+import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
+import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
+import {
+  storeDraft,
+  createReviewDraft,
+  IDraftsState
+} from '@opencrvs/register/src/drafts'
+import { Dispatch } from 'redux'
+import StoreTransformer, {
+  IReviewSectionDetails
+} from 'src/utils/transformData'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { draftToMutationTransformer } from '../../transformer'
+import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -108,43 +136,157 @@ const StyledIconAction = styled(IconAction)`
     }
   }
 `
+const ConfirmBtn = styled(PrimaryButton)`
+  font-weight: bold;
+  padding: 15px 35px 15px 20px;
+  div {
+    position: relative !important;
+    margin-right: 20px;
+    top: 2px;
+  }
+  &:disabled {
+    background: ${({ theme }) => theme.colors.disabledButton};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
+`
+
+const EditRegistration = styled(SecondaryButton)`
+  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  color: ${({ theme }) => theme.colors.primary} !important;
+  font-weight: bold;
+  margin: 0px 20px;
+  top: 3px;
+  position: relative;
+  svg {
+    margin-right: 15px;
+  }
+  &:hover {
+    background: inherit;
+    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  }
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.inputBackground};
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: 0px;
+    margin-top: 15px;
+  }
+`
+
+const Info = styled.div`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  margin-bottom: 30px;
+`
+const B = styled.div`
+  display: block;
+  line-height: 50px;
+  font-weight: bold;
+`
+
+const ButtonSpinner = styled(Spinner)`
+  width: 15px;
+  height: 15px;
+  top: 0px !important;
+`
+
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
   query data($id: ID!) {
     fetchBirthRegistration(id: $id) {
+      _fhirIDMap
       id
       child {
+        id
         name {
           use
           firstNames
           familyName
         }
         birthDate
+        gender
       }
       mother {
+        id
         name {
+          use
           firstNames
           familyName
         }
+        birthDate
+        maritalStatus
+        dateOfMarriage
+        educationalAttainment
+        nationality
+        multipleBirth
         identifier {
           id
           type
         }
-        birthDate
-        nationality
+        address {
+          type
+          line
+          district
+          state
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
       }
       father {
+        id
         name {
+          use
           firstNames
           familyName
         }
+        birthDate
+        maritalStatus
+        dateOfMarriage
+        educationalAttainment
+        nationality
         identifier {
           id
           type
         }
-        birthDate
-        nationality
+        address {
+          type
+          line
+          district
+          state
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
       }
-      createdAt
+      registration {
+        id
+        contact
+        attachments {
+          data
+          type
+          contentType
+          subject
+        }
+        status {
+          comments {
+            comment
+          }
+        }
+        trackingId
+        registrationNumber
+      }
+      attendantAtBirth
+      weightAtBirth
+      birthType
+      presentAtBirthRegistration
     }
   }
 `
@@ -214,13 +356,30 @@ const messages = defineMessages({
     id: 'register.workQueue.print.finish',
     defaultMessage: 'Finish',
     description: 'The label for finish printing certificate button'
+  },
+  editRegistration: {
+    id: 'certificate.btn.editRegistration',
+    defaultMessage: 'Edit Registration'
+  },
+  certificateIsCorrect: {
+    id: 'certificate.txt.isCorrectTxt'
+  },
+  certificateConfirmationTxt: {
+    id: 'certificate.txt.confirmationTxt'
   }
 })
+
+const certifyMutation = gql`
+  mutation markBirthAsCertified($id: ID!, $details: BirthRegistrationInput!) {
+    markBirthAsCertified(id: $id, details: $details)
+  }
+`
 
 type State = {
   currentForm: string
   data: IFormSectionData
   enableConfirmButton: boolean
+  certificatePdf: string
 }
 
 type IProps = {
@@ -233,9 +392,11 @@ type IProps = {
   paymentFormSection: IFormSection
   IssuerDetails: Issuer
   certificatePreviewFormSection: IFormSection
+  registerForm: IForm
 }
 
-type IFullProps = InjectedIntlProps & IProps
+type IFullProps = InjectedIntlProps &
+  IProps & { dispatch: Dispatch; drafts: IDraftsState }
 
 class PrintCertificateActionComponent extends React.Component<
   IFullProps,
@@ -246,7 +407,8 @@ class PrintCertificateActionComponent extends React.Component<
     this.state = {
       data: {},
       enableConfirmButton: false,
-      currentForm: COLLECT_CERTIFICATE
+      currentForm: COLLECT_CERTIFICATE,
+      certificatePdf: ''
     }
   }
 
@@ -267,6 +429,15 @@ class PrintCertificateActionComponent extends React.Component<
     return documentData && !hasFormError(form.fields, documentData)
   }
 
+  addPDFToField(form: IFormSection) {
+    form.fields.map((field: IFormField) => {
+      if (field.type === PDF_DOCUMENT_VIEWER) {
+        field.initialValue = this.state.certificatePdf
+      }
+    })
+    return form
+  }
+
   getForm = (currentForm: string) => {
     const {
       printCertificateFormSection,
@@ -279,13 +450,70 @@ class PrintCertificateActionComponent extends React.Component<
       case PAYMENT:
         return paymentFormSection
       case CERTIFICATE_PREVIEW:
-        return certificatePreviewFormSection
+        const result = this.addPDFToField(certificatePreviewFormSection)
+        return result
       default:
         throw new Error(`No form found for id ${currentForm}`)
     }
   }
 
-  getFormAction = (currentForm: string, registrant: Registrant) => {
+  processSubmitData() {
+    const {
+      registrationId,
+      drafts: { drafts },
+      registerForm
+    } = this.props
+    const { data } = this.state
+    const draft = drafts.find(draftItem => draftItem.id === registrationId) || {
+      data: {}
+    }
+    const result = {
+      id: registrationId,
+      details: draftToMutationTransformer(registerForm, draft.data)
+    }
+    let individual = null
+    if (data.personCollectingCertificate === documentForWhomFhirMapping.Other) {
+      individual = {
+        name: [
+          {
+            use: 'en',
+            firstNames: data.otherPersonGivenNames,
+            familyName: data.otherPersonFamilyName
+          }
+        ],
+        identifier: [{ id: data.documentNumber, type: data.otherPersonIDType }]
+      }
+    }
+
+    const certificates = {
+      collector: {
+        relationship: data.personCollectingCertificate,
+        individual
+      },
+      payments: {
+        type: data.paymentMethod,
+        total: data.paymentAmount,
+        amount: data.paymentAmount,
+        outcome: 'COMPLETED',
+        date: Date.now()
+      },
+      hasShowedVerifiedDocument:
+        data.otherPersonSignedAffidavit ||
+        data.motherDetails ||
+        data.fatherDetails
+    }
+
+    result.details.registration.certificates =
+      result.details.registration.certificates || []
+    result.details.registration.certificates.push(certificates)
+    return result
+  }
+
+  getFormAction = (
+    currentForm: string,
+    registrant: Registrant,
+    certificateDetails: CertificateDetails
+  ) => {
     const { intl, IssuerDetails, paymentFormSection } = this.props
     const { enableConfirmButton } = this.state
     const amountObj = paymentFormSection.fields.find(
@@ -305,7 +533,10 @@ class PrintCertificateActionComponent extends React.Component<
             <StyledPrimaryButton
               id="print-confirm-button"
               disabled={!enableConfirmButton}
-              onClick={this.onConfirmForm}
+              onClick={() => {
+                this.previewCertificatePDF(certificateDetails)
+                this.onConfirmForm()
+              }}
             >
               {intl.formatMessage(messages.confirm)}
             </StyledPrimaryButton>
@@ -319,7 +550,7 @@ class PrintCertificateActionComponent extends React.Component<
                 id="print-receipt"
                 title={intl.formatMessage(messages.printReceipt)}
                 icon={() => <StyledPrintIcon />}
-                onClick={() =>
+                onClick={() => {
                   generateMoneyReceipt(
                     intl,
                     registrant,
@@ -327,7 +558,7 @@ class PrintCertificateActionComponent extends React.Component<
                     amount,
                     this.props.language
                   )
-                }
+                }}
               />
             </ButtonContainer>
 
@@ -335,7 +566,10 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
-                onClick={this.onConfirmForm}
+                onClick={() => {
+                  this.previewCertificatePDF(certificateDetails)
+                  this.onConfirmForm()
+                }}
               >
                 {intl.formatMessage(messages.next)}
               </StyledPrimaryButton>
@@ -345,14 +579,63 @@ class PrintCertificateActionComponent extends React.Component<
       case CERTIFICATE_PREVIEW:
         return (
           <>
+            <Box>
+              <Info>
+                <B>{intl.formatMessage(messages.certificateIsCorrect)}</B>
+                {intl.formatMessage(messages.certificateConfirmationTxt)}
+              </Info>
+              <Mutation
+                mutation={certifyMutation}
+                variables={this.processSubmitData()}
+                onCompleted={() => {
+                  this.setState(() => ({
+                    enableConfirmButton: true
+                  }))
+                }}
+              >
+                {(markBirthAsCertified, { loading, error, data }) => {
+                  return (
+                    <ConfirmBtn
+                      id="registerApplicationBtn"
+                      icon={() => {
+                        if (loading) {
+                          return (
+                            <>
+                              <ButtonSpinner id="Spinner" baseColor="#F9F9F9" />
+                            </>
+                          )
+                        }
+                        return (
+                          <>
+                            <TickLarge />
+                          </>
+                        )
+                      }}
+                      align={ICON_ALIGNMENT.LEFT}
+                      disabled={loading || data}
+                      onClick={() => {
+                        markBirthAsCertified()
+                      }}
+                    >
+                      {intl.formatMessage(messages.confirm)}
+                    </ConfirmBtn>
+                  )
+                }}
+              </Mutation>
+              <EditRegistration id="edit" disabled={true}>
+                <Edit />
+                {this.props.intl.formatMessage(messages.editRegistration)}
+              </EditRegistration>
+            </Box>
             <ButtonContainer>
               <StyledIconAction
                 id="print-certificate"
                 title={intl.formatMessage(messages.printCertificate)}
                 icon={() => <StyledPrintIcon />}
-                onClick={() =>
-                  console.log('to open certificate document in another window')
-                }
+                disabled={!enableConfirmButton}
+                onClick={() => {
+                  generateAndPrintCertificate(certificateDetails)
+                }}
               />
             </ButtonContainer>
 
@@ -360,7 +643,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="finish-printing-certificate"
                 disabled={!enableConfirmButton}
-                onClick={() => console.log('certifier mutation to be called')}
+                onClick={() => (location.href = 'work-queue')}
               >
                 {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>
@@ -372,13 +655,31 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
+  previewCertificatePDF(certificateDetails: CertificateDetails) {
+    generateCertificateDataURL(certificateDetails, (certificatePdf: string) => {
+      this.setState(prevState => {
+        const result = {
+          ...prevState,
+          certificatePdf
+        }
+        return result
+      })
+    })
+  }
+
   onConfirmForm = () => {
     const { currentForm } = this.state
     let destForm = COLLECT_CERTIFICATE
 
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
-        destForm = PAYMENT
+        const { paymentFormSection } = this.props
+        const paymentAmountField = paymentFormSection.fields.find(
+          field => field.name === 'paymentAmount'
+        )
+        paymentAmountField && Number(paymentAmountField.initialValue) > 0
+          ? (destForm = PAYMENT)
+          : (destForm = CERTIFICATE_PREVIEW)
         break
       case PAYMENT:
         destForm = CERTIFICATE_PREVIEW
@@ -386,6 +687,7 @@ class PrintCertificateActionComponent extends React.Component<
       default:
         break
     }
+
     this.setState({ currentForm: destForm })
   }
 
@@ -406,6 +708,31 @@ class PrintCertificateActionComponent extends React.Component<
     return registrant
   }
 
+  getCertificateDetails(data: IFormData): CertificateDetails {
+    const names = data.child.name as Array<{ [key: string]: {} }>
+    const NameBn = names.find(name => name.use === 'bn')
+    const NameEn = names.find(name => name.use === 'en')
+    const DOBEn = moment(data.child.birthDate as string).format(
+      CERTIFICATE_DATE_FORMAT
+    )
+    moment.locale('bn')
+    const DOBBn = moment(data.child.birthDate as string).format(
+      CERTIFICATE_DATE_FORMAT
+    )
+
+    return {
+      registrationNo: data.registration.registrationNumber as string,
+      name: {
+        bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
+        en: NameEn ? NameEn.firstNames + ' ' + NameEn.familyName : ''
+      },
+      dob: {
+        bn: DOBBn,
+        en: DOBEn
+      }
+    }
+  }
+
   render = () => {
     const {
       intl,
@@ -413,7 +740,9 @@ class PrintCertificateActionComponent extends React.Component<
       registrationId,
       togglePrintCertificateSection,
       printCertificateFormSection,
-      paymentFormSection
+      paymentFormSection,
+      drafts: { drafts },
+      dispatch
     } = this.props
 
     const { currentForm } = this.state
@@ -496,6 +825,27 @@ class PrintCertificateActionComponent extends React.Component<
                     data.fetchBirthRegistration
                   )
 
+                  const certificateData = this.getCertificateDetails(
+                    data.fetchBirthRegistration
+                  )
+
+                  const transData: IReviewSectionDetails = StoreTransformer.transformData(
+                    data.fetchBirthRegistration
+                  )
+                  const eventType =
+                    transData.registration && transData.registration.type
+                  const reviewDraft = createReviewDraft(
+                    registrationId,
+                    transData,
+                    eventType
+                  )
+                  const draftExist = !!drafts.find(
+                    draft => draft.id === registrationId
+                  )
+                  if (!draftExist) {
+                    dispatch(storeDraft(reviewDraft))
+                  }
+
                   return (
                     <FormContainer>
                       <Box>
@@ -510,7 +860,8 @@ class PrintCertificateActionComponent extends React.Component<
                         {this.state.data.personCollectingCertificate &&
                           this.getFormAction(
                             this.state.currentForm,
-                            registrant
+                            registrant,
+                            certificateData
                           )}
                       </Column>
                     </FormContainer>
@@ -534,9 +885,12 @@ class PrintCertificateActionComponent extends React.Component<
   }
 }
 
+const event = 'birth'
 export const PrintCertificateAction = connect((state: IStoreState) => ({
   language: state.i18n.language,
   paymentFormSection: state.printCertificateForm.paymentForm,
   certificatePreviewFormSection:
-    state.printCertificateForm.certificatePreviewForm
+    state.printCertificateForm.certificatePreviewForm,
+  drafts: state.drafts,
+  registerForm: state.registerForm.registerForm[event]
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))

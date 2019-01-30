@@ -1,9 +1,9 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { collectCertificateFormSection } from './print-certificate'
+import { collectCertificateFormSection } from './fieldDefinitions/collector-section'
 import { Action } from 'redux'
 import { IFormSection } from 'src/forms'
-import { paymentFormSection } from './payment-section'
-import { certificatePreview } from './certificate-preview'
+import { paymentFormSection } from './fieldDefinitions/payment-section'
+import { certificatePreview } from './fieldDefinitions/preview-section'
 
 const initialState: IPrintFormState = {
   collectCertificateFrom: collectCertificateFormSection,

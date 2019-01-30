@@ -695,7 +695,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )}
 
             {!!saveDraftClickEvent && (
-              <DraftButtonContainer onClick={saveDraftClickEvent}>
+              <DraftButtonContainer
+                onClick={saveDraftClickEvent}
+                id="delete-draft"
+              >
                 <DraftSimple />
                 <SaveDraftText>
                   {intl.formatMessage(messages.valueSaveAsDraft)}
@@ -718,7 +721,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         </Row>
         {deleteApplicationClickEvent && (
           <DButtonContainer>
-            <DeleteApplication onClick={deleteApplicationClickEvent}>
+            <DeleteApplication
+              onClick={deleteApplicationClickEvent}
+              id="delete-application"
+            >
               <Delete />
               {intl.formatMessage(messages.deleteApplicationBtnTxt)}
             </DeleteApplication>
