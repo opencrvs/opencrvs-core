@@ -689,7 +689,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   onClick={submitClickEvent}
                   disabled={numberOfErrors > 0 || !this.state.allSectionVisited}
                 >
-                  {intl.formatMessage(messages.valueSendForReview)}
+                  {intl.formatMessage(
+                    this.userHasRegisterScope()
+                      ? messages.valueRegister
+                      : messages.valueSendForReview
+                  )}
                 </RegisterApplication>
               </ButtonContainer>
             )}
