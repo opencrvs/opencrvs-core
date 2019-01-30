@@ -733,7 +733,7 @@ export const ENGLISH_STATE: ILanguage = {
     'review.birthRegistration.queryError':
       'An error occurred while fetching birth registration',
     'review.error.unauthorized': 'We are unable to display this page to you',
-    'register.workQueue.buttons.newRegistration': 'New birth registration',
+    'register.workQueue.buttons.newRegistration': 'New registration',
     'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
     'register.work-queue.certificate.header':
       'Receipt for Birth Certificate of',

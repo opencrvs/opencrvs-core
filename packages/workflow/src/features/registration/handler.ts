@@ -7,8 +7,8 @@ import {
   markBundleAsCertified,
   setTrackingId
 } from './fhir/fhir-bundle-modifier'
+import { getToken, hasScope } from 'src/utils/authUtils'
 import { sendEventNotification } from './utils'
-import { getToken } from 'src/utils/authUtils'
 import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
 
@@ -42,11 +42,16 @@ export async function createRegistrationHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = await modifyRegistrationBundle(
+    let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-
+    if (hasScope(request, 'register')) {
+      payload = await markBundleAsRegistered(
+        request.payload as fhir.Bundle & fhir.BundleEntry,
+        getToken(request)
+      )
+    }
     const resBundle = await sendBundleToHearth(payload)
 
     const msisdn = getSharedContactMsisdn(payload)

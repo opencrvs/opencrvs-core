@@ -1,1740 +1,1740 @@
 {
   "data": [
     {
-      "id": "3fadd4e1-bcfd-470b-a997-07bc09631e2c",
+      "id": "235decf5-fea1-44b6-818d-277622fa7c44",
       "name": "Moktarpur Union Parishad",
       "nameBn": "মোক্তারপুর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/9ce9fdba-ae24-467f-87ab-5b5498a0217f"
+      "partOf": "Location/0fcffcd9-1d63-4007-a79e-690df2bc9baa"
     },
     {
-      "id": "b8dce0d4-6499-4ef8-80f7-082e97d62552",
+      "id": "861e37fb-1320-4919-9e97-5b7b1354548e",
       "name": "Nagari Union Parishad",
       "nameBn": "নাগারি ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/c4cb19d8-5884-483c-862c-417427231527"
+      "partOf": "Location/154e5b6f-4a72-49aa-bd27-8076748cb93a"
     },
     {
-      "id": "8726278a-8509-4f71-90e9-aced67474288",
+      "id": "cd4fffc6-e663-4499-b74b-ef82ca2559a2",
       "name": "Tumulia Union Parishad",
       "nameBn": "তিমুলিয়া ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/c8a9954a-dfe6-4dae-a3a1-ec0b45387ff7"
+      "partOf": "Location/8f9314cc-f515-49cf-9468-8fc07aaf478d"
     },
     {
-      "id": "644d14b7-4a31-4340-a864-6c7ba55a0e99",
+      "id": "c5509336-b3f5-4b64-857c-664ca442deb7",
       "name": "Kanthalbari Union Parishad",
       "nameBn": "কাঁঠালবাড়ী ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/8b87ddcd-8e9e-4b91-aa8c-0b42fabd36ce"
+      "partOf": "Location/c0f6c349-42ad-4dcd-a232-b11df3c5e65e"
     },
     {
-      "id": "32c39834-7a29-4307-b9e8-d12a0fe1a9c6",
+      "id": "df8a43a9-d016-4383-a54a-b847b3746747",
       "name": "Mogolbasa Union Porishad",
       "nameBn": "মোগলবাসা ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/a8b9d971-0b84-4d22-b14a-a3ff0dd2b213"
+      "partOf": "Location/8b6b8ecb-f976-40ff-885a-bffec56bf8a8"
     },
     {
-      "id": "2efa5e21-60d6-4be3-b2e2-2a737da96b65",
+      "id": "76e525c1-82f0-4ee3-8771-3c04f615f1de",
       "name": "Punchgachhi Union Porishad",
       "nameBn": " পাচগাছী ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/a8ad96b3-cc88-490e-b249-cbd220f8e8a9"
+      "partOf": "Location/c3b50744-0674-4c91-9f3a-a9428605266d"
     },
     {
-      "id": "682a4c9e-339f-4221-8b0d-ef335c91926e",
+      "id": "10902d9e-eb2f-4e50-b263-59c537d031b8",
       "name": "Belgachha Union Parishad",
       "nameBn": "বেলগাছা ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/c5b97a56-2938-4fb7-9727-ceb151e1ccc0"
+      "partOf": "Location/d5448725-2f10-4136-9851-c3ea64c66ae6"
     },
     {
-      "id": "1ada7b6e-75b3-4a53-a05c-08a5782faf26",
+      "id": "11f039f4-c9b6-4a11-8ed4-da82f5b5f967",
       "name": "Bhogdanga Union Parishad",
       "nameBn": "ভোগডাঙ্গা ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/b7a52b62-7d0b-4ca3-8781-b6ca39a10367"
+      "partOf": "Location/2279244e-242c-493f-9541-f1b06f348fcd"
     },
     {
-      "id": "39ad56bb-c2dd-4392-a3d4-b59dca621ae3",
+      "id": "845f2cc5-dc25-4eb4-a4e9-e306a6b96fda",
       "name": "Ghogadaha Union Parishad",
       "nameBn": "ঘোগাদহ ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/e4327a98-0968-4f84-a321-493ef797a1a1"
+      "partOf": "Location/2ac0e85c-cc5a-48b7-b675-2f8f849d2849"
     },
     {
-      "id": "3d7124c2-7149-4a17-a8c1-1c37182e2789",
+      "id": "8f58d024-8abe-4261-bad5-5a1ca79caa6a",
       "name": "Holokhana Union Parishad",
       "nameBn": "হলোখানা ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/908799cd-f386-4f77-bc91-723313ff1144"
+      "partOf": "Location/d702dba7-bf6b-41c0-9a99-3e384ecd7a50"
     },
     {
-      "id": "f9c8f243-876b-4ba2-82f1-621d369be37d",
+      "id": "aa895777-ee57-4320-a898-81ea962847cb",
       "name": "Jatrapur Union Parishad",
       "nameBn": "যাত্রাপুর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/3e6e1c33-7568-416d-bd10-44fd87c663f8"
+      "partOf": "Location/0bd18ec3-d7eb-4093-a39d-fee3c7709a64"
     },
     {
-      "id": "007669eb-3ac9-4bb8-be5b-ed85c9e88544",
+      "id": "22d2225d-5fae-4d12-bf9f-96ffefbdd6bf",
       "name": "Nurallapur Union Parishad",
       "nameBn": "নূরালাপুর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/2665e54a-69cd-4c5e-84be-8e63fefd40d8"
+      "partOf": "Location/69a5d9c8-5cf1-49a4-94a3-86fd1dfb7797"
     },
     {
-      "id": "7f514ccf-c88a-455c-8012-2b31aef4a9e0",
+      "id": "7d42bd41-a4a1-41a3-ba0c-8418a96f6f00",
       "name": "Mahishasura Union Parishad",
       "nameBn": "মহিষাশুড়া ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/87428981-9be2-4359-9347-eb496769c29e"
+      "partOf": "Location/8c722f7b-140f-40e8-989d-dd4cedc545e2"
     },
     {
-      "id": "7c15f1ad-edc9-4bc0-996d-8f6907573cf5",
+      "id": "cf36fdbc-3bb2-4970-83e4-a36a60f52077",
       "name": "Meherpara Union Parishad",
       "nameBn": "মেহেড়পাড়া ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/680fdad6-3f22-449f-8e48-3529f7b5c674"
+      "partOf": "Location/6768042f-e523-4d3b-96c0-277897413467"
     },
     {
-      "id": "e65b8fff-209f-469e-b4e2-e6fb59b47313",
+      "id": "5087b88e-3996-432f-b6c6-5ef2e3925056",
       "name": "Nazarpur Union Parishad",
       "nameBn": "নজরপুর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/5429924d-d267-4183-bb10-51769caae9c4"
+      "partOf": "Location/f7cc1942-3e13-4ef4-9745-5e45a2bdab3e"
     },
     {
-      "id": "19c1bea3-48d8-4396-8863-24197b0c852a",
+      "id": "9a6a54a0-0249-4047-a17a-631606dd895c",
       "name": "Paikarchar Union Parishad",
       "nameBn": "পাইকারচর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/d0d89b76-0e7f-40a2-a4fd-ec9e6b5b4d82"
+      "partOf": "Location/589498cb-76b0-40dd-9b46-176657fa25f9"
     },
     {
-      "id": "f502fe9e-d014-46e2-a858-680f66c16872",
+      "id": "33ffb8c2-67c0-4603-a67d-9473f159be4a",
       "name": "Panchdona Union Parishad",
       "nameBn": "পাঁচদোনা ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/f96892e4-f09d-47ee-b3e8-73ae22914544"
+      "partOf": "Location/43c4478f-5477-4ac6-a7fe-88e746ab5267"
     },
     {
-      "id": "feb486de-e6e6-418d-ae03-b707f18d4859",
+      "id": "8f9d2c68-a481-4074-b538-7d335800603d",
       "name": "Amdia Union Parishad",
       "nameBn": "আমদিয়া ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/0e518fa3-2b35-4c7c-9048-8fc05a328156"
+      "partOf": "Location/f0f32a6f-225a-4c5e-8471-7feb2bd2c635"
     },
     {
-      "id": "f6f5e237-9fea-48e8-abe3-848023bcf8c0",
+      "id": "2cbc09aa-1dd9-499a-a3da-56a8f591a393",
       "name": "Chardighaldi Union Parishad",
       "nameBn": "চরদিঘলদী ইউনয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/fa8361a7-d368-4569-b2e6-115b96a89ecc"
+      "partOf": "Location/ad8ae7ac-7ef7-4705-b729-67293c9f2f5c"
     },
     {
-      "id": "8f4eb2e0-fdb3-4e8a-b546-b28fd95602f1",
+      "id": "28da365c-e3db-486b-8740-6a628afa2a33",
       "name": "Chinishpur Union Parishad",
       "nameBn": "চিনিশপুর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/c44cc867-41d4-4d26-9e9c-ed18f9584076"
+      "partOf": "Location/5c5d4a2d-2c2e-4104-9af7-c1294e566b66"
     },
     {
-      "id": "aacffea4-6eac-45af-821c-dc6982514a9d",
+      "id": "a58e0290-61a6-4b9d-a06c-0b4f867cbc7e",
       "name": "Hajipur Union Parishad",
       "nameBn": "হাজীপুর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/b3299e8c-9df7-466a-a3c0-db6f4af880ef"
+      "partOf": "Location/62602dbe-e402-49c5-bbb9-327b52758797"
     },
     {
-      "id": "4aea9e43-272e-4d3b-a7de-f55c335c4140",
+      "id": "b5d9289d-3fb3-465a-84c8-1195fa52896d",
       "name": "Karimpur Union parishad",
       "nameBn": "করিমপুর ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/bb28879b-74cb-49b1-b122-83e5f747c990"
+      "partOf": "Location/de9378ae-f801-4cd0-a2c9-ffed0853f44f"
     },
     {
-      "id": "cb86d950-5f24-4dd0-af8a-a6ab85688849",
+      "id": "44ba3766-adf5-4ff0-a3fd-21ae2a7b89ec",
       "name": "Kanthalia Union Parishad",
       "nameBn": "কাঠালিয়া ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/1d71905e-28fa-454b-b48e-7e50b19f9376"
+      "partOf": "Location/c845599e-b8a9-4bb3-acf5-7b815929fbc9"
     },
     {
-      "id": "281e04ca-4a42-4e8b-9ce1-87641754f55d",
+      "id": "3827ec48-d68e-4f45-a229-2e31b052dcd0",
       "name": "Alokbali Union Parishad",
       "nameBn": "আলোকবালী ইউনিয়ন পরিষদ",
       "physicalType": "Building",
       "type": "CRVS_OFFICE",
-      "partOf": "Location/250a6572-76fe-429f-b415-a52e4bd272d7"
+      "partOf": "Location/95800624-b344-4733-a5b6-01dbf8670d80"
     },
     {
-      "id": "627fc0cc-e0e2-4c09-804d-38a9fa1807ee",
+      "id": "50c2d4e7-eb26-4aca-8086-4d707593d6f5",
       "name": "Shaheed Taj Uddin Ahmad Medical College",
       "nameBn": "শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f"
+      "partOf": "Location/249a6236-d867-402f-a8b5-b134f5a7b354"
     },
     {
-      "id": "ae5b4462-d1b2-4b22-b289-a66f912dce73",
+      "id": "b7d2cf8a-944e-4fba-9073-b0df45158004",
       "name": "Kaliganj Union Sub Center",
       "nameBn": "কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "6abbb7b8-d02e-41cf-8a3e-5039776c1eb0",
+      "id": "cfce2d03-5676-4984-8f68-2448c8c27826",
       "name": "Kaliganj Upazila Health Complex",
       "nameBn": "কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "0d8474da-0361-4d32-979e-af91f020309e",
+      "id": "ec23562e-1542-4381-b871-2b93e03f4443",
       "name": "Dholashadhukhan Cc",
       "nameBn": "ধলাশাধুখান সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "82234bfa-9f03-480a-a630-483a3a080da5",
+      "id": "bcca9ec7-b973-4bc9-8224-153ace170ad8",
       "name": "Kholapara Cc",
       "nameBn": "খোলাপাড়া সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "6714c233-4574-46da-b2ea-ea7a1fee978b",
+      "id": "b8f06469-fd5b-403d-8e4b-372aef2e245b",
       "name": "Berua Cc",
       "nameBn": "বেরুয়া সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "9b8bb136-c9a8-406b-814c-f24d74721702",
+      "id": "21663096-f55a-4425-84f4-5dfc7f58bac1",
       "name": "Brammangaon Cc",
       "nameBn": "ব্রাহ্মণগাঁও সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "3d49e610-b11d-4f16-bdb4-0ae6cb521d11",
+      "id": "53f57c1d-7820-41c1-9fe9-7c75ec355c9e",
       "name": "Fuldi Cc",
       "nameBn": "ফুলদি সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "5c9ea600-25ea-4ea5-8f85-482938cd4e96",
+      "id": "2106e30c-7b67-4325-a48f-05606261d468",
       "name": "Majhukhan Cc",
       "nameBn": "মাজুখান সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "badf5062-b4ac-46d8-84a3-9564157e71b6",
+      "id": "a8155567-6ca1-4c85-9a0c-c359d6047193",
       "name": "Mohani Cc",
       "nameBn": "মোহানি সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "76c24251-a323-4efe-9646-180e935bf1af",
+      "id": "adeae71b-e74f-4617-b191-5c5eb19ec749",
       "name": "Vatira Cc",
       "nameBn": "ভাটিরা সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "53d0a160-07b4-4c4a-a763-a86114bf5d1d",
+      "id": "27095c67-56bb-4965-afe7-8b023aa8bbc6",
       "name": "Chhailadi Cc",
       "nameBn": "ছাইলাদি সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "2bebb515-173b-4e44-a794-18df8f8f232b",
+      "id": "8e645763-76cd-40a3-a6e6-c431810fb650",
       "name": "Jamalpur Cc",
       "nameBn": "জামালপুর সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "74d8c3a6-7df1-466f-aa57-90fc0145abf7",
+      "id": "66cdc1df-7e1c-417b-b518-781534e8ef27",
       "name": "Kapais Cc",
       "nameBn": "কাপাইস সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "942bf7b2-5a2f-4d49-b083-4837dce13cac",
+      "id": "b5bda1f8-987a-4da4-8313-cca45d937560",
       "name": "Chhatiyani Cc ",
       "nameBn": "ছাতিয়ানি সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "5f97f66e-a3cf-49e2-b9ac-ce8e0b0c5133",
+      "id": "2ff53856-eb4c-40b4-89e5-f81b0bcffbbe",
       "name": "Dubriya Cc",
       "nameBn": "ডুবরিয়া সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "adf0de7f-d41c-4365-9e85-be18df8dad7c",
+      "id": "ecbfd6ad-4a3c-4121-a6a8-574cb52cada7",
       "name": "Jangaliya Cc",
       "nameBn": "জাঙ্গালিয়া সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "f2899863-ae7f-4b38-a55d-9bb19beaede3",
+      "id": "51eb9e4b-3658-4f02-b186-455f334945b0",
       "name": "Chaiterpara CC",
       "nameBn": "ছাইতেরপারা সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "ac246881-3478-43cf-9012-bcb094d628c9",
+      "id": "d74a1962-4de5-473a-b504-0e23bf8296ab",
       "name": "Chandaiya CC",
       "nameBn": "ছান্দাইয়া সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "c2de52ab-9cf7-45f5-9f13-d664b54d1b10",
+      "id": "bb8e65f6-87f8-44e6-8325-d1819ac5681f",
       "name": "Deopara Cc ",
       "nameBn": "দেওপারা সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "14766ebd-f61e-462b-b908-53214fc5a13f",
+      "id": "3e324868-843a-43b5-89d0-fc14e5f9fd7c",
       "name": "Dubbati CC ",
       "nameBn": "ডুব্বাতি সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "1e3a54e3-37f6-4b9b-baad-4573f540bbbf",
+      "id": "73ac762f-56af-4298-b65f-d9147f472501",
       "name": "Kumartek Cc",
       "nameBn": "কুমারটেক সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "c402b76e-fa5a-476d-8b4c-52ad7ec86798",
+      "id": "f2bb616d-11dc-49b9-9f44-a6fb33c4b504",
       "name": "Uttargaon Cc ",
       "nameBn": "উত্তারগাঁও সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "be7a7ebe-3d44-4a6b-b99b-4fe15b3df235",
+      "id": "bf4543e3-a212-47d1-8949-d325901edde0",
       "name": "Baghun Cc",
       "nameBn": "বাঘুন সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "629fb2e1-190d-4813-b795-316994f86d50",
+      "id": "dfdb062d-5120-4e05-93a0-6d808c357fa4",
       "name": "Baragaon Cc",
       "nameBn": "বারাগাঁও সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "35792c36-be6c-417b-8ea5-6ff41656c897",
+      "id": "5b8187e2-7e5b-40d9-a31b-4585bb3c38cb",
       "name": "Dhanpur Cc ",
       "nameBn": "ধানপুর সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "d2fd7c15-dd23-4015-bc81-9dfc113e80be",
+      "id": "8ff1f59e-e639-4062-a9e3-34d64b97bf14",
       "name": "Rathura Cc",
       "nameBn": "রাথুরা সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "d4fabd1c-42fb-4e4f-b20e-29f72d866514",
+      "id": "33c6ead4-fd77-48b1-9f7b-7c580ca5925e",
       "name": "Shinglab Cc",
       "nameBn": "শিংলাব সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "d0410922-3fe3-4bbf-9490-46b341c31885",
+      "id": "caf0d826-d0e0-4d43-ac14-1595ace4e2af",
       "name": "Boali Cc",
       "nameBn": "বোয়ালি সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "4ad8c0b4-6872-427d-bc5f-33fc3779a856",
+      "id": "ca12cd0f-6190-444d-a93f-87714a6c7eb4",
       "name": "South Som Cc",
       "nameBn": "সাউথ সম সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "001092d2-e23f-44cc-a642-5d33ce23f71c",
+      "id": "e2afa59a-354e-4d3e-bd1d-aabe0f24478e",
       "name": "Bahadurshadi Union Centre ",
       "nameBn": "বাহাদুরশাদী ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "6e65321d-604b-40ce-807c-9b17dbf95f77",
+      "id": "8c1e4dea-9a45-4114-8c93-83f973c93452",
       "name": "Baktarpur Union Centre ",
       "nameBn": "বক্তারপুর ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "0afd113c-a0bc-4fd3-b863-726db3029430",
+      "id": "b566fc95-61ea-41f6-960b-212f52af04ca",
       "name": "Jamalpur Union Centre",
       "nameBn": "জামালপুর ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "6c81a825-8e9d-474a-a417-b2a4bb77fe84",
+      "id": "addf7730-437d-40c0-9bfa-ac910db1803d",
       "name": "Jangalia Union Centre",
       "nameBn": "জাঙ্গালিয়া ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "a17ddb3a-3faa-41e6-b630-5929e908b4c9",
+      "id": "82b42033-3851-4a3f-8615-fd085139c255",
       "name": "Moktarpur Union Centre",
       "nameBn": "মোক্তারপুর ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "e12d3b20-2637-47c0-a6c7-7a791860095d",
+      "id": "2b65e096-7824-4bda-89e0-8effd29e219f",
       "name": "Nagri Union Centre",
       "nameBn": "নাগরি ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "d1106b43-4c40-4ce5-b164-c6320bfdc610",
+      "id": "ff1f9b73-d5bf-498e-9ba7-32006a1ffe75",
       "name": "Tumulia Union Centre",
       "nameBn": "তুমুলিয়া ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "c3258924-449c-428b-a266-2f6e8ee3496f",
+      "id": "1fa4722a-8b26-4ff5-868f-b20459616126",
       "name": "Royen CC- Kaligonj",
       "nameBn": "রয়েন সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "fadf581d-d00d-4077-aaed-1234f28c20ed",
+      "id": "8734be55-5a5e-40d2-8fb6-63cf21dee84c",
       "name": "Parabartha CC- Kaligonj",
       "nameBn": "পারাবারথা সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "52c22465-ee5c-4d74-8a94-3836916658a5",
+      "id": "d7aebd49-9364-4025-b815-e83493153c26",
       "name": "Bangladesh Red Crescent Society-Kaliganj",
       "nameBn": "বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "b7f4192f-24aa-40f3-9330-0abc6a8f7199",
+      "id": "935a7bca-cb51-49ac-8503-5b140792baba",
       "name": "Bangladesh Red Crescent Society-2 Kaliganj",
       "nameBn": "বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - ২ কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "0fbd8ed3-44d4-4547-bec9-f1da83d8ad8d",
+      "id": "b13aaa1f-5f27-4537-bf8b-89d7c3b45509",
       "name": "Bangladesh Red Crescent Society-3 Kaliganj",
       "nameBn": "বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি -৩ কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "874ec623-1719-46a6-8d06-80db9c34e744",
+      "id": "8baad346-fdaf-4bbf-8bf2-9436b1de1acc",
       "name": "BRAC (BHP) -Kaliganj",
       "nameBn": "ব্রাক (বিএইচপি) - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "1c062a2b-57eb-4cc2-8bc8-f2e0f809ff77",
+      "id": "81522fab-b77f-4e2f-b37d-66b8d6e9800e",
       "name": "Marie Stops-Kaliganj",
       "nameBn": "মেরি স্টোপস - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "b775b5c5-caf4-4629-92e0-1589c52fa4d1",
+      "id": "ca3e09f7-6780-42f4-af1c-29ab64b5cc8c",
       "name": "Saint marys Catholic Mother and Child Health center-Kaliganj",
       "nameBn": "সেন্ট মেরিস কাথলিক মাদার অ্যান্ড চাইল্ড হেলথ সেন্টার - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "bac44104-6486-4dcd-bedc-26ccf9aad01d",
+      "id": "101a1810-9a6e-4e05-9fe2-7aee028c2ba3",
       "name": "St. Anthony Mother and Child Health Care-Kaliganj",
       "nameBn": "এসটি আন্থনি মাদার অ্যান্ড চাইল্ড হেলথ কেয়ার - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "75fae8cf-0c28-41aa-9a5c-de122fb89e9f",
+      "id": "157d411c-7770-4f80-8f3c-93074a33e039",
       "name": "Kaliganj Central Hospital-kalioganj",
       "nameBn": "কালিগঞ্জ সেন্টার হসপিটাল - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "f6e203d7-dd5d-4cc5-9605-66939fbd723e",
+      "id": "a0a8f1d0-b49a-45fd-816b-7c578be91c64",
       "name": "Jamil Eye General Hospital-kalioganj",
       "nameBn": "জামিল আই জেনারেল হসপিটাল - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "8fe8da77-879b-45ef-9dd1-0c43e522e9f5",
+      "id": "fa8a2379-f165-4ee0-baa7-bf26dd343c05",
       "name": "Norun CC - Kaliganj",
       "nameBn": "নরুন সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "72f38ea3-f788-455c-8392-cda22bacc01a",
+      "id": "b9ce91bd-836a-489e-8d28-ccd77653f908",
       "name": "Upazila family welfare office",
       "nameBn": "উপজেলা ফ্যামিলি ওয়েলফেয়ার অফিস - কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "dc5834e1-bd9c-44ef-ae39-3025d9e0fb59",
+      "id": "f139b883-4689-43a9-aa2d-b3aee960f835",
       "name": "Upazila family welfare sadar clinic",
       "nameBn": "উপজেলা ফ্যামিলি ওয়েলফেয়ার সদর ক্লিনিক কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "4b69d4f9-59f5-47a2-84f8-619b64a84ca3",
+      "id": "12a0f39d-74f2-4569-ba11-5f63a55d371f",
       "name": "UH & FWC Bahadursad",
       "nameBn": "ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (ইউএইচ অ্যান্ড এফডবলিওসি) বাহাদুরশাদী কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "63ff91e1-54f1-4784-9d2e-4561560123f0",
+      "id": "129c260b-721e-4663-90a6-b2dd3b95e13a",
       "name": "UH & FWC Jamalpur",
       "nameBn": "ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) জামালপুর কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "28fedcc4-2380-4466-9f96-2c702ca882bd",
+      "id": "be1a41c8-be8f-440e-a2c4-0b7cfd16a3df",
       "name": "UH & FWC Bakterpur",
       "nameBn": "ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) বক্তারপুর কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "891b3271-f801-4d27-a308-616d508bf16b",
+      "id": "6b9dc641-db71-4279-8674-30599ce3d725",
       "name": "UH & FWC makterpur",
       "nameBn": "ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) মক্তারপুর কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "154dbea7-1c1c-4e81-a85f-2ea55fd4aa37",
+      "id": "7448ee10-bf62-440e-a4d9-ab69dc40f413",
       "name": "UH & FWC Jangalia",
       "nameBn": "ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) জাঙ্গালিয়া কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "ce94aab7-f777-4a6e-b7b9-7056339d0b9c",
+      "id": "26fe12c5-b1c7-48db-8d3f-4b759dd6e58c",
       "name": "UH & FWC Tumolia",
       "nameBn": "ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) তুমুলিয়া কালিগঞ্জ গাজীপুর.",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "93dfb4cf-f977-4a82-a0bb-696a18a7e180",
+      "id": "a4dd3317-96b6-4e6d-9c58-b8831b5d3025",
       "name": "Khoikora CC - Kaliganj",
       "nameBn": "খইকরা সিসি - কালিগঞ্জ",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "a18f666b-d5f7-459f-aa85-c325f568f3b2",
+      "id": "99e76035-4fb5-46f2-a281-b1104e77cc11",
       "name": "Kaliganj (GP) Mun.",
       "nameBn": "কালিগঞ্জ (জিপি) মুন",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987"
+      "partOf": "Location/83983c41-9e6e-493b-bcbb-90b31be5a7e2"
     },
     {
-      "id": "e186f287-34b6-4aff-b37a-3a02c175e475",
+      "id": "52b99a56-d185-4493-9219-e6748c78361d",
       "name": "Algi(madhabdi) Union Sub Center",
       "nameBn": "আল্গি (মাধাব্দি) ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "2d6cda66-439d-49f4-99e6-fecce7ccfc58",
+      "id": "8b2d896a-07d1-43b8-bb7d-c217c7e59366",
       "name": "Amdia Union Sub Center",
       "nameBn": "আমদিয়া উপ-স্বাস্থ্য কেন্দ্র",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "781dbb84-d7dc-4588-89ce-6daee02a51e9",
+      "id": "de72a795-8d35-4f36-bdcb-000a9e37cd12",
       "name": "Bhagirathpur Union Sub Center",
       "nameBn": "ভাগিরাথপুর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "035fc00c-058f-4908-ba21-5ad1a99da6f9",
+      "id": "87b51775-0ccd-4dd8-8f26-6bb7de690175",
       "name": "Bhatpara Union Sub Center",
       "nameBn": "ভাটপারা ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "074d6d1b-705c-45b8-ae0a-b4e9231745c6",
+      "id": "42615b99-5198-4adb-a72e-5a6176827feb",
       "name": "Karimpur Union Sub Center",
       "nameBn": "করিমপুর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "a17b983e-ce38-48da-a410-b2d276a12542",
+      "id": "108ccebb-af86-406e-b121-07675e2e102f",
       "name": "Narsingdi Sadar Union Sub Center",
       "nameBn": "নরসিংদী সদর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "962215eb-8e60-4bd5-9b77-436ef919b2f7",
+      "id": "97e233f7-f38f-48ac-ac9b-b28b081917a1",
       "name": "Narsingdi (sadar) Upazila Health Office",
       "nameBn": "নরসিংদী (সদর) উপজেলা স্বাস্থ্য অফিস",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "f94a1ac2-22ba-460d-ac4c-976d22a13430",
+      "id": "1b8762a8-fc1f-41a3-bdaa-99e9ec89e887",
       "name": "Narsingdi Civil Surgeon Office",
       "nameBn": "নরসিংদী সিভিল সার্জন অফিস",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "fe363f48-832a-4258-ad66-40924fdd255b",
+      "id": "5306a003-8fd7-409c-ae66-612eb95bb211",
       "name": "Narsingdi District Hospital",
       "nameBn": "নরসিংদী জেলা হসপিটাল",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "2da86c4c-b28b-4542-b5ee-7134a713a43e",
+      "id": "bb6b336c-795c-4c91-835b-6d598ffd9b29",
       "name": "Narsingdi 100 Bed Zilla Hospital",
       "nameBn": "নরসিংদী ১০০ বেড জেলা হসপিটাল",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "b086e9e3-374c-4443-9fd9-03f8fa96c489",
+      "id": "9c8f3228-e587-4801-bea9-1424d0bcd4fc",
       "name": "Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar",
       "nameBn": "চরমাধবপুর (বাখারনগর) সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "9d9ca670-5092-47d6-bf5a-34a35b95f36c",
+      "id": "9edd3e29-3cf3-493c-a88b-662008d769e5",
       "name": "Khodadila Cc - Narsingdi Sadar",
       "nameBn": "খোদাদিলা সিসি – নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "58f5a3e1-181d-4535-a8af-38f7a7b92fdb",
+      "id": "e14af6bd-a225-45da-b960-9bbedcf7b513",
       "name": "Belab (bhaiyum) Cc - Narsingdi Sadar",
       "nameBn": "বেলাব (ভাইয়ুম) সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "fdb07376-96cb-4c22-9798-131b5f5c726c",
+      "id": "d0f3b33f-f5f7-4e94-9661-67a146aec0e6",
       "name": "Goaldi Cc - Narsingdi Sadar",
       "nameBn": "গলাদি সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "8903dc6f-a3be-4093-a2b3-a2bd7349b29f",
+      "id": "841839bb-4212-49c2-9815-0dd0f06bc95f",
       "name": "Pakuriya Cc - Narsingdi Sadar",
       "nameBn": "পাকুরিয়া সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "953e55bb-5227-4b7c-9a4f-e031cc97e002",
+      "id": "5c26c400-a827-4894-9a7d-4089a20b39b6",
       "name": "Kalikapur Cc - Narsingdi Sadar",
       "nameBn": "কালিকাপুর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "93c66aac-ddc2-43fa-9b71-34cda236fefe",
+      "id": "f1be2462-c420-41ec-8b9b-357aa08a1ec5",
       "name": "Chinishpur Cc - Narsingdi Sadar",
       "nameBn": "চিনিসপুর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "8e49b8b1-7623-4917-91d8-a043d85b286f",
+      "id": "30e7a23d-5cbe-4c5e-9848-8c8157f28f05",
       "name": "Ghoradiya Cc - Narsingdi Sadar",
       "nameBn": "ঘোরাদিয়া সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "3f734334-fc08-411d-b221-935512795ca7",
+      "id": "90bf2ec3-62bf-4fdd-bdf2-9bb727396c4a",
       "name": "Badarpur Cc - Narsingdi Sadar",
       "nameBn": "বাদারপুর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "adb4ea49-a405-490a-a365-ee0b74455589",
+      "id": "11a05031-7c80-43e8-85c8-a6200e38ac90",
       "name": "Hajipur Cc - Narsingdi Sadar",
       "nameBn": "হাজিপুর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "b7276800-45df-43a3-8fd7-4c243f873e2e",
+      "id": "cff94cc5-de06-43c9-b07d-6d3282bf7a4e",
       "name": "Daukadi Cc - Narsingdi Sadar",
       "nameBn": "দাউকাদি সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "15926d33-27a4-4b25-9a84-918bcce0b21a",
+      "id": "1870a92f-58e8-4b4a-b006-bcd567ffd039",
       "name": "Khamardi Cc - Narsingdi Sadar",
       "nameBn": "খামারদি সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "20ac5dc6-43cc-4173-80de-d211a6ad8d45",
+      "id": "508e1159-0108-4464-955c-dc533dce8f56",
       "name": "Panchabati Cc - Narsingdi Sadar",
       "nameBn": "পঞ্চবতি সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "7cb71a62-c6c8-4e7f-9be5-650f716231cf",
+      "id": "6ffe5f33-3043-4a2b-ba71-4cbae67d58ab",
       "name": "Rasulpur Cc - Narsingdi Sadar",
       "nameBn": "রাসুলপুর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "67d4df5a-509b-4515-bae4-41de2b8b83b3",
+      "id": "036353b9-dd2e-49ea-a1ea-7584ae84a40d",
       "name": "Sreenagar Madhyapara Cc - Narsingdi Sadar",
       "nameBn": "শ্রীনগর মধ্যপাড়া সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "a967ad46-502d-43a8-b070-5840a608464d",
+      "id": "3dabff36-df40-4b33-ac9b-13b6a0b96d2d",
       "name": "Baluchar Cc - Narsingdi Sadar",
       "nameBn": "বালুচর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "3b649f71-e015-467d-ac60-a1a4215e3a88",
+      "id": "180b54d9-0d50-4678-b29c-b0be8b7a39b8",
       "name": "Chanderpara Cc - Narsingdi Sadar",
       "nameBn": "চান্দেরপাড়া সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "1d886a95-e06c-4a52-9b3c-d228f70e322e",
+      "id": "97fbcb2c-dbec-4070-bce0-eaa91f853d22",
       "name": "Dorigazirgaon Cc - Narsingdi Sadar",
       "nameBn": "দরিগাজিরগাঁও সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "9da34c22-24e6-4b7a-bf3d-baf2430173b0",
+      "id": "e582f8a9-d2f1-49ab-a1de-ee8ace3c93a9",
       "name": "Kotalichor(bilpar) Cc - Narsingdi Sadar",
       "nameBn": "কোটালিচর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "38fcf21e-9b13-41cc-9a1c-b8601bf22da7",
+      "id": "c98f92bf-dd8b-41d6-914a-0ee59b7b9011",
       "name": "Mahishashuragram Cc - Narsingdi Sadar",
       "nameBn": "মহিষাসুরাগ্রাম সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "95caddaa-80d0-4bde-92b6-5c658d92027e",
+      "id": "026e7235-7815-42f6-b263-4159e39e735d",
       "name": "Meherpara Cc - Narsingdi Sadar",
       "nameBn": "মেহেরপুরা সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "256385bd-515c-4840-a06f-c736dda65a4c",
+      "id": "e5f968c5-f0bb-4f55-b85a-190985f2ac98",
       "name": "Sbarpanigair Cc - Narsingdi Sadar",
       "nameBn": "সর্পনিগৈর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "4dec934c-4675-4fe7-be3a-89fc5d50d82f",
+      "id": "b29e61b8-bd1b-4e60-984f-5edf3949030a",
       "name": "Chhagriyapara Cc - Narsingdi Sadar",
       "nameBn": "ছাগরিয়াপারা - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "99a7e25f-94f2-4106-9406-416b21f4b0fe",
+      "id": "1a28fb7d-0c63-4723-a398-6b286f929f6a",
       "name": "Dilarpur (alipur School Cc) - Narsingdi Sadar",
       "nameBn": "দিলারপুর - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "d7802d61-3c64-4acb-80ce-6250071db811",
+      "id": "d942174c-8fee-4c4f-aa28-28a59f5fbd0c",
       "name": "Dilarpur Eidgah Cc - Narsingdi Sadar",
       "nameBn": "দিলারপুর ঈদগাহ - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "72d62525-ad69-41a2-9bb6-ab00824b35c1",
+      "id": "925cb047-8803-48d5-b23d-56ac16400885",
       "name": "Jamaliyakandi Cc - Narsingdi Sadar",
       "nameBn": "জামালিয়াকান্দি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "f8b44df1-c3b6-43ea-8909-012a282ddec2",
+      "id": "6107bf62-a690-47ff-b267-e24d12dd6d37",
       "name": "North Char Bashania Cc. Narsingdi Sadar",
       "nameBn": "নর্থ চর বাশানিয়া - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "b57c7956-8031-4b07-8725-9d14b56a4095",
+      "id": "3aa5f419-817b-4d7d-b5a7-56cc7ec586fb",
       "name": "Bhatpara Cc - Narsingdi Sadar",
       "nameBn": "ভাতপারা সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "ec39b030-67d1-4387-a70a-f813c9fefe3f",
+      "id": "0ecfb2ee-e043-470f-80e7-4bc2e7f5e851",
       "name": "Kakshiya Cc - Narsingdi Sadar",
       "nameBn": "কাকশিয়া - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "80e6c6db-bb40-4a02-9e4a-9eaa1ff9657d",
+      "id": "ad39aa0c-a43f-46fe-b0a7-0748b4b2ca18",
       "name": "Shekherchar Cc - Narsingdi Sadar",
       "nameBn": "শেখেরচর সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "ed1d718e-3a87-4f75-b929-adbdaa391ff6",
+      "id": "bce1b5e1-9b24-471f-89b8-7fce84ecfbd1",
       "name": "Shilmandi Cc - Narsingdi Sadar",
       "nameBn": "শিলামান্দি সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "5eabccf4-157e-4542-8a13-c280f8888c98",
+      "id": "751e4ae9-704b-4fef-b707-ac99a3d5926c",
       "name": "Alokbali Union Centre",
       "nameBn": "আলোকবালি ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "c8a78599-5473-47eb-a565-701944ca6fef",
+      "id": "974dc971-3691-417b-9312-6c8ec5fc6663",
       "name": "Chardighaldi Union Centre",
       "nameBn": "চরদিঘলদি ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "13dbf810-9acf-4805-be73-0f89bb7f3a1c",
+      "id": "cf441ee8-7bb9-4c08-a458-c45fafa7efa9",
       "name": "Chinishpur Union Centre",
       "nameBn": "চিনিসপুর ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "ac44b3b3-1d8d-4648-a897-3c16c7eb7bcb",
+      "id": "265a3ee1-44d8-42db-a80c-fc4ea61fcffc",
       "name": "Nazarpur Union Centre",
       "nameBn": "নজরপুর ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "3b9ebb4a-711b-4d76-91ca-a01cd1e2a161",
+      "id": "14bb8538-20fd-4ce0-a891-7fdbb042418d",
       "name": "Nuralpur Union Centre",
       "nameBn": "নুরালপুর ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "bf1af7b7-49bc-4865-9d6a-1be75f71ec8c",
+      "id": "67df8b45-c6b0-43eb-8ea0-87717c443156",
       "name": "Paikar Char Union Centre",
       "nameBn": "পাইকারচর ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "ee689c2b-b0d0-47db-9698-ea6068cdac61",
+      "id": "dd783512-e024-41b0-a931-40395a9c1449",
       "name": "Silmandi Union Centre",
       "nameBn": "শিলামান্দি ইউনিয়ন সেন্টার",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "0dd6b282-8f53-4ef5-aec9-2465ffd0f5cb",
+      "id": "9381b334-1c6a-4685-a39d-71a9a506a8ec",
       "name": "Kazir Kandi Cc - Narsingdi Sadar",
       "nameBn": "কাযিরকান্দি সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "f057ab2e-d664-40e0-8201-9c1e4f137ef1",
+      "id": "df65c76a-ddb9-4df0-8e2f-4a31b01953b5",
       "name": "BRAC (BHP) ",
       "nameBn": "ব্র্যাক (বিএইচপি) - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "b94e0408-c0d5-432a-9298-c949a6353b55",
+      "id": "8cd04e44-4b10-4545-bbaa-0adae0cf49de",
       "name": "Bangladesh Red Crescent Society",
       "nameBn": "বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "158a47c2-5624-4f47-8c4d-7a67873eca3f",
+      "id": "910c1243-c96e-41df-b88d-9d6298025741",
       "name": "Marie Stops",
       "nameBn": "মেরি স্টোপস সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "1739b6da-ac71-4e29-becc-6ec79755a929",
+      "id": "51bf78d1-6d42-49b8-b421-54921efc9d1c",
       "name": "Bangladesh Association for Prevention of Septic Abortion",
       "nameBn": "বাংলাদেশ এসোসিয়েশন ফর অফ প্রেভেনশন সেপটিক এবোরশন",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "86f2688f-05ee-4946-b56e-2a8d88ddc163",
+      "id": "b441a4bc-3b58-45a3-a1bc-dacacb1a64aa",
       "name": "BRAC (BHP)",
       "nameBn": "ব্র্যাক (বিএইচপি)- নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "2913b28c-d360-44b0-94c8-1158e591a96f",
+      "id": "c2860399-194f-431d-b62f-888d722da63e",
       "name": "Welcome Hospital Pvt.",
       "nameBn": "ওয়েলকাম হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "9bde0201-390c-4151-8c1b-9f9ee38261ad",
+      "id": "a13ea5ec-2b1f-4b06-b9df-591768509ac0",
       "name": "Narsingdi Modern Clinic",
       "nameBn": "মডার্ন ক্লিনিক - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "22e496af-04d1-4d62-bfa4-c8d4ae9c87c9",
+      "id": "eef0db55-7770-48cc-a3c1-3fe4d385fe3c",
       "name": "Prime General Hospital",
       "nameBn": "প্রাইম জেনারেল হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "a6f720e1-b711-4042-97c0-2849e22f801d",
+      "id": "034250ba-04af-4f8c-a828-797ae46451be",
       "name": "Narsingdhi General Hospital",
       "nameBn": "নরসিংদী জেনারেল হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "579b17db-8707-4fe5-b36c-f1f3460adc94",
+      "id": "3de88290-84cb-42a4-980e-dfad38545742",
       "name": "Mukti General Hospital",
       "nameBn": "মুক্তি জেনারেল হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "9e492fd4-4aa7-4d61-b053-36ad67c77ce3",
+      "id": "d5329c91-37ff-4e7a-86e9-039d769095c0",
       "name": "National General Child Hospital",
       "nameBn": "ন্যাশনাল জেনারেল চাইল্ড হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "e8d3d8f0-f1ff-4d1d-a170-70368805cd1c",
+      "id": "0ab2a6e7-ea39-42a9-8876-5b4e772cf2fc",
       "name": "EBA Private Hospital",
       "nameBn": "ইবিএ প্রাইভেট হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "11e034d4-2a74-409a-80ec-64785ff80bba",
+      "id": "ead1833e-5b7e-4644-964e-f1a923d5c97f",
       "name": "Holy Life General Hospital",
       "nameBn": "হলি লাইফ জেনারেল হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "73729e16-7f2c-41d8-ace6-d41d3d8c22ba",
+      "id": "9c2e8f91-5b28-406d-b881-f011b1aad61f",
       "name": "Sufia Pvt. Hospital",
       "nameBn": "সুফিয়া পিভিটি. হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "34690376-3855-4293-b1a1-d2dc95c14ee8",
+      "id": "8d46ce3b-6188-499a-959c-d564e2651538",
       "name": "Madhavi General Hospital",
       "nameBn": "মাধোভি জেনারেল হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "dcb32b85-2013-48d0-9c86-6f9668375ff0",
+      "id": "1a6afd11-582e-496c-a9ec-ac905f53ddae",
       "name": "Poli Clinic and Eye Care Center",
       "nameBn": "পলি ক্লিনিক এন্ড আই কেয়ার সেন্টার - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "9ba424a2-cd76-440f-84c1-89966350e785",
+      "id": "f2073026-3161-4295-b463-826ef4bd4523",
       "name": "Alfalaha Pipals Prikate Hospital",
       "nameBn": "আলফালাহা পিপলস প্রাইভেট হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "f6b951e5-e90a-43dd-a266-2c87a808e706",
+      "id": "ba52a299-a7dd-42de-9c8c-0580e7eec028",
       "name": "Apollo Hospital",
       "nameBn": "এপোলো হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "32ccb781-5ae3-44b1-89fb-815fc4b4e349",
+      "id": "26e4cc8c-bb09-410a-b47a-c97dd280fcb5",
       "name": "People's Pvt. Hospital",
       "nameBn": "পিপলস প্রাইভেট হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "9d43e907-8c75-472d-97f4-2ee1da8b1739",
+      "id": "58ba3534-88e9-4e95-abb4-ad3b11a8fc86",
       "name": "Mita Nursing Home",
       "nameBn": "মিতা নার্সিং হোম - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "2389a67c-a6d4-4ee7-9e08-c34dd7d6f1dd",
+      "id": "d5dabc7d-c8a2-4d1d-9925-1dd1bcbc6d31",
       "name": "Holly Cricent Hospital",
       "nameBn": "হলি ক্রিসেন্ট হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "e16b21f5-b3d4-4117-8d0a-f161eb4a3f65",
+      "id": "01eaaea3-3da8-4777-8da3-136164d87f50",
       "name": "Faith General Hospital",
       "nameBn": "ফেইথ জেনারেল হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "bd0691a0-3604-4131-88bf-75cecbf99fb1",
+      "id": "fe3eba23-e195-49ee-973d-1d726b6d4286",
       "name": "Prime General Hospital",
       "nameBn": "প্রাইম জেনারেল হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "2d169b35-51f6-4b95-a098-42d8b17930c2",
+      "id": "72a96c56-1173-44ea-beb7-1762423676d5",
       "name": "Mother & Child Welfare Centre (MCWC) Narsingdi Sadar",
       "nameBn": "মাদার অ্যান্ড চাইল্ড ওয়েলফেয়ার সেন্টার (এমসিডব্লিওসি) নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "b834f696-02dd-4cea-a084-c1fbd4983131",
+      "id": "1e482ef3-4920-44e8-bc43-10712fa5b34f",
       "name": "Dhaka Progressive Lions Eye Hospital",
       "nameBn": "ঢাকা প্রগ্রেসসিভ লায়ন্স আই হসপিটাল - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "efc19f6e-2890-4e45-8a84-67cdc80338de",
+      "id": "9b6acc76-3d42-48f7-bc00-55314e0c8e60",
       "name": "Baghhata take para CC - Narsingdi Sadar",
       "nameBn": "বাঘহাটা টেক পাড়া সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "83c8a92e-611b-4302-b56e-ba9283f872be",
+      "id": "6a10c616-13a6-435b-92b8-069edd923ca4",
       "name": "Dr. Nuruzzaman Khokon CC - Narsingdi Sadar",
       "nameBn": "ডঃ নুরুজামান খোকন সিসি - নরসিংদী সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/2c981e20-ecf2-4ed1-887b-fc41e981f9ed"
+      "partOf": "Location/dbf2186e-2d42-435b-8d6a-256853c725b4"
     },
     {
-      "id": "e3c4838b-a153-4203-a14f-386362eba05e",
+      "id": "70a66961-3b77-4174-b655-e0199da71663",
       "name": "Kurigram (Sadar) Upazila Health office",
       "nameBn": "কুড়িগ্রাম (সদর) উপজেলা হেল্‌থ অফিস",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "86e6890c-eef9-4efc-a6d6-5bb18fe73463",
+      "id": "30157e23-51b7-438f-aebb-35b487b69ae2",
       "name": "Pangachi Uh&fwc",
       "nameBn": "পাঁচগাছি (এউএইচএন্ডএফডবলিওসি)",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "62acdcd3-ffe2-4bb3-bc8d-451e0f2c1078",
+      "id": "6b039099-5ea0-45d5-933c-ee4cdd5fde1e",
       "name": "Kurigram Civil Surgeon Office",
       "nameBn": "কুড়িগ্রাম সিভিল সার্জন অফিস",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "d1eae89b-835e-483f-9eac-d55fffac57f9",
+      "id": "3a1fdedb-0f3b-480d-8ffa-e3e06059d5c4",
       "name": "Kurigram District Hospital",
       "nameBn": "কুড়িগ্রাম জেলা হসপিটাল",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "61711f42-0ea3-499d-a015-7e5001aa5efd",
+      "id": "f2b156fa-2df6-4861-88b6-71707a9e223c",
       "name": "Kurigram Chest Disease Clinic",
       "nameBn": "কুড়িগ্রাম চেস্ট ডিসিস ক্লিনিক",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "46c046d8-cb93-4d2b-a777-fa32b63cdc0d",
+      "id": "8bbd917c-5006-41f8-9d29-ca86acff057b",
       "name": "Chilapara Cc",
       "nameBn": "চিলাপাড়া সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "4ca00dd0-886e-4ae8-b4f1-48850a161379",
+      "id": "381bb254-504b-4ef1-af29-f8aae23910aa",
       "name": "Palashbari Cc",
       "nameBn": "পলাশবাড়ী সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "5281e13c-0d94-46e9-a6bc-7db42e4b4169",
+      "id": "d105d80f-8769-4bb1-8edc-538a7336caef",
       "name": "Basurvita Cc",
       "nameBn": "বাসুরভিটা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "ff5f2800-f38f-4b91-bb00-a1c9d866fc9c",
+      "id": "ca61d568-1f34-45b6-8e97-7fc01934e6c5",
       "name": "Madhabram Cc",
       "nameBn": "মাধবরাম সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "44027160-b690-496c-b0ab-6cae3313afa2",
+      "id": "78c72eb1-10fe-4251-b4f6-02248d0d70fa",
       "name": "Uttor Kumarpur Cc",
       "nameBn": "উত্তর কুমারপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "ce43c805-053b-4fcf-aa80-41a036575b04",
+      "id": "55cef448-f550-40f2-8c10-37a3771b9810",
       "name": "Paramali Cc",
       "nameBn": "পারামালি সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "496e4352-50ad-40cd-9670-02772f5d1cf9",
+      "id": "d881760f-678e-41e6-857c-f4f068a05ebb",
       "name": "Kachichar Cc",
       "nameBn": "কাছিছার সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "0bbcdc23-4d70-480b-8689-c2dd7e4e29a8",
+      "id": "db081546-0610-431f-83fc-3a67e0f1f54a",
       "name": "Lakshir Khamar Cc",
       "nameBn": "লাকশির খামার সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "c419c797-cf63-481f-9325-3a245939bd78",
+      "id": "8a2c634d-5550-4e3d-acf6-921499d712df",
       "name": "Rasulpur Cc",
       "nameBn": "রাসুলপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "90f6813b-b975-4cc5-b696-d761f02b6109",
+      "id": "8009e8a3-bd18-4575-833b-b98748a930e0",
       "name": "Lakshikanto Cc",
       "nameBn": "লাকশিখান্ত সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "93ebe9f8-e0fb-41ab-95f6-6b83e735ebf8",
+      "id": "23132ac6-ea84-412e-8d1c-3b92dfc5e47e",
       "name": "Halokhana Cc",
       "nameBn": "হলোখানা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "c40e4177-5aed-4b2b-bf21-f4ff0c4ec0d7",
+      "id": "a344904a-e6ac-4198-8d7b-bd152b4d1a32",
       "name": "Ververi Cc",
       "nameBn": "ভেরভেরী সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "80a9b5d1-dc79-4cb0-ba5a-876c5e895daa",
+      "id": "20070766-1918-4bc4-bd6f-b98273394548",
       "name": "Ghaneshyampur Cc",
       "nameBn": "ঘনেশ্যামপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "508bc6b4-83c8-4e0e-9a7c-1cf6bc938bf0",
+      "id": "d13719c9-bb50-409d-aed2-226da5c616ec",
       "name": "Adhgram Cc",
       "nameBn": "আধগ্রাম সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "eaa126ba-85c5-4d81-8f0f-b27fd1d50dd2",
+      "id": "b16aead6-1270-4d91-970c-1e5016114c4e",
       "name": "Jotgobardhan Cc",
       "nameBn": "জোতগোবরধন সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "efbe1b37-69e2-4db5-a819-7673a29bf312",
+      "id": "b59af632-2254-42fe-984c-9a14072910dc",
       "name": "Khalisa Kalowa Cc",
       "nameBn": "খালিসা কালোয়া সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "dc9a612d-f7d6-4297-a431-79013d6555b9",
+      "id": "7a7f2750-5cb3-4878-adec-3cebe1a49949",
       "name": "Uttor Sitaijhar Cc",
       "nameBn": "উত্তর সিতাইঝার সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "89e618f7-8e34-4839-a6bf-471eca1d6263",
+      "id": "0e2a187c-fb9c-458b-866f-c6ed2d0bb012",
       "name": "Dakhin Sitaijhar Cc",
       "nameBn": "দক্ষিন সিতাইঝার সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "0056cc04-12a7-42b2-9b89-e21261f5daaf",
+      "id": "91a13495-3699-4ff1-8966-72bd54818ac3",
       "name": "Gobindapur Cc",
       "nameBn": "গোবিন্দাপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "adf78764-3730-40e4-b73b-396cdc2731f4",
+      "id": "be686f38-3270-48c3-ba9f-d6092720f8f9",
       "name": "Shulkur Bazar Cc",
       "nameBn": "শুলকুর বাজার সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "3c0e1af7-6bb5-4e18-b3dd-9dcd1ee63137",
+      "id": "bfda70f1-8851-4781-b29c-a07db94ad4e8",
       "name": "Sitaijhar Cc",
       "nameBn": "সিতাইঝার সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "14c710c5-220a-4c3a-90b5-458b1c699b77",
+      "id": "07d2dcee-0cab-491a-9d1a-4425adc5b0c0",
       "name": "Holokhana Union Centre",
       "nameBn": "হলোখানা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "f2d7b9d9-4fea-488e-a2e3-a647712cfca0",
+      "id": "ff4b23aa-173c-4836-96f3-09bba792fd1f",
       "name": "Jattarapur Union Centre",
       "nameBn": "জাত্তারাপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "5e65c4b7-dd7c-4b7b-b04f-ba6fb49cc8c5",
+      "id": "6241eb3f-0eb7-45d7-bfb8-d95714c0cf60",
       "name": "Khatalbari Union Centre",
       "nameBn": "খাতালবাড়ী সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "569d9630-f761-4530-b143-7e170fa63942",
+      "id": "11447395-337a-452a-9baa-0e3184fa5d5c",
       "name": "Mogulbasha Union Centre",
       "nameBn": "মঘুলবাসা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "5f718a06-c814-4a5d-8530-fae02f927e65",
+      "id": "889d407f-e689-4564-97ab-26f6960597b8",
       "name": "Vogdanga Union Centre",
       "nameBn": "ভগদাঙ্গা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "52a2c930-1415-450d-b50d-87da4eab87c7",
+      "id": "e2977d3b-6833-4090-9e86-f1cb85e4ff1e",
       "name": "Char Boraibari Cc",
       "nameBn": "চর বরাইবাড়ী সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "b9375b8c-801e-4c8f-a372-9e38d2cc5ab0",
+      "id": "6d93d7d2-cd17-42a2-b3a1-4f22d33d9118",
       "name": "Khalisha Zalfara Cc",
       "nameBn": "খালিশা যালফারা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "d599b0f0-e4ba-4d40-854e-db7d635e11a2",
+      "id": "068c4fbd-33b7-4b61-9e7e-8801a5cb9c64",
       "name": "Velakopa CC",
       "nameBn": "ভেলাকোপা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "84ab2745-54c0-4fec-9eeb-0928bbc0e152",
+      "id": "26fd796d-2b00-4ae9-9bd5-68a21b0cd4ca",
       "name": "Kachichar(telipara) Cc",
       "nameBn": "কাছিচর তেলিপারা)সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "8cf68597-d7b1-4939-9af2-f666c3d2f581",
+      "id": "e7195ca1-3b02-4665-b929-776a92b43774",
       "name": "Moratari Cc",
       "nameBn": "মরাতরি সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "ab55465c-8f97-431c-9ba9-c5dc1f4a8478",
+      "id": "ff7963a2-16b9-4c31-919f-ed912e458aef",
       "name": "Himerkuti Cc",
       "nameBn": "হিমেরকুটি সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "48f42693-86c5-40b6-b8a1-f6b82f840aa8",
+      "id": "c9871ca4-6352-46ad-8ae7-3a10fd64908f",
       "name": "Pipul Bari CC",
       "nameBn": "পিপুলবাড়ী সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "5b14154d-47a2-46ba-b991-72763f1da099",
+      "id": "1944ae77-924b-43bd-b88d-6de7432505c2",
       "name": "Madhya Kumorpur Cc",
       "nameBn": "মধ্য কুমরপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "9d24447f-0e4f-4fbd-8f41-d801d260c0ae",
+      "id": "ca9bb023-035e-46b6-9a95-17653ec9de71",
       "name": "Kadomtola Cc",
       "nameBn": "কদমতলা সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "fc19a8ed-8271-42a3-a562-dcc805fe324d",
+      "id": "e8229a4f-51e1-4ae2-bc10-55dceea152e4",
       "name": "Char Kisnopur Cc",
       "nameBn": "চর কিষ্ণপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "2e98f104-e327-446f-a8b1-b0c85c4d6cdb",
+      "id": "5d9ed6f7-cc96-4080-b7d1-a7cc286b0e73",
       "name": "Purbo Kollan Cc",
       "nameBn": "পুর্ব কল্যাণ সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "5c4c6411-3257-4ec2-a7da-514e8cc943b8",
+      "id": "14fba2b4-c000-4c1e-a13f-96ace300b7b3",
       "name": "Parbotipur Cc",
       "nameBn": "পার্বতীপুর সিসি- কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "2ea0821a-099b-44db-bede-d2205dcde51e",
+      "id": "494feef3-813e-4084-8041-cdb03dccdc37",
       "name": "Terre Des Hommes Foundation",
       "nameBn": "তেরে দেস হোমস ফাউন্ডেশন - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "06754e66-e73c-4154-beee-1761f71a6c85",
+      "id": "88f07cb7-15b1-4716-8268-5b301324a36b",
       "name": "RDRS Bangladesh",
       "nameBn": "আরডিআরএস বাংলাদেশ -কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "5e1d802b-25e7-4ad6-bd87-805e9bf2ad0c",
+      "id": "aa28e607-6aa8-4b8b-9fc4-480b6fe10157",
       "name": "BRAC (BHP) ",
       "nameBn": "ব্র্যাক (বিএইচপি) - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "b2aae102-61b5-477a-934a-0de39e9d3c8d",
+      "id": "abb0bdc7-3b0e-4ebb-a042-d13eebced4d8",
       "name": "Paribaik Shastho Clinic",
       "nameBn": "পারিবাইক স্বাস্থ্য ক্লিনিক - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "0951e45e-db76-4220-bc62-51a227e9550b",
+      "id": "2154dabd-b8f5-4044-b98d-dec957b70283",
       "name": "RDRS Bangladesh",
       "nameBn": "আরডিআরএস বাংলাদেশ - কুড়িগ্রাম সদর – ২",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "8d7be5f7-34d2-4d60-a935-6bf39533e01d",
+      "id": "3f8dfa09-70e9-4a2d-8b58-7f029fd3b230",
       "name": "Chinno Mukul",
       "nameBn": "ছিন্ন মুকুল - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "d0206080-3d8e-4f07-bf84-a078eeec01eb",
+      "id": "d31d9941-efcc-404e-b3c3-cdaf12d1dce6",
       "name": "Terre Des Hommes Foundation",
       "nameBn": "তেরে দেস হোমস ফাউন্ডেশন - কুড়িগ্রাম সদর -২",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "7d2eef2f-13bf-45c5-b35d-cb975024fbb4",
+      "id": "df10cd8d-5b84-4307-bdf4-a65493c1f951",
       "name": "Sheba Clinic",
       "nameBn": "সেবা ক্লিনিক - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "333c18e5-d971-48b2-a400-0f01b933c99d",
+      "id": "819aa860-d0d3-45cd-b9ff-512d41818744",
       "name": "Khan Clinic",
       "nameBn": "খান ক্লিনিক - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "59d1e179-17df-4148-b9c5-419e61e054be",
+      "id": "2285ed67-dece-4878-8698-05fb169e6677",
       "name": "Dharla clinic",
       "nameBn": "ধারলা ক্লিনিক - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "eb57ec1a-020a-41f8-933d-4ad65f0de312",
+      "id": "df4541d7-f966-466c-88a7-321c102d28c0",
       "name": "Kurigram clinic",
       "nameBn": "কুড়িগ্রাম ক্লিনিক - কুড়িগ্রাম সদর",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "d62efbf4-6df6-416c-981c-0e9ad4980342",
+      "id": "5a2256d8-2da3-48b5-b7ef-d9ab9f8cbdd8",
       "name": "Mother & Child Welfare Centre (MCWC) Kurigram Sadar",
       "nameBn": "মাদার অ্যান্ড চাইল্ড ওয়েলফেয়ার (এমসিডবলিওসি)",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "81b6020e-418e-4ec6-84c2-4b5703f8281a",
+      "id": "5f91a075-075c-4955-ac38-f5b3c6a66634",
       "name": "District Family Planing Office Kurigram",
       "nameBn": "জেলা ফ্যামিলি প্লানিং অফিস কুড়িগ্রাম",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "bbb82bcd-4ebc-434f-a4a2-058b18683eee",
+      "id": "734a0ebe-3603-4683-9afd-b896ae289d2d",
       "name": "UH&FWC Holokhana",
       "nameBn": "ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচএন্ডএফডবলিওসি) হলোখানা কুড়িগ্রাম সদর কুড়িগ্রাম",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     },
     {
-      "id": "b5e27f13-77c2-42d4-9d31-3fc93bef89c3",
+      "id": "8494f1b2-1c7e-4fc7-afb4-d22b23e344e4",
       "name": "Upazila Family Planning Office Sadar Kurigram",
       "nameBn": "উপজেলা ফ্যামিলি প্লানিং অফিস সদর কুড়িগ্রাম",
       "physicalType": "Building",
       "type": "HEALTH_FACILITY",
-      "partOf": "Location/14e349ad-7c3a-4146-97f4-2763bebdd03b"
+      "partOf": "Location/49921e96-6ccb-45db-a57c-5213715b08af"
     }
   ]
 }
