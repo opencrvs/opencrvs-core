@@ -5,7 +5,6 @@ import { messages as identityMessages } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { config } from 'src/config'
 import {
   ViewType,
   RADIO_GROUP,
@@ -352,7 +351,7 @@ export const fatherSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       conditionals: [conditionals.addressSameAsMother],
@@ -515,7 +514,7 @@ export const fatherSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       conditionals: [conditionals.permanentAddressSameAsMother],

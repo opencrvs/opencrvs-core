@@ -103,6 +103,16 @@ const DraftButtonText = styled.span`
   letter-spacing: 0px;
   margin-left: 14px;
 `
+const Notice = styled.div`
+  background: ${({ theme }) => theme.colors.primary};
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
+  padding: 25px;
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  line-height: 24px;
+  margin: 30px -25px;
+`
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -161,6 +171,11 @@ export const messages = defineMessages({
     id: 'register.form.saveDraft',
     defaultMessage: 'Save as draft',
     description: 'Save as draft Button Text'
+  },
+  optionalLabel: {
+    id: 'formFields.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
   }
 })
 
@@ -178,6 +193,15 @@ const FormViewContainer = styled.div`
 const PreviewButton = styled.a`
   text-decoration: underline;
   color: ${({ theme }) => theme.colors.primary};
+`
+const Optional = styled.span.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.placeholder};
+  flex-grow: 0;
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -512,7 +536,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     id={`form_section_title_${activeSection.id}`}
                   >
                     {intl.formatMessage(activeSection.title)}
+                    {activeSection.optional && (
+                      <Optional
+                        id={`form_section_optional_label_${activeSection.id}`}
+                        disabled={activeSection.disabled}
+                      >
+                        &nbsp;&nbsp;•&nbsp;
+                        {intl.formatMessage(messages.optionalLabel)}
+                      </Optional>
+                    )}
                   </FormSectionTitle>
+                  {activeSection.notice && (
+                    <Notice id={`form_section_notice_${activeSection.id}`}>
+                      {intl.formatMessage(activeSection.notice)}
+                    </Notice>
+                  )}
                   <form
                     id={`form_section_id_${activeSection.id}`}
                     onSubmit={handleSubmit}

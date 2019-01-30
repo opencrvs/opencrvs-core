@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   register:
-    image: jembi/ocrvs-register:latest
+    image: jembi/ocrvs-register:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./Dockerfile-register
@@ -11,7 +11,7 @@ services:
       replicas: 2
 
   performance:
-    image: jembi/ocrvs-performance:latest
+    image: jembi/ocrvs-performance:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./Dockerfile-performance
@@ -20,7 +20,7 @@ services:
       replicas: 2
 
   login:
-    image: jembi/ocrvs-login:latest
+    image: jembi/ocrvs-login:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./Dockerfile-login
@@ -29,7 +29,7 @@ services:
       replicas: 2
 
   gateway:
-    image: jembi/ocrvs-gateway:latest
+    image: jembi/ocrvs-gateway:${VERSION:-latest}
     build: packages/gateway
     restart: unless-stopped
     environment:
@@ -41,7 +41,7 @@ services:
       replicas: 2
 
   workflow:
-    image: jembi/ocrvs-workflow:latest
+    image: jembi/ocrvs-workflow:${VERSION:-latest}
     build: packages/workflow
     restart: unless-stopped
     environment:
@@ -54,7 +54,7 @@ services:
       replicas: 2
 
   deduplication:
-    image: jembi/ocrvs-deduplication:latest
+    image: jembi/ocrvs-deduplication:${VERSION:-latest}
     build: packages/deduplication
     restart: unless-stopped
     environment:
@@ -64,7 +64,7 @@ services:
       replicas: 2
 
   auth:
-    image: jembi/ocrvs-auth:latest
+    image: jembi/ocrvs-auth:${VERSION:-latest}
     build: packages/auth
     restart: unless-stopped
     environment:
@@ -77,7 +77,7 @@ services:
       replicas: 2
 
   user-mgnt:
-    image: jembi/ocrvs-user-mgnt:latest
+    image: jembi/ocrvs-user-mgnt:${VERSION:-latest}
     build: packages/user-mgnt
     restart: unless-stopped
     environment:
@@ -86,7 +86,7 @@ services:
       replicas: 2
 
   notification:
-    image: jembi/ocrvs-notification:latest
+    image: jembi/ocrvs-notification:${VERSION:-latest}
     build: packages/notification
     restart: unless-stopped
     environment:
@@ -95,7 +95,7 @@ services:
       replicas: 2
 
   resources:
-    image: jembi/ocrvs-resources:latest
+    image: jembi/ocrvs-resources:${VERSION:-latest}
     build: packages/resources
     restart: unless-stopped
     environment:

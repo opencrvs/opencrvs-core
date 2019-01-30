@@ -199,6 +199,7 @@ export interface IConditionals {
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
+  causeOfDeathEstablished: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
@@ -215,6 +216,8 @@ export interface IFormSection {
   title: FormattedMessage.MessageDescriptor
   fields: IFormField[]
   disabled?: boolean
+  optional?: boolean
+  notice?: FormattedMessage.MessageDescriptor
   mapping?: IFormSectionMapFunction
 }
 

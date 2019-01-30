@@ -1,5 +1,4 @@
 import { defineMessages } from 'react-intl'
-import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
 import { IFormFieldValue } from '@opencrvs/register/src/forms'
 
@@ -27,6 +26,12 @@ export const messages = defineMessages({
     defaultMessage: 'Must be {min} characters or more',
     description:
       'The error message that appears on fields with a minimum length'
+  },
+  maxLength: {
+    id: 'validations.maxLength',
+    defaultMessage: 'Must not be more than {max} characters',
+    description:
+      'The error message that appears on fields with a maximum length'
   },
   numberRequired: {
     id: 'validations.numberRequired',
@@ -78,7 +83,7 @@ export const messages = defineMessages({
   }
 })
 
-const fallbackCountry = config.COUNTRY
+const fallbackCountry = window.config.COUNTRY
 
 const mobilePhonePatternTable = {
   gbr: {
@@ -150,13 +155,19 @@ export const minLength = (min: number) => (value: string) => {
     : undefined
 }
 
+export const maxLength = (max: number) => (value: string) => {
+  return value && value.length > max
+    ? { message: messages.maxLength, props: { max } }
+    : undefined
+}
+
 export const isNumber: Validation = (value: string) =>
   value && isNaN(Number(value))
     ? { message: messages.numberRequired }
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  const country = config.COUNTRY
+  const country = window.config.COUNTRY
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
   const { example } = countryMobileTable
