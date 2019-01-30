@@ -712,6 +712,10 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'জাতীয়তা',
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
     'certificate.parent.details.label.number': 'সংখ্যা',
+    'certificate.btn.editRegistration': 'নিবন্ধন সম্পাদনা করুন',
+    'certificate.txt.isCorrectTxt': 'জন্ম নিবন্ধনটি কি সঠিক?',
+    'certificate.txt.confirmationTxt':
+      'অনুগ্রহ করে নিশ্চিত করুন যে নিবন্ধনটি পর্যালোচনা হয়েছে তার তথ্য সঠিক এবং আপনি মুদ্রণ করতে প্রস্তুত',
     'review.form.section.reviewTitle': 'পর্যালোচনা',
     'validations.bengaliOnlyNameFormat': 'শুধুমাত্র বাংলা অক্ষর থাকতে হবে',
     'validations.englishOnlyNameFormat': 'শুধুমাত্র ইংরেজি অক্ষর থাকা আবশ্যক',

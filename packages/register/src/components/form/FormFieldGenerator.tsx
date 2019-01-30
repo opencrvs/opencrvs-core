@@ -261,7 +261,12 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
-    return <PDFViewer id={fieldDefinition.name} pdfSource={value as string} />
+    return (
+      <PDFViewer
+        id={fieldDefinition.name}
+        pdfSource={fieldDefinition.initialValue as string}
+      />
+    )
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {

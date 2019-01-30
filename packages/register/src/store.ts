@@ -35,10 +35,7 @@ import {
   IRejectState,
   rejectReducer
 } from '@opencrvs/register/src/review/reducer'
-import {
-  IPrintFormState,
-  printReducer
-} from './views/PrintCertificate/printReducer'
+import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
 
 export interface IStoreState {
   profile: ProfileState

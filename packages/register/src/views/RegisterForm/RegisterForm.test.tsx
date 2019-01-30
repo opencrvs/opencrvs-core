@@ -200,6 +200,21 @@ describe('when user is in the register form preview section', () => {
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(0)
   })
 
+  it('Should be able to click the Delete application button', () => {
+    // @ts-ignore
+    global.window = { location: { pathname: null } }
+
+    // @ts-ignore
+    expect(global.window.location.pathname).toMatch('/saved')
+
+    const deleteBtn = component.find('#delete-application').hostNodes()
+    deleteBtn.simulate('click')
+    component.update()
+
+    // @ts-ignore
+    expect(global.window.location.pathname).toEqual('/')
+  })
+
   describe('User in the Preview section for submitting the Form', () => {
     beforeEach(async () => {
       // @ts-ignore
@@ -226,6 +241,27 @@ describe('when user is in the register form preview section', () => {
         store
       )
       component = nTestComponent.component
+    })
+
+    it('Should be able to click the Save Draft button', () => {
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      // @ts-ignore
+      global.window = { location: { pathname: null } }
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toMatch('/')
+
+      const deleteBtn = component.find('#delete-draft').hostNodes()
+      deleteBtn.simulate('click')
+      component.update()
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toEqual('/')
     })
 
     it('should be able to submit the form', () => {
