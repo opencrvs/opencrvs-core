@@ -168,7 +168,7 @@ export const fatherSection: IFormSection = {
     {
       name: 'iDTypeOther',
       type: TEXT,
-      label: identityMessages.iDType,
+      label: identityMessages.iDTypeOtherLabel,
       required: true,
       initialValue: '',
       validate: [],

@@ -46,6 +46,11 @@ export const messages = defineMessages({
     defaultMessage: 'Other',
     description: 'Option for form field: Type of ID'
   },
+  iDTypeOtherLabel: {
+    id: 'formFields.iDTypeOtherLabel',
+    defaultMessage: 'Other type of ID',
+    description: 'Label for form field: Other type of ID'
+  },
   iD: {
     id: 'formFields.iD',
     defaultMessage: 'ID Number',

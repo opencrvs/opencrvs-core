@@ -294,6 +294,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.iDTypeRefugeeNumber': 'শরণার্থী নিবন্ধন সংখ্যা',
     'formFields.iDTypeAlienNumber': 'বিদেশী নিবন্ধন সংখ্যা',
     'formFields.iDTypeOther': 'অন্যান্য',
+    'formFields.iDTypeOtherLabel': 'অন্যান্য আইডি',
     'formFields.iD': 'পরিচয় নম্বর',
     'formFields.maritalStatus': 'বৈবাহিক অবস্থা',
     'formFields.maritalStatusSingle': 'অবিবাহিত',

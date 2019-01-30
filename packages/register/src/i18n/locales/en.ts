@@ -294,6 +294,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.iDTypeRefugeeNumber': 'Refugee Number',
     'formFields.iDTypeAlienNumber': 'Alien Number',
     'formFields.iDTypeOther': 'Other',
+    'formFields.iDTypeOtherLabel': 'Other type of ID',
     'formFields.iD': 'ID Number',
     'formFields.maritalStatus': 'Marital status',
     'formFields.maritalStatusSingle': 'Unmarried',
