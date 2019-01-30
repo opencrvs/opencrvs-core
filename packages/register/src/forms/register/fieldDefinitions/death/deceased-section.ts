@@ -21,7 +21,6 @@ import { messages as identityMessages } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as addressMessages } from '../../../address'
 
-import { config } from 'src/config'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { conditionals } from 'src/forms/utils'
 
@@ -257,7 +256,7 @@ export const deceasedSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries
     },
@@ -393,7 +392,7 @@ export const deceasedSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
       required: true,
-      initialValue: config.COUNTRY.toUpperCase(),
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
       conditionals: [conditionals.currentAddressSameAsPermanent]

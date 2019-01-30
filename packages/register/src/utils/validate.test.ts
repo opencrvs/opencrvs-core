@@ -10,7 +10,8 @@ import {
   emailAddressFormat,
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  range
+  range,
+  maxLength
 } from './validate'
 
 describe('validate', () => {
@@ -106,6 +107,29 @@ describe('validate', () => {
       const goodValue = '1234567890'
       const response = undefined
       expect(minLength(10)(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('maxLength. Used for fields that have a maximum length', () => {
+    it('Should error when supplied a bad value. ', () => {
+      const badValue = '186821638721616236132872163781268316863'
+      const response = {
+        message: {
+          id: 'validations.maxLength',
+          defaultMessage: 'Must not be more than {max} characters',
+          description:
+            'The error message that appears on fields with a maximum length'
+        },
+        props: {
+          max: 17
+        }
+      }
+      expect(maxLength(17)(badValue)).toEqual(response)
+    })
+    it('should pass when supplied a good value.', () => {
+      const goodValue = '1234567890'
+      const response = undefined
+      expect(maxLength(17)(goodValue)).toEqual(response)
     })
   })
 

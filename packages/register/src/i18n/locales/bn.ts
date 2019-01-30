@@ -438,8 +438,19 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.deathPlaceAddressSameAsCurrent': 'মৃত ব্যক্তির বর্তমান ঠিকানা',
     'formFields.deathPlaceAddressOther': 'অন্য ঠিকানা',
     'formFields.deathPlaceAddressType': 'স্থান প্রকার',
+    'register.form.tabs.causeOfDeathTab': 'মৃত্যুর  কারণ',
+    'register.form.section.causeOfDeathTitle': 'মৃত্যুর  কারণ',
+    'register.form.section.causeOfDeathNotice':
+      'আবেদন জমা দেয়ার জন্য মৃত্যুর আনুষ্ঠানিক কারণ বাধ্যতামূলক নয়। মৃত্যুর কারণ পরবর্তী তারিখে জমা দেয়া যেতে পারে।',
+    'formFields.causeOfDeathEstablished':
+      'মৃত্যুর কোন একটি কারণ কি প্রতিষ্ঠিত হয়েছে?',
+    'formFields.methodOfCauseOfDeath': 'মৃত্যুর কারণ নির্ণয়ের পদ্ধতি',
+    'formFields.causeOfDeathCode': 'মৃত্যুর কারণের কোড',
+    'formFields.verbalAutopsy': 'মৌখিক অটোপসি',
+    'formFields.medicallyCertified': 'মেডিকেল সার্টিফাইড',
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
+    'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
     'validations.numberRequired': 'Must be a number',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':

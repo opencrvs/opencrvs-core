@@ -439,8 +439,19 @@ export const ENGLISH_STATE: ILanguage = {
       'Current address of the deceased',
     'formFields.deathPlaceAddressOther': 'Different Address',
     'formFields.deathPlaceAddressType': 'Type of Place',
+    'register.form.tabs.causeOfDeathTab': 'Cause of Death',
+    'register.form.section.causeOfDeathTitle': 'Cause of Death',
+    'register.form.section.causeOfDeathNotice':
+      'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
+    'formFields.causeOfDeathEstablished':
+      'Has a Cause of Death been established ?',
+    'formFields.methodOfCauseOfDeath': 'Method of Cause of Death',
+    'formFields.causeOfDeathCode': 'Cause of Death Code',
+    'formFields.verbalAutopsy': 'Verbal autopsy',
+    'formFields.medicallyCertified': 'Medically Certified Cause of Death',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
+    'validations.maxLength': 'Must not be more than {max} characters',
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
     'validations.phoneNumberFormat':

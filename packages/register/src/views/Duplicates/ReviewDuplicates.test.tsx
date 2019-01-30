@@ -249,7 +249,7 @@ describe('Review Duplicates component', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 200)
     })
 
     testComponent.component.update()

@@ -9,6 +9,7 @@ import { documentsSection } from './fieldDefinitions/birth/documents-section'
 import { deceasedSection } from './fieldDefinitions/death/deceased-section'
 import { applicantsSection } from './fieldDefinitions/death/application-section'
 import { eventSection } from './fieldDefinitions/death/event-section'
+import { causeOfDeathSection } from './fieldDefinitions/death/cause-of-death-section'
 
 const messages = defineMessages({
   previewTab: {
@@ -49,7 +50,12 @@ export const initialState: IRegisterFormState = {
       ]
     },
     death: {
-      sections: [deceasedSection, applicantsSection, eventSection]
+      sections: [
+        deceasedSection,
+        applicantsSection,
+        eventSection,
+        causeOfDeathSection
+      ]
     }
   }
 }

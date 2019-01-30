@@ -12,7 +12,7 @@ import {
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
-import { config } from 'src/config'
+
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -54,7 +54,7 @@ export function goToHome() {
 }
 
 export function goToPerformance() {
-  window.location.assign(`${config.PERFORMANCE_URL}?token=${getToken()}`)
+  window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
 export function goToWorkQueue() {
