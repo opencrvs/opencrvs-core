@@ -149,6 +149,8 @@ const ConfirmBtn = styled(PrimaryButton)`
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }
+    position: relative;
+    top: 7px;
   }
 `
 
@@ -169,6 +171,11 @@ const EditRegistration = styled(SecondaryButton)`
   &:disabled {
     background-color: ${({ theme }) => theme.colors.inputBackground};
   }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: 0px;
+    margin-top: 15px;
+  }
 `
 
 const Info = styled.div`
@@ -179,6 +186,12 @@ const B = styled.div`
   display: block;
   line-height: 50px;
   font-weight: bold;
+`
+
+const ButtonSpinner = styled(Spinner)`
+  width: 25px;
+  height: 25px;
+  top: 0px !important;
 `
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
@@ -582,12 +595,26 @@ class PrintCertificateActionComponent extends React.Component<
                   }))
                 }}
               >
-                {(markBirthAsCertified, { data }) => {
+                {(markBirthAsCertified, { loading, error }) => {
                   return (
                     <ConfirmBtn
                       id="registerApplicationBtn"
-                      icon={() => <TickLarge />}
+                      icon={() => {
+                        if (loading) {
+                          return (
+                            <>
+                              <ButtonSpinner id="Spinner" baseColor="#F9F9F9" />
+                            </>
+                          )
+                        }
+                        return (
+                          <>
+                            <TickLarge />
+                          </>
+                        )
+                      }}
                       align={ICON_ALIGNMENT.LEFT}
+                      disabled={loading}
                       onClick={() => {
                         markBirthAsCertified()
                       }}
