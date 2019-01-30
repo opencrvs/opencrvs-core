@@ -6,7 +6,7 @@ import { createStore } from '../../store'
 
 const fullNameInBn = 'টম ব্র্যাডি'
 const fullNameInEng = 'Tom Brady'
-
+const assign = window.location.assign as jest.Mock
 describe('when user is in the saved registration page', () => {
   const { store, history } = createStore()
 
@@ -249,10 +249,20 @@ describe('when user is in reject registration page from duplicates', () => {
     savedRegistrationComponent = testComponent.component
   })
 
-  it('should show the rejection card text', () => {
+  it('should show the go to duplicate button', () => {
     expect(
       savedRegistrationComponent.find('#go_to_duplicate_button').hostNodes()
         .length
     ).toEqual(1)
+  })
+
+  it('should change the route to review duplicates', () => {
+    savedRegistrationComponent
+      .find('#go_to_duplicate_button')
+      .hostNodes()
+      .simulate('click')
+
+    savedRegistrationComponent.update()
+    expect(assign.mock.calls).toHaveLength(1)
   })
 })
