@@ -48,7 +48,7 @@ export async function createRegistrationHandler(
     )
     if (hasScope(request, 'register')) {
       payload = await markBundleAsRegistered(
-        request.payload as fhir.Bundle & fhir.BundleEntry,
+        payload as fhir.Bundle,
         getToken(request)
       )
     }
