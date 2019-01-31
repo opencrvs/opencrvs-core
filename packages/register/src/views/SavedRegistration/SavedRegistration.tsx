@@ -427,7 +427,8 @@ class SavedRegistrationView extends React.Component<
                 </span>
               ) : (
                 <span>
-                  <strong>{fullNameInBn}</strong> {noticeCardText2}
+                  {noticeCardText1} <strong>{fullNameInBn}</strong>{' '}
+                  {noticeCardText2}
                 </span>
               )}
             </SubmissionText>
