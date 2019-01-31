@@ -572,7 +572,7 @@ export class WorkQueueView extends React.Component<
             <StatusRejected />
           </StatusIcon>
         )
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return (
           <StatusIcon>
             <StatusCollected />
@@ -595,7 +595,7 @@ export class WorkQueueView extends React.Component<
         return this.props.intl.formatMessage(messages.registered)
       case 'REJECTED':
         return this.props.intl.formatMessage(messages.rejected)
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return this.props.intl.formatMessage(messages.collected)
       default:
         return this.props.intl.formatMessage(messages.application)
@@ -610,7 +610,7 @@ export class WorkQueueView extends React.Component<
         return messages.workflowStatusDateRegistered
       case 'REJECTED':
         return messages.workflowStatusDateRejected
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return messages.workflowStatusDateCollected
       default:
         return messages.workflowStatusDateApplication

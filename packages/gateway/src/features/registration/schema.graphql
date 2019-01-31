@@ -201,6 +201,7 @@ input DeathRegistrationInput {
   otherInformantRelationship: String # -> RelatedPerson.relationship
   placeOfDeath: LocationInput
   deathLocation: String
+  deathLocationType: AddressType
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -221,6 +222,7 @@ type DeathRegistration { # -> Composition
   otherInformantRelationship: String # -> RelatedPerson.relationship
   placeOfDeath: Location
   deathLocation: String
+  deathLocationType: AddressType
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept
