@@ -57,7 +57,7 @@ const data = [
     date_of_application: '2001-10-20',
     tracking_id: '33333',
     event: 'BIRTH',
-    declaration_status: 'COLLECTED'
+    declaration_status: 'CERTIFIED'
   }
 ]
 type State = {
@@ -131,6 +131,11 @@ const messages = defineMessages({
     defaultMessage: 'Registered',
     description: 'Label for the filter by registered option'
   },
+  filtersRejected: {
+    id: 'register.workQueue.statusLabel.rejected',
+    defaultMessage: 'rejected',
+    description: 'The status label for rejected'
+  },
   filtersCollected: {
     id: 'myRecords.labels.statuses.collected',
     defaultMessage: 'Collected',
@@ -166,6 +171,33 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
       enableConfirmButton: false
     }
   }
+  getDeclarationStatusLabel = (status: string) => {
+    switch (status) {
+      case 'APPLICATION':
+        return this.props.intl.formatMessage(messages.filtersApplication)
+      case 'REGISTERED':
+        return this.props.intl.formatMessage(messages.filtersRegistered)
+      case 'REJECTED':
+        return this.props.intl.formatMessage(messages.filtersRejected)
+      case 'CERTIFIED':
+        return this.props.intl.formatMessage(messages.filtersCollected)
+      default:
+        return this.props.intl.formatMessage(messages.filtersApplication)
+    }
+  }
+
+  getEventLabel = (status: string) => {
+    switch (status) {
+      case 'birth':
+        return this.props.intl.formatMessage(messages.filtersBirth)
+      case 'death':
+        return this.props.intl.formatMessage(messages.filtersDeath)
+      case 'marriage':
+        return this.props.intl.formatMessage(messages.filtersMarriage)
+      default:
+        return this.props.intl.formatMessage(messages.filtersBirth)
+    }
+  }
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'APPLICATION':
@@ -180,7 +212,7 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
             <StatusGreen />
           </StatusIcon>
         )
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return (
           <StatusIcon>
             <StatusCollected />
@@ -220,10 +252,10 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
       value: item.tracking_id
     })
 
-    status.push({ icon: <StatusGray />, label: item.event })
+    status.push({ icon: <StatusGray />, label: this.getEventLabel(item.event) })
     status.push({
       icon: this.getDeclarationStatusIcon(item.declaration_status),
-      label: item.declaration_status
+      label: this.getDeclarationStatusLabel(item.declaration_status)
     })
 
     const expansionActions: JSX.Element[] = []
@@ -294,7 +326,7 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
                 label: intl.formatMessage(messages.filtersRegistered)
               },
               {
-                value: 'COLLECTED',
+                value: 'CERTIFIED',
                 label: intl.formatMessage(messages.filtersCollected)
               }
             ],
