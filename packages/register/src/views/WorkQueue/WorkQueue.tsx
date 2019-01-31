@@ -517,6 +517,11 @@ const StatusIcon = styled.div`
   margin-top: 3px;
 `
 
+const StatusIconCollected = styled.div`
+  padding-left: 6px;
+  margin-top: 3px;
+`
+
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -574,9 +579,9 @@ export class WorkQueueView extends React.Component<
         )
       case 'CERTIFIED':
         return (
-          <StatusIcon>
+          <StatusIconCollected>
             <StatusCollected />
-          </StatusIcon>
+          </StatusIconCollected>
         )
       default:
         return (

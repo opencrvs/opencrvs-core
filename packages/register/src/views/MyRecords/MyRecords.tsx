@@ -40,6 +40,12 @@ const StyledPrimaryButton = styled(PrimaryButton)`
 const StatusIcon = styled.div`
   margin-top: 3px;
 `
+
+const StatusIconCollected = styled.div`
+  padding-left: 6px;
+  margin-top: 3px;
+`
+
 const data = [
   {
     id: 123,
@@ -214,9 +220,9 @@ class MyRecordsComponent extends React.Component<IFullProps, State> {
         )
       case 'CERTIFIED':
         return (
-          <StatusIcon>
+          <StatusIconCollected>
             <StatusCollected />
-          </StatusIcon>
+          </StatusIconCollected>
         )
       default:
         return (

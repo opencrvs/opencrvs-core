@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 export const StatusCollected = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={15} height={20} {...props}>
+  <svg width={15} height={20} viewBox="0 0 15 20" {...props}>
     <title>{`1CF845C6-773F-42EB-A218-B2F74ADC1265-565-0000A5468BB14508`}</title>
     <defs>
       <linearGradient x1="50%" y1="79.891%" x2="50%" y2="2.378%" id="a">
