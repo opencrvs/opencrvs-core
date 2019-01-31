@@ -26,7 +26,7 @@ describe('when user is in the confirmation screen page', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
         <ConfirmationScreen
-          location={mock}
+          location={history.location}
           history={history}
           staticContext={mock}
           match={{
@@ -82,7 +82,7 @@ describe('when user is in the confirmation screen page', () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
       const testComponent = createTestComponent(
         <ConfirmationScreen
-          location={mock}
+          location={history.location}
           history={history}
           staticContext={mock}
           match={{
