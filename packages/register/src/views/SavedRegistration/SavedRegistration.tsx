@@ -422,10 +422,7 @@ class SavedRegistrationView extends React.Component<
               fullNameInEng &&
               fullNameInEng !== 'undefined' ? (
                 <span>
-                  {noticeCardText1}{' '}
-                  <strong>
-                    {fullNameInEng ? fullNameInEng : fullNameInBn}
-                  </strong>{' '}
+                  {noticeCardText1} <strong>{fullNameInEng}</strong>{' '}
                   {noticeCardText2}
                 </span>
               ) : (
