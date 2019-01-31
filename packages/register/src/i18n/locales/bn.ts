@@ -772,32 +772,33 @@ export const BENGALI_STATE: ILanguage = {
       certificate {সনদপত্র} offlineEvent {আবেদন সংযোগ}} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
       rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {মুলতুবী}}`,
     'register.confirmationScreen.headerDesc': `{event, select, declaration {তথ্য বিবরনী} registration {} duplication {} certificate {}
-      offlineEvent {তথ্য বিবরনীটি}} {action, select, submitted {বৈধতার জন্য পর্যালোচিত হচ্ছে} completed {} rejected {প্রত্যাখ্যাত হচ্ছে } approved {অনুমোদিত হচ্ছে }
-      registered {নিবন্ধভুক্তকরন করা হচ্ছে} offlineAction {ডিভাইসে ইন্টারনেট সংযোগ কালীন স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে}}`,
-    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত !} submitted {সমাপ্ত !} rejected {আবেদন প্রত্যাখ্যাত !} 
+      offlineEvent {তথ্য বিবরনীটি}} {action, select, submitted {বৈধতার জন্য পর্যালোচিত হচ্ছে।} completed {} rejected {প্রত্যাখ্যাত হচ্ছে।} approved {অনুমোদিত হচ্ছে।}
+      registered {নিবন্ধভুক্তকরন করা হচ্ছে।} offlineAction {ডিভাইসে ইন্টারনেট সংযোগ কালীন স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।}}`,
+    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত!} submitted {সমাপ্ত!} rejected {আবেদন প্রত্যাখ্যাত!} 
       approved {আবেদন অনুমোদিত}  registered {আবেদন নিবন্ধভুক্তকরন} offlineAction {সম্পূর্ণ হচ্ছে}}`,
-    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{fullName} এর জন্ম নিবন্ধন আবেদন} registration {{fullName} এর জন্ম নিবন্ধন}
-      duplication {{fullName} এর জন্ম নিবন্ধন নকল} certificate {{fullName} এর জন্ম নিবন্ধন সনদ} offlineEvent {{fullName} এর জন্ম নিবন্ধন আবেদন}} {action, select,
-      completed {সম্পূর্ণ হয়েছে।} submitted {জমা দেওয়া হয়েছে।} rejected {প্রত্যাখ্যাত হয়েছে।} registered {আবেদন নিবন্ধভুক্তকরন হয়েছে।}
-      approved {অনুমোদিত হয়েছে।} offlineAction {জমা দেওয়া হচ্ছে}}`,
     'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {রেজিস্ট্রেশন সম্পূর্ণ হলে অথবা প্রক্রিয়ায় কোন বিলম্ব থাকলে আপনাকে OpenCRVS এর মাধ্যমে জানানো হবে।} 
       registration {নিবন্ধন প্রক্রিয়া সম্পূর্ণ।} duplication {} certificate {} 
       offlineEvent {পরবর্তী 7 দিনের মধ্যে ডিভাইসে ইন্টারনেট সংযোগ স্থাপন করার পরে আপনাকে লগইন করতে হবে। OpenCRVS স্বয়ংক্রিয়ভাবে ফর্ম জমা দেবে, তাই আপনাকে অন্য কিছু করার প্রয়োজন হবে না।}}`,
     'register.confirmationScreen.nextSectionDescDetails': `{event, select, declaration {
-      ইনফরম্যান্ট তাদের যোগাযোগের বিবরণ দিয়েছেন এবং যখন নিবন্ধন সম্পূর্ণ হবে তখন জানানো হবে।} registration {সার্টিফিকেটটি তথ্য সরবরাহকারী সংগ্রহ করতে গেলেই কেবল মুদ্রণ করা উচিত।} 
-      duplication {} certificate {} offlineEvent {আবেদন একবার সফলভাবে জমা দেয়ার পর রেজিস্ট্রেশন সম্পূর্ণ হলে আপনাকে  এবং ইনফরম্যান্টকে অবহিত করা হবে।}}`,
+      ইনফরম্যান্ট তাদের যোগাযোগের বিবরণ দিয়েছেন এবং যখন নিবন্ধন সম্পূর্ণ হবে তখন জানানো হবে।} registration {সনদপত্রটি তথ্য সরবরাহকারী সংগ্রহ করতে গেলেই কেবল মুদ্রণ করতে হবে।} 
+      duplication {} certificate {} offlineEvent {আবেদন একবার সফলভাবে জমা দেয়ার পর রেজিস্ট্রেশন সম্পূর্ণ হলে আপনাকে  এবং সংবাদদাতাকে অবহিত করা হবে।}}`,
     'register.confirmationScreen.nextCard.title': 'পরবর্তী',
     'register.confirmationScreen.rejectedNoticeCardText2':
-      'বাতিল করা হয়েছে. এজেন্টকে প্রত্যাখ্যানের কারণগুলি সম্পর্কে জানানো হবে এবং অনুসরণ করার নির্দেশ দেওয়া হবে।',
+      'বাতিল করা হয়েছে এবং এজেন্টকে প্রত্যাখ্যানের কারণগুলি সম্পর্কে জানানো হবে এবং অনুসরণ করার নির্দেশ দেওয়া হবে।',
     'register.confirmationScreen.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.confirmationScreen.buttons.newDeclaration': 'নতুন আবেদন',
-    'register.confirmationScreen.buttons.back.duplicate': 'সদৃশ ফিরে যান',
+    'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {জন্ম নিবন্ধন নম্বর : } 
-      duplication {}  duplication {} certificate {...} offlineEvent {pending}}`,
+      duplication {...} certificate {...} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }}`,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
-      registration {প্ৰশংসাপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে ইনফরম্যান্ট এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} 
-      duplication {} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে} offlineEvent {ইন্টারনেটের জন্য অপেক্ষা করুন}}`,
-    'register.confirmationScreen.footerActionButton': `{event, select, declaration {নতুন আবেদনে} registration {আবেদনে} duplication {সদৃশ এ}
-     certificate {সনদে} offlineEvent {নতুন আবেদনে}} ফিরে যান`
+      registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} 
+      duplication {...} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} offlineEvent {ইন্টারনেটের জন্য অপেক্ষা করুন।}}`,
+    'register.confirmationScreen.footerActionButton': `{event, select, declaration {নতুন আবেদনে} registration {আবেদনে} duplication {নকলে}
+     certificate {সনদে} offlineEvent {নতুন আবেদনে}} ফিরে যান`,
+    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration { এর জন্ম নিবন্ধন আবেদন} registration { এর জন্ম নিবন্ধন}
+     duplication { এর জন্ম নিবন্ধন নকল} certificate { এর জন্ম নিবন্ধন সনদ} offlineEvent { এর জন্ম নিবন্ধন আবেদন }}`,
+    'register.confirmationScreen.boxHeaderDescLast': `{action, select,
+        completed {সম্পূর্ণ হয়েছে।} submitted {জমা দেওয়া হয়েছে।} rejected {প্রত্যাখ্যাত হয়েছে।} registered {আবেদন নিবন্ধভুক্তকরন হয়েছে।}
+        approved {অনুমোদিত হয়েছে।} offlineAction {জমা দেওয়া হচ্ছে}}`
   }
 }

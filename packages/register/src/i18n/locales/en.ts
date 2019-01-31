@@ -783,12 +783,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.headerDesc': `{event, select, declaration {The application} registration {The birth application} duplication {} certificate {} offlineEvent {The application}} 
       {action, select, submitted {is now on its way for validation} completed {} rejected {rejected} approved {approved} registered {registered}
       offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
-    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All Done} submitted {All Done} rejected {Application rejected} 
+    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All done!} submitted {All done!} rejected {Application rejected} 
       approved {Application approved} registered {Application registered} offlineAction {Almost there}}`,
-    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {The birth application of {fullName}} registration {The birth of {fullName}}
-      duplication {The birth duplication of {fullName}} certificate {The birth certificate of {fullName}} 
-      offlineEvent {The birth application of {fullName}}} {action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.}
-      approved {has been approved.} registered {has been registered} offlineAction {is pending due to internet connection.}}`,
     'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.} 
       registration {The registration process is complete.} duplication {} certificate {}
       offlineEvent {All you need to do is login once you have internet connectivity on your device within the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.}}`,
@@ -803,11 +799,15 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
-    duplication {duplication}  duplication {duplication rejected} certificate {...} offlineEvent {pending}}`,
+     duplication {...} certificate {...} offlineEvent {Tracking ID number: }}`,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
       registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-      duplication{} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
+      duplication{...} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
     'register.confirmationScreen.footerActionButton': `Back to {event, select, declaration {New Application} registration {Application} duplication {Duplication}
-    certificate {Certification} offlineEvent {New Application}}`
+    certificate {Certification} offlineEvent {New Application}}`,
+    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The birth application of } registration {The birth of } duplication 
+    {The birth duplication of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
+    'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
+      approved {has been approved.} offlineAction {is pending due to internet connection.}}`
   }
 }

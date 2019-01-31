@@ -66,30 +66,32 @@ const messages = defineMessages({
       approved {Application approved} offlineAction {Almost there}}`,
     description: 'The box header title that appear on the confirmation screen '
   },
-  boxHeaderDesc: {
-    id: 'register.confirmationScreen.boxHeaderDesc',
-    defaultMessage: `{event, select, declaration {The birth application of {fullName}} registration {The birth of {fullName}} duplication 
-      {The birth duplication of {fullName}} certificate {The birth certificate of {fullName}} offlineEvent {The birth application of 
-      {fullName}}} {action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
+  boxHeaderDescFirst: {
+    id: 'register.confirmationScreen.boxHeaderDescFirst',
+    defaultMessage: `{event, select, declaration {The birth application of } registration {The birth of } duplication 
+      {The birth duplication of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
+    description:
+      'The first box header description that appear on the confirmation screen '
+  },
+  boxHeaderDescLast: {
+    id: 'register.confirmationScreen.boxHeaderDescLast',
+    defaultMessage: `{action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
       approved {has been approved.} offlineAction {is pending due to internet connection.}}`,
     description:
-      'The box header description that appear on the confirmation screen '
+      'The first box header description that appear on the confirmation screen '
   },
   trackingSectionTitle: {
     id: 'register.confirmationScreen.trackingSectionTitle',
     defaultMessage: `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
-    duplication {duplication} certificate {...} offlineEvent {pending}}`,
+    duplication {...} certificate {...} offlineEvent {Tracking ID number: }}`,
     description:
       'The tracking section title that appear on the confirmation screen'
   },
   trackingSectionDesc: {
     id: 'register.confirmationScreen.trackingSectionDesc',
-    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, 
-      but make sure they write it down and keep it safe. They should use the number as a reference if enquiring 
-      about their registration.} registration-registered {The informant will receive this number via SMS with instructions 
-      on how and where to collect the certificate. They should use the number as a reference if enquiring about their 
-      registration.} registration {} duplication{} certificate {Certificates have been collected from your jurisdiction.} 
-      offlineEvent {}}`,
+    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
+    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
+    duplication{...} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
     description:
       'The tracking section description that appear on the confirmation screen'
   },
@@ -239,10 +241,11 @@ class ConfirmationScreenView extends React.Component<
     })
     const isRejection = actionName === REJECTION ? true : false
     const fullName = language === 'en' ? fullNameInEng : fullNameInBn
-    const boxHeaderDesc = intl.formatMessage(messages.boxHeaderDesc, {
-      event: eventName,
-      action: actionName,
-      fullName
+    const boxHeaderDescFirst = intl.formatMessage(messages.boxHeaderDescFirst, {
+      event: eventName
+    })
+    const boxHeaderDescLast = intl.formatMessage(messages.boxHeaderDescLast, {
+      action: actionName
     })
     const trackNumber = location.state.trackNumber
       ? location.state.trackNumber
@@ -297,7 +300,17 @@ class ConfirmationScreenView extends React.Component<
               </BoxHeader>
             </ImgHeaderContainer>
             <SubmissionText id="submission_text">
-              {<span>{boxHeaderDesc}</span>}
+              {language === 'en' ? (
+                <span>
+                  {boxHeaderDescFirst}
+                  <strong>{fullName}</strong> {boxHeaderDescLast}
+                </span>
+              ) : (
+                <span>
+                  <strong>{fullName}</strong> {boxHeaderDescFirst}{' '}
+                  {boxHeaderDescLast}
+                </span>
+              )}
             </SubmissionText>
           </Box>
           {isTrackingSection && (

@@ -46,7 +46,7 @@ describe('when user is in the confirmation screen page', () => {
           .find('#submission_title')
           .first()
           .text()
-      ).toEqual('All Done')
+      ).toEqual('All done!')
     })
     it('should show the online text', () => {
       expect(
