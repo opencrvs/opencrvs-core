@@ -109,6 +109,15 @@ describe('Registration type resolvers', () => {
     expect(given).toBe('John')
   })
 
+  it('returns first names part with empty first name', () => {
+    // @ts-ignore
+    const given = typeResolvers.HumanName.firstNames({
+      use: 'test',
+      given: undefined
+    })
+    expect(given).toBe('')
+  })
+
   it('returns first names part with multiple naems', () => {
     // @ts-ignore
     const given = typeResolvers.HumanName.firstNames({
@@ -427,23 +436,14 @@ describe('Registration type resolvers', () => {
       expect(foetalDeathsToMother).toEqual(null)
     })
     it('returns birthLocation', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          location: [
-            {
-              location: {
-                reference: 'Location/123'
-              }
-            }
-          ]
-        })
-      )
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocation))
+      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
       // @ts-ignore
       const birthLocation = await typeResolvers.BirthRegistration.birthLocation(
         mockComposition
       )
       expect(birthLocation).toBeDefined()
+      expect(birthLocation).toEqual('123')
     })
   })
 

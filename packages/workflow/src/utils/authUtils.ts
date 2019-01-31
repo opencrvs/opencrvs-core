@@ -27,9 +27,20 @@ export const getTokenPayload = (token: string) => {
 }
 
 export const getToken = (request: Hapi.Request): string => {
-  if (request.headers['authorization'].indexOf('Bearer') > -1) {
-    return request.headers['authorization'].split(' ')[1]
+  if (request.headers.authorization.indexOf('Bearer') > -1) {
+    return request.headers.authorization.split(' ')[1]
   } else {
-    return request.headers['authorization']
+    return request.headers.authorization
   }
+}
+
+export const hasScope = (request: Hapi.Request, scope: string): boolean => {
+  if (
+    !request.auth ||
+    !request.auth.credentials ||
+    !request.auth.credentials.scope
+  ) {
+    return false
+  }
+  return request.auth.credentials.scope.includes(scope)
 }

@@ -11,6 +11,7 @@ import {
   removeDuplicatesFromComposition
 } from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
+import { hasScope } from 'src/features/user/utils'
 
 const statusMap = {
   declared: 'preliminary',
@@ -40,8 +41,13 @@ export const resolvers: GQLResolver = {
       const doc = await buildFHIRBundle(details)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      // return tracking-id
-      return await getTrackingIdFromResponse(res, authHeader)
+      if (hasScope(authHeader, 'register')) {
+        // return the brn
+        return await getBRNFromResponse(res, authHeader)
+      } else {
+        // return tracking-id
+        return await getTrackingIdFromResponse(res, authHeader)
+      }
     },
     async updateBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)

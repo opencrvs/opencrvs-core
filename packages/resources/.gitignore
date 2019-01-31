@@ -25,3 +25,4 @@ yarn-error.log*
 
 src/features/facilities/generated/bn/crvs-facilities.json
 src/features/facilities/generated/bn/health-facilities.json
+src/tests/locations.json

@@ -22,7 +22,8 @@ import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
-  getFieldOptions
+  getFieldOptions,
+  getFieldLabel
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -41,21 +42,24 @@ import {
   NUMBER,
   SUBSECTION,
   LIST,
-  ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
   WARNING,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions,
+  TEXT_WITH_DYNAMIC_DEFINITIONS,
+  TEXT,
+  ITextFormField,
+  IDynamicFormField,
   LINK,
   PDF_DOCUMENT_VIEWER
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
 import { IOfflineDataState } from 'src/offline/reducer'
-
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
@@ -397,7 +401,8 @@ class FormSectionComponent extends React.Component<Props> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            values
+            values,
+            offlineResources
           )
 
           if (conditionalActions.includes('hide')) {
@@ -415,6 +420,12 @@ class FormSectionComponent extends React.Component<Props> {
                     offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
+              : field.type === TEXT_WITH_DYNAMIC_DEFINITIONS
+              ? ({
+                  ...field,
+                  type: TEXT,
+                  label: getFieldLabel(field as IDynamicFormField, values)
+                } as ITextFormField)
               : field
 
           return (
@@ -451,5 +462,5 @@ export const FormFieldGenerator = withFormik<
     console.log(values)
   },
   validate: (values, props: IFormSectionProps) =>
-    getValidationErrorsForForm(props.fields, values)
+    getValidationErrorsForForm(props.fields, values, props.offlineResources)
 })(injectIntl(FormSectionComponent))

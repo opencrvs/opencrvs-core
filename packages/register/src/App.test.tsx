@@ -62,6 +62,21 @@ mockFetchLocations.mockReturnValue({
 })
 referenceApi.loadLocations = mockFetchLocations
 
+const mockFetchFacilities = jest.fn()
+mockFetchLocations.mockReturnValue({
+  data: [
+    {
+      id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
+      name: 'Shaheed Taj Uddin Ahmad Medical College',
+      nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
+      physicalType: 'Building',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
+    }
+  ]
+})
+referenceApi.loadFacilities = mockFetchFacilities
+
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
 }
@@ -70,6 +85,20 @@ beforeEach(() => {
   history.replaceState({}, '', '/')
   assign.mockClear()
 })
+
+/*describe('when user does not have a token', () => {
+  let store: Store
+  beforeEach(() => {
+    const testApp = createTestApp()
+    store = testApp.store
+    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+  })
+
+  it("redirects user to SSO if user doesn't have a token", async () => {
+    await flushPromises()
+    expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
+  })
+})*/
 
 it('renders without crashing', async () => {
   createTestApp()
@@ -484,7 +513,6 @@ describe('when user has a valid token in local storage', () => {
         })
       })
     })
-
     describe('when user clicks "next" button', () => {
       beforeEach(async () => {
         app
@@ -647,28 +675,30 @@ describe('when user has a valid token in local storage', () => {
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
-      birthDate: '1999-10-10',
+      childBirthDate: '1999-10-10',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
-      multipleBirth: '2',
       placeOfBirth: 'HOSPITAL',
+      birthLocation: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
+      multipleBirth: '2',
       birthType: 'SINGLE',
       weightAtBirth: '5'
     }
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '234234423424234244',
-      iDType: 'NATIONAL_ID',
+      iD: '23423442342423424',
+      iDType: 'OTHER',
+      iDTypeOther: 'Custom type',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
       country: 'BGD',
       countryPermanent: 'BGD',
       currentAddress: '',
-      birthDate: '1999-10-10',
+      motherBirthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       familyName: 'ইসলাম',
@@ -690,7 +720,7 @@ describe('when user has a valid token in local storage', () => {
       firstNamesEng: 'Rokeya',
       maritalStatus: 'MARRIED',
       dateOfMarriage: '2010-10-10',
-      birthDate: '1999-10-10',
+      fatherBirthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       currentAddressSameAsPermanent: true,
       addressLine1: 'Rd #10',
@@ -780,6 +810,78 @@ describe('when user has a valid token in local storage', () => {
         draftToMutationTransformer(form, data).father.address[1].line[0]
       ).toBe('Rd#10')
     })
+    it('Check if existing place of birth location is parsed properly', () => {
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(draftToMutationTransformer(form, data).birthLocationType).toBe(
+        'HOSPITAL'
+      )
+
+      expect(draftToMutationTransformer(form, data).birthLocation).toBe(
+        '90d39759-7f02-4646-aca3-9272b4b5ce5a'
+      )
+    })
+    it('Check if new place of birth location address is parsed properly', () => {
+      const clonedChild = clone(childDetails)
+      clonedChild.placeOfBirth = 'PRIVATE_HOME'
+      clonedChild.addressLine1 = 'Rd #10'
+      clonedChild.addressLine2 = 'Akua'
+      clonedChild.addressLine3 = 'union1'
+      clonedChild.addressLine4 = 'upazila10'
+      clonedChild.country = 'BGD'
+      clonedChild.district = 'district2'
+      clonedChild.postCode = '1020'
+      clonedChild.state = 'state4'
+      const data = {
+        child: clonedChild,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        documents: { image_uploader: '' }
+      }
+
+      expect(draftToMutationTransformer(form, data).birthLocationType).toBe(
+        'PRIVATE_HOME'
+      )
+
+      expect(draftToMutationTransformer(form, data).placeOfBirth.type).toBe(
+        'PRIVATE_HOME'
+      )
+      expect(draftToMutationTransformer(form, data).placeOfBirth.partOf).toBe(
+        'upazila10'
+      )
+
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.type
+      ).toBe('BIRTH_PLACE')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.state
+      ).toBe('state4')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.postalCode
+      ).toBe('1020')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.district
+      ).toBe('district2')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[0]
+      ).toBe('Rd #10')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[2]
+      ).toBe('Akua')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[3]
+      ).toBe('union1')
+      expect(
+        draftToMutationTransformer(form, data).placeOfBirth.address.line[5]
+      ).toBe('upazila10')
+    })
     it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
       const registration = clone(registrationDetails)
       registration.whoseContactDetails = 'BOTH_PARENTS'
@@ -865,6 +967,7 @@ describe('when user has a valid token in local storage', () => {
         })
 
         it('Should be able to click SEND FOR REVIEW Button', () => {
+          // console.log(app.debug())
           expect(
             app
               .find('#submit_form')
@@ -909,14 +1012,13 @@ describe('when user has a valid token in local storage', () => {
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
-      birthDate: '1999-10-10',
+      childBirthDate: '1999-10-10',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
       multipleBirth: '2',
-      placeOfBirth: 'HOSPITAL',
       birthType: 'SINGLE',
       weightAtBirth: '6',
       _fhirID: '1'
@@ -931,7 +1033,7 @@ describe('when user has a valid token in local storage', () => {
       country: 'BGD',
       countryPermanent: 'BGD',
       currentAddress: '',
-      birthDate: '1999-10-10',
+      fatherBirthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       familyName: 'ইসলাম',
@@ -954,7 +1056,7 @@ describe('when user has a valid token in local storage', () => {
       firstNamesEng: 'Rokeya',
       maritalStatus: 'MARRIED',
       dateOfMarriage: '2010-10-10',
-      birthDate: '1999-10-10',
+      motherBirthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       addressLine1: 'Rd #10',
       addressLine1Permanent: 'Rd#10',

@@ -62,7 +62,7 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
       ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
+        width: 275px;
       }`
       : ''
   }}

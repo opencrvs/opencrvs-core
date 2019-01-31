@@ -7,5 +7,6 @@ interface Window {
     LOGIN_URL: string
     PERFORMANCE_URL: string
     RESOURCES_URL: string
+    HEALTH_FACILITY_FILTER: string
   }
 }

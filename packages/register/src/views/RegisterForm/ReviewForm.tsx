@@ -72,6 +72,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -101,6 +102,7 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -136,6 +138,18 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      placeOfBirth {
+        address {
+          type
+          line
+          district
+          state
+          postalCode
+          country
+        }
+      }
+      birthLocation
+      birthLocationType
       presentAtBirthRegistration
     }
   }
@@ -212,20 +226,26 @@ export class ReviewFormView extends React.Component<IProps> {
         person.statePermanent = address.state
         person.districtPermanent = address.district
         person.addressLine1Permanent = address.line && address.line[0]
-        person.addressLine2Permanent = address.line && address.line[1]
-        person.addressLine3Permanent = address.line && address.line[2]
-        person.addressLine4Permanent = address.line && address.line[3]
+        person.addressLine1CityOptionPermanent = address.line && address.line[1]
+        person.addressLine2Permanent = address.line && address.line[2]
+        person.addressLine3Permanent = address.line && address.line[3]
+        person.addressLine3CityOptionPermanent = address.line && address.line[4]
+        person.addressLine4Permanent = address.line && address.line[5]
         person.postalCodePermanent = address.line && address.postalCode
+        person.postCodeCityOptionPermanent = address.line && address.postalCode
       }
       if (address.type === 'CURRENT') {
         person.country = address.country
         person.state = address.state
         person.district = address.district
         person.addressLine1 = address.line && address.line[0]
-        person.addressLine2 = address.line && address.line[1]
-        person.addressLine3 = address.line && address.line[2]
-        person.addressLine4 = address.line && address.line[3]
+        person.addressLine1CityOption = address.line && address.line[1]
+        person.addressLine2 = address.line && address.line[2]
+        person.addressLine3 = address.line && address.line[3]
+        person.addressLine3CityOption = address.line && address.line[4]
+        person.addressLine4 = address.line && address.line[5]
         person.postalCode = address.line && address.postalCode
+        person.postCodeCityOption = address.line && address.postalCode
       }
     })
   }
@@ -236,6 +256,7 @@ export class ReviewFormView extends React.Component<IProps> {
   ) => {
     person.iD = identifier[0].id
     person.iDType = identifier[0].type
+    person.iDTypeOther = identifier[0].otherType
   }
 
   transformChild = (reg: GQLBirthRegistration) => {
@@ -246,11 +267,28 @@ export class ReviewFormView extends React.Component<IProps> {
     const childNames = child.name as GQLHumanName[]
     this.transformName(childNames, childDetails)
 
-    childDetails.birthDate = child.birthDate
+    childDetails.childBirthDate = child.birthDate
     childDetails.gender = child.gender
     childDetails.weightAtBirth = reg.weightAtBirth
     childDetails.attendantAtBirth = reg.attendantAtBirth
     childDetails.birthType = reg.birthType
+    childDetails.birthLocation = reg.birthLocation
+    childDetails.placeOfBirth = reg.birthLocationType
+    if (reg.placeOfBirth && reg.placeOfBirth.address) {
+      childDetails.country = reg.placeOfBirth.address.country
+      childDetails.state = reg.placeOfBirth.address.state
+      childDetails.district = reg.placeOfBirth.address.district
+      if (reg.placeOfBirth.address.line) {
+        childDetails.addressLine1 = reg.placeOfBirth.address.line[0]
+        childDetails.addressLine1CityOption = reg.placeOfBirth.address.line[1]
+        childDetails.addressLine2 = reg.placeOfBirth.address.line[2]
+        childDetails.addressLine3 = reg.placeOfBirth.address.line[3]
+        childDetails.addressLine3CityOption = reg.placeOfBirth.address.line[4]
+        childDetails.addressLine4 = reg.placeOfBirth.address.line[5]
+      }
+      childDetails.postCode = reg.placeOfBirth.address.postalCode
+      childDetails.postCodeCityOption = reg.placeOfBirth.address.postalCode
+    }
     if (child.id) {
       childDetails._fhirID = child.id
     }
@@ -272,7 +310,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, motherDetails)
 
     motherDetails.gender = mother.gender
-    motherDetails.birthDate = mother.birthDate
+    motherDetails.motherBirthDate = mother.birthDate
     motherDetails.dateOfMarriage = mother.dateOfMarriage
     motherDetails.maritalStatus = mother.maritalStatus
     motherDetails.educationalAttainment = mother.educationalAttainment
@@ -311,7 +349,7 @@ export class ReviewFormView extends React.Component<IProps> {
     this.transformIdentifier(identifier, fatherDetails)
 
     fatherDetails.gender = father.gender
-    fatherDetails.birthDate = father.birthDate
+    fatherDetails.fatherBirthDate = father.birthDate
     fatherDetails.dateOfMarriage = father.dateOfMarriage
     fatherDetails.maritalStatus = father.maritalStatus
     fatherDetails.educationalAttainment = father.educationalAttainment
@@ -336,10 +374,15 @@ export class ReviewFormView extends React.Component<IProps> {
       mother.statePermanent === mother.state &&
       mother.districtPermanent === mother.district &&
       mother.addressLine1Permanent === mother.addressLine1 &&
+      mother.addressLine1CityOptionPermanent ===
+        mother.addressLine1CityOption &&
       mother.addressLine2Permanent === mother.addressLine2 &&
       mother.addressLine3Permanent === mother.addressLine3 &&
+      mother.addressLine3CityOptionPermanent ===
+        mother.addressLine3CityOption &&
       mother.addressLine4Permanent === mother.addressLine4 &&
-      mother.postalCodePermanent === mother.postalCode
+      mother.postalCodePermanent === mother.postalCode &&
+      mother.postCodeCityOptionPermanent === mother.postCodeCityOption
   }
 
   setFatherAddressSameAsMother(
@@ -351,20 +394,28 @@ export class ReviewFormView extends React.Component<IProps> {
       father.statePermanent === mother.statePermanent &&
       father.districtPermanent === mother.districtPermanent &&
       father.addressLine1Permanent === mother.addressLine1Permanent &&
+      father.addressLine1CityOptionPermanent ===
+        mother.addressLine1CityOptionPermanent &&
       father.addressLine2Permanent === mother.addressLine2Permanent &&
       father.addressLine3Permanent === mother.addressLine3Permanent &&
+      father.addressLine3CityOptionPermanent ===
+        mother.addressLine3CityOptionPermanent &&
       father.addressLine4Permanent === mother.addressLine4Permanent &&
-      father.postalCodePermanent === mother.postalCodePermanent
+      father.postalCodePermanent === mother.postalCodePermanent &&
+      father.postCodeCityOptionPermanent === mother.postCodeCityOptionPermanent
 
     father.addressSameAsMother =
       father.country === mother.country &&
       father.state === mother.state &&
       father.district === mother.district &&
       father.addressLine1 === mother.addressLine1 &&
+      father.addressLine1CityOption === mother.addressLine1CityOption &&
       father.addressLine2 === mother.addressLine2 &&
       father.addressLine3 === mother.addressLine3 &&
+      father.addressLine3CityOption === mother.addressLine3CityOption &&
       father.addressLine4 === mother.addressLine4 &&
-      father.postalCode === mother.postalCode
+      father.postalCode === mother.postalCode &&
+      father.postCodeCityOption === mother.postCodeCityOption
   }
 
   transformRegistration = (reg: GQLBirthRegistration) => {
