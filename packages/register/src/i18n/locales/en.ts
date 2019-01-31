@@ -806,6 +806,8 @@ export const ENGLISH_STATE: ILanguage = {
     duplication {duplication}  duplication {duplication rejected} certificate {...} offlineEvent {pending}}`,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
       registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-      duplication{} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`
+      duplication{} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
+    'register.confirmationScreen.footerActionButton': `Back to {event, select, declaration {New Application} registration {Application} duplication {Duplication}
+    certificate {Certification} offlineEvent {New Application}}`
   }
 }

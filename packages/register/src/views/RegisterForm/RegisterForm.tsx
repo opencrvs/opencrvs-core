@@ -35,7 +35,13 @@ import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
 import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { DECLARATION, SUBMISSION, REJECTION } from 'src/utils/constants'
+import {
+  DECLARATION,
+  SUBMISSION,
+  REJECTION,
+  REGISTRATION,
+  REGISTERED
+} from 'src/utils/constants'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -318,19 +324,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName: IFullName = getFullName(childData)
+    this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       eventName: DECLARATION,
       actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    this.props.deleteDraft(draft)
   }
 
   successfulSubmission = (response: string) => {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
+    this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       nextSection: true,
@@ -340,13 +347,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    this.props.deleteDraft(draft)
   }
 
-  successfullyRegistered = () => {
-    const { draft } = this.props
-    window.location.href = '/work-queue'
-    this.props.deleteDraft(draft)
+  successfullyRegistered = (response: string) => {
+    const { history, draft } = this.props
+    const childData = this.props.draft.data.child
+    const fullName = getFullName(childData)
+    this.props.deleteDraft({ ...draft })
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      trackingSection: true,
+      eventName: REGISTRATION,
+      actionName: REGISTERED,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
+    })
   }
 
   submitForm = () => {
@@ -580,11 +595,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation mutation={postMutation} variables={this.processSubmitData()}>
+        <Mutation
+          mutation={postMutation}
+          variables={this.processSubmitData()}
+          onCompleted={data =>
+            this.successfulSubmission(data.createBirthRegistration)
+          }
+        >
           {(submitBirthRegistration, { data }) => {
-            if (data && data.createBirthRegistration) {
-              this.successfulSubmission(data.createBirthRegistration)
-            }
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -617,12 +635,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
           }}
         </Mutation>
 
-        <Mutation mutation={patchMutation} variables={this.processSubmitData()}>
+        <Mutation
+          mutation={patchMutation}
+          variables={this.processSubmitData()}
+          onCompleted={data =>
+            this.successfullyRegistered(data.markBirthAsRegistered)
+          }
+        >
           {(markBirthAsRegistered, { data }) => {
-            if (data && data.markBirthAsRegistered) {
-              this.successfullyRegistered()
-            }
-
             return (
               <Modal
                 title="Are you ready to submit?"

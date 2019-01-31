@@ -796,6 +796,8 @@ export const BENGALI_STATE: ILanguage = {
       duplication {}  duplication {} certificate {...} offlineEvent {pending}}`,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
       registration {প্ৰশংসাপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে ইনফরম্যান্ট এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} 
-      duplication {} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে} offlineEvent {ইন্টারনেটের জন্য অপেক্ষা করুন}}`
+      duplication {} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে} offlineEvent {ইন্টারনেটের জন্য অপেক্ষা করুন}}`,
+    'register.confirmationScreen.footerActionButton': `{event, select, declaration {নতুন আবেদনে} registration {আবেদনে} duplication {সদৃশ এ}
+     certificate {সনদে} offlineEvent {নতুন আবেদনে}} ফিরে যান`
   }
 }

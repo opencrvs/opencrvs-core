@@ -21,7 +21,7 @@ import { DECLARATION, REJECTION } from 'src/utils/constants'
 
 const messages = defineMessages({
   nextCardTitle: {
-    id: 'register.savedRegistration.nextCard.title',
+    id: 'register.confirmationScreen.nextCard.title',
     defaultMessage: 'What next?',
     description:
       'The title of the what next card that appears on the saved registration page'
@@ -38,18 +38,13 @@ const messages = defineMessages({
     defaultMessage: 'Back to homescreen',
     description: 'The button to return to the homescreen'
   },
-  newButton: {
-    id: 'register.confirmationScreen.buttons.newDeclaration',
-    defaultMessage: 'New application',
-    description:
-      'The button to start a new application now that they are finished with this one'
+  footerActionButton: {
+    id: 'register.confirmationScreen.footerActionButton',
+    defaultMessage: `Back to {event, select, declaration {New Application} registration {Application} duplication {Duplication}
+    certificate {Certification} offlineEvent {New Application}}`,
+    description: 'The button to showed on footer section'
   },
-  duplicationButton: {
-    id: 'register.confirmationScreen.buttons.back.duplicate',
-    defaultMessage: 'Back to duplicate',
-    description:
-      'The button to start a new application now that they are finished with this one'
-  },
+
   title: {
     id: 'register.confirmationScreen.title',
     defaultMessage: `{event, select, declaration {Application} registration {Registration} duplication {Duplication}
@@ -223,19 +218,17 @@ class ConfirmationScreenView extends React.Component<
   Props & InjectedIntlProps & RouteComponentProps<{}>
 > {
   render() {
-    const { intl, history } = this.props
+    const { intl, history, location } = this.props
     const online = navigator.onLine
     const language = this.props.language
-    const fullNameInBn = history.location.state.fullNameInBn
-      ? history.location.state.fullNameInBn
+    const fullNameInBn = location.state.fullNameInBn
+      ? location.state.fullNameInBn
       : ''
-    const fullNameInEng = history.location.state.fullNameInEng
-      ? history.location.state.fullNameInEng
+    const fullNameInEng = location.state.fullNameInEng
+      ? location.state.fullNameInEng
       : ''
-    const eventName = online ? history.location.state.eventName : 'offlineEvent'
-    const actionName = online
-      ? history.location.state.actionName
-      : 'offlineAction'
+    const eventName = online ? location.state.eventName : 'offlineEvent'
+    const actionName = online ? location.state.actionName : 'offlineAction'
     const title = intl.formatMessage(messages.title, {
       event: eventName,
       action: actionName
@@ -251,8 +244,8 @@ class ConfirmationScreenView extends React.Component<
       action: actionName,
       fullName
     })
-    const trackNumber = history.location.state.trackNumber
-      ? history.location.state.trackNumber
+    const trackNumber = location.state.trackNumber
+      ? location.state.trackNumber
       : ''
     const trackingCardTitle = intl.formatMessage(
       messages.trackingSectionTitle,
@@ -270,11 +263,12 @@ class ConfirmationScreenView extends React.Component<
       event: eventName
     })
     const isDeclaration =
-      history.location.state.eventName === DECLARATION ? true : false
-    const isTrackingSection = history.location.state.trackingSection
-      ? true
-      : false
-    const isNextSection = history.location.state.nextSection ? true : false
+      location.state.eventName === DECLARATION ? true : false
+    const isTrackingSection = location.state.trackingSection ? true : false
+    const isNextSection = location.state.nextSection ? true : false
+    const footerButtonText = intl.formatMessage(messages.footerActionButton, {
+      event: eventName
+    })
 
     return (
       <>
@@ -326,21 +320,13 @@ class ConfirmationScreenView extends React.Component<
           )}
         </Container>
         <Footer>
-          {!isRejection &&
-            (isDeclaration ? (
-              <FooterAction>
-                <FooterPrimaryButton onClick={() => history.push('/')}>
-                  {intl.formatMessage(messages.newButton)}
-                </FooterPrimaryButton>
-              </FooterAction>
-            ) : (
-              <FooterAction>
-                <FooterPrimaryButton onClick={() => history.push('/')}>
-                  {intl.formatMessage(messages.duplicationButton)}
-                </FooterPrimaryButton>
-              </FooterAction>
-            ))}
-
+          {!isRejection && (
+            <FooterAction>
+              <FooterPrimaryButton onClick={() => history.push('/')}>
+                {footerButtonText}
+              </FooterPrimaryButton>
+            </FooterAction>
+          )}
           <FooterAction>
             <FooterPrimaryButton onClick={() => history.push('/')}>
               {intl.formatMessage(messages.backButton)}
