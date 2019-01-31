@@ -571,7 +571,7 @@ function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string; draftId: string }>
 ) {
-  const { match } = props
+  const { match, history } = props
   const form = getReviewForm(state)
 
   const draft = state.drafts.drafts.find(
@@ -582,6 +582,7 @@ function mapStatetoProps(
     scope: getScope(state),
     draftId: match.params.draftId,
     registerForm: form,
+    duplicate: history.location.state && history.location.state.duplicate,
     tabRoute: REVIEW_BIRTH_PARENT_FORM_TAB
   }
 }

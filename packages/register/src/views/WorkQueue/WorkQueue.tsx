@@ -839,7 +839,7 @@ export class WorkQueueView extends React.Component<
 
     if (this.userHasRegisterScope()) {
       if (
-        !item.duplicates &&
+        !(item.duplicates && item.duplicates.length > 0) &&
         !applicationIsRegistered &&
         !applicationIsRejected &&
         !applicationIsCertified

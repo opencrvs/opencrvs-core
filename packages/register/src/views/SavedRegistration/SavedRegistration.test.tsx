@@ -6,7 +6,7 @@ import { createStore } from '../../store'
 
 const fullNameInBn = 'টম ব্র্যাডি'
 const fullNameInEng = 'Tom Brady'
-
+const assign = window.location.assign as jest.Mock
 describe('when user is in the saved registration page', () => {
   const { store, history } = createStore()
 
@@ -214,5 +214,55 @@ describe('when user is in reject registration page', () => {
     ).toEqual(
       `The birth application of Tom Brady has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.`
     )
+  })
+})
+
+describe('when user is in reject registration page from duplicates', () => {
+  const { store, history } = createStore()
+
+  const mock: any = jest.fn()
+  let savedRegistrationComponent: ReactWrapper<{}, {}>
+  history.push('/rejected', {
+    trackingId: '123456789',
+    rejection: true,
+    fullNameInBn,
+    fullNameInEng,
+    duplicate: true,
+    duplicateContextId: '123'
+  })
+
+  beforeEach(async () => {
+    const testComponent = createTestComponent(
+      <SavedRegistration
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    savedRegistrationComponent = testComponent.component
+  })
+
+  it('should show the go to duplicate button', () => {
+    expect(
+      savedRegistrationComponent.find('#go_to_duplicate_button').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+
+  it('should change the route to review duplicates', () => {
+    savedRegistrationComponent
+      .find('#go_to_duplicate_button')
+      .hostNodes()
+      .simulate('click')
+
+    savedRegistrationComponent.update()
+    expect(assign.mock.calls).toHaveLength(1)
   })
 })
