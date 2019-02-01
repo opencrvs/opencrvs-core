@@ -482,9 +482,9 @@
 "validations.emailAddressFormat","Must be a valid email address"
 "validations.dateFormat","একটি বৈধ তারিখ হওয়া আবশ্যক"
 "validations.requiredSymbol",""
-"validations.validNationalId": "জাতীয় পরিচয় পত্র {maxLength} অক্ষর থেকে বেশি হতে পারবেনা",
-"validations.validBirthRegistrationNumber": "জন্ম নিবন্ধন নম্বর {maxLength} অক্ষর থেকে বেশি হতে পারবেনা",
-"validations.validDeathRegistrationNumber": "মৃত্যু নিবন্ধন সংখ্যা {maxLength} অক্ষর থেকে বেশি হতে পারবেনা",
+"validations.validNationalId","জাতীয় পরিচয় পত্র শুধু মাত্র সংখ্যায় এবং এর দৈর্ঘ্য {validLength} সংখ্যা থেকে বেশি হতে পারবেনা"
+"validations.validBirthRegistrationNumber","জন্ম নিবন্ধন নম্বর শুধু মাত্র সংখ্য-অক্ষরের মিশ্রণ এবং এর দৈর্ঘ্য {validLength} অক্ষর থেকে বেশি হতে পারবেনা"
+"validations.validPassportNumber","পাসপোর্ট নম্বর শুধু মাত্র সংখ্যা-অক্ষরের মিশ্রণ এবং এর দৈর্ঘ্য {validLength} অক্ষর থেকে বেশি হতে পারবেনা"
 "register.form.submit","পর্যালোচনার জন্য পাঠান"
 "register.form.saveAsDraft","Save as draft"
 "register.form.informationMissing","অনুপস্থিত তথ্য"

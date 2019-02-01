@@ -92,23 +92,23 @@ export const messages = defineMessages({
   validNationalId: {
     id: 'validations.validNationalId',
     defaultMessage:
-      'The National ID can be up to {maxCharLength} characters long',
+      'The National ID can only be numeric and must be {validLength} digits long',
     description:
-      'The error message that appears when an invalid length of value is used as nid'
+      'The error message that appears when an invalid value is used as nid'
   },
   validBirthRegistrationNumber: {
     id: 'validations.validBirthRegistrationNumber',
     defaultMessage:
-      'The Birth Registration Number can be up to {maxCharLength} characters long',
+      'The Birth Registration Number can only be alpha numeric and must be {validLength} characters long',
     description:
-      'The error message that appears when an invalid length of value is used as brn'
+      'The error message that appears when an invalid value is used as brn'
   },
-  validDeathRegistrationNumber: {
-    id: 'validations.validDeathRegistrationNumber',
+  validPassportNumber: {
+    id: 'validations.validPassportNumber',
     defaultMessage:
-      'The Death Registration Number can be up to {maxCharLength} characters long',
+      'The Passport Number can only be alpha numeric and must be {validLength} characters long',
     description:
-      'The error message that appears when an invalid length of value is used as drn'
+      'The error message that appears when an invalid value is used as passport number'
   }
 })
 
@@ -191,6 +191,12 @@ export const maxLength = (max: number) => (value: string) => {
 }
 
 const isNumber = (value: string): boolean => !value || !isNaN(Number(value))
+
+const isAlphaNumeric = (value: string): boolean =>
+  !value || value.match(/^[0-9a-zA-Z]+$/) !== null
+
+const isAllCapsAlphaNumeric = (value: string): boolean =>
+  !value || value.match(/^[0-9A-Z]+$/) !== null
 
 export const numeric: Validation = (value: string) =>
   isNumber(value) ? undefined : { message: messages.numberRequired }
@@ -332,35 +338,39 @@ export const range = (min: number, max: number) => (value: string) => {
     : { message: messages.range, props: { min, max } }
 }
 
+const hasValidLength = (value: string, length: number): boolean =>
+  !value || value.length === length
+
 export const validIDNumber: ValidationInitializer = (
   typeOfID: string
 ): Validation => (value: string) => {
-  const validNationalIDLength = 17
+  const validNationalIDLength = 13
   const validBirthRegistrationNumberLength = 17
-  const validDeathRegistrationNumberLength = 17
+  const validPassportLength = 9
   switch (typeOfID) {
     case 'NATIONAL_ID':
-      return isLessOrEqual(value, validNationalIDLength)
+      return hasValidLength(value, validNationalIDLength) && isNumber(value)
         ? undefined
         : {
             message: messages.validNationalId,
-            props: { maxCharLength: validNationalIDLength }
+            props: { validLength: validNationalIDLength }
           }
 
     case 'BIRTH_REGISTRATION_NUMBER':
-      return isLessOrEqual(value, validBirthRegistrationNumberLength)
+      return hasValidLength(value, validBirthRegistrationNumberLength) &&
+        isAllCapsAlphaNumeric(value)
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
-            props: { maxCharLength: validBirthRegistrationNumberLength }
+            props: { validLength: validBirthRegistrationNumberLength }
           }
 
-    case 'DEATH_REGISTRATION_NUMBER':
-      return isLessOrEqual(value, validDeathRegistrationNumberLength)
+    case 'PASSPORT':
+      return hasValidLength(value, validPassportLength) && isAlphaNumeric(value)
         ? undefined
         : {
-            message: messages.validDeathRegistrationNumber,
-            props: { maxCharLength: validDeathRegistrationNumberLength }
+            message: messages.validPassportNumber,
+            props: { validLength: validPassportLength }
           }
 
     default:

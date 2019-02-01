@@ -705,7 +705,7 @@ describe('when user has a valid token in local storage', () => {
       fathersDetailsExist: true,
       iD: '23423442342423424',
       iDType: 'OTHER',
-      iDTypeOther: 'Custom type',
+      iDTypeOther: 'Taxpayer Identification Number',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
       country: 'BGD',
@@ -723,7 +723,7 @@ describe('when user has a valid token in local storage', () => {
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '234243453455',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       country: 'BGD',
       nationality: 'BGD',
@@ -1064,7 +1064,7 @@ describe('when user has a valid token in local storage', () => {
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '234234423424234244',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
@@ -1084,7 +1084,7 @@ describe('when user has a valid token in local storage', () => {
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '234243453455',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       country: 'BGD',
       nationality: 'BGD',
