@@ -154,7 +154,7 @@ export const registrationSection: IFormSection = {
           label: messages.presentOther
         }
       ],
-      mapping: sectionFieldToBundleFieldTransformer
+      mapping: { mutation: sectionFieldToBundleFieldTransformer }
     },
     {
       name: 'whoseContactDetails',
@@ -177,7 +177,7 @@ export const registrationSection: IFormSection = {
           label: messages.contactDetailsFather
         }
       ],
-      mapping: fieldNameTransformer('contact')
+      mapping: { mutation: fieldNameTransformer('contact') }
     },
     {
       name: 'registrationPhone',
@@ -186,7 +186,7 @@ export const registrationSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [phoneNumberFormat],
-      mapping: phoneNumberTransformer('whoseContactDetails')
+      mapping: { mutation: phoneNumberTransformer('whoseContactDetails') }
     },
     {
       name: 'phoneVerificationWarning',
@@ -203,8 +203,8 @@ export const registrationSection: IFormSection = {
       initialValue: '',
       validate: [],
       description: messages.commentsOrNotesDescription,
-      mapping: commentTransformer
+      mapping: { mutation: commentTransformer }
     }
   ],
-  mapping: registrationSectionTransformer
+  mapping: { mutation: registrationSectionTransformer }
 }

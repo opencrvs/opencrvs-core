@@ -176,7 +176,9 @@ export const documentsSection: IFormSection = {
           }
         ]
       },
-      mapping: birthAttachmentTransformer
+      mapping: {
+        mutation: birthAttachmentTransformer
+      }
     },
     {
       name: 'paragraph',

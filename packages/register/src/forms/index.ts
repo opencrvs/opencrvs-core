@@ -91,6 +91,10 @@ export type IFormFieldMapFunction = (
   fieldDefinition: IFormField
 ) => void
 
+export type IFormFieldMapping = {
+  mutation?: IFormFieldMapFunction
+  query?: IFormFieldMapFunction
+}
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
@@ -103,7 +107,7 @@ export interface IFormFieldBase {
   initialValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
-  mapping?: IFormFieldMapFunction
+  mapping?: IFormFieldMapping
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -252,6 +256,11 @@ export type IFormSectionMapFunction = (
   draftData: IFormData,
   sectionId: string
 ) => void
+
+export type IFormSectionMapping = {
+  mutation?: IFormSectionMapFunction
+  query?: IFormSectionMapFunction
+}
 export interface IFormSection {
   id: string
   viewType: ViewType
@@ -261,7 +270,7 @@ export interface IFormSection {
   disabled?: boolean
   optional?: boolean
   notice?: FormattedMessage.MessageDescriptor
-  mapping?: IFormSectionMapFunction
+  mapping?: IFormSectionMapping
 }
 
 export interface IForm {

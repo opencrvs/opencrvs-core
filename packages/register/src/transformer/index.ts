@@ -36,19 +36,24 @@ export const draftToGqlTransformer = (
         draftData[section.id][fieldDef.name] !== '' &&
         !conditionalActions.includes('hide')
       ) {
-        if (!fieldDef.mapping) {
+        if (fieldDef.mapping && fieldDef.mapping.mutation) {
+          fieldDef.mapping.mutation(
+            transformedData,
+            draftData,
+            section.id,
+            fieldDef
+          )
+        } else {
           transformedData[section.id][fieldDef.name] =
             draftData[section.id][fieldDef.name]
-        } else {
-          fieldDef.mapping(transformedData, draftData, section.id, fieldDef)
         }
       }
     })
     if (draftData[section.id]._fhirID) {
       transformedData[section.id]._fhirID = draftData[section.id]._fhirID
     }
-    if (section.mapping) {
-      section.mapping(transformedData, draftData, section.id)
+    if (section.mapping && section.mapping.mutation) {
+      section.mapping.mutation(transformedData, draftData, section.id)
     }
     if (
       transformedData[section.id] &&
@@ -74,8 +79,14 @@ export const gqlToDraftTransformer = (
     throw new Error('Provided query data is not valid')
   }
   const transformedData: any = {}
-  Object.keys(queryData).forEach(key => {
-    return null
+  formDefinition.sections.forEach(section => {
+    if (!queryData[section.id]) {
+      return
+    }
+    transformedData[section.id] = {}
+    section.fields.forEach(fieldDef => {
+      return null
+    })
   })
   return transformedData
 }

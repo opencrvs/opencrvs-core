@@ -130,7 +130,9 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       options: identityOptions,
-      mapping: identifierTypeTransformer
+      mapping: {
+        mutation: identifierTypeTransformer
+      }
     },
     {
       name: 'iDTypeOther',
@@ -140,7 +142,9 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [],
       conditionals: [conditionals.iDType],
-      mapping: identifierOtherTypeTransformer
+      mapping: {
+        mutation: identifierOtherTypeTransformer
+      }
     },
     {
       name: 'iD',
@@ -161,7 +165,9 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      mapping: identifierTransformer
+      mapping: {
+        mutation: identifierTransformer
+      }
     },
     {
       name: 'nationality',
@@ -171,7 +177,9 @@ export const motherSection: IFormSection = {
       initialValue: 'BGD',
       validate: [],
       options: countries,
-      mapping: fieldToArrayTransformer
+      mapping: {
+        mutation: fieldToArrayTransformer
+      }
     },
     {
       name: 'firstNames',
@@ -180,7 +188,9 @@ export const motherSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
-      mapping: nameTransformer('bn')
+      mapping: {
+        mutation: nameTransformer('bn')
+      }
     },
     {
       name: 'familyName',
@@ -189,7 +199,9 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
-      mapping: nameTransformer('bn')
+      mapping: {
+        mutation: nameTransformer('bn')
+      }
     },
     {
       name: 'firstNamesEng',
@@ -198,7 +210,9 @@ export const motherSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat],
-      mapping: nameTransformer('en', 'firstNames')
+      mapping: {
+        mutation: nameTransformer('en', 'firstNames')
+      }
     },
     {
       name: 'familyNameEng',
@@ -207,7 +221,9 @@ export const motherSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat],
-      mapping: nameTransformer('en', 'familyName')
+      mapping: {
+        mutation: nameTransformer('en', 'familyName')
+      }
     },
     {
       name: 'motherBirthDate',
@@ -216,7 +232,9 @@ export const motherSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [dateFormat],
-      mapping: fieldNameTransformer('birthDate')
+      mapping: {
+        mutation: fieldNameTransformer('birthDate')
+      }
     },
     {
       name: 'maritalStatus',
@@ -305,7 +323,9 @@ export const motherSection: IFormSection = {
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      mapping: addressTransformer('PERMANENT', 0, 'country')
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 0, 'country')
+      }
     },
     {
       name: 'statePermanent',
@@ -319,7 +339,9 @@ export const motherSection: IFormSection = {
         dependency: 'countryPermanent'
       },
       conditionals: [conditionals.countryPermanent],
-      mapping: addressTransformer('PERMANENT', 0, 'state')
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 0, 'state')
+      }
     },
     {
       name: 'districtPermanent',
@@ -336,7 +358,9 @@ export const motherSection: IFormSection = {
         conditionals.countryPermanent,
         conditionals.statePermanent
       ],
-      mapping: addressTransformer('PERMANENT', 0, 'district')
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 0, 'district')
+      }
     },
     {
       name: 'addressLine4Permanent',
@@ -354,7 +378,9 @@ export const motherSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 6)
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 6)
+      }
     },
     {
       name: 'addressLine3Permanent',
@@ -374,7 +400,9 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.isNotCityLocationPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 4)
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 4)
+      }
     },
     {
       name: 'addressLine3CityOptionPermanent',
@@ -390,7 +418,9 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.isCityLocationPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 5)
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 5)
+      }
     },
     {
       name: 'addressLine2Permanent',
@@ -406,7 +436,9 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent
       ],
-      mapping: addressTransformer('PERMANENT', 3)
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 3)
+      }
     },
     {
       name: 'addressLine1CityOptionPermanent',
@@ -422,7 +454,9 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.isCityLocationPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 2)
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 2)
+      }
     },
     {
       name: 'postCodeCityOptionPermanent',
@@ -438,7 +472,9 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.isCityLocationPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 0, 'postalCode')
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 0, 'postalCode')
+      }
     },
     {
       name: 'addressLine1Permanent',
@@ -454,7 +490,9 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent
       ],
-      mapping: addressTransformer('PERMANENT', 1)
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 1)
+      }
     },
     {
       name: 'postCodePermanent',
@@ -470,7 +508,9 @@ export const motherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent
       ],
-      mapping: addressTransformer('PERMANENT', 0, 'postalCode')
+      mapping: {
+        mutation: addressTransformer('PERMANENT', 0, 'postalCode')
+      }
     },
     {
       name: 'currentAddressSameAsPermanent',
@@ -484,12 +524,14 @@ export const motherSection: IFormSection = {
         { value: false, label: addressMessages.deny }
       ],
       conditionals: [],
-      mapping: copyAddressTransformer(
-        'PERMANENT',
-        'mother',
-        'CURRENT',
-        'mother'
-      )
+      mapping: {
+        mutation: copyAddressTransformer(
+          'PERMANENT',
+          'mother',
+          'CURRENT',
+          'mother'
+        )
+      }
     },
     {
       name: 'currentAddress',
@@ -508,7 +550,7 @@ export const motherSection: IFormSection = {
       validate: [],
       options: countries,
       conditionals: [conditionals.currentAddressSameAsPermanent],
-      mapping: addressTransformer('CURRENT')
+      mapping: { mutation: addressTransformer('CURRENT') }
     },
     {
       name: 'state',
@@ -525,7 +567,7 @@ export const motherSection: IFormSection = {
         conditionals.country,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT')
+      mapping: { mutation: addressTransformer('CURRENT') }
     },
     {
       name: 'district',
@@ -543,7 +585,7 @@ export const motherSection: IFormSection = {
         conditionals.state,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT')
+      mapping: { mutation: addressTransformer('CURRENT') }
     },
     {
       name: 'addressLine4',
@@ -562,7 +604,7 @@ export const motherSection: IFormSection = {
         conditionals.district,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT', 6)
+      mapping: { mutation: addressTransformer('CURRENT', 6) }
     },
     {
       name: 'addressLine3',
@@ -583,7 +625,7 @@ export const motherSection: IFormSection = {
         conditionals.currentAddressSameAsPermanent,
         conditionals.isNotCityLocation
       ],
-      mapping: addressTransformer('CURRENT', 4)
+      mapping: { mutation: addressTransformer('CURRENT', 4) }
     },
     {
       name: 'addressLine3CityOption',
@@ -600,7 +642,7 @@ export const motherSection: IFormSection = {
         conditionals.currentAddressSameAsPermanent,
         conditionals.isCityLocation
       ],
-      mapping: addressTransformer('CURRENT', 5)
+      mapping: { mutation: addressTransformer('CURRENT', 5) }
     },
     {
       name: 'addressLine2',
@@ -617,7 +659,7 @@ export const motherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT', 3)
+      mapping: { mutation: addressTransformer('CURRENT', 3) }
     },
     {
       name: 'addressLine1CityOption',
@@ -634,7 +676,7 @@ export const motherSection: IFormSection = {
         conditionals.currentAddressSameAsPermanent,
         conditionals.isCityLocation
       ],
-      mapping: addressTransformer('CURRENT', 2)
+      mapping: { mutation: addressTransformer('CURRENT', 2) }
     },
     {
       name: 'postCodeCityOption',
@@ -651,7 +693,7 @@ export const motherSection: IFormSection = {
         conditionals.currentAddressSameAsPermanent,
         conditionals.isCityLocation
       ],
-      mapping: addressTransformer('CURRENT', 0, 'postalCode')
+      mapping: { mutation: addressTransformer('CURRENT', 0, 'postalCode') }
     },
     {
       name: 'addressLine1',
@@ -668,7 +710,7 @@ export const motherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT', 1)
+      mapping: { mutation: addressTransformer('CURRENT', 1) }
     },
     {
       name: 'postCode',
@@ -685,7 +727,7 @@ export const motherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.currentAddressSameAsPermanent
       ],
-      mapping: addressTransformer('CURRENT', 0, 'postalCode')
+      mapping: { mutation: addressTransformer('CURRENT', 0, 'postalCode') }
     }
   ]
 }

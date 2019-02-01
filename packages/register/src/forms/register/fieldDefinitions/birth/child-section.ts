@@ -236,7 +236,9 @@ export const childSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
-      mapping: nameTransformer('bn')
+      mapping: {
+        mutation: nameTransformer('bn')
+      }
     },
     {
       name: 'familyName',
@@ -245,7 +247,9 @@ export const childSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
-      mapping: nameTransformer('bn')
+      mapping: {
+        mutation: nameTransformer('bn')
+      }
     },
     {
       name: 'firstNamesEng',
@@ -254,7 +258,9 @@ export const childSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat],
-      mapping: nameTransformer('en', 'firstNames')
+      mapping: {
+        mutation: nameTransformer('en', 'firstNames')
+      }
     },
     {
       name: 'familyNameEng',
@@ -263,7 +269,9 @@ export const childSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [englishOnlyNameFormat],
-      mapping: nameTransformer('en', 'familyName')
+      mapping: {
+        mutation: nameTransformer('en', 'familyName')
+      }
     },
     {
       name: 'gender',
@@ -286,7 +294,9 @@ export const childSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [dateFormat],
-      mapping: fieldNameTransformer('birthDate')
+      mapping: {
+        mutation: fieldNameTransformer('birthDate')
+      }
     },
     {
       name: 'attendantAtBirth',
@@ -307,7 +317,9 @@ export const childSection: IFormSection = {
         { value: 'NONE', label: messages.attendantAtBirthNone },
         { value: 'OTHER', label: messages.attendantAtBirthOther }
       ],
-      mapping: sectionFieldToBundleFieldTransformer
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer
+      }
     },
     {
       name: 'birthType',
@@ -326,7 +338,9 @@ export const childSection: IFormSection = {
           label: messages.birthTypeHigherMultipleDelivery
         }
       ],
-      mapping: sectionFieldToBundleFieldTransformer
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer
+      }
     },
     {
       name: 'multipleBirth',
@@ -345,7 +359,9 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [range(0, 6)],
       postfix: 'Kg',
-      mapping: sectionFieldToBundleFieldTransformer
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer
+      }
     },
     {
       name: 'placeOfBirth',
@@ -363,7 +379,9 @@ export const childSection: IFormSection = {
         { value: 'PRIVATE_HOME', label: messages.privateHome },
         { value: 'OTHER', label: messages.otherInstitution }
       ],
-      mapping: sectionFieldToBundleFieldTransformer('birthLocationType')
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer('birthLocationType')
+      }
     },
     {
       name: 'birthLocation',
@@ -377,7 +395,9 @@ export const childSection: IFormSection = {
         dependency: 'placeOfBirth'
       },
       conditionals: [conditionals.placeOfBirthHospital],
-      mapping: sectionFieldToBundleFieldTransformer('birthLocation')
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer('birthLocation')
+      }
     },
     {
       name: 'country',
@@ -388,7 +408,9 @@ export const childSection: IFormSection = {
       validate: [],
       options: countries,
       conditionals: [conditionals.otherPlaceOfBirth],
-      mapping: vitalEventAddressTransformer('BIRTH')
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH')
+      }
     },
     {
       name: 'state',
@@ -402,7 +424,9 @@ export const childSection: IFormSection = {
         dependency: 'country'
       },
       conditionals: [conditionals.country, conditionals.otherPlaceOfBirth],
-      mapping: vitalEventAddressTransformer('BIRTH')
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH')
+      }
     },
     {
       name: 'district',
@@ -420,7 +444,9 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.otherPlaceOfBirth
       ],
-      mapping: vitalEventAddressTransformer('BIRTH')
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH')
+      }
     },
     {
       name: 'addressLine4',
@@ -439,7 +465,9 @@ export const childSection: IFormSection = {
         conditionals.district,
         conditionals.otherPlaceOfBirth
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 6)
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 6)
+      }
     },
     {
       name: 'addressLine3',
@@ -460,7 +488,9 @@ export const childSection: IFormSection = {
         conditionals.otherPlaceOfBirth,
         conditionals.isNotCityLocation
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 4)
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 4)
+      }
     },
     {
       name: 'addressLine3CityOption',
@@ -477,7 +507,9 @@ export const childSection: IFormSection = {
         conditionals.otherPlaceOfBirth,
         conditionals.isCityLocation
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 5)
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 5)
+      }
     },
     {
       name: 'addressLine2',
@@ -494,7 +526,9 @@ export const childSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.otherPlaceOfBirth
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 3)
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 3)
+      }
     },
     {
       name: 'addressLine1CityOption',
@@ -511,7 +545,9 @@ export const childSection: IFormSection = {
         conditionals.otherPlaceOfBirth,
         conditionals.isCityLocation
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 2)
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 2)
+      }
     },
     {
       name: 'postCodeCityOption',
@@ -528,7 +564,9 @@ export const childSection: IFormSection = {
         conditionals.otherPlaceOfBirth,
         conditionals.isCityLocation
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 0, 'postalCode')
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 0, 'postalCode')
+      }
     },
     {
       name: 'addressLine1',
@@ -545,7 +583,9 @@ export const childSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.otherPlaceOfBirth
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 1)
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 1)
+      }
     },
     {
       name: 'postCode',
@@ -562,7 +602,9 @@ export const childSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.otherPlaceOfBirth
       ],
-      mapping: vitalEventAddressTransformer('BIRTH', 0, 'postalCode')
+      mapping: {
+        mutation: vitalEventAddressTransformer('BIRTH', 0, 'postalCode')
+      }
     }
   ]
 }
