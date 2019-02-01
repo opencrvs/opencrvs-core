@@ -51,7 +51,7 @@ import {
   WARNING,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
-  TEXT_WITH_DYNAMIC_DEFINITIONS,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
   TEXT,
   ITextFormField,
   IDynamicFormField,
@@ -430,7 +430,7 @@ class FormSectionComponent extends React.Component<Props> {
                     offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
-              : field.type === TEXT_WITH_DYNAMIC_DEFINITIONS
+              : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
               ? ({
                   ...field,
                   type: TEXT,

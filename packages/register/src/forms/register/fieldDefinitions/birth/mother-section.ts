@@ -14,7 +14,7 @@ import {
   SUBSECTION,
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  TEXT_WITH_DYNAMIC_DEFINITIONS
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -157,7 +157,7 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'iD',
-      type: TEXT_WITH_DYNAMIC_DEFINITIONS,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
           dependency: 'iDType',
