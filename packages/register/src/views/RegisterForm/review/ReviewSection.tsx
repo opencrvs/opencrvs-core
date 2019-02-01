@@ -708,7 +708,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             {!!saveDraftClickEvent && (
               <DraftButtonContainer
                 onClick={saveDraftClickEvent}
-                id="delete-draft"
+                id="save-draft"
               >
                 <DraftSimple />
                 <SaveDraftText>
