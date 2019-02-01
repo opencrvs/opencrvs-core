@@ -84,16 +84,23 @@ export type IFileValue = {
   data: string
 }
 
-export type IFormFieldMapFunction = (
+export type IFormFieldMutationMapFunction = (
   transFormedData: any,
   draftData: IFormData,
   sectionId: string,
   fieldDefinition: IFormField
 ) => void
 
+export type IFormFieldQueryMapFunction = (
+  transFormedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  fieldDefinition: IFormField
+) => void
+
 export type IFormFieldMapping = {
-  mutation?: IFormFieldMapFunction
-  query?: IFormFieldMapFunction
+  mutation?: IFormFieldMutationMapFunction
+  query?: IFormFieldQueryMapFunction
 }
 export interface IFormFieldBase {
   name: string
@@ -251,15 +258,21 @@ export interface IConditionals {
 
 export type ViewType = 'form' | 'preview' | 'review'
 
-export type IFormSectionMapFunction = (
+export type IFormSectionMutationMapFunction = (
   transFormedData: any,
   draftData: IFormData,
   sectionId: string
 ) => void
 
+export type IFormSectionQueryMapFunction = (
+  transFormedData: IFormData,
+  queryData: any,
+  sectionId: string
+) => void
+
 export type IFormSectionMapping = {
-  mutation?: IFormSectionMapFunction
-  query?: IFormSectionMapFunction
+  mutation?: IFormSectionMutationMapFunction
+  query?: IFormSectionQueryMapFunction
 }
 export interface IFormSection {
   id: string

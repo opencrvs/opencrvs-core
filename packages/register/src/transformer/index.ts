@@ -70,7 +70,7 @@ export const draftToGqlTransformer = (
 
 export const gqlToDraftTransformer = (
   formDefinition: IForm,
-  queryData: IFormData
+  queryData: any
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -78,15 +78,36 @@ export const gqlToDraftTransformer = (
   if (!queryData) {
     throw new Error('Provided query data is not valid')
   }
-  const transformedData: any = {}
+  const transformedData: IFormData = {}
   formDefinition.sections.forEach(section => {
-    if (!queryData[section.id]) {
-      return
-    }
     transformedData[section.id] = {}
     section.fields.forEach(fieldDef => {
-      return null
+      if (fieldDef.mapping && fieldDef.mapping.query) {
+        fieldDef.mapping.query(transformedData, queryData, section.id, fieldDef)
+      } else if (
+        queryData[section.id] &&
+        queryData[section.id][fieldDef.name] &&
+        queryData[section.id][fieldDef.name] !== ''
+      ) {
+        transformedData[section.id][fieldDef.name] =
+          queryData[section.id][fieldDef.name]
+      }
     })
+    if (queryData[section.id] && queryData[section.id].id) {
+      transformedData[section.id]._fhirID = queryData[section.id].id
+    }
+    if (section.mapping && section.mapping.query) {
+      section.mapping.query(transformedData, queryData, section.id)
+    }
+    if (
+      transformedData[section.id] &&
+      Object.keys(transformedData[section.id]).length < 1
+    ) {
+      delete transformedData[section.id]
+    }
   })
+  if (queryData._fhirIDMap) {
+    transformedData._fhirIDMap = queryData._fhirIDMap
+  }
   return transformedData
 }

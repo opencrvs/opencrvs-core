@@ -25,7 +25,11 @@ import {
   sectionFieldToBundleFieldTransformer,
   fieldNameTransformer,
   vitalEventAddressTransformer
-} from 'src/forms/field-mappings'
+} from 'src/forms/mappings/mutation/field-mappings'
+import {
+  nameFieldTransformer,
+  fieldValueTransformer
+} from 'src/forms/mappings/query/field-mappings'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -237,7 +241,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn')
+        mutation: nameTransformer('bn'),
+        query: nameFieldTransformer('bn', 'firstNames')
       }
     },
     {
@@ -248,7 +253,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn')
+        mutation: nameTransformer('bn'),
+        query: nameFieldTransformer('bn', 'familyName')
       }
     },
     {
@@ -259,7 +265,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames')
+        mutation: nameTransformer('en', 'firstNames'),
+        query: nameFieldTransformer('en', 'firstNames', 'firstNames')
       }
     },
     {
@@ -270,7 +277,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'familyName')
+        mutation: nameTransformer('en', 'familyName'),
+        query: nameFieldTransformer('en', 'familyName', 'familyName')
       }
     },
     {
@@ -295,7 +303,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [dateFormat],
       mapping: {
-        mutation: fieldNameTransformer('birthDate')
+        mutation: fieldNameTransformer('birthDate'),
+        query: fieldValueTransformer('birthDate')
       }
     },
     {
