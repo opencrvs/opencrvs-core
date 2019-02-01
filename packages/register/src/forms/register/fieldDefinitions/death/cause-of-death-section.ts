@@ -6,7 +6,7 @@ import {
   TEXT
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
-import { maxLength, isNumber } from 'src/utils/validate'
+import { maxLength, numeric } from 'src/utils/validate'
 import { conditionals } from 'src/forms/utils'
 
 const messages = defineMessages({
@@ -112,7 +112,7 @@ export const causeOfDeathSection: IFormSection = {
       label: messages.causeOfDeathCode,
       required: false,
       conditionals: [conditionals.causeOfDeathEstablished],
-      validate: [isNumber, maxLength(17)]
+      validate: [numeric, maxLength(17)]
     }
   ]
 }

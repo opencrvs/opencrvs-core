@@ -4,7 +4,7 @@ import {
   requiredSymbol,
   required,
   minLength,
-  isNumber,
+  numeric,
   phoneNumberFormat,
   dateFormat,
   emailAddressFormat,
@@ -185,7 +185,7 @@ describe('validate', () => {
     })
   })
 
-  describe('isNumber. Checks a value is a number', () => {
+  describe('numeric. Checks a value is numeric', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
       const response = {
@@ -196,12 +196,12 @@ describe('validate', () => {
             'The error message that appears on fields where the value must be a number'
         }
       }
-      expect(isNumber(badValue)).toEqual(response)
+      expect(numeric(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value.', () => {
       const goodValue = '7'
       const response = undefined
-      expect(isNumber(goodValue)).toEqual(response)
+      expect(numeric(goodValue)).toEqual(response)
     })
   })
 

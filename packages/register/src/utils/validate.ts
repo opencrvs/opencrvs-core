@@ -190,10 +190,10 @@ export const maxLength = (max: number) => (value: string) => {
     : { message: messages.maxLength, props: { max } }
 }
 
-export const isNumber: Validation = (value: string) =>
-  value && isNaN(Number(value))
-    ? { message: messages.numberRequired }
-    : undefined
+const isNumber = (value: string): boolean => !value || !isNaN(Number(value))
+
+export const numeric: Validation = (value: string) =>
+  isNumber(value) ? undefined : { message: messages.numberRequired }
 
 export const phoneNumberFormat: Validation = (value: string) => {
   const country = window.config.COUNTRY
