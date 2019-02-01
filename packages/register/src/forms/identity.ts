@@ -1,5 +1,11 @@
 import { defineMessages } from 'react-intl'
 
+const NATIONAL_ID = 'NATIONAL_ID'
+const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
+const PASSPORT = 'PASSPORT'
+const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
+const OTHER = 'OTHER'
+
 export const messages = defineMessages({
   iDType: {
     id: 'formFields.iDType',
@@ -59,15 +65,15 @@ export const messages = defineMessages({
 })
 
 export const identityOptions = [
-  { value: 'NATIONAL_ID', label: messages.iDTypeNationalID },
+  { value: NATIONAL_ID, label: messages.iDTypeNationalID },
   {
-    value: 'BIRTH_REGISTRATION_NUMBER',
+    value: BIRTH_REGISTRATION_NUMBER,
     label: messages.iDTypeBRN
   },
-  { value: 'PASSPORT', label: messages.iDTypePassport },
+  { value: PASSPORT, label: messages.iDTypePassport },
   {
-    value: 'DEATH_REGISTRATION_NUMBER',
+    value: DEATH_REGISTRATION_NUMBER,
     label: messages.iDTypeDRN
   },
-  { value: 'OTHER', label: messages.iDTypeOther }
+  { value: OTHER, label: messages.iDTypeOther }
 ]
