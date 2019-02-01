@@ -155,12 +155,12 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         isSubMenu: true,
         menuItems: [
           {
-            title: intl.formatMessage(messages.english),
+            title: 'English',
             key: 'english',
             onClick: this.props.changeLanguage.bind(null, { language: 'en' })
           },
           {
-            title: intl.formatMessage(messages.bengali),
+            title: 'বাংলা',
             key: 'bengali',
             onClick: this.props.changeLanguage.bind(null, { language: 'bn' })
           }

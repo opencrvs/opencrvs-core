@@ -6,17 +6,12 @@ context('Menu', () => {
   })
 
   it('Opens menu and selects Bengali', () => {
-    cy.visit(`${Cypress.env('REGISTER_URL')}events`)
-    // CHILD DETAILS
-
     cy.get('#sub-menu').click()
-    //Click on change Lanuage
     cy.get('#ChangeLanguage-nested-menu').click()
-    // select Bengali
-    cy.get('#Bengali-nested-menu-item')
-      .contains('Bengali')
+    cy.get('#English-nested-menu-item')
+      .contains('English')
       .click()
 
-    cy.get('#select_vital_event_view').should('be.visible')
+    cy.get('#new_event_declaration').should('be.visible')
   })
 })

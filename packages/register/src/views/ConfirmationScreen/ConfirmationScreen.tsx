@@ -17,7 +17,7 @@ import {
 import { RouteComponentProps } from 'react-router'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
-import { DECLARATION, REJECTION } from 'src/utils/constants'
+import { DECLARATION, REJECTION, DUPLICATION } from 'src/utils/constants'
 
 const messages = defineMessages({
   nextCardTitle: {
@@ -38,23 +38,16 @@ const messages = defineMessages({
     defaultMessage: 'Back to homescreen',
     description: 'The button to return to the homescreen'
   },
-  footerActionButton: {
-    id: 'register.confirmationScreen.footerActionButton',
-    defaultMessage: `Back to {event, select, declaration {New Application} registration {Application} duplication {Duplication}
-    certificate {Certification} offlineEvent {New Application}}`,
-    description: 'The button to showed on footer section'
-  },
-
   title: {
     id: 'register.confirmationScreen.title',
-    defaultMessage: `{event, select, declaration {Application} registration {Registration} duplication {Duplication}
+    defaultMessage: `{event, select, declaration {Application} registration {Registration} duplication {Application}
       certificate {Certificate} offlineEvent {Application connectivity}} {action, select, completed {completed} 
       submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending}}`,
     description: 'The title that appear on the confirmation screen '
   },
   headerDesc: {
     id: 'register.confirmationScreen.headerDesc',
-    defaultMessage: `{event, select, declaration {The application} registration {} duplication {} certificate {} offlineEvent {The application}} 
+    defaultMessage: `{event, select, declaration {The application} registration {} duplication {The application} certificate {} offlineEvent {The application}} 
       {action, select, submitted {is now on its way for validation} completed {} registered {registered} rejected {rejected} approved {Approved}
       offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     description:
@@ -69,7 +62,7 @@ const messages = defineMessages({
   boxHeaderDescFirst: {
     id: 'register.confirmationScreen.boxHeaderDescFirst',
     defaultMessage: `{event, select, declaration {The birth application of } registration {The birth of } duplication 
-      {The birth duplication of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
+      {The birth application of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
@@ -112,6 +105,17 @@ const messages = defineMessages({
       offlineEvent {wait for internet connection}}`,
     description:
       'The next section description details that appear on the confirmation screen'
+  },
+  backToDuplicatesButton: {
+    id: 'register.confirmationScreen.buttons.back.duplicate',
+    defaultMessage: 'Back to duplicates',
+    description: 'The button to return to the duplicates'
+  },
+  newButton: {
+    id: 'register.confirmationScreen.buttons.newDeclaration',
+    defaultMessage: 'New application',
+    description:
+      'The button to start a new application now that they are finished with this one'
   }
 })
 
@@ -220,17 +224,19 @@ class ConfirmationScreenView extends React.Component<
   Props & InjectedIntlProps & RouteComponentProps<{}>
 > {
   render() {
-    const { intl, history, location } = this.props
+    const { intl, history } = this.props
     const online = navigator.onLine
     const language = this.props.language
-    const fullNameInBn = location.state.fullNameInBn
-      ? location.state.fullNameInBn
+    const fullNameInBn = history.location.state.fullNameInBn
+      ? history.location.state.fullNameInBn
       : ''
-    const fullNameInEng = location.state.fullNameInEng
-      ? location.state.fullNameInEng
+    const fullNameInEng = history.location.state.fullNameInEng
+      ? history.location.state.fullNameInEng
       : ''
-    const eventName = online ? location.state.eventName : 'offlineEvent'
-    const actionName = online ? location.state.actionName : 'offlineAction'
+    const eventName = online ? history.location.state.eventName : 'offlineEvent'
+    const actionName = online
+      ? history.location.state.actionName
+      : 'offlineAction'
     const title = intl.formatMessage(messages.title, {
       event: eventName,
       action: actionName
@@ -240,15 +246,20 @@ class ConfirmationScreenView extends React.Component<
       action: actionName
     })
     const isRejection = actionName === REJECTION ? true : false
-    const fullName = language === 'en' ? fullNameInEng : fullNameInBn
+    const fullName =
+      language === 'en'
+        ? fullNameInEng !== ''
+          ? fullNameInEng
+          : fullNameInBn
+        : fullNameInBn
     const boxHeaderDescFirst = intl.formatMessage(messages.boxHeaderDescFirst, {
       event: eventName
     })
     const boxHeaderDescLast = intl.formatMessage(messages.boxHeaderDescLast, {
       action: actionName
     })
-    const trackNumber = location.state.trackNumber
-      ? location.state.trackNumber
+    const trackNumber = history.location.state.trackNumber
+      ? history.location.state.trackNumber
       : ''
     const trackingCardTitle = intl.formatMessage(
       messages.trackingSectionTitle,
@@ -266,12 +277,14 @@ class ConfirmationScreenView extends React.Component<
       event: eventName
     })
     const isDeclaration =
-      location.state.eventName === DECLARATION ? true : false
-    const isTrackingSection = location.state.trackingSection ? true : false
-    const isNextSection = location.state.nextSection ? true : false
-    const footerButtonText = intl.formatMessage(messages.footerActionButton, {
-      event: eventName
-    })
+      history.location.state.eventName === DECLARATION ? true : false
+    const isTrackingSection = history.location.state.trackingSection
+      ? true
+      : false
+    const isNextSection = history.location.state.nextSection ? true : false
+    const isDuplicate =
+      history.location.state.eventName === DUPLICATION ? true : false
+    const duplicateContextId = history.location.state.duplicateContextId
 
     return (
       <>
@@ -333,15 +346,27 @@ class ConfirmationScreenView extends React.Component<
           )}
         </Container>
         <Footer>
-          {!isRejection && (
+          {!isRejection && isDeclaration && (
             <FooterAction>
-              <FooterPrimaryButton onClick={() => history.push('/')}>
-                {footerButtonText}
+              <FooterPrimaryButton onClick={() => (location.href = '/')}>
+                {intl.formatMessage(messages.newButton)}
+              </FooterPrimaryButton>
+            </FooterAction>
+          )}
+          {isDuplicate && (
+            <FooterAction>
+              <FooterPrimaryButton
+                id="go_to_duplicate_button"
+                onClick={() => {
+                  window.location.assign(`/duplicates/${duplicateContextId}`)
+                }}
+              >
+                {intl.formatMessage(messages.backToDuplicatesButton)}
               </FooterPrimaryButton>
             </FooterAction>
           )}
           <FooterAction>
-            <FooterPrimaryButton onClick={() => history.push('/')}>
+            <FooterPrimaryButton onClick={() => (location.href = '/')}>
               {intl.formatMessage(messages.backButton)}
             </FooterPrimaryButton>
           </FooterAction>

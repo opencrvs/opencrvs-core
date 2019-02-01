@@ -8,9 +8,10 @@ import { IStoreState } from '@opencrvs/register/src/store'
 import { setInitialDrafts } from 'src/drafts'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getInitialDraftsLoaded } from 'src/drafts/selectors'
-import { setInitialUserDetails } from 'src/profile/profileActions'
-import { setOfflineData } from 'src/offline/actions'
 import { getOfflineDataLoaded } from 'src/offline/selectors'
+import { parse } from 'querystring'
+import { IURLParams } from '../utils/authUtils'
+import { checkAuth } from '../profile/profileActions'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -96,8 +97,7 @@ interface IPageProps {
 
 interface IDispatchProps {
   setInitialDrafts: () => void
-  setInitialUserDetails: () => void
-  setOfflineData: () => void
+  checkAuth: (urlValues: IURLParams) => void
 }
 interface IState {
   loadingDataModal: boolean
@@ -131,9 +131,9 @@ class Component extends React.Component<
   }
 
   componentDidMount() {
+    const values = parse(this.props.location.search)
+    this.props.checkAuth(values)
     this.props.setInitialDrafts()
-    this.props.setInitialUserDetails()
-    this.props.setOfflineData()
   }
 
   closeLoadingModal = () => {
@@ -166,8 +166,7 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
 
 const mapDispatchToProps = {
   setInitialDrafts,
-  setInitialUserDetails,
-  setOfflineData
+  checkAuth
 }
 
 export const Page = withRouter(

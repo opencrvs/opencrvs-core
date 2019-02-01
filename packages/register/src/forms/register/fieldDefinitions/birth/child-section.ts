@@ -3,9 +3,9 @@ import {
   ViewType,
   TEXT,
   NUMBER,
-  TEXTAREA,
   DATE,
-  SELECT_WITH_OPTIONS
+  SELECT_WITH_OPTIONS,
+  SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -13,11 +13,19 @@ import {
   range,
   dateFormat
 } from 'src/utils/validate'
+import { conditionals } from '../../../utils'
+import {
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
+} from 'src/offline/reducer'
+import { messages as addressMessages } from '../../../address'
+import { countries } from '../../../countries'
 import {
   nameTransformer,
   sectionFieldToBundleFieldTransformer,
-  ignoreValueTransformer
-} from '../field-mappings'
+  fieldNameTransformer,
+  vitalEventAddressTransformer
+} from 'src/forms/field-mappings'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -173,6 +181,11 @@ const messages = defineMessages({
     defaultMessage: 'Place of delivery',
     description: 'Label for form field: Place of delivery'
   },
+  birthLocation: {
+    id: 'formFields.birthLocation',
+    defaultMessage: 'Hospital / Clinic',
+    description: 'Label for form field: Hospital or Health Institution'
+  },
   deliveryInstitution: {
     id: 'formFields.deliveryInstitution',
     defaultMessage: 'Type or select institution',
@@ -267,12 +280,13 @@ export const childSection: IFormSection = {
       ]
     },
     {
-      name: 'birthDate',
+      name: 'childBirthDate',
       type: DATE,
       label: messages.childDateOfBirth,
       required: true,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      mapping: fieldNameTransformer('birthDate')
     },
     {
       name: 'attendantAtBirth',
@@ -349,25 +363,206 @@ export const childSection: IFormSection = {
         { value: 'PRIVATE_HOME', label: messages.privateHome },
         { value: 'OTHER', label: messages.otherInstitution }
       ],
-      mapping: ignoreValueTransformer // TODO: once placeOfBirth issue is resolved remove this
+      mapping: sectionFieldToBundleFieldTransformer('birthLocationType')
     },
     {
-      name: 'deliveryInstitution',
+      name: 'birthLocation',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: messages.birthLocation,
+      required: false,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_FACILITIES_KEY,
+        dependency: 'placeOfBirth'
+      },
+      conditionals: [conditionals.placeOfBirthHospital],
+      mapping: sectionFieldToBundleFieldTransformer('birthLocation')
+    },
+    {
+      name: 'country',
       type: SELECT_WITH_OPTIONS,
-      label: messages.deliveryInstitution,
+      label: addressMessages.country,
       required: false,
-      initialValue: '',
+      initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
-      options: [{ value: '?', label: messages.deliveryInstitution }]
+      options: countries,
+      conditionals: [conditionals.otherPlaceOfBirth],
+      mapping: vitalEventAddressTransformer('BIRTH')
     },
     {
-      name: 'deliveryAddress',
-      type: TEXTAREA,
-      label: messages.deliveryAddress,
+      name: 'state',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.state,
       required: false,
       initialValue: '',
       validate: [],
-      disabled: true
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'country'
+      },
+      conditionals: [conditionals.country, conditionals.otherPlaceOfBirth],
+      mapping: vitalEventAddressTransformer('BIRTH')
+    },
+    {
+      name: 'district',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.district,
+      required: false,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'state'
+      },
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.otherPlaceOfBirth
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH')
+    },
+    {
+      name: 'addressLine4',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.addressLine4,
+      required: false,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'district'
+      },
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.otherPlaceOfBirth
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 6)
+    },
+    {
+      name: 'addressLine3',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: addressMessages.addressLine3,
+      required: false,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_LOCATIONS_KEY,
+        dependency: 'addressLine4'
+      },
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth,
+        conditionals.isNotCityLocation
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 4)
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth,
+        conditionals.isCityLocation
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 5)
+    },
+    {
+      name: 'addressLine2',
+      type: TEXT,
+      label: addressMessages.addressLine2,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressLine3,
+        conditionals.otherPlaceOfBirth
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 3)
+    },
+    {
+      name: 'addressLine1CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth,
+        conditionals.isCityLocation
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 2)
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherPlaceOfBirth,
+        conditionals.isCityLocation
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 0, 'postalCode')
+    },
+    {
+      name: 'addressLine1',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressLine3,
+        conditionals.otherPlaceOfBirth
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 1)
+    },
+    {
+      name: 'postCode',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressLine3,
+        conditionals.otherPlaceOfBirth
+      ],
+      mapping: vitalEventAddressTransformer('BIRTH', 0, 'postalCode')
     }
   ]
 }

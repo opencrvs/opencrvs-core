@@ -11,11 +11,9 @@ import { Mutation } from 'react-apollo'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { WORK_QUEUE } from 'src/navigation/routes'
-import {
-  DuplicateDetails,
-  Event,
-  Action
-} from 'src/components/DuplicateDetails'
+import { DuplicateDetails, Action } from 'src/components/DuplicateDetails'
+import { Event } from 'src/forms'
+import { NotDuplicateConfirmation } from 'src/views/Duplicates/NotDuplicateConfirmation'
 import { RouteComponentProps } from 'react-router'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -233,9 +231,15 @@ export const rejectMutation = gql`
     markBirthAsVoided(id: $id, reason: $reason)
   }
 `
+export const notADuplicateMutation = gql`
+  mutation submitNotADuplicateMutation($id: String!, $duplicateId: String!) {
+    notADuplicate(id: $id, duplicateId: $duplicateId)
+  }
+`
 interface IState {
   selectedCompositionID: string
   showRejectModal: boolean
+  showNotDuplicateModal: boolean
 }
 type Props = InjectedIntlProps &
   RouteComponentProps<IMatchParams> & { language: string }
@@ -244,7 +248,8 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     super(props)
     this.state = {
       selectedCompositionID: '',
-      showRejectModal: false
+      showRejectModal: false,
+      showNotDuplicateModal: false
     }
   }
 
@@ -368,8 +373,19 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
       showRejectModal: !prevState.showRejectModal
     }))
   }
+  toggleNotDuplicateModal = (id: string = '') => {
+    this.setState((prevState: IState) => ({
+      selectedCompositionID: id,
+      showNotDuplicateModal: !prevState.showNotDuplicateModal
+    }))
+  }
   successfulRejection = (response: string) => {
     this.toggleRejectModal()
+    window.location.reload()
+  }
+
+  successfulDuplicateRemoval = (response: string) => {
+    this.toggleNotDuplicateModal()
     window.location.reload()
   }
 
@@ -467,10 +483,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                           <DuplicateDetails
                             id={`duplicate-details-item-${i}`}
                             key={i}
+                            duplicateContextId={applicationId}
                             data={duplicateData}
-                            notDuplicateHandler={() => {
-                              alert('Not a duplicate! (°◇°)')
-                            }}
+                            notDuplicateHandler={() =>
+                              this.toggleNotDuplicateModal(duplicateData.id)
+                            }
                             rejectHandler={() =>
                               this.toggleRejectModal(duplicateData.id)
                             }
@@ -519,6 +536,26 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                 ]}
                 show={this.state.showRejectModal}
                 handleClose={this.toggleRejectModal}
+              />
+            )
+          }}
+        </Mutation>
+        <Mutation
+          mutation={notADuplicateMutation}
+          variables={{
+            id: applicationId,
+            duplicateId: this.state.selectedCompositionID
+          }}
+          onCompleted={data =>
+            this.successfulDuplicateRemoval(data.notADuplicate)
+          }
+        >
+          {(submitNotADuplicateMutation, { data }) => {
+            return (
+              <NotDuplicateConfirmation
+                handleYes={() => submitNotADuplicateMutation()}
+                show={this.state.showNotDuplicateModal}
+                handleClose={this.toggleNotDuplicateModal}
               />
             )
           }}

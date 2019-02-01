@@ -1,5 +1,4 @@
 import { defineMessages } from 'react-intl'
-import { config } from '../config'
 import { FormattedMessage, MessageValue } from 'react-intl'
 
 export interface IValidationResult {
@@ -54,7 +53,7 @@ export const messages = defineMessages({
   }
 })
 
-const fallbackCountry = config.COUNTRY
+const fallbackCountry = window.config.COUNTRY
 
 const mobilePhonePatternTable = {
   gbr: {
@@ -95,7 +94,7 @@ export const isNumber: Validation = (value: string) =>
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  const country = config.COUNTRY
+  const country = window.config.COUNTRY
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
   const { example } = countryMobileTable

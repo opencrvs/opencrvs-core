@@ -32,6 +32,7 @@ enum IdentityIDType {
   DEATH_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
+  OTHER
 }
 
 enum EducationType {
@@ -56,10 +57,11 @@ enum MaritalStatusType {
 enum AddressType {
   CURRENT
   PERMANENT
-  # BIRTH_PLACE
+  BIRTH_PLACE
   MILITARY_BASE_OR_CANTONMENT # Move the next three out to catchment areas
   IDP_CAMP # -> Disaster Camp
   UNHCR_CAMP # -> UNHCR Camp
+  OTHER_HEALTH_INSTITUTION
   HOSPITAL
   HEALTH_INSTITUTION
   PRIVATE_HOME
@@ -79,11 +81,13 @@ enum RelationshipType {
 input IdentityInput {
   id: ID
   type: IdentityIDType
+  otherType: String
 }
 
 type IdentityType { # -> Identifier
   id: ID # -> .value
   type: IdentityIDType # -> .system
+  otherType: String
 }
 
 input RelatedPersonInput {

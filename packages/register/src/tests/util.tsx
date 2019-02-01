@@ -17,7 +17,6 @@ import { getSchema } from './graphql-schema-mock'
 import { ThemeProvider } from 'styled-components'
 import { ENGLISH_STATE } from '../i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { config } from '../config'
 import { I18nContainer } from '@opencrvs/register/src/i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
@@ -84,7 +83,7 @@ export function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider theme={getTheme(config.COUNTRY)}>
+          <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
             {nodeWithIntlProp(node)}
           </ThemeProvider>
         </I18nContainer>
@@ -223,18 +222,51 @@ export const mockUserResponse = {
           id: 'ddab090d-040e-4bef-9475-314a448a576a',
           name: 'Dhaka',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'DIVISION'
+            }
+          ],
           __typename: 'Location'
         },
         {
           id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
           name: 'GAZIPUR',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '20'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'DISTRICT'
+            }
+          ],
           __typename: 'Location'
         },
         {
           id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
           name: 'KALIGANJ',
           status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '165'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UPAZILA'
+            }
+          ],
           __typename: 'Location'
         },
         {
@@ -243,9 +275,13 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3473'
+            },
+            { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+            {
               system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UNION',
-              __typename: 'Identifier'
+              value: 'UNION'
             }
           ],
           __typename: 'Location'
@@ -268,11 +304,12 @@ export const mockApplicationData = {
     familyName: 'স্পিভক',
     firstNamesEng: 'Mike',
     familyNameEng: 'Test',
-    birthDate: '1977-09-20',
+    childBirthDate: '1977-09-20',
     gender: 'male',
     weightAtBirth: '3.5',
     attendantAtBirth: 'MIDWIFE',
-    birthType: 'SINGLE'
+    birthType: 'SINGLE',
+    multipleBirth: 1
   },
   mother: {
     firstNames: 'স্পিভক',
@@ -281,7 +318,7 @@ export const mockApplicationData = {
     familyNameEng: 'Test',
     iD: '654651',
     iDType: 'NATIONAL_ID',
-    birthDate: '1949-05-31',
+    motherBirthDate: '1949-05-31',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
@@ -289,9 +326,9 @@ export const mockApplicationData = {
     countryPermanent: 'BGD',
     statePermanent: 'state2',
     districtPermanent: 'district2',
-    addressLine1Permanent: '',
-    addressLine2Permanent: '',
-    addressLine3Permanent: '',
+    addressLine1Permanent: 'some road',
+    addressLine2Permanent: 'some more',
+    addressLine3Permanent: 'some more',
     addressLine4Permanent: 'upazila1',
     postalCodePermanent: '',
     country: 'BGD',
@@ -301,7 +338,8 @@ export const mockApplicationData = {
     addressLine2: '',
     addressLine3: '',
     addressLine4: 'upazila2',
-    postalCode: ''
+    postalCode: '',
+    currentAddressSameAsPermanent: true
   },
   father: {
     fathersDetailsExist: true,
@@ -311,7 +349,7 @@ export const mockApplicationData = {
     familyNameEng: 'Test',
     iD: '43468',
     iDType: 'NATIONAL_ID',
-    birthDate: '1950-05-19',
+    fatherBirthDate: '1950-05-19',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
@@ -343,6 +381,41 @@ export const mockApplicationData = {
 }
 
 export const mockOfflineData = {
+  facilities: [
+    {
+      id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
+      name: 'Shaheed Taj Uddin Ahmad Medical College',
+      nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
+      physicalType: 'Building',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
+    },
+    {
+      id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+      name: 'Kaliganj Union Sub Center',
+      nameBn: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
+      physicalType: 'Building',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+    },
+    {
+      id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
+      name: 'Kaliganj Upazila Health Complex',
+      nameBn: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
+      physicalType: 'Building',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+    },
+    {
+      id: '0d8474da-0361-4d32-979e-af91f020309e',
+      name: 'Dholashadhukhan Cc',
+      nameBn: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
+      physicalType: 'Building',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+    }
+  ],
+  healthFacilityFilterLocation: '50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987',
   locations: [
     {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',

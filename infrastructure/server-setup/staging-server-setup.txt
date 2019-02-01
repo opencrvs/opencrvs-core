@@ -1,3 +1,5 @@
+# Manual server setup notes
+
 # add users
 curl https://github.com/rcrichton.keys >> ~/.ssh/authorized_keys
 curl https://github.com/euanmillar.keys >> ~/.ssh/authorized_keys
@@ -29,10 +31,15 @@ mkdir -p /data/traefik
 mkdir -p /data/elasticsearch
 chmod g+rwx /data/elasticsearch
 chgrp 1000 /data/elasticsearch
-sysctl -w vm.max_map_count=262144
+echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 mkdir -p /data/influxdb
 touch /data/traefik/acme.json
 chmod 600 /data/traefik/acme.json
 
 # on all nodes
-Add this to the crontab to clean up autodeploys -> 0 0 * * 0 /usr/bin/docker system prune -f
+Add this to the crontab to clean up autodeploys ->
+  0 0 * * * /usr/bin/docker system prune -f >> /var/log/docker-prune.log
+
+# After deploy:
+in user mgnt service container: yarn populate
+in resource service container: FHIR_URL=http://hearth:3447/fhir yarn populate

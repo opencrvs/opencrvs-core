@@ -7,9 +7,11 @@ import {
   fetchFHIR,
   getIDFromResponse,
   getTrackingIdFromResponse,
-  getBRNFromResponse
+  getBRNFromResponse,
+  removeDuplicatesFromComposition
 } from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
+import { hasScope } from 'src/features/user/utils'
 
 const statusMap = {
   declared: 'preliminary',
@@ -39,8 +41,13 @@ export const resolvers: GQLResolver = {
       const doc = await buildFHIRBundle(details)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      // return tracking-id
-      return await getTrackingIdFromResponse(res, authHeader)
+      if (hasScope(authHeader, 'register')) {
+        // return the brn
+        return await getBRNFromResponse(res, authHeader)
+      } else {
+        // return tracking-id
+        return await getTrackingIdFromResponse(res, authHeader)
+      }
     },
     async updateBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details)
@@ -93,11 +100,26 @@ export const resolvers: GQLResolver = {
       return taskEntry.resource.id
     },
     async markBirthAsCertified(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details)
+      const doc = await buildFHIRBundle(details, authHeader)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       // return composition-id
       return getIDFromResponse(res)
+    },
+    async notADuplicate(_, { id, duplicateId }, authHeader) {
+      const composition = await fetchFHIR(
+        `/Composition/${id}`,
+        authHeader,
+        'GET'
+      )
+      removeDuplicatesFromComposition(composition, id, duplicateId)
+      await fetchFHIR(
+        `/Composition/${id}`,
+        authHeader,
+        'PUT',
+        JSON.stringify(composition)
+      )
+      return composition.id
     }
   }
 }

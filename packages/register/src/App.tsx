@@ -9,7 +9,6 @@ import { ThemeProvider } from 'styled-components'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { createStore, AppStore } from './store'
-import { config } from './config'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import * as routes from './navigation/routes'
 import { NotificationComponent } from './components/Notification'
@@ -44,7 +43,7 @@ export class App extends React.Component<IAppProps> {
       >
         <Provider store={this.props.store}>
           <I18nContainer>
-            <ThemeProvider theme={getTheme(config.COUNTRY)}>
+            <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
               <ConnectedRouter history={this.props.history}>
                 <ScrollToTop>
                   <SessionExpireConfirmation />

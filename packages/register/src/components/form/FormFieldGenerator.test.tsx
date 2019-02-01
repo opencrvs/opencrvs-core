@@ -16,7 +16,6 @@ import {
 } from 'src/forms'
 import { countries } from 'src/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { config } from 'src/config'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -24,6 +23,8 @@ export interface IMotherSectionFormData {
 
 const offlineResources = {
   locations: mockOfflineData.locations,
+  facilities: mockOfflineData.facilities,
+  healthFacilityFilterLocation: '',
   offlineDataLoaded: true,
   loadingError: false
 }
@@ -48,7 +49,7 @@ describe('form component', () => {
           type: SELECT_WITH_OPTIONS,
           label: addressMessages.country,
           required: true,
-          initialValue: config.COUNTRY.toUpperCase(),
+          initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
           options: countries
         },

@@ -24,14 +24,15 @@ import {
   FATHER_TITLE,
   CHILD_TITLE,
   ATTACHMENT_DOCS_TITLE,
-  ATTACHMENT_CONTEXT_KEY
+  ATTACHMENT_CONTEXT_KEY,
+  HEALTH_FACILITY_BIRTH_CODE,
+  BIRTH_LOCATION_TYPE_CODE
 } from 'src/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
   selectOrCreateObservationResource,
   selectOrCreatePersonResource,
   selectOrCreateDocRefResource,
-  selectOrCreateLocationRefResource,
   setObjectPropInResourceArray,
   getMaritalStatusCode,
   selectOrCreateTaskRefResource,
@@ -39,13 +40,15 @@ import {
   selectOrCreateRelatedPersonResource,
   selectOrCreateCollectorPersonResource,
   setCertificateCollectorReference,
-  selectOrCreatePaymentReconciliationResource
+  selectOrCreatePaymentReconciliationResource,
+  selectOrCreateLocationRefResource
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
   EVENT_TYPE
 } from '../fhir/constants'
+import { IAuthHeader } from 'src/common-types'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -123,6 +126,24 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'identifier',
         fieldValue,
         'type',
+        context
+      )
+    },
+    otherType: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+      setObjectPropInResourceArray(
+        person,
+        'identifier',
+        fieldValue,
+        'otherType',
         context
       )
     }
@@ -373,6 +394,131 @@ function createAddressBuilder(sectionCode: string, sectionTitle: string) {
   }
 }
 
+function createLocationAddressBuilder(sectionCode: string) {
+  return {
+    use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.use = fieldValue
+    },
+    type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.type = fieldValue
+    },
+    text: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.text = fieldValue
+    },
+    line: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+      if (!location.address) {
+        location.address = {}
+      }
+      if (!location.address.line) {
+        location.address.line = []
+      }
+      ;(location.address.line as string[]).push(fieldValue)
+    },
+    city: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.city = fieldValue
+    },
+    district: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.district = fieldValue
+    },
+    state: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.state = fieldValue
+    },
+    postalCode: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.postalCode = fieldValue
+    },
+    country: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const location = selectOrCreateLocationRefResource(
+        sectionCode,
+        fhirBundle,
+        context
+      )
+
+      if (!location.address) {
+        location.address = {}
+      }
+      location.address.country = fieldValue
+    }
+  }
+}
+
 function createDateOfMarriageBuilder(
   resource: fhir.Patient,
   fieldValue: string
@@ -508,6 +654,38 @@ const builders: IFieldBuilders = {
       encounter.id = fieldValue as string
     },
     observation: {
+      birthLocation: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const observation = selectOrCreateObservationResource(
+          BIRTH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          HEALTH_FACILITY_BIRTH_CODE,
+          'Health facility birth location',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      birthLocationType: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const observation = selectOrCreateObservationResource(
+          BIRTH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          BIRTH_LOCATION_TYPE_CODE,
+          'Type of birth location',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
       birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
@@ -1141,7 +1319,7 @@ const builders: IFieldBuilders = {
     },
     certificates: {
       collector: {
-        relationship: (
+        relationship: async (
           fhirBundle: ITemplatedBundle,
           fieldValue: string,
           context: any
@@ -1162,16 +1340,18 @@ const builders: IFieldBuilders = {
           }
           /* if mother/father is collecting then we will just put the person ref here */
           if (fieldValue === 'MOTHER') {
-            setCertificateCollectorReference(
+            await setCertificateCollectorReference(
               MOTHER_CODE,
               relatedPersonResource,
-              fhirBundle
+              fhirBundle,
+              context
             )
           } else if (fieldValue === 'FATHER') {
-            setCertificateCollectorReference(
+            await setCertificateCollectorReference(
               FATHER_CODE,
               relatedPersonResource,
-              fhirBundle
+              fhirBundle,
+              context
             )
           }
         },
@@ -1441,7 +1621,39 @@ const builders: IFieldBuilders = {
       }
     }
   },
-  birthLocation: {
+  birthLocation: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_DESC,
+      HEALTH_FACILITY_BIRTH_CODE,
+      'Health facility birth location',
+      fhirBundle,
+      context
+    )
+    observation.valueString = `Location/${fieldValue}`
+  },
+  birthLocationType: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      BIRTH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_DESC,
+      BIRTH_LOCATION_TYPE_CODE,
+      'Type of birth location',
+      fhirBundle,
+      context
+    )
+    observation.valueString = fieldValue
+  },
+  placeOfBirth: {
     _fhirID: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -1454,11 +1666,7 @@ const builders: IFieldBuilders = {
       )
       location.id = fieldValue as string
     },
-    status: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
+    type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const location = selectOrCreateLocationRefResource(
         BIRTH_ENCOUNTER_CODE,
         fhirBundle,
@@ -1466,17 +1674,9 @@ const builders: IFieldBuilders = {
       )
       location.status = fieldValue
     },
-    name: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const location = selectOrCreateLocationRefResource(
-        BIRTH_ENCOUNTER_CODE,
-        fhirBundle,
-        context
-      )
-      location.name = fieldValue
-    },
-    latitude: (
+    partOf: (
       fhirBundle: ITemplatedBundle,
-      fieldValue: number,
+      fieldValue: string,
       context: any
     ) => {
       const location = selectOrCreateLocationRefResource(
@@ -1484,26 +1684,11 @@ const builders: IFieldBuilders = {
         fhirBundle,
         context
       )
-      if (!location.position) {
-        location.position = { latitude: 0, longitude: 0 }
+      location.partOf = {
+        reference: `Location/${fieldValue}`
       }
-      location.position.latitude = fieldValue
     },
-    longitude: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: number,
-      context: any
-    ) => {
-      const location = selectOrCreateLocationRefResource(
-        BIRTH_ENCOUNTER_CODE,
-        fhirBundle,
-        context
-      )
-      if (!location.position) {
-        location.position = { latitude: 0, longitude: 0 }
-      }
-      location.position.longitude = fieldValue
-    }
+    address: createLocationAddressBuilder(BIRTH_ENCOUNTER_CODE)
   },
   birthType: (
     fhirBundle: ITemplatedBundle,
@@ -1649,15 +1834,20 @@ const builders: IFieldBuilders = {
   }
 }
 
-export async function buildFHIRBundle(reg: object) {
+export async function buildFHIRBundle(reg: object, authHeader?: IAuthHeader) {
   const ref = uuid()
   const fhirBundle: ITemplatedBundle = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [createCompositionTemplate(ref)]
   }
-
-  await transformObj(reg, fhirBundle, builders)
+  let context = {}
+  if (authHeader) {
+    context = {
+      authHeader
+    }
+  }
+  await transformObj(reg, fhirBundle, builders, context)
   return fhirBundle
 }
 

@@ -49,7 +49,7 @@ import {
 } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
+import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
 import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
 import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
@@ -239,7 +239,7 @@ const messages = defineMessages({
   },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New birth registration',
+    defaultMessage: 'New registration',
     description: 'The title of new registration button'
   },
   newApplication: {
@@ -352,6 +352,26 @@ const messages = defineMessages({
     id: 'register.home.hedaer.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
+  },
+  application: {
+    id: 'register.workQueue.statusLabel.application',
+    defaultMessage: 'application',
+    description: 'The status label for application'
+  },
+  registered: {
+    id: 'register.workQueue.statusLabel.registered',
+    defaultMessage: 'registered',
+    description: 'The status label for registered'
+  },
+  rejected: {
+    id: 'register.workQueue.statusLabel.rejected',
+    defaultMessage: 'rejected',
+    description: 'The status label for rejected'
+  },
+  collected: {
+    id: 'register.workQueue.statusLabel.collected',
+    defaultMessage: 'collected',
+    description: 'The status label for collected'
   }
 })
 
@@ -497,6 +517,11 @@ const StatusIcon = styled.div`
   margin-top: 3px;
 `
 
+const StatusIconCollected = styled.div`
+  padding-left: 6px;
+  margin-top: 3px;
+`
+
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -552,11 +577,11 @@ export class WorkQueueView extends React.Component<
             <StatusRejected />
           </StatusIcon>
         )
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return (
-          <StatusIcon>
+          <StatusIconCollected>
             <StatusCollected />
-          </StatusIcon>
+          </StatusIconCollected>
         )
       default:
         return (
@@ -564,6 +589,21 @@ export class WorkQueueView extends React.Component<
             <StatusOrange />
           </StatusIcon>
         )
+    }
+  }
+
+  getDeclarationStatusLabel = (status: string) => {
+    switch (status) {
+      case 'APPLICATION':
+        return this.props.intl.formatMessage(messages.application)
+      case 'REGISTERED':
+        return this.props.intl.formatMessage(messages.registered)
+      case 'REJECTED':
+        return this.props.intl.formatMessage(messages.rejected)
+      case 'CERTIFIED':
+        return this.props.intl.formatMessage(messages.collected)
+      default:
+        return this.props.intl.formatMessage(messages.application)
     }
   }
 
@@ -575,10 +615,23 @@ export class WorkQueueView extends React.Component<
         return messages.workflowStatusDateRegistered
       case 'REJECTED':
         return messages.workflowStatusDateRejected
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return messages.workflowStatusDateCollected
       default:
         return messages.workflowStatusDateApplication
+    }
+  }
+
+  getEventLabel = (status: string) => {
+    switch (status) {
+      case 'birth':
+        return this.props.intl.formatMessage(messages.filtersBirth)
+      case 'death':
+        return this.props.intl.formatMessage(messages.filtersDeath)
+      case 'marriage':
+        return this.props.intl.formatMessage(messages.filtersMarriage)
+      default:
+        return this.props.intl.formatMessage(messages.filtersBirth)
     }
   }
 
@@ -642,6 +695,7 @@ export class WorkQueueView extends React.Component<
           reg.registration.status &&
           (reg.registration.status[0] as GQLRegWorkflow).type,
         event: 'birth',
+
         duplicates: reg.registration && reg.registration.duplicates,
         location:
           (reg.registration &&
@@ -700,7 +754,7 @@ export class WorkQueueView extends React.Component<
                 separator={<Separator />}
               />
             </ValueContainer>
-            {item.duplicates && (
+            {item.duplicates && item.duplicates.length > 0 && (
               <DuplicateIndicatorContainer>
                 <Duplicate />
                 <span>
@@ -721,6 +775,7 @@ export class WorkQueueView extends React.Component<
     key: number
   ): JSX.Element => {
     const applicationIsRegistered = item.declaration_status === 'REGISTERED'
+    const applicationIsCertified = item.declaration_status === 'CERTIFIED'
     const applicationIsRejected = item.declaration_status === 'REJECTED'
     const info = []
     const status = []
@@ -738,13 +793,13 @@ export class WorkQueueView extends React.Component<
       label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
       value: item.date_of_application
     })
-    if (!applicationIsRegistered) {
+    if (!applicationIsRegistered || !applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
         value: item.tracking_id
       })
     }
-    if (applicationIsRegistered) {
+    if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
           messages.listItemBirthRegistrationNumber
@@ -753,13 +808,16 @@ export class WorkQueueView extends React.Component<
       })
     }
 
-    status.push({ icon: <StatusGray />, label: item.event })
+    status.push({
+      icon: <StatusGray />,
+      label: this.getEventLabel(item.event)
+    })
     status.push({
       icon: this.getDeclarationStatusIcon(item.declaration_status),
-      label: item.declaration_status
+      label: this.getDeclarationStatusLabel(item.declaration_status)
     })
 
-    if (item.duplicates) {
+    if (item.duplicates && item.duplicates.length > 0) {
       icons.push(<Duplicate />)
     }
 
@@ -767,7 +825,7 @@ export class WorkQueueView extends React.Component<
 
     const expansionActions: JSX.Element[] = []
     if (this.userHasCertifyScope()) {
-      if (applicationIsRegistered) {
+      if (applicationIsRegistered || applicationIsCertified) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.print),
           handler: () => this.togglePrintModal(item.id)
@@ -786,9 +844,10 @@ export class WorkQueueView extends React.Component<
 
     if (this.userHasRegisterScope()) {
       if (
-        !item.duplicates &&
+        !(item.duplicates && item.duplicates.length > 0) &&
         !applicationIsRegistered &&
-        !applicationIsRejected
+        !applicationIsRejected &&
+        !applicationIsCertified
       ) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
@@ -813,7 +872,12 @@ export class WorkQueueView extends React.Component<
       }
     }
 
-    if (item.duplicates && !applicationIsRegistered && !applicationIsRejected) {
+    if (
+      item.duplicates &&
+      item.duplicates.length > 0 &&
+      !applicationIsRegistered &&
+      !applicationIsRejected
+    ) {
       listItemActions.push({
         label: this.props.intl.formatMessage(messages.reviewDuplicates),
         handler: () => this.props.goToReviewDuplicate(item.id)
@@ -873,7 +937,7 @@ export class WorkQueueView extends React.Component<
     const area = this.props.userDetails && this.props.userDetails.catchmentArea
     const identifier =
       area &&
-      area.find((location: ILocation) => {
+      area.find((location: IGQLLocation) => {
         return (
           (location.identifier &&
             location.identifier.find((areaIdentifier: IIdentifier) => {

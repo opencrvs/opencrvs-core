@@ -11,6 +11,9 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { goToTab as goToTabAction } from 'src/navigation'
+import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 import Moment from 'react-moment'
 
 export enum Event {
@@ -27,6 +30,7 @@ export enum Action {
 
 interface IProps {
   id: string
+  duplicateContextId: string
   data: {
     id: string
     dateOfApplication: string
@@ -58,6 +62,7 @@ interface IProps {
   }
   notDuplicateHandler?: () => void
   rejectHandler?: () => void
+  gotoTab: typeof goToTabAction
 }
 
 const messages = defineMessages({
@@ -189,6 +194,7 @@ const DetailText = styled.div`
 const DetailTextSplitContainer = styled(DetailText)`
   display: flex;
   justify-content: stretch;
+  cursor: pointer;
 `
 
 const Link = styled.a`
@@ -265,7 +271,13 @@ class DuplicateDetailsClass extends React.Component<
 
   render() {
     const currentStatus = this.props.data.regStatusHistory.slice(-1)[0].action
-    const { data, intl, notDuplicateHandler, rejectHandler } = this.props
+    const {
+      data,
+      intl,
+      notDuplicateHandler,
+      rejectHandler,
+      duplicateContextId
+    } = this.props
 
     return (
       <DetailsBox id={`detail_box_${data.id}`} currentStatus={currentStatus}>
@@ -285,7 +297,10 @@ class DuplicateDetailsClass extends React.Component<
             <br />
           </DetailText>
           {notDuplicateHandler && (
-            <Link onClick={notDuplicateHandler}>
+            <Link
+              id={`not_duplicate_link_${data.id}`}
+              onClick={notDuplicateHandler}
+            >
               {intl.formatMessage(messages.notDuplicate)}
             </Link>
           )}
@@ -320,7 +335,7 @@ class DuplicateDetailsClass extends React.Component<
         <TagContainer>
           <Chip
             status={<StatusGray />}
-            text={intl.formatHTMLMessage(messages[data.event])}
+            text={intl.formatHTMLMessage(messages[data.event.toUpperCase()])}
           />
           <Chip
             status={this.renderStatusIcon(currentStatus)}
@@ -356,7 +371,20 @@ class DuplicateDetailsClass extends React.Component<
         {currentStatus === Action.DECLARED && (
           <>
             <Separator />
-            <PrimaryButton>{intl.formatMessage(messages.review)}</PrimaryButton>
+            <PrimaryButton
+              id={`review_link_${data.id}`}
+              onClick={() => {
+                this.props.gotoTab(
+                  REVIEW_BIRTH_PARENT_FORM_TAB,
+                  data.id,
+                  'review',
+                  '',
+                  { duplicate: true, duplicateContextId }
+                )
+              }}
+            >
+              {intl.formatMessage(messages.review)}
+            </PrimaryButton>
             {rejectHandler && (
               <>
                 <ConditionalSeparator />
@@ -376,4 +404,9 @@ class DuplicateDetailsClass extends React.Component<
   }
 }
 
-export const DuplicateDetails = injectIntl<IProps>(DuplicateDetailsClass)
+export const DuplicateDetails = connect(
+  null,
+  {
+    gotoTab: goToTabAction
+  }
+)(injectIntl<IProps>(DuplicateDetailsClass))

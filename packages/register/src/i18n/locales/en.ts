@@ -3,6 +3,17 @@ import { ILanguage } from '../reducer'
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
   messages: {
+    'app.loading.data.loadingOfflineData':
+      'We are loading some essential data, so that you can submit applications offline.  Please wait ...',
+    'app.loading.data.offlineDataLoaded': 'OpenCRVS is ready for use.',
+    'app.loading.data.continueButton': 'Continue',
+    'login.stepOneTitle': 'Login',
+    'session.expire.text': 'Your session has expired. Please login again.',
+    'myDrafts.title': 'My drafts',
+    'myDrafts.labels.results.name': 'Name',
+    'myDrafts.labels.results.dob': 'D.o.B.',
+    'myDrafts.labels.results.savedOn': 'Saved on',
+    'myDrafts.labels.results.trackingID': 'Tracking ID',
     'menu.back': 'Back',
     'menu.menu': 'Menu',
     'menu.items.homepage': 'Homepage',
@@ -20,7 +31,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.addressLine1': 'Street and house number',
     'formFields.addressLine2': 'Area / Ward / Mouja / Village',
     'formFields.addressLine3': 'Union / Municipality / Cantonement',
-    'formFields.addressLine3Options2': 'Ward / Cantonement',
+    'formFields.addressLine3CityOption': 'Ward',
     'formFields.addressLine4': 'Upazila (Thana) / City',
     'formFields.postCode': 'Postcode',
     'formFields.permanentAddress': 'Permanent Address',
@@ -293,6 +304,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.iDTypeDRN': 'Death Registration Number',
     'formFields.iDTypeRefugeeNumber': 'Refugee Number',
     'formFields.iDTypeAlienNumber': 'Alien Number',
+    'formFields.iDTypeOther': 'Other',
+    'formFields.iDTypeOtherLabel': 'Other type of ID',
     'formFields.iD': 'ID Number',
     'formFields.maritalStatus': 'Marital status',
     'formFields.maritalStatusSingle': 'Unmarried',
@@ -322,6 +335,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.attendantAtBirthLayperson': 'Layperson',
     'formFields.attendantAtBirthNone': 'None',
     'formFields.attendantAtBirthOther': 'Other',
+    'formFields.otherOption': 'Other',
     'formFields.birthType': 'Type of birth',
     'formFields.birthTypeSingle': 'Single',
     'formFields.birthTypeTwin': 'Twin',
@@ -331,6 +345,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.multipleBirth': 'Order of birth (number)',
     'formFields.weightAtBirth': 'Weight at birth',
     'formFields.placeOfBirth': 'Place of delivery',
+    'formFields.birthLocation': 'Hospital / Clinic',
     'formFields.deliveryInstitution': 'Type or select institution',
     'formFields.deliveryAddress': 'Address of place of delivery',
     'formFields.defaultLabel': 'Label goes here',
@@ -347,6 +362,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.fatherEducationAttainment':
       "Father's level of formal education attained",
     'formFields.currentAddress': 'Current Address',
+    'formFields.currentAddressSameAsPermanent':
+      'Is her current address the same as her permanent address?',
     'register.form.tabs.motherTab': 'Mother',
     'register.form.section.motherTitle': "Mother's details",
     'formFields.mother.nationality': 'Nationality',
@@ -370,7 +387,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
-      'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
+      'For birth registration of children below 5 years old, one of the documents listed bellow is required:',
     'register.form.section.documents.list.informantAttestation':
       'Attestation of the informant, or',
     'register.form.section.documents.list.attestedVaccination':
@@ -439,10 +456,27 @@ export const ENGLISH_STATE: ILanguage = {
       'Current address of the deceased',
     'formFields.deathPlaceAddressOther': 'Different Address',
     'formFields.deathPlaceAddressType': 'Type of Place',
+    'register.form.tabs.causeOfDeathTab': 'Cause of Death',
+    'register.form.section.causeOfDeathTitle': 'Cause of Death',
+    'register.form.section.causeOfDeathNotice':
+      'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
+    'formFields.causeOfDeathEstablished':
+      'Has a Cause of Death been established ?',
+    'formFields.methodOfCauseOfDeath': 'Method of Cause of Death',
+    'formFields.causeOfDeathCode': 'Cause of Death Code',
+    'formFields.verbalAutopsy': 'Verbal autopsy',
+    'formFields.medicallyCertified': 'Medically Certified Cause of Death',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
+    'validations.maxLength': 'Must not be more than {max} characters',
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
+    'validations.validNationalId':
+      'The National ID can be up to {maxLength} characters long',
+    'validations.validBirthRegistrationNumber':
+      'The Birth Registration Number can be up to {maxLength} characters long',
+    'validations.validDeathRegistrationNumber':
+      'The Death Registration Number can be up to {maxLength} characters long',
     'validations.phoneNumberFormat':
       'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
@@ -582,10 +616,14 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.buttons.search': 'Search',
     'register.workQueue.selects.sort.item0': 'Oldest to newest',
     'register.workQueue.selects.sort.item1': 'Newest to oldest',
-    'register.workQueue.labels.statuses.all': 'All statues',
+    'register.workQueue.labels.statuses.all': 'All statuses',
     'register.workQueue.labels.statuses.application': 'Application',
     'register.workQueue.labels.statuses.registered': 'Registered',
     'register.workQueue.labels.statuses.collected': 'Collected',
+    'register.workQueue.statusLabel.application': 'Application',
+    'register.workQueue.statusLabel.registered': 'Registered',
+    'register.workQueue.statusLabel.collected': 'Collected',
+    'register.workQueue.statusLabel.rejected': 'rejected',
     'register.workQueue.labels.events.all': 'All life events',
     'register.workQueue.labels.events.birth': 'Birth',
     'register.workQueue.labels.events.death': 'Death',
@@ -707,6 +745,10 @@ export const ENGLISH_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'Nationality',
     'certificate.parent.details.label.typeOfID': 'Type of ID',
     'certificate.parent.details.label.number': 'Number',
+    'certificate.btn.editRegistration': 'Edit Registration',
+    'certificate.txt.isCorrectTxt': 'Is the birth certificate correct?',
+    'certificate.txt.confirmationTxt':
+      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that you are ready to print.',
     'review.form.section.reviewTitle': 'Review',
     'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
     'validations.englishOnlyNameFormat': 'Must contain only English characters',
@@ -716,7 +758,7 @@ export const ENGLISH_STATE: ILanguage = {
     'review.birthRegistration.queryError':
       'An error occurred while fetching birth registration',
     'review.error.unauthorized': 'We are unable to display this page to you',
-    'register.workQueue.buttons.newRegistration': 'New birth registration',
+    'register.workQueue.buttons.newRegistration': 'New registration',
     'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
     'register.work-queue.certificate.header':
       'Receipt for Birth Certificate of',
@@ -777,10 +819,11 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
-    'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Registration} duplication {Duplication}
+
+    'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Registration} duplication {Application}
       certificate {Certificate} offlineEvent {Application connectivity}} {action, select, completed {completed}
       submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending}}`,
-    'register.confirmationScreen.headerDesc': `{event, select, declaration {The application} registration {The birth application} duplication {} certificate {} offlineEvent {The application}} 
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {The application} registration {The birth application} duplication {The application} certificate {} offlineEvent {The application}} 
       {action, select, submitted {is now on its way for validation} completed {} rejected {rejected} approved {approved} registered {registered}
       offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All done!} submitted {All done!} rejected {Application rejected} 
@@ -803,11 +846,14 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
       registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
       duplication{...} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
-    'register.confirmationScreen.footerActionButton': `Back to {event, select, declaration {New Application} registration {Application} duplication {Duplication}
-    certificate {Certification} offlineEvent {New Application}}`,
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The birth application of } registration {The birth of } duplication 
     {The birth duplication of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
-      approved {has been approved.} offlineAction {is pending due to internet connection.}}`
+      approved {has been approved.} offlineAction {is pending due to internet connection.}}`,
+
+    'register.duplicates.notDuplicate.modal.back': 'Back',
+    'register.duplicates.notDuplicate.modal.yes': 'Yes',
+    'register.duplicates.notDuplicate.modal.confirmationText':
+      'Are you sure this is not a duplicate application?'
   }
 }

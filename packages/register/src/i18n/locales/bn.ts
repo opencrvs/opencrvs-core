@@ -3,6 +3,18 @@ import { ILanguage } from '../reducer'
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
   messages: {
+    'app.loading.data.loadingOfflineData':
+      'আমরা কিছু প্রয়োজনীয় তথ্য লোড করছি, যাতে আপনি অফলাইনে  আবেদন জমা দিতে পারেন',
+    'app.loading.data.offlineDataLoaded':
+      'ওপেন সি আর ভি এস ব্যবহারের জন্য প্রস্তুত',
+    'app.loading.data.continueButton': 'চালিয়ে যান',
+    'login.stepOneTitle': 'লগইন',
+    'session.expire.text': 'আপনার সেশনের মেয়াদ শেষ হয়ে গেছে',
+    'myDrafts.title': 'আমার খসড়া গুলি',
+    'myDrafts.labels.results.name': 'নাম',
+    'myDrafts.labels.results.dob': 'জন্ম তারিখ',
+    'myDrafts.labels.results.savedOn': 'সংরক্ষিত',
+    'myDrafts.labels.results.trackingID': 'ট্র্যাকিং আইডি',
     'menu.back': 'পিছনে',
     'menu.menu': 'তালিকা',
     'menu.items.homepage': 'হোমপেজে',
@@ -13,14 +25,14 @@ export const BENGALI_STATE: ILanguage = {
     'menu.items.changeLanguage': 'ভাষা পরিবর্তন',
     'menu.items.changeLanguage.english': 'ইংরেজি',
     'menu.items.changeLanguage.bengali': 'বাংলা',
-    'menu.items.performance': 'Performance',
+    'menu.items.performance': 'দক্ষতা',
     'formFields.country': 'দেশ',
     'formFields.state': 'বিভাগ',
     'formFields.district': 'জেলা',
     'formFields.addressLine1': 'রাস্তার এবং  হোল্ডিং নম্বর',
     'formFields.addressLine2': 'এলাকা / Ward / গ্রাম/পাড়া',
     'formFields.addressLine3': 'ইউনিয়ন / পৌরসভার / ক্যান্টনমেন্ট',
-    'formFields.addressLine3Options2': 'ওয়ার্ড / ক্যান্টনমেন্ট',
+    'formFields.addressLine3CityOption': 'ওয়ার্ড',
     'formFields.addressLine4': 'উপজেলা (থানা) / পৌরসভা / সিটি করপোরেশন',
     'formFields.postCode': 'পোস্ট কোড',
     'formFields.permanentAddress': 'স্থায়ী বসবাসের ঠিকানা',
@@ -293,7 +305,9 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.iDTypeDRN': 'মৃত্যু নিবন্ধন সংখ্যা',
     'formFields.iDTypeRefugeeNumber': 'শরণার্থী নিবন্ধন সংখ্যা',
     'formFields.iDTypeAlienNumber': 'বিদেশী নিবন্ধন সংখ্যা',
-    'formFields.iD': 'পরিচয় নম্বর',
+    'formFields.iDTypeOther': 'অন্যান্য',
+    'formFields.iDTypeOtherLabel': 'অন্যান্য আইডি',
+    'formFields.iD': 'আইডি নম্বর',
     'formFields.maritalStatus': 'বৈবাহিক অবস্থা',
     'formFields.maritalStatusSingle': 'অবিবাহিত',
     'formFields.maritalStatusMarried': 'বিবাহিত',
@@ -324,6 +338,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.attendantAtBirthLayperson': 'সাধারণ ব্যক্তি',
     'formFields.attendantAtBirthNone': 'কেউ না',
     'formFields.attendantAtBirthOther': 'অন্যান্য',
+    'formFields.otherOption': 'Other',
     'formFields.birthType': 'জন্মের ধরন',
     'formFields.birthTypeSingle': 'একক',
     'formFields.birthTypeTwin': 'যমজ',
@@ -333,6 +348,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.multipleBirth': 'জন্ম ক্রম (number)',
     'formFields.weightAtBirth': 'জন্মের সময় ওজন',
     'formFields.placeOfBirth': 'জন্মস্থান',
+    'formFields.birthLocation': 'হাসপাতাল',
     'formFields.deliveryInstitution': 'প্রতিষ্ঠান নির্বাচন করুন',
     'formFields.deliveryAddress': 'জন্মস্থান',
     'formFields.defaultLabel': 'Label goes here',
@@ -348,6 +364,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.fatherDateOfBirth': 'জন্ম তারিখ',
     'formFields.fatherEducationAttainment': 'পিতার আনুষ্ঠানিক শিক্ষা',
     'formFields.currentAddress': 'বর্তমান বসবাসের ঠিকানা',
+    'formFields.currentAddressSameAsPermanent':
+      'তার বর্তমান এবং স্থায়ী বাসস্থান কি একই?',
     'register.form.tabs.motherTab': 'মা',
     'register.form.section.motherTitle': 'মা এর বিবরণ',
     'formFields.mother.nationality': 'জাতীয়তা',
@@ -421,26 +439,43 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.deceasedSexUnknown': 'অজানা',
     'formFields.deceasedDateOfBirth': 'জন্ম তারিখ',
     'formFields.deceasedCurrentAddressSameAsPermanent':
-      'মৃত ব্যক্তির বর্তমান ঠিকানা এবং স্থায়ী ঠিকানা একই?',
+      'মৃত ব্যক্তির স্থায়ী ঠিকানা কি বর্তমান ঠিকানার মত একই?',
     'register.form.tabs.deathEventTab': 'ঘটনা',
     'register.form.section.deathEventTitle': 'ঘটনার বিবরন',
     'formFields.deathDate': 'ঘটনার তারিখ',
-    'formFields.manner': 'মৃত্যুর পদ্ধতি',
+    'formFields.manner': 'মৃত্যুর ধরন',
     'formFields.mannerNatural': 'প্রাকৃতিক কারণ',
     'formFields.mannerAccident': 'দুর্ঘটনা',
     'formFields.mannerSuicide': 'আত্মহত্যা',
     'formFields.mannerHomicide': 'নরহত্যা',
     'formFields.mannerUndetermined': 'অনির্দিষ্ট পদ্ধতি',
-    'formFields.deathPlace': 'মৃত্যুর ঘটনা স্থান',
+    'formFields.deathPlace': 'মৃত্যুর ঘটনাস্থল',
     'formFields.deathPlaceAddress': 'কোথায় মৃত্যু ঘটেছে?',
     'formFields.deathPlaceAddressSameAsPermanent':
       'মৃত ব্যক্তির স্থায়ী ঠিকানা',
-    'formFields.deathPlaceAddressSameAsCurrent': 'মৃত ব্যক্তির বর্তমান ঠিকানা',
-    'formFields.deathPlaceAddressOther': 'অন্য ঠিকানা',
-    'formFields.deathPlaceAddressType': 'স্থান প্রকার',
+    'formFields.deathPlaceAddressSameAsCurrent': 'মৃতের বর্তমান ঠিকানা',
+    'formFields.deathPlaceAddressOther': 'ভিন্ন ঠিকানা',
+    'formFields.deathPlaceAddressType': 'স্থানের ধরণ',
+    'register.form.tabs.causeOfDeathTab': 'মৃত্যুর কারণ',
+    'register.form.section.causeOfDeathTitle': 'মৃত্যুর কারণ',
+    'register.form.section.causeOfDeathNotice':
+      'আবেদন জমা দেয়ার জন্য মৃত্যুর আনুষ্ঠানিক কারণ বাধ্যতামূলক নয়। মৃত্যুর কারণ পরবর্তী তারিখে জমা দেয়া যেতে পারে।',
+    'formFields.causeOfDeathEstablished':
+      'মৃত্যুর কোন একটি কারণ কি প্রতিষ্ঠিত হয়েছে?',
+    'formFields.methodOfCauseOfDeath': 'মৃত্যুর কারণ নির্ণয়ের পদ্ধতি',
+    'formFields.causeOfDeathCode': 'মৃত্যুর কারণের কোড',
+    'formFields.verbalAutopsy': 'মৌখিক ময়না তদন্ত',
+    'formFields.medicallyCertified': 'মৃত্যুর কারণ চিকিৎসাগতভাবে প্রত্যয়িত',
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
+    'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
     'validations.numberRequired': 'Must be a number',
+    'validations.validNationalId':
+      'জাতীয় পরিচয় পত্র {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+    'validations.validBirthRegistrationNumber':
+      'জন্ম নিবন্ধন নম্বর {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+    'validations.validDeathRegistrationNumber':
+      'মৃত্যু নিবন্ধন সংখ্যা {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',
@@ -536,16 +571,16 @@ export const BENGALI_STATE: ILanguage = {
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle': 'একটি নতুন ইভেন্ট ঘোষণা',
-    'register.home.buttons.registerNewEvent': 'New applications',
+    'register.home.buttons.registerNewEvent': 'নতুন জন্ম ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়াগুলি',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
     'register.home.buttons.completedSumissions': 'সমাপ্ত জমাগুলি',
     'register.home.banner.notificationsToComplete':
-      'Notifications to complete in my area',
-    'register.home.banner.rejectedApplications': 'My rejected applications',
-    'register.home.button.savedDrafts': 'My saved drafts',
-    'register.home.button.records': 'My records',
-    'register.home.buttons.trackingId': 'Tracking ID',
+      'আমার এলাকায় নিস্পন্ন  করার বিজ্ঞপ্তিগুলি',
+    'register.home.banner.rejectedApplications': 'আমার অননুমোদিত আবেদনগুলি',
+    'register.home.button.savedDrafts': 'আমার সংরক্ষিত খসড়া গুলি',
+    'register.home.button.records': 'আমার নথি গুলি',
+    'register.home.buttons.trackingId': 'ট্র্যাকিং আইডি',
     'register.home.logout': 'প্রস্থান',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
@@ -585,6 +620,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.statuses.application': 'আবেদন',
     'register.workQueue.labels.statuses.registered': 'নিবন্ধভুক্ত',
     'register.workQueue.labels.statuses.collected': 'সংগৃহীত',
+    'register.workQueue.statusLabel.application': 'আবেদন',
+    'register.workQueue.statusLabel.registered': 'নিবন্ধভুক্ত',
+    'register.workQueue.statusLabel.collected': 'সংগৃহীত',
+    'register.workQueue.statusLabel.rejected': 'প্রত্যাখ্যাত',
     'register.workQueue.labels.events.all': 'সব ইভেন্ট',
     'register.workQueue.labels.events.birth': 'জন্ম',
     'register.workQueue.labels.events.death': 'মৃত্যু',
@@ -701,6 +740,10 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'জাতীয়তা',
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
     'certificate.parent.details.label.number': 'সংখ্যা',
+    'certificate.btn.editRegistration': 'নিবন্ধন সম্পাদনা করুন',
+    'certificate.txt.isCorrectTxt': 'জন্ম নিবন্ধনটি কি সঠিক?',
+    'certificate.txt.confirmationTxt':
+      'অনুগ্রহ করে নিশ্চিত করুন যে নিবন্ধনটি পর্যালোচনা হয়েছে তার তথ্য সঠিক এবং আপনি মুদ্রণ করতে প্রস্তুত',
     'review.form.section.reviewTitle': 'পর্যালোচনা',
     'validations.bengaliOnlyNameFormat': 'শুধুমাত্র বাংলা অক্ষর থাকতে হবে',
     'validations.englishOnlyNameFormat': 'শুধুমাত্র ইংরেজি অক্ষর থাকা আবশ্যক',
@@ -757,7 +800,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantsFamilyNameEng': 'পারিবারিক নাম (in english)',
     'formFields.applicants.nationality': 'জাতীয়তা',
     'formFields.applicantsDateOfBirth': 'জন্ম তারিখ',
-    'formFields.applicantsRelationWithDeceased': 'মৃত ব্যক্তির সঙ্গে সম্পর্ক',
+    'formFields.applicantsRelationWithDeceased': 'মৃতের সাথে সম্পর্ক',
     'formFields.applicantRelation.father': 'পিতা',
     'formFields.applicantRelation.mother': 'মা',
     'formFields.applicantRelation.spouse': 'স্বামী / স্ত্রী',
@@ -771,7 +814,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {নিবন্ধন} duplication {নকল আবেদন} 
       certificate {সনদপত্র} offlineEvent {আবেদন সংযোগ}} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
       rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {মুলতুবী}}`,
-    'register.confirmationScreen.headerDesc': `{event, select, declaration {তথ্য বিবরনী} registration {} duplication {} certificate {}
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {তথ্য বিবরনী} registration {} duplication {তথ্য বিবরনী আবেদন} certificate {}
       offlineEvent {তথ্য বিবরনীটি}} {action, select, submitted {বৈধতার জন্য পর্যালোচিত হচ্ছে।} completed {} rejected {প্রত্যাখ্যাত হচ্ছে।} approved {অনুমোদিত হচ্ছে।}
       registered {নিবন্ধভুক্তকরন করা হচ্ছে।} offlineAction {ডিভাইসে ইন্টারনেট সংযোগ কালীন স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।}}`,
     'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত!} submitted {সমাপ্ত!} rejected {আবেদন প্রত্যাখ্যাত!} 
@@ -793,12 +836,15 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
       registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} 
       duplication {...} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} offlineEvent {ইন্টারনেটের জন্য অপেক্ষা করুন।}}`,
-    'register.confirmationScreen.footerActionButton': `{event, select, declaration {নতুন আবেদনে} registration {আবেদনে} duplication {নকলে}
-     certificate {সনদে} offlineEvent {নতুন আবেদনে}} ফিরে যান`,
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration { এর জন্ম নিবন্ধন আবেদন} registration { এর জন্ম নিবন্ধন}
      duplication { এর জন্ম নিবন্ধন নকল} certificate { এর জন্ম নিবন্ধন সনদ} offlineEvent { এর জন্ম নিবন্ধন আবেদন }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select,
         completed {সম্পূর্ণ হয়েছে।} submitted {জমা দেওয়া হয়েছে।} rejected {প্রত্যাখ্যাত হয়েছে।} registered {আবেদন নিবন্ধভুক্তকরন হয়েছে।}
-        approved {অনুমোদিত হয়েছে।} offlineAction {জমা দেওয়া হচ্ছে}}`
+        approved {অনুমোদিত হয়েছে।} offlineAction {জমা দেওয়া হচ্ছে}}`,
+
+    'register.duplicates.notDuplicate.modal.back': 'পিছনে',
+    'register.duplicates.notDuplicate.modal.yes': 'হাঁ',
+    'register.duplicates.notDuplicate.modal.confirmationText':
+      'আপনি কি নিশ্চিত এই আবেদন নকল না?'
   }
 }

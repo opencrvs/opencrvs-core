@@ -12,16 +12,19 @@ import {
   ICheckboxOption,
   ISelectFormFieldWithDynamicOptions,
   INFORMATIVE_RADIO_GROUP,
-  PARAGRAPH
+  PARAGRAPH,
+  IDynamicTextFieldValidators,
+  IDynamicFormField
 } from './'
-import { InjectedIntl } from 'react-intl'
+import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
+  OFFLINE_FACILITIES_KEY,
   ILocation
 } from 'src/offline/reducer'
-import { config } from 'src/config'
+import { Validation } from 'src/utils/validate'
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -57,21 +60,59 @@ export const internationaliseOptions = (
   })
 }
 
-export const generateOptionsFromLocations = (
-  locations: ILocation[]
+export const generateOptions = (
+  options: ILocation[],
+  optionType: string
 ): ISelectOption[] => {
   const optionsArray: ISelectOption[] = []
-  locations.forEach((location: ILocation, index: number) => {
+  options.forEach((option: ILocation, index: number) => {
     optionsArray.push({
-      value: location.id,
+      value: option.id,
       label: {
-        id: `location.${location.id}`,
-        defaultMessage: location.name,
-        description: `Location select item for ${location.id}`
+        id: `${optionType}.${option.id}`,
+        defaultMessage: option.name,
+        description: `${optionType} select item for ${option.id}`
       }
     })
   })
   return optionsArray
+}
+
+export const getFieldLabel = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): FormattedMessage.MessageDescriptor | undefined => {
+  if (!field.dynamicDefinitions.label) {
+    return undefined
+  }
+  return field.dynamicDefinitions.label.labelMapper(values[
+    field.dynamicDefinitions.label.dependency
+  ] as string)
+}
+
+export const getFieldValidation = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): Validation[] => {
+  const validate: Validation[] = []
+  if (
+    field.dynamicDefinitions &&
+    field.dynamicDefinitions.validate &&
+    field.dynamicDefinitions.validate.length > 0
+  ) {
+    field.dynamicDefinitions.validate.map(
+      (element: IDynamicTextFieldValidators) => {
+        const params: any[] = []
+        element.dependencies.map((dependency: string) =>
+          params.push(values[dependency])
+        )
+        const fun = element.validator(...params)
+        validate.push(fun)
+      }
+    )
+  }
+
+  return validate
 }
 
 export const getFieldOptions = (
@@ -86,16 +127,23 @@ export const getFieldOptions = (
   if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
     const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
     let partOf: string
-    if (dependencyVal === config.COUNTRY.toUpperCase()) {
+    if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
     } else {
       partOf = `Location/${dependencyVal}`
     }
-    return generateOptionsFromLocations(
+    return generateOptions(
       locations.filter((location: ILocation) => {
         return location.partOf === partOf
-      })
+      }),
+      'location'
     )
+  } else if (
+    resources &&
+    field.dynamicOptions.resource === OFFLINE_FACILITIES_KEY
+  ) {
+    const facilities = resources[OFFLINE_FACILITIES_KEY] as ILocation[]
+    return generateOptions(facilities, 'facility')
   } else {
     let options
     if (!field.dynamicOptions.options) {
@@ -109,13 +157,33 @@ export const getFieldOptions = (
   }
 }
 
+export function isCityLocation(
+  locations: ILocation[],
+  locationId: string
+): boolean {
+  const selectedLocation = locations.filter((location: ILocation) => {
+    return location.id === locationId
+  })[0]
+  if (selectedLocation) {
+    if (selectedLocation.jurisdictionType === 'CITYCORPORATION') {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return false
+  }
+}
+
 export const getConditionalActionsForField = (
   field: IFormField,
-  values: IFormSectionData
+  values: IFormSectionData,
+  resources?: IOfflineDataState
 ): string[] => {
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
     .filter(conditional =>
       /* tslint:disable-next-line: no-eval */
@@ -137,6 +205,10 @@ export const hasFormError = (
 }
 
 export const conditionals: IConditionals = {
+  iDType: {
+    action: 'hide',
+    expression: "!values.iDType || (values.iDType !== 'OTHER')"
+  },
   fathersDetailsExist: {
     action: 'hide',
     expression: '!values.fathersDetailsExist'
@@ -214,6 +286,36 @@ export const conditionals: IConditionals = {
     expression:
       '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
   },
+  placeOfBirthHospital: {
+    action: 'hide',
+    expression:
+      '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
+  },
+  otherPlaceOfBirth: {
+    action: 'hide',
+    expression:
+      '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
+  },
+  isNotCityLocation: {
+    action: 'hide',
+    expression:
+      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+  },
+  isCityLocation: {
+    action: 'hide',
+    expression:
+      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+  },
+  isNotCityLocationPermanent: {
+    action: 'hide',
+    expression:
+      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+  },
+  isCityLocationPermanent: {
+    action: 'hide',
+    expression:
+      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+  },
   iDAvailable: {
     action: 'hide',
     expression: 'values.iDType === "NO_ID"'
@@ -225,5 +327,9 @@ export const conditionals: IConditionals = {
   deathPlaceOther: {
     action: 'hide',
     expression: 'values.deathPlaceAddress !== "other"'
+  },
+  causeOfDeathEstablished: {
+    action: 'hide',
+    expression: '!values.causeOfDeathEstablished'
   }
 }

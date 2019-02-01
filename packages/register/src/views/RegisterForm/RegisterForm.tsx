@@ -35,13 +35,18 @@ import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
 import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+
 import {
   DECLARATION,
   SUBMISSION,
   REJECTION,
   REGISTRATION,
-  REGISTERED
+  REGISTERED,
+  DUPLICATION
 } from 'src/utils/constants'
+
+import { getScope } from 'src/profile/profileSelectors'
+import { Scope } from 'src/utils/authUtils'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -107,6 +112,16 @@ const DraftButtonText = styled.span`
   letter-spacing: 0px;
   margin-left: 14px;
 `
+const Notice = styled.div`
+  background: ${({ theme }) => theme.colors.primary};
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
+  padding: 25px;
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  line-height: 24px;
+  margin: 30px -25px;
+`
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -165,6 +180,11 @@ export const messages = defineMessages({
     id: 'register.form.saveDraft',
     defaultMessage: 'Save as draft',
     description: 'Save as draft Button Text'
+  },
+  optionalLabel: {
+    id: 'formFields.optionalLabel',
+    defaultMessage: 'Optional',
+    description: 'Optional label'
   }
 })
 
@@ -182,6 +202,15 @@ const FormViewContainer = styled.div`
 const PreviewButton = styled.a`
   text-decoration: underline;
   color: ${({ theme }) => theme.colors.primary};
+`
+const Optional = styled.span.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.placeholder};
+  flex-grow: 0;
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -219,6 +248,7 @@ export interface IFormProps {
   draft: IDraft
   registerForm: IForm
   tabRoute: string
+  duplicate?: boolean
 }
 
 type DispatchProps = {
@@ -238,8 +268,7 @@ type Props = {
 type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps &
-  RouteComponentProps<{}>
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
 
 type State = {
   showSubmitModal: boolean
@@ -306,6 +335,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     if (draft.review && !this.state.isDataAltered) {
@@ -324,35 +357,84 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName: IFullName = getFullName(childData)
-    this.props.deleteDraft({ ...draft })
+    const duplicate = history.location.state && history.location.state.duplicate
+    let eventName = DECLARATION
+    if (duplicate) {
+      eventName = DUPLICATION
+    }
+    // this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
-      eventName: DECLARATION,
+      eventName,
       actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      //  duplicate: history.location.state && history.location.state.duplicate,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
+
+    this.props.deleteDraft(draft)
   }
 
   successfulSubmission = (response: string) => {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    this.props.deleteDraft({ ...draft })
+
+    const duplicate = history.location.state && history.location.state.duplicate
+
+    let eventName = DECLARATION
+
+    if (this.userHasRegisterScope()) {
+      eventName = REGISTRATION
+    }
+
+    if (duplicate) {
+      eventName = DUPLICATION
+    }
+
+    // this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       nextSection: true,
       trackingSection: true,
-      eventName: DECLARATION,
+      eventName,
       actionName: SUBMISSION,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
+
+    // const payload = {
+    //   fullNameInBn: fullName.fullNameInBn,
+    //   fullNameInEng: fullName.fullNameInEng,
+    //   duplicate: history.location.state && history.location.state.duplicate,
+    //   duplicateContextId:
+    //     history.location.state && history.location.state.duplicateContextId
+    // }
+    // if (this.userHasRegisterScope()) {
+    //   // @ts-ignore
+    //   payload.registrationNumber = response
+    //   // @ts-ignore
+    //   payload.declaration = false
+    // } else {
+    //   // @ts-ignore
+    //   payload.trackingId = response
+    //   // @ts-ignore
+    //   payload.declaration = true
+    // }
+
+    //  history.push(SAVED_REGISTRATION, payload)
+
+    this.props.deleteDraft(draft)
   }
 
   successfullyRegistered = (response: string) => {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
+    // <<<<<<< HEAD
     this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
@@ -362,6 +444,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
+    // =======
+    //     history.push(SAVED_REGISTRATION, {
+    //       registrationNumber: response,
+    //       declaration: false,
+    //       fullNameInBn: fullName.fullNameInBn,
+    //       fullNameInEng: fullName.fullNameInEng
+    //     })
+    //     this.props.deleteDraft(draft)
+    // >>>>>>> origin
   }
 
   submitForm = () => {
@@ -448,8 +539,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
       history,
       registerForm,
       offlineResources,
-      handleSubmit
+      handleSubmit,
+      duplicate
     } = this.props
+
     const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
@@ -529,7 +622,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     id={`form_section_title_${activeSection.id}`}
                   >
                     {intl.formatMessage(activeSection.title)}
+                    {activeSection.optional && (
+                      <Optional
+                        id={`form_section_optional_label_${activeSection.id}`}
+                        disabled={activeSection.disabled}
+                      >
+                        &nbsp;&nbsp;•&nbsp;
+                        {intl.formatMessage(messages.optionalLabel)}
+                      </Optional>
+                    )}
                   </FormSectionTitle>
+                  {activeSection.notice && (
+                    <Notice id={`form_section_notice_${activeSection.id}`}>
+                      {intl.formatMessage(activeSection.notice)}
+                    </Notice>
+                  )}
                   <form
                     id={`form_section_id_${activeSection.id}`}
                     onSubmit={handleSubmit}
@@ -602,7 +709,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfulSubmission(data.createBirthRegistration)
           }
         >
-          {(submitBirthRegistration, { data }) => {
+          {submitBirthRegistration => {
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -615,6 +722,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     {intl.formatMessage(messages.submitButton)}
                   </PrimaryButton>,
                   <PreviewButton
+                    id="preview-btn"
                     key="preview"
                     onClick={() => {
                       this.toggleSubmitModalOpen()
@@ -642,7 +750,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfullyRegistered(data.markBirthAsRegistered)
           }
         >
-          {(markBirthAsRegistered, { data }) => {
+          {markBirthAsRegistered => {
             return (
               <Modal
                 title="Are you ready to submit?"
@@ -682,6 +790,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             confirmRejectionEvent={() => {
               this.rejectSubmission()
             }}
+            duplicate={duplicate}
             draftId={draft.id}
           />
         )}
@@ -738,6 +847,7 @@ function mapStateToProps(
 
   return {
     registerForm,
+    scope: getScope(state),
     setAllFieldsDirty,
     offlineResources,
     activeSection: {

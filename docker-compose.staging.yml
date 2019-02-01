@@ -21,27 +21,37 @@ services:
           - node.role == manager
 
   register:
+    configs:
+      - source: register-config.{{ts}}
+        target: /usr/src/app/packages/register/build/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: register.opencrvs-staging.jembi.org,opencrvs-staging.jembi.org'
-        - 'traefik.frontend.redirect.regex=^https?://opencrvs-staging.jembi.org/(.*)'
-        - 'traefik.frontend.redirect.replacement=https://register.opencrvs-staging.jembi.org/$${1}'
+        - 'traefik.frontend.rule=Host: register.{{hostname}},{{hostname}}'
+        - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}'
         - 'traefik.port=5000'
         - 'traefik.docker.network=opencrvs_default'
 
   performance:
+    configs:
+      - source: performance-config.{{ts}}
+        target: /usr/src/app/packages/performance/build/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: performance.opencrvs-staging.jembi.org'
+        - 'traefik.frontend.rule=Host: performance.{{hostname}}'
         - 'traefik.port=5000'
         - 'traefik.docker.network=opencrvs_default'
+
   login:
+    configs:
+      - source: login-config.{{ts}}
+        target: /usr/src/app/packages/login/build/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: login.opencrvs-staging.jembi.org'
+        - 'traefik.frontend.rule=Host: login.{{hostname}}'
         - 'traefik.port=5000'
         - 'traefik.docker.network=opencrvs_default'
 
@@ -55,7 +65,7 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: auth.opencrvs-staging.jembi.org'
+        - 'traefik.frontend.rule=Host: auth.{{hostname}}'
         - 'traefik.port=4040'
         - 'traefik.docker.network=opencrvs_default'
 
@@ -83,7 +93,7 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: gateway.opencrvs-staging.jembi.org'
+        - 'traefik.frontend.rule=Host: gateway.{{hostname}}'
         - 'traefik.port=7070'
         - 'traefik.docker.network=opencrvs_default'
 
@@ -107,7 +117,7 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: resources.opencrvs-staging.jembi.org'
+        - 'traefik.frontend.rule=Host: resources.{{hostname}}'
         - 'traefik.port=3040'
         - 'traefik.docker.network=opencrvs_default'
 
@@ -146,3 +156,9 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
+  register-config.{{ts}}:
+    file: ./infrastructure/register-config.js
+  performance-config.{{ts}}:
+    file: ./infrastructure/performance-config.js
+  login-config.{{ts}}:
+    file: ./infrastructure/login-config.js

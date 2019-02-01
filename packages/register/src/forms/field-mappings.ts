@@ -1,9 +1,4 @@
-import {
-  IFormField,
-  IFormData,
-  IFormFieldValue,
-  IAttachment
-} from '../../../forms'
+import { IFormField, IFormData, IFormFieldValue, IAttachment } from '.'
 
 export const nameTransformer = (
   language: string,
@@ -73,6 +68,20 @@ export function identifierTypeTransformer(
   return transformedData
 }
 
+export function identifierOtherTypeTransformer(
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) {
+  const sectionData = transformedData[sectionId]
+  if (!sectionData.identifier) {
+    sectionData.identifier = [{}]
+  }
+  sectionData.identifier[0].otherType = draftData[sectionId][field.name]
+  return transformedData
+}
+
 export const addressTransformer = (
   addressType: string,
   lineNumber: number = 0,
@@ -93,7 +102,7 @@ export const addressTransformer = (
   if (!address) {
     address = {
       type: addressType,
-      line: ['', '', '', '']
+      line: ['', '', '', '', '', '']
     }
     sectionData.address.push(address)
   }
@@ -102,6 +111,50 @@ export const addressTransformer = (
   } else {
     address[!transformedFieldName ? field.name : transformedFieldName] =
       draftData[sectionId][field.name]
+  }
+  return transformedData
+}
+
+export const vitalEventAddressTransformer = (
+  eventType: string,
+  lineNumber: number = 0,
+  transformedFieldName?: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (eventType !== 'BIRTH') {
+    throw new Error(
+      `Vital event: ${eventType} not supported in vitalEventAddressTransformer.`
+    )
+  }
+  if (!transformedData.placeOfBirth) {
+    transformedData.placeOfBirth = {
+      type: draftData[sectionId].placeOfBirth
+        ? draftData[sectionId].placeOfBirth
+        : '',
+      partOf: draftData[sectionId].addressLine4
+        ? draftData[sectionId].addressLine4
+        : '',
+      address: {
+        type: `BIRTH_PLACE`,
+        country: '',
+        state: '',
+        district: '',
+        postalCode: '',
+        line: ['', '', '', '', '', '']
+      }
+    }
+  }
+  if (lineNumber > 0) {
+    transformedData.placeOfBirth.address.line[lineNumber - 1] =
+      draftData[sectionId][field.name]
+  } else {
+    transformedData.placeOfBirth.address[
+      !transformedFieldName ? field.name : transformedFieldName
+    ] = draftData[sectionId][field.name]
   }
   return transformedData
 }
@@ -116,14 +169,19 @@ export const fieldNameTransformer = (transformedFieldName: string) => (
     draftData[sectionId][field.name]
   return transformedData
 }
-
-export function sectionFieldToBundleFieldTransformer(
+export const sectionFieldToBundleFieldTransformer = (
+  transformedFieldName?: string
+) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
-) {
-  transformedData[field.name] = draftData[sectionId][field.name]
+) => {
+  if (transformedFieldName) {
+    transformedData[transformedFieldName] = draftData[sectionId][field.name]
+  } else {
+    transformedData[field.name] = draftData[sectionId][field.name]
+  }
   return transformedData
 }
 
@@ -197,23 +255,13 @@ export function commentTransformer(
     {
       comments: [
         {
-          comment: draftData[sectionId][field.name],
+          comment: draftData[sectionId][field.name] || '',
           createdAt: new Date()
         }
       ],
       timestamp: new Date()
     }
   ]
-  return transformedData
-}
-
-export function ignoreValueTransformer(
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) {
-  /* don't include the value on transformed data */
   return transformedData
 }
 
@@ -226,6 +274,9 @@ export function attachmentTransformer(
   subjectMapper?: any,
   typeMapper?: any
 ) {
+  if (draftData[sectionId][field.name] === []) {
+    return transformedData
+  }
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     attachment => {
       return {
@@ -241,9 +292,13 @@ export function attachmentTransformer(
     }
   )
   if (attachments) {
-    transformedData[
-      alternateSectionId ? alternateSectionId : sectionId
-    ].attachments = attachments
+    const selectedSectionId = alternateSectionId
+      ? alternateSectionId
+      : sectionId
+    if (!transformedData[selectedSectionId]) {
+      transformedData[selectedSectionId] = {}
+    }
+    transformedData[selectedSectionId].attachments = attachments
   }
   return transformedData
 }

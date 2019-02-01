@@ -10,7 +10,6 @@ import {
   isTokenStillValid,
   removeToken
 } from '../utils/authUtils'
-import { config } from '../config'
 import {
   IUserDetails,
   getUserDetails,
@@ -20,6 +19,7 @@ import {
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from 'src/profile/queries'
+import * as offlineActions from 'src/offline/actions'
 
 export type ProfileState = {
   authenticated: boolean
@@ -35,10 +35,15 @@ export const initialState: ProfileState = {
   userDetails: null
 }
 
-export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
+export const profileReducer: LoopReducer<
+  ProfileState,
+  actions.Action | offlineActions.Action
+> = (
   state: ProfileState = initialState,
-  action: actions.Action
-): ProfileState | Loop<ProfileState, actions.Action> => {
+  action: actions.Action | offlineActions.Action
+):
+  | ProfileState
+  | Loop<ProfileState, actions.Action | offlineActions.Action> => {
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
       return loop(
@@ -57,7 +62,7 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
             removeUserDetails()
           }),
           Cmd.run(() => {
-            window.location.assign(config.LOGIN_URL)
+            window.location.assign(window.config.LOGIN_URL)
           })
         ])
       )
@@ -86,10 +91,7 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
               storeToken(token)
             }
           }),
-          Cmd.run(queries.fetchUserDetails, {
-            successActionCreator: actions.setUserDetails,
-            args: [payload.sub]
-          })
+          Cmd.action(actions.setInitialUserDetails())
         ])
       )
     case actions.SET_USER_DETAILS:
@@ -109,7 +111,10 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
           userDetailsFetched: true,
           userDetails
         },
-        Cmd.run(() => storeUserDetails(userDetails))
+        Cmd.list([
+          Cmd.run(() => storeUserDetails(userDetails)),
+          Cmd.action(offlineActions.setOfflineData(userDetails))
+        ])
       )
     case actions.SET_INITIAL_USER_DETAILS:
       return loop(
@@ -130,10 +135,27 @@ export const profileReducer: LoopReducer<ProfileState, actions.Action> = (
       const userDetailsCollection = JSON.parse(
         userDetailsString ? userDetailsString : '[]'
       )
-      return {
-        ...state,
-        userDetails: userDetailsCollection
+      if (userDetailsCollection.length === 0 && state.tokenPayload) {
+        return loop(
+          {
+            ...state,
+            userDetails: userDetailsCollection
+          },
+          Cmd.run(queries.fetchUserDetails, {
+            successActionCreator: actions.setUserDetails,
+            args: [state.tokenPayload.sub]
+          })
+        )
+      } else {
+        return loop(
+          {
+            ...state,
+            userDetails: userDetailsCollection
+          },
+          Cmd.action(offlineActions.setOfflineData(userDetailsCollection))
+        )
       }
+
     default:
       return state
   }

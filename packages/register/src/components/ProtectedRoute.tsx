@@ -8,25 +8,15 @@ import {
 import { connect } from 'react-redux'
 import { IStoreState } from '../store'
 import { getAuthenticated } from '../profile/profileSelectors'
-import { checkAuth } from '../profile/profileActions'
-import { IURLParams } from '../utils/authUtils'
-import { parse } from 'querystring'
 
 export interface IProps {
   authenticated: boolean
   userDetailsFetched: boolean
 }
-interface IDispatchProps {
-  checkAuth: (urlValues: IURLParams) => void
-}
 
 class ProtectedRouteWrapper extends Route<
-  IProps & IDispatchProps & RouteProps & RouteComponentProps<{}>
+  IProps & RouteProps & RouteComponentProps<{}>
 > {
-  public componentDidMount() {
-    const values = parse(this.props.location.search)
-    this.props.checkAuth(values)
-  }
   public render() {
     if (!this.props.authenticated && !this.props.userDetailsFetched) {
       return <div />
@@ -42,10 +32,5 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 export const ProtectedRoute = withRouter(
-  connect<IProps, IDispatchProps>(
-    mapStateToProps,
-    {
-      checkAuth
-    }
-  )(ProtectedRouteWrapper)
+  connect<IProps, {}>(mapStateToProps)(ProtectedRouteWrapper)
 )

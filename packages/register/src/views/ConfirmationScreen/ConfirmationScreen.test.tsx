@@ -10,7 +10,6 @@ const fullNameInEng = 'Tom Brady'
 
 describe('when user is in the confirmation screen page', () => {
   const { store, history } = createStore()
-
   const mock: any = jest.fn()
   let confirmationScreenComponent: ReactWrapper<{}, {}>
   history.push('/confirm', {
@@ -26,7 +25,7 @@ describe('when user is in the confirmation screen page', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
         <ConfirmationScreen
-          location={history.location}
+          location={mock}
           history={history}
           staticContext={mock}
           match={{
@@ -82,7 +81,7 @@ describe('when user is in the confirmation screen page', () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
       const testComponent = createTestComponent(
         <ConfirmationScreen
-          location={history.location}
+          location={mock}
           history={history}
           staticContext={mock}
           match={{
