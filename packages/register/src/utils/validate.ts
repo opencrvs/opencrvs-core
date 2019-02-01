@@ -343,13 +343,14 @@ const hasValidLength = (value: string, length: number): boolean =>
 
 export const validIDNumber: ValidationInitializer = (
   typeOfID: string
-): Validation => (value: string) => {
+): Validation => (value: any) => {
   const validNationalIDLength = 13
   const validBirthRegistrationNumberLength = 17
   const validPassportLength = 9
   switch (typeOfID) {
     case 'NATIONAL_ID':
-      return hasValidLength(value, validNationalIDLength) && isNumber(value)
+      return hasValidLength(value.toString(), validNationalIDLength) &&
+        isNumber(value.toString())
         ? undefined
         : {
             message: messages.validNationalId,
@@ -357,8 +358,10 @@ export const validIDNumber: ValidationInitializer = (
           }
 
     case 'BIRTH_REGISTRATION_NUMBER':
-      return hasValidLength(value, validBirthRegistrationNumberLength) &&
-        isAllCapsAlphaNumeric(value)
+      return hasValidLength(
+        value.toString(),
+        validBirthRegistrationNumberLength
+      ) && isAllCapsAlphaNumeric(value.toString())
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
@@ -366,7 +369,8 @@ export const validIDNumber: ValidationInitializer = (
           }
 
     case 'PASSPORT':
-      return hasValidLength(value, validPassportLength) && isAlphaNumeric(value)
+      return hasValidLength(value.toString(), validPassportLength) &&
+        isAlphaNumeric(value.toString())
         ? undefined
         : {
             message: messages.validPassportNumber,
