@@ -102,17 +102,6 @@ class Component extends React.Component<
             })}
           </Notification>
         )}
-        {backgroundSyncMessageVisible && (
-          <Notification
-            id="backgroundSyncShowNotification"
-            show={backgroundSyncMessageVisible}
-            callback={this.hideBackgroundSyncedNotification}
-          >
-            {intl.formatMessage(messages.declarationsSynced, {
-              syncCount
-            })}
-          </Notification>
-        )}
         {configurationErrorVisible && (
           <Notification
             type={NOTIFICATION_TYPE.ERROR}
