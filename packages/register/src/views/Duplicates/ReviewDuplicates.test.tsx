@@ -12,21 +12,23 @@ import { ReactWrapper } from 'enzyme'
 import { DuplicateDetails } from 'src/components/DuplicateDetails'
 import { clone } from 'lodash'
 
+const assign = window.location.assign as jest.Mock
+
 describe('Review Duplicates component', () => {
   const graphqlMock = [
     {
       request: {
         query: FETCH_DUPLICATES,
         variables: {
-          id: '123'
+          id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
         }
       },
       result: {
         data: {
           fetchBirthRegistration: {
-            id: '123',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             registration: {
-              duplicates: ['111']
+              duplicates: ['450ce5e3-b495-4868-bb6a-1183ffd0fff1']
             }
           }
         }
@@ -35,10 +37,32 @@ describe('Review Duplicates component', () => {
 
     {
       request: {
-        query: createDuplicateDetailsQuery(['123', '111']),
+        query: FETCH_DUPLICATES,
         variables: {
-          duplicate0Id: '123',
-          duplicate1Id: '111'
+          id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+        }
+      },
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              duplicates: []
+            }
+          }
+        }
+      }
+    },
+
+    {
+      request: {
+        query: createDuplicateDetailsQuery([
+          '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        ]),
+        variables: {
+          duplicate0Id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          duplicate1Id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
         }
       },
       result: {
@@ -239,7 +263,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '123'
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -263,15 +287,15 @@ describe('Review Duplicates component', () => {
         request: {
           query: FETCH_DUPLICATES,
           variables: {
-            id: '123'
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
         result: {
           data: {
             fetchBirthRegistration: {
-              id: '123',
+              id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
               registration: {
-                duplicates: ['111']
+                duplicates: ['450ce5e3-b495-4868-bb6a-1183ffd0fff1']
               }
             }
           }
@@ -280,10 +304,13 @@ describe('Review Duplicates component', () => {
 
       {
         request: {
-          query: createDuplicateDetailsQuery(['123', '111']),
+          query: createDuplicateDetailsQuery([
+            '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+          ]),
           variables: {
-            duplicate0Id: '123',
-            duplicate1Id: '111'
+            duplicate0Id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            duplicate1Id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
           }
         },
         error: new Error('boom!')
@@ -296,7 +323,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '123'
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -325,7 +352,7 @@ describe('Review Duplicates component', () => {
         request: {
           query: FETCH_DUPLICATES,
           variables: {
-            id: '123'
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
         error: new Error('boom!')
@@ -338,7 +365,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '123'
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -369,7 +396,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -443,7 +470,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -486,7 +513,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -530,14 +557,14 @@ describe('Review Duplicates component', () => {
       )
     })
 
-    it('successfuly rejects the application', async () => {
+    it('successfully removes duplicate from application', async () => {
       const mock = clone(graphqlMock)
       // @ts-ignore
       mock.push({
         request: {
           query: notADuplicateMutation,
           variables: {
-            id: '123',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
@@ -554,7 +581,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -586,6 +613,90 @@ describe('Review Duplicates component', () => {
       expect(
         testComponent.component.find('#not_duplicate_confirm').hostNodes()
       ).toHaveLength(0)
+    })
+
+    it('successfully redirects to work queue if all duplicates removed', async () => {
+      const mock = clone(graphqlMock)
+      // @ts-ignore
+      mock.push({
+        request: {
+          query: notADuplicateMutation,
+          variables: {
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        },
+        result: {
+          data: {
+            // @ts-ignore
+            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }
+      })
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            }
+          }}
+        />,
+        store,
+        mock
+      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(assign).toBeCalledWith('/work-queue')
+    })
+
+    it('successfully redirects to work queue if no duplicates returned from fetch query', async () => {
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            }
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(assign).toBeCalledWith('/work-queue')
     })
   })
 })
