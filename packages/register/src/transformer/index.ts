@@ -1,7 +1,7 @@
 import { IForm, IFormData } from '../forms'
 import { getConditionalActionsForField } from '../forms/utils'
 
-export const draftToMutationTransformer = (
+export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData
 ) => {
@@ -60,5 +60,22 @@ export const draftToMutationTransformer = (
   if (draftData._fhirIDMap) {
     transformedData._fhirIDMap = draftData._fhirIDMap
   }
+  return transformedData
+}
+
+export const gqlToDraftTransformer = (
+  formDefinition: IForm,
+  queryData: IFormData
+) => {
+  if (!formDefinition.sections) {
+    throw new Error('Sections are missing in form definition')
+  }
+  if (!queryData) {
+    throw new Error('Provided query data is not valid')
+  }
+  const transformedData: any = {}
+  Object.keys(queryData).forEach(key => {
+    return null
+  })
   return transformedData
 }

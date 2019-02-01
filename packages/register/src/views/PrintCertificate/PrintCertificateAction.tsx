@@ -50,7 +50,7 @@ import StoreTransformer, {
   IReviewSectionDetails
 } from 'src/utils/transformData'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { draftToMutationTransformer } from '../../transformer'
+import { draftToGqlTransformer } from '../../transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
@@ -469,7 +469,7 @@ class PrintCertificateActionComponent extends React.Component<
     }
     const result = {
       id: registrationId,
-      details: draftToMutationTransformer(registerForm, draft.data)
+      details: draftToGqlTransformer(registerForm, draft.data)
     }
     let individual = null
     if (data.personCollectingCertificate === documentForWhomFhirMapping.Other) {
