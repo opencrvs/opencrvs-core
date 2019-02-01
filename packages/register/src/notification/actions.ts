@@ -3,6 +3,8 @@ export const HIDE_NEW_CONTENT_AVAILABLE = 'HIDE_NEW_CONTENT_AVAILABLE'
 
 export const SHOW_BACKGROUND_SYNC_TRIGGERED = 'SHOW_BACKGROUND_SYNC_TRIGGERED'
 export const HIDE_BACKGROUND_SYNC_TRIGGERED = 'HIDE_BACKGROUND_SYNC_TRIGGERED'
+export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
+export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
 export const SESSION_EXPIRED = 'AUTH/SESSION_EXPIRED'
 
 export type ShowNewContentAvailableAction = {
@@ -23,6 +25,22 @@ export const showNewContentAvailableNotification = (
 
 export const hideNewContentAvailableNotification = (): HideNewContentAvailableAction => ({
   type: HIDE_NEW_CONTENT_AVAILABLE
+})
+
+export type ShowConfigurationErrorAction = {
+  type: typeof SHOW_CONFIG_ERROR
+}
+
+export type HideConfigurationErrorAction = {
+  type: typeof HIDE_CONFIG_ERROR
+}
+
+export const showConfigurationErrorNotification = (): ShowConfigurationErrorAction => ({
+  type: SHOW_CONFIG_ERROR
+})
+
+export const hideConfigurationErrorNotification = (): HideConfigurationErrorAction => ({
+  type: HIDE_CONFIG_ERROR
 })
 
 type backgroundSyncPayload = {
@@ -56,3 +74,12 @@ export const hideBackgroundSyncedNotification = (): HideBackgroundSyncedAction =
 export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
   type: SESSION_EXPIRED
 })
+
+export type Action =
+  | ShowNewContentAvailableAction
+  | HideNewContentAvailableAction
+  | ShowBackgroundSyncedAction
+  | HideBackgroundSyncedAction
+  | SessionExpiredAction
+  | ShowConfigurationErrorAction
+  | HideConfigurationErrorAction

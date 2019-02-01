@@ -3,6 +3,7 @@ import * as actions from './actions'
 import { storage } from 'src/storage'
 import { referenceApi } from 'src/utils/referenceApi'
 import * as i18nActions from 'src/i18n/actions'
+import * as notificationActions from 'src/notification/actions'
 import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
 import { getUserLocation } from 'src/utils/userUtils'
 import { filterLocations } from 'src/utils/locationUtils'
@@ -73,20 +74,44 @@ export const initialState: IOfflineDataState = {
 
 export const offlineDataReducer: LoopReducer<
   IOfflineDataState,
-  actions.Action | i18nActions.Action
+  actions.Action | i18nActions.Action | notificationActions.Action
 > = (
   state: IOfflineDataState = initialState,
   action: actions.Action
 ):
   | IOfflineDataState
-  | Loop<IOfflineDataState, actions.Action | i18nActions.Action> => {
+  | Loop<
+      IOfflineDataState,
+      actions.Action | i18nActions.Action | notificationActions.Action
+    > => {
   let locationLanguageState: ILanguageState
   let facilitesLanguageState: ILanguageState
   switch (action.type) {
     case actions.LOCATIONS_FAILED:
-      return { ...state, loadingError: true }
+      return loop(
+        {
+          ...state,
+          loadingError: true
+        },
+        Cmd.run<
+          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
+        >(referenceApi.loadFacilities, {
+          successActionCreator: actions.facilitiesLoaded,
+          failActionCreator: actions.facilitiesFailed
+        })
+      )
     case actions.FACILITIES_FAILED:
-      return { ...state, loadingError: true }
+      locationLanguageState = formatLocationLanguageState(state.locations)
+      return loop(
+        {
+          ...state,
+          loadingError: true,
+          offlineDataLoaded: true
+        },
+        Cmd.list([
+          Cmd.action(notificationActions.showConfigurationErrorNotification())
+        ])
+      )
     case actions.LOCATIONS_LOADED:
       return loop(
         {
