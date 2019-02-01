@@ -483,6 +483,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                           <DuplicateDetails
                             id={`duplicate-details-item-${i}`}
                             key={i}
+                            duplicateContextId={applicationId}
                             data={duplicateData}
                             notDuplicateHandler={() =>
                               this.toggleNotDuplicateModal(duplicateData.id)
