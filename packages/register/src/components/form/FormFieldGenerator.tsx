@@ -24,7 +24,8 @@ import {
   getConditionalActionsForField,
   getFieldOptions,
   getFieldLabel,
-  getFieldOptionsByValueMapper
+  getFieldOptionsByValueMapper,
+  getFieldType
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -52,7 +53,6 @@ import {
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
-  TEXT,
   ITextFormField,
   IDynamicFormField,
   LINK,
@@ -433,7 +433,7 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
               ? ({
                   ...field,
-                  type: TEXT,
+                  type: getFieldType(field as IDynamicFormField, values),
                   label: getFieldLabel(field as IDynamicFormField, values)
                 } as ITextFormField)
               : field.type === DYNAMIC_LIST

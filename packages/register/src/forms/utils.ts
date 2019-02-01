@@ -88,6 +88,19 @@ export const generateOptions = (
   return optionsArray
 }
 
+export const getFieldType = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): string => {
+  if (!field.dynamicDefinitions.type) {
+    return field.type
+  }
+
+  return field.dynamicDefinitions.type.typeMapper(values[
+    field.dynamicDefinitions.type.dependency
+  ] as string)
+}
+
 export const getFieldLabel = (
   field: IDynamicFormField,
   values: IFormSectionData

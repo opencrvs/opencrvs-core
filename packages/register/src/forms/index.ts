@@ -77,10 +77,16 @@ export type IDynamicFormFieldLabelMapper = (
 
 export type IDynamicValueMapper = (key: string) => string
 
+export type IDynamicFieldTypeMapper = (key: string) => string
+
 export interface IDynamicFormFieldDefinitions {
   label?: {
     dependency: string
     labelMapper: IDynamicFormFieldLabelMapper
+  }
+  type?: {
+    dependency: string
+    typeMapper: IDynamicFieldTypeMapper
   }
   validate?: IDynamicFormFieldValidators[]
 }

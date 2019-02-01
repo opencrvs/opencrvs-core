@@ -3,7 +3,8 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import {
   messages as identityMessages,
-  identityOptions
+  identityOptions,
+  identityTypeMapper
 } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
@@ -199,6 +200,10 @@ export const fatherSection: IFormSection = {
         label: {
           dependency: 'iDType',
           labelMapper: iDType
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
         },
         validate: [
           {

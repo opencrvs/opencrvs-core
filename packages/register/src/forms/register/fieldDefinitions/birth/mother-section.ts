@@ -1,7 +1,8 @@
 import { defineMessages } from 'react-intl'
 import {
   messages as identityMessages,
-  identityOptions
+  identityOptions,
+  identityTypeMapper
 } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
@@ -162,6 +163,10 @@ export const motherSection: IFormSection = {
         label: {
           dependency: 'iDType',
           labelMapper: iDType
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
         },
         validate: [
           {

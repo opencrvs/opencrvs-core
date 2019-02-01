@@ -1,4 +1,5 @@
 import { defineMessages } from 'react-intl'
+import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
 
 const NATIONAL_ID = 'NATIONAL_ID'
 const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
@@ -77,3 +78,12 @@ export const identityOptions = [
   },
   { value: OTHER, label: messages.iDTypeOther }
 ]
+
+export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
+  switch (key) {
+    case NATIONAL_ID:
+      return NUMBER
+    default:
+      return TEXT
+  }
+}
