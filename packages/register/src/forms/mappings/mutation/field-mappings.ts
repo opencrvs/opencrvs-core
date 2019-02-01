@@ -40,45 +40,17 @@ export function fieldToArrayTransformer(
   return transformedData
 }
 
-export function identifierTransformer(
+export const fieldToIdentifierTransformer = (identifierField: string) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
-) {
+) => {
   const sectionData = transformedData[sectionId]
   if (!sectionData.identifier) {
     sectionData.identifier = [{}]
   }
-  sectionData.identifier[0].id = draftData[sectionId][field.name]
-  return transformedData
-}
-
-export function identifierTypeTransformer(
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = [{}]
-  }
-  sectionData.identifier[0].type = draftData[sectionId][field.name]
-  return transformedData
-}
-
-export function identifierOtherTypeTransformer(
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = [{}]
-  }
-  sectionData.identifier[0].otherType = draftData[sectionId][field.name]
+  sectionData.identifier[0][identifierField] = draftData[sectionId][field.name]
   return transformedData
 }
 

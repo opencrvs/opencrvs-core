@@ -38,14 +38,12 @@ import { conditionals } from '../../../utils'
 import {
   nameTransformer,
   fieldToArrayTransformer,
-  identifierTransformer,
-  identifierTypeTransformer,
+  fieldToIdentifierTransformer,
   addressTransformer,
   copyAddressTransformer,
   sectionRemoveTransformer,
-  fieldNameTransformer,
-  identifierOtherTypeTransformer
-} from 'src/forms/field-mappings'
+  fieldNameTransformer
+} from 'src/forms/mappings/mutation/field-mappings'
 
 export const messages = defineMessages({
   fatherTab: {
@@ -166,7 +164,7 @@ export const fatherSection: IFormSection = {
       options: identityOptions,
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: identifierTypeTransformer
+        mutation: fieldToIdentifierTransformer('type')
       }
     },
     {
@@ -178,7 +176,7 @@ export const fatherSection: IFormSection = {
       validate: [],
       conditionals: [conditionals.fathersDetailsExist, conditionals.iDType],
       mapping: {
-        mutation: identifierOtherTypeTransformer
+        mutation: fieldToIdentifierTransformer('otherType')
       }
     },
     {
@@ -202,7 +200,7 @@ export const fatherSection: IFormSection = {
       validate: [],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: identifierTransformer
+        mutation: fieldToIdentifierTransformer('id')
       }
     },
     {

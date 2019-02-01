@@ -244,7 +244,7 @@ export const childSection: IFormSection = {
       validate: [bengaliOnlyNameFormat],
       mapping: {
         mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn', 'firstNames')
+        query: nameFieldTransformer('bn')
       }
     },
     {
@@ -256,7 +256,7 @@ export const childSection: IFormSection = {
       validate: [bengaliOnlyNameFormat],
       mapping: {
         mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn', 'familyName')
+        query: nameFieldTransformer('bn')
       }
     },
     {
@@ -268,7 +268,7 @@ export const childSection: IFormSection = {
       validate: [englishOnlyNameFormat],
       mapping: {
         mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames', 'firstNames')
+        query: nameFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -280,7 +280,7 @@ export const childSection: IFormSection = {
       validate: [englishOnlyNameFormat],
       mapping: {
         mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName', 'familyName')
+        query: nameFieldTransformer('en', 'familyName')
       }
     },
     {
