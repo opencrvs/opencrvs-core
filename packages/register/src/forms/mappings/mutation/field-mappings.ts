@@ -1,4 +1,4 @@
-import { IFormField, IFormData, IFormFieldValue, IAttachment } from '.'
+import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
 
 export const nameTransformer = (
   language: string,
@@ -111,50 +111,6 @@ export const addressTransformer = (
   } else {
     address[!transformedFieldName ? field.name : transformedFieldName] =
       draftData[sectionId][field.name]
-  }
-  return transformedData
-}
-
-export const vitalEventAddressTransformer = (
-  eventType: string,
-  lineNumber: number = 0,
-  transformedFieldName?: string
-) => (
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (eventType !== 'BIRTH') {
-    throw new Error(
-      `Vital event: ${eventType} not supported in vitalEventAddressTransformer.`
-    )
-  }
-  if (!transformedData.placeOfBirth) {
-    transformedData.placeOfBirth = {
-      type: draftData[sectionId].placeOfBirth
-        ? draftData[sectionId].placeOfBirth
-        : '',
-      partOf: draftData[sectionId].addressLine4
-        ? draftData[sectionId].addressLine4
-        : '',
-      address: {
-        type: `BIRTH_PLACE`,
-        country: '',
-        state: '',
-        district: '',
-        postalCode: '',
-        line: ['', '', '', '', '', '']
-      }
-    }
-  }
-  if (lineNumber > 0) {
-    transformedData.placeOfBirth.address.line[lineNumber - 1] =
-      draftData[sectionId][field.name]
-  } else {
-    transformedData.placeOfBirth.address[
-      !transformedFieldName ? field.name : transformedFieldName
-    ] = draftData[sectionId][field.name]
   }
   return transformedData
 }

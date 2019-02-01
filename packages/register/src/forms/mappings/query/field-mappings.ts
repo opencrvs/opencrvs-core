@@ -1,4 +1,4 @@
-import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
+import { IFormField, IFormData } from '../..'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 
 export const nameFieldTransformer = (
@@ -35,7 +35,24 @@ export const fieldValueTransformer = (transformedFieldName: string) => (
   sectionId: string,
   field: IFormField
 ) => {
-  transformedData[sectionId][field.name] =
-    queryData[sectionId][transformedFieldName]
+  if (queryData[sectionId][transformedFieldName]) {
+    transformedData[sectionId][field.name] =
+      queryData[sectionId][transformedFieldName]
+  }
+  return transformedData
+}
+
+export const bundleFieldToSectionFieldTransformer = (
+  transformedFieldName?: string
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (queryData[transformedFieldName ? transformedFieldName : field.name]) {
+    transformedData[sectionId][field.name] =
+      queryData[transformedFieldName ? transformedFieldName : field.name]
+  }
   return transformedData
 }
