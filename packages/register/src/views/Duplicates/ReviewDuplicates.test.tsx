@@ -623,7 +623,7 @@ describe('Review Duplicates component', () => {
           query: notADuplicateMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
-            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
           }
         },
         result: {
@@ -652,7 +652,7 @@ describe('Review Duplicates component', () => {
       testComponent.component.update()
 
       testComponent.component
-        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fff1')
         .hostNodes()
         .simulate('click')
       testComponent.component.update()
@@ -698,5 +698,36 @@ describe('Review Duplicates component', () => {
 
       expect(assign).toBeCalledWith('/work-queue')
     })
+  })
+
+  it('takes user back to work queue page when back button is pressed', async () => {
+    const { store } = createStore()
+    const testComponent = createTestComponent(
+      <ReviewDuplicates
+        // @ts-ignore
+        match={{
+          params: {
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+
+    testComponent.component.update()
+
+    testComponent.component
+      .find('#action_page_back_button')
+      .hostNodes()
+      .simulate('click')
+    testComponent.component.update()
+
+    expect(assign).toBeCalledWith('/work-queue')
   })
 })

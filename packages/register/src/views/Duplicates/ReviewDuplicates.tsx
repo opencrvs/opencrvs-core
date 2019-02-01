@@ -401,7 +401,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     return (
       <ActionPage
         goBack={() => {
-          window.location.href = WORK_QUEUE
+          window.location.assign(WORK_QUEUE)
         }}
         title={intl.formatMessage(messages.pageTitle)}
       >
@@ -433,7 +433,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             if (
               data.fetchBirthRegistration.registration.duplicates.length <= 0
             ) {
-              window.location.assign('/work-queue')
+              window.location.assign(WORK_QUEUE)
             }
 
             let duplicateIds = [applicationId]
