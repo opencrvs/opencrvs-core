@@ -1,8 +1,11 @@
 import { ITemplatedComposition } from '../registration/fhir-builders'
+import { EVENT_TYPE } from './constants'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
 export const CHILD_CODE = 'child-details'
+export const DECEASED_CODE = 'deceased-details'
+export const INFORMANT_CODE = 'informant-details'
 export const ATTACHMENT_DOCS_CODE = 'supporting-documents'
 export const CERTIFICATE_DOCS_CODE = 'certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
@@ -21,12 +24,19 @@ export const OBSERVATION_CATEGORY_VSIGN_DESC = 'Vital Signs'
 export const MOTHER_TITLE = "Mother's details"
 export const FATHER_TITLE = "Father's details"
 export const CHILD_TITLE = 'Child details'
+export const DECEASED_TITLE = 'Deceased details'
+export const INFORMANT_TITLE = "Intformant's details"
 export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
 export const CERTIFICATE_DOCS_TITLE = 'Certificates'
 export const ATTACHMENT_CONTEXT_KEY = 'attachments'
 export const CERTIFICATE_CONTEXT_KEY = 'certificates'
 export const HEALTH_FACILITY_BIRTH_CODE = 'health-facility-birth'
 export const BIRTH_LOCATION_TYPE_CODE = 'birth-location-type'
+export const DEATH_ENCOUNTER_CODE = 'death-encounter'
+export const CAUSE_OF_DEATH_CODE = '79378-6'
+export const MANNER_OF_DEATH_CODE = 'death'
+export const HEALTH_FACILITY_DEATH_CODE = 'health-facility-death'
+export const DEATH_LOCATION_TYPE_CODE = 'death-location-type'
 
 export function createPersonSection(
   refUuid: string,
@@ -82,6 +92,26 @@ export function createEncounterSection(refUuid: string) {
   }
 }
 
+export function createDeathEncounterSection(refUuid: string) {
+  return {
+    title: 'Death Encounter',
+    code: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/sections',
+          code: 'death-encounter'
+        }
+      ],
+      text: 'Death encounter'
+    },
+    entry: [
+      {
+        reference: `urn:uuid:${refUuid}`
+      }
+    ]
+  }
+}
+
 export function createEncounter(refUuid: string) {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
@@ -111,7 +141,17 @@ export function createPaymentReconciliationTemplate(refUuid: string) {
   }
 }
 
-export function createCompositionTemplate(refUuid: string) {
+export function createCompositionTemplate(refUuid: string, context: any) {
+  let declarationText
+  let declarationCode
+  if (context.event === EVENT_TYPE.BIRTH) {
+    declarationCode = 'birth-declaration'
+    declarationText = 'Birth Declaration'
+  } else {
+    declarationCode = 'death-declaration'
+    declarationText = 'Death Declaration'
+  }
+
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
@@ -125,10 +165,10 @@ export function createCompositionTemplate(refUuid: string) {
         coding: [
           {
             system: 'http://opencrvs.org/doc-types',
-            code: 'birth-declaration'
+            code: `${declarationCode}`
           }
         ],
-        text: 'Birth Declaration'
+        text: `${declarationText}`
       },
       class: {
         coding: [
@@ -139,7 +179,7 @@ export function createCompositionTemplate(refUuid: string) {
         ],
         text: 'CRVS Document'
       },
-      title: 'Birth Declaration',
+      title: `${declarationText}`,
       section: [],
       subject: {},
       date: '',
