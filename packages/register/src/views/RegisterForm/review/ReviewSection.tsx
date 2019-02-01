@@ -553,7 +553,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
-        draft.data[section.id] || {}
+        draft.data[section.id] || {},
+        offlineResources
       )
       return !conditionalActions.includes('hide')
     }
