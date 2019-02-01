@@ -386,7 +386,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
 
   successfulDuplicateRemoval = (response: string) => {
     this.toggleNotDuplicateModal()
-    window.location.reload()
+    if (response === this.state.selectedCompositionID) {
+      window.location.assign('/work-queue')
+    } else {
+      window.location.reload()
+    }
   }
 
   render() {
@@ -424,6 +428,12 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   {this.props.intl.formatMessage(messages.queryError)}
                 </ErrorText>
               )
+            }
+
+            if (
+              data.fetchBirthRegistration.registration.duplicates.length <= 0
+            ) {
+              window.location.assign('/work-queue')
             }
 
             let duplicateIds = [applicationId]
