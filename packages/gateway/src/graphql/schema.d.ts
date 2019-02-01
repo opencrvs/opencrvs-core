@@ -554,6 +554,7 @@ export interface GQLDeathRegistrationInput {
   otherInformantRelationship?: string
   placeOfDeath?: GQLLocationInput
   deathLocation?: string
+  deathLocationType?: GQLAddressType
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
@@ -585,6 +586,7 @@ export interface GQLDeathRegistration {
   otherInformantRelationship?: string
   placeOfDeath?: GQLLocation
   deathLocation?: string
+  deathLocationType?: GQLAddressType
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
@@ -1870,6 +1872,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   >
   placeOfDeath?: DeathRegistrationToPlaceOfDeathResolver<TParent>
   deathLocation?: DeathRegistrationToDeathLocationResolver<TParent>
+  deathLocationType?: DeathRegistrationToDeathLocationTypeResolver<TParent>
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
@@ -1938,6 +1941,13 @@ export interface DeathRegistrationToPlaceOfDeathResolver<
 }
 
 export interface DeathRegistrationToDeathLocationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToDeathLocationTypeResolver<
   TParent = any,
   TResult = any
 > {

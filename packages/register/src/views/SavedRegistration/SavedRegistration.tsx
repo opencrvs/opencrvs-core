@@ -17,6 +17,7 @@ import {
 import { RouteComponentProps } from 'react-router'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
+import { goToReviewDuplicate as goToReviewDuplicateAction } from 'src/navigation'
 
 const messages = defineMessages({
   registrationCompleteTitle: {
@@ -190,6 +191,11 @@ const messages = defineMessages({
     defaultMessage: 'Back to homescreen',
     description: 'The button to return to the homescreen'
   },
+  backToDuplicatesButton: {
+    id: 'register.savedRegistration.buttons.backToDuplicates',
+    defaultMessage: 'Back to duplicates',
+    description: 'The button to return to the duplicates'
+  },
   newButton: {
     id: 'register.savedRegistration.buttons.newDeclaration',
     defaultMessage: 'New application',
@@ -301,6 +307,7 @@ const HeaderWrapper = styled.div`
 
 type Props = {
   language: IntlState['language']
+  goToReviewDuplicate: typeof goToReviewDuplicateAction
 }
 
 class SavedRegistrationView extends React.Component<
@@ -312,6 +319,9 @@ class SavedRegistrationView extends React.Component<
     const language = this.props.language
     const fullNameInBn = history.location.state.fullNameInBn
     const fullNameInEng = history.location.state.fullNameInEng
+    const isDuplicate = history.location.state.duplicate
+    const duplicateContextId = history.location.state.duplicateContextId
+
     let headerTitle: string
     let headerDesc: string
     let noticeCardText1: string
@@ -408,17 +418,17 @@ class SavedRegistrationView extends React.Component<
               </BoxHeader>
             </ImgHeaderContainer>
             <SubmissionText id="submission_text">
-              {language === 'en' ? (
+              {language === 'en' &&
+              fullNameInEng &&
+              fullNameInEng !== 'undefined' ? (
                 <span>
-                  {noticeCardText1}{' '}
-                  <strong>
-                    {fullNameInEng ? fullNameInEng : fullNameInBn}
-                  </strong>{' '}
+                  {noticeCardText1} <strong>{fullNameInEng}</strong>{' '}
                   {noticeCardText2}
                 </span>
               ) : (
                 <span>
-                  <strong>{fullNameInBn}</strong> {noticeCardText2}
+                  {noticeCardText1} <strong>{fullNameInBn}</strong>{' '}
+                  {noticeCardText2}
                 </span>
               )}
             </SubmissionText>
@@ -451,6 +461,19 @@ class SavedRegistrationView extends React.Component<
             </FooterAction>
           )}
 
+          {isDuplicate && (
+            <FooterAction>
+              <FooterPrimaryButton
+                id="go_to_duplicate_button"
+                onClick={() => {
+                  window.location.assign(`/duplicates/${duplicateContextId}`)
+                }}
+              >
+                {intl.formatMessage(messages.backToDuplicatesButton)}
+              </FooterPrimaryButton>
+            </FooterAction>
+          )}
+
           <FooterAction>
             <FooterPrimaryButton onClick={() => (location.href = '/')}>
               {intl.formatMessage(messages.backButton)}
@@ -463,7 +486,10 @@ class SavedRegistrationView extends React.Component<
 }
 
 export const SavedRegistration = injectIntl(
-  connect((state: IStoreState) => ({
-    language: state.i18n.language
-  }))(SavedRegistrationView)
+  connect(
+    (state: IStoreState) => ({
+      language: state.i18n.language
+    }),
+    { goToReviewDuplicate: goToReviewDuplicateAction }
+  )(SavedRegistrationView)
 )

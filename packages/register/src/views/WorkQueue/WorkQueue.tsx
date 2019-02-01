@@ -517,6 +517,11 @@ const StatusIcon = styled.div`
   margin-top: 3px;
 `
 
+const StatusIconCollected = styled.div`
+  padding-left: 6px;
+  margin-top: 3px;
+`
+
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -572,11 +577,11 @@ export class WorkQueueView extends React.Component<
             <StatusRejected />
           </StatusIcon>
         )
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return (
-          <StatusIcon>
+          <StatusIconCollected>
             <StatusCollected />
-          </StatusIcon>
+          </StatusIconCollected>
         )
       default:
         return (
@@ -595,7 +600,7 @@ export class WorkQueueView extends React.Component<
         return this.props.intl.formatMessage(messages.registered)
       case 'REJECTED':
         return this.props.intl.formatMessage(messages.rejected)
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return this.props.intl.formatMessage(messages.collected)
       default:
         return this.props.intl.formatMessage(messages.application)
@@ -610,7 +615,7 @@ export class WorkQueueView extends React.Component<
         return messages.workflowStatusDateRegistered
       case 'REJECTED':
         return messages.workflowStatusDateRejected
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return messages.workflowStatusDateCollected
       default:
         return messages.workflowStatusDateApplication
@@ -839,7 +844,7 @@ export class WorkQueueView extends React.Component<
 
     if (this.userHasRegisterScope()) {
       if (
-        !item.duplicates &&
+        !(item.duplicates && item.duplicates.length > 0) &&
         !applicationIsRegistered &&
         !applicationIsRejected &&
         !applicationIsCertified
