@@ -68,6 +68,7 @@ export const postMutation = gql`
 
 interface IProps {
   draftId: string
+  duplicate?: boolean
   onBack: () => void
   confirmRejectionEvent: () => void
 }
@@ -116,8 +117,16 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { form, intl, draftId, confirmRejectionEvent } = this.props
+    const { form, intl, draftId, confirmRejectionEvent, duplicate } = this.props
     const { fields } = form
+    if (duplicate) {
+      fields.map(field => {
+        if (field.name === 'rejectionReason') {
+          field.initialValue = ['duplicate']
+        }
+      })
+    }
+
     return (
       <Mutation
         mutation={postMutation}
