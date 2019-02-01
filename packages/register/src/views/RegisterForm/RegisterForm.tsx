@@ -362,13 +362,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     if (duplicate) {
       eventName = DUPLICATION
     }
-    // this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       eventName,
       actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
-      //  duplicate: history.location.state && history.location.state.duplicate,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
@@ -392,8 +390,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     if (duplicate) {
       eventName = DUPLICATION
     }
-
-    // this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       nextSection: true,
@@ -405,28 +401,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
-
-    // const payload = {
-    //   fullNameInBn: fullName.fullNameInBn,
-    //   fullNameInEng: fullName.fullNameInEng,
-    //   duplicate: history.location.state && history.location.state.duplicate,
-    //   duplicateContextId:
-    //     history.location.state && history.location.state.duplicateContextId
-    // }
-    // if (this.userHasRegisterScope()) {
-    //   // @ts-ignore
-    //   payload.registrationNumber = response
-    //   // @ts-ignore
-    //   payload.declaration = false
-    // } else {
-    //   // @ts-ignore
-    //   payload.trackingId = response
-    //   // @ts-ignore
-    //   payload.declaration = true
-    // }
-
-    //  history.push(SAVED_REGISTRATION, payload)
-
     this.props.deleteDraft(draft)
   }
 
@@ -434,7 +408,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    // <<<<<<< HEAD
     this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
@@ -444,15 +417,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    // =======
-    //     history.push(SAVED_REGISTRATION, {
-    //       registrationNumber: response,
-    //       declaration: false,
-    //       fullNameInBn: fullName.fullNameInBn,
-    //       fullNameInEng: fullName.fullNameInEng
-    //     })
-    //     this.props.deleteDraft(draft)
-    // >>>>>>> origin
   }
 
   submitForm = () => {
