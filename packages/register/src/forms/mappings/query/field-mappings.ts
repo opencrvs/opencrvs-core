@@ -1,5 +1,5 @@
 import { IFormField, IFormData } from '../..'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLHumanName, GQLAddress } from '@opencrvs/gateway/src/graphql/schema'
 
 export const nameFieldTransformer = (
   language: string,
@@ -82,5 +82,82 @@ export const identifierToFieldTransformer = (identifierField: string) => (
   }
   transformedData[sectionId][field.name] =
     queryData[sectionId].identifier[0][identifierField]
+  return transformedData
+}
+
+export const addressToFieldTransformer = (
+  addressType: string,
+  lineNumber: number = 0,
+  transformedFieldName?: string
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  const address =
+    queryData[sectionId] &&
+    queryData[sectionId].address &&
+    (queryData[sectionId].address as GQLAddress[]).find(
+      addr => addr.type === addressType
+    )
+
+  if (!address) {
+    return transformedData
+  }
+  if (lineNumber > 0) {
+    transformedData[sectionId][field.name] =
+      (address.line && address.line[lineNumber - 1]) || ''
+  } else {
+    transformedData[sectionId][field.name] =
+      address[transformedFieldName ? transformedFieldName : field.name]
+  }
+  return transformedData
+}
+
+export const sameAddressFieldTransformer = (
+  fromAddressType: string,
+  fromSection: string,
+  toAddressType: string,
+  toSection: string
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fromAddress =
+    queryData[fromSection].address &&
+    (queryData[fromSection].address as [GQLAddress]).find(
+      addr => addr.type === fromAddressType
+    )
+  const toAddress =
+    queryData[toSection].address &&
+    (queryData[toSection].address as [GQLAddress]).find(
+      addr => addr.type === toAddressType
+    )
+  if (!fromAddress || !toAddress) {
+    transformedData[sectionId][field.name] = false
+    return transformedData
+  }
+
+  transformedData[sectionId][field.name] =
+    fromAddress.country === toAddress.country &&
+    fromAddress.state === toAddress.state &&
+    fromAddress.district === toAddress.district &&
+    fromAddress.postalCode === toAddress.postalCode &&
+    (fromAddress.line && fromAddress.line[0]) ===
+      (toAddress.line && toAddress.line[0]) &&
+    (fromAddress.line && fromAddress.line[1]) ===
+      (toAddress.line && toAddress.line[1]) &&
+    (fromAddress.line && fromAddress.line[2]) ===
+      (toAddress.line && toAddress.line[2]) &&
+    (fromAddress.line && fromAddress.line[3]) ===
+      (toAddress.line && toAddress.line[3]) &&
+    (fromAddress.line && fromAddress.line[4]) ===
+      (toAddress.line && toAddress.line[4]) &&
+    (fromAddress.line && fromAddress.line[5]) ===
+      (toAddress.line && toAddress.line[5])
+
   return transformedData
 }

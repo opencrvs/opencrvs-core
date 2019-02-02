@@ -54,7 +54,7 @@ export const fieldToIdentifierTransformer = (identifierField: string) => (
   return transformedData
 }
 
-export const addressTransformer = (
+export const fieldToAddressTransformer = (
   addressType: string,
   lineNumber: number = 0,
   transformedFieldName?: string

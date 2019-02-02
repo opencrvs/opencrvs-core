@@ -38,7 +38,7 @@ import { Scope } from '@opencrvs/register/src/utils/authUtils'
 import {
   documentForWhomFhirMapping,
   documentTypeFhirMapping
-} from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
+} from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import { Event, IAttachment } from '@opencrvs/register/src/forms'
 
 export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
