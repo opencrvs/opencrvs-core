@@ -641,7 +641,16 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              placeOfBirth: null,
+              placeOfBirth: {
+                address: {
+                  type: 'PERMANENT',
+                  line: ['12', '', '', 'union1', '', 'upazila10'],
+                  district: 'district2',
+                  state: 'state2',
+                  postalCode: '',
+                  country: 'BGD'
+                }
+              },
               birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
               birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
