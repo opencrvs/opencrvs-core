@@ -13,7 +13,9 @@ export const draftToGqlTransformer = (
     if (!draftData[section.id]) {
       return
     }
-    transformedData[section.id] = {}
+    if (!transformedData[section.id]) {
+      transformedData[section.id] = {}
+    }
     section.fields.forEach(fieldDef => {
       const conditionalActions: string[] = getConditionalActionsForField(
         fieldDef,

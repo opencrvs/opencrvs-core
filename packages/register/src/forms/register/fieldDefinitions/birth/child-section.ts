@@ -23,7 +23,8 @@ import { countries } from '../../../countries'
 import {
   nameTransformer,
   sectionFieldToBundleFieldTransformer,
-  fieldNameTransformer
+  fieldNameTransformer,
+  fieldValueSectionExchangeTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import { addressToPlaceOfBirthTransformer } from './mappings/mutation/child-mappings'
 import { placeOfBirthToAddressTransformer } from './mappings/query/child-mappings'
@@ -364,6 +365,7 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [],
       mapping: {
+        mutation: fieldValueSectionExchangeTransformer('mother'),
         query: sectionFieldExchangeTransformer('mother')
       }
     },

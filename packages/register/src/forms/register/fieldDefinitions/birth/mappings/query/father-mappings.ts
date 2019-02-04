@@ -11,6 +11,11 @@ export function emptyFatherSectionTransformer(
       permanentAddressSameAsMother: true,
       addressSameAsMother: true
     }
+  } else {
+    transformedData[sectionId] = {
+      fathersDetailsExist: true,
+      ...transformedData[sectionId]
+    }
   }
   return transformedData
 }

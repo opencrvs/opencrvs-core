@@ -97,6 +97,24 @@ export const fieldNameTransformer = (transformedFieldName: string) => (
     draftData[sectionId][field.name]
   return transformedData
 }
+
+export const fieldValueSectionExchangeTransformer = (
+  toSectionId: string,
+  toSectionField?: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (!transformedData[toSectionId]) {
+    transformedData[toSectionId] = {}
+  }
+  transformedData[toSectionId][toSectionField ? toSectionField : field.name] =
+    draftData[sectionId][field.name]
+  return transformedData
+}
+
 export const sectionFieldToBundleFieldTransformer = (
   transformedFieldName?: string
 ) => (
