@@ -175,6 +175,7 @@ describe('ReviewForm tests', async () => {
                 ],
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
+              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -231,8 +232,6 @@ describe('ReviewForm tests', async () => {
       childBirthDate: '2001-01-01',
       familyName: 'আকাশ',
       familyNameEng: 'Akash',
-      firstNames: '',
-      firstNamesEng: '',
       gender: 'male',
       birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
       placeOfBirth: 'HOSPITAL',
@@ -241,46 +240,6 @@ describe('ReviewForm tests', async () => {
       weightAtBirth: 2
     })
 
-    testComponent.component.unmount()
-  })
-  it('it returns empty data and checks if there is any error', async () => {
-    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
-          variables: { id: draft.id }
-        },
-        result: {
-          data: {
-            fetchBirthRegistration: {}
-          }
-        }
-      }
-    ]
-    const testComponent = createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        scope={scope}
-        staticContext={mock}
-        registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
-        match={{
-          params: { draftId: draft.id, tabId: 'review' },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftId={draft.id}
-      />,
-      store,
-      graphqlMock
-    )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 0)
-    })
     testComponent.component.unmount()
   })
   it("when registration contact is father, father's should be set", async () => {
@@ -308,6 +267,8 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
+              child: null,
+              mother: null,
               father: {
                 name: [
                   {
@@ -401,13 +362,11 @@ describe('ReviewForm tests', async () => {
 
     const data = testComponent.component
       .find(RegisterForm)
-
       .prop('draft') as IDraft
 
     expect(data.data.registration.registrationPhone).toBe('01711111111')
     testComponent.component.unmount()
   })
-
   it('when registration contact is there but no contact information for father/mother', async () => {
     const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
@@ -433,6 +392,9 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
+              child: null,
+              mother: null,
+              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -488,7 +450,6 @@ describe('ReviewForm tests', async () => {
 
     testComponent.component.unmount()
   })
-
   it('when registration has attachment', async () => {
     const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
@@ -514,6 +475,9 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
+              child: null,
+              mother: null,
+              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -609,6 +573,7 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
+              child: null,
               mother: {
                 name: [
                   {
@@ -655,6 +620,7 @@ describe('ReviewForm tests', async () => {
                 ],
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
+              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -721,7 +687,6 @@ describe('ReviewForm tests', async () => {
       registrationPhone: '01711111111',
       commentsOrNotes: 'This is a note',
       trackingId: 'B123456',
-      registrationNumber: null,
       type: 'birth'
     })
 
@@ -818,6 +783,9 @@ describe('ReviewForm tests', async () => {
           result: {
             data: {
               fetchBirthRegistration: {
+                child: null,
+                mother: null,
+                father: null,
                 registration: {
                   contact: 'MOTHER',
                   attachments: null,

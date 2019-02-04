@@ -15,7 +15,7 @@ export const phoneNumberToFieldTransformer = (dependentFieldName: string) => (
   } else {
     toSectionID = undefined
   }
-  if (toSectionID && queryData[toSectionID].telecom) {
+  if (toSectionID && queryData[toSectionID] && queryData[toSectionID].telecom) {
     ;(queryData[toSectionID].telecom as GQLContactPoint[]).map(tel => {
       if (tel.system === 'phone' && tel.value) {
         transformedData[sectionId][field.name] = tel.value

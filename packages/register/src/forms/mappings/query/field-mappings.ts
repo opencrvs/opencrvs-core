@@ -29,7 +29,7 @@ export const nameFieldTransformer = (
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
   }
-  transformedData[sectionId][nameKey] = selectedName[nameKey]
+  transformedData[sectionId][field.name] = selectedName[nameKey]
   return transformedData
 }
 
@@ -39,7 +39,7 @@ export const fieldValueTransformer = (transformedFieldName: string) => (
   sectionId: string,
   field: IFormField
 ) => {
-  if (queryData[sectionId][transformedFieldName]) {
+  if (queryData[sectionId] && queryData[sectionId][transformedFieldName]) {
     transformedData[sectionId][field.name] =
       queryData[sectionId][transformedFieldName]
   }
@@ -67,7 +67,11 @@ export function arrayToFieldTransformer(
   sectionId: string,
   field: IFormField
 ) {
-  if (queryData[sectionId][field.name] && queryData[sectionId][field.name][0]) {
+  if (
+    queryData[sectionId] &&
+    queryData[sectionId][field.name] &&
+    queryData[sectionId][field.name][0]
+  ) {
     transformedData[sectionId][field.name] = queryData[sectionId][field.name][0]
   }
   return transformedData
@@ -80,6 +84,7 @@ export const identifierToFieldTransformer = (identifierField: string) => (
   field: IFormField
 ) => {
   if (
+    !queryData[sectionId] ||
     !queryData[sectionId].identifier ||
     !queryData[sectionId].identifier[0] ||
     !queryData[sectionId].identifier[0][identifierField]
@@ -133,11 +138,13 @@ export const sameAddressFieldTransformer = (
   field: IFormField
 ) => {
   const fromAddress =
+    queryData[fromSection] &&
     queryData[fromSection].address &&
     (queryData[fromSection].address as [GQLAddress]).find(
       addr => addr.type === fromAddressType
     )
   const toAddress =
+    queryData[toSection] &&
     queryData[toSection].address &&
     (queryData[toSection].address as [GQLAddress]).find(
       addr => addr.type === toAddressType
