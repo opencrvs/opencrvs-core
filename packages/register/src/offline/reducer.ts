@@ -7,6 +7,7 @@ import * as notificationActions from 'src/notification/actions'
 import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
 import { getUserLocation } from 'src/utils/userUtils'
 import { filterLocations } from 'src/utils/locationUtils'
+import { tempData } from 'src/offline/temp/tempLocations'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -91,25 +92,35 @@ export const offlineDataReducer: LoopReducer<
       return loop(
         {
           ...state,
-          loadingError: true
+          loadingError: true,
+          locations: tempData.locations
         },
-        Cmd.run<
-          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
-        >(referenceApi.loadFacilities, {
-          successActionCreator: actions.facilitiesLoaded,
-          failActionCreator: actions.facilitiesFailed
-        })
+        Cmd.list([
+          Cmd.run<
+            actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
+          >(referenceApi.loadFacilities, {
+            successActionCreator: actions.facilitiesLoaded,
+            failActionCreator: actions.facilitiesFailed
+          }),
+
+          Cmd.action(notificationActions.showConfigurationErrorNotification())
+        ])
       )
     case actions.FACILITIES_FAILED:
       locationLanguageState = formatLocationLanguageState(state.locations)
+      facilitesLanguageState = formatFacilitiesLanguageState(
+        tempData.facilities
+      )
       return loop(
         {
           ...state,
           loadingError: true,
-          offlineDataLoaded: true
+          offlineDataLoaded: true,
+          facilities: tempData.facilities
         },
         Cmd.list([
-          Cmd.action(notificationActions.showConfigurationErrorNotification())
+          Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
+          Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
         ])
       )
     case actions.LOCATIONS_LOADED:
