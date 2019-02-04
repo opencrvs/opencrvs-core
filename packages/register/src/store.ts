@@ -72,7 +72,6 @@ export type AppStore = Store<IStoreState, AnyAction>
 export const createStore = (): { store: AppStore; history: History } => {
   const history = createBrowserHistory()
   const middleware = routerMiddleware(history)
-
   const enhancer = compose(
     install(),
     applyMiddleware(middleware),

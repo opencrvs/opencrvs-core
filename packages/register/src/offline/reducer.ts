@@ -6,6 +6,7 @@ import * as i18nActions from 'src/i18n/actions'
 import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
 import { getUserLocation } from 'src/utils/userUtils'
 import { filterLocations } from 'src/utils/locationUtils'
+import { tempData } from 'src/offline/temp/tempLocations'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -84,9 +85,36 @@ export const offlineDataReducer: LoopReducer<
   let facilitesLanguageState: ILanguageState
   switch (action.type) {
     case actions.LOCATIONS_FAILED:
-      return { ...state, loadingError: true }
+      return loop(
+        {
+          ...state,
+          loadingError: true,
+          locations: tempData.locations
+        },
+        Cmd.run<
+          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
+        >(referenceApi.loadFacilities, {
+          successActionCreator: actions.facilitiesLoaded,
+          failActionCreator: actions.facilitiesFailed
+        })
+      )
     case actions.FACILITIES_FAILED:
-      return { ...state, loadingError: true }
+      locationLanguageState = formatLocationLanguageState(state.locations)
+      facilitesLanguageState = formatFacilitiesLanguageState(
+        tempData.facilities
+      )
+      return loop(
+        {
+          ...state,
+          loadingError: true,
+          offlineDataLoaded: true,
+          facilities: tempData.facilities
+        },
+        Cmd.list([
+          Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
+          Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
+        ])
+      )
     case actions.LOCATIONS_LOADED:
       return loop(
         {

@@ -8,10 +8,14 @@ import { IStoreState } from '@opencrvs/register/src/store'
 import { setInitialDrafts } from 'src/drafts'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getInitialDraftsLoaded } from 'src/drafts/selectors'
-import { getOfflineDataLoaded } from 'src/offline/selectors'
+import {
+  getOfflineDataLoaded,
+  getOfflineLoadingError
+} from 'src/offline/selectors'
 import { parse } from 'querystring'
 import { IURLParams } from '../utils/authUtils'
 import { checkAuth } from '../profile/profileActions'
+import { showConfigurationErrorNotification } from '../notification/actions'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -93,11 +97,13 @@ interface IPageProps {
   language?: string
   initialDraftsLoaded: boolean
   offlineDataLoaded: boolean
+  loadingError: boolean
 }
 
 interface IDispatchProps {
   setInitialDrafts: () => void
   checkAuth: (urlValues: IURLParams) => void
+  showConfigurationErrorNotification: () => void
 }
 interface IState {
   loadingDataModal: boolean
@@ -127,6 +133,9 @@ class Component extends React.Component<
           element.scrollIntoView()
         }
       }, 0)
+    }
+    if (this.props.loadingError) {
+      this.props.showConfigurationErrorNotification()
     }
   }
 
@@ -160,13 +169,15 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
     language: getLanguage(store),
     initialDraftsLoaded: getInitialDraftsLoaded(store),
-    offlineDataLoaded: getOfflineDataLoaded(store)
+    offlineDataLoaded: getOfflineDataLoaded(store),
+    loadingError: getOfflineLoadingError(store)
   }
 }
 
 const mapDispatchToProps = {
   setInitialDrafts,
-  checkAuth
+  checkAuth,
+  showConfigurationErrorNotification
 }
 
 export const Page = withRouter(
