@@ -261,8 +261,8 @@ describe('when user is in the register form preview section', () => {
       // @ts-ignore
       expect(global.window.location.pathname).toMatch('/')
 
-      const deleteBtn = component.find('#save-draft').hostNodes()
-      deleteBtn.simulate('click')
+      const saveDraftButton = component.find('#save-draft').hostNodes()
+      saveDraftButton.simulate('click')
       component.update()
 
       // @ts-ignore

@@ -1,4 +1,4 @@
-export const isMobileDevise = () => {
+export const isMobileDevice = () => {
   const IS_MOBILE = true
   const IS_DESKTOP = false
 

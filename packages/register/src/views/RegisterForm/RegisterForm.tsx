@@ -40,7 +40,7 @@ import {
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
-import { isMobileDevise } from 'src/utils/commonUtils'
+import { isMobileDevice } from 'src/utils/commonUtils'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -520,7 +520,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         <FormContainer>
           <HeaderContent>
             <Swipeable
-              disabled={isReviewSection || !isMobileDevise()}
+              disabled={isReviewSection || !isMobileDevice()}
               id="swipeable_block"
               trackMouse
               onSwipedLeft={() =>
