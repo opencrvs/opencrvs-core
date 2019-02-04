@@ -3,7 +3,11 @@ import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import * as Swipeable from 'react-swipeable'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
-import { PrimaryButton, ButtonIcon } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  ButtonIcon,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
 import {
   ArrowForward,
   ArrowBack,
@@ -41,6 +45,8 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { TickLarge } from '@opencrvs/components/lib/icons'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -205,6 +211,28 @@ const Optional = styled.span.attrs<
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
+`
+
+const ButtonSpinner = styled(Spinner)`
+  width: 15px;
+  height: 15px;
+  top: 0px !important;
+`
+
+const ConfirmBtn = styled(PrimaryButton)`
+  font-weight: bold;
+  padding: 15px 35px 15px 20px;
+  div {
+    position: relative !important;
+    margin-right: 20px;
+    top: 2px;
+  }
+  &:disabled {
+    background: ${({ theme }) => theme.colors.disabledButton};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -386,6 +414,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
     history.push(SAVED_REGISTRATION, payload)
     this.props.deleteDraft(draft)
+
+    // console.log('clicked')
   }
 
   successfullyRegistered = (response: string) => {
@@ -655,18 +685,34 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfulSubmission(data.createBirthRegistration)
           }
         >
-          {submitBirthRegistration => {
+          {(submitBirthRegistration, { loading, error, data }) => {
             return (
               <Modal
                 title="Are you ready to submit?"
                 actions={[
-                  <PrimaryButton
+                  <ConfirmBtn
                     key="submit"
                     id="submit_confirm"
+                    icon={() => {
+                      if (loading) {
+                        return (
+                          <>
+                            <ButtonSpinner id="Spinner" baseColor="#F9F9F9" />
+                          </>
+                        )
+                      }
+                      return (
+                        <>
+                          <TickLarge />
+                        </>
+                      )
+                    }}
+                    align={ICON_ALIGNMENT.LEFT}
+                    disabled={loading || data}
                     onClick={() => submitBirthRegistration()}
                   >
                     {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
+                  </ConfirmBtn>,
                   <PreviewButton
                     id="preview-btn"
                     key="preview"
@@ -696,18 +742,34 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfullyRegistered(data.markBirthAsRegistered)
           }
         >
-          {markBirthAsRegistered => {
+          {(markBirthAsRegistered, { loading, error, data }) => {
             return (
               <Modal
                 title="Are you ready to submit?"
                 actions={[
-                  <PrimaryButton
+                  <ConfirmBtn
                     key="register"
                     id="register_confirm"
+                    icon={() => {
+                      if (loading) {
+                        return (
+                          <>
+                            <ButtonSpinner id="Spinner" baseColor="#F9F9F9" />
+                          </>
+                        )
+                      }
+                      return (
+                        <>
+                          <TickLarge />
+                        </>
+                      )
+                    }}
+                    align={ICON_ALIGNMENT.LEFT}
+                    disabled={loading || data}
                     onClick={() => markBirthAsRegistered()}
                   >
                     {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
+                  </ConfirmBtn>,
                   <PreviewButton
                     key="review"
                     id="register_review"
