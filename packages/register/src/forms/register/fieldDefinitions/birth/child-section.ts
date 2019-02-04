@@ -30,7 +30,8 @@ import { placeOfBirthToAddressTransformer } from './mappings/query/child-mapping
 import {
   nameFieldTransformer,
   fieldValueTransformer,
-  bundleFieldToSectionFieldTransformer
+  bundleFieldToSectionFieldTransformer,
+  sectionFieldExchangeTransformer
 } from 'src/forms/mappings/query/field-mappings'
 
 export interface IChildSectionFormData {
@@ -361,7 +362,10 @@ export const childSection: IFormSection = {
       label: messages.multipleBirth,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      mapping: {
+        query: sectionFieldExchangeTransformer('mother')
+      }
     },
     {
       name: 'weightAtBirth',

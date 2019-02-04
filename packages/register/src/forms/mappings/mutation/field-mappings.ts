@@ -173,7 +173,7 @@ export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
   return transformedData
 }
 
-export function commentTransformer(
+export function fieldToCommentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,

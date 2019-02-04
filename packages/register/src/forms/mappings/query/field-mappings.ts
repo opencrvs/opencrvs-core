@@ -1,5 +1,10 @@
 import { IFormField, IFormData } from '../..'
-import { GQLHumanName, GQLAddress } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLHumanName,
+  GQLAddress,
+  GQLRegWorkflow,
+  GQLComment
+} from '@opencrvs/gateway/src/graphql/schema'
 
 export const nameFieldTransformer = (
   language: string,
@@ -159,5 +164,42 @@ export const sameAddressFieldTransformer = (
     (fromAddress.line && fromAddress.line[5]) ===
       (toAddress.line && toAddress.line[5])
 
+  return transformedData
+}
+
+export const sectionFieldExchangeTransformer = (
+  fromSectionId: string,
+  fromSectionField?: string
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (
+    !queryData[fromSectionId] ||
+    !queryData[fromSectionId][fromSectionField ? fromSectionField : field.name]
+  ) {
+    return transformedData
+  }
+  transformedData[sectionId][field.name] =
+    queryData[fromSectionId][fromSectionField ? fromSectionField : field.name]
+  return transformedData
+}
+
+export function commentToFieldTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) {
+  const comment =
+    queryData[sectionId].status &&
+    (queryData[sectionId].status as GQLRegWorkflow[])[0].comments &&
+    ((queryData[sectionId].status as GQLRegWorkflow[])[0]
+      .comments as GQLComment[])[0].comment
+  if (comment) {
+    transformedData[sectionId][field.name] = comment
+  }
   return transformedData
 }
