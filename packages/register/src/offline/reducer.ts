@@ -3,10 +3,10 @@ import * as actions from './actions'
 import { storage } from 'src/storage'
 import { referenceApi } from 'src/utils/referenceApi'
 import * as i18nActions from 'src/i18n/actions'
-import * as notificationActions from 'src/notification/actions'
 import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
 import { getUserLocation } from 'src/utils/userUtils'
 import { filterLocations } from 'src/utils/locationUtils'
+import { tempData } from 'src/offline/temp/tempLocations'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -74,16 +74,13 @@ export const initialState: IOfflineDataState = {
 
 export const offlineDataReducer: LoopReducer<
   IOfflineDataState,
-  actions.Action | i18nActions.Action | notificationActions.Action
+  actions.Action | i18nActions.Action
 > = (
   state: IOfflineDataState = initialState,
   action: actions.Action
 ):
   | IOfflineDataState
-  | Loop<
-      IOfflineDataState,
-      actions.Action | i18nActions.Action | notificationActions.Action
-    > => {
+  | Loop<IOfflineDataState, actions.Action | i18nActions.Action> => {
   let locationLanguageState: ILanguageState
   let facilitesLanguageState: ILanguageState
   switch (action.type) {
@@ -91,7 +88,8 @@ export const offlineDataReducer: LoopReducer<
       return loop(
         {
           ...state,
-          loadingError: true
+          loadingError: true,
+          locations: tempData.locations
         },
         Cmd.run<
           actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
@@ -102,14 +100,19 @@ export const offlineDataReducer: LoopReducer<
       )
     case actions.FACILITIES_FAILED:
       locationLanguageState = formatLocationLanguageState(state.locations)
+      facilitesLanguageState = formatFacilitiesLanguageState(
+        tempData.facilities
+      )
       return loop(
         {
           ...state,
           loadingError: true,
-          offlineDataLoaded: true
+          offlineDataLoaded: true,
+          facilities: tempData.facilities
         },
         Cmd.list([
-          Cmd.action(notificationActions.showConfigurationErrorNotification())
+          Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
+          Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
         ])
       )
     case actions.LOCATIONS_LOADED:

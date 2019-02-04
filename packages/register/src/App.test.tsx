@@ -1,10 +1,5 @@
 import * as ReactApollo from 'react-apollo'
-import {
-  createTestApp,
-  mockUserResponseWithName,
-  mockOfflineData,
-  userDetails
-} from './tests/util'
+import { createTestApp, mockOfflineData, userDetails } from './tests/util'
 import { v4 as uuid } from 'uuid'
 import {
   HOME,
@@ -20,7 +15,6 @@ import { storeDraft, createDraft, IDraft } from './drafts'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import { storage } from 'src/storage'
-import { queries } from 'src/profile/queries'
 import { draftToGqlTransformer } from 'src/transformer'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import {
@@ -28,10 +22,14 @@ import {
   getStorageUserDetailsSuccess
 } from '@opencrvs/register/src/profile/profileActions'
 import { getOfflineDataSuccess } from 'src/offline/actions'
-import { referenceApi } from 'src/utils/referenceApi'
 import { createClient } from './utils/apolloClient'
 import { Event, IForm } from '@opencrvs/register/src/forms'
 import { clone } from 'lodash'
+import {
+  mockFetchLocations,
+  mockFetchFacilities
+} from 'src/utils/referenceApi.test'
+import * as nock from 'nock'
 
 interface IPersonDetails {
   [key: string]: any
@@ -42,40 +40,6 @@ storage.setItem = jest.fn()
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
-const mockFetchUserDetails = jest.fn()
-mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
-queries.fetchUserDetails = mockFetchUserDetails
-
-const mockFetchLocations = jest.fn()
-mockFetchLocations.mockReturnValue({
-  data: [
-    {
-      id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
-      name: 'Barisal',
-      nameBn: 'বরিশাল',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    }
-  ]
-})
-referenceApi.loadLocations = mockFetchLocations
-
-const mockFetchFacilities = jest.fn()
-mockFetchLocations.mockReturnValue({
-  data: [
-    {
-      id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
-      name: 'Shaheed Taj Uddin Ahmad Medical College',
-      nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
-    }
-  ]
-})
-referenceApi.loadFacilities = mockFetchFacilities
 
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
@@ -85,20 +49,6 @@ beforeEach(() => {
   history.replaceState({}, '', '/')
   assign.mockClear()
 })
-
-/*describe('when user does not have a token', () => {
-  let store: Store
-  beforeEach(() => {
-    const testApp = createTestApp()
-    store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
-  })
-
-  it("redirects user to SSO if user doesn't have a token", async () => {
-    await flushPromises()
-    expect(assign.mock.calls[0][0]).toBe(config.LOGIN_URL)
-  })
-})*/
 
 it('renders without crashing', async () => {
   createTestApp()
@@ -654,6 +604,13 @@ describe('when user has a valid token in local storage', () => {
                     .find('#file_item_0_delete_link')
                     .hostNodes()
                     .simulate('click')
+                  nock(window.config.RESOURCES_URL)
+                    .get('/locations')
+                    .reply(200, mockFetchLocations)
+
+                  nock(window.config.RESOURCES_URL)
+                    .get('/facilities')
+                    .reply(200, mockFetchFacilities)
 
                   await flushPromises()
                   app.update()
