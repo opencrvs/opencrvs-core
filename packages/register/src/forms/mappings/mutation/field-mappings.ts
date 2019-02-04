@@ -193,7 +193,7 @@ export function fieldToCommentTransformer(
   return transformedData
 }
 
-export function attachmentTransformer(
+export function fieldToAttachmentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,

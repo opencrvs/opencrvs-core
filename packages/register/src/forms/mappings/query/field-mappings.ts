@@ -1,9 +1,10 @@
-import { IFormField, IFormData } from '../..'
+import { IFormField, IFormData, IAttachment } from '../..'
 import {
   GQLHumanName,
   GQLAddress,
   GQLRegWorkflow,
-  GQLComment
+  GQLComment,
+  GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 
 export const nameFieldTransformer = (
@@ -200,6 +201,52 @@ export function commentToFieldTransformer(
       .comments as GQLComment[])[0].comment
   if (comment) {
     transformedData[sectionId][field.name] = comment
+  }
+  return transformedData
+}
+
+export function attachmentToFieldTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField,
+  alternateSectionId?: string,
+  subjectMapper?: any,
+  typeMapper?: any
+) {
+  const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
+  const attachments =
+    queryData[selectedSectionId].attachments &&
+    ((queryData[selectedSectionId].attachments as GQLAttachment[]).map(
+      attachment => {
+        let subject = attachment.subject
+        if (subjectMapper) {
+          // @ts-ignore
+          subject =
+            Object.keys(subjectMapper).find(
+              key => subjectMapper[key] === attachment.subject
+            ) || attachment.subject
+        }
+        let type = attachment.type
+        if (typeMapper) {
+          // @ts-ignore
+          type =
+            Object.keys(typeMapper).find(
+              key => typeMapper[key] === attachment.type
+            ) || attachment.type
+        }
+        return {
+          data: attachment.data,
+          type: attachment.contentType,
+          optionValues: [subject, type],
+          title: subject,
+          description: type
+        }
+      }
+    ) as IAttachment[])
+
+  if (attachments) {
+    transformedData[sectionId][field.name] = attachments
   }
   return transformedData
 }
