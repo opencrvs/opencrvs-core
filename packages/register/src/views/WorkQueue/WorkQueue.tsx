@@ -858,26 +858,27 @@ export class WorkQueueView extends React.Component<
     })
 
     if (applicationIsRejected && item.rejection_reason) {
-      const reasons = item.rejection_reason
-        .split('&')[0]
-        .split('=')[1]
-        .split(',')
+      const parsedComment = item.rejection_reason.split('&')[0]
+      const parsedReason = parsedComment && parsedComment.split('=')[1]
+      const reasons = parsedReason && parsedReason.split(',')
 
       info.push({
         label: this.props.intl.formatMessage(
           messages.listItemRejectionReasonLabel
         ),
-        value: reasons
-          .reduce(
-            (prev, curr) => [
-              ...prev,
-              this.props.intl.formatMessage(
-                getRejectionReasonDisplayValue(curr)
-              )
-            ],
-            []
-          )
-          .join(', ')
+        value:
+          reasons &&
+          reasons
+            .reduce(
+              (prev, curr) => [
+                ...prev,
+                this.props.intl.formatMessage(
+                  getRejectionReasonDisplayValue(curr)
+                )
+              ],
+              []
+            )
+            .join(', ')
       })
     }
 
