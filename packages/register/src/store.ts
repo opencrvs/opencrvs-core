@@ -36,7 +36,7 @@ import {
   rejectReducer
 } from '@opencrvs/register/src/review/reducer'
 import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
-import { createLogger } from 'redux-logger'
+// import { createLogger } from 'redux-logger'
 
 export interface IStoreState {
   profile: ProfileState
@@ -73,12 +73,12 @@ export type AppStore = Store<IStoreState, AnyAction>
 export const createStore = (): { store: AppStore; history: History } => {
   const history = createBrowserHistory()
   const middleware = routerMiddleware(history)
-  const logger = createLogger({
+  /*const logger = createLogger({
     diff: true
-  })
+  })*/
   const enhancer = compose(
     install(),
-    applyMiddleware(middleware, logger),
+    applyMiddleware(middleware /* logger */),
     // tslint:disable no-any
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
