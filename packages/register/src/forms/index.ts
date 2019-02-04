@@ -243,6 +243,7 @@ export interface IConditionals {
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   causeOfDeathEstablished: IConditional
+  isMarried: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'

@@ -331,5 +331,9 @@ export const conditionals: IConditionals = {
   causeOfDeathEstablished: {
     action: 'hide',
     expression: '!values.causeOfDeathEstablished'
+  },
+  isMarried: {
+    action: 'hide',
+    expression: '!values.maritalStatus || values.maritalStatus === "SINGLE"'
   }
 }
