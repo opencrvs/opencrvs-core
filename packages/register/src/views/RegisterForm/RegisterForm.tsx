@@ -47,6 +47,7 @@ import {
 
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
+import { isMobileDevice } from 'src/utils/commonUtils'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -538,7 +539,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         <FormContainer>
           <HeaderContent>
             <Swipeable
-              disabled={isReviewSection}
+              disabled={isReviewSection || !isMobileDevice()}
               id="swipeable_block"
               trackMouse
               onSwipedLeft={() =>
