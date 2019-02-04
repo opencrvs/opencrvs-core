@@ -4,6 +4,7 @@
 curl https://github.com/rcrichton.keys >> ~/.ssh/authorized_keys
 curl https://github.com/euanmillar.keys >> ~/.ssh/authorized_keys
 curl https://github.com/rikukissa.keys >> ~/.ssh/authorized_keys
+curl https://github.com/mushrafulhoque-dsi.keys  >> ~/.ssh/authorized_keys
 
 # prevent password login
 sed -i 's/PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -41,5 +42,12 @@ Add this to the crontab to clean up autodeploys ->
   0 0 * * * /usr/bin/docker system prune -f >> /var/log/docker-prune.log
 
 # After deploy:
-in user mgnt service container: yarn populate
 in resource service container: FHIR_URL=http://hearth:3447/fhir yarn populate
+in user mgnt service container: yarn populate
+
+# Copy the 2 locations.json files that are generated in the following directory in the resource package to the other running resources container.  You need to check Docker swarm
+
+/usr/src/app/src/features/administrative/generated/bn/locations.json
+/usr/src/app/src/features/facilities/generated/bn/locations.json
+
+
