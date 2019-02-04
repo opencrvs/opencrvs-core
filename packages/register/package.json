@@ -88,7 +88,6 @@
     "nock": "^10.0.6",
     "opener": "^1.5.1",
     "prettier": "^1.15.2",
-    "redux-logger": "^3.0.6",
     "serve": "^10.0.2",
     "stylelint": "^9.5.0",
     "stylelint-config-recommended": "^2.1.0",
