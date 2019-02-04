@@ -553,7 +553,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
-        draft.data[section.id] || {}
+        draft.data[section.id] || {},
+        offlineResources
       )
       return !conditionalActions.includes('hide')
     }
@@ -708,7 +709,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             {!!saveDraftClickEvent && (
               <DraftButtonContainer
                 onClick={saveDraftClickEvent}
-                id="delete-draft"
+                id="save-draft"
               >
                 <DraftSimple />
                 <SaveDraftText>
