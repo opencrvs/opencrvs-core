@@ -1,10 +1,4 @@
-import {
-  IFormSection,
-  ViewType,
-  SELECT_WITH_OPTIONS,
-  LINK,
-  PDF_DOCUMENT_VIEWER
-} from 'src/forms'
+import { IFormSection, ViewType, PDF_DOCUMENT_VIEWER } from 'src/forms'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
@@ -41,57 +35,12 @@ const messages = defineMessages({
   }
 })
 
-const authorizedPersons = [
-  {
-    value: 'UP SECRETARY SHAKIB AL HASAN',
-    label: messages.person1
-  },
-  {
-    value: 'LOCAL REGISTRAR Mohammad Ashraful',
-    label: messages.person2
-  }
-]
-
 export const certificatePreview: IFormSection = {
   id: 'certificatePreview',
   viewType: 'form' as ViewType,
   name: messages.preview,
   title: messages.preview,
   fields: [
-    {
-      name: 'signature1',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.selectSignature,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: authorizedPersons
-    },
-    {
-      name: 'signature2',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.noLabel,
-      initialValue: '',
-      required: true,
-      validate: [],
-      options: authorizedPersons
-    },
-    {
-      name: 'signature3',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.noLabel,
-      initialValue: '',
-      validate: [],
-      options: authorizedPersons,
-      conditionals: [{ action: 'hide', expression: '!values.addSignature' }]
-    },
-    {
-      name: 'addSignature',
-      type: LINK,
-      label: messages.addAnotherSignature,
-      initialValue: false,
-      validate: []
-    },
     {
       name: 'certificate',
       type: PDF_DOCUMENT_VIEWER,
