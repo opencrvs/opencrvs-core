@@ -14,6 +14,7 @@ const Label = styled.label`
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
+  cursor: pointer;
 `
 
 const Check = styled.span`

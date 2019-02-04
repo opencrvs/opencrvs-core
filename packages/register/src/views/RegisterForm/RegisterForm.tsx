@@ -29,7 +29,7 @@ import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 import { draftToMutationTransformer } from '../../transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
-import { merge } from 'lodash'
+import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
@@ -747,7 +747,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
 function replaceInitialValues(fields: IFormField[], sectionValues: object) {
   return fields.map(field => ({
     ...field,
-    initialValue: sectionValues[field.name] || field.initialValue
+    initialValue:
+      isUndefined(sectionValues[field.name]) ||
+      isNull(sectionValues[field.name])
+        ? field.initialValue
+        : sectionValues[field.name]
   }))
 }
 
