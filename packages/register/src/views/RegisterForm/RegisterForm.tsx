@@ -27,7 +27,7 @@ import {
 import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
-import { draftToGqlTransformer } from '../../transformer'
+import { draftToGqlTransformer } from 'src/transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'

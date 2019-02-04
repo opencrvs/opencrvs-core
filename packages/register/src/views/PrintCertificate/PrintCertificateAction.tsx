@@ -48,7 +48,7 @@ import {
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { gqlToDraftTransformer, draftToGqlTransformer } from '../../transformer'
+import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
