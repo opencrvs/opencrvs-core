@@ -149,4 +149,93 @@ describe('Verify handlers', () => {
 
     expect(res.statusCode).toBe(500)
   })
+  it('sendBirthRegistrationConfirmation returns OK the sms gets sent', async () => {
+    const spy = fetch.once('')
+
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/birthRegistrationSMS',
+      payload: {
+        msisdn: '447789778823',
+        name: 'অনিক'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(200)
+  })
+  it('sendBirthRegistrationConfirmation returns 400 if called with no name', async () => {
+    const spy = fetch.once('')
+
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/birthRegistrationSMS',
+      payload: {
+        msisdn: '447789778823'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        language: 'en' // default is bn
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(400)
+  })
+  it('sendBirthRegistrationConfirmation returns 500 the sms is not sent', async () => {
+    const spy = jest
+      .spyOn(service, 'sendSMS')
+      .mockImplementationOnce(() => Promise.reject(new Error()))
+
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/birthRegistrationSMS',
+      payload: {
+        msisdn: '447789778823',
+        name: 'অনিক'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(500)
+  })
 })
