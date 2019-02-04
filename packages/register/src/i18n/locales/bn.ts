@@ -488,11 +488,11 @@ export const BENGALI_STATE: ILanguage = {
     'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
     'validations.numberRequired': 'Must be a number',
     'validations.validNationalId':
-      'জাতীয় পরিচয় পত্র শুধু মাত্র সংখ্যায় এবং এর দৈর্ঘ্য {validLength} সংখ্যা থেকে বেশি হতে পারবেনা',
+      'জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validBirthRegistrationNumber':
-      'জন্ম নিবন্ধন নম্বর শুধু মাত্র সংখ্য-অক্ষরের মিশ্রণ এবং এর দৈর্ঘ্য {validLength} অক্ষর থেকে বেশি হতে পারবেনা',
+      'জন্ম নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
-      'পাসপোর্ট নম্বর শুধু মাত্র সংখ্যা-অক্ষরের মিশ্রণ এবং এর দৈর্ঘ্য {validLength} অক্ষর থেকে বেশি হতে পারবেনা',
+      'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',
