@@ -175,7 +175,6 @@ describe('ReviewForm tests', async () => {
                 ],
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
-              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -309,8 +308,6 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
-              child: null,
-              mother: null,
               father: {
                 name: [
                   {
@@ -404,6 +401,7 @@ describe('ReviewForm tests', async () => {
 
     const data = testComponent.component
       .find(RegisterForm)
+
       .prop('draft') as IDraft
 
     expect(data.data.registration.registrationPhone).toBe('01711111111')
@@ -435,9 +433,6 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
-              child: null,
-              mother: null,
-              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -519,9 +514,6 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
-              child: null,
-              mother: null,
-              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -617,7 +609,6 @@ describe('ReviewForm tests', async () => {
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
-              child: null,
               mother: {
                 name: [
                   {
@@ -664,7 +655,6 @@ describe('ReviewForm tests', async () => {
                 ],
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
-              father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -828,9 +818,6 @@ describe('ReviewForm tests', async () => {
           result: {
             data: {
               fetchBirthRegistration: {
-                child: null,
-                mother: null,
-                father: null,
                 registration: {
                   contact: 'MOTHER',
                   attachments: null,
