@@ -4,6 +4,7 @@ import * as actions from './actions'
 export type NotificationState = {
   newContentAvailable: boolean
   backgroundSyncMessageVisible: boolean
+  configurationErrorVisible: boolean
   syncCount: number
   waitingSW: ServiceWorker | null
   sessionExpired: boolean
@@ -12,22 +13,19 @@ export type NotificationState = {
 export const initialState: NotificationState = {
   newContentAvailable: false,
   backgroundSyncMessageVisible: false,
+  configurationErrorVisible: false,
   syncCount: 0,
   waitingSW: null,
   sessionExpired: false
 }
 
-type Action =
-  | actions.ShowNewContentAvailableAction
-  | actions.HideNewContentAvailableAction
-  | actions.ShowBackgroundSyncedAction
-  | actions.HideBackgroundSyncedAction
-  | actions.SessionExpiredAction
-
-export const notificationReducer: LoopReducer<NotificationState, Action> = (
+export const notificationReducer: LoopReducer<
+  NotificationState,
+  actions.Action
+> = (
   state: NotificationState = initialState,
-  action: Action
-): NotificationState | Loop<NotificationState, Action> => {
+  action: actions.Action
+): NotificationState | Loop<NotificationState, actions.Action> => {
   switch (action.type) {
     case actions.SHOW_NEW_CONTENT_AVAILABLE:
       return {
@@ -56,6 +54,16 @@ export const notificationReducer: LoopReducer<NotificationState, Action> = (
       return {
         ...state,
         sessionExpired: true
+      }
+    case actions.SHOW_CONFIG_ERROR:
+      return {
+        ...state,
+        configurationErrorVisible: true
+      }
+    case actions.HIDE_CONFIG_ERROR:
+      return {
+        ...state,
+        configurationErrorVisible: false
       }
     default:
       return state
