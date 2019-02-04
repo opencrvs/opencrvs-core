@@ -96,7 +96,12 @@ describe('WorkQueue tests', async () => {
                         name: 'Kaliganj Union Sub Center',
                         alias: ['']
                       },
-                      type: 'REGISTERED'
+                      type: 'REGISTERED',
+                      comments: [
+                        {
+                          comment: ''
+                        }
+                      ]
                     }
                   ]
                 },
@@ -141,7 +146,12 @@ describe('WorkQueue tests', async () => {
                         name: 'Kaliganj Union Sub Center',
                         alias: ['']
                       },
-                      type: 'REGISTERED'
+                      type: 'REGISTERED',
+                      comments: [
+                        {
+                          comment: ''
+                        }
+                      ]
                     }
                   ]
                 },
@@ -200,6 +210,7 @@ describe('WorkQueue tests', async () => {
             practitionerRole: 'LOCAL_REGISTRAR'
           }
         ],
+        rejection_reason: '',
         location: 'Kaliganj Union Sub Center'
       },
       {
@@ -222,6 +233,7 @@ describe('WorkQueue tests', async () => {
             practitionerRole: 'LOCAL_REGISTRAR'
           }
         ],
+        rejection_reason: '',
         location: 'Kaliganj Union Sub Center'
       }
     ])
@@ -312,7 +324,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'DECLARED'
+                        type: 'DECLARED',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       }
                     ]
                   },
@@ -425,7 +442,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'REGISTERED'
+                        type: 'REGISTERED',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       }
                     ]
                   },
@@ -526,7 +548,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'REGISTERED'
+                        type: 'REGISTERED',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       },
                       {
                         timestamp: null,
@@ -550,7 +577,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'APPLICATION'
+                        type: 'APPLICATION',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       },
                       {
                         timestamp: null,
@@ -574,7 +606,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'COLLECTED'
+                        type: 'COLLECTED',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       },
                       {
                         timestamp: null,
@@ -598,7 +635,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'REJECTED'
+                        type: 'REJECTED',
+                        comments: [
+                          {
+                            comment: 'reason=duplicate,other&comment=lol'
+                          }
+                        ]
                       }
                     ]
                   },
@@ -643,7 +685,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'APPLICATION'
+                        type: 'APPLICATION',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       }
                     ]
                   },
@@ -688,7 +735,13 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'REJECTED'
+                        type: 'REJECTED',
+                        comments: [
+                          {
+                            comment:
+                              'reason=misspelling,missing_supporting_doc&comment=lol'
+                          }
+                        ]
                       }
                     ]
                   },
@@ -733,7 +786,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'COLLECTED'
+                        type: 'COLLECTED',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       }
                     ]
                   },
@@ -840,7 +898,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'DECLARED'
+                        type: 'DECLARED',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       }
                     ]
                   },
@@ -939,7 +1002,12 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'DECLARED'
+                        type: 'DECLARED',
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
                       }
                     ]
                   },
