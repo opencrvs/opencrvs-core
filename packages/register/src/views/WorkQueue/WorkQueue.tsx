@@ -58,39 +58,46 @@ import { createNamesMap } from 'src/utils/data-formating'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const FETCH_REGISTRATION_QUERY = gql`
-  query list($locationIds: [String]) {
-    listBirthRegistrations(locationIds: $locationIds) {
-      id
-      registration {
-        trackingId
-        registrationNumber
-        status {
-          user {
-            name {
-              use
-              firstNames
-              familyName
+  query list($locationIds: [String], $count: Int, $skip: Int) {
+    listBirthRegistrations(
+      locationIds: $locationIds
+      count: $count
+      skip: $skip
+    ) {
+      totalItems
+      results {
+        id
+        registration {
+          trackingId
+          registrationNumber
+          status {
+            user {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              role
             }
-            role
+            location {
+              name
+              alias
+            }
+            type
+            timestamp
           }
-          location {
-            name
-            alias
+          duplicates
+        }
+        child {
+          name {
+            use
+            firstNames
+            familyName
           }
-          type
-          timestamp
+          birthDate
         }
-        duplicates
+        createdAt
       }
-      child {
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-      }
-      createdAt
     }
   }
 `
@@ -541,6 +548,7 @@ type IWorkQueueProps = InjectedIntlProps &
 interface IWorkQueueState {
   printCertificateModalVisible: boolean
   regId: string | null
+  currentPage: number
 }
 
 interface IData {
@@ -555,7 +563,8 @@ export class WorkQueueView extends React.Component<
   IWorkQueueProps,
   IWorkQueueState
 > {
-  state = { printCertificateModalVisible: false, regId: null }
+  state = { printCertificateModalVisible: false, regId: null, currentPage: 1 }
+  pageSize = 10
 
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
@@ -643,69 +652,72 @@ export class WorkQueueView extends React.Component<
   }
 
   transformData = (data: GQLQuery) => {
-    if (!data.listBirthRegistrations) {
+    if (!data.listBirthRegistrations || !data.listBirthRegistrations.results) {
       return []
     }
 
-    return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
-      const childNames = (reg.child && (reg.child.name as GQLHumanName[])) || []
-      const lang = 'bn'
-      return {
-        id: reg.id,
-        name:
-          (createNamesMap(childNames)[lang] as string) ||
-          /* tslint:disable:no-string-literal */
-          (createNamesMap(childNames)['default'] as string) ||
-          /* tslint:enable:no-string-literal */
-          '',
-        dob: (reg.child && reg.child.birthDate) || '',
-        date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
-        registrationNumber:
-          (reg.registration && reg.registration.registrationNumber) || '',
-        tracking_id: (reg.registration && reg.registration.trackingId) || '',
-        createdAt: reg.createdAt as string,
-        status:
-          reg.registration &&
-          reg.registration.status &&
-          reg.registration.status.map(status => {
-            return {
-              type: status && status.type,
-              practitionerName:
-                (status &&
-                  status.user &&
-                  (createNamesMap(status.user.name as GQLHumanName[])[
-                    this.props.language
-                  ] as string)) ||
-                (status &&
-                  status.user &&
-                  /* tslint:disable:no-string-literal */
-                  (createNamesMap(status.user.name as GQLHumanName[])[
-                    'default'
-                  ] as string)) ||
-                /* tslint:enable:no-string-literal */
-                '',
-              timestamp:
-                status && moment(status.timestamp).format('YYYY-MM-DD'),
-              practitionerRole: status && status.user && status.user.role,
-              location: status && status.location && status.location.name
-            }
-          }),
-        declaration_status:
-          reg.registration &&
-          reg.registration.status &&
-          (reg.registration.status[0] as GQLRegWorkflow).type,
-        event: 'birth',
-
-        duplicates: reg.registration && reg.registration.duplicates,
-        location:
-          (reg.registration &&
+    return data.listBirthRegistrations.results.map(
+      (reg: GQLBirthRegistration) => {
+        const childNames =
+          (reg.child && (reg.child.name as GQLHumanName[])) || []
+        const lang = 'bn'
+        return {
+          id: reg.id,
+          name:
+            (createNamesMap(childNames)[lang] as string) ||
+            /* tslint:disable:no-string-literal */
+            (createNamesMap(childNames)['default'] as string) ||
+            /* tslint:enable:no-string-literal */
+            '',
+          dob: (reg.child && reg.child.birthDate) || '',
+          date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
+          registrationNumber:
+            (reg.registration && reg.registration.registrationNumber) || '',
+          tracking_id: (reg.registration && reg.registration.trackingId) || '',
+          createdAt: reg.createdAt as string,
+          status:
+            reg.registration &&
             reg.registration.status &&
-            (reg.registration.status[0] as GQLRegWorkflow).location &&
-            ((reg.registration.status[0] as GQLRegWorkflow)
-              .location as GQLLocation).name) ||
-          ''
+            reg.registration.status.map(status => {
+              return {
+                type: status && status.type,
+                practitionerName:
+                  (status &&
+                    status.user &&
+                    (createNamesMap(status.user.name as GQLHumanName[])[
+                      this.props.language
+                    ] as string)) ||
+                  (status &&
+                    status.user &&
+                    /* tslint:disable:no-string-literal */
+                    (createNamesMap(status.user.name as GQLHumanName[])[
+                      'default'
+                    ] as string)) ||
+                  /* tslint:enable:no-string-literal */
+                  '',
+                timestamp:
+                  status && moment(status.timestamp).format('YYYY-MM-DD'),
+                practitionerRole: status && status.user && status.user.role,
+                location: status && status.location && status.location.name
+              }
+            }),
+          declaration_status:
+            reg.registration &&
+            reg.registration.status &&
+            (reg.registration.status[0] as GQLRegWorkflow).type,
+          event: 'birth',
+
+          duplicates: reg.registration && reg.registration.duplicates,
+          location:
+            (reg.registration &&
+              reg.registration.status &&
+              (reg.registration.status[0] as GQLRegWorkflow).location &&
+              ((reg.registration.status[0] as GQLRegWorkflow)
+                .location as GQLLocation).name) ||
+            ''
+        }
       }
-    })
+    )
   }
 
   getApplicationData = (
@@ -988,6 +1000,10 @@ export class WorkQueueView extends React.Component<
     }
   }
 
+  onPageChange = async (newPageNumber: number) => {
+    this.setState({ currentPage: newPageNumber })
+  }
+
   render() {
     const { intl, theme, printForm } = this.props
     const sortBy = {
@@ -1052,15 +1068,15 @@ export class WorkQueueView extends React.Component<
                 label: intl.formatMessage(messages.filtersAllStatuses)
               },
               {
-                value: 'application',
+                value: 'DECLARED',
                 label: intl.formatMessage(messages.filtersApplication)
               },
               {
-                value: 'registered',
+                value: 'REGISTERED',
                 label: intl.formatMessage(messages.filtersRegistered)
               },
               {
-                value: 'collected',
+                value: 'CERTIFIED',
                 label: intl.formatMessage(messages.filtersCollected)
               }
             ],
@@ -1099,7 +1115,9 @@ export class WorkQueueView extends React.Component<
             <Query
               query={FETCH_REGISTRATION_QUERY}
               variables={{
-                locationIds: [this.getLocalLocationId()]
+                locationIds: [this.getLocalLocationId()],
+                count: this.pageSize,
+                skip: (this.state.currentPage - 1) * this.pageSize
               }}
             >
               {({ loading, error, data }) => {
@@ -1153,6 +1171,14 @@ export class WorkQueueView extends React.Component<
                       noResultText={intl.formatMessage(
                         messages.dataTableNoResults
                       )}
+                      onPageChange={(currentPage: number) => {
+                        this.onPageChange(currentPage)
+                      }}
+                      pageSize={this.pageSize}
+                      totalPages={Math.ceil(
+                        data.listBirthRegistrations.totalItems / this.pageSize
+                      )}
+                      initialPage={this.state.currentPage}
                     />
                   </>
                 )
