@@ -632,6 +632,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <FormAction>
                       {
                         <DraftButtonContainer
+                          id="save_as_draft"
                           onClick={() => this.onSaveAsDraftClicked()}
                         >
                           <DraftSimple />
