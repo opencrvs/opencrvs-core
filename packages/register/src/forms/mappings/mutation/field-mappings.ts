@@ -1,4 +1,4 @@
-import { IFormField, IFormData, IFormFieldValue, IAttachment } from '.'
+import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
 
 export const nameTransformer = (
   language: string,
@@ -40,49 +40,21 @@ export function fieldToArrayTransformer(
   return transformedData
 }
 
-export function identifierTransformer(
+export const fieldToIdentifierTransformer = (identifierField: string) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
-) {
+) => {
   const sectionData = transformedData[sectionId]
   if (!sectionData.identifier) {
     sectionData.identifier = [{}]
   }
-  sectionData.identifier[0].id = draftData[sectionId][field.name]
+  sectionData.identifier[0][identifierField] = draftData[sectionId][field.name]
   return transformedData
 }
 
-export function identifierTypeTransformer(
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = [{}]
-  }
-  sectionData.identifier[0].type = draftData[sectionId][field.name]
-  return transformedData
-}
-
-export function identifierOtherTypeTransformer(
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = [{}]
-  }
-  sectionData.identifier[0].otherType = draftData[sectionId][field.name]
-  return transformedData
-}
-
-export const addressTransformer = (
+export const fieldToAddressTransformer = (
   addressType: string,
   lineNumber: number = 0,
   transformedFieldName?: string
@@ -115,50 +87,6 @@ export const addressTransformer = (
   return transformedData
 }
 
-export const vitalEventAddressTransformer = (
-  eventType: string,
-  lineNumber: number = 0,
-  transformedFieldName?: string
-) => (
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (eventType !== 'BIRTH') {
-    throw new Error(
-      `Vital event: ${eventType} not supported in vitalEventAddressTransformer.`
-    )
-  }
-  if (!transformedData.placeOfBirth) {
-    transformedData.placeOfBirth = {
-      type: draftData[sectionId].placeOfBirth
-        ? draftData[sectionId].placeOfBirth
-        : '',
-      partOf: draftData[sectionId].addressLine4
-        ? draftData[sectionId].addressLine4
-        : '',
-      address: {
-        type: `BIRTH_PLACE`,
-        country: '',
-        state: '',
-        district: '',
-        postalCode: '',
-        line: ['', '', '', '', '', '']
-      }
-    }
-  }
-  if (lineNumber > 0) {
-    transformedData.placeOfBirth.address.line[lineNumber - 1] =
-      draftData[sectionId][field.name]
-  } else {
-    transformedData.placeOfBirth.address[
-      !transformedFieldName ? field.name : transformedFieldName
-    ] = draftData[sectionId][field.name]
-  }
-  return transformedData
-}
-
 export const fieldNameTransformer = (transformedFieldName: string) => (
   transformedData: any,
   draftData: IFormData,
@@ -169,6 +97,24 @@ export const fieldNameTransformer = (transformedFieldName: string) => (
     draftData[sectionId][field.name]
   return transformedData
 }
+
+export const fieldValueSectionExchangeTransformer = (
+  toSectionId: string,
+  toSectionField?: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (!transformedData[toSectionId]) {
+    transformedData[toSectionId] = {}
+  }
+  transformedData[toSectionId][toSectionField ? toSectionField : field.name] =
+    draftData[sectionId][field.name]
+  return transformedData
+}
+
 export const sectionFieldToBundleFieldTransformer = (
   transformedFieldName?: string
 ) => (
@@ -245,7 +191,7 @@ export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
   return transformedData
 }
 
-export function commentTransformer(
+export function fieldToCommentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
@@ -265,7 +211,7 @@ export function commentTransformer(
   return transformedData
 }
 
-export function attachmentTransformer(
+export function fieldToAttachmentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,

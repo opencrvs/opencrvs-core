@@ -28,7 +28,8 @@ import {
   GQLRegWorkflow,
   GQLLocation,
   GQLHumanName,
-  GQLQuery
+  GQLQuery,
+  GQLComment
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   StatusGray,
@@ -56,6 +57,7 @@ import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { createNamesMap } from 'src/utils/data-formating'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { messages as rejectionMessages } from 'src/review/reject-registration'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String]) {
@@ -79,6 +81,9 @@ export const FETCH_REGISTRATION_QUERY = gql`
           }
           type
           timestamp
+          comments {
+            comment
+          }
         }
         duplicates
       }
@@ -236,6 +241,11 @@ const messages = defineMessages({
     id: 'register.workQueue.labels.results.duplicate',
     defaultMessage: 'Possible duplicate found',
     description: 'Label for duplicate indication in work queue'
+  },
+  listItemRejectionReasonLabel: {
+    id: 'register.workQueue.labels.results.rejectionReason',
+    defaultMessage: 'Reason',
+    description: 'Label for rejection reason'
   },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
@@ -479,6 +489,21 @@ function formatRoleCode(str: string) {
   return formattedString.join(' ')
 }
 
+function getRejectionReasonDisplayValue(reason: string) {
+  switch (reason) {
+    case 'duplicate':
+      return rejectionMessages.rejectionReasonDuplicate
+    case 'misspelling':
+      return rejectionMessages.rejectionReasonMisspelling
+    case 'missing_supporting_doc':
+      return rejectionMessages.rejectionReasonMissingSupportingDoc
+    case 'other':
+      return rejectionMessages.rejectionReasonOther
+    default:
+      return rejectionMessages.rejectionReasonOther
+  }
+}
+
 const ExpansionContainer = styled.div`
   flex: 1;
   display: flex;
@@ -650,6 +675,10 @@ export class WorkQueueView extends React.Component<
     return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
       const childNames = (reg.child && (reg.child.name as GQLHumanName[])) || []
       const lang = 'bn'
+      const type =
+        reg.registration &&
+        reg.registration.status &&
+        (reg.registration.status[0] as GQLRegWorkflow).type
       return {
         id: reg.id,
         name:
@@ -695,7 +724,18 @@ export class WorkQueueView extends React.Component<
           reg.registration.status &&
           (reg.registration.status[0] as GQLRegWorkflow).type,
         event: 'birth',
-
+        rejection_reason:
+          (type === 'REJECTED' &&
+            (reg.registration &&
+              reg.registration.status &&
+              (reg.registration.status[0] as GQLRegWorkflow).comments &&
+              ((reg.registration.status[0] as GQLRegWorkflow)
+                .comments as GQLComment[]) &&
+              ([
+                ...((reg.registration.status[0] as GQLRegWorkflow)
+                  .comments as GQLComment[])
+              ].pop() as GQLComment).comment)) ||
+          '',
         duplicates: reg.registration && reg.registration.duplicates,
         location:
           (reg.registration &&
@@ -816,6 +856,31 @@ export class WorkQueueView extends React.Component<
       icon: this.getDeclarationStatusIcon(item.declaration_status),
       label: this.getDeclarationStatusLabel(item.declaration_status)
     })
+
+    if (applicationIsRejected && item.rejection_reason) {
+      const parsedComment = item.rejection_reason.split('&')[0]
+      const parsedReason = parsedComment && parsedComment.split('=')[1]
+      const reasons = parsedReason && parsedReason.split(',')
+
+      info.push({
+        label: this.props.intl.formatMessage(
+          messages.listItemRejectionReasonLabel
+        ),
+        value:
+          reasons &&
+          reasons
+            .reduce(
+              (prev, curr) => [
+                ...prev,
+                this.props.intl.formatMessage(
+                  getRejectionReasonDisplayValue(curr)
+                )
+              ],
+              []
+            )
+            .join(', ')
+      })
+    }
 
     if (item.duplicates && item.duplicates.length > 0) {
       icons.push(<Duplicate />)
