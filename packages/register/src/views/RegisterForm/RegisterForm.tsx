@@ -15,7 +15,14 @@ import {
   goToTab as goToTabAction,
   goBack as goBackAction
 } from '../../navigation'
-import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
+import {
+  IForm,
+  IFormSection,
+  IFormField,
+  IFormSectionData,
+  Event,
+  Action
+} from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from 'src/store'
 import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
@@ -41,6 +48,7 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
+import { DataProvider } from '../DataProvider/DataProvider'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -272,11 +280,6 @@ type State = {
   selectedTabId: string
 }
 
-const postMutation = gql`
-  mutation submitBirthRegistration($details: BirthRegistrationInput!) {
-    createBirthRegistration(details: $details)
-  }
-`
 const patchMutation = gql`
   mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput) {
     markBirthAsRegistered(id: $id, details: $details)
@@ -474,6 +477,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
+  getEvent() {
+    const eventType = this.props.draft.eventType || 'BIRTH'
+    switch (eventType.toLocaleLowerCase()) {
+      case 'birth':
+        return Event.BIRTH
+      case 'death':
+        return Event.DEATH
+      default:
+        return Event.BIRTH
+    }
+  }
+
   render() {
     const {
       goToTab,
@@ -648,46 +663,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation
-          mutation={postMutation}
-          variables={this.processSubmitData()}
-          onCompleted={data =>
-            this.successfulSubmission(data.createBirthRegistration)
-          }
-        >
-          {submitBirthRegistration => {
-            return (
-              <Modal
-                title="Are you ready to submit?"
-                actions={[
-                  <PrimaryButton
-                    key="submit"
-                    id="submit_confirm"
-                    onClick={() => submitBirthRegistration()}
-                  >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
-                  <PreviewButton
-                    id="preview-btn"
-                    key="preview"
-                    onClick={() => {
-                      this.toggleSubmitModalOpen()
-                      if (document.documentElement) {
-                        document.documentElement.scrollTop = 0
-                      }
-                    }}
-                  >
-                    {intl.formatMessage(messages.preview)}
-                  </PreviewButton>
-                ]}
-                show={this.state.showSubmitModal}
-                handleClose={this.toggleSubmitModalOpen}
-              >
-                {intl.formatMessage(messages.submitDescription)}
-              </Modal>
-            )
-          }}
-        </Mutation>
+
+        <DataProvider
+          event={this.getEvent()}
+          action={Action.SUBMIT_FOR_REVIEW}
+          scope={this.props.scope}
+          form={registerForm}
+          draft={draft}
+          showModal={this.state.showSubmitModal}
+          toggleModal={this.toggleSubmitModalOpen}
+          onCompleted={this.successfulSubmission}
+        />
 
         <Mutation
           mutation={patchMutation}

@@ -40,6 +40,14 @@ export enum Event {
   DEATH = 'death'
 }
 
+export enum Action {
+  SUBMIT_FOR_REVIEW = 'submit for review',
+  REGISTER_APPLICATION = 'register',
+  COLLECT_CERTIFICATE = 'collect certificate',
+  REJECT_APPLICATION = 'reject',
+  LOAD_APPLICATION = 'load application data'
+}
+
 export interface ISelectOption {
   value: SelectComponentOption['value']
   label: FormattedMessage.MessageDescriptor
