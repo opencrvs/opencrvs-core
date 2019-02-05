@@ -48,7 +48,7 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
-import { DataProvider } from '../DataProvider/DataProvider'
+import { MutationProviderView } from '../DataProvider/DataProvider'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -664,10 +664,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
           </FooterAction>
         </ViewFooter>
 
-        <DataProvider
+        <MutationProviderView
           event={this.getEvent()}
           action={Action.SUBMIT_FOR_REVIEW}
-          scope={this.props.scope}
           form={registerForm}
           draft={draft}
           showModal={this.state.showSubmitModal}
