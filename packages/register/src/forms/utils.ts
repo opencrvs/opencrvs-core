@@ -334,6 +334,6 @@ export const conditionals: IConditionals = {
   },
   isMarried: {
     action: 'hide',
-    expression: '!values.maritalStatus || values.maritalStatus === "SINGLE"'
+    expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
   }
 }
