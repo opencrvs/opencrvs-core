@@ -14,7 +14,7 @@ jobs:
         - yarn dev:secrets:gen
         - yarn compose -d
         - sleep 10
-        - yarn start:prod &
+        - travis_wait 30 yarn start:prod &
         - wait-on http://localhost:3000 http://localhost:3020
         - cd packages/resources && yarn save:testData && cd ../..
         - cd packages/user-mgnt && yarn populate && cd ../..
