@@ -27,7 +27,7 @@ import {
 import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
-import { draftToMutationTransformer } from '../../transformer'
+import { draftToGqlTransformer } from 'src/transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
@@ -438,7 +438,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     if (!showRegisterModal && !showSubmitModal) {
       return
     }
-    const data = draftToMutationTransformer(registerForm, draft.data)
+    const data = draftToGqlTransformer(registerForm, draft.data)
     if (!draft.review) {
       return { details: data }
     } else {
