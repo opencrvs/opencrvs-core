@@ -14,6 +14,7 @@ const Label = styled.label`
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
+  cursor: pointer;
 `
 
 const Check = styled.span`
@@ -32,10 +33,10 @@ const Check = styled.span`
     content: '';
     background: ${({ theme }) => theme.colors.white};
     border-radius: 50%;
-    height: 8px;
-    width: 8px;
-    top: -7px;
-    left: 7px;
+    height: 14px;
+    width: 14px;
+    top: -14px;
+    left: 4px;
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
   }
@@ -46,10 +47,10 @@ const Check = styled.span`
     content: '';
     background: ${({ theme }) => theme.colors.white};
     border-radius: 50%;
-    height: 14px;
-    width: 14px;
-    top: 4px;
-    left: 4px;
+    height: 18px;
+    width: 18px;
+    top: 2px;
+    left: 2px;
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
   }
@@ -98,7 +99,7 @@ export class Radio extends React.Component<IRadio> {
           onChange={this.onChange}
         />
         <Check />
-        <Label>{label}</Label>
+        <Label htmlFor={id}>{label}</Label>
       </Wrapper>
     )
   }
