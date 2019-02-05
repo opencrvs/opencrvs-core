@@ -136,18 +136,18 @@ export async function fhirWorkflowEventHandler(
 
   switch (event) {
     case Events.BIRTH_NEW_DEC:
-      response = await createRegistrationHandler(request, h)
+      response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
       break
     case Events.DEATH_NEW_DEC:
-      response = await createRegistrationHandler(request, h)
+      response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.DEATH_NEW_DEC, request)
       break
     case Events.BIRTH_MARK_REG:
-      response = await markEventAsRegisteredHandler(request, h)
+      response = await markEventAsRegisteredHandler(request, h, event)
       break
     case Events.DEATH_MARK_REG:
-      response = await markEventAsRegisteredHandler(request, h)
+      response = await markEventAsRegisteredHandler(request, h, event)
       break
     case Events.BIRTH_MARK_CERT || Events.DEATH_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)

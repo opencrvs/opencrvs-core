@@ -4,6 +4,7 @@ import fetch from 'node-fetch'
 import { logger } from 'src/logger'
 import { getInformantName, getTrackingId } from './fhir/fhir-utils'
 import { EVENT_TYPE } from './fhir/constants'
+import { Events } from '../events/handler'
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -25,18 +26,43 @@ export function convertStringToASCII(str: string): string {
 
 export async function sendEventNotification(
   fhirBundle: fhir.Bundle,
+  event: Events,
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
-  const eventType = getEventType(fhirBundle)
-  if (eventType === EVENT_TYPE.BIRTH) {
-    sendNotification(fhirBundle, msisdn, 'birthDeclarationSMS', authHeader)
-  } else {
-    sendNotification(fhirBundle, msisdn, 'deathDeclarationSMS', authHeader)
+  switch (event) {
+    case Events.BIRTH_NEW_DEC:
+      sendDeclarationNotification(
+        fhirBundle,
+        msisdn,
+        'birthDeclarationSMS',
+        authHeader
+      )
+    case Events.BIRTH_MARK_REG:
+      sendRegistrationNotification(
+        fhirBundle,
+        msisdn,
+        'birthRegistrationSMS',
+        authHeader
+      )
+    case Events.DEATH_NEW_DEC:
+      sendDeclarationNotification(
+        fhirBundle,
+        msisdn,
+        'deathDeclarationSMS',
+        authHeader
+      )
+    case Events.DEATH_MARK_REG:
+      sendRegistrationNotification(
+        fhirBundle,
+        msisdn,
+        'deathRegistrationSMS',
+        authHeader
+      )
   }
 }
 
-async function sendNotification(
+async function sendDeclarationNotification(
   fhirBundle: fhir.Bundle,
   msisdn: string,
   smsType: string,
@@ -47,6 +73,29 @@ async function sendNotification(
       method: 'POST',
       body: JSON.stringify({
         trackingid: getTrackingId(fhirBundle),
+        msisdn,
+        name: getInformantName(fhirBundle)
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    })
+  } catch (err) {
+    logger.error(`Unable to send notification for error : ${err}`)
+  }
+}
+
+async function sendRegistrationNotification(
+  fhirBundle: fhir.Bundle,
+  msisdn: string,
+  smsType: string,
+  authHeader: { Authorization: string }
+) {
+  try {
+    await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
+      method: 'POST',
+      body: JSON.stringify({
         msisdn,
         name: getInformantName(fhirBundle)
       }),

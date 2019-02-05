@@ -11,6 +11,7 @@ import { getToken, hasScope } from 'src/utils/authUtils'
 import { sendEventNotification } from './utils'
 import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
+import { Events } from 'src/features/events/handler'
 
 async function sendBundleToHearth(
   payload: fhir.Bundle,
@@ -39,7 +40,8 @@ async function sendBundleToHearth(
 
 export async function createRegistrationHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
     let payload = await modifyRegistrationBundle(
@@ -57,31 +59,43 @@ export async function createRegistrationHandler(
     const msisdn = getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      sendEventNotification(payload, msisdn, {
+      sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
     }
 
     return resBundle
   } catch (error) {
-    logger.error(`Workflow/createBirthRegistrationHandler: error: ${error}`)
+    logger.error(
+      `Workflow/createRegistrationHandler[${event}]: error: ${error}`
+    )
     throw new Error(error)
   }
 }
 
 export async function markEventAsRegisteredHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
     const payload = await markBundleAsRegistered(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
-    // TODO: need to send notification here
-    return await postToHearth(payload)
+    const resBundle = await postToHearth(payload)
+
+    const msisdn = getSharedContactMsisdn(payload)
+    /* sending notification to the contact */
+    if (msisdn) {
+      sendEventNotification(payload, event, msisdn, {
+        Authorization: request.headers.authorization
+      })
+    }
+
+    return resBundle
   } catch (error) {
-    logger.error(`Workflow/markBirthAsRegisteredHandler: error: ${error}`)
+    logger.error(`Workflow/markAsRegisteredHandler[${event}]: error: ${error}`)
     throw new Error(error)
   }
 }
