@@ -61,103 +61,108 @@ describe('WorkQueue tests', async () => {
         request: {
           query: FETCH_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['123456789'],
+            skip: 0,
+            count: 10
           }
         },
         result: {
           data: {
-            listBirthRegistrations: [
-              {
-                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                registration: {
-                  registrationNumber: null,
-                  trackingId: 'B111111',
-                  duplicates: null,
-                  status: [
-                    {
-                      timestamp: '2018-12-07T13:11:49.380Z',
-                      user: {
-                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                        name: [
-                          {
-                            use: 'en',
-                            firstNames: 'Mohammad',
-                            familyName: 'Ashraful'
-                          },
-                          {
-                            use: 'bn',
-                            firstNames: '',
-                            familyName: ''
-                          }
-                        ],
-                        role: 'LOCAL_REGISTRAR'
-                      },
-                      location: {
-                        name: 'Kaliganj Union Sub Center',
-                        alias: ['']
-                      },
-                      type: 'REGISTERED'
-                    }
-                  ]
+            listBirthRegistrations: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    registrationNumber: null,
+                    trackingId: 'B111111',
+                    duplicates: null,
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: null
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
                 },
-                child: {
-                  name: [
-                    {
-                      use: 'bn',
-                      firstNames: '',
-                      familyName: 'অনিক'
-                    }
-                  ],
-                  birthDate: null
-                },
-                createdAt: '2018-05-23T14:44:58+02:00'
-              },
-              {
-                id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-                registration: {
-                  registrationNumber: null,
-                  trackingId: 'B222222',
-                  duplicates: null,
-                  status: [
-                    {
-                      timestamp: '2018-12-07T13:11:49.380Z',
-                      user: {
-                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                        name: [
-                          {
-                            use: 'en',
-                            firstNames: 'Mohammad',
-                            familyName: 'Ashraful'
-                          },
-                          {
-                            use: 'bn',
-                            firstNames: '',
-                            familyName: ''
-                          }
-                        ],
-                        role: 'LOCAL_REGISTRAR'
-                      },
-                      location: {
-                        name: 'Kaliganj Union Sub Center',
-                        alias: ['']
-                      },
-                      type: 'REGISTERED'
-                    }
-                  ]
-                },
-                child: {
-                  name: [
-                    {
-                      use: 'bn',
-                      firstNames: '',
-                      familyName: 'মাসুম'
-                    }
-                  ],
-                  birthDate: null
-                },
-                createdAt: '2018-05-23T14:44:58+02:00'
-              }
-            ]
+                {
+                  id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
+                  registration: {
+                    registrationNumber: null,
+                    trackingId: 'B222222',
+                    duplicates: null,
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'মাসুম'
+                      }
+                    ],
+                    birthDate: null
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
           }
         }
       }
@@ -235,7 +240,9 @@ describe('WorkQueue tests', async () => {
         request: {
           query: FETCH_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['123456789'],
+            skip: 0,
+            count: 10
           }
         },
         error: new Error('boom')
@@ -277,58 +284,63 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789']
+              locationIds: ['123456789'],
+              skip: 0,
+              count: 10
             }
           },
           result: {
             data: {
-              listBirthRegistrations: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B111111',
-                    duplicates: null,
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'DECLARED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
-                  },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                }
-              ]
+              listBirthRegistrations: {
+                totalItems: 1,
+                results: [
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B111111',
+                      duplicates: null,
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'DECLARED'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
+                  }
+                ]
+              }
             }
           }
         }
@@ -390,58 +402,63 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789']
+              locationIds: ['123456789'],
+              skip: 0,
+              count: 10
             }
           },
           result: {
             data: {
-              listBirthRegistrations: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B111111',
-                    duplicates: null,
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'REGISTERED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
-                  },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                }
-              ]
+              listBirthRegistrations: {
+                totalItems: 1,
+                results: [
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B111111',
+                      duplicates: null,
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'REGISTERED'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
+                  }
+                ]
+              }
             }
           }
         }
@@ -491,265 +508,270 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789']
+              locationIds: ['123456789'],
+              skip: 0,
+              count: 10
             }
           },
           result: {
             data: {
-              listBirthRegistrations: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B111111',
-                    duplicates: null,
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
+              listBirthRegistrations: {
+                totalItems: 4,
+                results: [
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B111111',
+                      duplicates: null,
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'REGISTERED'
                         },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'APPLICATION'
                         },
-                        type: 'REGISTERED'
-                      },
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'COLLECTED'
                         },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'APPLICATION'
-                      },
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'COLLECTED'
-                      },
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'REJECTED'
-                      }
-                    ]
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'REJECTED'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
                   },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be815',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B2222',
+                      duplicates: null,
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'APPLICATION'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
                   },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                },
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be815',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B2222',
-                    duplicates: null,
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'APPLICATION'
-                      }
-                    ]
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be816',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B33333',
+                      duplicates: null,
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'REJECTED'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
                   },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
-                  },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                },
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be816',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B33333',
-                    duplicates: null,
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'REJECTED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
-                  },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                },
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be817',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B444444',
-                    duplicates: null,
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'COLLECTED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
-                  },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                }
-              ]
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be817',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B444444',
+                      duplicates: null,
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'COLLECTED'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
+                  }
+                ]
+              }
             }
           }
         }
@@ -805,58 +827,63 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789']
+              locationIds: ['123456789'],
+              skip: 0,
+              count: 10
             }
           },
           result: {
             data: {
-              listBirthRegistrations: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B111111',
-                    duplicates: ['e302f7c5-ad87-4117-91c1-35eaf2ea7be8'],
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'DECLARED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
-                  },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                }
-              ]
+              listBirthRegistrations: {
+                totalItems: 1,
+                results: [
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B111111',
+                      duplicates: ['e302f7c5-ad87-4117-91c1-35eaf2ea7be8'],
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'DECLARED'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
+                  }
+                ]
+              }
             }
           }
         }
@@ -904,58 +931,63 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789']
+              locationIds: ['123456789'],
+              skip: 0,
+              count: 10
             }
           },
           result: {
             data: {
-              listBirthRegistrations: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  registration: {
-                    registrationNumber: null,
-                    trackingId: 'B111111',
-                    duplicates: null,
-                    status: [
-                      {
-                        timestamp: null,
-                        user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
-                        },
-                        type: 'DECLARED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: null,
-                        firstNames: 'Baby',
-                        familyName: 'Doe'
-                      }
-                    ],
-                    birthDate: null
-                  },
-                  createdAt: '2018-05-23T14:44:58+02:00'
-                }
-              ]
+              listBirthRegistrations: {
+                totalItems: 1,
+                results: [
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    registration: {
+                      registrationNumber: null,
+                      trackingId: 'B111111',
+                      duplicates: null,
+                      status: [
+                        {
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          type: 'DECLARED'
+                        }
+                      ]
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
+                  }
+                ]
+              }
             }
           }
         }
