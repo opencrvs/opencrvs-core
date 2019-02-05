@@ -11,3 +11,7 @@ function getKey<K extends keyof IOfflineDataState>(store: IStoreState, key: K) {
 export const getOfflineDataLoaded = (
   store: IStoreState
 ): IOfflineDataState['offlineDataLoaded'] => getKey(store, 'offlineDataLoaded')
+
+export const getOfflineLoadingError = (
+  store: IStoreState
+): IOfflineDataState['loadingError'] => getKey(store, 'loadingError')
