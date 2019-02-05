@@ -739,7 +739,7 @@ describe('WorkQueue tests', async () => {
                         comments: [
                           {
                             comment:
-                              'reason=misspelling,missing_supporting_doc&comment=lol'
+                              'reason=misspelling,missing_supporting_doc,duplicate,other&comment=lol'
                           }
                         ]
                       }
@@ -1002,7 +1002,7 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
-                        type: 'DECLARED',
+                        type: 'CERTIFIED',
                         comments: [
                           {
                             comment: ''
