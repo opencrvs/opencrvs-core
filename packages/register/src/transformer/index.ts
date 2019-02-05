@@ -1,7 +1,7 @@
 import { IForm, IFormData } from '../forms'
 import { getConditionalActionsForField } from '../forms/utils'
 
-export const draftToMutationTransformer = (
+export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData
 ) => {
@@ -13,7 +13,9 @@ export const draftToMutationTransformer = (
     if (!draftData[section.id]) {
       return
     }
-    transformedData[section.id] = {}
+    if (!transformedData[section.id]) {
+      transformedData[section.id] = {}
+    }
     section.fields.forEach(fieldDef => {
       const conditionalActions: string[] = getConditionalActionsForField(
         fieldDef,
@@ -36,19 +38,24 @@ export const draftToMutationTransformer = (
         draftData[section.id][fieldDef.name] !== '' &&
         !conditionalActions.includes('hide')
       ) {
-        if (!fieldDef.mapping) {
+        if (fieldDef.mapping && fieldDef.mapping.mutation) {
+          fieldDef.mapping.mutation(
+            transformedData,
+            draftData,
+            section.id,
+            fieldDef
+          )
+        } else {
           transformedData[section.id][fieldDef.name] =
             draftData[section.id][fieldDef.name]
-        } else {
-          fieldDef.mapping(transformedData, draftData, section.id, fieldDef)
         }
       }
     })
     if (draftData[section.id]._fhirID) {
       transformedData[section.id]._fhirID = draftData[section.id]._fhirID
     }
-    if (section.mapping) {
-      section.mapping(transformedData, draftData, section.id)
+    if (section.mapping && section.mapping.mutation) {
+      section.mapping.mutation(transformedData, draftData, section.id)
     }
     if (
       transformedData[section.id] &&
@@ -59,6 +66,50 @@ export const draftToMutationTransformer = (
   })
   if (draftData._fhirIDMap) {
     transformedData._fhirIDMap = draftData._fhirIDMap
+  }
+  return transformedData
+}
+
+export const gqlToDraftTransformer = (
+  formDefinition: IForm,
+  queryData: any
+) => {
+  if (!formDefinition.sections) {
+    throw new Error('Sections are missing in form definition')
+  }
+  if (!queryData) {
+    throw new Error('Provided query data is not valid')
+  }
+  const transformedData: IFormData = {}
+  formDefinition.sections.forEach(section => {
+    transformedData[section.id] = {}
+    section.fields.forEach(fieldDef => {
+      if (fieldDef.mapping && fieldDef.mapping.query) {
+        fieldDef.mapping.query(transformedData, queryData, section.id, fieldDef)
+      } else if (
+        queryData[section.id] &&
+        queryData[section.id][fieldDef.name] &&
+        queryData[section.id][fieldDef.name] !== ''
+      ) {
+        transformedData[section.id][fieldDef.name] =
+          queryData[section.id][fieldDef.name]
+      }
+    })
+    if (queryData[section.id] && queryData[section.id].id) {
+      transformedData[section.id]._fhirID = queryData[section.id].id
+    }
+    if (section.mapping && section.mapping.query) {
+      section.mapping.query(transformedData, queryData, section.id)
+    }
+    if (
+      transformedData[section.id] &&
+      Object.keys(transformedData[section.id]).length < 1
+    ) {
+      delete transformedData[section.id]
+    }
+  })
+  if (queryData._fhirIDMap) {
+    transformedData._fhirIDMap = queryData._fhirIDMap
   }
   return transformedData
 }
