@@ -177,6 +177,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
     },
     ...certificateDetails
   }
+  // TODO: Will replace in OCRVS-1183
   if (!data.placeOfBirth) {
     data.placeOfBirth = {
       bn: 'গাজীপুর হাসপাতাল',

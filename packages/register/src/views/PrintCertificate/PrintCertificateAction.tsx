@@ -52,6 +52,10 @@ import StoreTransformer, {
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { draftToMutationTransformer } from '../../transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
+import {
+  fatherDataDoesNotExist,
+  fatherDataExists
+} from 'src/forms/certificate/fieldDefinitions/collector-section'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -288,7 +292,6 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
             name
             alias
             address {
-              line
               district
               state
             }
@@ -389,6 +392,7 @@ const certifyMutation = gql`
     markBirthAsCertified(id: $id, details: $details)
   }
 `
+
 interface ICertDetail {
   [key: string]: any
 }
@@ -749,20 +753,14 @@ class PrintCertificateActionComponent extends React.Component<
       data.registration.status &&
       data.registration.status[0] &&
       data.registration.status[0].office &&
-      data.registration.status[0].office.address &&
-      data.registration.status[0].office.address.line &&
-      data.registration.status[0].office.address.line[1]
+      data.registration.status[0].office.address
     ) {
       regLocationLocationEn = [
         data.registration.status[0].office.name as string,
         data.registration.status[0].office.address.district as string,
         data.registration.status[0].office.address.state as string
       ].join(', ') as string
-      regLocationLocationBn = [
-        data.registration.status[0].office.alias as string,
-        data.registration.status[0].office.address.district as string,
-        data.registration.status[0].office.address.state as string
-      ].join(', ') as string
+      regLocationLocationBn = data.registration.status[0].office.alias as string
     }
 
     return {
@@ -881,6 +879,20 @@ class PrintCertificateActionComponent extends React.Component<
                   const transData: IReviewSectionDetails = StoreTransformer.transformData(
                     data.fetchBirthRegistration
                   )
+                  if (
+                    form.fields.filter(
+                      field => field.name === 'personCollectingCertificate'
+                    ).length === 0
+                  ) {
+                    if (
+                      transData.father &&
+                      transData.father.fathersDetailsExist
+                    ) {
+                      form.fields.unshift(fatherDataExists)
+                    } else {
+                      form.fields.unshift(fatherDataDoesNotExist)
+                    }
+                  }
                   const eventType =
                     transData.registration && transData.registration.type
                   const reviewDraft = createReviewDraft(

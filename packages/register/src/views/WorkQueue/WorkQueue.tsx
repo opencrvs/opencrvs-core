@@ -676,7 +676,6 @@ export class WorkQueueView extends React.Component<
           reg.registration &&
           reg.registration.status &&
           reg.registration.status.map(status => {
-            console.log(JSON.stringify(status))
             return {
               type: status && status.type,
               practitionerName:
