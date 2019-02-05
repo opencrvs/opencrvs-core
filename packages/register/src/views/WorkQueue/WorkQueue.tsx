@@ -69,10 +69,13 @@ export const FETCH_REGISTRATION_QUERY = gql`
       results {
         id
         registration {
+          id
           trackingId
           registrationNumber
           status {
+            id
             user {
+              id
               name {
                 use
                 firstNames
@@ -81,6 +84,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
               role
             }
             location {
+              id
               name
               alias
             }
@@ -93,6 +97,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
           duplicates
         }
         child {
+          id
           name {
             use
             firstNames
@@ -1167,7 +1172,6 @@ export class WorkQueueView extends React.Component<
               }}
             >
               {({ loading, error, data }) => {
-                console.log(loading, error, data)
                 if (loading) {
                   return (
                     <StyledSpinner

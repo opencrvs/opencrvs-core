@@ -53,6 +53,8 @@ import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from 'src/utils/userUtils'
+import { RouteComponentProps } from 'react-router'
+import { goToHome } from 'src/navigation'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -391,7 +393,7 @@ type State = {
 type IProps = {
   registrationId: string
   language: string
-  printCertificateFormSection: IFormSection
+  collectCertificateForm: IFormSection
   paymentFormSection: IFormSection
   IssuerDetails: Issuer
   certificatePreviewFormSection: IFormSection
@@ -400,6 +402,7 @@ type IProps = {
 }
 
 type IFullProps = InjectedIntlProps &
+  RouteComponentProps<{}> &
   IProps & { dispatch: Dispatch; drafts: IDraftsState }
 
 class PrintCertificateActionComponent extends React.Component<
@@ -444,13 +447,13 @@ class PrintCertificateActionComponent extends React.Component<
 
   getForm = (currentForm: string) => {
     const {
-      printCertificateFormSection,
+      collectCertificateForm,
       paymentFormSection,
       certificatePreviewFormSection
     } = this.props
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
-        return printCertificateFormSection
+        return collectCertificateForm
       case PAYMENT:
         return paymentFormSection
       case CERTIFICATE_PREVIEW:
@@ -767,7 +770,7 @@ class PrintCertificateActionComponent extends React.Component<
     const {
       intl,
       registrationId,
-      printCertificateFormSection,
+      collectCertificateForm,
       paymentFormSection,
       drafts: { drafts },
       dispatch
@@ -782,7 +785,7 @@ class PrintCertificateActionComponent extends React.Component<
           title={intl.formatMessage(form.title)}
           backLabel={intl.formatMessage(messages.back)}
           goBack={() => {
-            /* TODO */
+            dispatch(goToHome())
           }}
         >
           <HeaderContent>
@@ -798,7 +801,7 @@ class PrintCertificateActionComponent extends React.Component<
                 }
 
                 if (data) {
-                  let fields = printCertificateFormSection.fields
+                  let fields = collectCertificateForm.fields
                   fields = fields.map(field => {
                     if (
                       field &&
@@ -915,13 +918,25 @@ class PrintCertificateActionComponent extends React.Component<
 }
 
 const event = 'birth'
-export const PrintCertificateAction = connect((state: IStoreState) => ({
-  language: state.i18n.language,
-  paymentFormSection: state.printCertificateForm.paymentForm,
-  certificatePreviewFormSection:
-    state.printCertificateForm.certificatePreviewForm,
-  drafts: state.drafts,
-  registerForm: state.registerForm.registerForm[event],
-  printForm: state.printCertificateForm.collectCertificateFrom,
-  userDetails: getUserDetails(state)
-}))(injectIntl<IFullProps>(PrintCertificateActionComponent))
+
+function mapStatetoProps(
+  state: IStoreState,
+  props: RouteComponentProps<{ registrationId: string }>
+) {
+  const { match } = props
+
+  return {
+    registrationId: match.params.registrationId,
+    language: state.i18n.language,
+    paymentFormSection: state.printCertificateForm.paymentForm,
+    certificatePreviewFormSection:
+      state.printCertificateForm.certificatePreviewForm,
+    drafts: state.drafts,
+    registerForm: state.registerForm.registerForm[event],
+    collectCertificateForm: state.printCertificateForm.collectCertificateForm,
+    userDetails: getUserDetails(state)
+  }
+}
+export const PrintCertificateAction = connect(
+  (state: IStoreState) => mapStatetoProps
+)(injectIntl<IFullProps>(PrintCertificateActionComponent))
