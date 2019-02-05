@@ -54,7 +54,14 @@ export const initialState: IRegisterFormState = {
         deceasedSection,
         applicantsSection,
         eventSection,
-        causeOfDeathSection
+        causeOfDeathSection,
+        {
+          id: 'preview',
+          viewType: 'preview',
+          name: messages.previewTab,
+          title: messages.previewTitle,
+          fields: []
+        }
       ]
     }
   }

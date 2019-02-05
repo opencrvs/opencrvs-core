@@ -53,8 +53,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   ISelectOption,
   IDynamicOptions,
-  IFormSectionData,
-  Event
+  IFormSectionData
 } from 'src/forms'
 
 const messages = defineMessages({
@@ -265,7 +264,7 @@ const DraftButtonContainer = styled.div`
 `
 interface IProps {
   draft: IDraft
-  registerForm: IForm
+  registerForm: { [key: string]: IForm }
   tabRoute: string
   registerClickEvent?: () => void
   rejectApplicationClickEvent?: () => void
@@ -465,11 +464,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
 
+    const event = this.props.draft.event
+
     this.state = {
       displayEditDialog: false,
       allSectionVisited: false,
       editClickedSectionId: '',
-      sectionExpansionConfig: getSectionExpansionConfig(props.registerForm)
+      sectionExpansionConfig: getSectionExpansionConfig(
+        props.registerForm[event]
+      )
     }
   }
 
@@ -543,10 +546,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       deleteApplicationClickEvent,
       offlineResources,
       language,
-      tabRoute
+      tabRoute,
+      draft: { event }
     } = this.props
 
-    const formSections = getViewableSection(registerForm)
+    const formSections = getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
 
@@ -749,7 +753,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
 export const ReviewSection = connect(
   (state: IStoreState) => ({
-    registerForm: getRegisterForm(state)[Event.BIRTH],
+    registerForm: getRegisterForm(state),
     scope: getScope(state),
     offlineResources: getOfflineState(state),
     language: getLanguage(state)
