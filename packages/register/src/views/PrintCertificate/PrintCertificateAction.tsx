@@ -50,6 +50,9 @@ import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import { getUserDetails } from 'src/profile/profileSelectors'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { IUserDetails } from 'src/utils/userUtils'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -364,6 +367,11 @@ const messages = defineMessages({
   },
   certificateConfirmationTxt: {
     id: 'certificate.txt.confirmationTxt'
+  },
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
   }
 })
 
@@ -381,16 +389,14 @@ type State = {
 }
 
 type IProps = {
-  backLabel: string
-  title: string
   registrationId: string
   language: string
-  togglePrintCertificateSection: () => void
   printCertificateFormSection: IFormSection
   paymentFormSection: IFormSection
   IssuerDetails: Issuer
   certificatePreviewFormSection: IFormSection
   registerForm: IForm
+  userDetails: IUserDetails
 }
 
 type IFullProps = InjectedIntlProps &
@@ -731,12 +737,36 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
+  getIssuerDetails() {
+    const { intl, userDetails, language } = this.props
+    let fullName = ''
+
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    }
+
+    return {
+      name: fullName,
+      role:
+        userDetails && userDetails.role
+          ? intl.formatMessage(messages[userDetails.role])
+          : '',
+      issuedAt:
+        userDetails &&
+        userDetails.primaryOffice &&
+        userDetails.primaryOffice.name
+          ? userDetails.primaryOffice.name
+          : ''
+    }
+  }
+
   render = () => {
     const {
       intl,
-      backLabel,
       registrationId,
-      togglePrintCertificateSection,
       printCertificateFormSection,
       paymentFormSection,
       drafts: { drafts },
@@ -750,8 +780,10 @@ class PrintCertificateActionComponent extends React.Component<
       <ActionPageWrapper>
         <ActionPage
           title={intl.formatMessage(form.title)}
-          backLabel={backLabel}
-          goBack={togglePrintCertificateSection}
+          backLabel={intl.formatMessage(messages.back)}
+          goBack={() => {
+            /* TODO */
+          }}
         >
           <HeaderContent>
             <Query
@@ -889,5 +921,7 @@ export const PrintCertificateAction = connect((state: IStoreState) => ({
   certificatePreviewFormSection:
     state.printCertificateForm.certificatePreviewForm,
   drafts: state.drafts,
-  registerForm: state.registerForm.registerForm[event]
+  registerForm: state.registerForm.registerForm[event],
+  printForm: state.printCertificateForm.collectCertificateFrom,
+  userDetails: getUserDetails(state)
 }))(injectIntl<IFullProps>(PrintCertificateActionComponent))

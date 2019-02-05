@@ -46,13 +46,12 @@ import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   goToEvents as goToEventsAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
+  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToPrintCertificate as goToPrintCertificateAction
 } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
-import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
-import { IFormSection } from 'src/forms'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { createNamesMap } from 'src/utils/data-formating'
@@ -286,11 +285,6 @@ const messages = defineMessages({
     defaultMessage: 'Print',
     description: 'The title of print button in list item actions'
   },
-  certificateCollectionActionTitle: {
-    id: 'register.workQueue.title.certificateCollection',
-    defaultMessage: 'Certificate Collection',
-    description: 'The title of print certificate action'
-  },
   printCertificate: {
     id: 'register.workQueue.list.buttons.printCertificate',
     defaultMessage: 'Print certificate',
@@ -324,12 +318,6 @@ const messages = defineMessages({
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
   },
-  back: {
-    id: 'menu.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  },
-
   EditBtnText: {
     id: 'review.edit.modal.editButton',
     defaultMessage: 'Edit',
@@ -562,7 +550,7 @@ interface IBaseWorkQueueProps {
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
-  printForm: IFormSection
+  goToPrintCertificate: typeof goToPrintCertificateAction
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -667,13 +655,6 @@ export class WorkQueueView extends React.Component<
       default:
         return this.props.intl.formatMessage(messages.filtersBirth)
     }
-  }
-
-  togglePrintModal = (id?: string) => {
-    this.setState(prevState => ({
-      printCertificateModalVisible: !prevState.printCertificateModalVisible,
-      regId: id ? id : ''
-    }))
   }
 
   transformData = (data: GQLQuery) => {
@@ -905,13 +886,13 @@ export class WorkQueueView extends React.Component<
       if (applicationIsRegistered || applicationIsCertified) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.print),
-          handler: () => this.togglePrintModal(item.id)
+          handler: () => this.props.goToPrintCertificate(item.id)
         })
 
         expansionActions.push(
           <StyledPrimaryButton
             id={`printCertificate_${item.tracking_id}`}
-            onClick={() => this.togglePrintModal(item.id)}
+            onClick={() => this.props.goToPrintCertificate(item.id)}
           >
             {this.props.intl.formatMessage(messages.printCertificateBtnText)}
           </StyledPrimaryButton>
@@ -1070,7 +1051,7 @@ export class WorkQueueView extends React.Component<
   }
 
   render() {
-    const { intl, theme, printForm } = this.props
+    const { intl, theme } = this.props
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -1186,6 +1167,7 @@ export class WorkQueueView extends React.Component<
               }}
             >
               {({ loading, error, data }) => {
+                console.log(loading, error, data)
                 if (loading) {
                   return (
                     <StyledSpinner
@@ -1201,7 +1183,6 @@ export class WorkQueueView extends React.Component<
                     </ErrorText>
                   )
                 }
-                console.log('=======================', data)
                 const transformedData = this.transformData(data)
                 const applicationData = this.getApplicationData(transformedData)
                 return (
@@ -1242,7 +1223,9 @@ export class WorkQueueView extends React.Component<
                       }}
                       pageSize={this.pageSize}
                       totalPages={Math.ceil(
-                        data.listBirthRegistrations.totalItems / this.pageSize
+                        ((data.listBirthRegistrations &&
+                          data.listBirthRegistrations.totalItems) ||
+                          0) / this.pageSize
                       )}
                       initialPage={this.state.currentPage}
                     />
@@ -1252,18 +1235,6 @@ export class WorkQueueView extends React.Component<
             </Query>
           </HeaderContent>
         </Container>
-        {this.state.printCertificateModalVisible ? (
-          <PrintCertificateAction
-            title={this.props.intl.formatMessage(
-              messages.certificateCollectionActionTitle
-            )}
-            backLabel={this.props.intl.formatMessage(messages.back)}
-            registrationId={(this.state.regId && this.state.regId) || ''}
-            togglePrintCertificateSection={this.togglePrintModal}
-            printCertificateFormSection={printForm}
-            IssuerDetails={this.getIssuerDetails()}
-          />
-        ) : null}
       </>
     )
   }
@@ -1272,12 +1243,12 @@ export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: getUserDetails(state),
-    printForm: state.printCertificateForm.collectCertificateFrom
+    userDetails: getUserDetails(state)
   }),
   {
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
-    goToReviewDuplicate: goToReviewDuplicateAction
+    goToReviewDuplicate: goToReviewDuplicateAction,
+    goToPrintCertificate: goToPrintCertificateAction
   }
 )(injectIntl(withTheme(WorkQueueView)))
