@@ -77,6 +77,14 @@ export const FETCH_REGISTRATION_QUERY = gql`
             name
             alias
           }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
           type
           timestamp
         }
@@ -668,6 +676,7 @@ export class WorkQueueView extends React.Component<
           reg.registration &&
           reg.registration.status &&
           reg.registration.status.map(status => {
+            console.log(JSON.stringify(status))
             return {
               type: status && status.type,
               practitionerName:
@@ -687,7 +696,7 @@ export class WorkQueueView extends React.Component<
               timestamp:
                 status && moment(status.timestamp).format('YYYY-MM-DD'),
               practitionerRole: status && status.user && status.user.role,
-              location: status && status.location && status.location.name
+              officeName: status && status.office && status.office.name
             }
           }),
         declaration_status:
@@ -727,7 +736,7 @@ export class WorkQueueView extends React.Component<
     key: number
   ): JSX.Element[] => {
     return item.status.map(status => {
-      const { practitionerName, practitionerRole, location } = status
+      const { practitionerName, practitionerRole, officeName } = status
       return (
         <ExpansionContainer key={key}>
           {this.getDeclarationStatusIcon(status.type)}
@@ -749,7 +758,7 @@ export class WorkQueueView extends React.Component<
                 strings={[
                   practitionerName,
                   formatRoleCode(practitionerRole),
-                  location
+                  officeName
                 ]}
                 separator={<Separator />}
               />

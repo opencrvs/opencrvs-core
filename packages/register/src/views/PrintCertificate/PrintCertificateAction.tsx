@@ -279,7 +279,22 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
           comments {
             comment
           }
+
+          location {
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              line
+              district
+              state
+            }
+          }
         }
+
         trackingId
         registrationNumber
       }
@@ -374,6 +389,12 @@ const certifyMutation = gql`
     markBirthAsCertified(id: $id, details: $details)
   }
 `
+interface ICertDetail {
+  [key: string]: any
+}
+interface ICertDetails {
+  [key: string]: ICertDetail
+}
 
 type State = {
   currentForm: string
@@ -708,7 +729,7 @@ class PrintCertificateActionComponent extends React.Component<
     return registrant
   }
 
-  getCertificateDetails(data: IFormData): CertificateDetails {
+  getCertificateDetails(data: ICertDetails): CertificateDetails {
     const names = data.child.name as Array<{ [key: string]: {} }>
     const NameBn = names.find(name => name.use === 'bn')
     const NameEn = names.find(name => name.use === 'en')
@@ -720,8 +741,36 @@ class PrintCertificateActionComponent extends React.Component<
       CERTIFICATE_DATE_FORMAT
     )
 
+    let regLocationLocationEn = ''
+    let regLocationLocationBn = ''
+    if (
+      data &&
+      data.registration &&
+      data.registration.status &&
+      data.registration.status[0] &&
+      data.registration.status[0].office &&
+      data.registration.status[0].office.address &&
+      data.registration.status[0].office.address.line &&
+      data.registration.status[0].office.address.line[1]
+    ) {
+      regLocationLocationEn = [
+        data.registration.status[0].office.name as string,
+        data.registration.status[0].office.address.district as string,
+        data.registration.status[0].office.address.state as string
+      ].join(', ') as string
+      regLocationLocationBn = [
+        data.registration.status[0].office.alias as string,
+        data.registration.status[0].office.address.district as string,
+        data.registration.status[0].office.address.state as string
+      ].join(', ') as string
+    }
+
     return {
       registrationNo: data.registration.registrationNumber as string,
+      registrationLocation: {
+        en: regLocationLocationEn,
+        bn: regLocationLocationBn
+      },
       name: {
         bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
         en: NameEn ? NameEn.firstNames + ' ' + NameEn.familyName : ''
