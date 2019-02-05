@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled from 'styled-components'
 
 export interface IInvertSpinner {
   id: string
@@ -45,7 +45,7 @@ const StyledSpinner = styledSpinner`
     content: '';
   }
   &:after {
-    background: ${({ baseColor }) => (baseColor ? baseColor : '#FFFFFF')};
+    background: ${({ baseColor }) => (baseColor ? baseColor : '#4C68C1')};
     width: 80%;
     height: 80%;
     border-radius: 50%;
