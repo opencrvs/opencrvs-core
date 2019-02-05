@@ -509,6 +509,7 @@ export const ENGLISH_STATE: ILanguage = {
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
       'As you have connectivity, we have synced {syncCount} new birth applications.',
+    'register.notification.draftsSaved': 'Your draft has been saved',
     'register.savedRegistration.online.title': 'Application submitted',
     'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'Registration complete',
