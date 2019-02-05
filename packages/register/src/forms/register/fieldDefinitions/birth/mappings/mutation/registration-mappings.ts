@@ -1,6 +1,6 @@
 import { IFormField, IFormData } from 'src/forms'
 
-export const phoneNumberTransformer = (dependentFieldName: string) => (
+export const fieldToPhoneNumberTransformer = (dependentFieldName: string) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
@@ -22,7 +22,7 @@ export const phoneNumberTransformer = (dependentFieldName: string) => (
   return transformedData
 }
 
-export function registrationSectionTransformer(
+export function setRegistrationSectionTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string

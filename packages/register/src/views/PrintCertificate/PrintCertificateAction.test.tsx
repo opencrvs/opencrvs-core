@@ -86,7 +86,7 @@ describe('when user wants to print certificate', async () => {
                 dateOfMarriage: null,
                 educationalAttainment: null,
                 nationality: ['BGD'],
-                multipleBirth: null,
+                multipleBirth: 1,
                 identifier: [
                   {
                     id: '123',
@@ -100,7 +100,9 @@ describe('when user wants to print certificate', async () => {
                     line: [
                       '2015',
                       '',
+                      '',
                       '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                      '',
                       '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                     ],
                     district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
@@ -114,7 +116,9 @@ describe('when user wants to print certificate', async () => {
                     line: [
                       '2015',
                       '',
+                      '',
                       '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                      '',
                       '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                     ],
                     district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
@@ -517,7 +521,7 @@ describe('when user wants to print certificate', async () => {
                   dateOfMarriage: null,
                   educationalAttainment: null,
                   nationality: ['BGD'],
-                  multipleBirth: null,
+                  multipleBirth: 1,
                   identifier: [
                     {
                       id: '123',
@@ -531,7 +535,9 @@ describe('when user wants to print certificate', async () => {
                       line: [
                         '2015',
                         '',
+                        '',
                         '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                        '',
                         '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                       ],
                       district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
@@ -545,7 +551,9 @@ describe('when user wants to print certificate', async () => {
                       line: [
                         '2015',
                         '',
+                        '',
                         '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                        '',
                         '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                       ],
                       district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',

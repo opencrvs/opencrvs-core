@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { withFormik, Field, FormikProps, FieldProps } from 'formik'
+import { withFormik, FastField, Field, FormikProps, FieldProps } from 'formik'
 import { isEqual } from 'lodash'
 import {
   InjectedIntlProps,
@@ -428,25 +428,54 @@ class FormSectionComponent extends React.Component<Props> {
                 } as ITextFormField)
               : field
 
-          return (
-            <FormItem key={`${field.name}`}>
-              <Field name={field.name}>
-                {(formikFieldProps: FieldProps<any>) => (
-                  <GeneratedInputField
-                    fieldDefinition={internationaliseFieldObject(
-                      intl,
-                      withDynamicallyGeneratedFields
-                    )}
-                    onSetFieldValue={setFieldValue}
-                    resetDependentSelectValues={this.resetDependentSelectValues}
-                    {...formikFieldProps.field}
-                    touched={touched[field.name] || false}
-                    error={error}
-                  />
-                )}
-              </Field>
-            </FormItem>
-          )
+          if (
+            field.type === PDF_DOCUMENT_VIEWER ||
+            field.type === IMAGE_UPLOADER_WITH_OPTIONS
+          ) {
+            return (
+              <FormItem key={`${field.name}`}>
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => (
+                    <GeneratedInputField
+                      fieldDefinition={internationaliseFieldObject(
+                        intl,
+                        withDynamicallyGeneratedFields
+                      )}
+                      onSetFieldValue={setFieldValue}
+                      resetDependentSelectValues={
+                        this.resetDependentSelectValues
+                      }
+                      {...formikFieldProps.field}
+                      touched={touched[field.name] || false}
+                      error={error}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+            )
+          } else {
+            return (
+              <FormItem key={`${field.name}`}>
+                <FastField name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => (
+                    <GeneratedInputField
+                      fieldDefinition={internationaliseFieldObject(
+                        intl,
+                        withDynamicallyGeneratedFields
+                      )}
+                      onSetFieldValue={setFieldValue}
+                      resetDependentSelectValues={
+                        this.resetDependentSelectValues
+                      }
+                      {...formikFieldProps.field}
+                      touched={touched[field.name] || false}
+                      error={error}
+                    />
+                  )}
+                </FastField>
+              </FormItem>
+            )
+          }
         })}
       </section>
     )

@@ -14,7 +14,8 @@ import {
   IFormData,
   PDF_DOCUMENT_VIEWER,
   IFormField,
-  IForm
+  IForm,
+  Event
 } from 'src/forms'
 import {
   PrimaryButton,
@@ -45,12 +46,9 @@ import {
   IDraftsState
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
-import StoreTransformer, {
-  IReviewSectionDetails
-} from 'src/utils/transformData'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { draftToMutationTransformer } from '../../transformer'
-import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/documents-mappings'
+import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
+import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -467,7 +465,7 @@ class PrintCertificateActionComponent extends React.Component<
     }
     const result = {
       id: registrationId,
-      details: draftToMutationTransformer(registerForm, draft.data)
+      details: draftToGqlTransformer(registerForm, draft.data)
     }
     let individual = null
     if (data.personCollectingCertificate === documentForWhomFhirMapping.Other) {
@@ -822,15 +820,14 @@ class PrintCertificateActionComponent extends React.Component<
                     data.fetchBirthRegistration
                   )
 
-                  const transData: IReviewSectionDetails = StoreTransformer.transformData(
+                  const transData: IFormData = gqlToDraftTransformer(
+                    this.props.registerForm,
                     data.fetchBirthRegistration
                   )
-                  const eventType =
-                    transData.registration && transData.registration.type
                   const reviewDraft = createReviewDraft(
                     registrationId,
                     transData,
-                    eventType
+                    Event.BIRTH
                   )
                   const draftExist = !!drafts.find(
                     draft => draft.id === registrationId
