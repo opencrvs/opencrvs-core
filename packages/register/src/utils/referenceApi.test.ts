@@ -3,7 +3,7 @@ import * as fetch from 'jest-fetch-mock'
 
 import * as nock from 'nock'
 
-const mockFetchLocations = {
+export const mockFetchLocations = {
   data: [
     {
       id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
@@ -17,7 +17,7 @@ const mockFetchLocations = {
   ]
 }
 
-const mockFetchFacilites = {
+export const mockFetchFacilities = {
   data: [
     {
       id: '3fadd4e1-bcfd-470b-a997-07bc09631e2c',
@@ -36,7 +36,7 @@ nock(window.config.RESOURCES_URL)
 
 nock(window.config.RESOURCES_URL)
   .get('/facilities')
-  .reply(200, mockFetchFacilites)
+  .reply(200, mockFetchFacilities)
 
 describe('referenceApi', () => {
   beforeEach(() => {
@@ -52,10 +52,10 @@ describe('referenceApi', () => {
   })
 
   it('retrieves the facilities.json from the server', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockFetchFacilites))
+    fetch.mockResponseOnce(JSON.stringify(mockFetchFacilities))
 
     return referenceApi.loadFacilities().then(data => {
-      expect(data).toEqual(mockFetchFacilites)
+      expect(data).toEqual(mockFetchFacilities)
     })
   })
 })
