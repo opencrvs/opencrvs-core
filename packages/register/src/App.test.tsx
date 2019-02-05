@@ -15,7 +15,7 @@ import { storeDraft, createDraft, IDraft } from './drafts'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import { storage } from 'src/storage'
-import { draftToMutationTransformer } from 'src/transformer'
+import { draftToGqlTransformer } from 'src/transformer'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import {
   checkAuth,
@@ -728,9 +728,9 @@ describe('when user has a valid token in local storage', () => {
 
     it('Throws error for invalid formDefinition', () => {
       const emptyObj = {}
-      expect(() =>
-        draftToMutationTransformer({} as IForm, emptyObj)
-      ).toThrowError('Sections are missing in form definition')
+      expect(() => draftToGqlTransformer({} as IForm, emptyObj)).toThrowError(
+        'Sections are missing in form definition'
+      )
     })
 
     it('Check if father addresses are parsed properly', () => {
@@ -763,9 +763,9 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(
-        draftToMutationTransformer(form, data).father.address[1].line[0]
-      ).toBe('Rd#10')
+      expect(draftToGqlTransformer(form, data).father.address[1].line[0]).toBe(
+        'Rd#10'
+      )
     })
     it('Check if existing place of birth location is parsed properly', () => {
       const data = {
@@ -776,11 +776,11 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToMutationTransformer(form, data).birthLocationType).toBe(
+      expect(draftToGqlTransformer(form, data).birthLocationType).toBe(
         'HOSPITAL'
       )
 
-      expect(draftToMutationTransformer(form, data).birthLocation).toBe(
+      expect(draftToGqlTransformer(form, data).birthLocation).toBe(
         '90d39759-7f02-4646-aca3-9272b4b5ce5a'
       )
     })
@@ -803,40 +803,40 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToMutationTransformer(form, data).birthLocationType).toBe(
+      expect(draftToGqlTransformer(form, data).birthLocationType).toBe(
         'PRIVATE_HOME'
       )
 
-      expect(draftToMutationTransformer(form, data).placeOfBirth.type).toBe(
+      expect(draftToGqlTransformer(form, data).placeOfBirth.type).toBe(
         'PRIVATE_HOME'
       )
-      expect(draftToMutationTransformer(form, data).placeOfBirth.partOf).toBe(
+      expect(draftToGqlTransformer(form, data).placeOfBirth.partOf).toBe(
         'upazila10'
       )
 
+      expect(draftToGqlTransformer(form, data).placeOfBirth.address.type).toBe(
+        'BIRTH_PLACE'
+      )
+      expect(draftToGqlTransformer(form, data).placeOfBirth.address.state).toBe(
+        'state4'
+      )
       expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.type
-      ).toBe('BIRTH_PLACE')
-      expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.state
-      ).toBe('state4')
-      expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.postalCode
+        draftToGqlTransformer(form, data).placeOfBirth.address.postalCode
       ).toBe('1020')
       expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.district
+        draftToGqlTransformer(form, data).placeOfBirth.address.district
       ).toBe('district2')
       expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.line[0]
+        draftToGqlTransformer(form, data).placeOfBirth.address.line[0]
       ).toBe('Rd #10')
       expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.line[2]
+        draftToGqlTransformer(form, data).placeOfBirth.address.line[2]
       ).toBe('Akua')
       expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.line[3]
+        draftToGqlTransformer(form, data).placeOfBirth.address.line[3]
       ).toBe('union1')
       expect(
-        draftToMutationTransformer(form, data).placeOfBirth.address.line[5]
+        draftToGqlTransformer(form, data).placeOfBirth.address.line[5]
       ).toBe('upazila10')
     })
     it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
@@ -851,7 +851,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToMutationTransformer(form, data).father.telecom).toBeFalsy()
+      expect(draftToGqlTransformer(form, data).father.telecom).toBeFalsy()
     })
 
     it('Pass FATHER as whoseContactDetails value', () => {
@@ -866,9 +866,9 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(
-        draftToMutationTransformer(form, data).father.telecom[0].value
-      ).toBe('01736478884')
+      expect(draftToGqlTransformer(form, data).father.telecom[0].value).toBe(
+        '01736478884'
+      )
     })
 
     it('Pass false as fathersDetailsExist on father section', () => {
@@ -883,7 +883,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToMutationTransformer(form, data).father).toBeUndefined()
+      expect(draftToGqlTransformer(form, data).father).toBeUndefined()
     })
 
     describe('when user clicks the "submit" button', () => {

@@ -7,7 +7,8 @@ import {
   RADIO_GROUP
 } from 'src/forms'
 import { conditionals } from '../../../utils'
-import { birthAttachmentTransformer } from './mappings/documents-mappings'
+import { birthFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
+import { birthAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
 
 const messages = defineMessages({
   documentsTab: {
@@ -176,7 +177,10 @@ export const documentsSection: IFormSection = {
           }
         ]
       },
-      mapping: birthAttachmentTransformer
+      mapping: {
+        mutation: birthFieldToAttachmentTransformer,
+        query: birthAttachmentToFieldTransformer
+      }
     },
     {
       name: 'paragraph',
