@@ -8,7 +8,8 @@ import {
   SELECT_VITAL_EVENT,
   MY_RECORDS,
   MY_DRAFTS,
-  REVIEW_DUPLICATES
+  REVIEW_DUPLICATES,
+  PRINT_CERTIFICATE
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -76,6 +77,12 @@ export function goToBirthRegistrationAsParent(draftId: string) {
 export function goToReviewDuplicate(applicationId: string) {
   return push(
     formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })
+  )
+}
+
+export function goToPrintCertificate(registrationId: string) {
+  return push(
+    formatUrl(PRINT_CERTIFICATE, { registrationId: registrationId.toString() })
   )
 }
 

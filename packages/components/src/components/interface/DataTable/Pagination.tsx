@@ -4,9 +4,7 @@ import { Next, Previous } from '../../icons'
 import { Button } from '../../buttons/Button'
 
 export interface IPaginationCustomProps {
-  pageSize: number
   initialPage: number
-  totalItemCount: number
   totalPages: number
   onPageChange: (page: number) => void
 }
@@ -57,18 +55,12 @@ export class Pagination extends React.Component<
   constructor(props: IPaginationCustomProps, {}) {
     super(props)
 
-    const { initialPage, totalItemCount, pageSize, totalPages } = props
+    const { initialPage, totalPages } = props
     this.state = {
       canPrevious: false,
       canNext: false,
       currentPage:
         totalPages > 0 ? (initialPage && initialPage > 0 ? initialPage : 1) : 0
-    }
-  }
-
-  componentDidUpdate(prevProps: IPaginationCustomProps) {
-    if (prevProps.totalItemCount !== this.props.totalItemCount) {
-      this.setState(() => ({ currentPage: this.props.initialPage }))
     }
   }
 
@@ -83,14 +75,12 @@ export class Pagination extends React.Component<
     )
 
   render() {
-    const {
-      initialPage,
-      totalPages,
-      totalItemCount,
-      pageSize,
-      ...props
-    } = this.props
+    const { totalPages } = this.props
     const { currentPage } = this.state
+
+    if (currentPage > totalPages) {
+      this.changePage(totalPages)
+    }
 
     return (
       <PaginationContainer>
