@@ -582,7 +582,7 @@ export class WorkQueueView extends React.Component<
   IWorkQueueState
 > {
   state = { printCertificateModalVisible: false, regId: null, currentPage: 1 }
-  pageSize = 5
+  pageSize = 10
 
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {

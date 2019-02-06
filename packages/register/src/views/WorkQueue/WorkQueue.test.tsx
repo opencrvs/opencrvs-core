@@ -74,11 +74,13 @@ describe('WorkQueue tests', async () => {
                 {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   registration: {
+                    id: '123',
                     registrationNumber: null,
                     trackingId: 'B111111',
                     duplicates: null,
                     status: [
                       {
+                        id: '123',
                         timestamp: '2018-12-07T13:11:49.380Z',
                         user: {
                           id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -97,6 +99,7 @@ describe('WorkQueue tests', async () => {
                           role: 'LOCAL_REGISTRAR'
                         },
                         location: {
+                          id: '123',
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
@@ -110,6 +113,7 @@ describe('WorkQueue tests', async () => {
                     ]
                   },
                   child: {
+                    id: '123',
                     name: [
                       {
                         use: 'bn',
@@ -124,11 +128,13 @@ describe('WorkQueue tests', async () => {
                 {
                   id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
                   registration: {
+                    id: '123',
                     registrationNumber: null,
                     trackingId: 'B222222',
                     duplicates: null,
                     status: [
                       {
+                        id: '123',
                         timestamp: '2018-12-07T13:11:49.380Z',
                         user: {
                           id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -147,6 +153,7 @@ describe('WorkQueue tests', async () => {
                           role: 'LOCAL_REGISTRAR'
                         },
                         location: {
+                          id: '123',
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
@@ -160,6 +167,7 @@ describe('WorkQueue tests', async () => {
                     ]
                   },
                   child: {
+                    id: '123',
                     name: [
                       {
                         use: 'bn',
@@ -190,7 +198,7 @@ describe('WorkQueue tests', async () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 200)
+      setTimeout(resolve, 100)
     })
     console.log(testComponent.component.debug())
     testComponent.component.update()
@@ -310,11 +318,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
                       duplicates: null,
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -333,6 +343,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -346,6 +357,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
@@ -433,11 +445,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
                       duplicates: null,
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -456,6 +470,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -469,6 +484,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
@@ -544,11 +560,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
                       duplicates: null,
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -567,6 +585,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -578,6 +597,7 @@ describe('WorkQueue tests', async () => {
                           ]
                         },
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -596,6 +616,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -607,6 +628,7 @@ describe('WorkQueue tests', async () => {
                           ]
                         },
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -625,6 +647,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -636,6 +659,7 @@ describe('WorkQueue tests', async () => {
                           ]
                         },
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -654,6 +678,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -667,6 +692,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
@@ -681,11 +707,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be815',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B2222',
                       duplicates: null,
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -704,6 +732,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -717,6 +746,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
@@ -731,11 +761,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be816',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B33333',
                       duplicates: null,
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -754,6 +786,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -768,6 +801,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
@@ -782,11 +816,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be817',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B444444',
                       duplicates: null,
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -805,6 +841,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -818,6 +855,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
@@ -899,11 +937,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
                       duplicates: ['e302f7c5-ad87-4117-91c1-35eaf2ea7be8'],
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -922,6 +962,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -935,6 +976,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
@@ -1008,11 +1050,13 @@ describe('WorkQueue tests', async () => {
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     registration: {
+                      id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
                       duplicates: null,
                       status: [
                         {
+                          id: '123',
                           timestamp: null,
                           user: {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -1031,6 +1075,7 @@ describe('WorkQueue tests', async () => {
                             role: 'LOCAL_REGISTRAR'
                           },
                           location: {
+                            id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
@@ -1044,6 +1089,7 @@ describe('WorkQueue tests', async () => {
                       ]
                     },
                     child: {
+                      id: '123',
                       name: [
                         {
                           use: null,
