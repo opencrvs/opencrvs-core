@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 import { Query, Mutation } from 'react-apollo'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner, InvertSpinner } from '@opencrvs/components/lib/interface'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { FormFieldGenerator } from 'src/components/form'
 import {
@@ -20,8 +20,7 @@ import {
 import {
   PrimaryButton,
   SecondaryButton,
-  IconAction,
-  ICON_ALIGNMENT
+  IconAction
 } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
@@ -136,14 +135,13 @@ const StyledIconAction = styled(IconAction)`
 `
 const ConfirmBtn = styled(PrimaryButton)`
   font-weight: bold;
-  padding: 15px 35px 15px 20px;
-  div {
-    position: relative !important;
-    margin-right: 20px;
-    top: 2px;
+  min-width: 148px;
+  padding: 15px 20px 15px 20px;
+  span {
+    margin: 0 auto;
   }
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.primary};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }
@@ -184,7 +182,7 @@ const B = styled.div`
   font-weight: bold;
 `
 
-const ButtonSpinner = styled(Spinner)`
+const ButtonSpinner = styled(InvertSpinner)`
   width: 15px;
   height: 15px;
   top: 0px !important;
@@ -595,27 +593,22 @@ class PrintCertificateActionComponent extends React.Component<
                   return (
                     <ConfirmBtn
                       id="registerApplicationBtn"
-                      icon={() => {
-                        if (loading) {
-                          return (
-                            <>
-                              <ButtonSpinner id="Spinner" baseColor="#F9F9F9" />
-                            </>
-                          )
-                        }
-                        return (
-                          <>
-                            <TickLarge />
-                          </>
-                        )
-                      }}
-                      align={ICON_ALIGNMENT.LEFT}
                       disabled={loading || data}
                       onClick={() => {
                         markBirthAsCertified()
                       }}
                     >
-                      {intl.formatMessage(messages.confirm)}
+                      {!loading && (
+                        <>
+                          <TickLarge />
+                          <span>{intl.formatMessage(messages.confirm)}</span>
+                        </>
+                      )}
+                      {loading && (
+                        <span>
+                          <ButtonSpinner id="Spinner" />
+                        </span>
+                      )}
                     </ConfirmBtn>
                   )
                 }}
