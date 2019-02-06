@@ -807,17 +807,73 @@ describe('Registration root resolvers', () => {
     })
   })
   describe('queryRegistrationByIdentifier()', async () => {
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-      })
-    )
-    // @ts-ignore
-    const composition = await resolvers.Query.queryRegistrationByIdentifier(
-      {},
-      { identifier: '2019333494BAQFYEG6' }
-    )
-    expect(composition).toBeDefined()
-    expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    it('returns registration', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                resource: {
+                  resourceType: 'Task',
+
+                  focus: {
+                    reference:
+                      'Composition/80b90ac3-1032-4f98-af64-627d2b7443f3'
+                  },
+                  id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            id: '80b90ac3-1032-4f98-af64-627d2b7443f3'
+          })
+        ]
+      )
+      // @ts-ignore
+      const composition = await resolvers.Query.queryRegistrationByIdentifier(
+        {},
+        { identifier: '2019333494BAQFYEG6' }
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('80b90ac3-1032-4f98-af64-627d2b7443f3')
+    })
+    it("throws an error when the response isn't what we expect", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        // @ts-ignore
+        resolvers.Query.queryRegistrationByIdentifier(
+          {},
+          { identifier: '2019333494BAQFYEG6' }
+        )
+      ).rejects.toThrowError(
+        'Task does not exist for identifer 2019333494BAQFYEG6'
+      )
+    })
+
+    it('throws an error when task doesnt have composition reference', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: {
+                id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
+              }
+            }
+          ]
+        })
+      )
+      await expect(
+        // @ts-ignore
+        resolvers.Query.queryRegistrationByIdentifier(
+          {},
+          { identifier: '2019333494BAQFYEG6' }
+        )
+      ).rejects.toThrowError('Composition reference not found')
+    })
   })
 })
