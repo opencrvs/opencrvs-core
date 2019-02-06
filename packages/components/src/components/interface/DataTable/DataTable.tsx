@@ -218,7 +218,7 @@ export class DataTable extends React.Component<
   ): IDynamicValues => {
     item.selects.options.forEach((element: ISelectGroupOption) => {
       if (!values[element.name]) {
-        values[element.name] = ''
+        values[element.name] = element.value || ''
       }
     })
     return values

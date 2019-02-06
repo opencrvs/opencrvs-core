@@ -628,7 +628,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.events.birth': 'জন্ম',
     'register.workQueue.labels.events.death': 'মৃত্যু',
     'register.workQueue.labels.events.marriage': 'বিবাহ',
-    'register.workQueue.labels.locations.all': 'TODO',
+    'register.workQueue.labels.locations.all': 'সব জায়গা',
     'register.workQueue.labels.selects.sort': 'ক্রমানুসার:',
     'register.workQueue.labels.selects.filter': 'ফিল্টার করুন:',
     'register.workQueue.labels.results.name': 'নাম',
