@@ -165,6 +165,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
       createdAt
       id
       registration {
+        id
         trackingId
         type
         status {
