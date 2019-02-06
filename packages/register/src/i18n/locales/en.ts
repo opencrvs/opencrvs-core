@@ -466,6 +466,22 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.causeOfDeathCode': 'Cause of Death Code',
     'formFields.verbalAutopsy': 'Verbal autopsy',
     'formFields.medicallyCertified': 'Medically Certified Cause of Death',
+    'formFields.deceasedIDProof': "Proof of Deceased's ID",
+    'formFields.deceasedPermanentAddressProof':
+      'Proof of Permanent Address of Deceased',
+    'formFields.deceasedDeathProof': 'Proof of Death of Deceased',
+    'formFields.deceasedDoBProof': 'Proof of Date of Birth of Deceased',
+    'formFields.applicantIDProof': "Proof of Applicant's ID",
+    'formFields.deceasedDocumentParagraph':
+      'For this death registration, the following documents are required:',
+    'formFields.typeOfDocument': 'Choose type of document',
+    'formFields.docTypePostMortemReport': 'Certified Post Mortem Report',
+    'formFields.docTypeHospitalDischargeCertificate':
+      'Hospital Discharge Certificate',
+    'formFields.docTypeLetterOfDeath': 'Attested Letter of Death',
+    'formFields.docTypeDeathCertificate': 'Attested Certificate of Death',
+    'formFields.docTypeCopyOfBurialReceipt': 'Certified Copy of Burial Receipt',
+    'formFields.docTypeFuneralReceipt': 'Certified Copy of Funeral Receipt',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': 'Must not be more than {max} characters',

@@ -466,6 +466,23 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.causeOfDeathCode': 'মৃত্যুর কারণের কোড',
     'formFields.verbalAutopsy': 'মৌখিক ময়না তদন্ত',
     'formFields.medicallyCertified': 'মৃত্যুর কারণ চিকিৎসাগতভাবে প্রত্যয়িত',
+    'formFields.deceasedIDProof': 'মৃতের প্রমাণের আইডি',
+    'formFields.deceasedPermanentAddressProof':
+      'মৃত ব্যক্তির স্থায়ী ঠিকানার প্রমাণ',
+    'formFields.deceasedDeathProof': 'মৃত্যুর প্রমাণ',
+    'formFields.deceasedDoBProof': 'মৃত ব্যক্তির জন্ম তারিখের প্রমাণ',
+    'formFields.applicantIDProof': "আবেদনকারীর আইডি'র প্রমাণ",
+    'formFields.deceasedDocumentParagraph':
+      'এই মৃত্যুর নিবন্ধনের জন্য, নিম্নলিখিত নথি প্রয়োজন:',
+    'formFields.typeOfDocument': 'নথির ধরন নির্বাচন করুন',
+    'formFields.docTypePostMortemReport': 'প্রত্যয়িত ময়না তদন্ত রিপোর্ট',
+    'formFields.docTypeHospitalDischargeCertificate': 'হাসপাতালের ছাড়পত্র',
+    'formFields.docTypeLetterOfDeath': 'সত্যায়িত মৃত্যুর চিঠি',
+    'formFields.docTypeDeathCertificate': 'সত্যায়িত মৃত্যুর সনদ',
+    'formFields.docTypeCopyOfBurialReceipt':
+      'সমাধিস্থলের রশিদের প্রত্যয়িত কপি',
+    'formFields.docTypeFuneralReceipt':
+      'অন্ত্যেষ্টিক্রিয়া রশিদের প্রত্যয়িত কপি',
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
