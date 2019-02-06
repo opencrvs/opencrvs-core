@@ -2,6 +2,7 @@ import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { Event, Action, IForm } from 'src/forms'
 import { getBirthMutationMappings } from './birth/mutations'
+import { getDeathMutationMappings } from './death/mutations'
 import { Mutation } from 'react-apollo'
 import { IDraft } from 'src/drafts'
 
@@ -16,7 +17,8 @@ interface IMutationProviderProps {
 type IProps = IMutationProviderProps & InjectedIntlProps
 /* Need to add mappings for events here */
 const MutationMapper = {
-  [Event.BIRTH]: getBirthMutationMappings
+  [Event.BIRTH]: getBirthMutationMappings,
+  [Event.DEATH]: getDeathMutationMappings
 }
 
 export const MutationContext = React.createContext({
