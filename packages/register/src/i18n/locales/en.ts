@@ -481,6 +481,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
+    'validations.isValidBirthDate': 'Must be a valid birth date',
     'validations.requiredSymbol': '',
     'register.form.submit': 'SEND FOR REVIEW',
     'register.form.informationMissing': 'Information missing',
