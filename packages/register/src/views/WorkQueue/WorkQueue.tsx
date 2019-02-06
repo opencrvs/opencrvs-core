@@ -88,22 +88,20 @@ export const FETCH_REGISTRATION_QUERY = gql`
               name
               alias
             }
+            office {
+              name
+              alias
+              address {
+                district
+                state
+              }
+            }
             type
             timestamp
             comments {
               comment
             }
           }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
           duplicates
         }
         child {
