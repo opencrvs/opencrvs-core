@@ -2,7 +2,7 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import * as Swipeable from 'react-swipeable'
-import { Box, Modal } from '@opencrvs/components/lib/interface'
+import { Box } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, ButtonIcon } from '@opencrvs/components/lib/buttons'
 import {
   ArrowForward,
@@ -32,8 +32,6 @@ import {
   ViewFooter
 } from 'src/components/interface/footer'
 import { StickyFormTabs } from './StickyFormTabs'
-import gql from 'graphql-tag'
-import { Mutation } from 'react-apollo'
 import { draftToGqlTransformer } from 'src/transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge, isUndefined, isNull } from 'lodash'
@@ -48,7 +46,7 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
-import { MutationProviderView } from '../DataProvider/DataProvider'
+import { MutationProvider } from '../DataProvider/MutationProvider'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -201,10 +199,6 @@ const FormViewContainer = styled.div`
   flex-direction: column;
 `
 
-const PreviewButton = styled.a`
-  text-decoration: underline;
-  color: ${({ theme }) => theme.colors.primary};
-`
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
@@ -279,12 +273,6 @@ type State = {
   rejectFormOpen: boolean
   selectedTabId: string
 }
-
-const patchMutation = gql`
-  mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput) {
-    markBirthAsRegistered(id: $id, details: $details)
-  }
-`
 const VIEW_TYPE = {
   REVIEW: 'review',
   PREVIEW: 'preview'
@@ -664,7 +652,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           </FooterAction>
         </ViewFooter>
 
-        <MutationProviderView
+        <MutationProvider
           event={this.getEvent()}
           action={Action.SUBMIT_FOR_REVIEW}
           form={registerForm}
@@ -673,47 +661,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
           toggleModal={this.toggleSubmitModalOpen}
           onCompleted={this.successfulSubmission}
         />
-
-        <Mutation
-          mutation={patchMutation}
-          variables={this.processSubmitData()}
-          onCompleted={data =>
-            this.successfullyRegistered(data.markBirthAsRegistered)
-          }
-        >
-          {markBirthAsRegistered => {
-            return (
-              <Modal
-                title="Are you ready to submit?"
-                actions={[
-                  <PrimaryButton
-                    key="register"
-                    id="register_confirm"
-                    onClick={() => markBirthAsRegistered()}
-                  >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
-                  <PreviewButton
-                    key="review"
-                    id="register_review"
-                    onClick={() => {
-                      this.toggleRegisterModalOpen()
-                      if (document.documentElement) {
-                        document.documentElement.scrollTop = 0
-                      }
-                    }}
-                  >
-                    {intl.formatMessage(messages.preview)}
-                  </PreviewButton>
-                ]}
-                show={this.state.showRegisterModal}
-                handleClose={this.toggleRegisterModalOpen}
-              >
-                {intl.formatMessage(messages.submitDescription)}
-              </Modal>
-            )
-          }}
-        </Mutation>
+        <MutationProvider
+          event={this.getEvent()}
+          action={Action.REGISTER_APPLICATION}
+          form={registerForm}
+          draft={draft}
+          showModal={this.state.showRegisterModal}
+          toggleModal={this.toggleRegisterModalOpen}
+          onCompleted={this.successfullyRegistered}
+        />
 
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
