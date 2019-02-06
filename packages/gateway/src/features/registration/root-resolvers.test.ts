@@ -806,4 +806,18 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
+  describe('queryRegistrationByIdentifier()', async () => {
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      })
+    )
+    // @ts-ignore
+    const composition = await resolvers.Query.queryRegistrationByIdentifier(
+      {},
+      { identifier: '2019333494BAQFYEG6' }
+    )
+    expect(composition).toBeDefined()
+    expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+  })
 })
