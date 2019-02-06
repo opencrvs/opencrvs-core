@@ -59,18 +59,14 @@ export interface ISearchResultProps {
   ) => void
   onPageChange?: (currentPage: number) => void
   pageSize?: number
+  totalPages?: number
+  initialPage?: number
 }
 
 interface ICustomState {
-  filterValues?: IDynamicValues
-  sortValues?: IDynamicValues
-  filteredSortedItems: IDynamicValues[]
-  displayItems: IDynamicValues[]
-  pageSize: number
-  totalPages: number
-  sortByItemsWithValues?: ISortAndFilterItem
-  filterByItemsWithValues?: ISortAndFilterItem
-  initialPage: number
+  currentPage: number
+  sortBySelectedValues: IDynamicValues
+  filterBySelectedValues: IDynamicValues
 }
 
 const defaultConfiguration = {
@@ -111,6 +107,7 @@ const defaultSort = (key: string, value: string, data: IDynamicValues[]) => {
     return 0
   })
 }
+
 const getSortAndFilterByPropsWithValues = (
   prop: ISortAndFilter,
   values: IDynamicValues
@@ -139,127 +136,38 @@ export class DataTable extends React.Component<
   ISearchResultProps,
   ICustomState
 > {
-  constructor(props: ISearchResultProps, {}) {
-    super(props)
-    const {
-      totalPages,
-      displayItems,
-      pageSize,
-      filteredSortedItems,
-      filterValues,
-      sortValues,
-      filterByItemsWithValues,
-      sortByItemsWithValues,
-      initialPage
-    } = this.calculateInitialState(this.props)
-
-    this.state = {
-      totalPages,
-      displayItems,
-      pageSize,
-      filteredSortedItems,
-      filterValues,
-      sortValues,
-      filterByItemsWithValues,
-      sortByItemsWithValues,
-      initialPage
-    }
+  state = {
+    currentPage: this.props.initialPage || defaultConfiguration.initialPage,
+    sortBySelectedValues: {},
+    filterBySelectedValues: {}
   }
 
-  componentDidUpdate(prevProps: ISearchResultProps) {
-    if (!isEqual(prevProps, this.props)) {
-      const {
-        totalPages,
-        displayItems,
-        pageSize,
-        filteredSortedItems,
-        filterValues,
-        sortValues,
-        filterByItemsWithValues,
-        sortByItemsWithValues,
-        initialPage
-      } = this.calculateInitialState(this.props)
-
-      this.setState(() => ({
-        totalPages,
-        displayItems,
-        pageSize,
-        filteredSortedItems,
-        filterValues,
-        sortValues,
-        filterByItemsWithValues,
-        sortByItemsWithValues,
-        initialPage
-      }))
-    }
-  }
-
-  calculateInitialState = (props: ISearchResultProps): ICustomState => {
-    const { data, sortBy, filterBy, pageSize } = props
-    const paginationSize = pageSize ? pageSize : defaultConfiguration.pageSize
-    const initialTotalPage = getTotalPageNumber(data.length, paginationSize)
-    const sortValues = sortBy && this.initializeSelectValues(sortBy)
-    const filterValues = filterBy && this.initializeSelectValues(filterBy)
-    const sortByItemsWithValues =
-      sortBy &&
-      sortValues &&
-      getSortAndFilterByPropsWithValues(sortBy, sortValues)
-
-    const filterByItemsWithValues =
-      filterBy &&
-      filterValues &&
-      getSortAndFilterByPropsWithValues(filterBy, filterValues)
-
-    let initialSortedAndFilteredData: IDynamicValues[] = []
-    initialSortedAndFilteredData = sortBy
-      ? this.performInitialSort(data, sortBy)
-      : data
-    initialSortedAndFilteredData = filterBy
-      ? this.performInitialFiltering(initialSortedAndFilteredData, filterBy)
-      : data
-
-    const displayItems = this.getDisplayItems(
-      defaultConfiguration.initialPage,
-      paginationSize,
-      initialSortedAndFilteredData
-    )
-    return {
-      totalPages: initialTotalPage,
-      displayItems,
-      pageSize: paginationSize,
-      filteredSortedItems: data,
-      filterValues,
-      sortValues,
-      sortByItemsWithValues,
-      filterByItemsWithValues,
-      initialPage: 1
-    }
-  }
-
-  performInitialSort = (
+  sortData = (
     data: IDynamicValues[],
-    sortBy: ISortAndFilter
+    sortBy: ISortAndFilterItem
   ): IDynamicValues[] => {
     let sortedData: IDynamicValues[] = data
     sortBy.selects.options.map((option: ISelectGroupOption) => {
-      sortedData = option.value
+      const val = sortBy.selects.values[option.name]
+      sortedData = val
         ? option.type === SelectFieldType.Date
-          ? sortByDate(option.name, option.value, data)
-          : defaultSort(option.name, option.value, data)
+          ? sortByDate(option.name, val, data)
+          : defaultSort(option.name, val, data)
         : sortedData
     })
 
     return sortedData
   }
 
-  performInitialFiltering = (
+  filterData = (
     data: IDynamicValues[],
-    filterBy: ISortAndFilter
+    filterBy: ISortAndFilterItem
   ): IDynamicValues[] => {
     let filteredData: IDynamicValues[] = data
     filterBy.selects.options.map((option: ISelectGroupOption) => {
-      filteredData = option.value
-        ? filterItems(option.name, option.value, filteredData)
+      const val = filterBy.selects.values[option.name]
+      filteredData = val
+        ? filterItems(option.name, val, filteredData)
         : filteredData
     })
     return filteredData
@@ -270,29 +178,10 @@ export class DataTable extends React.Component<
     changedValue: ISelectGroupValue,
     type?: SelectFieldType
   ) => {
-    const filterByItemsWithValues =
-      this.props.filterBy &&
-      getSortAndFilterByPropsWithValues(this.props.filterBy, values)
-
-    this.setState(() => {
-      return { filterByItemsWithValues }
-    })
-
     if (this.props.onFilterChange) {
       this.props.onFilterChange(values, changedValue, type)
     } else {
-      let filteredItems = this.props.data
-      Object.keys(values).forEach((filterKey: string) => {
-        if (values[filterKey]) {
-          filteredItems = filterItems(
-            filterKey,
-            values[filterKey],
-            filteredItems
-          )
-        }
-      })
-
-      this.resetPagination(filteredItems)
+      this.setState({ filterBySelectedValues: values })
     }
   }
 
@@ -301,34 +190,10 @@ export class DataTable extends React.Component<
     changedValue: ISelectGroupValue,
     type?: SelectFieldType
   ) => {
-    const sortByItemsWithValues =
-      this.props.sortBy &&
-      getSortAndFilterByPropsWithValues(this.props.sortBy, values)
-
-    this.setState(() => {
-      return { sortByItemsWithValues }
-    })
-
     if (this.props.onSortChange) {
       this.props.onSortChange(values, changedValue, type)
     } else {
-      const key = Object.keys(changedValue)[0]
-      const selectedValue = changedValue[key]
-      if (type === SelectFieldType.Date) {
-        const sortedItems = sortByDate(
-          key,
-          selectedValue,
-          this.state.filteredSortedItems
-        )
-        this.resetPagination(sortedItems)
-      } else {
-        const sortedItems = defaultSort(
-          key,
-          selectedValue,
-          this.state.filteredSortedItems
-        )
-        this.resetPagination(sortedItems)
-      }
+      this.setState({ sortBySelectedValues: values })
     }
   }
 
@@ -337,16 +202,25 @@ export class DataTable extends React.Component<
     pageSize: number,
     allItems: IDynamicValues[]
   ) => {
+    if (allItems.length <= pageSize) {
+      // expect that allItem is already sliced correctly externally
+      return allItems
+    }
+
+    // perform internal pagination
     const offset = (currentPage - 1) * pageSize
     const displayItems = allItems.slice(offset, offset + pageSize)
     return displayItems
   }
 
-  initializeSelectValues = (item: ISortAndFilter): IDynamicValues => {
-    const values: IDynamicValues = {}
-
+  ensureAllValuesInitialized = (
+    item: ISortAndFilter,
+    values: IDynamicValues
+  ): IDynamicValues => {
     item.selects.options.forEach((element: ISelectGroupOption) => {
-      values[element.name] = element.value ? element.value : ''
+      if (!values[element.name]) {
+        values[element.name] = ''
+      }
     })
     return values
   }
@@ -355,46 +229,56 @@ export class DataTable extends React.Component<
     if (this.props.onPageChange) {
       this.props.onPageChange(currentPage)
     } else {
-      const { pageSize, filteredSortedItems, totalPages } = this.state
-      const displayItems = this.getDisplayItems(
-        currentPage,
-        pageSize,
-        filteredSortedItems
-      )
-      this.setState(() => {
-        return { displayItems }
-      })
+      this.setState({ currentPage })
     }
-  }
-
-  resetPagination = (filteredItems: IDynamicValues[]) => {
-    const { pageSize } = this.props
-    const paginationSize = pageSize ? pageSize : defaultConfiguration.pageSize
-    const totalPages = getTotalPageNumber(filteredItems.length, paginationSize)
-    const displayItems = this.getDisplayItems(
-      defaultConfiguration.initialPage,
-      paginationSize,
-      filteredItems
-    )
-    this.setState(() => ({
-      filteredSortedItems: filteredItems,
-      displayItems,
-      totalPages,
-      initialPage: defaultConfiguration.initialPage
-    }))
   }
 
   render() {
     const {
-      displayItems,
-      totalPages,
-      sortByItemsWithValues,
-      filterByItemsWithValues,
-      filteredSortedItems,
-      pageSize,
-      initialPage
+      resultLabel,
+      data,
+      sortBy,
+      filterBy,
+      pageSize = defaultConfiguration.pageSize,
+      initialPage = defaultConfiguration.initialPage
+    } = this.props
+    const {
+      currentPage,
+      sortBySelectedValues,
+      filterBySelectedValues
     } = this.state
-    const { resultLabel, noResultText } = this.props
+
+    const sortValues =
+      sortBy && this.ensureAllValuesInitialized(sortBy, sortBySelectedValues)
+    const filterValues =
+      filterBy &&
+      this.ensureAllValuesInitialized(filterBy, filterBySelectedValues)
+
+    const sortByItemsWithValues =
+      sortBy &&
+      sortValues &&
+      getSortAndFilterByPropsWithValues(sortBy, sortValues)
+
+    const filterByItemsWithValues =
+      filterBy &&
+      filterValues &&
+      getSortAndFilterByPropsWithValues(filterBy, filterValues)
+
+    let sortedAndFilteredData: IDynamicValues[] = []
+    sortedAndFilteredData =
+      (sortByItemsWithValues && this.sortData(data, sortByItemsWithValues)) ||
+      data
+    sortedAndFilteredData =
+      (filterByItemsWithValues &&
+        this.filterData(sortedAndFilteredData, filterByItemsWithValues)) ||
+      sortedAndFilteredData
+
+    const totalPages = this.props.totalPages
+      ? this.props.totalPages
+      : getTotalPageNumber(
+          sortedAndFilteredData.length,
+          this.props.pageSize || defaultConfiguration.pageSize
+        )
 
     return (
       <Wrapper>
@@ -405,18 +289,18 @@ export class DataTable extends React.Component<
           onChangeFilter={this.onFilterChange}
         />
         <ResultsText>
-          {resultLabel}({filteredSortedItems.length})
+          {resultLabel}({sortedAndFilteredData.length})
         </ResultsText>
         <StyledList>
-          {displayItems.map((item, index) =>
-            this.props.cellRenderer(item, index)
-          )}
+          {this.getDisplayItems(
+            currentPage,
+            pageSize,
+            sortedAndFilteredData
+          ).map((item, index) => this.props.cellRenderer(item, index))}
         </StyledList>
-        {filteredSortedItems.length > 0 && (
+        {sortedAndFilteredData.length > 0 && (
           <Pagination
-            pageSize={pageSize}
             initialPage={initialPage}
-            totalItemCount={filteredSortedItems.length}
             totalPages={totalPages}
             onPageChange={this.onPageChange}
           />

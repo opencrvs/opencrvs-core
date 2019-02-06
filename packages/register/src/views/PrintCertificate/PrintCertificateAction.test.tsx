@@ -21,10 +21,9 @@ import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/previ
 import { calculateDays, timeElapsed } from './calculatePrice'
 
 describe('when user wants to print certificate', async () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   const mock: () => void = jest.fn()
-  const formSection = store.getState().printCertificateForm
-    .collectCertificateFrom
+  const mockLocation: any = jest.fn()
 
   it('renders fields after successful graphql query', async () => {
     const graphqlMock = [
@@ -86,7 +85,7 @@ describe('when user wants to print certificate', async () => {
                 dateOfMarriage: null,
                 educationalAttainment: null,
                 nationality: ['BGD'],
-                multipleBirth: null,
+                multipleBirth: 1,
                 identifier: [
                   {
                     id: '123',
@@ -100,7 +99,9 @@ describe('when user wants to print certificate', async () => {
                     line: [
                       '2015',
                       '',
+                      '',
                       '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                      '',
                       '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                     ],
                     district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
@@ -114,7 +115,9 @@ describe('when user wants to print certificate', async () => {
                     line: [
                       '2015',
                       '',
+                      '',
                       '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                      '',
                       '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                     ],
                     district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
@@ -155,15 +158,16 @@ describe('when user wants to print certificate', async () => {
 
     const testComponent = createTestComponent(
       <PrintCertificateAction
-        backLabel="Back"
-        title="Print certificate"
-        registrationId="asdhdqe2472487jsdfsdf"
-        togglePrintCertificateSection={mock}
-        printCertificateFormSection={formSection}
-        IssuerDetails={{
-          name: 'Some name',
-          role: 'Registrar',
-          issuedAt: 'some location'
+        location={mockLocation}
+        history={history}
+        staticContext={mockLocation}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf'
+          },
+          isExact: true,
+          path: '',
+          url: ''
         }}
       />,
       store,
@@ -294,15 +298,16 @@ describe('when user wants to print certificate', async () => {
 
     const testComponent = createTestComponent(
       <PrintCertificateAction
-        backLabel="Back"
-        title="Print certificate"
-        registrationId="asdhdqe2472487jsdfsdf"
-        togglePrintCertificateSection={mock}
-        printCertificateFormSection={formSection}
-        IssuerDetails={{
-          name: '',
-          role: '',
-          issuedAt: ''
+        location={mockLocation}
+        history={history}
+        staticContext={mockLocation}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf'
+          },
+          isExact: true,
+          path: '',
+          url: ''
         }}
       />,
       store,
@@ -517,7 +522,7 @@ describe('when user wants to print certificate', async () => {
                   dateOfMarriage: null,
                   educationalAttainment: null,
                   nationality: ['BGD'],
-                  multipleBirth: null,
+                  multipleBirth: 1,
                   identifier: [
                     {
                       id: '123',
@@ -531,7 +536,9 @@ describe('when user wants to print certificate', async () => {
                       line: [
                         '2015',
                         '',
+                        '',
                         '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                        '',
                         '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                       ],
                       district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
@@ -545,7 +552,9 @@ describe('when user wants to print certificate', async () => {
                       line: [
                         '2015',
                         '',
+                        '',
                         '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                        '',
                         '5518aef0-1d67-46cd-97c5-d46e9a44732a'
                       ],
                       district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
@@ -586,15 +595,16 @@ describe('when user wants to print certificate', async () => {
 
       const testComponent = createTestComponent(
         <PrintCertificateAction
-          backLabel="Back"
-          title="Print certificate"
-          registrationId="asdhdqe2472487jsdfsdf"
-          togglePrintCertificateSection={mock}
-          printCertificateFormSection={formSection}
-          IssuerDetails={{
-            name: '',
-            role: '',
-            issuedAt: ''
+          location={mockLocation}
+          history={history}
+          staticContext={mockLocation}
+          match={{
+            params: {
+              registrationId: 'asdhdqe2472487jsdfsdf'
+            },
+            isExact: true,
+            path: '',
+            url: ''
           }}
         />,
         store,

@@ -26,6 +26,7 @@ import { MyRecords } from './views/MyRecords/MyRecords'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
 import { MyDrafts } from './views/MyDrafts/MyDrafts'
+import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -118,6 +119,10 @@ export class App extends React.Component<IAppProps> {
                         <ProtectedRoute
                           path={routes.REVIEW_DUPLICATES}
                           component={ReviewDuplicates}
+                        />
+                        <ProtectedRoute
+                          path={routes.PRINT_CERTIFICATE}
+                          component={PrintCertificateAction}
                         />
                       </Switch>
                     </Page>
