@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Pagination, SortAndFilter } from '..'
 import { Omit } from '../../omit'
 import styled from 'styled-components'
-import { isEqual } from 'lodash'
 
 import {
   ISelectGroupProps,
