@@ -552,7 +552,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   tabRoute={this.props.tabRoute}
                   draft={draft}
                   submitClickEvent={this.submitForm}
-                  saveDraftClickEvent={() => history.push('/')}
+                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
                   deleteApplicationClickEvent={() => {
                     this.props.deleteDraft(draft)
                     history.push('/')
