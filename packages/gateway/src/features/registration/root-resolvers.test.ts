@@ -26,34 +26,35 @@ describe('Registration root resolvers', () => {
   })
   describe('listBirthRegistrations()', () => {
     it('returns an array of composition results', async () => {
-      fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))
+      fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}], total: 2 }))
       // @ts-ignore
-      const compositions = await resolvers.Query.listBirthRegistrations(
+      const result = await resolvers.Query.listBirthRegistrations(
         {},
         { status: 'preliminary' }
       )
 
-      expect(compositions).toBeDefined()
-      expect(compositions).toBeInstanceOf(Array)
-      expect(compositions).toHaveLength(2)
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(2)
     })
 
     it('returns an array of composition results when location ids provided', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }],
+          total: 2
         })
       )
 
       // @ts-ignore
-      const compositions = await resolvers.Query.listBirthRegistrations(
+      const result = await resolvers.Query.listBirthRegistrations(
         {},
         { locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'] }
       )
 
-      expect(compositions).toBeDefined()
-      expect(compositions).toBeInstanceOf(Array)
-      expect(compositions).toHaveLength(2)
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(2)
     })
   })
   describe('createBirthRegistration()', () => {

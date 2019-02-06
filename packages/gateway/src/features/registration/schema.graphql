@@ -310,6 +310,16 @@ type Attachment { # -> DocumentReference
   createdAt: Date # -> .created
 }
 
+type BirthRegResultSet {
+  results: [BirthRegistration]
+  totalItems: Int
+}
+
+type DeathRegResultSet {
+  results: [DeathRegistration]
+  totalItems: Int
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   listBirthRegistrations(
@@ -318,14 +328,18 @@ type Query {
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
   listDeathRegistrations(
     locationIds: [String]
     status: String
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): DeathRegResultSet
 }
 
 type Mutation {

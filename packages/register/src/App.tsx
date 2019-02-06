@@ -17,7 +17,6 @@ import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
 import { ApplicationForm } from './views/RegisterForm/ApplicationForm'
 import { ReviewForm } from './views/RegisterForm/ReviewForm'
-import { SavedRegistration } from './views/SavedRegistration/SavedRegistration'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
@@ -26,6 +25,8 @@ import { MyRecords } from './views/MyRecords/MyRecords'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
 import { MyDrafts } from './views/MyDrafts/MyDrafts'
+import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
+import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -94,14 +95,12 @@ export class App extends React.Component<IAppProps> {
                           path={routes.REVIEW_BIRTH_PARENT_FORM_TAB}
                           component={ReviewForm}
                         />
+
                         <ProtectedRoute
-                          path={routes.SAVED_REGISTRATION}
-                          component={SavedRegistration}
+                          path={routes.CONFIRMATION_SCREEN}
+                          component={ConfirmationScreen}
                         />
-                        <ProtectedRoute
-                          path={routes.REJECTED_REGISTRATION}
-                          component={SavedRegistration}
-                        />
+
                         <ProtectedRoute
                           path={routes.WORK_QUEUE}
                           component={WorkQueue}
@@ -118,6 +117,10 @@ export class App extends React.Component<IAppProps> {
                         <ProtectedRoute
                           path={routes.REVIEW_DUPLICATES}
                           component={ReviewDuplicates}
+                        />
+                        <ProtectedRoute
+                          path={routes.PRINT_CERTIFICATE}
+                          component={PrintCertificateAction}
                         />
                       </Switch>
                     </Page>

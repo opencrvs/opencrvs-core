@@ -33,15 +33,24 @@ import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
-import {
-  SAVED_REGISTRATION,
-  REJECTED_REGISTRATION
-} from 'src/navigation/routes'
+import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+
+import {
+  DECLARATION,
+  SUBMISSION,
+  REJECTION,
+  REGISTRATION,
+  REGISTERED,
+  DUPLICATION
+} from 'src/utils/constants'
+
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
 import { toggleDraftSavedNotification } from 'src/notification/actions'
+import { InvertSpinner } from '@opencrvs/components/lib/interface'
+import { TickLarge } from '@opencrvs/components/lib/icons'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -208,6 +217,27 @@ const Optional = styled.span.attrs<
   flex-grow: 0;
 `
 
+const ButtonSpinner = styled(InvertSpinner)`
+  width: 15px;
+  height: 15px;
+  top: 0px !important;
+`
+
+const ConfirmBtn = styled(PrimaryButton)`
+  font-weight: bold;
+  padding: 15px 20px 15px 20px;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  &:disabled {
+    background: ${({ theme }) => theme.colors.primary};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
+`
+
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
   return viewParams.tabId || form.sections[0].id
 }
@@ -353,14 +383,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName: IFullName = getFullName(childData)
-    history.push(REJECTED_REGISTRATION, {
-      rejection: true,
+    const duplicate = history.location.state && history.location.state.duplicate
+    let eventName = DECLARATION
+    if (duplicate) {
+      eventName = DUPLICATION
+    }
+    history.push(CONFIRMATION_SCREEN, {
+      eventName,
+      actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
-      duplicate: history.location.state && history.location.state.duplicate,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
+
     this.props.deleteDraft(draft)
   }
 
@@ -368,25 +404,29 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    const payload = {
+
+    const duplicate = history.location.state && history.location.state.duplicate
+
+    let eventName = DECLARATION
+
+    if (this.userHasRegisterScope()) {
+      eventName = REGISTRATION
+    }
+
+    if (duplicate) {
+      eventName = DUPLICATION
+    }
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      nextSection: true,
+      trackingSection: true,
+      eventName,
+      actionName: SUBMISSION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
-      duplicate: history.location.state && history.location.state.duplicate,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
-    }
-    if (this.userHasRegisterScope()) {
-      // @ts-ignore
-      payload.registrationNumber = response
-      // @ts-ignore
-      payload.declaration = false
-    } else {
-      // @ts-ignore
-      payload.trackingId = response
-      // @ts-ignore
-      payload.declaration = true
-    }
-    history.push(SAVED_REGISTRATION, payload)
+    })
     this.props.deleteDraft(draft)
   }
 
@@ -394,13 +434,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    history.push(SAVED_REGISTRATION, {
-      registrationNumber: response,
-      declaration: false,
+    this.props.deleteDraft({ ...draft })
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      trackingSection: true,
+      eventName: REGISTRATION,
+      actionName: REGISTERED,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    this.props.deleteDraft(draft)
   }
 
   submitForm = () => {
@@ -652,7 +694,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <FooterAction>
             <FooterPrimaryButton
               id="save_draft"
-              onClick={() => history.push(SAVED_REGISTRATION)}
+              onClick={() => history.push(CONFIRMATION_SCREEN)}
             >
               {intl.formatMessage(messages.saveDraft)}
             </FooterPrimaryButton>
@@ -665,18 +707,25 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfulSubmission(data.createBirthRegistration)
           }
         >
-          {submitBirthRegistration => {
+          {(submitBirthRegistration, { loading, error, data }) => {
             return (
               <Modal
                 title="Are you ready to submit?"
                 actions={[
-                  <PrimaryButton
+                  <ConfirmBtn
                     key="submit"
                     id="submit_confirm"
+                    disabled={loading || data}
                     onClick={() => submitBirthRegistration()}
                   >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
+                    {!loading && (
+                      <>
+                        <TickLarge />
+                        {intl.formatMessage(messages.submitButton)}
+                      </>
+                    )}
+                    {loading && <ButtonSpinner id="submit_confirm_spinner" />}
+                  </ConfirmBtn>,
                   <PreviewButton
                     id="preview-btn"
                     key="preview"
@@ -706,18 +755,25 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfullyRegistered(data.markBirthAsRegistered)
           }
         >
-          {markBirthAsRegistered => {
+          {(markBirthAsRegistered, { loading, error, data }) => {
             return (
               <Modal
                 title="Are you ready to submit?"
                 actions={[
-                  <PrimaryButton
+                  <ConfirmBtn
                     key="register"
                     id="register_confirm"
+                    disabled={loading || data}
                     onClick={() => markBirthAsRegistered()}
                   >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
+                    {!loading && (
+                      <>
+                        <TickLarge />
+                        {intl.formatMessage(messages.submitButton)}
+                      </>
+                    )}
+                    {loading && <ButtonSpinner id="register_confirm_spinner" />}
+                  </ConfirmBtn>,
                   <PreviewButton
                     key="review"
                     id="register_review"

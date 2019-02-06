@@ -43,6 +43,7 @@ const animation = {
 }
 
 const MenuContainer = styled.div`
+  top: 0;
   right: 0;
   width: 199px;
   background-color: ${({ theme }) => theme.colors.primary};
