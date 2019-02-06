@@ -232,8 +232,6 @@ describe('ReviewForm tests', async () => {
       childBirthDate: '2001-01-01',
       familyName: 'আকাশ',
       familyNameEng: 'Akash',
-      firstNames: '',
-      firstNamesEng: '',
       gender: 'male',
       birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
       placeOfBirth: 'HOSPITAL',
@@ -242,46 +240,6 @@ describe('ReviewForm tests', async () => {
       weightAtBirth: 2
     })
 
-    testComponent.component.unmount()
-  })
-  it('it returns empty data and checks if there is any error', async () => {
-    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
-          variables: { id: draft.id }
-        },
-        result: {
-          data: {
-            fetchBirthRegistration: {}
-          }
-        }
-      }
-    ]
-    const testComponent = createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        scope={scope}
-        staticContext={mock}
-        registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
-        match={{
-          params: { draftId: draft.id, tabId: 'review' },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftId={draft.id}
-      />,
-      store,
-      graphqlMock
-    )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 0)
-    })
     testComponent.component.unmount()
   })
   it("when registration contact is father, father's should be set", async () => {
@@ -409,7 +367,6 @@ describe('ReviewForm tests', async () => {
     expect(data.data.registration.registrationPhone).toBe('01711111111')
     testComponent.component.unmount()
   })
-
   it('when registration contact is there but no contact information for father/mother', async () => {
     const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
@@ -493,7 +450,6 @@ describe('ReviewForm tests', async () => {
 
     testComponent.component.unmount()
   })
-
   it('when registration has attachment', async () => {
     const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
@@ -685,7 +641,16 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              placeOfBirth: null,
+              placeOfBirth: {
+                address: {
+                  type: 'PERMANENT',
+                  line: ['12', '', '', 'union1', '', 'upazila10'],
+                  district: 'district2',
+                  state: 'state2',
+                  postalCode: '',
+                  country: 'BGD'
+                }
+              },
               birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
               birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
@@ -731,7 +696,6 @@ describe('ReviewForm tests', async () => {
       registrationPhone: '01711111111',
       commentsOrNotes: 'This is a note',
       trackingId: 'B123456',
-      registrationNumber: null,
       type: 'birth'
     })
 
