@@ -33,7 +33,6 @@ import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import {
   Registrant,
-  Issuer,
   generateMoneyReceipt,
   generateCertificateDataURL,
   CertificateDetails,
@@ -374,6 +373,36 @@ const messages = defineMessages({
     id: 'menu.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
+  },
+  FIELD_AGENT: {
+    id: 'register.home.hedaer.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
+  },
+  REGISTRATION_CLERK: {
+    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    defaultMessage: 'Registrar',
+    description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.hedaer.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
 
@@ -395,7 +424,6 @@ type IProps = {
   language: string
   collectCertificateForm: IFormSection
   paymentFormSection: IFormSection
-  IssuerDetails: Issuer
   certificatePreviewFormSection: IFormSection
   registerForm: IForm
   userDetails: IUserDetails
@@ -521,8 +549,9 @@ class PrintCertificateActionComponent extends React.Component<
     registrant: Registrant,
     certificateDetails: CertificateDetails
   ) => {
-    const { intl, IssuerDetails, paymentFormSection } = this.props
+    const { intl, paymentFormSection } = this.props
     const { enableConfirmButton } = this.state
+    const issuerDetails = this.getIssuerDetails()
     const amountObj = paymentFormSection.fields.find(
       i => i.name === 'paymentAmount'
     )
@@ -561,7 +590,7 @@ class PrintCertificateActionComponent extends React.Component<
                   generateMoneyReceipt(
                     intl,
                     registrant,
-                    IssuerDetails,
+                    issuerDetails,
                     amount,
                     this.props.language
                   )
@@ -650,7 +679,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="finish-printing-certificate"
                 disabled={!enableConfirmButton}
-                onClick={() => (location.href = 'work-queue')}
+                onClick={() => (location.href = '/work-queue')}
               >
                 {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>

@@ -169,11 +169,6 @@ describe('when user wants to print certificate', async () => {
           path: '',
           url: ''
         }}
-        IssuerDetails={{
-          name: 'Some name',
-          role: 'Registrar',
-          issuedAt: 'some location'
-        }}
       />,
       store,
       graphqlMock
@@ -313,11 +308,6 @@ describe('when user wants to print certificate', async () => {
           isExact: true,
           path: '',
           url: ''
-        }}
-        IssuerDetails={{
-          name: '',
-          role: '',
-          issuedAt: ''
         }}
       />,
       store,
@@ -615,11 +605,6 @@ describe('when user wants to print certificate', async () => {
             isExact: true,
             path: '',
             url: ''
-          }}
-          IssuerDetails={{
-            name: '',
-            role: '',
-            issuedAt: ''
           }}
         />,
         store,

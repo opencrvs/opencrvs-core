@@ -1025,38 +1025,12 @@ export class WorkQueueView extends React.Component<
     }
   }
 
-  getIssuerDetails() {
-    const { intl, userDetails, language } = this.props
-    let fullName = ''
-
-    if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
-      ) as GQLHumanName
-      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-    }
-
-    return {
-      name: fullName,
-      role:
-        userDetails && userDetails.role
-          ? intl.formatMessage(messages[userDetails.role])
-          : '',
-      issuedAt:
-        userDetails &&
-        userDetails.primaryOffice &&
-        userDetails.primaryOffice.name
-          ? userDetails.primaryOffice.name
-          : ''
-    }
-  }
-
   onPageChange = async (newPageNumber: number) => {
     this.setState({ currentPage: newPageNumber })
   }
 
   render() {
-    const { intl, theme } = this.props
+    const { intl, theme, userDetails, language } = this.props
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -1152,13 +1126,27 @@ export class WorkQueueView extends React.Component<
         ]
       }
     }
+
+    let fullName = ''
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    }
+
+    const role =
+      userDetails && userDetails.role
+        ? intl.formatMessage(messages[userDetails.role])
+        : ''
+
     return (
       <>
         <HomeViewHeader
           title={intl.formatMessage(messages.hello, {
-            fullName: this.getIssuerDetails().name
+            fullName
           })}
-          description={this.getIssuerDetails().role}
+          description={role}
           id="home_view"
         />
         <Container>
