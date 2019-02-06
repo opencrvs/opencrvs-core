@@ -473,7 +473,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   getEvent() {
-    const eventType = this.props.draft.eventType || 'BIRTH'
+    const eventType = this.props.draft.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
         return Event.BIRTH

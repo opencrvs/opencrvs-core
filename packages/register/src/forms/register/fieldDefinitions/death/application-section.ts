@@ -272,7 +272,6 @@ export const applicantsSection: IFormSection = {
       type: SUBSECTION,
       label: messages.currentAddress,
       initialValue: '',
-      required: true,
       validate: [],
       conditionals: []
     },
@@ -396,7 +395,6 @@ export const applicantsSection: IFormSection = {
       type: SUBSECTION,
       label: messages.permanentAddress,
       initialValue: '',
-      required: false,
       validate: []
     },
     {
