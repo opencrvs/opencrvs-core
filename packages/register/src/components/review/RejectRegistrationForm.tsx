@@ -131,11 +131,9 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
       <Mutation
         mutation={postMutation}
         variables={this.processSubmitData(draftId)}
+        onCompleted={() => confirmRejectionEvent()}
       >
-        {(rejectRegistration, { data }) => {
-          if (data && data.markBirthAsVoided) {
-            confirmRejectionEvent()
-          }
+        {rejectRegistration => {
           return (
             <OverlayContainer id="reject-registration-form-container">
               <ActionPage
