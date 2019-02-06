@@ -23,16 +23,27 @@ export const resolvers: GQLResolver = {
     async fetchBirthRegistration(_, { id }, authHeader) {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
-    async listBirthRegistrations(_, { status, locationIds }, authHeader) {
+    async listBirthRegistrations(
+      _,
+      { status, locationIds, count = 0, skip = 0 },
+      authHeader
+    ) {
       if (locationIds) {
-        return getCompositionsByLocation(locationIds, authHeader)
+        return getCompositionsByLocation(locationIds, authHeader, count, skip)
+      } else {
+        const bundle = await fetchFHIR(
+          `/Composition${
+            status ? `?status=${statusMap[status]}&` : '?'
+          }_count=${count}&_getpagesoffset=${skip}`,
+          authHeader
+        )
+        return {
+          results: bundle.entry.map(
+            (entry: { resource: {} }) => entry.resource
+          ),
+          totalItems: bundle.total
+        }
       }
-      const bundle = await fetchFHIR(
-        `/Composition${status ? `?status=${statusMap[status]}&` : '?'}_count=0`,
-        authHeader
-      )
-
-      return bundle.entry.map((entry: { resource: {} }) => entry.resource)
     }
   },
 
@@ -126,11 +137,16 @@ export const resolvers: GQLResolver = {
 
 async function getCompositionsByLocation(
   locationIds: Array<string | null>,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  count: number,
+  skip: number
 ) {
   const tasksResponses = await Promise.all(
     locationIds.map(locationId => {
-      return fetchFHIR(`/Task?location=Location/${locationId}`, authHeader)
+      return fetchFHIR(
+        `/Task?location=Location/${locationId}&_count=0`,
+        authHeader
+      )
     })
   )
 
@@ -144,7 +160,13 @@ async function getCompositionsByLocation(
 
   const filteredComposition =
     flattened && flattened.filter(composition => composition !== undefined)
-  return filteredComposition
+
+  // TODO: we should rather try do the skip and count in Hearth directly for efficiency, that would require a more complex query
+  return {
+    totalItems: (filteredComposition && filteredComposition.length) || 0,
+    results:
+      filteredComposition && filteredComposition.slice(skip, skip + count)
+  }
 }
 
 async function getComposition(
