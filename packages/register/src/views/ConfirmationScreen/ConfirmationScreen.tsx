@@ -17,7 +17,12 @@ import {
 import { RouteComponentProps } from 'react-router'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
-import { DECLARATION, REJECTION, DUPLICATION } from 'src/utils/constants'
+import {
+  DECLARATION,
+  REJECTION,
+  DUPLICATION,
+  CERTIFICATION
+} from 'src/utils/constants'
 
 const messages = defineMessages({
   nextCardTitle: {
@@ -261,21 +266,6 @@ class ConfirmationScreenView extends React.Component<
     const trackNumber = history.location.state.trackNumber
       ? history.location.state.trackNumber
       : ''
-    const trackingCardTitle = intl.formatMessage(
-      messages.trackingSectionTitle,
-      {
-        event: eventName
-      }
-    )
-    const trackingCardDesc = intl.formatMessage(messages.trackingSectionDesc, {
-      event: eventName
-    })
-    const nextCardText1 = intl.formatMessage(messages.nextSectionDesc, {
-      event: eventName
-    })
-    const nextCardText2 = intl.formatMessage(messages.nextSectionDescDetails, {
-      event: eventName
-    })
     const isDeclaration =
       history.location.state.eventName === DECLARATION ? true : false
     const isTrackingSection = history.location.state.trackingSection
@@ -285,6 +275,8 @@ class ConfirmationScreenView extends React.Component<
     const isDuplicate =
       history.location.state.eventName === DUPLICATION ? true : false
     const duplicateContextId = history.location.state.duplicateContextId
+    const isCertification =
+      history.location.state.eventName === CERTIFICATION ? true : false
 
     return (
       <>
@@ -328,11 +320,20 @@ class ConfirmationScreenView extends React.Component<
           </Box>
           {isTrackingSection && (
             <TrackingBox>
-              <TrackingHeader>{trackingCardTitle}</TrackingHeader>
+              <TrackingHeader>
+                {!isCertification &&
+                  intl.formatMessage(messages.trackingSectionTitle, {
+                    event: eventName
+                  })}
+              </TrackingHeader>
               <TrackingNumber id="trackingIdViewer">
                 {trackNumber}
               </TrackingNumber>
-              <StyledP>{trackingCardDesc}</StyledP>
+              <StyledP>
+                {intl.formatMessage(messages.trackingSectionDesc, {
+                  event: eventName
+                })}
+              </StyledP>
             </TrackingBox>
           )}
           {isNextSection && (
@@ -340,8 +341,16 @@ class ConfirmationScreenView extends React.Component<
               <BoxHeader>
                 {intl.formatMessage(messages.nextCardTitle)}
               </BoxHeader>
-              <StyledP id="whats_next_title">{nextCardText1}</StyledP>
-              <StyledP id="whats_next_text">{nextCardText2}</StyledP>
+              <StyledP id="whats_next_title">
+                {intl.formatMessage(messages.nextSectionDesc, {
+                  event: eventName
+                })}
+              </StyledP>
+              <StyledP id="whats_next_text">
+                {intl.formatMessage(messages.nextSectionDescDetails, {
+                  event: eventName
+                })}
+              </StyledP>
             </NextBox>
           )}
         </Container>
