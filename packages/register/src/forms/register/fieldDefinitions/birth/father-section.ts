@@ -324,7 +324,7 @@ export const fatherSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [dateFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      conditionals: [conditionals.fathersDetailsExist, conditionals.isMarried]
     },
     {
       name: 'educationalAttainment',
