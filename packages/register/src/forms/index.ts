@@ -84,13 +84,24 @@ export type IFileValue = {
   data: string
 }
 
-export type IFormFieldMapFunction = (
+export type IFormFieldMutationMapFunction = (
   transFormedData: any,
   draftData: IFormData,
   sectionId: string,
   fieldDefinition: IFormField
 ) => void
 
+export type IFormFieldQueryMapFunction = (
+  transFormedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  fieldDefinition: IFormField
+) => void
+
+export type IFormFieldMapping = {
+  mutation?: IFormFieldMutationMapFunction
+  query?: IFormFieldQueryMapFunction
+}
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
@@ -103,7 +114,7 @@ export interface IFormFieldBase {
   initialValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
-  mapping?: IFormFieldMapFunction
+  mapping?: IFormFieldMapping
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -243,15 +254,27 @@ export interface IConditionals {
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   causeOfDeathEstablished: IConditional
+  isMarried: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
 
-export type IFormSectionMapFunction = (
+export type IFormSectionMutationMapFunction = (
   transFormedData: any,
   draftData: IFormData,
   sectionId: string
 ) => void
+
+export type IFormSectionQueryMapFunction = (
+  transFormedData: IFormData,
+  queryData: any,
+  sectionId: string
+) => void
+
+export type IFormSectionMapping = {
+  mutation?: IFormSectionMutationMapFunction
+  query?: IFormSectionQueryMapFunction
+}
 export interface IFormSection {
   id: string
   viewType: ViewType
@@ -261,7 +284,7 @@ export interface IFormSection {
   disabled?: boolean
   optional?: boolean
   notice?: FormattedMessage.MessageDescriptor
-  mapping?: IFormSectionMapFunction
+  mapping?: IFormSectionMapping
 }
 
 export interface IForm {

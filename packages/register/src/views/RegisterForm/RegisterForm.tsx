@@ -27,9 +27,9 @@ import {
 import { StickyFormTabs } from './StickyFormTabs'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
-import { draftToMutationTransformer } from '../../transformer'
+import { draftToGqlTransformer } from 'src/transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
-import { merge } from 'lodash'
+import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
@@ -41,6 +41,8 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
+import { InvertSpinner } from '@opencrvs/components/lib/interface'
+import { TickLarge } from '@opencrvs/components/lib/icons'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -205,6 +207,27 @@ const Optional = styled.span.attrs<
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
+`
+
+const ButtonSpinner = styled(InvertSpinner)`
+  width: 15px;
+  height: 15px;
+  top: 0px !important;
+`
+
+const ConfirmBtn = styled(PrimaryButton)`
+  font-weight: bold;
+  padding: 15px 20px 15px 20px;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  &:disabled {
+    background: ${({ theme }) => theme.colors.primary};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -438,7 +461,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     if (!showRegisterModal && !showSubmitModal) {
       return
     }
-    const data = draftToMutationTransformer(registerForm, draft.data)
+    const data = draftToGqlTransformer(registerForm, draft.data)
     if (!draft.review) {
       return { details: data }
     } else {
@@ -655,18 +678,25 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfulSubmission(data.createBirthRegistration)
           }
         >
-          {submitBirthRegistration => {
+          {(submitBirthRegistration, { loading, error, data }) => {
             return (
               <Modal
                 title="Are you ready to submit?"
                 actions={[
-                  <PrimaryButton
+                  <ConfirmBtn
                     key="submit"
                     id="submit_confirm"
+                    disabled={loading || data}
                     onClick={() => submitBirthRegistration()}
                   >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
+                    {!loading && (
+                      <>
+                        <TickLarge />
+                        {intl.formatMessage(messages.submitButton)}
+                      </>
+                    )}
+                    {loading && <ButtonSpinner id="submit_confirm_spinner" />}
+                  </ConfirmBtn>,
                   <PreviewButton
                     id="preview-btn"
                     key="preview"
@@ -696,18 +726,25 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.successfullyRegistered(data.markBirthAsRegistered)
           }
         >
-          {markBirthAsRegistered => {
+          {(markBirthAsRegistered, { loading, error, data }) => {
             return (
               <Modal
                 title="Are you ready to submit?"
                 actions={[
-                  <PrimaryButton
+                  <ConfirmBtn
                     key="register"
                     id="register_confirm"
+                    disabled={loading || data}
                     onClick={() => markBirthAsRegistered()}
                   >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
+                    {!loading && (
+                      <>
+                        <TickLarge />
+                        {intl.formatMessage(messages.submitButton)}
+                      </>
+                    )}
+                    {loading && <ButtonSpinner id="register_confirm_spinner" />}
+                  </ConfirmBtn>,
                   <PreviewButton
                     key="review"
                     id="register_review"
@@ -748,7 +785,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
 function replaceInitialValues(fields: IFormField[], sectionValues: object) {
   return fields.map(field => ({
     ...field,
-    initialValue: sectionValues[field.name] || field.initialValue
+    initialValue:
+      isUndefined(sectionValues[field.name]) ||
+      isNull(sectionValues[field.name])
+        ? field.initialValue
+        : sectionValues[field.name]
   }))
 }
 

@@ -6,12 +6,12 @@ import { paymentFormSection } from './fieldDefinitions/payment-section'
 import { certificatePreview } from './fieldDefinitions/preview-section'
 
 const initialState: IPrintFormState = {
-  collectCertificateFrom: collectCertificateFormSection,
+  collectCertificateForm: collectCertificateFormSection,
   paymentForm: paymentFormSection,
   certificatePreviewForm: certificatePreview
 }
 export interface IPrintFormState {
-  collectCertificateFrom: IFormSection
+  collectCertificateForm: IFormSection
   paymentForm: IFormSection
   certificatePreviewForm: IFormSection
 }
