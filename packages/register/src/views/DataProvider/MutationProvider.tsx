@@ -14,9 +14,11 @@ interface IMutationProviderProps {
   onCompleted: (data: any) => void
 }
 type IProps = IMutationProviderProps & InjectedIntlProps
+/* Need to add mappings for events here */
 const MutationMapper = {
   [Event.BIRTH]: getBirthMutationMappings
 }
+
 export const MutationContext = React.createContext({
   mutation: {},
   loading: false,
