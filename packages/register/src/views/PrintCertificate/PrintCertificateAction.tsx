@@ -1,6 +1,6 @@
 import * as React from 'react'
 import gql from 'graphql-tag'
-import { Query, Mutation } from 'react-apollo'
+import { Query } from 'react-apollo'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner } from '@opencrvs/components/lib/interface'
@@ -15,7 +15,8 @@ import {
   PDF_DOCUMENT_VIEWER,
   IFormField,
   IForm,
-  Event
+  Event,
+  Action
 } from 'src/forms'
 import {
   PrimaryButton,
@@ -50,6 +51,10 @@ import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import {
+  MutationProvider,
+  MutationContext
+} from 'src/views/DataProvider/MutationProvider'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -367,12 +372,6 @@ const messages = defineMessages({
   }
 })
 
-const certifyMutation = gql`
-  mutation markBirthAsCertified($id: ID!, $details: BirthRegistrationInput!) {
-    markBirthAsCertified(id: $id, details: $details)
-  }
-`
-
 type State = {
   currentForm: string
   data: IFormSectionData
@@ -454,17 +453,23 @@ class PrintCertificateActionComponent extends React.Component<
         throw new Error(`No form found for id ${currentForm}`)
     }
   }
-
-  processSubmitData() {
+  getDraft() {
     const {
       registrationId,
-      drafts: { drafts },
-      registerForm
+      drafts: { drafts }
     } = this.props
+    return (
+      drafts.find(draftItem => draftItem.id === registrationId) || {
+        data: {},
+        eventType: 'birth'
+      }
+    )
+  }
+  processSubmitData() {
+    const { registrationId, registerForm } = this.props
     const { data } = this.state
-    const draft = drafts.find(draftItem => draftItem.id === registrationId) || {
-      data: {}
-    }
+    const draft = this.getDraft()
+
     const result = {
       id: registrationId,
       details: draftToGqlTransformer(registerForm, draft.data)
@@ -582,17 +587,18 @@ class PrintCertificateActionComponent extends React.Component<
                 <B>{intl.formatMessage(messages.certificateIsCorrect)}</B>
                 {intl.formatMessage(messages.certificateConfirmationTxt)}
               </Info>
-              <Mutation
-                mutation={certifyMutation}
-                variables={this.processSubmitData()}
+              <MutationProvider
+                event={this.getEvent()}
+                action={Action.COLLECT_CERTIFICATE}
+                payload={this.processSubmitData()}
                 onCompleted={() => {
                   this.setState(() => ({
                     enableConfirmButton: true
                   }))
                 }}
               >
-                {(markBirthAsCertified, { loading, error, data }) => {
-                  return (
+                <MutationContext.Consumer>
+                  {({ mutation, loading, data }) => (
                     <ConfirmBtn
                       id="registerApplicationBtn"
                       icon={() => {
@@ -611,15 +617,14 @@ class PrintCertificateActionComponent extends React.Component<
                       }}
                       align={ICON_ALIGNMENT.LEFT}
                       disabled={loading || data}
-                      onClick={() => {
-                        markBirthAsCertified()
-                      }}
+                      // @ts-ignore
+                      onClick={() => mutation()}
                     >
                       {intl.formatMessage(messages.confirm)}
                     </ConfirmBtn>
-                  )
-                }}
-              </Mutation>
+                  )}
+                </MutationContext.Consumer>
+              </MutationProvider>
               <EditRegistration id="edit" disabled={true}>
                 <Edit />
                 {this.props.intl.formatMessage(messages.editRegistration)}
@@ -730,6 +735,17 @@ class PrintCertificateActionComponent extends React.Component<
       }
     }
   }
+  getEvent() {
+    const eventType = this.getDraft().eventType || 'BIRTH'
+    switch (eventType.toLocaleLowerCase()) {
+      case 'birth':
+        return Event.BIRTH
+      case 'death':
+        return Event.DEATH
+      default:
+        return Event.BIRTH
+    }
+  }
 
   render = () => {
     const {
@@ -834,7 +850,7 @@ class PrintCertificateActionComponent extends React.Component<
                   const reviewDraft = createReviewDraft(
                     registrationId,
                     transData,
-                    Event.BIRTH
+                    this.getEvent()
                   )
                   const draftExist = !!drafts.find(
                     draft => draft.id === registrationId

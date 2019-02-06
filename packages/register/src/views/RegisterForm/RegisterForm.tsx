@@ -2,7 +2,7 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import * as Swipeable from 'react-swipeable'
-import { Box } from '@opencrvs/components/lib/interface'
+import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, ButtonIcon } from '@opencrvs/components/lib/buttons'
 import {
   ArrowForward,
@@ -46,7 +46,10 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
-import { MutationProvider } from '../DataProvider/MutationProvider'
+import {
+  MutationProvider,
+  MutationContext
+} from '../DataProvider/MutationProvider'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -121,6 +124,10 @@ const Notice = styled.div`
   font-size: 18px;
   line-height: 24px;
   margin: 30px -25px;
+`
+const PreviewButton = styled.a`
+  text-decoration: underline;
+  color: ${({ theme }) => theme.colors.primary};
 `
 
 export const messages = defineMessages({
@@ -652,24 +659,92 @@ class RegisterFormView extends React.Component<FullProps, State> {
           </FooterAction>
         </ViewFooter>
 
-        <MutationProvider
-          event={this.getEvent()}
-          action={Action.SUBMIT_FOR_REVIEW}
-          form={registerForm}
-          draft={draft}
-          showModal={this.state.showSubmitModal}
-          toggleModal={this.toggleSubmitModalOpen}
-          onCompleted={this.successfulSubmission}
-        />
-        <MutationProvider
-          event={this.getEvent()}
-          action={Action.REGISTER_APPLICATION}
-          form={registerForm}
-          draft={draft}
-          showModal={this.state.showRegisterModal}
-          toggleModal={this.toggleRegisterModalOpen}
-          onCompleted={this.successfullyRegistered}
-        />
+        {this.state.showSubmitModal && (
+          <MutationProvider
+            event={this.getEvent()}
+            action={Action.SUBMIT_FOR_REVIEW}
+            form={registerForm}
+            draft={draft}
+            onCompleted={this.successfulSubmission}
+          >
+            <MutationContext.Consumer>
+              {({ mutation }) => (
+                <Modal
+                  title="Are you ready to submit?"
+                  actions={[
+                    <PrimaryButton
+                      key="submit"
+                      id="submit_confirm"
+                      // @ts-ignore
+                      onClick={() => mutation()}
+                    >
+                      {intl.formatMessage(messages.submitButton)}
+                    </PrimaryButton>,
+                    <PreviewButton
+                      id="preview-btn"
+                      key="preview"
+                      onClick={() => {
+                        this.toggleSubmitModalOpen()
+                        if (document.documentElement) {
+                          document.documentElement.scrollTop = 0
+                        }
+                      }}
+                    >
+                      {intl.formatMessage(messages.preview)}
+                    </PreviewButton>
+                  ]}
+                  show={this.state.showSubmitModal}
+                  handleClose={this.toggleSubmitModalOpen}
+                >
+                  {intl.formatMessage(messages.submitDescription)}
+                </Modal>
+              )}
+            </MutationContext.Consumer>
+          </MutationProvider>
+        )}
+        {this.state.showRegisterModal && (
+          <MutationProvider
+            event={this.getEvent()}
+            action={Action.REGISTER_APPLICATION}
+            form={registerForm}
+            draft={draft}
+            onCompleted={this.successfullyRegistered}
+          >
+            <MutationContext.Consumer>
+              {({ mutation }) => (
+                <Modal
+                  title="Are you ready to submit?"
+                  actions={[
+                    <PrimaryButton
+                      key="register"
+                      id="register_confirm"
+                      // @ts-ignore
+                      onClick={() => mutation()}
+                    >
+                      {intl.formatMessage(messages.submitButton)}
+                    </PrimaryButton>,
+                    <PreviewButton
+                      key="review"
+                      id="register_review"
+                      onClick={() => {
+                        this.toggleRegisterModalOpen()
+                        if (document.documentElement) {
+                          document.documentElement.scrollTop = 0
+                        }
+                      }}
+                    >
+                      {intl.formatMessage(messages.preview)}
+                    </PreviewButton>
+                  ]}
+                  show={this.state.showRegisterModal}
+                  handleClose={this.toggleRegisterModalOpen}
+                >
+                  {intl.formatMessage(messages.submitDescription)}
+                </Modal>
+              )}
+            </MutationContext.Consumer>
+          </MutationProvider>
+        )}
 
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
@@ -679,6 +754,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             }}
             duplicate={duplicate}
             draftId={draft.id}
+            event={this.getEvent()}
           />
         )}
       </FormViewContainer>
