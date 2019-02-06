@@ -13,7 +13,7 @@ import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat
+  isValidBirthDate
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 
@@ -242,7 +242,7 @@ export const deceasedSection: IFormSection = {
       label: messages.deceasedDateOfBirth,
       required: true,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [isValidBirthDate]
     },
     {
       name: 'permanentAddress',

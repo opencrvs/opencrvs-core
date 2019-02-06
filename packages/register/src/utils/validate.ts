@@ -53,6 +53,12 @@ export const messages = defineMessages({
     defaultMessage: 'Must be a valid date',
     description: 'The error message appears when the given date is not valid'
   },
+  isValidBirthDate: {
+    id: 'validations.isValidBirthDate',
+    defaultMessage: 'Must be a valid birth date',
+    description:
+      'The error message appears when the given birth date is not valid'
+  },
   emailAddressFormat: {
     id: 'validations.emailAddressFormat',
     defaultMessage: 'Must be a valid email address',
@@ -223,6 +229,18 @@ export const dateFormat: Validation = (value: string) => {
     ? undefined
     : {
         message: messages.dateFormat
+      }
+}
+
+export const isDateNotInFuture = (date: string) => {
+  return new Date(date) <= new Date(new Date())
+}
+
+export const isValidBirthDate: Validation = (value: string) => {
+  return value && isDateNotInFuture(value) && isAValidDateFormat(value)
+    ? undefined
+    : {
+        message: messages.isValidBirthDate
       }
 }
 /*
