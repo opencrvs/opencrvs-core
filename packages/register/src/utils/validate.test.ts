@@ -12,7 +12,8 @@ import {
   englishOnlyNameFormat,
   range,
   validIDNumber,
-  maxLength
+  maxLength,
+  isValidBirthDate
 } from './validate'
 
 describe('validate', () => {
@@ -286,6 +287,48 @@ describe('validate', () => {
       const validDate = '2011-08-12'
       const response = undefined
       expect(dateFormat(validDate)).toEqual(response)
+    })
+  })
+
+  describe('isValidBirthDate. Checks a given date is a valid birth date', () => {
+    it('should error when input invalid chararcters', () => {
+      const invalidDate = '1901-+2-2e'
+      expect(isValidBirthDate(invalidDate)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
+    it('should error when input invalid format', () => {
+      const invalidDate = '190-2-21'
+      expect(isValidBirthDate(invalidDate)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
+    it('should error when input invalid date', () => {
+      const invalidDate = '2017-2-29'
+      expect(isValidBirthDate(invalidDate)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
+    it('should error when input a future date', () => {
+      const invalidDate = '2037-2-29'
+      expect(isValidBirthDate(invalidDate)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
+    it('should pass when supplied a valid birth date with single digit', () => {
+      const validDate = '2011-8-12'
+      const response = undefined
+      expect(isValidBirthDate(validDate)).toEqual(response)
+    })
+
+    it('should pass when supplied a valid birth date', () => {
+      const validDate = '2011-08-12'
+      const response = undefined
+      expect(isValidBirthDate(validDate)).toEqual(response)
     })
   })
 
