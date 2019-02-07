@@ -14,6 +14,7 @@ enum BirthRegType {
 }
 
 enum RegistrationContactType {
+  BOTH
   MOTHER
   FATHER
 }
