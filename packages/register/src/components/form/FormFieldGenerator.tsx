@@ -23,7 +23,8 @@ import {
   internationaliseFieldObject,
   getConditionalActionsForField,
   getFieldOptions,
-  getFieldLabel
+  getFieldLabel,
+  getFieldOptionsByValueMapper
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -55,7 +56,11 @@ import {
   ITextFormField,
   IDynamicFormField,
   LINK,
-  PDF_DOCUMENT_VIEWER
+  PDF_DOCUMENT_VIEWER,
+  DYNAMIC_LIST,
+  IDynamicListFormField,
+  IListFormField,
+  IFormData
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -310,6 +315,7 @@ interface IFormSectionProps {
   setAllFieldsDirty: boolean
   offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
+  draftData?: IFormData
 }
 
 type Props = IFormSectionProps &
@@ -366,7 +372,8 @@ class FormSectionComponent extends React.Component<Props> {
       setFieldValue,
       touched,
       offlineResources,
-      intl
+      intl,
+      draftData
     } = this.props
 
     const errors = (this.props.errors as any) as {
@@ -426,6 +433,16 @@ class FormSectionComponent extends React.Component<Props> {
                   type: TEXT,
                   label: getFieldLabel(field as IDynamicFormField, values)
                 } as ITextFormField)
+              : field.type === DYNAMIC_LIST
+              ? ({
+                  ...field,
+                  type: LIST,
+                  items: getFieldOptionsByValueMapper(
+                    field as IDynamicListFormField,
+                    draftData as IFormData,
+                    field.dynamicItems.valueMapper
+                  )
+                } as IListFormField)
               : field
 
           if (
