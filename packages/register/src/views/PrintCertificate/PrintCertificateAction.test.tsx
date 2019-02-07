@@ -19,10 +19,9 @@ import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/previ
 import { calculateDays, timeElapsed } from './calculatePrice'
 
 describe('when user wants to print certificate', async () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   const mock: () => void = jest.fn()
-  const formSection = store.getState().printCertificateForm
-    .collectCertificateFrom
+  const mockLocation: any = jest.fn()
 
   it('renders fields after successful graphql query', async () => {
     const graphqlMock = [
@@ -137,6 +136,21 @@ describe('when user wants to print certificate', async () => {
                 status: [
                   {
                     comments: null,
+
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    },
                     __typename: 'RegWorkflow'
                   }
                 ],
@@ -157,15 +171,16 @@ describe('when user wants to print certificate', async () => {
 
     const testComponent = createTestComponent(
       <PrintCertificateAction
-        backLabel="Back"
-        title="Print certificate"
-        registrationId="asdhdqe2472487jsdfsdf"
-        togglePrintCertificateSection={mock}
-        printCertificateFormSection={formSection}
-        IssuerDetails={{
-          name: 'Some name',
-          role: 'Registrar',
-          issuedAt: 'some location'
+        location={mockLocation}
+        history={history}
+        staticContext={mockLocation}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf'
+          },
+          isExact: true,
+          path: '',
+          url: ''
         }}
       />,
       store,
@@ -296,15 +311,16 @@ describe('when user wants to print certificate', async () => {
 
     const testComponent = createTestComponent(
       <PrintCertificateAction
-        backLabel="Back"
-        title="Print certificate"
-        registrationId="asdhdqe2472487jsdfsdf"
-        togglePrintCertificateSection={mock}
-        printCertificateFormSection={formSection}
-        IssuerDetails={{
-          name: '',
-          role: '',
-          issuedAt: ''
+        location={mockLocation}
+        history={history}
+        staticContext={mockLocation}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf'
+          },
+          isExact: true,
+          path: '',
+          url: ''
         }}
       />,
       store,
@@ -572,6 +588,21 @@ describe('when user wants to print certificate', async () => {
                   status: [
                     {
                       comments: null,
+
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
                       __typename: 'RegWorkflow'
                     }
                   ],
@@ -592,15 +623,16 @@ describe('when user wants to print certificate', async () => {
 
       const testComponent = createTestComponent(
         <PrintCertificateAction
-          backLabel="Back"
-          title="Print certificate"
-          registrationId="asdhdqe2472487jsdfsdf"
-          togglePrintCertificateSection={mock}
-          printCertificateFormSection={formSection}
-          IssuerDetails={{
-            name: '',
-            role: '',
-            issuedAt: ''
+          location={mockLocation}
+          history={history}
+          staticContext={mockLocation}
+          match={{
+            params: {
+              registrationId: 'asdhdqe2472487jsdfsdf'
+            },
+            isExact: true,
+            path: '',
+            url: ''
           }}
         />,
         store,

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner, InvertSpinner } from '@opencrvs/components/lib/interface'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { FormFieldGenerator } from 'src/components/form'
 import {
@@ -19,8 +19,7 @@ import {
 import {
   PrimaryButton,
   SecondaryButton,
-  IconAction,
-  ICON_ALIGNMENT
+  IconAction
 } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
@@ -32,7 +31,6 @@ import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import {
   Registrant,
-  Issuer,
   generateMoneyReceipt,
   generateCertificateDataURL,
   CertificateDetails,
@@ -47,6 +45,10 @@ import {
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import {
+  fatherDataDoesNotExist,
+  fatherDataExists
+} from 'src/forms/certificate/fieldDefinitions/collector-section'
 import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import {
@@ -57,6 +59,13 @@ import {
   QueryProvider,
   QueryContext
 } from 'src/views/DataProvider/QueryProvider'
+import { getUserDetails } from 'src/profile/profileSelectors'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { IUserDetails } from 'src/utils/userUtils'
+import { RouteComponentProps } from 'react-router'
+import { goToHome } from 'src/navigation'
+import { CERTIFICATION, COMPLETION } from 'src/utils/constants'
+import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -143,14 +152,13 @@ const StyledIconAction = styled(IconAction)`
 `
 const ConfirmBtn = styled(PrimaryButton)`
   font-weight: bold;
-  padding: 15px 35px 15px 20px;
-  div {
-    position: relative !important;
-    margin-right: 20px;
-    top: 2px;
+  min-width: 148px;
+  padding: 15px 20px 15px 20px;
+  span {
+    margin: 0 auto;
   }
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.primary};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }
@@ -191,7 +199,7 @@ const B = styled.div`
   font-weight: bold;
 `
 
-const ButtonSpinner = styled(Spinner)`
+const ButtonSpinner = styled(InvertSpinner)`
   width: 15px;
   height: 15px;
   top: 0px !important;
@@ -272,8 +280,68 @@ const messages = defineMessages({
   },
   certificateConfirmationTxt: {
     id: 'certificate.txt.confirmationTxt'
+  },
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
+  },
+  FIELD_AGENT: {
+    id: 'register.home.hedaer.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
+  },
+  REGISTRATION_CLERK: {
+    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    defaultMessage: 'Registrar',
+    description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.hedaer.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
+
+interface IFullName {
+  fullNameInBn: string
+  fullNameInEng: string
+}
+
+const getFullName = (certificateDetails: CertificateDetails): IFullName => {
+  let fullNameInBn = ''
+  let fullNameInEng = ''
+  if (certificateDetails && certificateDetails.name) {
+    fullNameInBn = String(certificateDetails.name.bn)
+    fullNameInEng = String(certificateDetails.name.en)
+  }
+  return {
+    fullNameInBn,
+    fullNameInEng
+  }
+}
+
+interface ICertDetail {
+  [key: string]: any
+}
+interface ICertDetails {
+  [key: string]: ICertDetail
+}
 
 type State = {
   currentForm: string
@@ -283,19 +351,17 @@ type State = {
 }
 
 type IProps = {
-  backLabel: string
-  title: string
   registrationId: string
   language: string
-  togglePrintCertificateSection: () => void
-  printCertificateFormSection: IFormSection
+  collectCertificateForm: IFormSection
   paymentFormSection: IFormSection
-  IssuerDetails: Issuer
   certificatePreviewFormSection: IFormSection
   registerForm: IForm
+  userDetails: IUserDetails
 }
 
 type IFullProps = InjectedIntlProps &
+  RouteComponentProps<{}> &
   IProps & { dispatch: Dispatch; drafts: IDraftsState }
 
 class PrintCertificateActionComponent extends React.Component<
@@ -312,6 +378,21 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
+  finishSubmission = (certificateDetails: CertificateDetails) => {
+    const { history } = this.props
+    const fullName = getFullName(certificateDetails)
+    const noOfCertificate = 103
+
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: noOfCertificate,
+      trackingSection: true,
+      eventName: CERTIFICATION,
+      actionName: COMPLETION,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
+    })
+  }
+
   storeData = (documentData: IFormSectionData) => {
     this.setState(
       prevState => ({
@@ -326,7 +407,11 @@ class PrintCertificateActionComponent extends React.Component<
 
   shouldEnableConfirmButton = (documentData: IFormSectionData) => {
     const form = this.getForm(this.state.currentForm)
-    return documentData && !hasFormError(form.fields, documentData)
+    if (form.id !== 'certificatePreview') {
+      return documentData && !hasFormError(form.fields, documentData)
+    } else {
+      return false
+    }
   }
 
   addPDFToField(form: IFormSection) {
@@ -340,13 +425,13 @@ class PrintCertificateActionComponent extends React.Component<
 
   getForm = (currentForm: string) => {
     const {
-      printCertificateFormSection,
+      collectCertificateForm,
       paymentFormSection,
       certificatePreviewFormSection
     } = this.props
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
-        return printCertificateFormSection
+        return collectCertificateForm
       case PAYMENT:
         return paymentFormSection
       case CERTIFICATE_PREVIEW:
@@ -420,8 +505,9 @@ class PrintCertificateActionComponent extends React.Component<
     registrant: Registrant,
     certificateDetails: CertificateDetails
   ) => {
-    const { intl, IssuerDetails, paymentFormSection } = this.props
+    const { intl, paymentFormSection } = this.props
     const { enableConfirmButton } = this.state
+    const issuerDetails = this.getIssuerDetails()
     const amountObj = paymentFormSection.fields.find(
       i => i.name === 'paymentAmount'
     )
@@ -460,7 +546,7 @@ class PrintCertificateActionComponent extends React.Component<
                   generateMoneyReceipt(
                     intl,
                     registrant,
-                    IssuerDetails,
+                    issuerDetails,
                     amount,
                     this.props.language
                   )
@@ -504,26 +590,21 @@ class PrintCertificateActionComponent extends React.Component<
                   {({ mutation, loading, data }) => (
                     <ConfirmBtn
                       id="registerApplicationBtn"
-                      icon={() => {
-                        if (loading) {
-                          return (
-                            <>
-                              <ButtonSpinner id="Spinner" baseColor="#F9F9F9" />
-                            </>
-                          )
-                        }
-                        return (
-                          <>
-                            <TickLarge />
-                          </>
-                        )
-                      }}
-                      align={ICON_ALIGNMENT.LEFT}
                       disabled={loading || data}
                       // @ts-ignore
                       onClick={() => mutation()}
                     >
-                      {intl.formatMessage(messages.confirm)}
+                      {!loading && (
+                        <>
+                          <TickLarge />
+                          <span>{intl.formatMessage(messages.confirm)}</span>
+                        </>
+                      )}
+                      {loading && (
+                        <span>
+                          <ButtonSpinner id="Spinner" />
+                        </span>
+                      )}
                     </ConfirmBtn>
                   )}
                 </MutationContext.Consumer>
@@ -549,7 +630,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="finish-printing-certificate"
                 disabled={!enableConfirmButton}
-                onClick={() => (location.href = 'work-queue')}
+                onClick={() => this.finishSubmission(certificateDetails)}
               >
                 {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>
@@ -614,7 +695,7 @@ class PrintCertificateActionComponent extends React.Component<
     return registrant
   }
 
-  getCertificateDetails(data: IFormData): CertificateDetails {
+  getCertificateDetails(data: ICertDetails): CertificateDetails {
     const names = data.child.name as Array<{ [key: string]: {} }>
     const NameBn = names.find(name => name.use === 'bn')
     const NameEn = names.find(name => name.use === 'en')
@@ -626,8 +707,30 @@ class PrintCertificateActionComponent extends React.Component<
       CERTIFICATE_DATE_FORMAT
     )
 
+    let regLocationLocationEn = ''
+    let regLocationLocationBn = ''
+    if (
+      data &&
+      data.registration &&
+      data.registration.status &&
+      data.registration.status[0] &&
+      data.registration.status[0].office &&
+      data.registration.status[0].office.address
+    ) {
+      regLocationLocationEn = [
+        data.registration.status[0].office.name as string,
+        data.registration.status[0].office.address.district as string,
+        data.registration.status[0].office.address.state as string
+      ].join(', ') as string
+      regLocationLocationBn = data.registration.status[0].office.alias as string
+    }
+
     return {
       registrationNo: data.registration.registrationNumber as string,
+      registrationLocation: {
+        en: regLocationLocationEn,
+        bn: regLocationLocationBn
+      },
       name: {
         bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
         en: NameEn ? NameEn.firstNames + ' ' + NameEn.familyName : ''
@@ -650,13 +753,37 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
+  getIssuerDetails() {
+    const { intl, userDetails, language } = this.props
+    let fullName = ''
+
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    }
+
+    return {
+      name: fullName,
+      role:
+        userDetails && userDetails.role
+          ? intl.formatMessage(messages[userDetails.role])
+          : '',
+      issuedAt:
+        userDetails &&
+        userDetails.primaryOffice &&
+        userDetails.primaryOffice.name
+          ? userDetails.primaryOffice.name
+          : ''
+    }
+  }
+
   render = () => {
     const {
       intl,
-      backLabel,
       registrationId,
-      togglePrintCertificateSection,
-      printCertificateFormSection,
+      collectCertificateForm,
       paymentFormSection,
       drafts: { drafts },
       dispatch
@@ -669,8 +796,10 @@ class PrintCertificateActionComponent extends React.Component<
       <ActionPageWrapper>
         <ActionPage
           title={intl.formatMessage(form.title)}
-          backLabel={backLabel}
-          goBack={togglePrintCertificateSection}
+          backLabel={intl.formatMessage(messages.back)}
+          goBack={() => {
+            dispatch(goToHome())
+          }}
         >
           <HeaderContent>
             <QueryProvider
@@ -683,11 +812,10 @@ class PrintCertificateActionComponent extends React.Component<
                   if (loading) {
                     return <StyledSpinner id="print-certificate-spinner" />
                   }
-
                   if (data) {
                     // @ts-ignore
                     const retrievedData = data[dataKey]
-                    let fields = printCertificateFormSection.fields
+                    let fields = collectCertificateForm.fields
                     fields = fields.map(field => {
                       if (
                         field &&
@@ -752,6 +880,21 @@ class PrintCertificateActionComponent extends React.Component<
                       this.props.registerForm,
                       retrievedData
                     )
+                    if (
+                      form.fields.filter(
+                        field => field.name === 'personCollectingCertificate'
+                      ).length === 0 &&
+                      form === collectCertificateForm
+                    ) {
+                      if (
+                        transData.father &&
+                        transData.father.fathersDetailsExist
+                      ) {
+                        form.fields.unshift(fatherDataExists)
+                      } else {
+                        form.fields.unshift(fatherDataDoesNotExist)
+                      }
+                    }
                     const reviewDraft = createReviewDraft(
                       registrationId,
                       transData,
@@ -763,7 +906,6 @@ class PrintCertificateActionComponent extends React.Component<
                     if (!draftExist) {
                       dispatch(storeDraft(reviewDraft))
                     }
-
                     return (
                       <FormContainer>
                         <Box>
@@ -792,7 +934,6 @@ class PrintCertificateActionComponent extends React.Component<
                       </ErrorText>
                     )
                   }
-
                   return JSON.stringify(data)
                 }}
               </QueryContext.Consumer>
@@ -805,11 +946,25 @@ class PrintCertificateActionComponent extends React.Component<
 }
 
 const event = 'birth'
-export const PrintCertificateAction = connect((state: IStoreState) => ({
-  language: state.i18n.language,
-  paymentFormSection: state.printCertificateForm.paymentForm,
-  certificatePreviewFormSection:
-    state.printCertificateForm.certificatePreviewForm,
-  drafts: state.drafts,
-  registerForm: state.registerForm.registerForm[event]
-}))(injectIntl<IFullProps>(PrintCertificateActionComponent))
+
+function mapStatetoProps(
+  state: IStoreState,
+  props: RouteComponentProps<{ registrationId: string }>
+) {
+  const { match } = props
+
+  return {
+    registrationId: match.params.registrationId,
+    language: state.i18n.language,
+    paymentFormSection: state.printCertificateForm.paymentForm,
+    certificatePreviewFormSection:
+      state.printCertificateForm.certificatePreviewForm,
+    drafts: state.drafts,
+    registerForm: state.registerForm.registerForm[event],
+    collectCertificateForm: state.printCertificateForm.collectCertificateForm,
+    userDetails: getUserDetails(state)
+  }
+}
+export const PrintCertificateAction = connect(
+  (state: IStoreState) => mapStatetoProps
+)(injectIntl<IFullProps>(PrintCertificateActionComponent))

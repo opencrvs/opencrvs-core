@@ -13,7 +13,8 @@ import {
 import {
   hideNewContentAvailableNotification,
   hideBackgroundSyncedNotification,
-  hideConfigurationErrorNotification
+  hideConfigurationErrorNotification,
+  toggleDraftSavedNotification
 } from 'src/notification/actions'
 
 type NotificationProps = {
@@ -23,12 +24,14 @@ type NotificationProps = {
   backgroundSyncMessageVisible: boolean
   syncCount: number
   waitingSW: ServiceWorker | null
+  saveDraftClicked: boolean
 }
 
 type DispatchProps = {
   hideNewContentAvailableNotification: typeof hideNewContentAvailableNotification
   hideBackgroundSyncedNotification: typeof hideBackgroundSyncedNotification
   hideConfigurationErrorNotification: typeof hideConfigurationErrorNotification
+  toggleDraftSavedNotification: typeof toggleDraftSavedNotification
 }
 
 export const messages = defineMessages({
@@ -44,6 +47,12 @@ export const messages = defineMessages({
       'As you have connectivity, we have synced {syncCount} new birth declarations.',
     description:
       'The message that appears in notification when background sync takes place'
+  },
+  draftsSaved: {
+    id: 'register.notification.draftsSaved',
+    defaultMessage: 'Your draft has been saved',
+    description:
+      'The message that appears in notification when save drafts button is clicked'
   }
 })
 
@@ -69,6 +78,10 @@ class Component extends React.Component<
     this.props.hideConfigurationErrorNotification()
   }
 
+  hideDraftsSavedNotification = () => {
+    this.props.toggleDraftSavedNotification()
+  }
+
   render() {
     const {
       children,
@@ -76,7 +89,8 @@ class Component extends React.Component<
       backgroundSyncMessageVisible,
       configurationErrorVisible,
       syncCount,
-      intl
+      intl,
+      saveDraftClicked
     } = this.props
 
     return (
@@ -113,6 +127,15 @@ class Component extends React.Component<
             and locations
           </Notification>
         )}
+        {saveDraftClicked && (
+          <Notification
+            id="draftsSavedNotification"
+            show={saveDraftClicked}
+            callback={this.hideDraftsSavedNotification}
+          >
+            {intl.formatMessage(messages.draftsSaved)}
+          </Notification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -127,7 +150,8 @@ const mapStateToProps = (store: IStoreState) => {
       store.notification.backgroundSyncMessageVisible,
     configurationErrorVisible: store.notification.configurationErrorVisible,
     syncCount: store.notification.syncCount,
-    waitingSW: store.notification.waitingSW
+    waitingSW: store.notification.waitingSW,
+    saveDraftClicked: store.notification.saveDraftClicked
   }
 }
 
@@ -137,7 +161,8 @@ export const NotificationComponent = withRouter(
     {
       hideNewContentAvailableNotification,
       hideBackgroundSyncedNotification,
-      hideConfigurationErrorNotification
+      hideConfigurationErrorNotification,
+      toggleDraftSavedNotification
     }
   )(injectIntl(Component))
 )

@@ -20,7 +20,8 @@ import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   dateFormat,
-  validIDNumber
+  validIDNumber,
+  isValidBirthDate
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -245,7 +246,7 @@ export const motherSection: IFormSection = {
       label: messages.motherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
+      validate: [isValidBirthDate],
       mapping: {
         mutation: fieldNameTransformer('birthDate'),
         query: fieldValueTransformer('birthDate')
@@ -278,7 +279,8 @@ export const motherSection: IFormSection = {
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      conditionals: [conditionals.isMarried]
     },
     {
       name: 'educationalAttainment',

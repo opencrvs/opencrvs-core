@@ -145,7 +145,10 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
-          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          onChange={(val: string) => {
+            resetDependentSelectValues(fieldDefinition.name)
+            onSetFieldValue(fieldDefinition.name, val)
+          }}
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
@@ -430,7 +433,8 @@ class FormSectionComponent extends React.Component<Props> {
 
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
-            field.type === IMAGE_UPLOADER_WITH_OPTIONS
+            field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS
           ) {
             return (
               <FormItem key={`${field.name}`}>

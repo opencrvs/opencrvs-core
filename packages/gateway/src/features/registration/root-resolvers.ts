@@ -23,16 +23,44 @@ export const resolvers: GQLResolver = {
     async fetchBirthRegistration(_, { id }, authHeader) {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
-    async listBirthRegistrations(_, { status, locationIds }, authHeader) {
-      if (locationIds) {
-        return getCompositionsByLocation(locationIds, authHeader)
-      }
-      const bundle = await fetchFHIR(
-        `/Composition${status ? `?status=${statusMap[status]}&` : '?'}_count=0`,
+    async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
+      const taskBundle = await fetchFHIR(
+        `/Task?identifier=${identifier}`,
         authHeader
       )
 
-      return bundle.entry.map((entry: { resource: {} }) => entry.resource)
+      if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+        throw new Error(`Task does not exist for identifer ${identifier}`)
+      }
+      const task = taskBundle.entry[0].resource as fhir.Task
+
+      if (!task.focus || !task.focus.reference) {
+        throw new Error(`Composition reference not found`)
+      }
+
+      return await fetchFHIR(`/${task.focus.reference}`, authHeader)
+    },
+    async listBirthRegistrations(
+      _,
+      { status, locationIds, count = 0, skip = 0 },
+      authHeader
+    ) {
+      if (locationIds) {
+        return getCompositionsByLocation(locationIds, authHeader, count, skip)
+      } else {
+        const bundle = await fetchFHIR(
+          `/Composition${
+            status ? `?status=${statusMap[status]}&` : '?'
+          }_count=${count}&_getpagesoffset=${skip}`,
+          authHeader
+        )
+        return {
+          results: bundle.entry.map(
+            (entry: { resource: {} }) => entry.resource
+          ),
+          totalItems: bundle.total
+        }
+      }
     }
   },
 
@@ -126,11 +154,16 @@ export const resolvers: GQLResolver = {
 
 async function getCompositionsByLocation(
   locationIds: Array<string | null>,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  count: number,
+  skip: number
 ) {
   const tasksResponses = await Promise.all(
     locationIds.map(locationId => {
-      return fetchFHIR(`/Task?location=Location/${locationId}`, authHeader)
+      return fetchFHIR(
+        `/Task?location=Location/${locationId}&_count=0`,
+        authHeader
+      )
     })
   )
 
@@ -144,7 +177,13 @@ async function getCompositionsByLocation(
 
   const filteredComposition =
     flattened && flattened.filter(composition => composition !== undefined)
-  return filteredComposition
+
+  // TODO: we should rather try do the skip and count in Hearth directly for efficiency, that would require a more complex query
+  return {
+    totalItems: (filteredComposition && filteredComposition.length) || 0,
+    results:
+      filteredComposition && filteredComposition.slice(skip, skip + count)
+  }
 }
 
 async function getComposition(

@@ -90,6 +90,18 @@ export const GET_BIRTH_REGISTRATION = gql`
           comments {
             comment
           }
+          location {
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
         }
         trackingId
         registrationNumber

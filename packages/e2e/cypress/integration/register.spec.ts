@@ -115,6 +115,6 @@ context('Register', () => {
     // MODAL
     // cy.get('#submit_confirm').click()
     // SUCCESS
-    // cy.get('#saved_registration_view').contains('Application submitted')
+    // cy.get('#confirmation_screen_view').contains('Application submitted')
   })
 })
