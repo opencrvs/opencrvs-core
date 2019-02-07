@@ -27,7 +27,7 @@ import {
   fieldValueSectionExchangeTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import { addressToPlaceOfBirthTransformer } from './mappings/mutation/child-mappings'
-import { placeOfBirthToAddressTransformer } from './mappings/query/child-mappings'
+import { eventLocationTransformer } from './mappings/query/child-mappings'
 import {
   nameFieldTransformer,
   fieldValueTransformer,
@@ -429,10 +429,10 @@ export const childSection: IFormSection = {
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.otherPlaceOfBirth],
+      conditionals: [conditionals.otherEventLocation],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(),
-        query: placeOfBirthToAddressTransformer()
+        query: eventLocationTransformer()
       }
     },
     {
@@ -446,10 +446,10 @@ export const childSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
       },
-      conditionals: [conditionals.country, conditionals.otherPlaceOfBirth],
+      conditionals: [conditionals.country, conditionals.otherEventLocation],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(),
-        query: placeOfBirthToAddressTransformer()
+        query: eventLocationTransformer()
       }
     },
     {
@@ -466,11 +466,11 @@ export const childSection: IFormSection = {
       conditionals: [
         conditionals.country,
         conditionals.state,
-        conditionals.otherPlaceOfBirth
+        conditionals.otherEventLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(),
-        query: placeOfBirthToAddressTransformer()
+        query: eventLocationTransformer()
       }
     },
     {
@@ -488,11 +488,11 @@ export const childSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.district,
-        conditionals.otherPlaceOfBirth
+        conditionals.otherEventLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(6),
-        query: placeOfBirthToAddressTransformer(6)
+        query: eventLocationTransformer(6)
       }
     },
     {
@@ -511,12 +511,12 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherPlaceOfBirth,
+        conditionals.otherEventLocation,
         conditionals.isNotCityLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(4),
-        query: placeOfBirthToAddressTransformer(4)
+        query: eventLocationTransformer(4)
       }
     },
     {
@@ -531,12 +531,12 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherPlaceOfBirth,
+        conditionals.otherEventLocation,
         conditionals.isCityLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(5),
-        query: placeOfBirthToAddressTransformer(5)
+        query: eventLocationTransformer(5)
       }
     },
     {
@@ -552,11 +552,11 @@ export const childSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.otherPlaceOfBirth
+        conditionals.otherEventLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(3),
-        query: placeOfBirthToAddressTransformer(3)
+        query: eventLocationTransformer(3)
       }
     },
     {
@@ -571,12 +571,12 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherPlaceOfBirth,
+        conditionals.otherEventLocation,
         conditionals.isCityLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(2),
-        query: placeOfBirthToAddressTransformer(2)
+        query: eventLocationTransformer(2)
       }
     },
     {
@@ -591,12 +591,12 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherPlaceOfBirth,
+        conditionals.otherEventLocation,
         conditionals.isCityLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(0, 'postalCode'),
-        query: placeOfBirthToAddressTransformer(0, 'postalCode')
+        query: eventLocationTransformer(0, 'postalCode')
       }
     },
     {
@@ -612,11 +612,11 @@ export const childSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.otherPlaceOfBirth
+        conditionals.otherEventLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(1),
-        query: placeOfBirthToAddressTransformer(1)
+        query: eventLocationTransformer(1)
       }
     },
     {
@@ -632,11 +632,11 @@ export const childSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.otherPlaceOfBirth
+        conditionals.otherEventLocation
       ],
       mapping: {
         mutation: addressToPlaceOfBirthTransformer(0, 'postalCode'),
-        query: placeOfBirthToAddressTransformer(0, 'postalCode')
+        query: eventLocationTransformer(0, 'postalCode')
       }
     }
   ]

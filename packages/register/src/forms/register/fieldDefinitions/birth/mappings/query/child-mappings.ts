@@ -1,6 +1,6 @@
 import { IFormField, IFormData } from 'src/forms'
 
-export const placeOfBirthToAddressTransformer = (
+export const eventLocationTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (

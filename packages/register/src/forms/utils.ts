@@ -291,7 +291,7 @@ export const conditionals: IConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  otherPlaceOfBirth: {
+  otherEventLocation: {
     action: 'hide',
     expression:
       '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
