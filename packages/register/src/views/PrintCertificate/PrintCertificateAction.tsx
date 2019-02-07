@@ -588,12 +588,6 @@ class PrintCertificateActionComponent extends React.Component<
         paymentAmount: amountObj.initialValue.toString()
       })
     }
-    console.log(
-      'currentForm: ',
-      currentForm,
-      ' enableConfirmButton',
-      enableConfirmButton
-    )
 
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
