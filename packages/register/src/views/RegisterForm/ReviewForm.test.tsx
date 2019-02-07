@@ -632,7 +632,21 @@ describe('ReviewForm tests', async () => {
                       {
                         comment: 'This is a note'
                       }
-                    ]
+                    ],
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    }
                   }
                 ],
                 trackingId: 'B123456',
@@ -696,8 +710,7 @@ describe('ReviewForm tests', async () => {
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationPhone: '01711111111',
       commentsOrNotes: 'This is a note',
-      trackingId: 'B123456',
-      type: 'birth'
+      trackingId: 'B123456'
     })
 
     testComponent.component.unmount()

@@ -159,8 +159,20 @@ describe('when user wants to print certificate', async () => {
                 __typename: 'Registration'
               },
               attendantAtBirth: null,
-              weightAtBirth: null,
+              weightAtBirth: 2,
               birthType: null,
+              placeOfBirth: {
+                address: {
+                  type: 'PERMANENT',
+                  line: ['12', '', '', 'union1', '', 'upazila10'],
+                  district: 'district2',
+                  state: 'state2',
+                  postalCode: '',
+                  country: 'BGD'
+                }
+              },
+              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: null,
               __typename: 'BirthRegistration'
             }
@@ -613,6 +625,18 @@ describe('when user wants to print certificate', async () => {
                 attendantAtBirth: null,
                 weightAtBirth: null,
                 birthType: null,
+                placeOfBirth: {
+                  address: {
+                    type: 'PERMANENT',
+                    line: ['12', '', '', 'union1', '', 'upazila10'],
+                    district: 'district2',
+                    state: 'state2',
+                    postalCode: '',
+                    country: 'BGD'
+                  }
+                },
+                birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+                birthLocationType: 'HOSPITAL',
                 presentAtBirthRegistration: null,
                 __typename: 'BirthRegistration'
               }
