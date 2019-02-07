@@ -2,7 +2,8 @@ import {
   smsHandler,
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
-  sendDeathDeclarationConfirmation
+  sendDeathDeclarationConfirmation,
+  sendDeathRegistrationConfirmation
 } from 'src/features/sms/handler'
 import {
   requestSchema,
@@ -79,12 +80,27 @@ export default function getRoutes() {
       handler: sendDeathDeclarationConfirmation,
       config: {
         tags: ['api'],
-        description: 'Sends an sms to a user for birth declaration entry',
+        description: 'Sends an sms to a user for death declaration entry',
         auth: {
           scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
         },
         validate: {
           payload: declarationNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deathRegistrationSMS',
+      handler: sendDeathRegistrationConfirmation,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user for death registration entry',
+        auth: {
+          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+        },
+        validate: {
+          payload: registrationNotificationSchema
         }
       }
     }
