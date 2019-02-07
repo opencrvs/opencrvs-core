@@ -12,9 +12,6 @@ import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
-
-import gql from 'graphql-tag'
-import { Query } from 'react-apollo'
 import {
   storeDraft,
   IDraft,
@@ -24,120 +21,11 @@ import { Dispatch } from 'redux'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from '@opencrvs/register/src/utils/authUtils'
 import { gqlToDraftTransformer } from 'src/transformer'
-import { IFormData, Event } from 'src/forms'
-export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
-  query data($id: ID!) {
-    fetchBirthRegistration(id: $id) {
-      _fhirIDMap
-      id
-      child {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        gender
-      }
-      mother {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        multipleBirth
-        identifier {
-          id
-          type
-          otherType
-        }
-        address {
-          type
-          line
-          district
-          state
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
-        }
-      }
-      father {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        identifier {
-          id
-          type
-          otherType
-        }
-        address {
-          type
-          line
-          district
-          state
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
-        }
-      }
-      registration {
-        id
-        contact
-        attachments {
-          data
-          type
-          contentType
-          subject
-        }
-        status {
-          comments {
-            comment
-          }
-        }
-        type
-        trackingId
-        registrationNumber
-      }
-      attendantAtBirth
-      weightAtBirth
-      birthType
-      placeOfBirth {
-        address {
-          type
-          line
-          district
-          state
-          postalCode
-          country
-        }
-      }
-      birthLocation
-      birthLocationType
-      presentAtBirthRegistration
-    }
-  }
-`
+import { IFormData, Event, Action } from 'src/forms'
+import {
+  QueryProvider,
+  QueryContext
+} from 'src/views/DataProvider/QueryProvider'
 
 const messages = defineMessages({
   queryError: {
@@ -184,6 +72,18 @@ const ErrorText = styled.div`
 `
 
 export class ReviewFormView extends React.Component<IProps> {
+  getEvent() {
+    const eventType = this.props.draft.event || 'BIRTH'
+    switch (eventType.toLocaleLowerCase()) {
+      case 'birth':
+        return Event.BIRTH
+      case 'death':
+        return Event.DEATH
+      default:
+        return Event.BIRTH
+    }
+  }
+
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
@@ -198,40 +98,45 @@ export class ReviewFormView extends React.Component<IProps> {
     }
     if (!draft) {
       return (
-        <Query
-          query={FETCH_BIRTH_REGISTRATION_QUERY}
-          variables={{ id: this.props.draftId }}
+        <QueryProvider
+          event={this.getEvent()}
+          action={Action.LOAD_APPLICATION}
+          payload={{ id: this.props.draftId }}
         >
-          {({ loading, error, data }) => {
-            if (loading) {
-              return (
-                <StyledSpinner
-                  id="review-spinner"
-                  baseColor={theme.colors.background}
-                />
-              )
-            }
-            if (error) {
-              return (
-                <ErrorText id="review-error-text">
-                  {intl.formatMessage(messages.queryError)}
-                </ErrorText>
-              )
-            }
-            const transData: IFormData = gqlToDraftTransformer(
-              this.props.registerForm,
-              data.fetchBirthRegistration
-            )
-            const reviewDraft = createReviewDraft(
-              draftId,
-              transData,
-              Event.BIRTH
-            )
-            dispatch(storeDraft(reviewDraft))
+          <QueryContext.Consumer>
+            {({ loading, error, data, dataKey }) => {
+              if (loading) {
+                return (
+                  <StyledSpinner
+                    id="review-spinner"
+                    baseColor={theme.colors.background}
+                  />
+                )
+              }
+              if (error) {
+                return (
+                  <ErrorText id="review-error-text">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
+              }
 
-            return <RegisterForm {...this.props} draft={reviewDraft} />
-          }}
-        </Query>
+              const transData: IFormData = gqlToDraftTransformer(
+                this.props.registerForm,
+                // @ts-ignore
+                data && data[dataKey]
+              )
+              const reviewDraft = createReviewDraft(
+                draftId,
+                transData,
+                Event.BIRTH
+              )
+              dispatch(storeDraft(reviewDraft))
+
+              return <RegisterForm {...this.props} draft={reviewDraft} />
+            }}
+          </QueryContext.Consumer>
+        </QueryProvider>
       )
     } else {
       return <RegisterForm {...this.props} />

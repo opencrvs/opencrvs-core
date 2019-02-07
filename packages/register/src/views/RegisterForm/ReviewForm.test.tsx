@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { ReviewForm, FETCH_BIRTH_REGISTRATION_QUERY } from './ReviewForm'
+import { ReviewForm } from './ReviewForm'
+import { GET_BIRTH_REGISTRATION } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -42,7 +43,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY
+          query: GET_BIRTH_REGISTRATION
         },
         error: new Error('boom')
       }
@@ -88,7 +89,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION,
           variables: { id: draft.id }
         },
         result: {
@@ -247,7 +248,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION,
           variables: { id: draft.id }
         },
         result: {
@@ -372,7 +373,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION,
           variables: { id: draft.id }
         },
         result: {
@@ -455,7 +456,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION,
           variables: { id: draft.id }
         },
         result: {
@@ -553,7 +554,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION,
           variables: { id: draft.id }
         },
         result: {
@@ -786,7 +787,7 @@ describe('ReviewForm tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_BIRTH_REGISTRATION_QUERY,
+            query: GET_BIRTH_REGISTRATION,
             variables: { id: draft.id }
           },
           result: {

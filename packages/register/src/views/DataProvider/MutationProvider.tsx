@@ -24,10 +24,11 @@ const MutationMapper = {
 export const MutationContext = React.createContext({
   mutation: {},
   loading: false,
+  error: undefined,
   data: undefined
 })
-class MutationProviderView extends React.Component<IProps> {
-  getMutationMapping() {
+class MutationProviderComponent extends React.Component<IProps> {
+  getMapping() {
     const { event, action, payload, form, draft } = this.props
     const eventMutationMapping =
       MutationMapper[event] &&
@@ -40,7 +41,7 @@ class MutationProviderView extends React.Component<IProps> {
 
   render() {
     const { onCompleted } = this.props
-    const eventMutationMapping = this.getMutationMapping()
+    const eventMutationMapping = this.getMapping()
     if (!eventMutationMapping) {
       return null
     }
@@ -53,7 +54,8 @@ class MutationProviderView extends React.Component<IProps> {
         {(submitMutation, { loading, data }) => {
           return (
             <MutationContext.Provider
-              value={{ mutation: submitMutation, loading, data }}
+              // @ts-ignore
+              value={{ mutation: submitMutation, loading, error, data }}
             >
               {this.props.children}
             </MutationContext.Provider>
@@ -64,4 +66,4 @@ class MutationProviderView extends React.Component<IProps> {
   }
 }
 
-export const MutationProvider = injectIntl(MutationProviderView)
+export const MutationProvider = injectIntl(MutationProviderComponent)
