@@ -56,7 +56,7 @@ export async function createRegistrationHandler(
     }
     const resBundle = await sendBundleToHearth(payload)
 
-    const msisdn = getSharedContactMsisdn(payload)
+    const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
       sendEventNotification(payload, event, msisdn, {
@@ -85,7 +85,7 @@ export async function markEventAsRegisteredHandler(
     )
     const resBundle = await postToHearth(payload)
 
-    const msisdn = getSharedContactMsisdn(payload)
+    const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
       sendEventNotification(payload, event, msisdn, {

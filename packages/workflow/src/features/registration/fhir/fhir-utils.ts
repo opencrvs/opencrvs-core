@@ -22,7 +22,7 @@ enum CONTACT {
   FATHER
 }
 
-export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
+export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
       'phoneNumberExists: Invalid FHIR bundle found for declaration'
@@ -50,7 +50,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
       return false
     }
 
-    contact = findPersonEntry(
+    contact = await findPersonEntry(
       getContactSection(CONTACT[sharedContact.valueString.toUpperCase()]),
       fhirBundle
     )
@@ -72,7 +72,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   return phoneNumber.value
 }
 
-export function getInformantName(
+export async function getInformantName(
   fhirBundle: fhir.Bundle,
   language: string = 'bn'
 ) {
@@ -82,7 +82,7 @@ export function getInformantName(
     )
   }
 
-  const informant = findPersonEntry(CHILD_SECTION_CODE, fhirBundle)
+  const informant = await findPersonEntry(CHILD_SECTION_CODE, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
   }
