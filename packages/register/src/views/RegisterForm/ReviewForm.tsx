@@ -73,7 +73,7 @@ const ErrorText = styled.div`
 
 export class ReviewFormView extends React.Component<IProps> {
   getEvent() {
-    const eventType = this.props.draft.event || 'BIRTH'
+    const eventType = (this.props.draft && this.props.draft.event) || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
         return Event.BIRTH

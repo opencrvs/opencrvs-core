@@ -24,7 +24,6 @@ const MutationMapper = {
 export const MutationContext = React.createContext({
   mutation: {},
   loading: false,
-  error: undefined,
   data: undefined
 })
 class MutationProviderComponent extends React.Component<IProps> {
@@ -55,7 +54,7 @@ class MutationProviderComponent extends React.Component<IProps> {
           return (
             <MutationContext.Provider
               // @ts-ignore
-              value={{ mutation: submitMutation, loading, error, data }}
+              value={{ mutation: submitMutation, loading, data }}
             >
               {this.props.children}
             </MutationContext.Provider>

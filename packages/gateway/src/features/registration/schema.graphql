@@ -194,11 +194,7 @@ input DeathRegistrationInput {
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
-  mother: PersonInput # -> Only use for foetal death -> .section(code='mother-details').entry.reference
-  father: PersonInput # -> Only use for foetal death -> .section(code='father-details').entry.reference
   informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  informantRelationship: RelationshipType # -> RelatedPerson.relationship
-  otherInformantRelationship: String # -> RelatedPerson.relationship
   placeOfDeath: LocationInput
   deathLocation: String
   deathLocationType: AddressType
@@ -215,11 +211,7 @@ type DeathRegistration { # -> Composition
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  mother: Person # -> Only use for foetal death -> .section(code='mother-details').entry.reference
-  father: Person # -> Only use for foetal death -> .section(code='father-details').entry.reference
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  informantRelationship: RelationshipType # -> RelatedPerson.relationship
-  otherInformantRelationship: String # -> RelatedPerson.relationship
   placeOfDeath: Location
   deathLocation: String
   deathLocationType: AddressType

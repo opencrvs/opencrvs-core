@@ -1,6 +1,4 @@
 import * as React from 'react'
-import gql from 'graphql-tag'
-import { Query } from 'react-apollo'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner } from '@opencrvs/components/lib/interface'
@@ -55,6 +53,10 @@ import {
   MutationProvider,
   MutationContext
 } from 'src/views/DataProvider/MutationProvider'
+import {
+  QueryProvider,
+  QueryContext
+} from 'src/views/DataProvider/QueryProvider'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -193,105 +195,6 @@ const ButtonSpinner = styled(Spinner)`
   width: 15px;
   height: 15px;
   top: 0px !important;
-`
-
-export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
-  query data($id: ID!) {
-    fetchBirthRegistration(id: $id) {
-      _fhirIDMap
-      id
-      child {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        gender
-      }
-      mother {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        multipleBirth
-        identifier {
-          id
-          type
-        }
-        address {
-          type
-          line
-          district
-          state
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
-        }
-      }
-      father {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        identifier {
-          id
-          type
-        }
-        address {
-          type
-          line
-          district
-          state
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
-        }
-      }
-      registration {
-        id
-        contact
-        attachments {
-          data
-          type
-          contentType
-          subject
-        }
-        status {
-          comments {
-            comment
-          }
-        }
-        trackingId
-        registrationNumber
-      }
-      attendantAtBirth
-      weightAtBirth
-      birthType
-      presentAtBirthRegistration
-    }
-  }
 `
 
 const messages = defineMessages({
@@ -770,127 +673,130 @@ class PrintCertificateActionComponent extends React.Component<
           goBack={togglePrintCertificateSection}
         >
           <HeaderContent>
-            <Query
-              query={FETCH_BIRTH_REGISTRATION_QUERY}
-              variables={{
-                id: registrationId
-              }}
+            <QueryProvider
+              event={this.getEvent()}
+              action={Action.LOAD_APPLICATION}
+              payload={{ id: registrationId }}
             >
-              {({ loading, error, data }) => {
-                if (loading) {
-                  return <StyledSpinner id="print-certificate-spinner" />
-                }
-
-                if (data) {
-                  let fields = printCertificateFormSection.fields
-                  fields = fields.map(field => {
-                    if (
-                      field &&
-                      field.type === INFORMATIVE_RADIO_GROUP &&
-                      field.name === 'motherDetails'
-                    ) {
-                      field.information = data.fetchBirthRegistration.mother
-                    } else if (
-                      field &&
-                      field.type === INFORMATIVE_RADIO_GROUP &&
-                      field.name === 'fatherDetails'
-                    ) {
-                      field.information = data.fetchBirthRegistration.father
-                    }
-
-                    return field
-                  })
-
-                  const paymentAmount = calculatePrice(
-                    data.fetchBirthRegistration.child.birthDate
-                  )
-
-                  moment.locale(this.props.language)
-                  const DOBDiff = moment(
-                    data.fetchBirthRegistration.child.birthDate,
-                    'YYYY-MM-DD'
-                  )
-                    .fromNow()
-                    .replace(' ago', '')
-                    .replace(' আগে', '')
-
-                  paymentFormSection.fields.map(field => {
-                    if (
-                      field &&
-                      field.type === PARAGRAPH &&
-                      field.name === 'paymentAmount'
-                    ) {
-                      field.initialValue = paymentAmount
-                    }
-                  })
-
-                  paymentFormSection.fields.map(field => {
-                    if (
-                      field &&
-                      field.type === PARAGRAPH &&
-                      field.name === 'service'
-                    ) {
-                      field.initialValue = DOBDiff.toString()
-                      field.label = messages[`service`]
-                    }
-                  })
-
-                  const registrant: Registrant = this.setRegistrant(
-                    data.fetchBirthRegistration
-                  )
-
-                  const certificateData = this.getCertificateDetails(
-                    data.fetchBirthRegistration
-                  )
-
-                  const transData: IFormData = gqlToDraftTransformer(
-                    this.props.registerForm,
-                    data.fetchBirthRegistration
-                  )
-                  const reviewDraft = createReviewDraft(
-                    registrationId,
-                    transData,
-                    this.getEvent()
-                  )
-                  const draftExist = !!drafts.find(
-                    draft => draft.id === registrationId
-                  )
-                  if (!draftExist) {
-                    dispatch(storeDraft(reviewDraft))
+              <QueryContext.Consumer>
+                {({ loading, error, data, dataKey }) => {
+                  if (loading) {
+                    return <StyledSpinner id="print-certificate-spinner" />
                   }
 
-                  return (
-                    <FormContainer>
-                      <Box>
-                        <FormFieldGenerator
-                          id={form.id}
-                          onChange={this.storeData}
-                          setAllFieldsDirty={false}
-                          fields={form.fields}
-                        />
-                      </Box>
-                      <Column>
-                        {this.state.data.personCollectingCertificate &&
-                          this.getFormAction(
-                            this.state.currentForm,
-                            registrant,
-                            certificateData
-                          )}
-                      </Column>
-                    </FormContainer>
-                  )
-                }
-                if (error) {
-                  return (
-                    <ErrorText id="print-certificate-queue-error-text">
-                      {intl.formatMessage(messages.queryError)}
-                    </ErrorText>
-                  )
-                }
+                  if (data) {
+                    // @ts-ignore
+                    const retrievedData = data[dataKey]
+                    let fields = printCertificateFormSection.fields
+                    fields = fields.map(field => {
+                      if (
+                        field &&
+                        field.type === INFORMATIVE_RADIO_GROUP &&
+                        field.name === 'motherDetails'
+                      ) {
+                        field.information = retrievedData.mother
+                      } else if (
+                        field &&
+                        field.type === INFORMATIVE_RADIO_GROUP &&
+                        field.name === 'fatherDetails'
+                      ) {
+                        field.information = retrievedData.father
+                      }
 
-                return JSON.stringify(data)
-              }}
-            </Query>
+                      return field
+                    })
+
+                    const paymentAmount = calculatePrice(
+                      retrievedData.child.birthDate
+                    )
+
+                    moment.locale(this.props.language)
+                    const DOBDiff = moment(
+                      retrievedData.child.birthDate,
+                      'YYYY-MM-DD'
+                    )
+                      .fromNow()
+                      .replace(' ago', '')
+                      .replace(' আগে', '')
+
+                    paymentFormSection.fields.map(field => {
+                      if (
+                        field &&
+                        field.type === PARAGRAPH &&
+                        field.name === 'paymentAmount'
+                      ) {
+                        field.initialValue = paymentAmount
+                      }
+                    })
+
+                    paymentFormSection.fields.map(field => {
+                      if (
+                        field &&
+                        field.type === PARAGRAPH &&
+                        field.name === 'service'
+                      ) {
+                        field.initialValue = DOBDiff.toString()
+                        field.label = messages[`service`]
+                      }
+                    })
+
+                    const registrant: Registrant = this.setRegistrant(
+                      retrievedData
+                    )
+
+                    const certificateData = this.getCertificateDetails(
+                      retrievedData
+                    )
+
+                    const transData: IFormData = gqlToDraftTransformer(
+                      this.props.registerForm,
+                      retrievedData
+                    )
+                    const reviewDraft = createReviewDraft(
+                      registrationId,
+                      transData,
+                      this.getEvent()
+                    )
+                    const draftExist = !!drafts.find(
+                      draft => draft.id === registrationId
+                    )
+                    if (!draftExist) {
+                      dispatch(storeDraft(reviewDraft))
+                    }
+
+                    return (
+                      <FormContainer>
+                        <Box>
+                          <FormFieldGenerator
+                            id={form.id}
+                            onChange={this.storeData}
+                            setAllFieldsDirty={false}
+                            fields={form.fields}
+                          />
+                        </Box>
+                        <Column>
+                          {this.state.data.personCollectingCertificate &&
+                            this.getFormAction(
+                              this.state.currentForm,
+                              registrant,
+                              certificateData
+                            )}
+                        </Column>
+                      </FormContainer>
+                    )
+                  }
+                  if (error) {
+                    return (
+                      <ErrorText id="print-certificate-queue-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+
+                  return JSON.stringify(data)
+                }}
+              </QueryContext.Consumer>
+            </QueryProvider>
           </HeaderContent>
         </ActionPage>
       </ActionPageWrapper>

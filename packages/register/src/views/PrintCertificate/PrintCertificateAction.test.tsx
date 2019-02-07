@@ -1,7 +1,5 @@
-import {
-  FETCH_BIRTH_REGISTRATION_QUERY,
-  PrintCertificateAction
-} from './PrintCertificateAction'
+import { PrintCertificateAction } from './PrintCertificateAction'
+import { GET_BIRTH_REGISTRATION } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import * as React from 'react'
@@ -30,7 +28,7 @@ describe('when user wants to print certificate', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION,
           variables: { id: 'asdhdqe2472487jsdfsdf' }
         },
         result: {
@@ -236,7 +234,7 @@ describe('when user wants to print certificate', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION,
           variables: { id: '12345' }
         },
         result: {
@@ -465,7 +463,7 @@ describe('when user wants to print certificate', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_BIRTH_REGISTRATION_QUERY,
+            query: GET_BIRTH_REGISTRATION,
             variables: { id: 'asdhdqe2472487jsdfsdf' }
           },
           result: {

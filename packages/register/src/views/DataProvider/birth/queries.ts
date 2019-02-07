@@ -91,7 +91,6 @@ export const GET_BIRTH_REGISTRATION = gql`
             comment
           }
         }
-        type
         trackingId
         registrationNumber
       }
