@@ -1,5 +1,10 @@
 import * as ReactApollo from 'react-apollo'
-import { createTestApp, mockOfflineData, userDetails } from './tests/util'
+import {
+  createTestApp,
+  mockOfflineData,
+  userDetails,
+  selectOption
+} from './tests/util'
 import { v4 as uuid } from 'uuid'
 import {
   HOME,
@@ -545,10 +550,7 @@ describe('when user has a valid token in local storage', () => {
           })
           describe('when user selects the type of document', () => {
             beforeEach(async () => {
-              app
-                .find('#whatDocToUpload_NID')
-                .hostNodes()
-                .simulate('change')
+              selectOption(app, '#whatDocToUpload', 'NID')
 
               await flushPromises()
               app.update()
