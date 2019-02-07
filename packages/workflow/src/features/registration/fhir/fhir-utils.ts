@@ -19,7 +19,8 @@ import { getEventType } from '../utils'
 
 enum CONTACT {
   MOTHER,
-  FATHER
+  FATHER,
+  BOTH
 }
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
@@ -195,6 +196,7 @@ export function getPaperFormID(taskResource: fhir.Task) {
 function getContactSection(contact: CONTACT) {
   switch (contact) {
     case CONTACT.MOTHER:
+    case CONTACT.BOTH:
       return MOTHER_SECTION_CODE
     case CONTACT.FATHER:
       return FATHER_SECTION_CODE
