@@ -32,7 +32,7 @@ export async function sendEventNotification(
 ) {
   switch (event) {
     case Events.BIRTH_NEW_DEC:
-      sendDeclarationNotification(
+      await sendDeclarationNotification(
         fhirBundle,
         msisdn,
         'birthDeclarationSMS',
@@ -40,7 +40,7 @@ export async function sendEventNotification(
       )
       break
     case Events.BIRTH_MARK_REG:
-      sendRegistrationNotification(
+      await sendRegistrationNotification(
         fhirBundle,
         msisdn,
         'birthRegistrationSMS',
@@ -48,7 +48,7 @@ export async function sendEventNotification(
       )
       break
     case Events.DEATH_NEW_DEC:
-      sendDeclarationNotification(
+      await sendDeclarationNotification(
         fhirBundle,
         msisdn,
         'deathDeclarationSMS',
@@ -56,7 +56,7 @@ export async function sendEventNotification(
       )
       break
     case Events.DEATH_MARK_REG:
-      sendRegistrationNotification(
+      await sendRegistrationNotification(
         fhirBundle,
         msisdn,
         'deathRegistrationSMS',

@@ -47,9 +47,14 @@ describe('Verify utility functions', () => {
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
-    sendEventNotification(testFhirBundle, Events.BIRTH_NEW_DEC, '01711111111', {
-      Authorization: 'bearer acd '
-    })
+    await sendEventNotification(
+      testFhirBundle,
+      Events.BIRTH_NEW_DEC,
+      '01711111111',
+      {
+        Authorization: 'bearer acd '
+      }
+    )
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
     )
