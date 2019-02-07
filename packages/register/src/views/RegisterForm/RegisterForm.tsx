@@ -33,11 +33,18 @@ import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
-import {
-  SAVED_REGISTRATION,
-  REJECTED_REGISTRATION
-} from 'src/navigation/routes'
+import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+
+import {
+  DECLARATION,
+  SUBMISSION,
+  REJECTION,
+  REGISTRATION,
+  REGISTERED,
+  DUPLICATION
+} from 'src/utils/constants'
+
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
@@ -374,14 +381,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName: IFullName = getFullName(childData)
-    history.push(REJECTED_REGISTRATION, {
-      rejection: true,
+    const duplicate = history.location.state && history.location.state.duplicate
+    let eventName = DECLARATION
+    if (duplicate) {
+      eventName = DUPLICATION
+    }
+    history.push(CONFIRMATION_SCREEN, {
+      eventName,
+      actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
-      duplicate: history.location.state && history.location.state.duplicate,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
+
     this.props.deleteDraft(draft)
   }
 
@@ -389,25 +402,29 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    const payload = {
+
+    const duplicate = history.location.state && history.location.state.duplicate
+
+    let eventName = DECLARATION
+
+    if (this.userHasRegisterScope()) {
+      eventName = REGISTRATION
+    }
+
+    if (duplicate) {
+      eventName = DUPLICATION
+    }
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      nextSection: true,
+      trackingSection: true,
+      eventName,
+      actionName: SUBMISSION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
-      duplicate: history.location.state && history.location.state.duplicate,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
-    }
-    if (this.userHasRegisterScope()) {
-      // @ts-ignore
-      payload.registrationNumber = response
-      // @ts-ignore
-      payload.declaration = false
-    } else {
-      // @ts-ignore
-      payload.trackingId = response
-      // @ts-ignore
-      payload.declaration = true
-    }
-    history.push(SAVED_REGISTRATION, payload)
+    })
     this.props.deleteDraft(draft)
   }
 
@@ -415,13 +432,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { history, draft } = this.props
     const childData = this.props.draft.data.child
     const fullName = getFullName(childData)
-    history.push(SAVED_REGISTRATION, {
-      registrationNumber: response,
-      declaration: false,
+    this.props.deleteDraft({ ...draft })
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      trackingSection: true,
+      eventName: REGISTRATION,
+      actionName: REGISTERED,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    this.props.deleteDraft(draft)
   }
 
   submitForm = () => {
@@ -665,7 +684,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <FooterAction>
             <FooterPrimaryButton
               id="save_draft"
-              onClick={() => history.push(SAVED_REGISTRATION)}
+              onClick={() => history.push(CONFIRMATION_SCREEN)}
             >
               {intl.formatMessage(messages.saveDraft)}
             </FooterPrimaryButton>

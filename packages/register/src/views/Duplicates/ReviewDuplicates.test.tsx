@@ -71,6 +71,7 @@ describe('Review Duplicates component', () => {
             createdAt: '2019-01-22T09:46:02.547Z',
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             registration: {
+              id: 'hghgjhg',
               trackingId: 'BFCJ02U',
               type: 'BIRTH',
               status: [
@@ -163,6 +164,7 @@ describe('Review Duplicates component', () => {
             createdAt: '2019-01-22T09:46:02.547Z',
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1',
             registration: {
+              id: 'hghgjhg',
               trackingId: 'BFCJ02U',
               type: 'BIRTH',
               status: [

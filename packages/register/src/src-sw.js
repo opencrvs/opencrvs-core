@@ -23,7 +23,10 @@ const queue = new workbox.backgroundSync.Queue('registerQueue', {
 const GraphQLMatch = /graphql(\S+)?/
 
 self.addEventListener('fetch', event => {
-  if (null !== event.request.url.match(GraphQLMatch)) {
+  if (
+    null !== event.request.url.match(GraphQLMatch) &&
+    navigator.onLine === false
+  ) {
     const promiseChain = fetch(event.request.clone()).catch(err => {
       return queue.addRequest(event.request)
     })
@@ -32,8 +35,8 @@ self.addEventListener('fetch', event => {
   }
 })
 
-self.addEventListener('message', (event) => {
-  if (!event.data){
+self.addEventListener('message', event => {
+  if (!event.data) {
     return
   }
 
@@ -49,8 +52,8 @@ self.addEventListener('message', (event) => {
 workbox.precaching.precacheAndRoute([])
 
 /*
-*   Alternate for navigateFallback & navigateFallbackBlacklist
-*/
+ *   Alternate for navigateFallback & navigateFallbackBlacklist
+ */
 workbox.routing.registerNavigationRoute('/index.html', {
   blacklist: [/^\/__.*$/]
 })

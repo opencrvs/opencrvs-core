@@ -53,6 +53,8 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from 'src/utils/userUtils'
 import { RouteComponentProps } from 'react-router'
 import { goToHome } from 'src/navigation'
+import { CERTIFICATION, COMPLETION } from 'src/utils/constants'
+import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -409,6 +411,23 @@ const certifyMutation = gql`
     markBirthAsCertified(id: $id, details: $details)
   }
 `
+interface IFullName {
+  fullNameInBn: string
+  fullNameInEng: string
+}
+
+const getFullName = (certificateDetails: CertificateDetails): IFullName => {
+  let fullNameInBn = ''
+  let fullNameInEng = ''
+  if (certificateDetails && certificateDetails.name) {
+    fullNameInBn = String(certificateDetails.name.bn)
+    fullNameInEng = String(certificateDetails.name.en)
+  }
+  return {
+    fullNameInBn,
+    fullNameInEng
+  }
+}
 
 type State = {
   currentForm: string
@@ -443,6 +462,21 @@ class PrintCertificateActionComponent extends React.Component<
       currentForm: COLLECT_CERTIFICATE,
       certificatePdf: ''
     }
+  }
+
+  finishSubmission = (certificateDetails: CertificateDetails) => {
+    const { history } = this.props
+    const fullName = getFullName(certificateDetails)
+    const noOfCertificate = 103
+
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: noOfCertificate,
+      trackingSection: true,
+      eventName: CERTIFICATION,
+      actionName: COMPLETION,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
+    })
   }
 
   storeData = (documentData: IFormSectionData) => {
@@ -672,7 +706,7 @@ class PrintCertificateActionComponent extends React.Component<
               <StyledPrimaryButton
                 id="finish-printing-certificate"
                 disabled={!enableConfirmButton}
-                onClick={() => (location.href = '/work-queue')}
+                onClick={() => this.finishSubmission(certificateDetails)}
               >
                 {intl.formatMessage(messages.finish)}
               </StyledPrimaryButton>
