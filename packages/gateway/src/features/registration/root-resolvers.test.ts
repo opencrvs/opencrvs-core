@@ -26,34 +26,35 @@ describe('Registration root resolvers', () => {
   })
   describe('listBirthRegistrations()', () => {
     it('returns an array of composition results', async () => {
-      fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}] }))
+      fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}], total: 2 }))
       // @ts-ignore
-      const compositions = await resolvers.Query.listBirthRegistrations(
+      const result = await resolvers.Query.listBirthRegistrations(
         {},
         { status: 'preliminary' }
       )
 
-      expect(compositions).toBeDefined()
-      expect(compositions).toBeInstanceOf(Array)
-      expect(compositions).toHaveLength(2)
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(2)
     })
 
     it('returns an array of composition results when location ids provided', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }],
+          total: 2
         })
       )
 
       // @ts-ignore
-      const compositions = await resolvers.Query.listBirthRegistrations(
+      const result = await resolvers.Query.listBirthRegistrations(
         {},
         { locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'] }
       )
 
-      expect(compositions).toBeDefined()
-      expect(compositions).toBeInstanceOf(Array)
-      expect(compositions).toHaveLength(2)
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(2)
     })
   })
   describe('createBirthRegistration()', () => {
@@ -803,6 +804,76 @@ describe('Registration root resolvers', () => {
         // @ts-ignore
         resolvers.Mutation.markBirthAsCertified({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
+    })
+  })
+  describe('queryRegistrationByIdentifier()', async () => {
+    it('returns registration', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                resource: {
+                  resourceType: 'Task',
+
+                  focus: {
+                    reference:
+                      'Composition/80b90ac3-1032-4f98-af64-627d2b7443f3'
+                  },
+                  id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            id: '80b90ac3-1032-4f98-af64-627d2b7443f3'
+          })
+        ]
+      )
+      // @ts-ignore
+      const composition = await resolvers.Query.queryRegistrationByIdentifier(
+        {},
+        { identifier: '2019333494BAQFYEG6' }
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('80b90ac3-1032-4f98-af64-627d2b7443f3')
+    })
+    it("throws an error when the response isn't what we expect", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        // @ts-ignore
+        resolvers.Query.queryRegistrationByIdentifier(
+          {},
+          { identifier: '2019333494BAQFYEG6' }
+        )
+      ).rejects.toThrowError(
+        'Task does not exist for identifer 2019333494BAQFYEG6'
+      )
+    })
+
+    it('throws an error when task doesnt have composition reference', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: {
+                id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
+              }
+            }
+          ]
+        })
+      )
+      await expect(
+        // @ts-ignore
+        resolvers.Query.queryRegistrationByIdentifier(
+          {},
+          { identifier: '2019333494BAQFYEG6' }
+        )
+      ).rejects.toThrowError('Composition reference not found')
     })
   })
 })

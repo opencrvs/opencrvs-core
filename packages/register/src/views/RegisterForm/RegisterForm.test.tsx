@@ -106,7 +106,7 @@ describe('when user is in the register form for birth event', async () => {
         .find('#save_draft')
         .hostNodes()
         .simulate('click')
-      expect(history.location.pathname).toEqual('/saved')
+      expect(history.location.pathname).toEqual('/confirm')
     })
   })
 })
@@ -209,7 +209,7 @@ describe('when user is in the register form preview section', () => {
     global.window = { location: { pathname: null } }
 
     // @ts-ignore
-    expect(global.window.location.pathname).toMatch('/saved')
+    expect(global.window.location.pathname).toMatch('/confirm')
 
     const deleteBtn = component.find('#delete-application').hostNodes()
     deleteBtn.simulate('click')

@@ -28,6 +28,7 @@ describe('Review Duplicates component', () => {
           fetchBirthRegistration: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             registration: {
+              id: '123',
               duplicates: ['450ce5e3-b495-4868-bb6a-1183ffd0fff1']
             }
           }
@@ -47,6 +48,7 @@ describe('Review Duplicates component', () => {
           fetchBirthRegistration: {
             id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1',
             registration: {
+              id: '123',
               duplicates: []
             }
           }
@@ -71,6 +73,7 @@ describe('Review Duplicates component', () => {
             createdAt: '2019-01-22T09:46:02.547Z',
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             registration: {
+              id: '123',
               trackingId: 'BFCJ02U',
               type: 'BIRTH',
               status: [
@@ -99,6 +102,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             child: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -115,6 +119,7 @@ describe('Review Duplicates component', () => {
               gender: 'female'
             },
             mother: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -137,6 +142,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             father: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -163,6 +169,7 @@ describe('Review Duplicates component', () => {
             createdAt: '2019-01-22T09:46:02.547Z',
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1',
             registration: {
+              id: 'hghgjhg',
               trackingId: 'BFCJ02U',
               type: 'BIRTH',
               status: [
@@ -191,6 +198,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             child: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -207,6 +215,7 @@ describe('Review Duplicates component', () => {
               gender: 'female'
             },
             mother: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -229,6 +238,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             father: {
+              id: '123',
               name: [
                 {
                   use: 'bn',

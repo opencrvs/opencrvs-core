@@ -40,6 +40,7 @@ export type CertificateDetails = {
   name: MultiLingualDetails
   dob: MultiLingualDetails
   placeOfBirth?: MultiLingualDetails
+  registrationLocation: MultiLingualDetails
   printDate?: MultiLingualDetails
 } | null
 
@@ -160,7 +161,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
   const dateBn = moment().format(CERTIFICATE_DATE_FORMAT)
   const NOT_FOUND = 'Not Found'
 
-  const data = {
+  const data: CertificateDetails = {
     registrationNo: NOT_FOUND,
     name: {
       bn: NOT_FOUND,
@@ -170,19 +171,72 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
       bn: NOT_FOUND,
       en: NOT_FOUND
     },
-    placeOfBirth: {
-      bn: 'গাজীপুর হাসপাতাল',
-      en: 'Gazipur Hospital'
-    },
     registrationLocation: {
-      bn: 'গাজীপুর ইউনিয়নের রেজিস্ট্রেশন অফিস, কালীগঞ্জে',
-      en: 'Gazipur Union registration office'
-    },
-    printDate: {
-      bn: dateBn,
-      en: dateEn
+      bn: NOT_FOUND,
+      en: NOT_FOUND
     },
     ...certificateDetails
+  }
+  // TODO: Will replace in OCRVS-1183
+  if (!data.placeOfBirth) {
+    data.placeOfBirth = {
+      bn: 'গাজীপুর হাসপাতাল',
+      en: 'Gazipur Hospital'
+    }
+  }
+
+  data.printDate = {
+    bn: dateBn,
+    en: dateEn
+  }
+
+  let nameRow
+  if (data.name.en) {
+    nameRow = [
+      {
+        margin: [0, 39, 0, 0],
+        columns: [
+          {
+            text: 'This is to certify that',
+            alignment: 'right'
+          },
+          {
+            text: data.name.en,
+            bold: true
+          }
+        ]
+      },
+      {
+        font: 'notosansbn',
+        columns: [
+          {
+            text: 'এই যে প্রত্যয়িত করা হয়',
+            alignment: 'right'
+          },
+          {
+            text: data.name.bn,
+            bold: true
+          }
+        ]
+      }
+    ]
+  } else {
+    nameRow = [
+      {
+        margin: [0, 39, 0, 0],
+        font: 'notosansbn',
+        columns: [
+          {
+            text: 'এই যে প্রত্যয়িত করা হয়',
+            alignment: 'right'
+          },
+          {
+            text: data.name.bn,
+            bold: true
+          }
+        ]
+      }
+    ]
   }
 
   const certificateDefinition = {
@@ -218,34 +272,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
           fontSize: 18
         }
       },
-      [
-        {
-          margin: [0, 39, 0, 0],
-          columns: [
-            {
-              text: 'This is to certify that',
-              alignment: 'right'
-            },
-            {
-              text: data.name.en,
-              bold: true
-            }
-          ]
-        },
-        {
-          font: 'notosansbn',
-          columns: [
-            {
-              text: 'এই যে প্রত্যয়িত করা হয়',
-              alignment: 'right'
-            },
-            {
-              text: data.name.bn,
-              bold: true
-            }
-          ]
-        }
-      ],
+      nameRow,
       [
         {
           margin: [0, 39, 0, 0],

@@ -1,5 +1,6 @@
 import {
   IFormSection,
+  IFormField,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   TEXT,
@@ -100,25 +101,39 @@ const messages = defineMessages({
   }
 })
 
+export const fatherDataExists: IFormField = {
+  name: 'personCollectingCertificate',
+  type: SELECT_WITH_OPTIONS,
+  label: messages.whoToCollect,
+  required: true,
+  initialValue: '',
+  validate: [],
+  options: [
+    { value: 'MOTHER', label: messages.mother },
+    { value: 'FATHER', label: messages.father },
+    { value: 'OTHER', label: messages.other }
+  ]
+}
+
+export const fatherDataDoesNotExist: IFormField = {
+  name: 'personCollectingCertificate',
+  type: SELECT_WITH_OPTIONS,
+  label: messages.whoToCollect,
+  required: true,
+  initialValue: '',
+  validate: [],
+  options: [
+    { value: 'MOTHER', label: messages.mother },
+    { value: 'OTHER', label: messages.other }
+  ]
+}
+
 export const collectCertificateFormSection: IFormSection = {
   id: 'collectCertificate',
   viewType: 'form',
   name: messages.printCertificate,
   title: messages.certificateCollectionTitle,
   fields: [
-    {
-      name: 'personCollectingCertificate',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.whoToCollect,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'MOTHER', label: messages.mother },
-        { value: 'FATHER', label: messages.father },
-        { value: 'OTHER', label: messages.other }
-      ]
-    },
     {
       name: 'motherDetails',
       type: INFORMATIVE_RADIO_GROUP,

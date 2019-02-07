@@ -14,6 +14,7 @@ enum BirthRegType {
 }
 
 enum RegistrationContactType {
+  BOTH
   MOTHER
   FATHER
 }
@@ -310,22 +311,37 @@ type Attachment { # -> DocumentReference
   createdAt: Date # -> .created
 }
 
+type BirthRegResultSet {
+  results: [BirthRegistration]
+  totalItems: Int
+}
+
+type DeathRegResultSet {
+  results: [DeathRegistration]
+  totalItems: Int
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
+  queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
   listDeathRegistrations(
     locationIds: [String]
     status: String
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): DeathRegResultSet
 }
 
 type Mutation {
