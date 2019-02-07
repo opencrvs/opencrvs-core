@@ -484,7 +484,11 @@ class PrintCertificateActionComponent extends React.Component<
 
   shouldEnableConfirmButton = (documentData: IFormSectionData) => {
     const form = this.getForm(this.state.currentForm)
-    return documentData && !hasFormError(form.fields, documentData)
+    if (form.id !== 'certificatePreview') {
+      return documentData && !hasFormError(form.fields, documentData)
+    } else {
+      return false
+    }
   }
 
   addPDFToField(form: IFormSection) {
@@ -584,6 +588,12 @@ class PrintCertificateActionComponent extends React.Component<
         paymentAmount: amountObj.initialValue.toString()
       })
     }
+    console.log(
+      'currentForm: ',
+      currentForm,
+      ' enableConfirmButton',
+      enableConfirmButton
+    )
 
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
