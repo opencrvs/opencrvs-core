@@ -23,6 +23,23 @@ export const resolvers: GQLResolver = {
     async fetchBirthRegistration(_, { id }, authHeader) {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
+    async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
+      const taskBundle = await fetchFHIR(
+        `/Task?identifier=${identifier}`,
+        authHeader
+      )
+
+      if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+        throw new Error(`Task does not exist for identifer ${identifier}`)
+      }
+      const task = taskBundle.entry[0].resource as fhir.Task
+
+      if (!task.focus || !task.focus.reference) {
+        throw new Error(`Composition reference not found`)
+      }
+
+      return await fetchFHIR(`/${task.focus.reference}`, authHeader)
+    },
     async listBirthRegistrations(
       _,
       { status, locationIds, count = 0, skip = 0 },

@@ -323,6 +323,7 @@ type DeathRegResultSet {
 
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
+  queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String
