@@ -38,6 +38,7 @@ export async function sendEventNotification(
         'birthDeclarationSMS',
         authHeader
       )
+      break
     case Events.BIRTH_MARK_REG:
       sendRegistrationNotification(
         fhirBundle,
@@ -45,6 +46,7 @@ export async function sendEventNotification(
         'birthRegistrationSMS',
         authHeader
       )
+      break
     case Events.DEATH_NEW_DEC:
       sendDeclarationNotification(
         fhirBundle,
@@ -52,6 +54,7 @@ export async function sendEventNotification(
         'deathDeclarationSMS',
         authHeader
       )
+      break
     case Events.DEATH_MARK_REG:
       sendRegistrationNotification(
         fhirBundle,
@@ -59,6 +62,7 @@ export async function sendEventNotification(
         'deathRegistrationSMS',
         authHeader
       )
+      break
   }
 }
 
@@ -74,7 +78,7 @@ async function sendDeclarationNotification(
       body: JSON.stringify({
         trackingid: getTrackingId(fhirBundle),
         msisdn,
-        name: getInformantName(fhirBundle)
+        name: await getInformantName(fhirBundle)
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -97,7 +101,7 @@ async function sendRegistrationNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        name: getInformantName(fhirBundle)
+        name: await getInformantName(fhirBundle)
       }),
       headers: {
         'Content-Type': 'application/json',
