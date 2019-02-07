@@ -930,7 +930,6 @@ class PrintCertificateActionComponent extends React.Component<
                   const certificateData = this.getCertificateDetails(
                     data.fetchBirthRegistration
                   )
-
                   const transData: IFormData = gqlToDraftTransformer(
                     this.props.registerForm,
                     data.fetchBirthRegistration
@@ -938,7 +937,8 @@ class PrintCertificateActionComponent extends React.Component<
                   if (
                     form.fields.filter(
                       field => field.name === 'personCollectingCertificate'
-                    ).length === 0
+                    ).length === 0 &&
+                    form === collectCertificateForm
                   ) {
                     if (
                       transData.father &&

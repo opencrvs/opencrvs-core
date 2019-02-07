@@ -138,6 +138,21 @@ describe('when user wants to print certificate', async () => {
                 status: [
                   {
                     comments: null,
+
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    },
                     __typename: 'RegWorkflow'
                   }
                 ],
@@ -575,6 +590,21 @@ describe('when user wants to print certificate', async () => {
                   status: [
                     {
                       comments: null,
+
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
                       __typename: 'RegWorkflow'
                     }
                   ],
@@ -779,6 +809,7 @@ describe('when user wants to print certificate', async () => {
         .simulate('click')
 
       component.update()
+      console.log(component.debug())
       expect(
         component.find('#payment-confirm-button').hostNodes()
       ).toHaveLength(1)
