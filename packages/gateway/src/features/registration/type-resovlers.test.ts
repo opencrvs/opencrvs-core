@@ -164,8 +164,8 @@ describe('Registration type resolvers', () => {
 
   it('returns deceased', () => {
     // @ts-ignore
-    const deceased = typeResolvers.Person.deceased(mockPatient)
-    expect(deceased).toBe('false')
+    const deceased = typeResolvers.Deceased.deceased(mockPatient)
+    expect(deceased).toBe('true')
   })
 
   it('returns nationality', () => {

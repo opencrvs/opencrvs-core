@@ -10,27 +10,33 @@ test('should build a minimal FHIR registration document without error', async ()
         birthDate: '2000-01-28',
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
-        deceased: false,
+        deceased: {
+          deceased: true,
+          deathDate: '2014-01-28'
+        },
         multipleBirth: 1,
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
       },
       informant: {
-        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
-        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
-        gender: 'male',
-        birthDate: '2000-01-28',
-        maritalStatus: 'MARRIED',
-        name: [{ firstNames: 'John', familyName: 'Doe', use: 'en' }],
-        deceased: false,
-        multipleBirth: 1,
-        dateOfMarriage: '2014-01-28',
-        nationality: ['BGD'],
-        educationalAttainment: 'UPPER_SECONDARY_ISCED_4'
+        individual: {
+          _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
+          identifier: [
+            { id: '123456', type: 'OTHER', otherType: 'Custom type' }
+          ],
+          gender: 'male',
+          birthDate: '2000-01-28',
+          maritalStatus: 'MARRIED',
+          name: [{ firstNames: 'John', familyName: 'Doe', use: 'en' }],
+          multipleBirth: 1,
+          dateOfMarriage: '2014-01-28',
+          nationality: ['BGD'],
+          educationalAttainment: 'UPPER_SECONDARY_ISCED_4'
+        },
+        relationship: 'OTHER',
+        otherRelationship: 'Nephew'
       },
-      informantRelationship: 'SON',
-      // otherInformantRelationship: 'OTHER',
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
         contact: 'MOTHER',
@@ -133,11 +139,17 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[0].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd'
   )
+
+  // deceased
   expect(fhir.entry[1].resource.gender).toBe('female')
   expect(fhir.entry[1].resource.name[0].given[0]).toEqual('Jane')
+  expect(fhir.entry[1].resource.deceasedDateTime).toEqual('2014-01-28')
 
+  // informant
   expect(fhir.entry[2].resource.resourceType).toEqual('RelatedPerson')
-  expect(fhir.entry[2].resource.relationship.coding[0].code).toEqual('SON')
+  // informant relationship
+  expect(fhir.entry[2].resource.relationship.coding[0].code).toEqual('OTHER')
+  expect(fhir.entry[2].resource.relationship.text).toEqual('Nephew')
   expect(fhir.entry[2].resource.patient.reference).toEqual(
     fhir.entry[3].fullUrl
   )

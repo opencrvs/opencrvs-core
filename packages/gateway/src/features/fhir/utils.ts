@@ -368,9 +368,6 @@ export function selectOrCreateInformantSection(
     // create person
     const ref = uuid()
     const informantSection = createPersonSection(ref, sectionCode, sectionTitle)
-    informantSection.entry.push({
-      reference: `urn:uuid:${ref}`
-    })
     const composition = fhirBundle.entry[0].resource
     composition.section.push(informantSection)
     informantEntry = createRelatedPersonTemplate(ref)

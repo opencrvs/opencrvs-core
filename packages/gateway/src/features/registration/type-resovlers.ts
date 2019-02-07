@@ -18,7 +18,15 @@ import {
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   HEALTH_FACILITY_BIRTH_CODE,
-  BIRTH_LOCATION_TYPE_CODE
+  BIRTH_LOCATION_TYPE_CODE,
+  DECEASED_CODE,
+  INFORMANT_CODE,
+  DEATH_ENCOUNTER_CODE,
+  DEATH_LOCATION_TYPE_CODE,
+  HEALTH_FACILITY_DEATH_CODE,
+  MANNER_OF_DEATH_CODE,
+  CAUSE_OF_DEATH_CODE,
+  CAUSE_OF_DEATH_METHOD_CODE
 } from 'src/features/fhir/templates'
 import { GQLResolver } from 'src/graphql/schema'
 import {
@@ -56,9 +64,6 @@ export const typeResolvers: GQLResolver = {
     },
     multipleBirth: person => {
       return person.multipleBirthInteger
-    },
-    deceased: person => {
-      return person.deceasedBoolean
     },
     nationality: person => {
       const nationalityExtension = findExtension(
@@ -99,7 +104,27 @@ export const typeResolvers: GQLResolver = {
       )
     }
   },
-
+  RelatedPerson: {
+    relationship: relatedPerson => {
+      return (
+        relatedPerson &&
+        relatedPerson.relationship &&
+        relatedPerson.relationship.coding &&
+        relatedPerson.relationship.coding[0].code
+      )
+    },
+    individual: async (relatedPerson, _, authHeader) => {
+      return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
+    }
+  },
+  Deceased: {
+    deceased: person => {
+      return person && person.deceasedBoolean
+    },
+    deathDate: person => {
+      return person && person.deceasedDateTime
+    }
+  },
   Registration: {
     async trackingId(task: fhir.Task) {
       const foundIdentifier =
@@ -367,7 +392,179 @@ export const typeResolvers: GQLResolver = {
     type: location => location.partOf,
     address: location => location.address
   },
+  DeathRegistration: {
+    createdAt(composition: ITemplatedComposition) {
+      return composition.date
+    },
+    async deceased(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(DECEASED_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
+    },
+    async informant(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )) as fhir.RelatedPerson
+    },
+    async registration(composition: ITemplatedComposition, _, authHeader) {
+      const taskBundle = await fetchFHIR(
+        `/Task?focus=Composition/${composition.id}`,
+        authHeader
+      )
 
+      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
+        return null
+      }
+      return taskBundle.entry[0].resource
+    },
+    async placeOfDeath(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const data = await fetchFHIR(
+        `/${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+
+      if (!data || !data.location || !data.location[0].location) {
+        return null
+      }
+
+      return await fetchFHIR(
+        `/${data.location[0].location.reference}`,
+        authHeader
+      )
+    },
+    async deathLocation(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${HEALTH_FACILITY_DEATH_CODE}`,
+        authHeader
+      )
+      if (!observations.entry[0]) {
+        return null
+      }
+      return observations.entry[0].resource.valueString.split('/')[1]
+    },
+    async deathLocationType(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${DEATH_LOCATION_TYPE_CODE}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
+    },
+    async mannerOfDeath(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${MANNER_OF_DEATH_CODE}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
+    },
+    async causeOfDeathMethod(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${CAUSE_OF_DEATH_METHOD_CODE}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
+    },
+    async causeOfDeath(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          encounterSection.entry[0].reference
+        }&code=${CAUSE_OF_DEATH_CODE}`,
+        authHeader
+      )
+
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueCodeableConcept &&
+          observations.entry[0].resource.valueCodeableConcept.coding &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
+        null
+      )
+    }
+  },
   BirthRegistration: {
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       // Preparing Encounter

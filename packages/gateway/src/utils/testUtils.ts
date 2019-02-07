@@ -60,7 +60,8 @@ export const mockPatient = {
       data: '<base64Binary>'
     }
   ],
-  deceasedBoolean: 'false',
+  deceasedBoolean: 'true',
+  deceasedDateTime: '2010-01-01',
   communication: [
     {
       language: {
@@ -360,6 +361,141 @@ export const mockComposition = {
       ]
     },
 
+    {
+      title: 'Supporting documents',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'supporting-documents'
+          }
+        ],
+        text: 'Supporting documents'
+      },
+      text: '',
+      entry: [
+        {
+          reference: 'DocumentReference/xxx' // reference to a DocumentReference resource contained below
+        },
+        {
+          reference: 'DocumentReference/yyy' // reference to a DocumentReference resource contained below
+        },
+        {
+          reference: 'DocumentReference/zzz' // reference to a DocumentReference resource contained below
+        }
+      ]
+    }
+  ],
+  id: '123',
+  relatesTo: [
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composition/xyz'
+      }
+    },
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composition/abc'
+      }
+    }
+  ]
+}
+
+export const mockDeathComposition = {
+  identifier: {
+    system: 'urn:ietf:rfc:3986',
+    value: '{{urn_uuid}}'
+  },
+  resourceType: 'Composition',
+  status: 'final', // 'final' when submitted | 'preliminary' when still a draft
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'death-registration'
+      }
+    ],
+    text: 'Death Registration'
+  },
+  class: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/classes',
+        code: 'crvs-document'
+      }
+    ],
+    text: 'CRVS Document'
+  },
+  subject: {
+    reference: 'Patient/xyz' // A reference to the person being registered, by fullUrl
+  },
+  date: '{{logicalCompositionDate}}', // declaration date
+  author: [
+    {
+      reference: 'Practitioner/xyz' // CHW that declared the event
+    }
+  ],
+  title: 'Death Registration',
+  section: [
+    {
+      title: 'Deceased details',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'deceased-details'
+          }
+        ],
+        text: 'Deceased details'
+      },
+      text: '',
+      entry: [
+        {
+          reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
+        },
+        {
+          reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
+        }
+      ]
+    },
+    {
+      title: "Informant's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'informant-details'
+          }
+        ],
+        text: "Informant's details"
+      },
+      text: '',
+      entry: [
+        {
+          reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
+        }
+      ]
+    },
+    {
+      title: 'Death Encounter',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'death-encounter'
+          }
+        ],
+        text: 'Death encounter'
+      },
+      text: '',
+      entry: [
+        {
+          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below, the encounter may have zero or more observations attached to it
+        }
+      ]
+    },
     {
       title: 'Supporting documents',
       code: {
@@ -934,5 +1070,171 @@ export const mockObservations = {
         }
       }
     ]
+  },
+  deathLocation: {
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the death encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'health-facility-death',
+                display: 'Health facility death location'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference deceased by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as death date
+          valueString: 'Location/123' // reference to a location
+        }
+      }
+    ]
+  },
+  deathLocationType: {
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the death encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'death-location-type',
+                display: 'Type of death location'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference deceased by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as death date
+          valueString: 'BIRTH_PLACE'
+        }
+      }
+    ]
+  },
+  mannerOfDeath: {
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the death encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'uncertified-manner-of-death',
+                display: 'Uncertified manner of death'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference deceased by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as death date
+          valueString: 'NATURAL_CAUSES'
+        }
+      }
+    ]
+  },
+  causeOfDeathMethod: {
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the death encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'cause-of-death-method',
+                display: 'Cause of death method'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference deceased by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as death date
+          valueString: 'VERBAL_AUTOPSY'
+        }
+      }
+    ]
+  },
+  causeOfDeath: {
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the death encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '79378-6  ',
+                display: 'Cause of death'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference deceased by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as death date
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/ValueSet/icd-10',
+                code: 'OTHER'
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  informant: {
+    fullUrl: 'urn:uuid:<uuid>',
+    resource: {
+      resourceType: 'RelatedPerson',
+      relationship: {
+        coding: [
+          {
+            system:
+              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+            code: 'OTHER' // or string for unsupported other
+          }
+        ],
+        text: 'Nephew'
+      },
+      patient: {
+        reference: 'Patient/123' // reference to deceased
+      }
+    }
   }
 }

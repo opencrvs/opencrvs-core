@@ -216,8 +216,6 @@ type DeathRegistration { # -> Composition
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  mother: Person # -> Only use for foetal death -> .section(code='mother-details').entry.reference
-  father: Person # -> Only use for foetal death -> .section(code='father-details').entry.reference
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType # -> RelatedPerson.relationship
   otherInformantRelationship: String # -> RelatedPerson.relationship
@@ -333,6 +331,7 @@ type Query {
     count: Int
     skip: Int
   ): BirthRegResultSet
+  fetchDeathRegistration(id: ID!): DeathRegistration
   listDeathRegistrations(
     locationIds: [String]
     status: String
