@@ -21,7 +21,8 @@ import {
   DECLARATION,
   REJECTION,
   DUPLICATION,
-  CERTIFICATION
+  CERTIFICATION,
+  BIRTH
 } from 'src/utils/constants'
 
 const messages = defineMessages({
@@ -45,14 +46,14 @@ const messages = defineMessages({
   },
   title: {
     id: 'register.confirmationScreen.title',
-    defaultMessage: `{event, select, declaration {Application} registration {Registration} duplication {Application}
-      certificate {Certificate} offlineEvent {Application connectivity}} {action, select, completed {completed} 
-      submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending}}`,
+    defaultMessage: `{event, select, declaration {Application} registration {Application} duplication {Application}
+      certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed} 
+      submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
     description: 'The title that appear on the confirmation screen '
   },
   headerDesc: {
     id: 'register.confirmationScreen.headerDesc',
-    defaultMessage: `{event, select, declaration {The application} registration {} duplication {The application} certificate {} offlineEvent {The application}} 
+    defaultMessage: `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The application}} 
       {action, select, submitted {is now on its way for validation} completed {} registered {registered} rejected {rejected} approved {Approved}
       offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     description:
@@ -66,14 +67,14 @@ const messages = defineMessages({
   },
   boxHeaderDescFirst: {
     id: 'register.confirmationScreen.boxHeaderDescFirst',
-    defaultMessage: `{event, select, declaration {The birth application of } registration {The birth of } duplication 
-      {The birth application of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
+    defaultMessage: `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The birth of } duplication 
+    {The birth duplication of } certificate {The birth certificate of } offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of } }`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
   boxHeaderDescLast: {
     id: 'register.confirmationScreen.boxHeaderDescLast',
-    defaultMessage: `{action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
+    defaultMessage: `{action, select, completed {has been completed.} submitted {has been successfully submitted to the registration office.} rejected {has been rejected.} registered {has been registered}
       approved {has been approved.} offlineAction {is pending due to internet connection.}}`,
     description:
       'The first box header description that appear on the confirmation screen '
@@ -89,7 +90,8 @@ const messages = defineMessages({
     id: 'register.confirmationScreen.trackingSectionDesc',
     defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
     registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-    duplication{...} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
+    duplication{...} certificate {Certificates have been collected from your jurisdiction.}
+    offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}}`,
     description:
       'The tracking section description that appear on the confirmation screen'
   },
@@ -118,7 +120,7 @@ const messages = defineMessages({
   },
   newButton: {
     id: 'register.confirmationScreen.buttons.newDeclaration',
-    defaultMessage: 'New application',
+    defaultMessage: 'New declaration',
     description:
       'The button to start a new application now that they are finished with this one'
   }
@@ -246,19 +248,19 @@ class ConfirmationScreenView extends React.Component<
       event: eventName,
       action: actionName
     })
+    const eventType = history.location.state.eventType
+      ? history.location.state.eventType
+      : BIRTH
     const headerDesc = intl.formatMessage(messages.headerDesc, {
       event: eventName,
       action: actionName
     })
     const isRejection = actionName === REJECTION ? true : false
     const fullName =
-      language === 'en'
-        ? fullNameInEng !== ''
-          ? fullNameInEng
-          : fullNameInBn
-        : fullNameInBn
+      language === 'bn' || !fullNameInEng ? fullNameInBn : fullNameInEng
     const boxHeaderDescFirst = intl.formatMessage(messages.boxHeaderDescFirst, {
-      event: eventName
+      event: eventName,
+      eventType
     })
     const boxHeaderDescLast = intl.formatMessage(messages.boxHeaderDescLast, {
       action: actionName
@@ -284,7 +286,7 @@ class ConfirmationScreenView extends React.Component<
           <Header
             title={title}
             description={headerDesc}
-            hideBackButton={!isDeclaration}
+            hideBackButton={true}
             id="confirmation_screen_view"
           />
         </HeaderWrapper>
@@ -355,6 +357,11 @@ class ConfirmationScreenView extends React.Component<
           )}
         </Container>
         <Footer>
+          <FooterAction>
+            <FooterPrimaryButton onClick={() => (location.href = '/')}>
+              {intl.formatMessage(messages.backButton)}
+            </FooterPrimaryButton>
+          </FooterAction>
           {!isRejection && isDeclaration && (
             <FooterAction>
               <FooterPrimaryButton onClick={() => (location.href = '/')}>
@@ -374,11 +381,6 @@ class ConfirmationScreenView extends React.Component<
               </FooterPrimaryButton>
             </FooterAction>
           )}
-          <FooterAction>
-            <FooterPrimaryButton onClick={() => (location.href = '/')}>
-              {intl.formatMessage(messages.backButton)}
-            </FooterPrimaryButton>
-          </FooterAction>
         </Footer>
       </>
     )
