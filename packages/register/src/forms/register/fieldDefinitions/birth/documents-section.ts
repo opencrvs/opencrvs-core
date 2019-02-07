@@ -280,7 +280,7 @@ export const documentsSection: IFormSection = {
             messages.proofOfParentPermanentAddress,
             messages.proofOfEPICardOfChild
           ],
-          After5yrs: [
+          after5yrs: [
             messages.proofOfMothersID,
             messages.proofOfFathersID,
             messages.proofOfBirthPlaceAndDate,

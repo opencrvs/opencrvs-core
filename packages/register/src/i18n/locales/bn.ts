@@ -604,6 +604,17 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.docTypePassport': 'পাসপোর্ট',
     'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
     'formFields.docTypeOther': 'অন্যান্য',
+    'formFields.docTypeChildBirthProof': 'জন্ম স্থান এবং জন্ম তারিখ প্রমাণ',
+    'formFields.docTypeEPICard': 'ইপিআই কার্ড',
+    'formFields.docTypeDoctorCertificate': 'ডাক্তার সার্টিফিকেট',
+    'formFields.proofOfMothersID': 'মায়ের আইডি প্রমাণ',
+    'formFields.proofOfFathersID': 'পিতার আইডি প্রমাণ',
+    'formFields.proofOfBirthPlaceAndDate': 'জন্ম স্থান এবং জন্ম তারিখ প্রমাণ',
+    'formFields.proofOfParentPermanentAddress':
+      'পিতা মাতার স্থায়ী ঠিকানা প্রমাণ',
+    'formFields.proofOfEPICardOfChild': 'শিশু ইপিআই কার্ড',
+    'formFields.proofOfDocCertificateOfChild':
+      'শিশুর বয়সের প্রমাণস্বরূপ ডাক্তারের সার্টিফিকেট অথবা স্কুল সার্টিফিকেট',
     'register.form.section.documents.uploadImage':
       'সমর্থনকারী কাগজপত্রর একটি ছবি আপলোড করুন',
     'formFields.imageUpload.uploadedList': 'আপলোড করা:',

@@ -208,7 +208,7 @@ export const diffDoB = (doB: string) => {
   const ranges: IRange[] = [
     { start: 0, end: 45, value: 'within45days' },
     { start: 46, end: 5 * 365, value: 'between46daysTo5yrs' },
-    { start: 5 * 365 + 1, value: 'After5yrs' }
+    { start: 5 * 365 + 1, value: 'after5yrs' }
   ]
   const valueWithinRange = ranges.find(range => betweenRange(range, diffInDays))
   return valueWithinRange ? valueWithinRange.value : ''

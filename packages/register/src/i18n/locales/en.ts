@@ -605,6 +605,18 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
     'formFields.docTypeOther': 'Other',
+    'formFields.docTypeChildBirthProof': 'Proof of Place and Date of Birth',
+    'formFields.docTypeEPICard': 'EPI Card',
+    'formFields.docTypeDoctorCertificate': 'Doctor Certificate',
+    'formFields.proofOfMothersID': "Proof of Mother's ID",
+    'formFields.proofOfFathersID': "Proof of Father's ID",
+    'formFields.proofOfBirthPlaceAndDate':
+      'Proof of Place and Date of Birth of Child',
+    'formFields.proofOfParentPermanentAddress':
+      'Proof of Permanent Address of Parent',
+    'formFields.proofOfEPICardOfChild': 'EPI Card of Child',
+    'formFields.proofOfDocCertificateOfChild':
+      "Certificate from doctor to prove child's age OR School certificate",
     'register.form.section.documents.uploadImage':
       'Upload a photo of the supporting document',
     'formFields.imageUpload.uploadedList': 'Uploaded:',
