@@ -9,19 +9,20 @@ export const eventLocationTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  if (!queryData.placeOfBirth || !queryData.placeOfBirth.address) {
+  if (!queryData.eventLocation || !queryData.eventLocation.address) {
     return transformedData
   }
   if (lineNumber > 0) {
     transformedData[sectionId][field.name] =
-      queryData.placeOfBirth.address.line[lineNumber - 1]
+      queryData.eventLocation.address.line[lineNumber - 1]
+  } else if (transformedFieldName === '') {
   } else if (
-    queryData.placeOfBirth.address[
+    queryData.eventLocation.address[
       transformedFieldName ? transformedFieldName : field.name
     ]
   ) {
     transformedData[sectionId][field.name] =
-      queryData.placeOfBirth.address[
+      queryData.eventLocation.address[
         transformedFieldName ? transformedFieldName : field.name
       ]
   }

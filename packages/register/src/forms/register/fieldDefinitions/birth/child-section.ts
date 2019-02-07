@@ -401,7 +401,7 @@ export const childSection: IFormSection = {
       ],
       mapping: {
         mutation: sectionFieldToBundleFieldTransformer('birthLocationType'),
-        query: bundleFieldToSectionFieldTransformer('birthLocationType')
+        query: eventLocationTransformer()
       }
     },
     {
@@ -418,7 +418,7 @@ export const childSection: IFormSection = {
       conditionals: [conditionals.placeOfBirthHospital],
       mapping: {
         mutation: sectionFieldToBundleFieldTransformer(),
-        query: bundleFieldToSectionFieldTransformer()
+        query: eventLocationTransformer()
       }
     },
     {
