@@ -184,7 +184,7 @@ describe('validate', () => {
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
     })
     it('Should error when supplied a bad value as Birth Registration Number.', () => {
-      const badValue = '2019BrTVz8945AVC9'
+      const badValue = '2019333453BRTVSRJ'
       const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
       const response = {
         message: {
@@ -195,14 +195,37 @@ describe('validate', () => {
             'The error message that appears when an invalid value is used as brn'
         },
         props: {
-          validLength: 17
+          validLength: 18
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
     it('Should pass when supplied a good value as Birth Registration Number.', () => {
-      const goodValue = '2019BRTVZ8945AVC9'
+      const goodValue = '2019333453BRTVSRJ1'
       const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
+      const response = undefined
+      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
+    })
+    it('Should error when supplied a bad value as Death Registration Number.', () => {
+      const badValue = '2019333453BRTVSRJ'
+      const typeOfID = 'DEATH_REGISTRATION_NUMBER'
+      const response = {
+        message: {
+          id: 'validations.validDeathRegistrationNumber',
+          defaultMessage:
+            'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+          description:
+            'The error message that appears when an invalid value is used as drn'
+        },
+        props: {
+          validLength: 18
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
+    it('Should pass when supplied a good value as Death Registration Number.', () => {
+      const goodValue = '2019333453BRTVSRJ1'
+      const typeOfID = 'DEATH_REGISTRATION_NUMBER'
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
     })
