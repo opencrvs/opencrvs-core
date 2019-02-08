@@ -521,21 +521,7 @@ export const mockDeathComposition = {
       ]
     }
   ],
-  id: '123',
-  relatesTo: [
-    {
-      code: 'duplicate',
-      targetReference: {
-        reference: 'Composition/xyz'
-      }
-    },
-    {
-      code: 'duplicate',
-      targetReference: {
-        reference: 'Composition/abc'
-      }
-    }
-  ]
+  id: '123'
 }
 
 export const mockFhirBundle = {
@@ -1197,7 +1183,7 @@ export const mockObservations = {
             coding: [
               {
                 system: 'http://loinc.org',
-                code: '79378-6  ',
+                code: 'ICD10',
                 display: 'Cause of death'
               }
             ]
@@ -1217,24 +1203,24 @@ export const mockObservations = {
         }
       }
     ]
-  },
-  informant: {
-    fullUrl: 'urn:uuid:<uuid>',
-    resource: {
-      resourceType: 'RelatedPerson',
-      relationship: {
-        coding: [
-          {
-            system:
-              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-            code: 'OTHER' // or string for unsupported other
-          }
-        ],
-        text: 'Nephew'
-      },
-      patient: {
-        reference: 'Patient/123' // reference to deceased
-      }
+  }
+}
+
+export const mockRelatedPerson = {
+  fullUrl: 'urn:uuid:<uuid>',
+  resource: {
+    resourceType: 'RelatedPerson',
+    relationship: {
+      coding: [
+        {
+          system: 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+          code: 'OTHER' // or string for unsupported other
+        }
+      ],
+      text: 'Nephew'
+    },
+    patient: {
+      reference: 'Patient/123' // reference to deceased
     }
   }
 }

@@ -4,7 +4,8 @@ import * as fetch from 'jest-fetch-mock'
 import {
   mockDeathComposition,
   mockPatient,
-  mockObservations
+  mockObservations,
+  mockRelatedPerson
 } from 'src/utils/testUtils'
 
 beforeEach(() => {
@@ -135,7 +136,8 @@ describe('Registration type resolvers', () => {
       expect(causeOfDeath).toEqual('OTHER')
     })
     it('returns informant', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.informant))
+      fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
+
       // @ts-ignore
       const informant = await typeResolvers.DeathRegistration.informant(
         mockDeathComposition
