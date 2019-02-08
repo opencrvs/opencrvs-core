@@ -79,6 +79,7 @@ async function sendSMSInfobip(to: string, text: string) {
   const responseBody = await response.text()
   logger.info(`Response from Infobip: ${JSON.stringify(responseBody)}`)
   if (!response.ok) {
+    logger.error(`Failed to send sms to ${to}`)
     throw new Error(`Failed to send sms to ${to}`)
   }
 }
