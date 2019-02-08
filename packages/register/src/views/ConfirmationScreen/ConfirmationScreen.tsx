@@ -17,13 +17,7 @@ import {
 import { RouteComponentProps } from 'react-router'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
-import {
-  DECLARATION,
-  REJECTION,
-  DUPLICATION,
-  CERTIFICATION,
-  BIRTH
-} from 'src/utils/constants'
+import { DECLARATION, REJECTION, DUPLICATION, BIRTH } from 'src/utils/constants'
 
 const messages = defineMessages({
   nextCardTitle: {
@@ -82,7 +76,7 @@ const messages = defineMessages({
   trackingSectionTitle: {
     id: 'register.confirmationScreen.trackingSectionTitle',
     defaultMessage: `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
-    duplication {...} certificate {...} offlineEvent {Tracking ID number: }}`,
+    duplication {Birth Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
     description:
       'The tracking section title that appear on the confirmation screen'
   },
@@ -90,8 +84,9 @@ const messages = defineMessages({
     id: 'register.confirmationScreen.trackingSectionDesc',
     defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
     registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-    duplication{...} certificate {Certificates have been collected from your jurisdiction.}
-    offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}}`,
+    duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
+    certificate {Certificates have been collected from your jurisdiction.}
+    offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}} `,
     description:
       'The tracking section description that appear on the confirmation screen'
   },
@@ -277,8 +272,6 @@ class ConfirmationScreenView extends React.Component<
     const isDuplicate =
       history.location.state.eventName === DUPLICATION ? true : false
     const duplicateContextId = history.location.state.duplicateContextId
-    const isCertification =
-      history.location.state.eventName === CERTIFICATION ? true : false
 
     return (
       <>
@@ -323,10 +316,9 @@ class ConfirmationScreenView extends React.Component<
           {isTrackingSection && (
             <TrackingBox>
               <TrackingHeader>
-                {!isCertification &&
-                  intl.formatMessage(messages.trackingSectionTitle, {
-                    event: eventName
-                  })}
+                {intl.formatMessage(messages.trackingSectionTitle, {
+                  event: eventName
+                })}
               </TrackingHeader>
               <TrackingNumber id="trackingIdViewer">
                 {trackNumber}

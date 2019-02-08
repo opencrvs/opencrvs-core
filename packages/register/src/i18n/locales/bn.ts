@@ -850,12 +850,11 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.confirmationScreen.buttons.newDeclaration': 'নতুন ঘোষণা',
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
-    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {জন্ম নিবন্ধন নম্বর : } 
-      duplication {...} certificate {...} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }}`,
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {জন্ম নিবন্ধন নম্বর : } duplication {জন্ম নিবন্ধন নম্বর : } certificate {} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }} `,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
       registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} 
-      duplication {...} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} 
-      offlineEvent {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}}`,
+      duplication {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} 
+      offlineEvent {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}} `,
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select,declaration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা } registration { এর জন্ম নিবন্ধন}
      duplication { এর জন্ম নিবন্ধন নকল} certificate { এর জন্ম নিবন্ধন সনদ} offlineEvent {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select,
