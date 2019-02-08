@@ -5,6 +5,11 @@ import { IFormFieldValue } from '@opencrvs/register/src/forms'
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
 import { isArray } from 'util'
+import {
+  NATIONAL_ID,
+  BIRTH_REGISTRATION_NUMBER,
+  PASSPORT
+} from 'src/forms/identity'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
@@ -348,7 +353,7 @@ export const validIDNumber: ValidationInitializer = (
   const validBirthRegistrationNumberLength = 17
   const validPassportLength = 9
   switch (typeOfID) {
-    case 'NATIONAL_ID':
+    case NATIONAL_ID:
       return hasValidLength(value.toString(), validNationalIDLength) &&
         isNumber(value.toString())
         ? undefined
@@ -357,7 +362,7 @@ export const validIDNumber: ValidationInitializer = (
             props: { validLength: validNationalIDLength }
           }
 
-    case 'BIRTH_REGISTRATION_NUMBER':
+    case BIRTH_REGISTRATION_NUMBER:
       return hasValidLength(
         value.toString(),
         validBirthRegistrationNumberLength
@@ -368,7 +373,7 @@ export const validIDNumber: ValidationInitializer = (
             props: { validLength: validBirthRegistrationNumberLength }
           }
 
-    case 'PASSPORT':
+    case PASSPORT:
       return hasValidLength(value.toString(), validPassportLength) &&
         isAlphaNumeric(value.toString())
         ? undefined

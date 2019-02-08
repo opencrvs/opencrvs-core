@@ -1,11 +1,11 @@
 import { defineMessages } from 'react-intl'
 import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
 
-const NATIONAL_ID = 'NATIONAL_ID'
-const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
-const PASSPORT = 'PASSPORT'
-const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
-const OTHER = 'OTHER'
+export const NATIONAL_ID = 'NATIONAL_ID'
+export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
+export const PASSPORT = 'PASSPORT'
+export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
+export const OTHER = 'OTHER'
 
 export const messages = defineMessages({
   iDType: {
