@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createTestComponent } from '../../tests/util'
+import { createTestComponent, wait } from '../../tests/util'
 import { ConfirmationScreen } from './ConfirmationScreen'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '../../store'
@@ -33,6 +33,7 @@ describe('when user is in the confirmation screen page for birth declaration', (
   })
   describe('when the application is online', () => {
     beforeEach(async () => {
+      window.location.assign = jest.fn()
       const testComponent = createTestComponent(
         <ConfirmationScreen
           location={mock}
@@ -86,6 +87,22 @@ describe('when user is in the confirmation screen page for birth declaration', (
       ).toEqual(
         'The informant has given their contact details and will also be informed when the registration is complete.'
       )
+    })
+    it('Should redirect the user to the register app', async () => {
+      confirmationScreenComponent
+        .find('#go_to_homepage_button')
+        .hostNodes()
+        .simulate('click')
+      await wait()
+      expect(history.location.pathname).toContain('/')
+    })
+    it('Should redirect the user to the register app', async () => {
+      confirmationScreenComponent
+        .find('#go_to_new_declaration')
+        .hostNodes()
+        .simulate('click')
+      await wait()
+      expect(history.location.pathname).toContain('/')
     })
   })
   describe('when the application is offline', () => {

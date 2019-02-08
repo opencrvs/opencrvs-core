@@ -350,13 +350,19 @@ class ConfirmationScreenView extends React.Component<
         </Container>
         <Footer>
           <FooterAction>
-            <FooterPrimaryButton onClick={() => (location.href = '/')}>
+            <FooterPrimaryButton
+              id="go_to_homepage_button"
+              onClick={() => (location.href = '/')}
+            >
               {intl.formatMessage(messages.backButton)}
             </FooterPrimaryButton>
           </FooterAction>
           {!isRejection && isDeclaration && (
             <FooterAction>
-              <FooterPrimaryButton onClick={() => (location.href = '/')}>
+              <FooterPrimaryButton
+                id="go_to_new_declaration"
+                onClick={() => (location.href = '/')}
+              >
                 {intl.formatMessage(messages.newButton)}
               </FooterPrimaryButton>
             </FooterAction>
