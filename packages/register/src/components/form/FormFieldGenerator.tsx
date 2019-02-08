@@ -242,7 +242,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === LIST) {
-    return <FormList list={fieldDefinition.items} />
+    return <FormList {...inputProps} list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
     return (

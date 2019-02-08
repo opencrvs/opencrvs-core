@@ -12,12 +12,13 @@ const StyledListItem = styled.li`
 `
 
 export interface IListProps {
+  id?: string
   list: string[]
 }
 
-export const List = ({ list }: IListProps) => {
+export const List = ({ list, id }: IListProps) => {
   return (
-    <StyledList>
+    <StyledList id={id}>
       {list.map((item: string, index: number) => (
         <StyledListItem key={index}>{item}</StyledListItem>
       ))}

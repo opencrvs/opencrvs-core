@@ -184,16 +184,18 @@ export const getFieldOptionsByValueMapper = (
     field.dynamicItems.dependency
   ) as string
 
+  const firstKey = Object.keys(field.dynamicItems.items)[0]
+
   if (!dependencyVal) {
-    const firstKey = Object.keys(field.dynamicItems.items)[0]
     return field.dynamicItems.items[firstKey]
   }
+
   const mappedValue = valueMapper(dependencyVal)
+
   let items
+
   if (!field.dynamicItems.items[mappedValue]) {
-    throw new Error(
-      `Dependency '${mappedValue}' has illegal value, the value should have an entry in the dynamic options object or the value mapper function is incorrect.`
-    )
+    items = field.dynamicItems.items[firstKey]
   } else {
     items = field.dynamicItems.items[mappedValue]
   }
