@@ -160,8 +160,25 @@ describe('validate', () => {
   })
 
   describe('validIDNumber. Used for ID number field that has a specific validation', () => {
-    it('Should error when supplied a bad value as National ID.', () => {
+    it('Should error when supplied a bad value containing characters as National ID.', () => {
       const badValue = '2019BrTVz8945'
+      const typeOfID = 'NATIONAL_ID'
+      const response = {
+        message: {
+          id: 'validations.validNationalId',
+          defaultMessage:
+            'The National ID can only be numeric and must be {validLength} digits long',
+          description:
+            'The error message that appears when an invalid value is used as nid'
+        },
+        props: {
+          validLength: 13
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
+    it('Should error when supplied a bad value containing more digits than desired as National ID.', () => {
+      const badValue = '20197839489452'
       const typeOfID = 'NATIONAL_ID'
       const response = {
         message: {
