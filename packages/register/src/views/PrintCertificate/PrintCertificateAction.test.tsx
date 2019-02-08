@@ -1,5 +1,5 @@
 import { PrintCertificateAction } from './PrintCertificateAction'
-import { GET_BIRTH_REGISTRATION } from 'src/views/DataProvider/birth/queries'
+import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import * as React from 'react'
@@ -27,7 +27,7 @@ describe('when user wants to print certificate', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION,
+          query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
           variables: { id: 'asdhdqe2472487jsdfsdf' }
         },
         result: {
@@ -159,20 +159,8 @@ describe('when user wants to print certificate', async () => {
                 __typename: 'Registration'
               },
               attendantAtBirth: null,
-              weightAtBirth: 2,
+              weightAtBirth: null,
               birthType: null,
-              placeOfBirth: {
-                address: {
-                  type: 'PERMANENT',
-                  line: ['12', '', '', 'union1', '', 'upazila10'],
-                  district: 'district2',
-                  state: 'state2',
-                  postalCode: '',
-                  country: 'BGD'
-                }
-              },
-              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: null,
               __typename: 'BirthRegistration'
             }
@@ -261,7 +249,7 @@ describe('when user wants to print certificate', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION,
+          query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
           variables: { id: '12345' }
         },
         result: {
@@ -491,7 +479,7 @@ describe('when user wants to print certificate', async () => {
       const graphqlMock = [
         {
           request: {
-            query: GET_BIRTH_REGISTRATION,
+            query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
             variables: { id: 'asdhdqe2472487jsdfsdf' }
           },
           result: {
@@ -625,18 +613,6 @@ describe('when user wants to print certificate', async () => {
                 attendantAtBirth: null,
                 weightAtBirth: null,
                 birthType: null,
-                placeOfBirth: {
-                  address: {
-                    type: 'PERMANENT',
-                    line: ['12', '', '', 'union1', '', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    postalCode: '',
-                    country: 'BGD'
-                  }
-                },
-                birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-                birthLocationType: 'HOSPITAL',
                 presentAtBirthRegistration: null,
                 __typename: 'BirthRegistration'
               }

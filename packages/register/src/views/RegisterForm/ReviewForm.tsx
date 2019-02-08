@@ -100,7 +100,7 @@ export class ReviewFormView extends React.Component<IProps> {
       return (
         <QueryProvider
           event={this.getEvent()}
-          action={Action.LOAD_APPLICATION}
+          action={Action.LOAD_REVIEW_APPLICATION}
           payload={{ id: this.props.draftId }}
         >
           <QueryContext.Consumer>

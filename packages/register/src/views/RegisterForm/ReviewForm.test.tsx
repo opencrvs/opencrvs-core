@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReviewForm } from './ReviewForm'
-import { GET_BIRTH_REGISTRATION } from 'src/views/DataProvider/birth/queries'
+import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -43,7 +43,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW
         },
         error: new Error('boom')
       }
@@ -89,7 +89,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -248,7 +248,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -373,7 +373,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -456,7 +456,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -554,7 +554,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: GET_BIRTH_REGISTRATION,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -632,21 +632,7 @@ describe('ReviewForm tests', async () => {
                       {
                         comment: 'This is a note'
                       }
-                    ],
-                    location: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: ['']
-                    },
-                    office: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: [''],
-                      address: {
-                        district: '7876',
-                        state: 'iuyiuy'
-                      }
-                    }
+                    ]
                   }
                 ],
                 trackingId: 'B123456',
@@ -710,7 +696,8 @@ describe('ReviewForm tests', async () => {
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationPhone: '01711111111',
       commentsOrNotes: 'This is a note',
-      trackingId: 'B123456'
+      trackingId: 'B123456',
+      type: 'birth'
     })
 
     testComponent.component.unmount()
@@ -800,7 +787,7 @@ describe('ReviewForm tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: GET_BIRTH_REGISTRATION,
+            query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
             variables: { id: draft.id }
           },
           result: {

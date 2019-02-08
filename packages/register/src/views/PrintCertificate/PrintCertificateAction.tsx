@@ -804,7 +804,7 @@ class PrintCertificateActionComponent extends React.Component<
           <HeaderContent>
             <QueryProvider
               event={this.getEvent()}
-              action={Action.LOAD_APPLICATION}
+              action={Action.LOAD_CERTIFICATE_APPLICATION}
               payload={{ id: registrationId }}
             >
               <QueryContext.Consumer>
