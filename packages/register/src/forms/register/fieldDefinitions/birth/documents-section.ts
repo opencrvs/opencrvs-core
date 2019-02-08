@@ -128,40 +128,49 @@ const messages = defineMessages({
   },
   docTypeChildBirthProof: {
     id: 'formFields.docTypeChildBirthProof',
-    defaultMessage: 'Proof of Place and Date of Birth'
+    defaultMessage: 'Proof of Place and Date of Birth',
+    description: 'Label for select option Child Birth Proof'
   },
   docTypeEPICard: {
     id: 'formFields.docTypeEPICard',
-    defaultMessage: 'EPI Card'
+    defaultMessage: 'EPI Card',
+    description: 'Label for select option EPI Card'
   },
   docTypeDoctorCertificate: {
     id: 'formFields.docTypeDoctorCertificate',
-    defaultMessage: 'Doctor Certificate'
+    defaultMessage: 'Doctor Certificate',
+    description: 'Label for select option Doctor Certificate'
   },
   proofOfMothersID: {
     id: 'formFields.proofOfMothersID',
-    defaultMessage: "Proof of Mother's ID"
+    defaultMessage: "Proof of Mother's ID",
+    description: 'Label for list item Mother ID Proof'
   },
   proofOfFathersID: {
     id: 'formFields.proofOfFathersID',
-    defaultMessage: "Proof of Father's ID"
+    defaultMessage: "Proof of Father's ID",
+    description: 'Label for list item Father ID Proof'
   },
   proofOfBirthPlaceAndDate: {
     id: 'formFields.proofOfBirthPlaceAndDate',
-    defaultMessage: 'Proof of Place and Date of Birth of Child'
+    defaultMessage: 'Proof of Place and Date of Birth of Child',
+    description: 'Label for list item Child Birth Proof'
   },
   proofOfParentPermanentAddress: {
     id: 'formFields.proofOfParentPermanentAddress',
-    defaultMessage: 'Proof of Permanent Address of Parent'
+    defaultMessage: 'Proof of Permanent Address of Parent',
+    description: 'Label for list item Parent Permanent Address Proof'
   },
   proofOfEPICardOfChild: {
     id: 'formFields.proofOfEPICardOfChild',
-    defaultMessage: 'EPI Card of Child'
+    defaultMessage: 'EPI Card of Child',
+    description: 'Label for list item EPI Card of Child'
   },
   proofOfDocCertificateOfChild: {
     id: 'formFields.proofOfDocCertificateOfChild',
     defaultMessage:
-      "Certificate from doctor to prove child's age OR School certificate"
+      "Certificate from doctor to prove child's age OR School certificate",
+    description: 'Label for list item Doctor Certificate'
   }
 })
 
