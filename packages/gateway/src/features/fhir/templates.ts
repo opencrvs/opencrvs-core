@@ -25,8 +25,6 @@ export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
 export const CERTIFICATE_DOCS_TITLE = 'Certificates'
 export const ATTACHMENT_CONTEXT_KEY = 'attachments'
 export const CERTIFICATE_CONTEXT_KEY = 'certificates'
-export const HEALTH_FACILITY_BIRTH_CODE = 'health-facility-birth'
-export const BIRTH_LOCATION_TYPE_CODE = 'birth-location-type'
 
 export function createPersonSection(
   refUuid: string,

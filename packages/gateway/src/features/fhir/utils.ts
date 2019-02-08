@@ -260,6 +260,24 @@ export function selectOrCreateLocationRefResource(
   return locationEntry.resource as fhir.Location
 }
 
+export function selectOrCreateEncounterLocationRef(
+  sectionCode: string,
+  fhirBundle: ITemplatedBundle
+): fhir.Reference {
+  const encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle)
+  if (!encounter.location) {
+    encounter.location = []
+    encounter.location.push({
+      location: { reference: '' }
+    })
+  } else {
+    if (!encounter.location || !encounter.location[0]) {
+      throw new Error('Encounter is expected to have a location property')
+    }
+  }
+  return encounter.location[0].location
+}
+
 export function selectOrCreateDocRefResource(
   sectionCode: string,
   sectionTitle: string,
@@ -653,6 +671,20 @@ export async function getBRNFromResponse(
     throw new Error('getBRNFromResponse: Task does not have any brn identifier')
   }
   return brnIdentifier.value
+}
+
+export async function parseEventLocation(
+  details: any,
+  authHeader: IAuthHeader
+): Promise<any> {
+  if (details.eventLocation._fhirID) {
+    console.log('hi')
+    delete details.eventLocation.address
+    delete details.eventLocation.type
+    return details
+  } else {
+    return details
+  }
 }
 
 export function getIDFromResponse(resBody: fhir.Bundle): string {

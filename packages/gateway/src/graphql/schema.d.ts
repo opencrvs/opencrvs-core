@@ -104,16 +104,15 @@ export interface GQLAddress {
 }
 
 export enum GQLAddressType {
+  HEALTH_FACILITY = 'HEALTH_FACILITY',
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
+  CRVS_OFFICE = 'CRVS_OFFICE',
+  PRIVATE_HOME = 'PRIVATE_HOME',
   CURRENT = 'CURRENT',
   PERMANENT = 'PERMANENT',
-  BIRTH_PLACE = 'BIRTH_PLACE',
   MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
   IDP_CAMP = 'IDP_CAMP',
   UNHCR_CAMP = 'UNHCR_CAMP',
-  OTHER_HEALTH_INSTITUTION = 'OTHER_HEALTH_INSTITUTION',
-  HOSPITAL = 'HOSPITAL',
-  HEALTH_INSTITUTION = 'HEALTH_INSTITUTION',
-  PRIVATE_HOME = 'PRIVATE_HOME',
   OTHER = 'OTHER'
 }
 
@@ -186,9 +185,16 @@ export interface GQLIdentifier {
 
 export enum GQLLocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
+  HOSPITAL = 'HOSPITAL',
+  OTHER_HEALTH_INSTITUTION = 'OTHER_HEALTH_INSTITUTION',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   CRVS_OFFICE = 'CRVS_OFFICE',
   PRIVATE_HOME = 'PRIVATE_HOME',
+  CURRENT = 'CURRENT',
+  PERMANENT = 'PERMANENT',
+  MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
+  IDP_CAMP = 'IDP_CAMP',
+  UNHCR_CAMP = 'UNHCR_CAMP',
   OTHER = 'OTHER'
 }
 
@@ -200,7 +206,7 @@ export interface GQLBirthRegistration {
   mother?: GQLPerson
   father?: GQLPerson
   informant?: GQLPerson
-  placeOfBirth?: GQLLocation
+  eventLocation?: GQLLocation
   birthType?: GQLBirthType
   weightAtBirth?: number
   attendantAtBirth?: GQLAttendantType
@@ -373,7 +379,7 @@ export interface GQLDeathRegistration {
   informant?: GQLRelatedPerson
   informantRelationship?: GQLRelationshipType
   otherInformantRelationship?: string
-  placeOfDeath?: GQLLocation
+  eventLocation?: GQLLocation
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
@@ -508,7 +514,7 @@ export interface GQLBirthRegistrationInput {
   mother?: GQLPersonInput
   father?: GQLPersonInput
   informant?: GQLPersonInput
-  placeOfBirth?: GQLLocationInput
+  eventLocation?: GQLLocationInput
   birthType?: GQLBirthType
   weightAtBirth?: number
   attendantAtBirth?: GQLAttendantType
@@ -590,7 +596,7 @@ export interface GQLDeathRegistrationInput {
   informant?: GQLRelatedPersonInput
   informantRelationship?: GQLRelationshipType
   otherInformantRelationship?: string
-  placeOfDeath?: GQLLocationInput
+  eventLocation?: GQLLocationInput
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
@@ -1182,7 +1188,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   mother?: BirthRegistrationToMotherResolver<TParent>
   father?: BirthRegistrationToFatherResolver<TParent>
   informant?: BirthRegistrationToInformantResolver<TParent>
-  placeOfBirth?: BirthRegistrationToPlaceOfBirthResolver<TParent>
+  eventLocation?: BirthRegistrationToEventLocationResolver<TParent>
   birthType?: BirthRegistrationToBirthTypeResolver<TParent>
   weightAtBirth?: BirthRegistrationToWeightAtBirthResolver<TParent>
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
@@ -1257,7 +1263,7 @@ export interface BirthRegistrationToInformantResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationToPlaceOfBirthResolver<
+export interface BirthRegistrationToEventLocationResolver<
   TParent = any,
   TResult = any
 > {
@@ -1667,7 +1673,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   otherInformantRelationship?: DeathRegistrationToOtherInformantRelationshipResolver<
     TParent
   >
-  placeOfDeath?: DeathRegistrationToPlaceOfDeathResolver<TParent>
+  eventLocation?: DeathRegistrationToEventLocationResolver<TParent>
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
@@ -1728,7 +1734,7 @@ export interface DeathRegistrationToOtherInformantRelationshipResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface DeathRegistrationToPlaceOfDeathResolver<
+export interface DeathRegistrationToEventLocationResolver<
   TParent = any,
   TResult = any
 > {

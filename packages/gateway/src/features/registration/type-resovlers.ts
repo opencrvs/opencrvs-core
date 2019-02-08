@@ -16,9 +16,7 @@ import {
   BIRTH_REG_TYPE_CODE,
   LAST_LIVE_BIRTH_CODE,
   NUMBER_BORN_ALIVE_CODE,
-  NUMBER_FOEATAL_DEATH_CODE,
-  HEALTH_FACILITY_BIRTH_CODE,
-  BIRTH_LOCATION_TYPE_CODE
+  NUMBER_FOEATAL_DEATH_CODE
 } from 'src/features/fhir/templates'
 import { GQLResolver } from 'src/graphql/schema'
 import {
@@ -401,9 +399,7 @@ export const typeResolvers: GQLResolver = {
           presentAtBirthRegistration: BIRTH_REG_PRESENT_CODE,
           childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
           foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
-          lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE,
-          birthLocation: HEALTH_FACILITY_BIRTH_CODE,
-          birthLocationType: BIRTH_LOCATION_TYPE_CODE
+          lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
         }
         observations.entry.map(
           (item: fhir.Observation & { resource: fhir.Observation }) => {
@@ -519,45 +515,7 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    async birthLocation(composition: ITemplatedComposition, _, authHeader) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${HEALTH_FACILITY_BIRTH_CODE}`,
-        authHeader
-      )
-      if (!observations.entry[0]) {
-        return null
-      }
-      return observations.entry[0].resource.valueString.split('/')[1]
-    },
-    async birthLocationType(composition: ITemplatedComposition, _, authHeader) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${BIRTH_LOCATION_TYPE_CODE}`,
-        authHeader
-      )
-      if (!observations.entry[0]) {
-        return null
-      }
-      return observations.entry[0].resource.valueString
-    },
-    async placeOfBirth(composition: ITemplatedComposition, _, authHeader) {
+    async eventLocation(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition

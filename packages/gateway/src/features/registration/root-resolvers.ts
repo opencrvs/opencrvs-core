@@ -8,7 +8,8 @@ import {
   getIDFromResponse,
   getTrackingIdFromResponse,
   getBRNFromResponse,
-  removeDuplicatesFromComposition
+  removeDuplicatesFromComposition,
+  parseEventLocation
 } from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
 import { hasScope } from 'src/features/user/utils'
@@ -66,7 +67,13 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details)
+      console.log('BEFORE: ', JSON.stringify(details))
+      const detailsWithEventLocation = await parseEventLocation(
+        details,
+        authHeader
+      )
+      console.log('AFTER: ', JSON.stringify(detailsWithEventLocation))
+      const doc = await buildFHIRBundle(detailsWithEventLocation)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       if (hasScope(authHeader, 'register')) {
