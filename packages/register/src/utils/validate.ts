@@ -350,7 +350,7 @@ export const validIDNumber: ValidationInitializer = (
   typeOfID: string
 ): Validation => (value: any) => {
   const validNationalIDLength = 13
-  const validBirthRegistrationNumberLength = 17
+  const validBirthRegistrationNumberLength = 18
   const validPassportLength = 9
   switch (typeOfID) {
     case NATIONAL_ID:
