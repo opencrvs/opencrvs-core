@@ -84,4 +84,54 @@ describe('Verify utility functions', () => {
       'Unable to send notification for error : Error: Mock Error'
     )
   })
+  it('send Death declaration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundle)
+    expect(
+      sendEventNotification(fhirBundle, Events.DEATH_NEW_DEC, '01711111111', {
+        Authorization: 'bearer acd '
+      })
+    ).toBeDefined()
+  })
+  it('send Death declaration notification logs an error in case of invalid data', async () => {
+    const logSpy = jest.spyOn(logger, 'error')
+    fetch.mockImplementationOnce(() => {
+      throw new Error('Mock Error')
+    })
+    await sendEventNotification(
+      testFhirBundle,
+      Events.DEATH_NEW_DEC,
+      '01711111111',
+      {
+        Authorization: 'bearer acd '
+      }
+    )
+    expect(logSpy).toHaveBeenLastCalledWith(
+      'Unable to send notification for error : Error: Mock Error'
+    )
+  })
+  it('send Death registration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundle)
+    expect(
+      sendEventNotification(fhirBundle, Events.DEATH_MARK_REG, '01711111111', {
+        Authorization: 'bearer acd '
+      })
+    ).toBeDefined()
+  })
+  it('send Death registration notification logs an error in case of invalid data', async () => {
+    const logSpy = jest.spyOn(logger, 'error')
+    fetch.mockImplementationOnce(() => {
+      throw new Error('Mock Error')
+    })
+    sendEventNotification(
+      testFhirBundle,
+      Events.DEATH_MARK_REG,
+      '01711111111',
+      {
+        Authorization: 'bearer acd '
+      }
+    )
+    expect(logSpy).toHaveBeenLastCalledWith(
+      'Unable to send notification for error : Error: Mock Error'
+    )
+  })
 })
