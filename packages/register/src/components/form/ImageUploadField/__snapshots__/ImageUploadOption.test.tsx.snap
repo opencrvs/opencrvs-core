@@ -62,6 +62,7 @@ ShallowWrapper {
                   Object {
                     "label": Object {
                       "defaultMessage": "Proof of Place and Date of Birth",
+                      "description": "Label for select option Child Birth Proof",
                       "id": "formFields.docTypeChildBirthProof",
                     },
                     "value": "Proof of Place and Date of Birth",
@@ -69,6 +70,7 @@ ShallowWrapper {
                   Object {
                     "label": Object {
                       "defaultMessage": "EPI Card",
+                      "description": "Label for select option EPI Card",
                       "id": "formFields.docTypeEPICard",
                     },
                     "value": "EPI Card",
@@ -76,6 +78,7 @@ ShallowWrapper {
                   Object {
                     "label": Object {
                       "defaultMessage": "Doctor Certificate",
+                      "description": "Label for select option Doctor Certificate",
                       "id": "formFields.docTypeDoctorCertificate",
                     },
                     "value": "Doctor Certificate",
@@ -323,6 +326,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Proof of Place and Date of Birth",
+                                "description": "Label for select option Child Birth Proof",
                                 "id": "formFields.docTypeChildBirthProof",
                               },
                               "value": "Proof of Place and Date of Birth",
@@ -330,6 +334,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "EPI Card",
+                                "description": "Label for select option EPI Card",
                                 "id": "formFields.docTypeEPICard",
                               },
                               "value": "EPI Card",
@@ -337,6 +342,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Doctor Certificate",
+                                "description": "Label for select option Doctor Certificate",
                                 "id": "formFields.docTypeDoctorCertificate",
                               },
                               "value": "Doctor Certificate",
@@ -567,6 +573,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Proof of Place and Date of Birth",
+                                "description": "Label for select option Child Birth Proof",
                                 "id": "formFields.docTypeChildBirthProof",
                               },
                               "value": "Proof of Place and Date of Birth",
@@ -574,6 +581,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "EPI Card",
+                                "description": "Label for select option EPI Card",
                                 "id": "formFields.docTypeEPICard",
                               },
                               "value": "EPI Card",
@@ -581,6 +589,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Doctor Certificate",
+                                "description": "Label for select option Doctor Certificate",
                                 "id": "formFields.docTypeDoctorCertificate",
                               },
                               "value": "Doctor Certificate",
@@ -810,6 +819,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Proof of Place and Date of Birth",
+                                "description": "Label for select option Child Birth Proof",
                                 "id": "formFields.docTypeChildBirthProof",
                               },
                               "value": "Proof of Place and Date of Birth",
@@ -817,6 +827,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "EPI Card",
+                                "description": "Label for select option EPI Card",
                                 "id": "formFields.docTypeEPICard",
                               },
                               "value": "EPI Card",
@@ -824,6 +835,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Doctor Certificate",
+                                "description": "Label for select option Doctor Certificate",
                                 "id": "formFields.docTypeDoctorCertificate",
                               },
                               "value": "Doctor Certificate",
@@ -1049,6 +1061,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Proof of Place and Date of Birth",
+                                "description": "Label for select option Child Birth Proof",
                                 "id": "formFields.docTypeChildBirthProof",
                               },
                               "value": "Proof of Place and Date of Birth",
@@ -1056,6 +1069,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "EPI Card",
+                                "description": "Label for select option EPI Card",
                                 "id": "formFields.docTypeEPICard",
                               },
                               "value": "EPI Card",
@@ -1063,6 +1077,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Doctor Certificate",
+                                "description": "Label for select option Doctor Certificate",
                                 "id": "formFields.docTypeDoctorCertificate",
                               },
                               "value": "Doctor Certificate",
@@ -1287,6 +1302,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Proof of Place and Date of Birth",
+                                  "description": "Label for select option Child Birth Proof",
                                   "id": "formFields.docTypeChildBirthProof",
                                 },
                                 "value": "Proof of Place and Date of Birth",
@@ -1294,6 +1310,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "EPI Card",
+                                  "description": "Label for select option EPI Card",
                                   "id": "formFields.docTypeEPICard",
                                 },
                                 "value": "EPI Card",
@@ -1301,6 +1318,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Doctor Certificate",
+                                  "description": "Label for select option Doctor Certificate",
                                   "id": "formFields.docTypeDoctorCertificate",
                                 },
                                 "value": "Doctor Certificate",
@@ -1524,6 +1542,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Proof of Place and Date of Birth",
+                                "description": "Label for select option Child Birth Proof",
                                 "id": "formFields.docTypeChildBirthProof",
                               },
                               "value": "Proof of Place and Date of Birth",
@@ -1531,6 +1550,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "EPI Card",
+                                "description": "Label for select option EPI Card",
                                 "id": "formFields.docTypeEPICard",
                               },
                               "value": "EPI Card",
@@ -1538,6 +1558,7 @@ ShallowWrapper {
                             Object {
                               "label": Object {
                                 "defaultMessage": "Doctor Certificate",
+                                "description": "Label for select option Doctor Certificate",
                                 "id": "formFields.docTypeDoctorCertificate",
                               },
                               "value": "Doctor Certificate",
@@ -1782,6 +1803,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Proof of Place and Date of Birth",
+                                  "description": "Label for select option Child Birth Proof",
                                   "id": "formFields.docTypeChildBirthProof",
                                 },
                                 "value": "Proof of Place and Date of Birth",
@@ -1789,6 +1811,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "EPI Card",
+                                  "description": "Label for select option EPI Card",
                                   "id": "formFields.docTypeEPICard",
                                 },
                                 "value": "EPI Card",
@@ -1796,6 +1819,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Doctor Certificate",
+                                  "description": "Label for select option Doctor Certificate",
                                   "id": "formFields.docTypeDoctorCertificate",
                                 },
                                 "value": "Doctor Certificate",
@@ -2026,6 +2050,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Proof of Place and Date of Birth",
+                                  "description": "Label for select option Child Birth Proof",
                                   "id": "formFields.docTypeChildBirthProof",
                                 },
                                 "value": "Proof of Place and Date of Birth",
@@ -2033,6 +2058,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "EPI Card",
+                                  "description": "Label for select option EPI Card",
                                   "id": "formFields.docTypeEPICard",
                                 },
                                 "value": "EPI Card",
@@ -2040,6 +2066,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Doctor Certificate",
+                                  "description": "Label for select option Doctor Certificate",
                                   "id": "formFields.docTypeDoctorCertificate",
                                 },
                                 "value": "Doctor Certificate",
@@ -2269,6 +2296,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Proof of Place and Date of Birth",
+                                  "description": "Label for select option Child Birth Proof",
                                   "id": "formFields.docTypeChildBirthProof",
                                 },
                                 "value": "Proof of Place and Date of Birth",
@@ -2276,6 +2304,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "EPI Card",
+                                  "description": "Label for select option EPI Card",
                                   "id": "formFields.docTypeEPICard",
                                 },
                                 "value": "EPI Card",
@@ -2283,6 +2312,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Doctor Certificate",
+                                  "description": "Label for select option Doctor Certificate",
                                   "id": "formFields.docTypeDoctorCertificate",
                                 },
                                 "value": "Doctor Certificate",
@@ -2508,6 +2538,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Proof of Place and Date of Birth",
+                                  "description": "Label for select option Child Birth Proof",
                                   "id": "formFields.docTypeChildBirthProof",
                                 },
                                 "value": "Proof of Place and Date of Birth",
@@ -2515,6 +2546,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "EPI Card",
+                                  "description": "Label for select option EPI Card",
                                   "id": "formFields.docTypeEPICard",
                                 },
                                 "value": "EPI Card",
@@ -2522,6 +2554,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Doctor Certificate",
+                                  "description": "Label for select option Doctor Certificate",
                                   "id": "formFields.docTypeDoctorCertificate",
                                 },
                                 "value": "Doctor Certificate",
@@ -2746,6 +2779,7 @@ ShallowWrapper {
                                 Object {
                                   "label": Object {
                                     "defaultMessage": "Proof of Place and Date of Birth",
+                                    "description": "Label for select option Child Birth Proof",
                                     "id": "formFields.docTypeChildBirthProof",
                                   },
                                   "value": "Proof of Place and Date of Birth",
@@ -2753,6 +2787,7 @@ ShallowWrapper {
                                 Object {
                                   "label": Object {
                                     "defaultMessage": "EPI Card",
+                                    "description": "Label for select option EPI Card",
                                     "id": "formFields.docTypeEPICard",
                                   },
                                   "value": "EPI Card",
@@ -2760,6 +2795,7 @@ ShallowWrapper {
                                 Object {
                                   "label": Object {
                                     "defaultMessage": "Doctor Certificate",
+                                    "description": "Label for select option Doctor Certificate",
                                     "id": "formFields.docTypeDoctorCertificate",
                                   },
                                   "value": "Doctor Certificate",
@@ -2983,6 +3019,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Proof of Place and Date of Birth",
+                                  "description": "Label for select option Child Birth Proof",
                                   "id": "formFields.docTypeChildBirthProof",
                                 },
                                 "value": "Proof of Place and Date of Birth",
@@ -2990,6 +3027,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "EPI Card",
+                                  "description": "Label for select option EPI Card",
                                   "id": "formFields.docTypeEPICard",
                                 },
                                 "value": "EPI Card",
@@ -2997,6 +3035,7 @@ ShallowWrapper {
                               Object {
                                 "label": Object {
                                   "defaultMessage": "Doctor Certificate",
+                                  "description": "Label for select option Doctor Certificate",
                                   "id": "formFields.docTypeDoctorCertificate",
                                 },
                                 "value": "Doctor Certificate",
