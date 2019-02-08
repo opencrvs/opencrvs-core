@@ -1606,7 +1606,14 @@ const builders: IFieldBuilders = {
         fhirBundle,
         fieldValue
       )
-      location.status = fieldValue
+      location.type = {
+        coding: [
+          {
+            system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
+            code: fieldValue
+          }
+        ]
+      }
     },
     partOf: (
       fhirBundle: ITemplatedBundle,

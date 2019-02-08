@@ -122,9 +122,9 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
       attendantAtBirth
       weightAtBirth
       birthType
-      placeOfBirth {
+      eventLocation {
+        type
         address {
-          type
           line
           district
           state
@@ -132,8 +132,6 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
           country
         }
       }
-      birthLocation
-      birthLocationType
       presentAtBirthRegistration
     }
   }

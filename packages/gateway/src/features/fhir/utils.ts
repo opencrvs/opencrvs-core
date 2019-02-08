@@ -678,7 +678,6 @@ export async function parseEventLocation(
   authHeader: IAuthHeader
 ): Promise<any> {
   if (details.eventLocation._fhirID) {
-    console.log('hi')
     delete details.eventLocation.address
     delete details.eventLocation.type
     return details

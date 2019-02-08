@@ -67,12 +67,10 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      console.log('BEFORE: ', JSON.stringify(details))
       const detailsWithEventLocation = await parseEventLocation(
         details,
         authHeader
       )
-      console.log('AFTER: ', JSON.stringify(detailsWithEventLocation))
       const doc = await buildFHIRBundle(detailsWithEventLocation)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
@@ -85,7 +83,11 @@ export const resolvers: GQLResolver = {
       }
     },
     async updateBirthRegistration(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details)
+      const detailsWithEventLocation = await parseEventLocation(
+        details,
+        authHeader
+      )
+      const doc = await buildFHIRBundle(detailsWithEventLocation)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       // return composition-id

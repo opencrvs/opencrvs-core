@@ -27,7 +27,11 @@ import {
   fieldValueSectionExchangeTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import { eventLocationMutationTransformer } from './mappings/mutation/child-mappings'
-import { eventLocationQueryTransformer } from './mappings/query/child-mappings'
+import {
+  eventLocationQueryTransformer,
+  eventLocationTypeQueryTransformer,
+  eventLocationIDQueryTransformer
+} from './mappings/query/child-mappings'
 import {
   nameFieldTransformer,
   fieldValueTransformer,
@@ -401,7 +405,7 @@ export const childSection: IFormSection = {
       ],
       mapping: {
         mutation: eventLocationMutationTransformer(),
-        query: eventLocationQueryTransformer()
+        query: eventLocationTypeQueryTransformer()
       }
     },
     {
@@ -418,7 +422,7 @@ export const childSection: IFormSection = {
       conditionals: [conditionals.placeOfBirthHospital],
       mapping: {
         mutation: eventLocationMutationTransformer(),
-        query: eventLocationQueryTransformer()
+        query: eventLocationIDQueryTransformer()
       }
     },
     {

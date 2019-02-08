@@ -362,7 +362,14 @@ export const typeResolvers: GQLResolver = {
     alias: location => location.alias,
     description: location => location.description,
     partOf: location => location.partOf,
-    type: location => location.partOf,
+    type: (location: fhir.Location) => {
+      return (
+        (location.type &&
+          location.type.coding &&
+          location.type.coding[0].code) ||
+        null
+      )
+    },
     address: location => location.address
   },
 
@@ -373,6 +380,7 @@ export const typeResolvers: GQLResolver = {
         BIRTH_ENCOUNTER_CODE,
         composition
       )
+
       const encounterReference =
         encounterSection &&
         encounterSection.entry &&
@@ -389,6 +397,8 @@ export const typeResolvers: GQLResolver = {
         `/Observation?encounter=${encounterReference}`,
         authHeader
       )
+
+      const encounter = await fetchFHIR(`/${encounterReference}`, authHeader)
 
       if (observations) {
         const observationKeys = {
@@ -424,6 +434,7 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
+        eventLocation: encounter.location[0].location.reference.split('/')[1],
         observation
       }
     },
