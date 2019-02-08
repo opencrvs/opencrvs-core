@@ -67,7 +67,7 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Sends an sms to a user for birth registration entry',
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+          scope: [RouteScope.REGISTER]
         },
         validate: {
           payload: registrationNotificationSchema
@@ -97,7 +97,7 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Sends an sms to a user for death registration entry',
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+          scope: [RouteScope.REGISTER]
         },
         validate: {
           payload: registrationNotificationSchema
