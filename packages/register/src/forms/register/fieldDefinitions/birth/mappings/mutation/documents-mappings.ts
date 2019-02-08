@@ -13,7 +13,10 @@ export const documentTypeFhirMapping = {
   NID: 'NATIONAL_ID',
   Passport: 'PASSPORT',
   'School Certificate': 'SCHOOL_CERTIFICATE',
-  Other: 'OTHER'
+  Other: 'OTHER',
+  'EPI Card': 'EPI_CARD',
+  'Doctor Certificate': 'DOCTOR_CERTIFICATE',
+  'Proof of Place and Date of Birth': 'BIRTH_PLACE_DATE_PROOF'
 }
 
 export function birthFieldToAttachmentTransformer(
