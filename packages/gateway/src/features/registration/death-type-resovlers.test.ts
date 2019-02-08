@@ -13,6 +13,13 @@ beforeEach(() => {
 })
 
 describe('Registration type resolvers', () => {
+  it('returns createdAt date', () => {
+    // @ts-ignore
+    const createdAt = typeResolvers.DeathRegistration.createdAt({
+      date: '2018-10-05'
+    })
+    expect(createdAt).toBe('2018-10-05')
+  })
   it('fetches and returns a deceased patient resource from a composition section', async () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
@@ -180,30 +187,16 @@ describe('Registration type resolvers', () => {
     it('returns RelatedPerson otherRelationship', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: 'OTHER' // or string for unsupported other
-            }
-          ],
           text: 'Nephew'
         })
       )
       // @ts-ignore
       const relationship = await typeResolvers.RelatedPerson.otherRelationship({
         relationship: {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: 'OTHER' // or string for unsupported other
-            }
-          ],
           text: 'Nephew'
         }
       })
-      console.log(relationship)
+
       expect(relationship).toEqual('Nephew')
     })
 
@@ -228,6 +221,137 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const deathDate = typeResolvers.Deceased.deathDate(mockPatient)
       expect(deathDate).toBe('2010-01-01')
+    })
+    it('returns deathLocationType whole encounter', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocation))
+      // @ts-ignore
+      const deathLocationType = await typeResolvers.DeathRegistration.deathLocationType(
+        {
+          section: [
+            {
+              title: 'Death Encounter',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/sections',
+                    code: ''
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      )
+      expect(deathLocationType).toBeDefined()
+    })
+    it('returns deathLocation invalid section', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocation))
+      // @ts-ignore
+      const deathLocation = await typeResolvers.DeathRegistration.deathLocation(
+        {
+          section: [
+            {
+              title: 'Death Encounter',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/sections',
+                    code: ''
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      )
+      expect(deathLocation).toBeDefined()
+    })
+    it('returns deathLocation invalid section', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.mannerOfDeath))
+      // @ts-ignore
+      const mannerOfDeath = await typeResolvers.DeathRegistration.mannerOfDeath(
+        {
+          section: [
+            {
+              title: 'Death Encounter',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/sections',
+                    code: ''
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      )
+      expect(mannerOfDeath).toBeDefined()
+    })
+    it('returns causeOfDeathMethod invalid section', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify(mockObservations.causeOfDeathMethod)
+      )
+      // @ts-ignore
+      const causeOfDeathMethod = await typeResolvers.DeathRegistration.causeOfDeathMethod(
+        {
+          section: [
+            {
+              title: 'Death Encounter',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/sections',
+                    code: ''
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      )
+      expect(causeOfDeathMethod).toBeDefined()
+    })
+    it('returns causeOfDeath invalid section', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.causeOfDeath))
+      // @ts-ignore
+      const causeOfDeath = await typeResolvers.DeathRegistration.causeOfDeath({
+        section: [
+          {
+            title: 'Death Encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: ''
+                }
+              ]
+            }
+          }
+        ]
+      })
+      expect(causeOfDeath).toBeDefined()
+    })
+
+    it('returns informant invalid section', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.informant))
+      // @ts-ignore
+      const informant = await typeResolvers.DeathRegistration.informant({
+        section: [
+          {
+            title: 'Death Encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: ''
+                }
+              ]
+            }
+          }
+        ]
+      })
+      expect(informant).toBeDefined()
     })
   })
 })

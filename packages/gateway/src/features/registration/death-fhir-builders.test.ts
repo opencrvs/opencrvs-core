@@ -32,7 +32,38 @@ test('should build a minimal FHIR registration document without error', async ()
           multipleBirth: 1,
           dateOfMarriage: '2014-01-28',
           nationality: ['BGD'],
-          educationalAttainment: 'UPPER_SECONDARY_ISCED_4'
+          educationalAttainment: 'UPPER_SECONDARY_ISCED_4',
+          telecom: [{ use: 'mobile', system: 'phone', value: '0171111111' }],
+          address: [
+            {
+              use: 'home',
+              type: 'both',
+              line: ['2760 Mlosi Street', 'Wallacedene'],
+              district: 'Kraaifontein',
+              state: 'Western Cape',
+              city: 'Cape Town',
+              postalCode: '7570',
+              country: 'BGD'
+            },
+            {
+              use: 'home',
+              type: 'both',
+              line: ['40 Orbis Wharf', 'Wallacedene'],
+              text: 'Optional address text',
+              district: 'Kraaifontein',
+              state: 'Western Cape',
+              city: 'Cape Town',
+              postalCode: '7570',
+              country: 'BGD'
+            }
+          ],
+          photo: [
+            {
+              contentType: 'image/jpeg',
+              data: '123456',
+              title: 'father-national-id'
+            }
+          ]
         },
         relationship: 'OTHER',
         otherRelationship: 'Nephew'
@@ -153,4 +184,41 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[2].resource.patient.reference).toEqual(
     fhir.entry[3].fullUrl
   )
+})
+
+test('should build a minimal FHIR registration document without error', async () => {
+  const fhir = await buildFHIRBundle(
+    {
+      deceased: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
+        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
+        gender: 'female',
+        birthDate: '2000-01-28',
+        maritalStatus: 'MARRIED',
+        name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
+        deceased: {
+          deceased: true,
+          deathDate: '2014-01-28'
+        },
+        multipleBirth: 1,
+        dateOfMarriage: '2014-01-28',
+        nationality: ['BGD'],
+        educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
+      },
+      informant: {
+        individual: {
+          _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
+          identifier: [
+            { id: '123456', type: 'OTHER', otherType: 'Custom type' }
+          ]
+        },
+        otherRelationship: 'Nephew'
+      }
+    },
+    'DEATH'
+  )
+  expect(fhir).toBeDefined()
+  // informant relationship
+  expect(fhir.entry[2].resource.relationship.coding[0].code).toEqual('OTHER')
+  expect(fhir.entry[2].resource.relationship.text).toEqual('Nephew')
 })

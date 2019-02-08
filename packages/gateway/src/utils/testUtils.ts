@@ -820,6 +820,34 @@ export const mockObservations = {
       }
     ]
   },
+  birthLocationType: {
+    entry: [
+      {
+        fullUrl: 'urn:uuid:<uuid>',
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          context: {
+            reference: 'Encounter/123' // the birth encounter
+          },
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/obs-type',
+                code: 'birth-location-type',
+                display: 'Type of birth location'
+              }
+            ]
+          },
+          subject: {
+            reference: 'Patient/123' // reference deceased by fullUrl
+          },
+          effectiveDateTime: '2016-03-28', // same as birth date
+          valueString: 'CURRENT'
+        }
+      }
+    ]
+  },
   birthLocation: {
     entry: [
       {

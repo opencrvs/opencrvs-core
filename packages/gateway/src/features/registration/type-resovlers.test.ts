@@ -445,6 +445,40 @@ describe('Registration type resolvers', () => {
       expect(birthLocation).toBeDefined()
       expect(birthLocation).toEqual('123')
     })
+
+    it('returns birthLocationType', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocationType))
+      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      // @ts-ignore
+      const birthLocationType = await typeResolvers.BirthRegistration.birthLocationType(
+        mockComposition
+      )
+      expect(birthLocationType).toBeDefined()
+      expect(birthLocationType).toEqual('CURRENT')
+    })
+    it('returns birthLocationType invalid encounter', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocationType))
+      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      // @ts-ignore
+      const birthLocationType = await typeResolvers.BirthRegistration.birthLocationType(
+        {
+          section: [
+            {
+              title: 'Birth Encounter',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/sections',
+                    code: ''
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      )
+      expect(birthLocationType).toBeDefined()
+    })
   })
 
   describe('Birth Registration branch', () => {
