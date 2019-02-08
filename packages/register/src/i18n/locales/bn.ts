@@ -491,6 +491,8 @@ export const BENGALI_STATE: ILanguage = {
       'জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validBirthRegistrationNumber':
       'জন্ম নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'validations.validDeathRegistrationNumber':
+      'মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
       'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',

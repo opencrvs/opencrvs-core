@@ -8,6 +8,7 @@ import { isArray } from 'util'
 import {
   NATIONAL_ID,
   BIRTH_REGISTRATION_NUMBER,
+  DEATH_REGISTRATION_NUMBER,
   PASSPORT
 } from 'src/forms/identity'
 
@@ -107,6 +108,13 @@ export const messages = defineMessages({
       'The Birth Registration Number can only be alpha numeric and must be {validLength} characters long',
     description:
       'The error message that appears when an invalid value is used as brn'
+  },
+  validDeathRegistrationNumber: {
+    id: 'validations.validDeathRegistrationNumber',
+    defaultMessage:
+      'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+    description:
+      'The error message that appears when an invalid value is used as drn'
   },
   validPassportNumber: {
     id: 'validations.validPassportNumber',
@@ -351,6 +359,7 @@ export const validIDNumber: ValidationInitializer = (
 ): Validation => (value: any) => {
   const validNationalIDLength = 13
   const validBirthRegistrationNumberLength = 18
+  const validDeathRegistrationNumberLength = 18
   const validPassportLength = 9
   switch (typeOfID) {
     case NATIONAL_ID:
@@ -371,6 +380,17 @@ export const validIDNumber: ValidationInitializer = (
         : {
             message: messages.validBirthRegistrationNumber,
             props: { validLength: validBirthRegistrationNumberLength }
+          }
+
+    case DEATH_REGISTRATION_NUMBER:
+      return hasValidLength(
+        value.toString(),
+        validDeathRegistrationNumberLength
+      ) && isAllCapsAlphaNumeric(value.toString())
+        ? undefined
+        : {
+            message: messages.validDeathRegistrationNumber,
+            props: { validLength: validDeathRegistrationNumberLength }
           }
 
     case PASSPORT:
