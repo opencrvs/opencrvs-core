@@ -113,6 +113,13 @@ export const typeResolvers: GQLResolver = {
         relatedPerson.relationship.coding[0].code
       )
     },
+    otherRelationship: relatedPerson => {
+      return (
+        relatedPerson &&
+        relatedPerson.relationship &&
+        relatedPerson.relationship.text
+      )
+    },
     individual: async (relatedPerson, _, authHeader) => {
       return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
     }

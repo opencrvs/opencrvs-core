@@ -148,6 +148,82 @@ describe('Registration type resolvers', () => {
       expect(informant.resource.relationship.text).toEqual('Nephew')
     })
 
+    it('returns RelatedPerson relationship', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER' // or string for unsupported other
+            }
+          ],
+          text: 'Nephew'
+        })
+      )
+      // @ts-ignore
+      const relationship = await typeResolvers.RelatedPerson.relationship({
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER' // or string for unsupported other
+            }
+          ],
+          text: 'Nephew'
+        }
+      })
+      expect(relationship).toEqual('OTHER')
+    })
+
+    it('returns RelatedPerson otherRelationship', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER' // or string for unsupported other
+            }
+          ],
+          text: 'Nephew'
+        })
+      )
+      // @ts-ignore
+      const relationship = await typeResolvers.RelatedPerson.otherRelationship({
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER' // or string for unsupported other
+            }
+          ],
+          text: 'Nephew'
+        }
+      })
+      console.log(relationship)
+      expect(relationship).toEqual('Nephew')
+    })
+
+    it('returns RelatedPerson individual', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({
+          ...mockPatient
+        })
+      )
+      // @ts-ignore
+      const person = await typeResolvers.RelatedPerson.individual({
+        patient: {
+          reference: 'Patient/123' // reference to deceased
+        }
+      })
+      // console.log(response.mockPatient.na)
+      expect(person.name[0].family[0]).toEqual('Matinyana')
+      expect(mock).toHaveBeenCalledTimes(1)
+    })
+
     it('returns deathDate', () => {
       // @ts-ignore
       const deathDate = typeResolvers.Deceased.deathDate(mockPatient)
