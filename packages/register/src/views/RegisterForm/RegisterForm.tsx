@@ -48,6 +48,7 @@ import {
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
+import { toggleDraftSavedNotification } from 'src/notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
 
@@ -280,6 +281,7 @@ type DispatchProps = {
   goBack: typeof goBackAction
   modifyDraft: typeof modifyDraft
   deleteDraft: typeof deleteDraft
+  toggleDraftSavedNotification: typeof toggleDraftSavedNotification
   handleSubmit: (values: unknown) => void
 }
 
@@ -516,6 +518,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
+  onSaveAsDraftClicked = () => {
+    this.props.history.push('/')
+    this.props.toggleDraftSavedNotification()
+  }
+
   render() {
     const {
       goToTab,
@@ -587,7 +594,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   tabRoute={this.props.tabRoute}
                   draft={draft}
                   submitClickEvent={this.submitForm}
-                  saveDraftClickEvent={() => history.push('/')}
+                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
                   deleteApplicationClickEvent={() => {
                     this.props.deleteDraft(draft)
                     history.push('/')
@@ -666,7 +673,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <FormActionDivider />
                     <FormAction>
                       {
-                        <DraftButtonContainer onClick={() => history.push('/')}>
+                        <DraftButtonContainer
+                          id="save_as_draft"
+                          onClick={() => this.onSaveAsDraftClicked()}
+                        >
                           <DraftSimple />
                           <DraftButtonText>
                             {intl.formatMessage(messages.valueSaveAsDraft)}
@@ -871,6 +881,7 @@ export const RegisterForm = connect<Props, DispatchProps>(
     deleteDraft,
     goToTab: goToTabAction,
     goBack: goBackAction,
+    toggleDraftSavedNotification,
     handleSubmit: values => {
       console.log(values)
     }
