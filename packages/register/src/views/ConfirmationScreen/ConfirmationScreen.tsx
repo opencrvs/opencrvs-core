@@ -315,7 +315,7 @@ class ConfirmationScreenView extends React.Component<
           </Box>
           {isTrackingSection && (
             <TrackingBox>
-              <TrackingHeader>
+              <TrackingHeader id="trackingSecHeader">
                 {intl.formatMessage(messages.trackingSectionTitle, {
                   event: eventName
                 })}
@@ -323,7 +323,7 @@ class ConfirmationScreenView extends React.Component<
               <TrackingNumber id="trackingIdViewer">
                 {trackNumber}
               </TrackingNumber>
-              <StyledP>
+              <StyledP id="trackingSecText">
                 {intl.formatMessage(messages.trackingSectionDesc, {
                   event: eventName
                 })}
