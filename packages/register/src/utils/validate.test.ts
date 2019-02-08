@@ -223,7 +223,7 @@ describe('validate', () => {
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
-    it('Should pass when supplied a good value as Birth Registration Number.', () => {
+    it('Should pass when supplied a good value as Passport Number.', () => {
       const goodValue = '2019BrTVz'
       const typeOfID = 'PASSPORT'
       const response = undefined
