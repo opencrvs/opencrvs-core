@@ -10,7 +10,9 @@ export const LANGUAGE = process.env.LANGUAGE || 'bn'
 */
 export const NON_UNICODED_LANGUAGES = ['en']
 
-export const SMS_PROVIDER = process.env.SMS_PROVIDER || 'clickatell'
+export const SMS_PROVIDER = process.env.SMS_PROVIDER || 'infobip'
+
+export const PHONE_NUMBER_PREFIX = process.env.PHONE_NUMBER_PREFIX || '+88'
 
 export const CLICKATELL_USER = process.env.CLICKATELL_USER_PATH
   ? readFileSync(process.env.CLICKATELL_USER_PATH).toString()
@@ -21,6 +23,12 @@ export const CLICKATELL_PASSWORD = process.env.CLICKATELL_PASSWORD_PATH
 export const CLICKATELL_API_ID = process.env.CLICKATELL_API_ID_PATH
   ? readFileSync(process.env.CLICKATELL_API_ID_PATH).toString()
   : ''
+
+export const INFOBIP_GATEWAY_ENDPOINT =
+  process.env.INFOBIP_GATEWAY_ENDPOINT ||
+  'https://j45mv.api.infobip.com/sms/1/text/single'
+
+export const INFOBIP_API_KEY = process.env.INFOBIP_API_KEY || ''
 
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
