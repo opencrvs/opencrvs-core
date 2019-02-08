@@ -642,6 +642,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={activeSection.fields}
                       offlineResources={offlineResources}
+                      draftData={draft.data}
                     />
                   </form>
                   <FormActionSection>
