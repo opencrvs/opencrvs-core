@@ -153,7 +153,7 @@ export const applicantsSection: IFormSection = {
   title: messages.applicantTitle,
   fields: [
     {
-      name: 'applicantIdType',
+      name: 'iDType',
       type: SELECT_WITH_OPTIONS,
       label: messages.applicantsIdType,
       required: true,
@@ -183,17 +183,17 @@ export const applicantsSection: IFormSection = {
       type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
-          dependency: 'applicantIdType',
+          dependency: 'iDType',
           labelMapper: identityNameMapper
         },
         type: {
-          dependency: 'applicantIdType',
+          dependency: 'iDType',
           typeMapper: identityTypeMapper
         },
         validate: [
           {
             validator: validIDNumber,
-            dependencies: ['applicantIdType']
+            dependencies: ['iDType']
           }
         ]
       },
