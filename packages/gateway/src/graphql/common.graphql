@@ -144,7 +144,7 @@ type Person { # -> Patient
   multipleBirth: Int # -> .multipleBirthInteger
   address: [Address] # -> .address
   photo: [Attachment] # -> .photo
-  deceased: Deceased # -> .deceasedBoolean
+  deceased: Deceased # -> .deceased
   nationality: [String] # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
   educationalAttainment: EducationType # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
 }

@@ -1,6 +1,8 @@
 import { v4 as uuid } from 'uuid'
 import { OPENCRVS_SPECIFICATION_URL } from './constants'
 
+export const INFORMANT_CODE = 'informant-details'
+
 export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
   if (
     !bundle ||
@@ -104,4 +106,36 @@ export function findPersonEntry(
     )
   }
   return personEntry.resource as fhir.Patient
+}
+
+export function selectInformantResource(
+  fhirBundle: fhir.Bundle
+): fhir.Patient | undefined {
+  const composition =
+    fhirBundle &&
+    fhirBundle.entry &&
+    (fhirBundle.entry[0].resource as fhir.Composition)
+
+  const informantSection =
+    composition &&
+    composition.section &&
+    composition.section.find((section: fhir.CompositionSection) => {
+      if (!section.code || !section.code.coding || !section.code.coding.some) {
+        return false
+      }
+      return section.code.coding.some(coding => coding.code === INFORMANT_CODE)
+    })
+
+  const informantSectionEntry =
+    informantSection && informantSection.entry && informantSection.entry[0]
+
+  const informantEntry =
+    informantSectionEntry &&
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      entry => entry.fullUrl === informantSectionEntry.reference
+    )
+
+  return informantEntry && (informantEntry.resource as fhir.Patient)
 }

@@ -7,7 +7,7 @@ import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
 import * as Verhoeff from 'node-verhoeff'
 import { convertStringToASCII } from '../utils'
 
-export async function generateBdBRN(
+export async function generateBdRegistrationNumber(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner
 ): Promise<string> {
