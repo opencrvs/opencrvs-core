@@ -96,6 +96,8 @@ export function identityNameMapper(
       return messages.iDTypeNationalID
     case 'PASSPORT':
       return messages.iDTypePassport
+    case 'DRIVING_LICENCE':
+      return messages.iDTypeDrivingLicence
     case 'BIRTH_REGISTRATION_NUMBER':
       return messages.iDTypeBRN
     case 'DEATH_REGISTRATION_NUMBER':
