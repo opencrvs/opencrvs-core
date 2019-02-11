@@ -136,7 +136,8 @@ export const copyAddressTransformer = (
   fromSection: string,
   toAddressType: string,
   toSection: string,
-  triggerValue: boolean = true
+  triggerValue: boolean = true,
+  nodeName?: string
 ) => (
   transformedData: any,
   draftData: IFormData,
@@ -147,7 +148,11 @@ export const copyAddressTransformer = (
     return transformedData
   }
 
-  const fromSectionData = transformedData[fromSection]
+  let fromSectionData = transformedData[fromSection]
+  if (nodeName) {
+    fromSectionData = transformedData[fromSection][nodeName]
+  }
+
   if (!fromSectionData.address) {
     throw new Error(`Address data not found on section ${sectionId}`)
   }
