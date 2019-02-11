@@ -8,17 +8,23 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
   RADIO_GROUP,
-  TEL
+  TEL,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate
+  isValidBirthDate,
+  validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  identityNameMapper,
+  identityTypeMapper
+} from '../../../identity'
 import { messages as addressMessages } from '../../../address'
 
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
@@ -174,7 +180,23 @@ export const applicantsSection: IFormSection = {
     },
     {
       name: 'applicantID',
-      type: TEXT,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'applicantIdType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'applicantIdType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['applicantIdType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',

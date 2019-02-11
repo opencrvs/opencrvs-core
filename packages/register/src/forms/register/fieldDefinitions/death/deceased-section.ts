@@ -7,17 +7,23 @@ import {
   SUBSECTION,
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
-  RADIO_GROUP
+  RADIO_GROUP,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate
+  isValidBirthDate,
+  validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  identityNameMapper,
+  identityTypeMapper
+} from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as addressMessages } from '../../../address'
 
@@ -153,7 +159,23 @@ export const deceasedSection: IFormSection = {
     },
     {
       name: 'iD',
-      type: TEXT,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',
