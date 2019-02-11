@@ -451,7 +451,8 @@ class FormSectionComponent extends React.Component<Props> {
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
             field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
           ) {
             return (
               <FormItem key={`${field.name}`}>
