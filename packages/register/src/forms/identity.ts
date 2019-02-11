@@ -65,7 +65,7 @@ export const messages = defineMessages({
   }
 })
 
-export const identityOptions = [
+export const birthIdentityOptions = [
   { value: NATIONAL_ID, label: messages.iDTypeNationalID },
   {
     value: BIRTH_REGISTRATION_NUMBER,

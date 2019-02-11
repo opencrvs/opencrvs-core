@@ -3,7 +3,7 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import {
   messages as identityMessages,
-  identityOptions,
+  birthIdentityOptions,
   identityTypeMapper
 } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
@@ -173,7 +173,7 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: identityOptions,
+      options: birthIdentityOptions,
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
         mutation: fieldToIdentifierTransformer('type'),

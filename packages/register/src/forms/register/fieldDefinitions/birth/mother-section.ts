@@ -1,7 +1,7 @@
 import { defineMessages } from 'react-intl'
 import {
   messages as identityMessages,
-  identityOptions,
+  birthIdentityOptions,
   identityTypeMapper
 } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
@@ -137,7 +137,7 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: identityOptions,
+      options: birthIdentityOptions,
       mapping: {
         mutation: fieldToIdentifierTransformer('type'),
         query: identifierToFieldTransformer('type')
