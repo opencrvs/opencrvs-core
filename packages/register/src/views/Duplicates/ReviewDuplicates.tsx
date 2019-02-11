@@ -351,8 +351,6 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           (rec.registration &&
             rec.registration.status &&
             rec.registration.status.map((status: GQLRegWorkflow) => {
-              // @ts-ignore
-              console.log(status.user.role)
               return {
                 action: Action[status.type as GQLRegStatus] || Action.DECLARED,
                 date: status.timestamp || '',
