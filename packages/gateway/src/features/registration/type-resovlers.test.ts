@@ -164,8 +164,8 @@ describe('Registration type resolvers', () => {
 
   it('returns deceased', () => {
     // @ts-ignore
-    const deceased = typeResolvers.Person.deceased(mockPatient)
-    expect(deceased).toBe('false')
+    const deceased = typeResolvers.Deceased.deceased(mockPatient)
+    expect(deceased).toBe('true')
   })
 
   it('returns nationality', () => {
@@ -444,6 +444,27 @@ describe('Registration type resolvers', () => {
       )
       expect(birthLocation).toBeDefined()
       expect(birthLocation).toEqual('123')
+    })
+
+    it('returns birthLocationType', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocationType))
+      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      // @ts-ignore
+      const birthLocationType = await typeResolvers.BirthRegistration.birthLocationType(
+        mockComposition
+      )
+      expect(birthLocationType).toBeDefined()
+      expect(birthLocationType).toEqual('CURRENT')
+    })
+    it('birthLocationType is null when section does not exist', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocationType))
+      // @ts-ignore
+      const birthLocationType = await typeResolvers.BirthRegistration.birthLocationType(
+        {
+          section: []
+        }
+      )
+      expect(birthLocationType).toBeNull()
     })
   })
 

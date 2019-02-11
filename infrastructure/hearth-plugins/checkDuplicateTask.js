@@ -19,7 +19,9 @@ module.exports = (mongo, fhirResources) => {
             const id = resource.identifier.find(
               identifier =>
                 identifier.system ===
-                'http://opencrvs.org/specs/id/birth-tracking-id'
+                  'http://opencrvs.org/specs/id/birth-tracking-id' ||
+                identifier.system ===
+                  'http://opencrvs.org/specs/id/death-tracking-id'
             )
             if (!id) {
               callback(null, null)
@@ -38,9 +40,11 @@ module.exports = (mongo, fhirResources) => {
               }
 
               if (result && result.resource && result.resource.total !== 0) {
-                logger.warn(`OCRVS-plugin: Duplicate Task found for identifier: ${
-                  id.value
-                }`)
+                logger.warn(
+                  `OCRVS-plugin: Duplicate Task found for identifier: ${
+                    id.value
+                  }`
+                )
 
                 callback(null, {
                   httpStatus: 409,

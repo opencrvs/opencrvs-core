@@ -10,3 +10,6 @@ export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
 }
+
+export const BIRTH_REG_NO = 'birth-registration-number'
+export const DEATH_REG_NO = 'death-registration-number'
