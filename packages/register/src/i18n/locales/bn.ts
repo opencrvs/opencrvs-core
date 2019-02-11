@@ -860,7 +860,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.rejectedNoticeCardText2':
       'বাতিল করা হয়েছে এবং এজেন্টকে প্রত্যাখ্যানের কারণগুলি সম্পর্কে জানানো হবে এবং অনুসরণ করার নির্দেশ দেওয়া হবে।',
     'register.confirmationScreen.buttons.back': 'হোমপেইজে ফিরে  যান',
-    'register.confirmationScreen.buttons.newDeclaration': 'নতুন ঘোষণা',
+    'register.confirmationScreen.buttons.newDeclaration': 'নতুন আবেদন',
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {জন্ম নিবন্ধন নম্বর : } duplication {জন্ম নিবন্ধন নম্বর : } certificate {} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }} `,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 

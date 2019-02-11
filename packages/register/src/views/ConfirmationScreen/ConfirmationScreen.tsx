@@ -115,7 +115,7 @@ const messages = defineMessages({
   },
   newButton: {
     id: 'register.confirmationScreen.buttons.newDeclaration',
-    defaultMessage: 'New declaration',
+    defaultMessage: 'New application',
     description:
       'The button to start a new application now that they are finished with this one'
   }

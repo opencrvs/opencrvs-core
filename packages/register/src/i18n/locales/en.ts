@@ -870,7 +870,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.rejectedNoticeCardText2':
       'has been rejected. The application agent will be informed about the reasons for rejection and instructed to follow up.',
     'register.confirmationScreen.buttons.back': 'Back to homescreen',
-    'register.confirmationScreen.buttons.newDeclaration': 'New declaration',
+    'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
     duplication {Birth Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
