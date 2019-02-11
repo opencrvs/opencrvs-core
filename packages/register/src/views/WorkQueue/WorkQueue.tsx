@@ -677,7 +677,6 @@ export class WorkQueueView extends React.Component<
 
     return data.listBirthRegistrations.results.map(
       (reg: GQLBirthRegistration) => {
-        console.log(reg)
         const childNames =
           (reg.child && (reg.child.name as GQLHumanName[])) || []
         const lang = 'bn'
