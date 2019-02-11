@@ -236,6 +236,7 @@ export interface GQLRegistration {
 }
 
 export enum GQLRegistrationContactType {
+  BOTH = 'BOTH',
   MOTHER = 'MOTHER',
   FATHER = 'FATHER'
 }

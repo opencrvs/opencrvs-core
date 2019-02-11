@@ -188,10 +188,25 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    status: async task => {
-      const taskArrary = []
-      taskArrary.push(task)
-      return taskArrary
+    status: async (task: fhir.Task, _, authHeader) => {
+      // fetch full task history
+      const taskBundle: fhir.Bundle = await fetchFHIR(
+        `/Task/${task.id}/_history`,
+        authHeader
+      )
+      return (
+        taskBundle.entry &&
+        taskBundle.entry.map((taskEntry: fhir.BundleEntry, i) => {
+          const historicalTask = taskEntry.resource
+          // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
+          if (historicalTask && historicalTask.meta) {
+            historicalTask.id = `${historicalTask.id}/_history/${
+              historicalTask.meta.versionId
+            }`
+          }
+          return historicalTask
+        })
+      )
     },
     type: task => {
       const taskType = task.code

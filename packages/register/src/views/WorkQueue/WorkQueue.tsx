@@ -677,6 +677,7 @@ export class WorkQueueView extends React.Component<
 
     return data.listBirthRegistrations.results.map(
       (reg: GQLBirthRegistration) => {
+        console.log(reg)
         const childNames =
           (reg.child && (reg.child.name as GQLHumanName[])) || []
         const lang = 'bn'
@@ -766,16 +767,13 @@ export class WorkQueueView extends React.Component<
     })
   }
 
-  renderExpansionContent = (
-    item: {
-      [key: string]: string & Array<{ [key: string]: string }>
-    },
-    key: number
-  ): JSX.Element[] => {
-    return item.status.map(status => {
+  renderExpansionContent = (item: {
+    [key: string]: string & Array<{ [key: string]: string }>
+  }): JSX.Element[] => {
+    return item.status.map((status, i) => {
       const { practitionerName, practitionerRole, officeName } = status
       return (
-        <ExpansionContainer key={key}>
+        <ExpansionContainer key={i}>
           {this.getDeclarationStatusIcon(status.type)}
           <ExpansionContentContainer>
             <LabelValue
@@ -987,7 +985,7 @@ export class WorkQueueView extends React.Component<
         actions={listItemActions}
         expandedCellRenderer={() => (
           <ListItemExpansion actions={expansionActions}>
-            {this.renderExpansionContent(item, key)}
+            {this.renderExpansionContent(item)}
           </ListItemExpansion>
         )}
       />
