@@ -137,6 +137,15 @@ export const deceasedSection: IFormSection = {
       options: deathIdentityOptions
     },
     {
+      name: 'iDTypeOther',
+      type: TEXT,
+      label: identityMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.iDType]
+    },
+    {
       name: 'iD',
       type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
