@@ -222,136 +222,65 @@ describe('Registration type resolvers', () => {
       const deathDate = typeResolvers.Deceased.deathDate(mockPatient)
       expect(deathDate).toBe('2010-01-01')
     })
-    it('returns deathLocationType whole encounter', async () => {
+
+    it('deathLocationType is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocation))
       // @ts-ignore
       const deathLocationType = await typeResolvers.DeathRegistration.deathLocationType(
         {
-          section: [
-            {
-              title: 'Death Encounter',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/sections',
-                    code: ''
-                  }
-                ]
-              }
-            }
-          ]
+          section: []
         }
       )
-      expect(deathLocationType).toBeDefined()
+      expect(deathLocationType).toBeNull()
     })
-    it('returns deathLocation invalid section', async () => {
+    it('deathLocation is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocation))
       // @ts-ignore
       const deathLocation = await typeResolvers.DeathRegistration.deathLocation(
         {
-          section: [
-            {
-              title: 'Death Encounter',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/sections',
-                    code: ''
-                  }
-                ]
-              }
-            }
-          ]
+          section: []
         }
       )
-      expect(deathLocation).toBeDefined()
+      expect(deathLocation).toBeNull()
     })
-    it('returns deathLocation invalid section', async () => {
+    it('mannerOfDeath is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.mannerOfDeath))
       // @ts-ignore
       const mannerOfDeath = await typeResolvers.DeathRegistration.mannerOfDeath(
         {
-          section: [
-            {
-              title: 'Death Encounter',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/sections',
-                    code: ''
-                  }
-                ]
-              }
-            }
-          ]
+          section: []
         }
       )
-      expect(mannerOfDeath).toBeDefined()
+      expect(mannerOfDeath).toBeNull()
     })
-    it('returns causeOfDeathMethod invalid section', async () => {
+    it('causeOfDeathMethod is null when section does not exist', async () => {
       fetch.mockResponseOnce(
         JSON.stringify(mockObservations.causeOfDeathMethod)
       )
       // @ts-ignore
       const causeOfDeathMethod = await typeResolvers.DeathRegistration.causeOfDeathMethod(
         {
-          section: [
-            {
-              title: 'Death Encounter',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/sections',
-                    code: ''
-                  }
-                ]
-              }
-            }
-          ]
+          section: []
         }
       )
-      expect(causeOfDeathMethod).toBeDefined()
+      expect(causeOfDeathMethod).toBeNull()
     })
-    it('returns causeOfDeath invalid section', async () => {
+    it('causeOfDeath is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.causeOfDeath))
       // @ts-ignore
       const causeOfDeath = await typeResolvers.DeathRegistration.causeOfDeath({
-        section: [
-          {
-            title: 'Death Encounter',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: ''
-                }
-              ]
-            }
-          }
-        ]
+        section: []
       })
-      expect(causeOfDeath).toBeDefined()
+      expect(causeOfDeath).toBeNull()
     })
 
-    it('returns informant invalid section', async () => {
+    it('informant is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.informant))
       // @ts-ignore
       const informant = await typeResolvers.DeathRegistration.informant({
-        section: [
-          {
-            title: 'Death Encounter',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: ''
-                }
-              ]
-            }
-          }
-        ]
+        section: []
       })
-      expect(informant).toBeDefined()
+      expect(informant).toBeNull()
     })
   })
 })

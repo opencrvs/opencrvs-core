@@ -14,7 +14,6 @@ import {
   CERTIFICATE_DOCS_CODE,
   CERTIFICATE_DOCS_TITLE,
   CERTIFICATE_CONTEXT_KEY,
-  createDeathEncounterSection,
   BIRTH_ENCOUNTER_CODE,
   DEATH_ENCOUNTER_CODE,
   INFORMANT_CODE,
@@ -106,14 +105,7 @@ export function selectOrCreateEncounterResource(
 
   if (!section) {
     const ref = uuid()
-    let encounterSection
-    if (sectionCode === BIRTH_ENCOUNTER_CODE) {
-      encounterSection = createEncounterSection(ref)
-    } else if (sectionCode === DEATH_ENCOUNTER_CODE) {
-      encounterSection = createDeathEncounterSection(ref)
-    } else {
-      throw new Error(`Unknown section code ${sectionCode}`)
-    }
+    const encounterSection = createEncounterSection(ref, sectionCode)
     fhirBundle.entry[0].resource.section.push(encounterSection)
     encounterEntry = createEncounter(ref)
     fhirBundle.entry.push(encounterEntry)

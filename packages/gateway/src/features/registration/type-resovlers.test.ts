@@ -456,28 +456,15 @@ describe('Registration type resolvers', () => {
       expect(birthLocationType).toBeDefined()
       expect(birthLocationType).toEqual('CURRENT')
     })
-    it('returns birthLocationType invalid encounter', async () => {
+    it('birthLocationType is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocationType))
-      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
       // @ts-ignore
       const birthLocationType = await typeResolvers.BirthRegistration.birthLocationType(
         {
-          section: [
-            {
-              title: 'Birth Encounter',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/sections',
-                    code: ''
-                  }
-                ]
-              }
-            }
-          ]
+          section: []
         }
       )
-      expect(birthLocationType).toBeDefined()
+      expect(birthLocationType).toBeNull()
     })
   })
 

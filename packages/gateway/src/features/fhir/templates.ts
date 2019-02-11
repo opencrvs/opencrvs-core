@@ -73,37 +73,26 @@ export function createLocationResource(refUuid: string) {
   }
 }
 
-export function createEncounterSection(refUuid: string) {
-  return {
-    title: 'Birth Encounter',
-    code: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/sections',
-          code: 'birth-encounter'
-        }
-      ],
-      text: 'Birth encounter'
-    },
-    entry: [
-      {
-        reference: `urn:uuid:${refUuid}`
-      }
-    ]
+export function createEncounterSection(refUuid: string, sectionCode: string) {
+  let sectionTitle
+  if (sectionCode === BIRTH_ENCOUNTER_CODE) {
+    sectionTitle = 'Birth encounter'
+  } else if (sectionCode === DEATH_ENCOUNTER_CODE) {
+    sectionTitle = 'Death encounter'
+  } else {
+    throw new Error(`Unknown section code ${sectionCode}`)
   }
-}
 
-export function createDeathEncounterSection(refUuid: string) {
   return {
-    title: 'Death Encounter',
+    title: sectionTitle,
     code: {
       coding: [
         {
           system: 'http://opencrvs.org/specs/sections',
-          code: 'death-encounter'
+          code: sectionCode
         }
       ],
-      text: 'Death encounter'
+      text: sectionTitle
     },
     entry: [
       {
