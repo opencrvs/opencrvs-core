@@ -300,7 +300,10 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
-      options: countries
+      options: countries,
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'country')
+      }
     },
     {
       name: 'statePermanent',
@@ -313,7 +316,10 @@ export const deceasedSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'countryPermanent'
       },
-      conditionals: [conditionals.countryPermanent]
+      conditionals: [conditionals.countryPermanent],
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'state')
+      }
     },
     {
       name: 'districtPermanent',
@@ -326,7 +332,13 @@ export const deceasedSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'statePermanent'
       },
-      conditionals: [conditionals.countryPermanent, conditionals.statePermanent]
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'district')
+      }
     },
     {
       name: 'addressLine4Permanent',

@@ -16,7 +16,8 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from 'src/forms/countries'
 import { conditionals } from 'src/forms/utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-
+import { sectionFieldToBundleFieldTransformer } from 'src/forms/mappings/mutation/field-mappings'
+import { sectionRemoveTransformer } from 'src/forms/mappings/mutation/field-mappings'
 const messages = defineMessages({
   deathEventTab: {
     id: 'register.form.tabs.deathEventTab',
@@ -127,7 +128,10 @@ export const eventSection: IFormSection = {
       label: messages.deathDate,
       required: true,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      mapping: {
+        mutation: sectionRemoveTransformer()
+      }
     },
     {
       name: 'manner',
@@ -151,7 +155,10 @@ export const eventSection: IFormSection = {
           value: 'MANNER_UNDETERMINED',
           label: messages.mannerUndetermined
         }
-      ]
+      ],
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath')
+      }
     },
     {
       name: 'deathPlace',
@@ -178,7 +185,10 @@ export const eventSection: IFormSection = {
         },
         { value: 'other', label: messages.deathPlaceAddressOther }
       ],
-      conditionals: []
+      conditionals: [],
+      mapping: {
+        mutation: sectionRemoveTransformer()
+      }
     },
     {
       name: 'addressType',

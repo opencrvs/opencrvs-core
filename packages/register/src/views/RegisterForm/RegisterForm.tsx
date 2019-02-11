@@ -400,8 +400,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   successfulSubmission = (response: string) => {
     const { history, draft } = this.props
-    const childData = this.props.draft.data.child
-    const fullName = getFullName(childData)
+    let personData
+    if (this.props.draft.event === 'death') {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
 
     const duplicate = history.location.state && history.location.state.duplicate
 
