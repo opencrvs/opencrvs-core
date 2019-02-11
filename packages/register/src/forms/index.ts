@@ -25,6 +25,7 @@ export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
+export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 import { defineMessages } from 'react-intl'
 
 export const messages = defineMessages({
@@ -59,6 +60,12 @@ export interface IDynamicOptions {
   options?: { [key: string]: ISelectOption[] }
 }
 
+export interface IDynamicItems {
+  dependency: string
+  valueMapper: IDynamicValueMapper
+  items: { [key: string]: FormattedMessage.MessageDescriptor[] }
+}
+
 export interface IDynamicTextFieldValidators {
   validator: ValidationInitializer
   dependencies: string[]
@@ -67,6 +74,8 @@ export interface IDynamicTextFieldValidators {
 export type IDynamicTextFieldLabelMapper = (
   key: string
 ) => FormattedMessage.MessageDescriptor
+
+export type IDynamicValueMapper = (key: string) => string
 
 export interface IDynamicTextFieldDefinitions {
   label?: {
@@ -173,6 +182,11 @@ export interface IListFormField extends IFormFieldBase {
   type: typeof LIST
   items: FormattedMessage.MessageDescriptor[]
 }
+
+export interface IDynamicListFormField extends IFormFieldBase {
+  type: typeof DYNAMIC_LIST
+  dynamicItems: IDynamicItems
+}
 export interface IParagraphFormField extends IFormFieldBase {
   type: typeof PARAGRAPH
   fontSize?: string
@@ -214,6 +228,7 @@ export type IFormField =
   | IWarningField
   | ILink
   | IPDFDocumentViewerFormField
+  | IDynamicListFormField
 
 export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
   ITextFormFieldWithDynamicDefinitions

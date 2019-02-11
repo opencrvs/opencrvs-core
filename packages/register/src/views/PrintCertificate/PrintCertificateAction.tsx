@@ -46,6 +46,10 @@ import {
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import {
+  fatherDataDoesNotExist,
+  fatherDataExists
+} from 'src/forms/certificate/fieldDefinitions/collector-section'
 import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import { getUserDetails } from 'src/profile/profileSelectors'
@@ -281,7 +285,21 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
           comments {
             comment
           }
+
+          location {
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
         }
+
         trackingId
         registrationNumber
       }
@@ -439,6 +457,13 @@ const getFullName = (certificateDetails: CertificateDetails): IFullName => {
   }
 }
 
+interface ICertDetail {
+  [key: string]: any
+}
+interface ICertDetails {
+  [key: string]: ICertDetail
+}
+
 type State = {
   currentForm: string
   data: IFormSectionData
@@ -503,7 +528,11 @@ class PrintCertificateActionComponent extends React.Component<
 
   shouldEnableConfirmButton = (documentData: IFormSectionData) => {
     const form = this.getForm(this.state.currentForm)
-    return documentData && !hasFormError(form.fields, documentData)
+    if (form.id !== 'certificatePreview') {
+      return documentData && !hasFormError(form.fields, documentData)
+    } else {
+      return false
+    }
   }
 
   addPDFToField(form: IFormSection) {
@@ -781,7 +810,7 @@ class PrintCertificateActionComponent extends React.Component<
     return registrant
   }
 
-  getCertificateDetails(data: IFormData): CertificateDetails {
+  getCertificateDetails(data: ICertDetails): CertificateDetails {
     const names = data.child.name as Array<{ [key: string]: {} }>
     const NameBn = names.find(name => name.use === 'bn')
     const NameEn = names.find(name => name.use === 'en')
@@ -793,8 +822,30 @@ class PrintCertificateActionComponent extends React.Component<
       CERTIFICATE_DATE_FORMAT
     )
 
+    let regLocationLocationEn = ''
+    let regLocationLocationBn = ''
+    if (
+      data &&
+      data.registration &&
+      data.registration.status &&
+      data.registration.status[0] &&
+      data.registration.status[0].office &&
+      data.registration.status[0].office.address
+    ) {
+      regLocationLocationEn = [
+        data.registration.status[0].office.name as string,
+        data.registration.status[0].office.address.district as string,
+        data.registration.status[0].office.address.state as string
+      ].join(', ') as string
+      regLocationLocationBn = data.registration.status[0].office.alias as string
+    }
+
     return {
       registrationNo: data.registration.registrationNumber as string,
+      registrationLocation: {
+        en: regLocationLocationEn,
+        bn: regLocationLocationBn
+      },
       name: {
         bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
         en: NameEn ? NameEn.firstNames + ' ' + NameEn.familyName : ''
@@ -927,11 +978,25 @@ class PrintCertificateActionComponent extends React.Component<
                   const certificateData = this.getCertificateDetails(
                     data.fetchBirthRegistration
                   )
-
                   const transData: IFormData = gqlToDraftTransformer(
                     this.props.registerForm,
                     data.fetchBirthRegistration
                   )
+                  if (
+                    form.fields.filter(
+                      field => field.name === 'personCollectingCertificate'
+                    ).length === 0 &&
+                    form === collectCertificateForm
+                  ) {
+                    if (
+                      transData.father &&
+                      transData.father.fathersDetailsExist
+                    ) {
+                      form.fields.unshift(fatherDataExists)
+                    } else {
+                      form.fields.unshift(fatherDataDoesNotExist)
+                    }
+                  }
                   const reviewDraft = createReviewDraft(
                     registrationId,
                     transData,

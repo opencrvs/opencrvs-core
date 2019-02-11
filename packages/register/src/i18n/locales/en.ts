@@ -623,6 +623,18 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
     'formFields.docTypeOther': 'Other',
+    'formFields.docTypeChildBirthProof': 'Proof of Place and Date of Birth',
+    'formFields.docTypeEPICard': 'EPI Card',
+    'formFields.docTypeDoctorCertificate': 'Doctor Certificate',
+    'formFields.proofOfMothersID': "Proof of Mother's ID",
+    'formFields.proofOfFathersID': "Proof of Father's ID",
+    'formFields.proofOfBirthPlaceAndDate':
+      'Proof of Place and Date of Birth of Child',
+    'formFields.proofOfParentPermanentAddress':
+      'Proof of Permanent Address of Parent',
+    'formFields.proofOfEPICardOfChild': 'EPI Card of Child',
+    'formFields.proofOfDocCertificateOfChild':
+      "Certificate from doctor to prove child's age OR School certificate",
     'register.form.section.documents.uploadImage':
       'Upload a photo of the supporting document',
     'formFields.imageUpload.uploadedList': 'Uploaded:',
@@ -839,12 +851,12 @@ export const ENGLISH_STATE: ILanguage = {
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
 
-    'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Registration} duplication {Application}
-      certificate {Certificate} offlineEvent {Application connectivity}} {action, select, completed {completed}
-      submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending}}`,
-    'register.confirmationScreen.headerDesc': `{event, select, declaration {The application} registration {The birth application} duplication {The application} certificate {} offlineEvent {The application}} 
-      {action, select, submitted {is now on its way for validation} completed {} rejected {rejected} approved {approved} registered {registered}
-      offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
+    'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
+    certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed} 
+    submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The declaration}} 
+    {action, select, submitted {is now on its way for validation} completed {} registered {registered} rejected {rejected} approved {Approved}
+    offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All done!} submitted {All done!} rejected {Application rejected} 
       approved {Application approved} registered {Application registered} offlineAction {Almost there}}`,
     'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.} 
@@ -861,13 +873,14 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
-     duplication {...} certificate {...} offlineEvent {Tracking ID number: }}`,
+    duplication {Birth Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
       registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-      duplication{...} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
-    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The birth application of } registration {The birth of } duplication 
-    {The birth duplication of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
-    'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
+      duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} certificate {Certificates have been collected from your jurisdiction.}
+      offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}} `,
+    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The birth of } duplication 
+      {The birth duplication of } certificate {The birth certificate of } offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of }}`,
+    'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been successfully submitted to the registration office.} rejected {has been rejected.} registered {has been registered}
       approved {has been approved.} offlineAction {is pending due to internet connection.}}`,
 
     'register.duplicates.notDuplicate.modal.back': 'Back',

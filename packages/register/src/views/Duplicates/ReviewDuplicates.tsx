@@ -149,6 +149,7 @@ export const FETCH_DUPLICATES = gql`
     fetchBirthRegistration(id: $id) {
       id
       registration {
+        id
         duplicates
       }
     }
@@ -185,6 +186,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
         }
       }
       child {
+        id
         name {
           use
           firstNames
@@ -194,6 +196,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
         gender
       }
       mother {
+        id
         name {
           use
           firstNames
@@ -207,6 +210,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
         }
       }
       father {
+        id
         name {
           use
           firstNames
@@ -463,7 +467,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   }
 
                   if (errorDetails) {
-                    console.error(error)
+                    console.error(errorDetails)
 
                     return (
                       <ErrorText id="duplicates-error-text">

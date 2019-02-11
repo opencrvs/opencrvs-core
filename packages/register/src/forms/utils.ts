@@ -14,7 +14,10 @@ import {
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH,
   IDynamicTextFieldValidators,
-  IDynamicFormField
+  IDynamicFormField,
+  IDynamicListFormField,
+  IDynamicValueMapper,
+  IFormData
 } from './'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -25,6 +28,13 @@ import {
   ILocation
 } from 'src/offline/reducer'
 import { Validation } from 'src/utils/validate'
+import * as moment from 'moment'
+
+interface IRange {
+  start: number
+  end?: number
+  value: string
+}
 
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
@@ -155,6 +165,55 @@ export const getFieldOptions = (
     }
     return options
   }
+}
+
+const getNestedValue = (obj: object, key: string) => {
+  return key.split('.').reduce((res, k) => res[k] || '', obj)
+}
+
+const betweenRange = (range: IRange, check: number) =>
+  range.end ? check >= range.start && check <= range.end : check >= range.start
+
+export const getFieldOptionsByValueMapper = (
+  field: IDynamicListFormField,
+  values: IFormSectionData | IFormData,
+  valueMapper: IDynamicValueMapper
+) => {
+  const dependencyVal = getNestedValue(
+    values,
+    field.dynamicItems.dependency
+  ) as string
+
+  const firstKey = Object.keys(field.dynamicItems.items)[0]
+
+  if (!dependencyVal) {
+    return field.dynamicItems.items[firstKey]
+  }
+
+  const mappedValue = valueMapper(dependencyVal)
+
+  let items
+
+  if (!field.dynamicItems.items[mappedValue]) {
+    items = field.dynamicItems.items[firstKey]
+  } else {
+    items = field.dynamicItems.items[mappedValue]
+  }
+  return items
+}
+
+export const diffDoB = (doB: string) => {
+  const todaysDate = moment(Date.now())
+  const birthDate = moment(doB)
+  const diffInDays = todaysDate.diff(birthDate, 'days')
+
+  const ranges: IRange[] = [
+    { start: 0, end: 45, value: 'within45days' },
+    { start: 46, end: 5 * 365, value: 'between46daysTo5yrs' },
+    { start: 5 * 365 + 1, value: 'after5yrs' }
+  ]
+  const valueWithinRange = ranges.find(range => betweenRange(range, diffInDays))
+  return valueWithinRange ? valueWithinRange.value : ''
 }
 
 export function isCityLocation(
