@@ -34,7 +34,7 @@ export interface IFatherSectionFormData {
   bar: string
   baz: string
 }
-import { iDType } from 'src/views/PrintCertificate/ParentDetails'
+import { identityNameMapper } from 'src/forms/identity'
 import { IFormSection } from '../../../index'
 import { conditionals } from '../../../utils'
 import {
@@ -199,7 +199,7 @@ export const fatherSection: IFormSection = {
       dynamicDefinitions: {
         label: {
           dependency: 'iDType',
-          labelMapper: iDType
+          labelMapper: identityNameMapper
         },
         type: {
           dependency: 'iDType',

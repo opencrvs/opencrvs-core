@@ -1,4 +1,4 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, FormattedMessage } from 'react-intl'
 import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
 
 export const NATIONAL_ID = 'NATIONAL_ID'
@@ -85,5 +85,26 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
       return NUMBER
     default:
       return TEXT
+  }
+}
+
+export function identityNameMapper(
+  code: string
+): FormattedMessage.MessageDescriptor {
+  switch (code) {
+    case 'NATIONAL_ID':
+      return messages.iDTypeNationalID
+    case 'PASSPORT':
+      return messages.iDTypePassport
+    case 'BIRTH_REGISTRATION_NUMBER':
+      return messages.iDTypeBRN
+    case 'DEATH_REGISTRATION_NUMBER':
+      return messages.iDTypeDRN
+    case 'REFUGEE_NUMBER':
+      return messages.iDTypeRefugeeNumber
+    case 'ALIEN_NUMBER':
+      return messages.iDTypeAlienNumber
+    default:
+      return messages.iD
   }
 }

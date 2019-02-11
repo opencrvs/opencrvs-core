@@ -33,7 +33,7 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import { conditionals } from '../../../utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { iDType } from 'src/views/PrintCertificate/ParentDetails'
+import { identityNameMapper } from 'src/forms/identity'
 import {
   nameTransformer,
   fieldToArrayTransformer,
@@ -162,7 +162,7 @@ export const motherSection: IFormSection = {
       dynamicDefinitions: {
         label: {
           dependency: 'iDType',
-          labelMapper: iDType
+          labelMapper: identityNameMapper
         },
         type: {
           dependency: 'iDType',
