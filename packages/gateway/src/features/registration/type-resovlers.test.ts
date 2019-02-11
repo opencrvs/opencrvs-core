@@ -687,12 +687,20 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns a correct status from a task object', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [{ resource: mockTask }, { resource: mockTask }]
+        })
+      )
+
       // @ts-ignore
       const status = await typeResolvers.Registration.status(mockTask)
 
       expect(status).toBeDefined()
-      expect(status).toHaveLength(1)
+      expect(status).toHaveLength(2)
       expect(status[0].resourceType).toBe('Task')
+      expect(status[1].resourceType).toBe('Task')
     })
 
     it('returns tracking ID from the task object', async () => {
