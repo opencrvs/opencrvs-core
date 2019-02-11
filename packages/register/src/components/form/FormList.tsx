@@ -6,12 +6,16 @@ export interface IProps {
   list: FormattedMessage.MessageDescriptor[]
 }
 
-const FormListComponent = ({ list, intl }: IProps & InjectedIntlProps) => {
+const FormListComponent = ({
+  list,
+  intl,
+  ...otherProps
+}: IProps & InjectedIntlProps) => {
   const localizedList = list.map((item: FormattedMessage.MessageDescriptor) =>
     intl.formatMessage(item)
   )
 
-  return <List list={localizedList} />
+  return <List list={localizedList} {...otherProps} />
 }
 
 export const FormList = injectIntl(FormListComponent)

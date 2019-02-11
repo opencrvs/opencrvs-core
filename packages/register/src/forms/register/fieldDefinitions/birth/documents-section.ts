@@ -1,14 +1,15 @@
 import { defineMessages } from 'react-intl'
 import {
   IFormSection,
-  LIST,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
-  RADIO_GROUP
+  RADIO_GROUP,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  DYNAMIC_LIST
 } from 'src/forms'
-import { conditionals } from '../../../utils'
 import { birthFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
 import { birthAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
+import { diffDoB } from 'src/forms/utils'
 
 const messages = defineMessages({
   documentsTab: {
@@ -124,6 +125,52 @@ const messages = defineMessages({
     id: 'formFields.docTypeOther',
     defaultMessage: 'Other',
     description: 'Label for radio option Other'
+  },
+  docTypeChildBirthProof: {
+    id: 'formFields.docTypeChildBirthProof',
+    defaultMessage: 'Proof of Place and Date of Birth',
+    description: 'Label for select option Child Birth Proof'
+  },
+  docTypeEPICard: {
+    id: 'formFields.docTypeEPICard',
+    defaultMessage: 'EPI Card',
+    description: 'Label for select option EPI Card'
+  },
+  docTypeDoctorCertificate: {
+    id: 'formFields.docTypeDoctorCertificate',
+    defaultMessage: 'Doctor Certificate',
+    description: 'Label for select option Doctor Certificate'
+  },
+  proofOfMothersID: {
+    id: 'formFields.proofOfMothersID',
+    defaultMessage: "Proof of Mother's ID",
+    description: 'Label for list item Mother ID Proof'
+  },
+  proofOfFathersID: {
+    id: 'formFields.proofOfFathersID',
+    defaultMessage: "Proof of Father's ID",
+    description: 'Label for list item Father ID Proof'
+  },
+  proofOfBirthPlaceAndDate: {
+    id: 'formFields.proofOfBirthPlaceAndDate',
+    defaultMessage: 'Proof of Place and Date of Birth of Child',
+    description: 'Label for list item Child Birth Proof'
+  },
+  proofOfParentPermanentAddress: {
+    id: 'formFields.proofOfParentPermanentAddress',
+    defaultMessage: 'Proof of Permanent Address of Parent',
+    description: 'Label for list item Parent Permanent Address Proof'
+  },
+  proofOfEPICardOfChild: {
+    id: 'formFields.proofOfEPICardOfChild',
+    defaultMessage: 'EPI Card of Child',
+    description: 'Label for list item EPI Card of Child'
+  },
+  proofOfDocCertificateOfChild: {
+    id: 'formFields.proofOfDocCertificateOfChild',
+    defaultMessage:
+      "Certificate from doctor to prove child's age OR School certificate",
+    description: 'Label for list item Doctor Certificate'
   }
 })
 
@@ -161,19 +208,49 @@ export const documentsSection: IFormSection = {
           },
           {
             name: 'whatDocToUpload',
-            type: RADIO_GROUP,
+            type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: messages.whatDocToUpload,
             required: true,
             initialValue: '',
             validate: [],
-            options: [
-              { value: 'Birth Registration', label: messages.docTypeBR },
-              { value: 'NID', label: messages.docTypeNID },
-              { value: 'Passport', label: messages.docTypePassport },
-              { value: 'School Certificate', label: messages.docTypeSC },
-              { value: 'Other', label: messages.docTypeOther }
-            ],
-            conditionals: [conditionals.uploadDocForWhom]
+            dynamicOptions: {
+              dependency: 'uploadDocForWhom',
+              options: {
+                Child: [
+                  {
+                    value: 'Proof of Place and Date of Birth',
+                    label: messages.docTypeChildBirthProof
+                  },
+                  { value: 'EPI Card', label: messages.docTypeEPICard },
+                  {
+                    value: 'Doctor Certificate',
+                    label: messages.docTypeDoctorCertificate
+                  },
+                  { value: 'School Certificate', label: messages.docTypeSC }
+                ],
+                Mother: [
+                  { value: 'Birth Registration', label: messages.docTypeBR },
+                  { value: 'NID', label: messages.docTypeNID },
+                  { value: 'Passport', label: messages.docTypePassport },
+                  { value: 'School Certificate', label: messages.docTypeSC },
+                  { value: 'Other', label: messages.docTypeOther }
+                ],
+                Father: [
+                  { value: 'Birth Registration', label: messages.docTypeBR },
+                  { value: 'NID', label: messages.docTypeNID },
+                  { value: 'Passport', label: messages.docTypePassport },
+                  { value: 'School Certificate', label: messages.docTypeSC },
+                  { value: 'Other', label: messages.docTypeOther }
+                ],
+                Other: [
+                  { value: 'Birth Registration', label: messages.docTypeBR },
+                  { value: 'NID', label: messages.docTypeNID },
+                  { value: 'Passport', label: messages.docTypePassport },
+                  { value: 'School Certificate', label: messages.docTypeSC },
+                  { value: 'Other', label: messages.docTypeOther }
+                ]
+              }
+            }
           }
         ]
       },
@@ -191,17 +268,36 @@ export const documentsSection: IFormSection = {
     },
     {
       name: 'list',
-      type: LIST,
+      type: DYNAMIC_LIST,
       label: messages.documentsTab,
-      initialValue: '',
       validate: [],
-      items: [
-        messages.informantAttestation,
-        messages.attestedVaccination,
-        messages.attestedBirthRecord,
-        messages.certification,
-        messages.otherDocuments
-      ]
+      initialValue: '',
+      dynamicItems: {
+        dependency: 'child.childBirthDate',
+        valueMapper: diffDoB,
+        items: {
+          within45days: [
+            messages.proofOfMothersID,
+            messages.proofOfFathersID,
+            messages.proofOfBirthPlaceAndDate,
+            messages.proofOfParentPermanentAddress
+          ],
+          between46daysTo5yrs: [
+            messages.proofOfMothersID,
+            messages.proofOfFathersID,
+            messages.proofOfBirthPlaceAndDate,
+            messages.proofOfParentPermanentAddress,
+            messages.proofOfEPICardOfChild
+          ],
+          after5yrs: [
+            messages.proofOfMothersID,
+            messages.proofOfFathersID,
+            messages.proofOfBirthPlaceAndDate,
+            messages.proofOfParentPermanentAddress,
+            messages.proofOfDocCertificateOfChild
+          ]
+        }
+      }
     }
   ]
 }
