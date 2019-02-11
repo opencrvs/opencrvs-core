@@ -1,12 +1,12 @@
 import { BRN_GENERATOR_CODE } from 'src/constants'
-import { generateBdBRN } from './bd-brn-generator'
-import { generateDefaultBRN } from './default-brn-generator'
+import { generateBdRegistrationNumber } from './bdRegistrationNumberGenerator'
+import { generateDefaultRegistrationNumber } from './defaultRegistrationNumberGenerator'
 
 enum GENERATOR_CODE {
   BD = 'bd'
 }
 
-export async function generateBirthRegistrationNumber(
+export async function generateRegistrationNumber(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner,
   generatorCode?: string
@@ -15,8 +15,8 @@ export async function generateBirthRegistrationNumber(
 
   switch (generatorCode) {
     case GENERATOR_CODE.BD.toString():
-      return await generateBdBRN(taskResource, practitioner)
+      return await generateBdRegistrationNumber(taskResource, practitioner)
     default:
-      return generateDefaultBRN()
+      return generateDefaultRegistrationNumber()
   }
 }
