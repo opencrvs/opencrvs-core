@@ -8,7 +8,7 @@ import {
   getRegStatusCode,
   getPaperFormID
 } from './fhir-utils'
-import { setTrackingId, pushBRN } from './fhir-bundle-modifier'
+import { setTrackingId, pushRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import * as fetch from 'jest-fetch-mock'
 
@@ -213,9 +213,10 @@ describe('Verify getBirthRegistrationNumber', () => {
     const birthTrackingId = 'B5WGYJE'
     const brnChecksum = 1
     testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
-    const taskResource = await pushBRN(
+    const taskResource = await pushRN(
       testFhirBundle.entry[1].resource as fhir.Task,
-      practitioner
+      practitioner,
+      'birth-registration-number'
     )
     const brn = getBirthRegistrationNumber(taskResource)
 

@@ -1,6 +1,6 @@
 import {
   setTrackingId,
-  pushBRN,
+  pushRN,
   setupRegistrationType,
   setupRegistrationWorkflow,
   setupLastRegUser,
@@ -257,7 +257,11 @@ describe('Verify fhir bundle modifier functions', () => {
       const brnChecksum = 1
       testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
 
-      const task = await pushBRN(testFhirBundle.entry[1].resource, practitioner)
+      const task = await pushRN(
+        testFhirBundle.entry[1].resource,
+        practitioner,
+        'birth-registration-number'
+      )
 
       expect(task.identifier[2].system).toEqual(
         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
@@ -272,9 +276,9 @@ describe('Verify fhir bundle modifier functions', () => {
 
     it('Throws error if invalid fhir bundle is provided', async () => {
       const invalidData = undefined
-      expect(pushBRN(invalidData, practitioner)).rejects.toThrowError(
-        'Invalid Task resource found for registration'
-      )
+      expect(
+        pushRN(invalidData, practitioner, 'birth-registration-number')
+      ).rejects.toThrowError('Invalid Task resource found for registration')
     })
     it('If fhirBundle already have a brn then it will update the exiting one instead of creating a new one', async () => {
       const oldTask = testFhirBundle.entry[1].resource as fhir.Task
@@ -286,7 +290,11 @@ describe('Verify fhir bundle modifier functions', () => {
       const birthTrackingId = 'B5WGYJE'
       const brnChecksum = 1
       fhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
-      const newTask = await pushBRN(fhirBundle.entry[1].resource, practitioner)
+      const newTask = await pushRN(
+        fhirBundle.entry[1].resource,
+        practitioner,
+        'birth-registration-number'
+      )
 
       expect(newTask.identifier.length).toBe(indentifierLength)
       expect(newTask.identifier[2].system).toEqual(
