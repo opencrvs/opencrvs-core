@@ -652,6 +652,9 @@ const builders: IFieldBuilders = {
       )
       encounter.id = fieldValue as string
     },
+    eventLocation: (fhirBundle, fieldValue) => {
+      return false
+    },
     observation: {
       birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(

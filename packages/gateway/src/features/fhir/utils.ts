@@ -673,19 +673,6 @@ export async function getBRNFromResponse(
   return brnIdentifier.value
 }
 
-export async function parseEventLocation(
-  details: any,
-  authHeader: IAuthHeader
-): Promise<any> {
-  if (details.eventLocation._fhirID) {
-    delete details.eventLocation.address
-    delete details.eventLocation.type
-    return details
-  } else {
-    return details
-  }
-}
-
 export function getIDFromResponse(resBody: fhir.Bundle): string {
   if (
     !resBody ||

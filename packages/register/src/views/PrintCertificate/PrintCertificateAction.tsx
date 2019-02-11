@@ -288,6 +288,16 @@ export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      eventLocation {
+        type
+        address {
+          line
+          district
+          state
+          postalCode
+          country
+        }
+      }
       presentAtBirthRegistration
     }
   }

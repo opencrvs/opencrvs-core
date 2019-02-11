@@ -27,11 +27,16 @@ export const eventLocationMutationTransformer = (
     transformedData.eventLocation.type = draftData[sectionId][field.name]
   } else if (field.name === 'birthLocation') {
     transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
+    if (transformedData.eventLocation.address) {
+      delete transformedData.eventLocation.address
+    }
+    if (transformedData.eventLocation.type) {
+      delete transformedData.eventLocation.type
+    }
   } else {
     transformedData.eventLocation.address[field.name] =
       draftData[sectionId][field.name]
   }
-
   if (field.name === 'addressLine4') {
     transformedData.eventLocation.partOf = `Location/${
       draftData[sectionId][field.name]
