@@ -72,10 +72,6 @@ export const birthIdentityOptions = [
     label: messages.iDTypeBRN
   },
   { value: PASSPORT, label: messages.iDTypePassport },
-  {
-    value: DEATH_REGISTRATION_NUMBER,
-    label: messages.iDTypeDRN
-  },
   { value: OTHER, label: messages.iDTypeOther }
 ]
 
