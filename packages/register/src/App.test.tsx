@@ -1,5 +1,10 @@
 import * as ReactApollo from 'react-apollo'
-import { createTestApp, mockOfflineData, userDetails } from './tests/util'
+import {
+  createTestApp,
+  mockOfflineData,
+  userDetails,
+  selectOption
+} from './tests/util'
 import { v4 as uuid } from 'uuid'
 import {
   HOME,
@@ -332,6 +337,60 @@ describe('when user has a valid token in local storage', () => {
       })
     })
 
+    describe('when user enters childBirthDate and clicks to documents tab', () => {
+      beforeEach(async () => {
+        Date.now = jest.fn(() => 1549607679507)
+        app
+          .find('#childBirthDate-dd')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childBirthDate-dd', value: '19' }
+          })
+        app
+          .find('#childBirthDate-mm')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childBirthDate-mm', value: '11' }
+          })
+        app
+          .find('#childBirthDate-yyyy')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childBirthDate-yyyy', value: '2018' }
+          })
+        await flushPromises()
+        app.update()
+      })
+
+      describe('when user goes to documents tab', () => {
+        beforeEach(async () => {
+          app
+            .find('#tab_documents')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+        })
+
+        it('renders list of document requirements', () => {
+          expect(
+            app
+              .find('#list')
+              .hostNodes()
+              .children()
+          ).toHaveLength(5)
+
+          expect(
+            app
+              .find('#list')
+              .hostNodes()
+              .childAt(4)
+              .text()
+          ).toBe('EPI Card of Child')
+        })
+      })
+    })
+
     describe('when user swipes left from the "child" section', () => {
       beforeEach(async () => {
         app
@@ -545,10 +604,7 @@ describe('when user has a valid token in local storage', () => {
           })
           describe('when user selects the type of document', () => {
             beforeEach(async () => {
-              app
-                .find('#whatDocToUpload_NID')
-                .hostNodes()
-                .simulate('change')
+              selectOption(app, '#whatDocToUpload', 'NID')
 
               await flushPromises()
               app.update()
@@ -961,6 +1017,31 @@ describe('when user has a valid token in local storage', () => {
             expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
           })
         })
+      })
+    })
+
+    describe('when user clicks save as draft button', () => {
+      beforeEach(async () => {
+        app
+          .find('#save_as_draft')
+          .hostNodes()
+          .simulate('click')
+
+        await flushPromises()
+        app.update()
+      })
+      it('should display draft saved notification', () => {
+        expect(app.find('#draftsSavedNotification').hostNodes()).toHaveLength(1)
+      })
+      it('should hide draft saved notification when clicked', async () => {
+        app
+          .find('#draftsSavedNotification')
+          .hostNodes()
+          .simulate('click')
+
+        await flushPromises()
+        app.update()
+        expect(app.find('#draftsSavedNotification').hostNodes()).toHaveLength(0)
       })
     })
   })

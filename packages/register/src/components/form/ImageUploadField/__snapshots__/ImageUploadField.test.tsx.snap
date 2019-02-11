@@ -59,12 +59,171 @@ ShallowWrapper {
               "validate": Array [],
             },
             Object {
-              "conditionals": Array [
-                Object {
-                  "action": "hide",
-                  "expression": "!values.uploadDocForWhom",
+              "dynamicOptions": Object {
+                "dependency": "uploadDocForWhom",
+                "options": Object {
+                  "Child": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Proof of Place and Date of Birth",
+                        "description": "Label for select option Child Birth Proof",
+                        "id": "formFields.docTypeChildBirthProof",
+                      },
+                      "value": "Proof of Place and Date of Birth",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "EPI Card",
+                        "description": "Label for select option EPI Card",
+                        "id": "formFields.docTypeEPICard",
+                      },
+                      "value": "EPI Card",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Doctor Certificate",
+                        "description": "Label for select option Doctor Certificate",
+                        "id": "formFields.docTypeDoctorCertificate",
+                      },
+                      "value": "Doctor Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                  ],
+                  "Father": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Birth Registration",
+                        "description": "Label for radio option Birth Registration",
+                        "id": "formFields.docTypeBR",
+                      },
+                      "value": "Birth Registration",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "NID",
+                        "description": "Label for radio option NID",
+                        "id": "formFields.docTypeNID",
+                      },
+                      "value": "NID",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "formFields.docTypePassport",
+                      },
+                      "value": "Passport",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "formFields.docTypeOther",
+                      },
+                      "value": "Other",
+                    },
+                  ],
+                  "Mother": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Birth Registration",
+                        "description": "Label for radio option Birth Registration",
+                        "id": "formFields.docTypeBR",
+                      },
+                      "value": "Birth Registration",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "NID",
+                        "description": "Label for radio option NID",
+                        "id": "formFields.docTypeNID",
+                      },
+                      "value": "NID",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "formFields.docTypePassport",
+                      },
+                      "value": "Passport",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "formFields.docTypeOther",
+                      },
+                      "value": "Other",
+                    },
+                  ],
+                  "Other": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Birth Registration",
+                        "description": "Label for radio option Birth Registration",
+                        "id": "formFields.docTypeBR",
+                      },
+                      "value": "Birth Registration",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "NID",
+                        "description": "Label for radio option NID",
+                        "id": "formFields.docTypeNID",
+                      },
+                      "value": "NID",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "formFields.docTypePassport",
+                      },
+                      "value": "Passport",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "formFields.docTypeOther",
+                      },
+                      "value": "Other",
+                    },
+                  ],
                 },
-              ],
+              },
               "initialValue": "",
               "label": Object {
                 "defaultMessage": "Which document type are you uploading?",
@@ -72,50 +231,8 @@ ShallowWrapper {
                 "id": "formFields.whatDocToUpload",
               },
               "name": "whatDocToUpload",
-              "options": Array [
-                Object {
-                  "label": Object {
-                    "defaultMessage": "Birth Registration",
-                    "description": "Label for radio option Birth Registration",
-                    "id": "formFields.docTypeBR",
-                  },
-                  "value": "Birth Registration",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "NID",
-                    "description": "Label for radio option NID",
-                    "id": "formFields.docTypeNID",
-                  },
-                  "value": "NID",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "Passport",
-                    "description": "Label for radio option Passport",
-                    "id": "formFields.docTypePassport",
-                  },
-                  "value": "Passport",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "School Certificate",
-                    "description": "Label for radio option School Certificate",
-                    "id": "formFields.docTypeSC",
-                  },
-                  "value": "School Certificate",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "Other",
-                    "description": "Label for radio option Other",
-                    "id": "formFields.docTypeOther",
-                  },
-                  "value": "Other",
-                },
-              ],
               "required": true,
-              "type": "RADIO_GROUP",
+              "type": "SELECT_WITH_DYNAMIC_OPTIONS",
               "validate": Array [],
             },
           ],
@@ -200,12 +317,171 @@ ShallowWrapper {
             "validate": Array [],
           },
           Object {
-            "conditionals": Array [
-              Object {
-                "action": "hide",
-                "expression": "!values.uploadDocForWhom",
+            "dynamicOptions": Object {
+              "dependency": "uploadDocForWhom",
+              "options": Object {
+                "Child": Array [
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Proof of Place and Date of Birth",
+                      "description": "Label for select option Child Birth Proof",
+                      "id": "formFields.docTypeChildBirthProof",
+                    },
+                    "value": "Proof of Place and Date of Birth",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "EPI Card",
+                      "description": "Label for select option EPI Card",
+                      "id": "formFields.docTypeEPICard",
+                    },
+                    "value": "EPI Card",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Doctor Certificate",
+                      "description": "Label for select option Doctor Certificate",
+                      "id": "formFields.docTypeDoctorCertificate",
+                    },
+                    "value": "Doctor Certificate",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "School Certificate",
+                      "description": "Label for radio option School Certificate",
+                      "id": "formFields.docTypeSC",
+                    },
+                    "value": "School Certificate",
+                  },
+                ],
+                "Father": Array [
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Birth Registration",
+                      "description": "Label for radio option Birth Registration",
+                      "id": "formFields.docTypeBR",
+                    },
+                    "value": "Birth Registration",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "NID",
+                      "description": "Label for radio option NID",
+                      "id": "formFields.docTypeNID",
+                    },
+                    "value": "NID",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Passport",
+                      "description": "Label for radio option Passport",
+                      "id": "formFields.docTypePassport",
+                    },
+                    "value": "Passport",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "School Certificate",
+                      "description": "Label for radio option School Certificate",
+                      "id": "formFields.docTypeSC",
+                    },
+                    "value": "School Certificate",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Other",
+                      "description": "Label for radio option Other",
+                      "id": "formFields.docTypeOther",
+                    },
+                    "value": "Other",
+                  },
+                ],
+                "Mother": Array [
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Birth Registration",
+                      "description": "Label for radio option Birth Registration",
+                      "id": "formFields.docTypeBR",
+                    },
+                    "value": "Birth Registration",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "NID",
+                      "description": "Label for radio option NID",
+                      "id": "formFields.docTypeNID",
+                    },
+                    "value": "NID",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Passport",
+                      "description": "Label for radio option Passport",
+                      "id": "formFields.docTypePassport",
+                    },
+                    "value": "Passport",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "School Certificate",
+                      "description": "Label for radio option School Certificate",
+                      "id": "formFields.docTypeSC",
+                    },
+                    "value": "School Certificate",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Other",
+                      "description": "Label for radio option Other",
+                      "id": "formFields.docTypeOther",
+                    },
+                    "value": "Other",
+                  },
+                ],
+                "Other": Array [
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Birth Registration",
+                      "description": "Label for radio option Birth Registration",
+                      "id": "formFields.docTypeBR",
+                    },
+                    "value": "Birth Registration",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "NID",
+                      "description": "Label for radio option NID",
+                      "id": "formFields.docTypeNID",
+                    },
+                    "value": "NID",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Passport",
+                      "description": "Label for radio option Passport",
+                      "id": "formFields.docTypePassport",
+                    },
+                    "value": "Passport",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "School Certificate",
+                      "description": "Label for radio option School Certificate",
+                      "id": "formFields.docTypeSC",
+                    },
+                    "value": "School Certificate",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "Other",
+                      "description": "Label for radio option Other",
+                      "id": "formFields.docTypeOther",
+                    },
+                    "value": "Other",
+                  },
+                ],
               },
-            ],
+            },
             "initialValue": "",
             "label": Object {
               "defaultMessage": "Which document type are you uploading?",
@@ -213,50 +489,8 @@ ShallowWrapper {
               "id": "formFields.whatDocToUpload",
             },
             "name": "whatDocToUpload",
-            "options": Array [
-              Object {
-                "label": Object {
-                  "defaultMessage": "Birth Registration",
-                  "description": "Label for radio option Birth Registration",
-                  "id": "formFields.docTypeBR",
-                },
-                "value": "Birth Registration",
-              },
-              Object {
-                "label": Object {
-                  "defaultMessage": "NID",
-                  "description": "Label for radio option NID",
-                  "id": "formFields.docTypeNID",
-                },
-                "value": "NID",
-              },
-              Object {
-                "label": Object {
-                  "defaultMessage": "Passport",
-                  "description": "Label for radio option Passport",
-                  "id": "formFields.docTypePassport",
-                },
-                "value": "Passport",
-              },
-              Object {
-                "label": Object {
-                  "defaultMessage": "School Certificate",
-                  "description": "Label for radio option School Certificate",
-                  "id": "formFields.docTypeSC",
-                },
-                "value": "School Certificate",
-              },
-              Object {
-                "label": Object {
-                  "defaultMessage": "Other",
-                  "description": "Label for radio option Other",
-                  "id": "formFields.docTypeOther",
-                },
-                "value": "Other",
-              },
-            ],
             "required": true,
-            "type": "RADIO_GROUP",
+            "type": "SELECT_WITH_DYNAMIC_OPTIONS",
             "validate": Array [],
           },
         ],
@@ -336,12 +570,171 @@ ShallowWrapper {
               "validate": Array [],
             },
             Object {
-              "conditionals": Array [
-                Object {
-                  "action": "hide",
-                  "expression": "!values.uploadDocForWhom",
+              "dynamicOptions": Object {
+                "dependency": "uploadDocForWhom",
+                "options": Object {
+                  "Child": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Proof of Place and Date of Birth",
+                        "description": "Label for select option Child Birth Proof",
+                        "id": "formFields.docTypeChildBirthProof",
+                      },
+                      "value": "Proof of Place and Date of Birth",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "EPI Card",
+                        "description": "Label for select option EPI Card",
+                        "id": "formFields.docTypeEPICard",
+                      },
+                      "value": "EPI Card",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Doctor Certificate",
+                        "description": "Label for select option Doctor Certificate",
+                        "id": "formFields.docTypeDoctorCertificate",
+                      },
+                      "value": "Doctor Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                  ],
+                  "Father": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Birth Registration",
+                        "description": "Label for radio option Birth Registration",
+                        "id": "formFields.docTypeBR",
+                      },
+                      "value": "Birth Registration",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "NID",
+                        "description": "Label for radio option NID",
+                        "id": "formFields.docTypeNID",
+                      },
+                      "value": "NID",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "formFields.docTypePassport",
+                      },
+                      "value": "Passport",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "formFields.docTypeOther",
+                      },
+                      "value": "Other",
+                    },
+                  ],
+                  "Mother": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Birth Registration",
+                        "description": "Label for radio option Birth Registration",
+                        "id": "formFields.docTypeBR",
+                      },
+                      "value": "Birth Registration",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "NID",
+                        "description": "Label for radio option NID",
+                        "id": "formFields.docTypeNID",
+                      },
+                      "value": "NID",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "formFields.docTypePassport",
+                      },
+                      "value": "Passport",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "formFields.docTypeOther",
+                      },
+                      "value": "Other",
+                    },
+                  ],
+                  "Other": Array [
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Birth Registration",
+                        "description": "Label for radio option Birth Registration",
+                        "id": "formFields.docTypeBR",
+                      },
+                      "value": "Birth Registration",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "NID",
+                        "description": "Label for radio option NID",
+                        "id": "formFields.docTypeNID",
+                      },
+                      "value": "NID",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "formFields.docTypePassport",
+                      },
+                      "value": "Passport",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "School Certificate",
+                        "description": "Label for radio option School Certificate",
+                        "id": "formFields.docTypeSC",
+                      },
+                      "value": "School Certificate",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "formFields.docTypeOther",
+                      },
+                      "value": "Other",
+                    },
+                  ],
                 },
-              ],
+              },
               "initialValue": "",
               "label": Object {
                 "defaultMessage": "Which document type are you uploading?",
@@ -349,50 +742,8 @@ ShallowWrapper {
                 "id": "formFields.whatDocToUpload",
               },
               "name": "whatDocToUpload",
-              "options": Array [
-                Object {
-                  "label": Object {
-                    "defaultMessage": "Birth Registration",
-                    "description": "Label for radio option Birth Registration",
-                    "id": "formFields.docTypeBR",
-                  },
-                  "value": "Birth Registration",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "NID",
-                    "description": "Label for radio option NID",
-                    "id": "formFields.docTypeNID",
-                  },
-                  "value": "NID",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "Passport",
-                    "description": "Label for radio option Passport",
-                    "id": "formFields.docTypePassport",
-                  },
-                  "value": "Passport",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "School Certificate",
-                    "description": "Label for radio option School Certificate",
-                    "id": "formFields.docTypeSC",
-                  },
-                  "value": "School Certificate",
-                },
-                Object {
-                  "label": Object {
-                    "defaultMessage": "Other",
-                    "description": "Label for radio option Other",
-                    "id": "formFields.docTypeOther",
-                  },
-                  "value": "Other",
-                },
-              ],
               "required": true,
-              "type": "RADIO_GROUP",
+              "type": "SELECT_WITH_DYNAMIC_OPTIONS",
               "validate": Array [],
             },
           ],

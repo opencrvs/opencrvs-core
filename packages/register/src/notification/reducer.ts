@@ -8,6 +8,7 @@ export type NotificationState = {
   syncCount: number
   waitingSW: ServiceWorker | null
   sessionExpired: boolean
+  saveDraftClicked: boolean
 }
 
 export const initialState: NotificationState = {
@@ -16,7 +17,8 @@ export const initialState: NotificationState = {
   configurationErrorVisible: false,
   syncCount: 0,
   waitingSW: null,
-  sessionExpired: false
+  sessionExpired: false,
+  saveDraftClicked: false
 }
 
 export const notificationReducer: LoopReducer<
@@ -64,6 +66,11 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         configurationErrorVisible: false
+      }
+    case actions.TOGGLE_DRAFT_SAVED_NOTIFICATION:
+      return {
+        ...state,
+        saveDraftClicked: !state.saveDraftClicked
       }
     default:
       return state

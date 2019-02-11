@@ -13,6 +13,7 @@ import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql'
 export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
   fetchBirthRegistration?: GQLBirthRegistration
+  queryRegistrationByIdentifier?: GQLBirthRegistration
   listBirthRegistrations?: GQLBirthRegResultSet
   listDeathRegistrations?: GQLDeathRegResultSet
   locationsByParent?: Array<GQLLocation | null>
@@ -235,6 +236,7 @@ export interface GQLRegistration {
 }
 
 export enum GQLRegistrationContactType {
+  BOTH = 'BOTH',
   MOTHER = 'MOTHER',
   FATHER = 'FATHER'
 }
@@ -648,6 +650,9 @@ export interface GQLResolver {
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
+  queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<
+    TParent
+  >
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
@@ -684,6 +689,21 @@ export interface QueryToFetchBirthRegistrationResolver<
   (
     parent: TParent,
     args: QueryToFetchBirthRegistrationArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToQueryRegistrationByIdentifierArgs {
+  identifier: string
+}
+export interface QueryToQueryRegistrationByIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToQueryRegistrationByIdentifierArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

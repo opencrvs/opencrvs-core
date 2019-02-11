@@ -103,6 +103,15 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
                         type: 'REGISTERED',
                         comments: [
                           {
@@ -157,6 +166,15 @@ describe('WorkQueue tests', async () => {
                           name: 'Kaliganj Union Sub Center',
                           alias: ['']
                         },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
                         type: 'REGISTERED',
                         comments: [
                           {
@@ -200,7 +218,6 @@ describe('WorkQueue tests', async () => {
     await new Promise(resolve => {
       setTimeout(resolve, 100)
     })
-    console.log(testComponent.component.debug())
     testComponent.component.update()
     const data = testComponent.component.find(DataTable).prop('data')
     expect(data).toEqual([
@@ -217,7 +234,7 @@ describe('WorkQueue tests', async () => {
         duplicates: null,
         status: [
           {
-            location: 'Kaliganj Union Sub Center',
+            officeName: 'Kaliganj Union Sub Center',
             timestamp: '2018-12-07',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
@@ -240,7 +257,7 @@ describe('WorkQueue tests', async () => {
         duplicates: null,
         status: [
           {
-            location: 'Kaliganj Union Sub Center',
+            officeName: 'Kaliganj Union Sub Center',
             timestamp: '2018-12-07',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
@@ -346,6 +363,15 @@ describe('WorkQueue tests', async () => {
                             id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
+                          },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
                           },
                           type: 'DECLARED',
                           comments: [
@@ -474,6 +500,15 @@ describe('WorkQueue tests', async () => {
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
+                          },
                           type: 'REGISTERED',
                           comments: [
                             {
@@ -589,6 +624,15 @@ describe('WorkQueue tests', async () => {
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
+                          },
                           type: 'REGISTERED',
                           comments: [
                             {
@@ -619,6 +663,15 @@ describe('WorkQueue tests', async () => {
                             id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
+                          },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
                           },
                           type: 'APPLICATION',
                           comments: [
@@ -651,6 +704,15 @@ describe('WorkQueue tests', async () => {
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
+                          },
                           type: 'COLLECTED',
                           comments: [
                             {
@@ -681,6 +743,15 @@ describe('WorkQueue tests', async () => {
                             id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
+                          },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
                           },
                           type: 'REJECTED',
                           comments: [
@@ -736,6 +807,15 @@ describe('WorkQueue tests', async () => {
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
+                          },
                           type: 'APPLICATION',
                           comments: [
                             {
@@ -789,6 +869,15 @@ describe('WorkQueue tests', async () => {
                             id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
+                          },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
                           },
                           type: 'REJECTED',
                           comments: [
@@ -844,6 +933,15 @@ describe('WorkQueue tests', async () => {
                             id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
+                          },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
                           },
                           type: 'COLLECTED',
                           comments: [
@@ -966,6 +1064,15 @@ describe('WorkQueue tests', async () => {
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
                           },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
+                          },
                           type: 'DECLARED',
                           comments: [
                             {
@@ -1078,6 +1185,15 @@ describe('WorkQueue tests', async () => {
                             id: '123',
                             name: 'Kaliganj Union Sub Center',
                             alias: ['']
+                          },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
                           },
                           type: 'CERTIFIED',
                           comments: [
