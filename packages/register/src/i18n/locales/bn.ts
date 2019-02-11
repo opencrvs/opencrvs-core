@@ -517,13 +517,12 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
-    'register.home.hedaer.hello': 'Hello {fullName}',
-    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
-    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
-    'register.home.hedaer.LOCAL_REGISTRAR': 'রেজিস্ট্রার',
-    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
-    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar',
+    'register.home.header.FIELD_AGENT': 'Field Agent',
+    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.header.LOCAL_REGISTRAR': 'রেজিস্ট্রার',
+    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.header.STATE_REGISTRAR': 'State Registrar',
+    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
     'register.notification.newContentAvailable':
       'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
@@ -842,19 +841,19 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',
-    'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন} 
+    'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন}
       certificate {সনদপত্র} offlineEvent {আবেদন }} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
       rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {সংযুক্তি স্থগিত}}`,
     'register.confirmationScreen.headerDesc': `{event, select, declaration {তথ্য বিবরনী ঘোষণা} registration {} duplication {তথ্য বিবরনী আবেদন} certificate {}
       offlineEvent {তথ্য বিবরনী ঘোষণাটি}} {action, select, submitted {বৈধতার জন্য পর্যালোচিত হচ্ছে।} completed {} rejected {প্রত্যাখ্যাত হচ্ছে।} approved {অনুমোদিত হচ্ছে।}
       registered {নিবন্ধভুক্তকরন করা হচ্ছে।} offlineAction {ডিভাইসে ইন্টারনেট সংযোগ কালীন স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।}}`,
-    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত!} submitted {সমাপ্ত!} rejected {আবেদন প্রত্যাখ্যাত!} 
+    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত!} submitted {সমাপ্ত!} rejected {আবেদন প্রত্যাখ্যাত!}
       approved {আবেদন অনুমোদিত}  registered {আবেদন নিবন্ধভুক্তকরন} offlineAction {সম্পূর্ণ হচ্ছে}}`,
-    'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {রেজিস্ট্রেশন সম্পূর্ণ হলে অথবা প্রক্রিয়ায় কোন বিলম্ব থাকলে আপনাকে OpenCRVS এর মাধ্যমে জানানো হবে।} 
-      registration {নিবন্ধন প্রক্রিয়া সম্পূর্ণ।} duplication {} certificate {} 
+    'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {রেজিস্ট্রেশন সম্পূর্ণ হলে অথবা প্রক্রিয়ায় কোন বিলম্ব থাকলে আপনাকে OpenCRVS এর মাধ্যমে জানানো হবে।}
+      registration {নিবন্ধন প্রক্রিয়া সম্পূর্ণ।} duplication {} certificate {}
       offlineEvent {পরবর্তী 7 দিনের মধ্যে ডিভাইসে ইন্টারনেট সংযোগ স্থাপন করার পরে আপনাকে লগইন করতে হবে। OpenCRVS স্বয়ংক্রিয়ভাবে ফর্ম জমা দেবে, তাই আপনাকে অন্য কিছু করার প্রয়োজন হবে না।}}`,
     'register.confirmationScreen.nextSectionDescDetails': `{event, select, declaration {
-      ইনফরম্যান্ট তাদের যোগাযোগের বিবরণ দিয়েছেন এবং যখন নিবন্ধন সম্পূর্ণ হবে তখন জানানো হবে।} registration {সনদপত্রটি তথ্য সরবরাহকারী সংগ্রহ করতে গেলেই কেবল মুদ্রণ করতে হবে।} 
+      ইনফরম্যান্ট তাদের যোগাযোগের বিবরণ দিয়েছেন এবং যখন নিবন্ধন সম্পূর্ণ হবে তখন জানানো হবে।} registration {সনদপত্রটি তথ্য সরবরাহকারী সংগ্রহ করতে গেলেই কেবল মুদ্রণ করতে হবে।}
       duplication {} certificate {} offlineEvent {আবেদন একবার সফলভাবে জমা দেয়ার পর রেজিস্ট্রেশন সম্পূর্ণ হলে আপনাকে  এবং সংবাদদাতাকে অবহিত করা হবে।}}`,
     'register.confirmationScreen.nextCard.title': 'পরবর্তী',
     'register.confirmationScreen.rejectedNoticeCardText2':
@@ -863,9 +862,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.buttons.newDeclaration': 'নতুন আবেদন',
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {জন্ম নিবন্ধন নম্বর : } duplication {জন্ম নিবন্ধন নম্বর : } certificate {} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }} `,
-    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
-      registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} 
-      duplication {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} 
+    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}
+      registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।}
+      duplication {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।}
       offlineEvent {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}} `,
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select,declaration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা } registration { এর জন্ম নিবন্ধন}
      duplication { এর জন্ম নিবন্ধন নকল} certificate { এর জন্ম নিবন্ধন সনদ} offlineEvent {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা }}`,
