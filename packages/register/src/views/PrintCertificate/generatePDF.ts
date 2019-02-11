@@ -393,6 +393,16 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
           font: 'notosansbn',
           bold: true,
           alignment: 'center'
+        },
+        {
+          text: 'Date of issue',
+          alignment: 'center',
+          margin: [0, 10, 0, 0]
+        },
+        {
+          text: 'প্রদান এর তারিখ',
+          alignment: 'center',
+          font: 'notosansbn'
         }
       ]
     ],

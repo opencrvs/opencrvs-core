@@ -13,7 +13,11 @@ import {
   createPaymentReconciliationTemplate,
   CERTIFICATE_DOCS_CODE,
   CERTIFICATE_DOCS_TITLE,
-  CERTIFICATE_CONTEXT_KEY
+  CERTIFICATE_CONTEXT_KEY,
+  BIRTH_ENCOUNTER_CODE,
+  DEATH_ENCOUNTER_CODE,
+  INFORMANT_CODE,
+  INFORMANT_TITLE
 } from 'src/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -24,7 +28,10 @@ import { FHIR_URL } from 'src/constants'
 import { IAuthHeader } from 'src/common-types'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE,
+  BIRTH_REG_NO,
+  DEATH_REG_NO
 } from './constants'
 
 export function findCompositionSectionInBundle(
@@ -82,20 +89,23 @@ export function selectOrCreatePersonResource(
 }
 
 export function selectOrCreateEncounterResource(
-  sectionCode: string,
-  fhirBundle: ITemplatedBundle
+  fhirBundle: ITemplatedBundle,
+  context: any
 ): fhir.Encounter {
+  let sectionCode
+  if (context.event === EVENT_TYPE.BIRTH) {
+    sectionCode = BIRTH_ENCOUNTER_CODE
+  } else if (context.event === EVENT_TYPE.DEATH) {
+    sectionCode = DEATH_ENCOUNTER_CODE
+  } else {
+    throw new Error(`Unknown event ${context}`)
+  }
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
   let encounterEntry
 
   if (!section) {
     const ref = uuid()
-    let encounterSection
-    if (sectionCode === 'birth-encounter') {
-      encounterSection = createEncounterSection(ref)
-    } else {
-      throw new Error(`Unknown section code ${sectionCode}`)
-    }
+    const encounterSection = createEncounterSection(ref, sectionCode)
     fhirBundle.entry[0].resource.section.push(encounterSection)
     encounterEntry = createEncounter(ref)
     fhirBundle.entry.push(encounterEntry)
@@ -200,12 +210,11 @@ export function createObservationResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.Observation {
-  const encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle)
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
 
   const ref = uuid()
   const observationEntry = createObservationEntryTemplate(ref)
-
   if (!section || !section.entry || !section.entry[0]) {
     throw new Error('Expected encounter section to exist and have an entry')
   }
@@ -230,7 +239,7 @@ export function selectOrCreateLocationRefResource(
 ): fhir.Location {
   let locationEntry
 
-  const encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle)
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
 
   if (!encounter.location) {
     // create location
@@ -261,10 +270,10 @@ export function selectOrCreateLocationRefResource(
 }
 
 export function selectOrCreateEncounterLocationRef(
-  sectionCode: string,
-  fhirBundle: ITemplatedBundle
+  fhirBundle: ITemplatedBundle,
+  context: any
 ): fhir.Reference {
-  const encounter = selectOrCreateEncounterResource(sectionCode, fhirBundle)
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
   if (!encounter.location) {
     encounter.location = []
     encounter.location.push({
@@ -355,6 +364,71 @@ export function selectOrCreateCertificateDocRefResource(
     }
   }
   return docRef
+}
+
+export function selectOrCreateInformantSection(
+  sectionCode: string,
+  sectionTitle: string,
+  fhirBundle: ITemplatedBundle
+): fhir.RelatedPerson {
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+
+  let informantEntry
+  if (!section) {
+    // create person
+    const ref = uuid()
+    const informantSection = createPersonSection(ref, sectionCode, sectionTitle)
+    const composition = fhirBundle.entry[0].resource
+    composition.section.push(informantSection)
+    informantEntry = createRelatedPersonTemplate(ref)
+    fhirBundle.entry.push(informantEntry)
+  } else {
+    if (!section.entry || !section.entry[0]) {
+      throw new Error('Expected person section ot have an entry')
+    }
+    const personSectionEntry = section.entry[0]
+    informantEntry = fhirBundle.entry.find(
+      entry => entry.fullUrl === personSectionEntry.reference
+    )
+  }
+
+  if (!informantEntry) {
+    throw new Error(
+      'Informant referenced from composition section not found in FHIR bundle'
+    )
+  }
+
+  return informantEntry.resource as fhir.RelatedPerson
+}
+
+export function selectOrCreateInformantResource(
+  fhirBundle: ITemplatedBundle
+): fhir.Patient {
+  const relatedPersonResource = selectOrCreateInformantSection(
+    INFORMANT_CODE,
+    INFORMANT_TITLE,
+    fhirBundle
+  )
+  const patientRef =
+    relatedPersonResource.patient && relatedPersonResource.patient.reference
+  if (!patientRef) {
+    const personEntry = createPersonEntryTemplate(uuid())
+    fhirBundle.entry.push(personEntry)
+    relatedPersonResource.patient = {
+      reference: personEntry.fullUrl
+    }
+    return personEntry.resource as fhir.Patient
+  } else {
+    const personEntry = fhirBundle.entry.find(
+      entry => entry.fullUrl === patientRef
+    )
+    if (!personEntry) {
+      throw new Error(
+        'No related informant person entry not found on fhir bundle'
+      )
+    }
+    return personEntry.resource as fhir.Patient
+  }
 }
 
 export function selectOrCreateRelatedPersonResource(
@@ -640,10 +714,18 @@ export async function getTrackingIdFromResponse(
   return compositionBundle.identifier.value
 }
 
-export async function getBRNFromResponse(
+export async function getRegistrationNumberFromResponse(
   resBody: fhir.Bundle,
+  eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
+  let registrationNumber: string
+
+  if (eventType === EVENT_TYPE.BIRTH) {
+    registrationNumber = BIRTH_REG_NO
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    registrationNumber = DEATH_REG_NO
+  }
   let path
   if (isTaskResponse(resBody)) {
     path = `/Task/${getIDFromResponse(resBody)}`
@@ -651,26 +733,27 @@ export async function getBRNFromResponse(
     path = `/Task?focus=Composition/${getIDFromResponse(resBody)}`
   }
   const taskBundle = await fetchFHIR(path, authHeader)
-
   let taskResource
   if (taskBundle && taskBundle.entry && taskBundle.entry[0].resource) {
     taskResource = taskBundle.entry[0].resource
   } else if (taskBundle.resourceType === 'Task') {
     taskResource = taskBundle
   } else {
-    throw new Error('getBRNFromResponse: Invalid task found')
+    throw new Error('getRegistrationNumberFromResponse: Invalid task found')
   }
-  const brnIdentifier =
+  const regIdentifier =
     taskResource.identifier &&
     taskResource.identifier.find(
       (identifier: fhir.Identifier) =>
         identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+        `${OPENCRVS_SPECIFICATION_URL}id/${registrationNumber}`
     )
-  if (!brnIdentifier || !brnIdentifier.value) {
-    throw new Error('getBRNFromResponse: Task does not have any brn identifier')
+  if (!regIdentifier || !regIdentifier.value) {
+    throw new Error(
+      'getRegistrationNumberFromResponse: Task does not have any registration identifier'
+    )
   }
-  return brnIdentifier.value
+  return regIdentifier.value
 }
 
 export function getIDFromResponse(resBody: fhir.Bundle): string {

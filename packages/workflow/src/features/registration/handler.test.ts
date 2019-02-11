@@ -13,7 +13,8 @@ import {
   unionMock,
   officeMock,
   testFhirBundleForDeath,
-  testFhirBundleWithIdsForDeath
+  testFhirBundleWithIdsForDeath,
+  testDeathFhirBundle
 } from '../../test/utils'
 import { cloneDeep } from 'lodash'
 
@@ -42,7 +43,7 @@ describe('Verify handler', () => {
         [officeMock, { status: 200 }]
       )
     })
-    it('returns OK for a correctly authenticated user', async () => {
+    it('returns OK for a correctly authenticated user  with birth declaration', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -71,6 +72,42 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('returns OK for a correctly authenticated user with death declaration', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+      jest
+        .spyOn(require('./utils'), 'sendEventNotification')
+        .mockReturnValue('')
+
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }

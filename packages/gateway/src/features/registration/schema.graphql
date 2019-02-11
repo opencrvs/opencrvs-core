@@ -210,8 +210,6 @@ type DeathRegistration { # -> Composition
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  mother: Person # -> Only use for foetal death -> .section(code='mother-details').entry.reference
-  father: Person # -> Only use for foetal death -> .section(code='father-details').entry.reference
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
   informantRelationship: RelationshipType # -> RelatedPerson.relationship
   otherInformantRelationship: String # -> RelatedPerson.relationship
@@ -325,6 +323,7 @@ type Query {
     count: Int
     skip: Int
   ): BirthRegResultSet
+  fetchDeathRegistration(id: ID!): DeathRegistration
   listDeathRegistrations(
     locationIds: [String]
     status: String
@@ -351,17 +350,13 @@ type Mutation {
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): ID!
-  updateDeathRegistration(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): DeathRegistration!
+  updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   # process transitions
-  markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
-  markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
-  markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'certified' - a printed certificate has been produced
-  markDeathAsVoided(
+  markDeathAsVerified(
     id: ID!
-    reason: String!
-    location: LocationInput
-  ): DeathRegistration # updated status to 'voided' - the registration was captured in error
+    details: DeathRegistrationInput
+  ): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsVoided(id: ID!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
 }
