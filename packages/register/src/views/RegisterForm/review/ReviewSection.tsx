@@ -53,7 +53,8 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   ISelectOption,
   IDynamicOptions,
-  IFormSectionData
+  IFormSectionData,
+  WARNING
 } from 'src/forms'
 
 const messages = defineMessages({
@@ -563,7 +564,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       return !conditionalActions.includes('hide')
     }
     const isViewOnly = (field: IFormField) => {
-      return [LIST, PARAGRAPH].find(type => type === field.type)
+      return [LIST, PARAGRAPH, WARNING].find(type => type === field.type)
     }
 
     const numberOfErrors = flatten(
