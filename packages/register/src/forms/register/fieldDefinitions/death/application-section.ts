@@ -23,7 +23,8 @@ import { countries } from 'src/forms/countries'
 import {
   messages as identityMessages,
   identityNameMapper,
-  identityTypeMapper
+  identityTypeMapper,
+  deathIdentityOptions
 } from '../../../identity'
 import { messages as addressMessages } from '../../../address'
 
@@ -46,11 +47,6 @@ const messages = defineMessages({
     id: 'formFields.applicantsIdType',
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
-  },
-  noId: {
-    id: 'formFields.idTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
   },
   applicantsGivenNames: {
     id: 'formFields.applicantsGivenNames',
@@ -159,24 +155,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
-        { value: 'NO_ID', label: messages.noId }
-      ]
+      options: deathIdentityOptions
     },
     {
       name: 'applicantID',

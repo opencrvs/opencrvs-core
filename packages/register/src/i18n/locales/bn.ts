@@ -426,7 +426,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.tabs.deceasedTab': 'মৃত',
     'register.form.section.deceasedTitle': 'মৃতের বিবরণ',
     'formFields.deceasedIdType': 'বিদ্যমান আইডি',
-    'formFields.idTypeNoID': 'আইডি পাওয়া যায় নি',
+    'formFields.iDTypeNoID': 'আইডি পাওয়া যায় নি',
     'formFields.deceasedGivenNames': 'প্রদত্ত নাম',
     'formFields.deceasedFamilyName': 'পরিবারের নাম',
     'formFields.deceasedGivenNamesEng': 'প্রদত্ত নাম (in english)',

@@ -5,7 +5,11 @@ export const NATIONAL_ID = 'NATIONAL_ID'
 export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
 export const PASSPORT = 'PASSPORT'
 export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
+export const DRIVING_LICENCE = 'DRIVING_LICENCE'
+export const REFUGEE_NUMBER = 'REFUGEE_NUMBER'
+export const ALIEN_NUMBER = 'ALIEN_NUMBER'
 export const OTHER = 'OTHER'
+export const NO_ID = 'NO_ID'
 
 export const messages = defineMessages({
   iDType: {
@@ -53,6 +57,11 @@ export const messages = defineMessages({
     defaultMessage: 'Other',
     description: 'Option for form field: Type of ID'
   },
+  iDTypeNoId: {
+    id: 'formFields.iDTypeNoID',
+    defaultMessage: 'No ID available',
+    description: 'Option for form field: Type of ID'
+  },
   iDTypeOtherLabel: {
     id: 'formFields.iDTypeOtherLabel',
     defaultMessage: 'Other type of ID',
@@ -72,6 +81,26 @@ export const birthIdentityOptions = [
     label: messages.iDTypeBRN
   },
   { value: PASSPORT, label: messages.iDTypePassport },
+  { value: OTHER, label: messages.iDTypeOther }
+]
+
+export const deathIdentityOptions = [
+  { value: PASSPORT, label: messages.iDTypePassport },
+  { value: NATIONAL_ID, label: messages.iDTypeNationalID },
+  {
+    value: DRIVING_LICENCE,
+    label: messages.iDTypeDrivingLicence
+  },
+  {
+    value: BIRTH_REGISTRATION_NUMBER,
+    label: messages.iDTypeBRN
+  },
+  {
+    value: REFUGEE_NUMBER,
+    label: messages.iDTypeRefugeeNumber
+  },
+  { value: ALIEN_NUMBER, label: messages.iDTypeAlienNumber },
+  { value: NO_ID, label: messages.iDTypeNoId },
   { value: OTHER, label: messages.iDTypeOther }
 ]
 

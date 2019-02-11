@@ -425,7 +425,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.tabs.deceasedTab': 'Deceased',
     'register.form.section.deceasedTitle': "Deceased's details",
     'formFields.deceasedIdType': 'Existing ID',
-    'formFields.idTypeNoID': 'No ID available',
+    'formFields.iDTypeNoID': 'No ID available',
     'formFields.deceasedGivenNames': 'Given Name (s)',
     'formFields.deceasedFamilyName': 'Family Name',
     'formFields.deceasedGivenNamesEng': 'Given Name (s) in English',
