@@ -8,17 +8,24 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
   RADIO_GROUP,
-  TEL
+  TEL,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate
+  isValidBirthDate,
+  validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  identityNameMapper,
+  identityTypeMapper,
+  deathIdentityOptions
+} from '../../../identity'
 import { messages as addressMessages } from '../../../address'
 
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
@@ -28,16 +35,17 @@ import {
   fieldValueSectionExchangeTransformer,
   fieldToAddressTransformer,
   fieldToIdentifierTransformer,
-  nameTransformer,
+  fieldToNameTransformer,
   fieldNameTransformer,
   fieldToArrayTransformer,
-  copyAddressTransformer
+  copyAddressTransformer,
+  fieldToPhoneNumberTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 
 import {
   fieldValueNestingTransformer,
   OBJECT_TYPE
-} from 'src/forms/register/fieldDefinitions/death/mutation/applicant-mapping'
+} from './mappings/mutation/applicant-mapping'
 
 const messages = defineMessages({
   applicantTab: {
@@ -54,11 +62,6 @@ const messages = defineMessages({
     id: 'formFields.applicantsIdType',
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
-  },
-  noId: {
-    id: 'formFields.idTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
   },
   applicantsGivenNames: {
     id: 'formFields.applicantsGivenNames',
@@ -163,30 +166,13 @@ export const applicantsSection: IFormSection = {
   title: messages.applicantTitle,
   fields: [
     {
-      name: 'applicantIdType',
+      name: 'iDType',
       type: SELECT_WITH_OPTIONS,
       label: messages.applicantsIdType,
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
-        { value: 'NO_ID', label: messages.noId }
-      ],
+      options: deathIdentityOptions,
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
@@ -195,8 +181,33 @@ export const applicantsSection: IFormSection = {
       }
     },
     {
-      name: 'applicantID',
+      name: 'iDTypeOther',
       type: TEXT,
+      label: identityMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.iDType]
+    },
+    {
+      name: 'applicantID',
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',
@@ -219,7 +230,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('bn', 'firstNames'),
+          fieldToNameTransformer('bn', 'firstNames'),
           OBJECT_TYPE.NAME
         )
       }
@@ -234,7 +245,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('bn', 'familyName'),
+          fieldToNameTransformer('bn', 'familyName'),
           OBJECT_TYPE.NAME
         )
       }
@@ -249,7 +260,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('en', 'firstNames'),
+          fieldToNameTransformer('en', 'firstNames'),
           OBJECT_TYPE.NAME
         )
       }
@@ -264,7 +275,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('en', 'familyName'),
+          fieldToNameTransformer('en', 'familyName'),
           OBJECT_TYPE.NAME
         )
       }
@@ -339,7 +350,13 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsPhone,
       required: false,
       initialValue: '',
-      validate: [phoneNumberFormat]
+      validate: [phoneNumberFormat],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToPhoneNumberTransformer
+        )
+      }
     },
     {
       name: 'currentAddress',

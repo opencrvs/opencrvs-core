@@ -316,7 +316,7 @@ export const mockApplicationData = {
     familyName: 'গায়ত্রী',
     firstNamesEng: 'Liz',
     familyNameEng: 'Test',
-    iD: '654651',
+    iD: '6546511876932',
     iDType: 'NATIONAL_ID',
     motherBirthDate: '1949-05-31',
     dateOfMarriage: '1972-09-19',
@@ -347,8 +347,8 @@ export const mockApplicationData = {
     familyName: 'স্পিভক',
     firstNamesEng: 'Jeff',
     familyNameEng: 'Test',
-    iD: '43468',
-    iDType: 'NATIONAL_ID',
+    iD: '43A8ZU817',
+    iDType: 'PASSPORT',
     fatherBirthDate: '1950-05-19',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
@@ -383,7 +383,7 @@ export const mockApplicationData = {
 export const mockDeathApplicationData = {
   deceased: {
     iDType: 'NATIONAL_ID',
-    iD: '123',
+    iD: '1230000000000',
     firstNames: 'মকবুল',
     familyName: 'ইসলাম',
     firstNamesEng: 'Mokbul',
@@ -414,7 +414,8 @@ export const mockDeathApplicationData = {
   },
   informant: {
     applicantIdType: 'NATIONAL_ID',
-    applicantID: '123',
+    iDType: 'NATIONAL_ID',
+    applicantID: '1230000000000',
     applicantFirstNames: '',
     applicantFamilyName: 'ইসলাম',
     applicantFirstNamesEng: 'Islam',

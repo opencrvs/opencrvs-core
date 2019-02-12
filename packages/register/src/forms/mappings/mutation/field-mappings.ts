@@ -1,6 +1,6 @@
 import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
 
-export const nameTransformer = (
+export const fieldToNameTransformer = (
   language: string,
   transformedFieldName?: string
 ) => (
@@ -27,6 +27,16 @@ export const nameTransformer = (
   personName[!transformedFieldName ? field.name : transformedFieldName] =
     draftData[sectionId][field.name]
 
+  return transformedData
+}
+
+export function ignoreFieldTransformer(
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) {
+  /* do nothing */
   return transformedData
 }
 
@@ -251,5 +261,19 @@ export function fieldToAttachmentTransformer(
     }
     transformedData[selectedSectionId].attachments = attachments
   }
+  return transformedData
+}
+
+export const fieldToPhoneNumberTransformer = (
+  transformedSectionId?: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  transformedData[
+    transformedSectionId ? transformedSectionId : sectionId
+  ].telecom = [{ system: 'phone', value: draftData[sectionId][field.name] }]
   return transformedData
 }
