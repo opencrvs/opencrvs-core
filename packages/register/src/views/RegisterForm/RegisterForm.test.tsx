@@ -401,7 +401,7 @@ describe('When user is in Preview section death event', async () => {
     component = nTestComponent.component
   })
 
-  it.only('Should be able to submit the form', () => {
+  it('Should be able to submit the form', () => {
     component
       .find('#next_button_deceased')
       .hostNodes()
