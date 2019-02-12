@@ -355,6 +355,11 @@ describe('when user wants to print certificate', async () => {
       defaultMessage: 'Passport',
       description: 'Option for form field: Type of ID'
     })
+    expect(identityNameMapper('DRIVING_LICENSE')).toEqual({
+      id: 'formFields.iDTypeDrivingLicense',
+      defaultMessage: 'Drivers License',
+      description: 'Option for form field: Type of ID'
+    })
     expect(identityNameMapper('BIRTH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeBRN',
       defaultMessage: 'Birth Registration Number',

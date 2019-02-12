@@ -299,7 +299,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.iDType': 'Type of ID',
     'formFields.iDTypePassport': 'Passport',
     'formFields.iDTypeNationalID': 'National ID',
-    'formFields.iDTypeDrivingLicence': 'Drivers Licence',
+    'formFields.iDTypeDrivingLicense': 'Drivers License',
     'formFields.iDTypeBRN': 'Birth Registration Number',
     'formFields.iDTypeDRN': 'Death Registration Number',
     'formFields.iDTypeRefugeeNumber': 'Refugee Number',

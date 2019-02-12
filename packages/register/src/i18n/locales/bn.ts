@@ -300,7 +300,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.iDType': 'আইডি প্রকার',
     'formFields.iDTypePassport': 'পাসপোর্ট',
     'formFields.iDTypeNationalID': 'জাতীয় পরিচয় পত্র',
-    'formFields.iDTypeDrivingLicence': 'চালনার অনুমতিপত্র',
+    'formFields.iDTypeDrivingLicense': 'চালনার অনুমতিপত্র',
     'formFields.iDTypeBRN': 'জন্ম নিবন্ধন নম্বর',
     'formFields.iDTypeDRN': 'মৃত্যু নিবন্ধন সংখ্যা',
     'formFields.iDTypeRefugeeNumber': 'শরণার্থী নিবন্ধন সংখ্যা',
