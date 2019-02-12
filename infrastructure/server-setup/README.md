@@ -22,7 +22,12 @@ ssh into the leader manager and run the following, replacing the values with the
 printf "<clickatell-user>" | docker secret create clickatell-user -
 printf "<clickatell-password>" | docker secret create clickatell-password -
 printf "<clickatell-api-id>" | docker secret create clickatell-api-id -
+
+printf "<infobip-gateway-endpoint>" | docker secret create infobip-gateway-endpoint -
+printf "<infobip-api-key>" | docker secret create infobip-api-key
 ```
+
+After creating the secrets make sure the commands are removed from the shell history
 
 Now, from the root folder of the repository run the deployment as follows:
 
