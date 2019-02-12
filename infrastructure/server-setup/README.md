@@ -24,7 +24,7 @@ printf "<clickatell-password>" | docker secret create clickatell-password -
 printf "<clickatell-api-id>" | docker secret create clickatell-api-id -
 
 printf "<infobip-gateway-endpoint>" | docker secret create infobip-gateway-endpoint -
-printf "<infobip-api-key>" | docker secret create infobip-api-key
+printf "<infobip-api-key>" | docker secret create infobip-api-key -
 ```
 
 After creating the secrets make sure the commands are removed from the shell history
