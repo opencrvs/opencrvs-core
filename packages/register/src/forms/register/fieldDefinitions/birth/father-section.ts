@@ -37,7 +37,7 @@ import { iDType } from 'src/views/PrintCertificate/ParentDetails'
 import { IFormSection } from '../../../index'
 import { conditionals } from '../../../utils'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   fieldToArrayTransformer,
   fieldToIdentifierTransformer,
   fieldToAddressTransformer,
@@ -47,7 +47,7 @@ import {
 } from 'src/forms/mappings/mutation/field-mappings'
 
 import {
-  nameFieldTransformer,
+  nameToFieldTransformer,
   fieldValueTransformer,
   arrayToFieldTransformer,
   identifierToFieldTransformer,
@@ -240,8 +240,8 @@ export const fatherSection: IFormSection = {
       validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -253,8 +253,8 @@ export const fatherSection: IFormSection = {
       validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -266,8 +266,8 @@ export const fatherSection: IFormSection = {
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames')
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -279,8 +279,8 @@ export const fatherSection: IFormSection = {
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName')
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
       }
     },
     {

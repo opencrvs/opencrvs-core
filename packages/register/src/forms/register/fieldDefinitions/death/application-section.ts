@@ -28,16 +28,17 @@ import {
   fieldValueSectionExchangeTransformer,
   fieldToAddressTransformer,
   fieldToIdentifierTransformer,
-  nameTransformer,
+  fieldToNameTransformer,
   fieldNameTransformer,
   fieldToArrayTransformer,
-  copyAddressTransformer
+  copyAddressTransformer,
+  fieldToPhoneNumberTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 
 import {
   fieldValueNestingTransformer,
   OBJECT_TYPE
-} from 'src/forms/register/fieldDefinitions/death/mutation/applicant-mapping'
+} from './mappings/mutation/applicant-mapping'
 
 const messages = defineMessages({
   applicantTab: {
@@ -219,7 +220,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('bn', 'firstNames'),
+          fieldToNameTransformer('bn', 'firstNames'),
           OBJECT_TYPE.NAME
         )
       }
@@ -234,7 +235,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('bn', 'familyName'),
+          fieldToNameTransformer('bn', 'familyName'),
           OBJECT_TYPE.NAME
         )
       }
@@ -249,7 +250,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('en', 'firstNames'),
+          fieldToNameTransformer('en', 'firstNames'),
           OBJECT_TYPE.NAME
         )
       }
@@ -264,7 +265,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          nameTransformer('en', 'familyName'),
+          fieldToNameTransformer('en', 'familyName'),
           OBJECT_TYPE.NAME
         )
       }
@@ -339,7 +340,13 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsPhone,
       required: false,
       initialValue: '',
-      validate: [phoneNumberFormat]
+      validate: [phoneNumberFormat],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToPhoneNumberTransformer
+        )
+      }
     },
     {
       name: 'currentAddress',

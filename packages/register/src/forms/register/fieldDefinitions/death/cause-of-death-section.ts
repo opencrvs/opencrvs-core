@@ -8,7 +8,10 @@ import {
 import { defineMessages } from 'react-intl'
 import { maxLength, isNumber } from 'src/utils/validate'
 import { conditionals } from 'src/forms/utils'
-import { sectionFieldToBundleFieldTransformer } from 'src/forms/mappings/mutation/field-mappings'
+import {
+  sectionFieldToBundleFieldTransformer,
+  ignoreFieldTransformer
+} from 'src/forms/mappings/mutation/field-mappings'
 
 const messages = defineMessages({
   causeOfDeathTab: {
@@ -85,7 +88,10 @@ export const causeOfDeathSection: IFormSection = {
           label: messages.deny
         },
         { value: true, label: messages.confirm }
-      ]
+      ],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'methodOfCauseOfDeath',

@@ -7,7 +7,7 @@ import {
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 
-export const nameFieldTransformer = (
+export const nameToFieldTransformer = (
   language: string,
   transformedFieldName?: string
 ) => (

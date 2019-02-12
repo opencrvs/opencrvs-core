@@ -34,7 +34,7 @@ import { conditionals } from '../../../utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { iDType } from 'src/views/PrintCertificate/ParentDetails'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   fieldToArrayTransformer,
   fieldToIdentifierTransformer,
   fieldToAddressTransformer,
@@ -42,7 +42,7 @@ import {
   copyAddressTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import {
-  nameFieldTransformer,
+  nameToFieldTransformer,
   fieldValueTransformer,
   arrayToFieldTransformer,
   identifierToFieldTransformer,
@@ -200,8 +200,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -212,8 +212,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -224,8 +224,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames')
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -236,8 +236,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName')
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
       }
     },
     {

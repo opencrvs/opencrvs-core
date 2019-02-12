@@ -24,14 +24,14 @@ import { messages as addressMessages } from '../../../address'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { conditionals } from 'src/forms/utils'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   fieldToArrayTransformer,
   fieldToIdentifierTransformer,
   fieldToAddressTransformer,
   copyAddressTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import {
-  nameFieldTransformer,
+  nameToFieldTransformer,
   arrayToFieldTransformer,
   identifierToFieldTransformer,
   addressToFieldTransformer,
@@ -190,8 +190,8 @@ export const deceasedSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -202,8 +202,8 @@ export const deceasedSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -214,8 +214,8 @@ export const deceasedSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames')
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -226,8 +226,8 @@ export const deceasedSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName')
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
       }
     },
     {
@@ -302,7 +302,8 @@ export const deceasedSection: IFormSection = {
       validate: [],
       options: countries,
       mapping: {
-        mutation: fieldToAddressTransformer('PERMANENT', 0, 'country')
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'country'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'country')
       }
     },
     {
@@ -318,7 +319,8 @@ export const deceasedSection: IFormSection = {
       },
       conditionals: [conditionals.countryPermanent],
       mapping: {
-        mutation: fieldToAddressTransformer('PERMANENT', 0, 'state')
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'state'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'state')
       }
     },
     {
@@ -337,7 +339,8 @@ export const deceasedSection: IFormSection = {
         conditionals.statePermanent
       ],
       mapping: {
-        mutation: fieldToAddressTransformer('PERMANENT', 0, 'district')
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'district'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'district')
       }
     },
     {
