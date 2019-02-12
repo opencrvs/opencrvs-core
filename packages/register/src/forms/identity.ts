@@ -1,4 +1,15 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, FormattedMessage } from 'react-intl'
+import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
+
+export const NATIONAL_ID = 'NATIONAL_ID'
+export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
+export const PASSPORT = 'PASSPORT'
+export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
+export const DRIVING_LICENCE = 'DRIVING_LICENCE'
+export const REFUGEE_NUMBER = 'REFUGEE_NUMBER'
+export const ALIEN_NUMBER = 'ALIEN_NUMBER'
+export const OTHER = 'OTHER'
+export const NO_ID = 'NO_ID'
 
 export const messages = defineMessages({
   iDType: {
@@ -46,6 +57,11 @@ export const messages = defineMessages({
     defaultMessage: 'Other',
     description: 'Option for form field: Type of ID'
   },
+  iDTypeNoId: {
+    id: 'formFields.iDTypeNoID',
+    defaultMessage: 'No ID available',
+    description: 'Option for form field: Type of ID'
+  },
   iDTypeOtherLabel: {
     id: 'formFields.iDTypeOtherLabel',
     defaultMessage: 'Other type of ID',
@@ -58,16 +74,64 @@ export const messages = defineMessages({
   }
 })
 
-export const identityOptions = [
-  { value: 'NATIONAL_ID', label: messages.iDTypeNationalID },
+export const birthIdentityOptions = [
+  { value: NATIONAL_ID, label: messages.iDTypeNationalID },
   {
-    value: 'BIRTH_REGISTRATION_NUMBER',
+    value: BIRTH_REGISTRATION_NUMBER,
     label: messages.iDTypeBRN
   },
-  { value: 'PASSPORT', label: messages.iDTypePassport },
-  {
-    value: 'DEATH_REGISTRATION_NUMBER',
-    label: messages.iDTypeDRN
-  },
-  { value: 'OTHER', label: messages.iDTypeOther }
+  { value: PASSPORT, label: messages.iDTypePassport },
+  { value: OTHER, label: messages.iDTypeOther }
 ]
+
+export const deathIdentityOptions = [
+  { value: PASSPORT, label: messages.iDTypePassport },
+  { value: NATIONAL_ID, label: messages.iDTypeNationalID },
+  {
+    value: DRIVING_LICENCE,
+    label: messages.iDTypeDrivingLicence
+  },
+  {
+    value: BIRTH_REGISTRATION_NUMBER,
+    label: messages.iDTypeBRN
+  },
+  {
+    value: REFUGEE_NUMBER,
+    label: messages.iDTypeRefugeeNumber
+  },
+  { value: ALIEN_NUMBER, label: messages.iDTypeAlienNumber },
+  { value: NO_ID, label: messages.iDTypeNoId },
+  { value: OTHER, label: messages.iDTypeOther }
+]
+
+export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
+  switch (key) {
+    case NATIONAL_ID:
+      return NUMBER
+    default:
+      return TEXT
+  }
+}
+
+export function identityNameMapper(
+  code: string
+): FormattedMessage.MessageDescriptor {
+  switch (code) {
+    case 'NATIONAL_ID':
+      return messages.iDTypeNationalID
+    case 'PASSPORT':
+      return messages.iDTypePassport
+    case 'DRIVING_LICENCE':
+      return messages.iDTypeDrivingLicence
+    case 'BIRTH_REGISTRATION_NUMBER':
+      return messages.iDTypeBRN
+    case 'DEATH_REGISTRATION_NUMBER':
+      return messages.iDTypeDRN
+    case 'REFUGEE_NUMBER':
+      return messages.iDTypeRefugeeNumber
+    case 'ALIEN_NUMBER':
+      return messages.iDTypeAlienNumber
+    default:
+      return messages.iD
+  }
+}

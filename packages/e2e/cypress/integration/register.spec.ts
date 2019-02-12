@@ -28,7 +28,7 @@ context('Register', () => {
     cy.get('#next_section').click()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National ID', 'National ID')
-    cy.get('#iD').type('1')
+    cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('গায়ত্রী')
     cy.get('#familyName').type('স্পিভক')
@@ -58,7 +58,7 @@ context('Register', () => {
     // FATHER DETAILS
     cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National ID', 'National ID')
-    cy.get('#iD').type('1')
+    cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('গায়ত্রী')
     cy.get('#familyName').type('স্পিভক')
