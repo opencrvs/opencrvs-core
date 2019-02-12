@@ -29,13 +29,10 @@ export const MutationContext = React.createContext({
 class MutationProviderComponent extends React.Component<IProps> {
   getMapping() {
     const { event, action, payload, form, draft } = this.props
-    const eventMutationMapping =
+    return (
       MutationMapper[event] &&
       MutationMapper[event](action, payload, form, draft)
-    if (!eventMutationMapping) {
-      return null
-    }
-    return eventMutationMapping
+    )
   }
 
   render() {

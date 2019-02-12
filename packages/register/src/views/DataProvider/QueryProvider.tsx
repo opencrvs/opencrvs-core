@@ -24,11 +24,7 @@ export const QueryContext = React.createContext({
 class QueryProviderComponent extends React.Component<IProps> {
   getMapping() {
     const { event, action } = this.props
-    const eventQueryMapping = QueryMapper[event] && QueryMapper[event](action)
-    if (!eventQueryMapping) {
-      return null
-    }
-    return eventQueryMapping
+    return QueryMapper[event] && QueryMapper[event](action)
   }
 
   render() {
