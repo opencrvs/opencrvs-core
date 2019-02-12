@@ -132,13 +132,10 @@ test('should build a minimal FHIR registration document without error', async ()
           }
         ]
       },
-      deathLocation: '123',
-      deathLocationType: 'PRIVATE_HOME',
-      placeOfDeath: {
+      eventLocation: {
         type: 'PRIVATE_HOME',
-        partOf: '456',
+        partOf: 'Location/456',
         address: {
-          type: 'BIRTH_PLACE',
           country: '789',
           state: '101112',
           district: '131415',

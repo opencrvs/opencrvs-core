@@ -437,6 +437,29 @@ export const typeResolvers: GQLResolver = {
       }
       return taskBundle.entry[0].resource
     },
+
+    async eventLocation(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const data = await fetchFHIR(
+        `/${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+
+      if (!data || !data.location || !data.location[0].location) {
+        return null
+      }
+
+      return await fetchFHIR(
+        `/${data.location[0].location.reference}`,
+        authHeader
+      )
+    },
     async mannerOfDeath(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,

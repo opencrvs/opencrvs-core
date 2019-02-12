@@ -1738,21 +1738,7 @@ export interface DeathRegistrationToOtherInformantRelationshipResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface DeathRegistrationToPlaceOfDeathResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface DeathRegistrationToDeathLocationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface DeathRegistrationToDeathLocationTypeResolver<
+export interface DeathRegistrationToEventLocationResolver<
   TParent = any,
   TResult = any
 > {
