@@ -5,7 +5,7 @@ export const NATIONAL_ID = 'NATIONAL_ID'
 export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
 export const PASSPORT = 'PASSPORT'
 export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
-export const DRIVING_LICENCE = 'DRIVING_LICENCE'
+export const DRIVING_LICENSE = 'DRIVING_LICENSE'
 export const REFUGEE_NUMBER = 'REFUGEE_NUMBER'
 export const ALIEN_NUMBER = 'ALIEN_NUMBER'
 export const OTHER = 'OTHER'
@@ -27,9 +27,9 @@ export const messages = defineMessages({
     defaultMessage: 'National ID',
     description: 'Option for form field: Type of ID'
   },
-  iDTypeDrivingLicence: {
-    id: 'formFields.iDTypeDrivingLicence',
-    defaultMessage: 'Drivers Licence',
+  iDTypeDrivingLicense: {
+    id: 'formFields.iDTypeDrivingLicense',
+    defaultMessage: 'Drivers License',
     description: 'Option for form field: Type of ID'
   },
   iDTypeBRN: {
@@ -88,8 +88,8 @@ export const deathIdentityOptions = [
   { value: PASSPORT, label: messages.iDTypePassport },
   { value: NATIONAL_ID, label: messages.iDTypeNationalID },
   {
-    value: DRIVING_LICENCE,
-    label: messages.iDTypeDrivingLicence
+    value: DRIVING_LICENSE,
+    label: messages.iDTypeDrivingLicense
   },
   {
     value: BIRTH_REGISTRATION_NUMBER,
@@ -121,8 +121,8 @@ export function identityNameMapper(
       return messages.iDTypeNationalID
     case 'PASSPORT':
       return messages.iDTypePassport
-    case 'DRIVING_LICENCE':
-      return messages.iDTypeDrivingLicence
+    case 'DRIVING_LICENSE':
+      return messages.iDTypeDrivingLicense
     case 'BIRTH_REGISTRATION_NUMBER':
       return messages.iDTypeBRN
     case 'DEATH_REGISTRATION_NUMBER':
