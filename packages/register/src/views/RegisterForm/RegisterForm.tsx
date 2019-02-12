@@ -32,7 +32,6 @@ import {
   ViewFooter
 } from 'src/components/interface/footer'
 import { StickyFormTabs } from './StickyFormTabs'
-import { draftToGqlTransformer } from 'src/transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
@@ -507,24 +506,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
   ): void => {
     if (selectedSection) {
       goToTab(tabRoute, draftId, selectedSection.id)
-    }
-  }
-
-  processSubmitData = () => {
-    const { draft, registerForm } = this.props
-    const { showSubmitModal, showRegisterModal } = this.state
-    if (!showRegisterModal && !showSubmitModal) {
-      return
-    }
-    const data = draftToGqlTransformer(registerForm, draft.data)
-    if (!draft.review) {
-      return { details: data }
-    } else {
-      if (!this.state.isDataAltered) {
-        return { id: draft.id }
-      } else {
-        return { id: draft.id, details: data }
-      }
     }
   }
 
