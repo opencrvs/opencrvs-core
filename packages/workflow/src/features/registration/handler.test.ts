@@ -19,8 +19,6 @@ import {
   testDeathFhirBundle
 } from '../../test/utils'
 import { cloneDeep } from 'lodash'
-import { findTypesThatChangedKind } from 'graphql/utilities/findBreakingChanges'
-import { union } from 'xregexp'
 
 describe('Verify handler', () => {
   let server: any
