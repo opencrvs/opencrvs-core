@@ -465,11 +465,16 @@ export const mockDeathApplicationData = {
     causeOfDeathCode: ''
   },
   documents: {
-    image_uploader: '',
-    paragraph: '',
-    list: ''
-  },
-  preview: {}
+    image_uploader: [
+      {
+        data: 'base64-data',
+        type: 'image/jpeg',
+        optionValues: ["Proof of Deceased's ID", 'NID'],
+        title: "Proof of Deceased's ID",
+        description: 'NID'
+      }
+    ]
+  }
 }
 
 export const mockOfflineData = {
