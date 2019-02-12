@@ -350,22 +350,25 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         regStatusHistory:
           (rec.registration &&
             rec.registration.status &&
-            rec.registration.status.map((status: GQLRegWorkflow) => {
-              return {
-                action: Action[status.type as GQLRegStatus] || Action.DECLARED,
-                date: status.timestamp || '',
-                usersName: userNamesMap[language],
-                usersRole:
-                  (status.user &&
-                    (status.user as GQLUser).role &&
-                    intl.formatMessage(
-                      messages[(status.user as GQLUser).role as string]
-                    )) ||
-                  '',
-                office:
-                  (status.office && (status.office as GQLLocation).name) || ''
-              }
-            })) ||
+            rec.registration.status
+              .map((status: GQLRegWorkflow) => {
+                return {
+                  action:
+                    Action[status.type as GQLRegStatus] || Action.DECLARED,
+                  date: status.timestamp || '',
+                  usersName: userNamesMap[language],
+                  usersRole:
+                    (status.user &&
+                      (status.user as GQLUser).role &&
+                      intl.formatMessage(
+                        messages[(status.user as GQLUser).role as string]
+                      )) ||
+                    '',
+                  office:
+                    (status.office && (status.office as GQLLocation).name) || ''
+                }
+              })
+              .reverse()) ||
           []
       }
     })

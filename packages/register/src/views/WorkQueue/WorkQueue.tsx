@@ -518,7 +518,7 @@ const ExpansionContainer = styled.div`
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  margin-bottom: 1px;
+  margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
   }
@@ -701,29 +701,31 @@ export class WorkQueueView extends React.Component<
           status:
             reg.registration &&
             reg.registration.status &&
-            reg.registration.status.map(status => {
-              return {
-                type: status && status.type,
-                practitionerName:
-                  (status &&
-                    status.user &&
-                    (createNamesMap(status.user.name as GQLHumanName[])[
-                      this.props.language
-                    ] as string)) ||
-                  (status &&
-                    status.user &&
-                    /* tslint:disable:no-string-literal */
-                    (createNamesMap(status.user.name as GQLHumanName[])[
-                      'default'
-                    ] as string)) ||
-                  /* tslint:enable:no-string-literal */
-                  '',
-                timestamp:
-                  status && moment(status.timestamp).format('YYYY-MM-DD'),
-                practitionerRole: status && status.user && status.user.role,
-                officeName: status && status.office && status.office.name
-              }
-            }),
+            reg.registration.status
+              .map(status => {
+                return {
+                  type: status && status.type,
+                  practitionerName:
+                    (status &&
+                      status.user &&
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        this.props.language
+                      ] as string)) ||
+                    (status &&
+                      status.user &&
+                      /* tslint:disable:no-string-literal */
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        'default'
+                      ] as string)) ||
+                    /* tslint:enable:no-string-literal */
+                    '',
+                  timestamp:
+                    status && moment(status.timestamp).format('YYYY-MM-DD'),
+                  practitionerRole: status && status.user && status.user.role,
+                  officeName: status && status.office && status.office.name
+                }
+              })
+              .reverse(),
           declaration_status:
             reg.registration &&
             reg.registration.status &&
