@@ -7,17 +7,24 @@ import {
   SUBSECTION,
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
-  RADIO_GROUP
+  RADIO_GROUP,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate
+  isValidBirthDate,
+  validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  identityNameMapper,
+  identityTypeMapper,
+  deathIdentityOptions
+} from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as addressMessages } from '../../../address'
 
@@ -53,11 +60,6 @@ const messages = defineMessages({
     id: 'formFields.deceasedIdType',
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
-  },
-  noId: {
-    id: 'formFields.idTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
   },
   deceasedGivenNames: {
     id: 'formFields.deceasedGivenNames',
@@ -146,32 +148,40 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
-        { value: 'NO_ID', label: messages.noId }
-      ],
+      options: deathIdentityOptions,
       mapping: {
         mutation: fieldToIdentifierTransformer('type'),
         query: identifierToFieldTransformer('type')
       }
     },
     {
-      name: 'iD',
+      name: 'iDTypeOther',
       type: TEXT,
+      label: identityMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.iDType]
+    },
+    {
+      name: 'iD',
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',

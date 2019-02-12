@@ -11,12 +11,13 @@ import {
   INFORMATIVE_RADIO_GROUP
 } from 'src/forms'
 import { ReactWrapper } from 'enzyme'
-import { iDType, ParentDetails } from './ParentDetails'
+import { ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
 import { paymentFormSection } from 'src/forms/certificate/fieldDefinitions/payment-section'
 import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/preview-section'
 import { calculateDays, timeElapsed } from './calculatePrice'
+import { identityNameMapper } from 'src/forms/identity'
 
 describe('when user wants to print certificate', async () => {
   const { store, history } = createStore()
@@ -344,37 +345,37 @@ describe('when user wants to print certificate', async () => {
   })
 
   it('renders i18n idType', () => {
-    expect(iDType('NATIONAL_ID')).toEqual({
+    expect(identityNameMapper('NATIONAL_ID')).toEqual({
       id: 'formFields.iDTypeNationalID',
       defaultMessage: 'National ID',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('PASSPORT')).toEqual({
+    expect(identityNameMapper('PASSPORT')).toEqual({
       id: 'formFields.iDTypePassport',
       defaultMessage: 'Passport',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('BIRTH_REGISTRATION_NUMBER')).toEqual({
+    expect(identityNameMapper('BIRTH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeBRN',
       defaultMessage: 'Birth Registration Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('DEATH_REGISTRATION_NUMBER')).toEqual({
+    expect(identityNameMapper('DEATH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeDRN',
       defaultMessage: 'Death Registration Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('REFUGEE_NUMBER')).toEqual({
+    expect(identityNameMapper('REFUGEE_NUMBER')).toEqual({
       id: 'formFields.iDTypeRefugeeNumber',
       defaultMessage: 'Refugee Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('ALIEN_NUMBER')).toEqual({
+    expect(identityNameMapper('ALIEN_NUMBER')).toEqual({
       id: 'formFields.iDTypeAlienNumber',
       defaultMessage: 'Alien Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('UNKNOWN')).toEqual({
+    expect(identityNameMapper('UNKNOWN')).toEqual({
       id: 'formFields.iD',
       defaultMessage: 'ID Number',
       description: 'Label for form field: ID Number'

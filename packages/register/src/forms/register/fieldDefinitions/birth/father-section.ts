@@ -3,7 +3,8 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import {
   messages as identityMessages,
-  identityOptions
+  birthIdentityOptions,
+  identityTypeMapper
 } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
@@ -17,7 +18,7 @@ import {
   SUBSECTION,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  TEXT_WITH_DYNAMIC_DEFINITIONS
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -33,7 +34,7 @@ export interface IFatherSectionFormData {
   bar: string
   baz: string
 }
-import { iDType } from 'src/views/PrintCertificate/ParentDetails'
+import { identityNameMapper } from 'src/forms/identity'
 import { IFormSection } from '../../../index'
 import { conditionals } from '../../../utils'
 import {
@@ -172,7 +173,7 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: identityOptions,
+      options: birthIdentityOptions,
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
         mutation: fieldToIdentifierTransformer('type'),
@@ -194,11 +195,15 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'iD',
-      type: TEXT_WITH_DYNAMIC_DEFINITIONS,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
           dependency: 'iDType',
-          labelMapper: iDType
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
         },
         validate: [
           {
