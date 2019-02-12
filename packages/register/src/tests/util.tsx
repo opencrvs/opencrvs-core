@@ -383,7 +383,7 @@ export const mockApplicationData = {
 export const mockDeathApplicationData = {
   deceased: {
     iDType: 'NATIONAL_ID',
-    iD: '123',
+    iD: '1230000000000',
     firstNames: 'মকবুল',
     familyName: 'ইসলাম',
     firstNamesEng: 'Mokbul',
@@ -414,7 +414,8 @@ export const mockDeathApplicationData = {
   },
   informant: {
     applicantIdType: 'NATIONAL_ID',
-    applicantID: '123',
+    iDType: 'NATIONAL_ID',
+    applicantID: '1230000000000',
     applicantFirstNames: '',
     applicantFamilyName: 'ইসলাম',
     applicantFirstNamesEng: 'Islam',
