@@ -399,9 +399,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   successfulSubmission = (response: string) => {
-    const { history, draft } = this.props
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
     let personData
-    if (this.props.draft.event === 'death') {
+    if (event === Event.DEATH) {
       personData = this.props.draft.data.deceased
     } else {
       personData = this.props.draft.data.child
@@ -424,7 +428,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       nextSection: true,
       trackingSection: true,
       eventName,
-      eventType: this.props.draft.event,
+      eventType: event,
       actionName: SUBMISSION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
@@ -435,9 +439,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   successfullyRegistered = (response: string) => {
-    const { history, draft } = this.props
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
     let personData
-    if (this.props.draft.event === 'death') {
+    if (event === Event.DEATH) {
       personData = this.props.draft.data.deceased
     } else {
       personData = this.props.draft.data.child
@@ -448,7 +456,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       trackNumber: response,
       trackingSection: true,
       eventName: REGISTRATION,
-      eventType: this.props.draft.event,
+      eventType: event,
       actionName: REGISTERED,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
