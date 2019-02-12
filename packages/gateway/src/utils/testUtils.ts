@@ -224,7 +224,10 @@ export const mockTask = {
       url: 'http://opencrvs.org/specs/extension/contact-person',
       valueString: 'MOTHER'
     }
-  ]
+  ],
+  meta: {
+    versionId: '123'
+  }
 }
 
 export const mockComposition = {

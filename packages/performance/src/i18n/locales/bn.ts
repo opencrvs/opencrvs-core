@@ -39,12 +39,12 @@ export const BENGALI_STATE = {
     'performance.graph.birthRegistrationRatePerMonthLabel': 'ক্যালেন্ডার মাস',
     'performance.graph.birthRegistrationPercentageOfEstimateLabel':
       'আনুমানিক জন্ম নিবন্ধন%',
-    'register.home.hedaer.hello': 'Hello {fullName}',
-    'register.home.hedaer.FIELD_AGENT': 'Field Agent',
-    'register.home.hedaer.REGISTRATION_CLERK': 'Registration Clerk',
-    'register.home.hedaer.LOCAL_REGISTRAR': 'Registrar',
-    'register.home.hedaer.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.hedaer.STATE_REGISTRAR': 'State Registrar',
-    'register.home.hedaer.NATIONAL_REGISTRAR': 'National Registrar'
+    'register.home.header.hello': 'Hello {fullName}',
+    'register.home.header.FIELD_AGENT': 'Field Agent',
+    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.header.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.header.STATE_REGISTRAR': 'State Registrar',
+    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar'
   }
 }
