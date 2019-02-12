@@ -620,7 +620,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                     )
                                   }}
                                 >
-                                  {intl.formatMessage(errorsOnField[0].message)}
+                                  {intl.formatMessage(
+                                    errorsOnField[0].message,
+                                    errorsOnField[0].props
+                                  )}
                                 </RequiredFieldLink>
                               ) : (
                                 renderValue(
