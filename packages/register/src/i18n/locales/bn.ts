@@ -426,7 +426,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.tabs.deceasedTab': 'মৃত',
     'register.form.section.deceasedTitle': 'মৃতের বিবরণ',
     'formFields.deceasedIdType': 'বিদ্যমান আইডি',
-    'formFields.idTypeNoID': 'আইডি পাওয়া যায় নি',
+    'formFields.iDTypeNoID': 'আইডি পাওয়া যায় নি',
     'formFields.deceasedGivenNames': 'প্রদত্ত নাম',
     'formFields.deceasedFamilyName': 'পরিবারের নাম',
     'formFields.deceasedGivenNamesEng': 'প্রদত্ত নাম (in english)',
@@ -488,11 +488,13 @@ export const BENGALI_STATE: ILanguage = {
     'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
     'validations.numberRequired': 'Must be a number',
     'validations.validNationalId':
-      'জাতীয় পরিচয় পত্র {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+      'জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validBirthRegistrationNumber':
-      'জন্ম নিবন্ধন নম্বর {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+      'জন্ম নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validDeathRegistrationNumber':
-      'মৃত্যু নিবন্ধন সংখ্যা {maxLength} অক্ষর থেকে বেশি হতে পারবেনা',
+      'মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'validations.validPassportNumber':
+      'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',
@@ -842,11 +844,11 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',
-    'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {নিবন্ধন} duplication {নকল আবেদন} 
-      certificate {সনদপত্র} offlineEvent {আবেদন সংযোগ}} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
-      rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {মুলতুবী}}`,
-    'register.confirmationScreen.headerDesc': `{event, select, declaration {তথ্য বিবরনী} registration {} duplication {তথ্য বিবরনী আবেদন} certificate {}
-      offlineEvent {তথ্য বিবরনীটি}} {action, select, submitted {বৈধতার জন্য পর্যালোচিত হচ্ছে।} completed {} rejected {প্রত্যাখ্যাত হচ্ছে।} approved {অনুমোদিত হচ্ছে।}
+    'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন} 
+      certificate {সনদপত্র} offlineEvent {আবেদন }} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
+      rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {সংযুক্তি স্থগিত}}`,
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {তথ্য বিবরনী ঘোষণা} registration {} duplication {তথ্য বিবরনী আবেদন} certificate {}
+      offlineEvent {তথ্য বিবরনী ঘোষণাটি}} {action, select, submitted {বৈধতার জন্য পর্যালোচিত হচ্ছে।} completed {} rejected {প্রত্যাখ্যাত হচ্ছে।} approved {অনুমোদিত হচ্ছে।}
       registered {নিবন্ধভুক্তকরন করা হচ্ছে।} offlineAction {ডিভাইসে ইন্টারনেট সংযোগ কালীন স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।}}`,
     'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত!} submitted {সমাপ্ত!} rejected {আবেদন প্রত্যাখ্যাত!} 
       approved {আবেদন অনুমোদিত}  registered {আবেদন নিবন্ধভুক্তকরন} offlineAction {সম্পূর্ণ হচ্ছে}}`,
@@ -862,16 +864,16 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.confirmationScreen.buttons.newDeclaration': 'নতুন আবেদন',
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
-    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {জন্ম নিবন্ধন নম্বর : } 
-      duplication {...} certificate {...} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }}`,
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {জন্ম নিবন্ধন নম্বর : } duplication {জন্ম নিবন্ধন নম্বর : } certificate {} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }} `,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
       registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} 
-      duplication {...} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} offlineEvent {ইন্টারনেটের জন্য অপেক্ষা করুন।}}`,
-    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration { এর জন্ম নিবন্ধন আবেদন} registration { এর জন্ম নিবন্ধন}
-     duplication { এর জন্ম নিবন্ধন নকল} certificate { এর জন্ম নিবন্ধন সনদ} offlineEvent { এর জন্ম নিবন্ধন আবেদন }}`,
+      duplication {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} 
+      offlineEvent {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}} `,
+    'register.confirmationScreen.boxHeaderDescFirst': `{event, select,declaration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা } registration { এর জন্ম নিবন্ধন}
+     duplication { এর জন্ম নিবন্ধন নকল} certificate { এর জন্ম নিবন্ধন সনদ} offlineEvent {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select,
-        completed {সম্পূর্ণ হয়েছে।} submitted {জমা দেওয়া হয়েছে।} rejected {প্রত্যাখ্যাত হয়েছে।} registered {আবেদন নিবন্ধভুক্তকরন হয়েছে।}
-        approved {অনুমোদিত হয়েছে।} offlineAction {জমা দেওয়া হচ্ছে}}`,
+      completed {সম্পূর্ণ হয়েছে।} submitted {সফলভাবে রেজিস্ট্রেশান অফিসে জমা দেওয়া হয়েছে।} rejected {প্রত্যাখ্যাত হয়েছে।} registered {আবেদন নিবন্ধভুক্তকরন হয়েছে।}
+      approved {অনুমোদিত হয়েছে।} offlineAction {জমা দেওয়া হচ্ছে।}}`,
 
     'register.duplicates.notDuplicate.modal.back': 'পিছনে',
     'register.duplicates.notDuplicate.modal.yes': 'হাঁ',

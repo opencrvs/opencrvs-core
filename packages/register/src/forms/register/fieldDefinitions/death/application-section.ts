@@ -8,17 +8,24 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
   RADIO_GROUP,
-  TEL
+  TEL,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate
+  isValidBirthDate,
+  validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  identityNameMapper,
+  identityTypeMapper,
+  deathIdentityOptions
+} from '../../../identity'
 import { messages as addressMessages } from '../../../address'
 
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
@@ -40,11 +47,6 @@ const messages = defineMessages({
     id: 'formFields.applicantsIdType',
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
-  },
-  noId: {
-    id: 'formFields.idTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
   },
   applicantsGivenNames: {
     id: 'formFields.applicantsGivenNames',
@@ -147,34 +149,42 @@ export const applicantsSection: IFormSection = {
   title: messages.applicantTitle,
   fields: [
     {
-      name: 'applicantIdType',
+      name: 'iDType',
       type: SELECT_WITH_OPTIONS,
       label: messages.applicantsIdType,
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
-        { value: 'NO_ID', label: messages.noId }
-      ]
+      options: deathIdentityOptions
+    },
+    {
+      name: 'iDTypeOther',
+      type: TEXT,
+      label: identityMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.iDType]
     },
     {
       name: 'applicantID',
-      type: TEXT,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',

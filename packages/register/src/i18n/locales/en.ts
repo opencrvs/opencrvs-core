@@ -425,7 +425,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.tabs.deceasedTab': 'Deceased',
     'register.form.section.deceasedTitle': "Deceased's details",
     'formFields.deceasedIdType': 'Existing ID',
-    'formFields.idTypeNoID': 'No ID available',
+    'formFields.iDTypeNoID': 'No ID available',
     'formFields.deceasedGivenNames': 'Given Name (s)',
     'formFields.deceasedFamilyName': 'Family Name',
     'formFields.deceasedGivenNamesEng': 'Given Name (s) in English',
@@ -488,11 +488,13 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.numberRequired': 'Must be a number',
     'validations.range': 'Must be within {min} and {max}',
     'validations.validNationalId':
-      'The National ID can be up to {maxLength} characters long',
+      'The National ID can only be numeric and must be {validLength} digits long',
     'validations.validBirthRegistrationNumber':
-      'The Birth Registration Number can be up to {maxLength} characters long',
+      'The Birth Registration Number can only be alpha numeric and must be {validLength} characters long',
     'validations.validDeathRegistrationNumber':
-      'The Death Registration Number can be up to {maxLength} characters long',
+      'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+    'validations.validPassportNumber':
+      'The Passport Number can only be alpha numeric and must be {validLength} characters long',
     'validations.phoneNumberFormat':
       'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
@@ -851,12 +853,12 @@ export const ENGLISH_STATE: ILanguage = {
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
 
-    'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Registration} duplication {Application}
-      certificate {Certificate} offlineEvent {Application connectivity}} {action, select, completed {completed}
-      submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending}}`,
-    'register.confirmationScreen.headerDesc': `{event, select, declaration {The application} registration {The birth application} duplication {The application} certificate {} offlineEvent {The application}} 
-      {action, select, submitted {is now on its way for validation} completed {} rejected {rejected} approved {approved} registered {registered}
-      offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
+    'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
+    certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed} 
+    submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The declaration}} 
+    {action, select, submitted {is now on its way for validation} completed {} registered {registered} rejected {rejected} approved {Approved}
+    offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All done!} submitted {All done!} rejected {Application rejected} 
       approved {Application approved} registered {Application registered} offlineAction {Almost there}}`,
     'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.} 
@@ -873,13 +875,14 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
-     duplication {...} certificate {...} offlineEvent {Tracking ID number: }}`,
+    duplication {Birth Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
       registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-      duplication{...} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
-    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The birth application of } registration {The birth of } duplication 
-    {The birth duplication of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
-    'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
+      duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} certificate {Certificates have been collected from your jurisdiction.}
+      offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}} `,
+    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The birth of } duplication 
+      {The birth duplication of } certificate {The birth certificate of } offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of }}`,
+    'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been successfully submitted to the registration office.} rejected {has been rejected.} registered {has been registered}
       approved {has been approved.} offlineAction {is pending due to internet connection.}}`,
 
     'register.duplicates.notDuplicate.modal.back': 'Back',
