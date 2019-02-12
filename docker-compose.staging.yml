@@ -80,8 +80,12 @@ services:
       - clickatell-user
       - clickatell-password
       - clickatell-api-id
+      - infobip-gateway-endpoint
+      - infobip-api-key
       - jwt-public-key.{{ts}}
     environment:
+      - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
+      - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGE=bn
       - COUNTRY_CODE=+88
@@ -146,6 +150,10 @@ secrets:
   clickatell-password:
     external: true
   clickatell-api-id:
+    external: true
+  infobip-gateway-endpoint:
+    external: true
+  infobip-api-key:
     external: true
 
 configs:
