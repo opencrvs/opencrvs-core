@@ -378,9 +378,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   rejectSubmission = () => {
-    const { history, draft } = this.props
-    const childData = this.props.draft.data.child
-    const fullName: IFullName = getFullName(childData)
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    let personData
+    if (event === Event.DEATH) {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
     const duplicate = history.location.state && history.location.state.duplicate
     let eventName = DECLARATION
     if (duplicate) {
@@ -391,6 +400,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
+      eventType: event,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
@@ -415,21 +425,27 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const duplicate = history.location.state && history.location.state.duplicate
 
     let eventName = DECLARATION
+    let actionName = SUBMISSION
+    let nextSection = true
 
     if (this.userHasRegisterScope()) {
       eventName = REGISTRATION
+      actionName = REGISTERED
+      nextSection = false
     }
 
     if (duplicate) {
       eventName = DUPLICATION
+      actionName = REGISTERED
+      nextSection = false
     }
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
-      nextSection: true,
+      nextSection,
       trackingSection: true,
       eventName,
       eventType: event,
-      actionName: SUBMISSION,
+      actionName,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
       duplicateContextId:
@@ -451,7 +467,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       personData = this.props.draft.data.child
     }
     const fullName = getFullName(personData)
-    this.props.deleteDraft({ ...draft })
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       trackingSection: true,
@@ -461,6 +476,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
+    this.props.deleteDraft(draft)
   }
 
   submitForm = () => {
