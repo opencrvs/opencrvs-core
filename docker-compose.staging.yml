@@ -84,6 +84,7 @@ services:
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGE=bn
+      - COUNTRY_CODE=+88
 
   gateway:
     secrets:

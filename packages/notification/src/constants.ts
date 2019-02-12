@@ -4,6 +4,7 @@ export const HOST = process.env.AUTH_HOST || 'localhost'
 export const PORT = process.env.AUTH_PORT || 2020
 
 export const LANGUAGE = process.env.LANGUAGE || 'bn'
+export const COUNTRY_CODE = process.env.COUNTRY_CODE || '+88'
 /* 
   For these locales sms content will not be sent as unicoded payload 
   In future based on our experience on different countries we can add more locals here
@@ -11,8 +12,6 @@ export const LANGUAGE = process.env.LANGUAGE || 'bn'
 export const NON_UNICODED_LANGUAGES = ['en']
 
 export const SMS_PROVIDER = process.env.SMS_PROVIDER || 'infobip'
-
-export const PHONE_NUMBER_PREFIX = process.env.PHONE_NUMBER_PREFIX || '+88'
 
 export const CLICKATELL_USER = process.env.CLICKATELL_USER_PATH
   ? readFileSync(process.env.CLICKATELL_USER_PATH).toString()

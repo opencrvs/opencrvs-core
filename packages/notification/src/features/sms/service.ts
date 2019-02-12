@@ -7,7 +7,7 @@ import {
   CLICKATELL_API_ID,
   CLICKATELL_PASSWORD,
   CLICKATELL_USER,
-  PHONE_NUMBER_PREFIX,
+  COUNTRY_CODE,
   INFOBIP_API_KEY,
   INFOBIP_GATEWAY_ENDPOINT
 } from 'src/constants'
@@ -56,7 +56,7 @@ async function sendSMSClickatell(
 
 async function sendSMSInfobip(to: string, text: string) {
   const body = JSON.stringify({
-    to: `${PHONE_NUMBER_PREFIX}${to}`,
+    to: `${COUNTRY_CODE}${to}`,
     text
   })
   const headers = {
