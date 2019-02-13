@@ -11,11 +11,13 @@ import {
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { dateFormat } from 'src/utils/validate'
-
 import { messages as addressMessages } from '../../../address'
 import { countries } from 'src/forms/countries'
 import { conditionals } from 'src/forms/utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import { sectionFieldToBundleFieldTransformer } from 'src/forms/mappings/mutation/field-mappings'
+import { deceasedDateTransformation } from './mappings/mutation/event-mappings'
+import { ignoreFieldTransformer } from 'src/forms/mappings/mutation/field-mappings'
 
 const messages = defineMessages({
   deathEventTab: {
@@ -127,7 +129,10 @@ export const eventSection: IFormSection = {
       label: messages.deathDate,
       required: true,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      mapping: {
+        mutation: deceasedDateTransformation('deceased')
+      }
     },
     {
       name: 'manner',
@@ -151,14 +156,16 @@ export const eventSection: IFormSection = {
           value: 'MANNER_UNDETERMINED',
           label: messages.mannerUndetermined
         }
-      ]
+      ],
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath')
+      }
     },
     {
       name: 'deathPlace',
       type: SUBSECTION,
       label: messages.deathPlace,
       initialValue: '',
-      required: true,
       validate: []
     },
     {
@@ -179,7 +186,10 @@ export const eventSection: IFormSection = {
         },
         { value: 'other', label: messages.deathPlaceAddressOther }
       ],
-      conditionals: []
+      conditionals: [],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'addressType',
@@ -197,7 +207,10 @@ export const eventSection: IFormSection = {
         { value: 'PRIVATE_HOME', label: messages.privateHome },
         { value: 'OTHER', label: messages.otherInstitution }
       ],
-      conditionals: [conditionals.deathPlaceOther]
+      conditionals: [conditionals.deathPlaceOther],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'country',
@@ -207,7 +220,10 @@ export const eventSection: IFormSection = {
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.deathPlaceOther]
+      conditionals: [conditionals.deathPlaceOther],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'state',
@@ -220,7 +236,10 @@ export const eventSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
       },
-      conditionals: [conditionals.country, conditionals.deathPlaceOther]
+      conditionals: [conditionals.country, conditionals.deathPlaceOther],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'district',
@@ -237,7 +256,10 @@ export const eventSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'addressLine4',
@@ -255,7 +277,10 @@ export const eventSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'addressLine3',
@@ -274,7 +299,10 @@ export const eventSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'addressLine2',
@@ -290,7 +318,10 @@ export const eventSection: IFormSection = {
         conditionals.addressLine4,
         conditionals.addressLine3,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'addressLine1',
@@ -306,7 +337,10 @@ export const eventSection: IFormSection = {
         conditionals.addressLine4,
         conditionals.addressLine3,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     },
     {
       name: 'postCode',
@@ -322,7 +356,10 @@ export const eventSection: IFormSection = {
         conditionals.addressLine4,
         conditionals.addressLine3,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: ignoreFieldTransformer
+      }
     }
   ]
 }

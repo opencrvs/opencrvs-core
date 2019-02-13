@@ -7,6 +7,7 @@ import {
   LIST,
   SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
+import { deathFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
@@ -225,6 +226,9 @@ export const documentsSection: IFormSection = {
             }
           }
         ]
+      },
+      mapping: {
+        mutation: deathFieldToAttachmentTransformer
       }
     },
     {
