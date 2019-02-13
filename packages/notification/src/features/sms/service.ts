@@ -7,11 +7,11 @@ import {
   CLICKATELL_API_ID,
   CLICKATELL_PASSWORD,
   CLICKATELL_USER,
-  COUNTRY_CODE,
   INFOBIP_API_KEY,
   INFOBIP_GATEWAY_ENDPOINT
 } from 'src/constants'
 import { logger } from 'src/logger'
+import { convertToMSISDN } from './utils'
 
 async function sendSMSClickatell(
   msisdn: string,
@@ -22,7 +22,7 @@ async function sendSMSClickatell(
     user: CLICKATELL_USER,
     password: CLICKATELL_PASSWORD,
     api_id: CLICKATELL_API_ID,
-    to: msisdn,
+    to: convertToMSISDN(msisdn),
     text: message,
     unicode: 0
   }
@@ -56,7 +56,7 @@ async function sendSMSClickatell(
 
 async function sendSMSInfobip(to: string, text: string) {
   const body = JSON.stringify({
-    to: `${COUNTRY_CODE}${to}`,
+    to: convertToMSISDN(to),
     text
   })
   const headers = {

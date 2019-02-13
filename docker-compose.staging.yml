@@ -91,7 +91,7 @@ services:
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGE=bn
-      - COUNTRY_CODE=+88
+      - COUNTRY_ALPHA3=BGD
 
   gateway:
     secrets:

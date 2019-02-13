@@ -34,6 +34,7 @@
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.2.1",
     "typescript": "^3.0.1",
+    "country-data": "^0.0.31",
     "winston": "^3.0.0"
   },
   "devDependencies": {
