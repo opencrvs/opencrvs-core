@@ -4,7 +4,7 @@ import {
   requiredSymbol,
   required,
   minLength,
-  isNumber,
+  numeric,
   phoneNumberFormat,
   dateFormat,
   emailAddressFormat,
@@ -159,33 +159,119 @@ describe('validate', () => {
     })
   })
 
-  describe('validIDNumber. User for ID number field that has a specific validation', () => {
-    it('Should error when supplied a bad value.', () => {
-      const badValue = '200847223985943928'
+  describe('validIDNumber. Used for ID number field that has a specific validation', () => {
+    it('Should error when supplied a bad value containing characters as National ID.', () => {
+      const badValue = '2019BrTVz8945'
       const typeOfID = 'NATIONAL_ID'
       const response = {
         message: {
           id: 'validations.validNationalId',
           defaultMessage:
-            'The National ID can be up to {maxCharLength} characters long',
+            'The National ID can only be numeric and must be {validLength} digits long',
           description:
-            'The error message that appears when an invalid length of value is used as nid'
+            'The error message that appears when an invalid value is used as nid'
         },
         props: {
-          maxCharLength: 17
+          validLength: 13
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
-    it('Should pass when supplied a good value.', () => {
-      const goodValue = '20088765284948575'
+    it('Should error when supplied a bad value containing more digits than desired as National ID.', () => {
+      const badValue = '20197839489452'
       const typeOfID = 'NATIONAL_ID'
+      const response = {
+        message: {
+          id: 'validations.validNationalId',
+          defaultMessage:
+            'The National ID can only be numeric and must be {validLength} digits long',
+          description:
+            'The error message that appears when an invalid value is used as nid'
+        },
+        props: {
+          validLength: 13
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
+    it('Should pass when supplied a good value as National ID.', () => {
+      const goodValue = '2019783948945'
+      const typeOfID = 'NATIONAL_ID'
+      const response = undefined
+      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
+    })
+    it('Should error when supplied a bad value as Birth Registration Number.', () => {
+      const badValue = '2019333453BRTVSRJ'
+      const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
+      const response = {
+        message: {
+          id: 'validations.validBirthRegistrationNumber',
+          defaultMessage:
+            'The Birth Registration Number can only be alpha numeric and must be {validLength} characters long',
+          description:
+            'The error message that appears when an invalid value is used as brn'
+        },
+        props: {
+          validLength: 18
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
+    it('Should pass when supplied a good value as Birth Registration Number.', () => {
+      const goodValue = '2019333453BRTVSRJ1'
+      const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
+      const response = undefined
+      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
+    })
+    it('Should error when supplied a bad value as Death Registration Number.', () => {
+      const badValue = '2019333453BRTVSRJ'
+      const typeOfID = 'DEATH_REGISTRATION_NUMBER'
+      const response = {
+        message: {
+          id: 'validations.validDeathRegistrationNumber',
+          defaultMessage:
+            'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+          description:
+            'The error message that appears when an invalid value is used as drn'
+        },
+        props: {
+          validLength: 18
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
+    it('Should pass when supplied a good value as Death Registration Number.', () => {
+      const goodValue = '2019333453BRTVSRJ1'
+      const typeOfID = 'DEATH_REGISTRATION_NUMBER'
+      const response = undefined
+      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
+    })
+    it('Should error when supplied a bad value as Pasport Number.', () => {
+      const badValue = '2019BrTVz8'
+      const typeOfID = 'PASSPORT'
+      const response = {
+        message: {
+          id: 'validations.validPassportNumber',
+          defaultMessage:
+            'The Passport Number can only be alpha numeric and must be {validLength} characters long',
+          description:
+            'The error message that appears when an invalid value is used as passport number'
+        },
+        props: {
+          validLength: 9
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
+    it('Should pass when supplied a good value as Passport Number.', () => {
+      const goodValue = '2019BrTVz'
+      const typeOfID = 'PASSPORT'
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
     })
   })
 
-  describe('isNumber. Checks a value is a number', () => {
+  describe('numeric. Checks a value is numeric', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
       const response = {
@@ -196,12 +282,12 @@ describe('validate', () => {
             'The error message that appears on fields where the value must be a number'
         }
       }
-      expect(isNumber(badValue)).toEqual(response)
+      expect(numeric(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value.', () => {
       const goodValue = '7'
       const response = undefined
-      expect(isNumber(goodValue)).toEqual(response)
+      expect(numeric(goodValue)).toEqual(response)
     })
   })
 

@@ -24,7 +24,8 @@ import {
   getConditionalActionsForField,
   getFieldOptions,
   getFieldLabel,
-  getFieldOptionsByValueMapper
+  getFieldOptionsByValueMapper,
+  getFieldType
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -51,8 +52,7 @@ import {
   WARNING,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
-  TEXT_WITH_DYNAMIC_DEFINITIONS,
-  TEXT,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
   ITextFormField,
   IDynamicFormField,
   LINK,
@@ -430,10 +430,10 @@ class FormSectionComponent extends React.Component<Props> {
                     offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
-              : field.type === TEXT_WITH_DYNAMIC_DEFINITIONS
+              : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
               ? ({
                   ...field,
-                  type: TEXT,
+                  type: getFieldType(field as IDynamicFormField, values),
                   label: getFieldLabel(field as IDynamicFormField, values)
                 } as ITextFormField)
               : field.type === DYNAMIC_LIST
@@ -451,7 +451,8 @@ class FormSectionComponent extends React.Component<Props> {
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
             field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
           ) {
             return (
               <FormItem key={`${field.name}`}>

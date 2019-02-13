@@ -1,6 +1,4 @@
 import * as React from 'react'
-import gql from 'graphql-tag'
-import { Query, Mutation } from 'react-apollo'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner, InvertSpinner } from '@opencrvs/components/lib/interface'
@@ -20,7 +18,8 @@ import {
   PDF_DOCUMENT_VIEWER,
   IFormField,
   IForm,
-  Event
+  Event,
+  Action
 } from 'src/forms'
 import {
   PrimaryButton,
@@ -57,6 +56,14 @@ import {
 } from 'src/forms/certificate/fieldDefinitions/collector-section'
 import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
 import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import {
+  MutationProvider,
+  MutationContext
+} from 'src/views/DataProvider/MutationProvider'
+import {
+  QueryProvider,
+  QueryContext
+} from 'src/views/DataProvider/QueryProvider'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from 'src/utils/userUtils'
@@ -211,129 +218,6 @@ const ButtonSpinner = styled(InvertSpinner)`
   top: 0px !important;
 `
 
-export const FETCH_BIRTH_REGISTRATION_QUERY = gql`
-  query data($id: ID!) {
-    fetchBirthRegistration(id: $id) {
-      _fhirIDMap
-      id
-      child {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        gender
-      }
-      mother {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        multipleBirth
-        identifier {
-          id
-          type
-        }
-        address {
-          type
-          line
-          district
-          state
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
-        }
-      }
-      father {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        identifier {
-          id
-          type
-        }
-        address {
-          type
-          line
-          district
-          state
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
-        }
-      }
-      registration {
-        id
-        contact
-        attachments {
-          data
-          type
-          contentType
-          subject
-        }
-        status {
-          comments {
-            comment
-          }
-
-          location {
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-        }
-
-        trackingId
-        registrationNumber
-      }
-      attendantAtBirth
-      weightAtBirth
-      birthType
-      eventLocation {
-        type
-        address {
-          line
-          district
-          state
-          postalCode
-          country
-        }
-      }
-      presentAtBirthRegistration
-    }
-  }
-`
-
 const messages = defineMessages({
   queryError: {
     id: 'print.certificate.queryError',
@@ -416,42 +300,37 @@ const messages = defineMessages({
     description: 'Back button in the menu'
   },
   FIELD_AGENT: {
-    id: 'register.home.hedaer.FIELD_AGENT',
+    id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
   REGISTRATION_CLERK: {
-    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    id: 'register.home.header.REGISTRATION_CLERK',
     defaultMessage: 'Registration Clerk',
     description: 'The description for REGISTRATION_CLERK role'
   },
   LOCAL_REGISTRAR: {
-    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    id: 'register.home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
     description: 'The description for LOCAL_REGISTRAR role'
   },
   DISTRICT_REGISTRAR: {
-    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    id: 'register.home.header.DISTRICT_REGISTRAR',
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role'
   },
   STATE_REGISTRAR: {
-    id: 'register.home.hedaer.STATE_REGISTRAR',
+    id: 'register.home.header.STATE_REGISTRAR',
     defaultMessage: 'State Registrar',
     description: 'The description for STATE_REGISTRAR role'
   },
   NATIONAL_REGISTRAR: {
-    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
 
-const certifyMutation = gql`
-  mutation markBirthAsCertified($id: ID!, $details: BirthRegistrationInput!) {
-    markBirthAsCertified(id: $id, details: $details)
-  }
-`
 interface IFullName {
   fullNameInBn: string
   fullNameInEng: string
@@ -576,17 +455,23 @@ class PrintCertificateActionComponent extends React.Component<
         throw new Error(`No form found for id ${currentForm}`)
     }
   }
-
-  processSubmitData() {
+  getDraft() {
     const {
       registrationId,
-      drafts: { drafts },
-      registerForm
+      drafts: { drafts }
     } = this.props
+    return (
+      drafts.find(draftItem => draftItem.id === registrationId) || {
+        data: {},
+        eventType: 'birth'
+      }
+    )
+  }
+  processSubmitData() {
+    const { registrationId, registerForm } = this.props
     const { data } = this.state
-    const draft = drafts.find(draftItem => draftItem.id === registrationId) || {
-      data: {}
-    }
+    const draft = this.getDraft()
+
     const result = {
       id: registrationId,
       details: draftToGqlTransformer(registerForm, draft.data)
@@ -705,23 +590,23 @@ class PrintCertificateActionComponent extends React.Component<
                 <B>{intl.formatMessage(messages.certificateIsCorrect)}</B>
                 {intl.formatMessage(messages.certificateConfirmationTxt)}
               </Info>
-              <Mutation
-                mutation={certifyMutation}
-                variables={this.processSubmitData()}
+              <MutationProvider
+                event={this.getEvent()}
+                action={Action.COLLECT_CERTIFICATE}
+                payload={this.processSubmitData()}
                 onCompleted={() => {
                   this.setState(() => ({
                     enableConfirmButton: true
                   }))
                 }}
               >
-                {(markBirthAsCertified, { loading, error, data }) => {
-                  return (
+                <MutationContext.Consumer>
+                  {({ mutation, loading, data }) => (
                     <ConfirmBtn
                       id="registerApplicationBtn"
                       disabled={loading || data}
-                      onClick={() => {
-                        markBirthAsCertified()
-                      }}
+                      // @ts-ignore
+                      onClick={() => mutation()}
                     >
                       {!loading && (
                         <>
@@ -735,9 +620,9 @@ class PrintCertificateActionComponent extends React.Component<
                         </span>
                       )}
                     </ConfirmBtn>
-                  )
-                }}
-              </Mutation>
+                  )}
+                </MutationContext.Consumer>
+              </MutationProvider>
               <EditRegistration id="edit" disabled={true}>
                 <Edit />
                 {this.props.intl.formatMessage(messages.editRegistration)}
@@ -992,6 +877,17 @@ class PrintCertificateActionComponent extends React.Component<
       }
     }
   }
+  getEvent() {
+    const eventType = this.getDraft().eventType || 'BIRTH'
+    switch (eventType.toLocaleLowerCase()) {
+      case 'birth':
+        return Event.BIRTH
+      case 'death':
+        return Event.DEATH
+      default:
+        return Event.BIRTH
+    }
+  }
 
   getIssuerDetails() {
     const { intl, userDetails, language } = this.props
@@ -1043,143 +939,144 @@ class PrintCertificateActionComponent extends React.Component<
           }}
         >
           <HeaderContent>
-            <Query
-              query={FETCH_BIRTH_REGISTRATION_QUERY}
-              variables={{
-                id: registrationId
-              }}
+            <QueryProvider
+              event={this.getEvent()}
+              action={Action.LOAD_CERTIFICATE_APPLICATION}
+              payload={{ id: registrationId }}
             >
-              {({ loading, error, data }) => {
-                if (loading) {
-                  return <StyledSpinner id="print-certificate-spinner" />
-                }
-
-                if (data) {
-                  let fields = collectCertificateForm.fields
-                  fields = fields.map(field => {
-                    if (
-                      field &&
-                      field.type === INFORMATIVE_RADIO_GROUP &&
-                      field.name === 'motherDetails'
-                    ) {
-                      field.information = data.fetchBirthRegistration.mother
-                    } else if (
-                      field &&
-                      field.type === INFORMATIVE_RADIO_GROUP &&
-                      field.name === 'fatherDetails'
-                    ) {
-                      field.information = data.fetchBirthRegistration.father
-                    }
-
-                    return field
-                  })
-
-                  const paymentAmount = calculatePrice(
-                    data.fetchBirthRegistration.child.birthDate
-                  )
-
-                  moment.locale(this.props.language)
-                  const DOBDiff = moment(
-                    data.fetchBirthRegistration.child.birthDate,
-                    'YYYY-MM-DD'
-                  )
-                    .fromNow()
-                    .replace(' ago', '')
-                    .replace(' আগে', '')
-
-                  paymentFormSection.fields.map(field => {
-                    if (
-                      field &&
-                      field.type === PARAGRAPH &&
-                      field.name === 'paymentAmount'
-                    ) {
-                      field.initialValue = paymentAmount
-                    }
-                  })
-
-                  paymentFormSection.fields.map(field => {
-                    if (
-                      field &&
-                      field.type === PARAGRAPH &&
-                      field.name === 'service'
-                    ) {
-                      field.initialValue = DOBDiff.toString()
-                      field.label = messages[`service`]
-                    }
-                  })
-
-                  const registrant: Registrant = this.setRegistrant(
-                    data.fetchBirthRegistration
-                  )
-
-                  const certificateData = this.getCertificateDetails(
-                    data.fetchBirthRegistration,
-                    intl,
-                    offlineResources
-                  )
-                  const transData: IFormData = gqlToDraftTransformer(
-                    this.props.registerForm,
-                    data.fetchBirthRegistration
-                  )
-                  if (
-                    form.fields.filter(
-                      field => field.name === 'personCollectingCertificate'
-                    ).length === 0 &&
-                    form === collectCertificateForm
-                  ) {
-                    if (
-                      transData.father &&
-                      transData.father.fathersDetailsExist
-                    ) {
-                      form.fields.unshift(fatherDataExists)
-                    } else {
-                      form.fields.unshift(fatherDataDoesNotExist)
-                    }
+              <QueryContext.Consumer>
+                {({ loading, error, data, dataKey }) => {
+                  if (loading) {
+                    return <StyledSpinner id="print-certificate-spinner" />
                   }
-                  const reviewDraft = createReviewDraft(
-                    registrationId,
-                    transData,
-                    Event.BIRTH
-                  )
-                  const draftExist = !!drafts.find(
-                    draft => draft.id === registrationId
-                  )
-                  if (!draftExist) {
-                    dispatch(storeDraft(reviewDraft))
+                  if (data) {
+                    // @ts-ignore
+                    const retrievedData = data[dataKey]
+                    let fields = collectCertificateForm.fields
+                    fields = fields.map(field => {
+                      if (
+                        field &&
+                        field.type === INFORMATIVE_RADIO_GROUP &&
+                        field.name === 'motherDetails'
+                      ) {
+                        field.information = retrievedData.mother
+                      } else if (
+                        field &&
+                        field.type === INFORMATIVE_RADIO_GROUP &&
+                        field.name === 'fatherDetails'
+                      ) {
+                        field.information = retrievedData.father
+                      }
+
+                      return field
+                    })
+
+                    const paymentAmount = calculatePrice(
+                      retrievedData.child.birthDate
+                    )
+
+                    moment.locale(this.props.language)
+                    const DOBDiff = moment(
+                      retrievedData.child.birthDate,
+                      'YYYY-MM-DD'
+                    )
+                      .fromNow()
+                      .replace(' ago', '')
+                      .replace(' আগে', '')
+
+                    paymentFormSection.fields.map(field => {
+                      if (
+                        field &&
+                        field.type === PARAGRAPH &&
+                        field.name === 'paymentAmount'
+                      ) {
+                        field.initialValue = paymentAmount
+                      }
+                    })
+
+                    paymentFormSection.fields.map(field => {
+                      if (
+                        field &&
+                        field.type === PARAGRAPH &&
+                        field.name === 'service'
+                      ) {
+                        field.initialValue = DOBDiff.toString()
+                        field.label = messages[`service`]
+                      }
+                    })
+
+                    const registrant: Registrant = this.setRegistrant(
+                      retrievedData
+                    )
+
+                    const certificateData = this.getCertificateDetails(
+                      retrievedData,
+                      intl,
+                      offlineResources
+                    )
+
+                    const transData: IFormData = gqlToDraftTransformer(
+                      this.props.registerForm,
+                      retrievedData
+                    )
+                    if (
+                      form.fields.filter(
+                        field => field.name === 'personCollectingCertificate'
+                      ).length === 0 &&
+                      form === collectCertificateForm
+                    ) {
+                      if (
+                        transData.father &&
+                        transData.father.fathersDetailsExist
+                      ) {
+                        form.fields.unshift(fatherDataExists)
+                      } else {
+                        form.fields.unshift(fatherDataDoesNotExist)
+                      }
+                    }
+                    const reviewDraft = createReviewDraft(
+                      registrationId,
+                      transData,
+                      this.getEvent()
+                    )
+                    const draftExist = !!drafts.find(
+                      draft => draft.id === registrationId
+                    )
+                    if (!draftExist) {
+                      dispatch(storeDraft(reviewDraft))
+                    }
+                    return (
+                      <FormContainer>
+                        <Box>
+                          <FormFieldGenerator
+                            id={form.id}
+                            onChange={this.storeData}
+                            setAllFieldsDirty={false}
+                            fields={form.fields}
+                          />
+                        </Box>
+                        <Column>
+                          {this.state.data.personCollectingCertificate &&
+                            this.getFormAction(
+                              this.state.currentForm,
+                              registrant,
+                              certificateData
+                            )}
+                        </Column>
+                      </FormContainer>
+                    )
                   }
-
-                  return (
-                    <FormContainer>
-                      <Box>
-                        <FormFieldGenerator
-                          id={form.id}
-                          onChange={this.storeData}
-                          setAllFieldsDirty={false}
-                          fields={form.fields}
-                        />
-                      </Box>
-                      <Column>
-                        {this.state.data.personCollectingCertificate &&
-                          this.getFormAction(
-                            this.state.currentForm,
-                            registrant,
-                            certificateData
-                          )}
-                      </Column>
-                    </FormContainer>
-                  )
-                }
-                if (error) {
-                  return (
-                    <ErrorText id="print-certificate-queue-error-text">
-                      {intl.formatMessage(messages.queryError)}
-                    </ErrorText>
-                  )
-                }
-
-                return JSON.stringify(data)
-              }}
-            </Query>
+                  if (error) {
+                    return (
+                      <ErrorText id="print-certificate-queue-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return JSON.stringify(data)
+                }}
+              </QueryContext.Consumer>
+            </QueryProvider>
           </HeaderContent>
         </ActionPage>
       </ActionPageWrapper>

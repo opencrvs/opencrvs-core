@@ -7,16 +7,16 @@ describe('.sendSMS()', () => {
     const logSpy = jest.spyOn(logger, 'info')
     fetch.once('Success')
     await sendSMS('+27845555555', 'test')
-    expect(logSpy).toHaveBeenLastCalledWith(
-      'Received success response from Clickatell: Success'
-    )
+    expect(logSpy).toHaveBeenLastCalledWith('Response from Infobip: "Success"')
   })
 
   it('should throw when an ERR is returned in the body', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.once('ERR: something broke :(')
+    fetch.mockResponse(JSON.stringify({}), { status: 400 })
     await expect(sendSMS('+27845555555', 'test')).rejects.toThrow()
-    expect(logSpy).toHaveBeenLastCalledWith('ERR: something broke :(')
+    expect(logSpy).toHaveBeenLastCalledWith(
+      'Failed to send sms to +27845555555'
+    )
   })
 
   it('should throw when the fetch throws', async () => {

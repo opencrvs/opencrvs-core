@@ -78,14 +78,34 @@ const messages = defineMessages({
     description: 'The duplicates text for female'
   },
   FIELD_AGENT: {
-    id: 'register.duplicates.field-agent',
-    defaultMessage: 'Field agent',
-    description: 'The duplicates text for field agent'
+    id: 'register.home.header.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
   },
-  REGISTRAR: {
-    id: 'register.duplicates.registrar',
+  REGISTRATION_CLERK: {
+    id: 'register.home.header.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
-    description: 'The duplicates text for registrar'
+    description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.header.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.header.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.header.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
   },
   queryError: {
     id: 'register.duplicates.queryError',
@@ -327,48 +347,29 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               (rec.father.identifier[0] as GQLIdentityType).id) ||
             ''
         },
-        regStatusHistory: [
-          {
-            action:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                Action[
-                  (rec.registration.status[0] as GQLRegWorkflow)
-                    .type as GQLRegStatus
-                ]) ||
-              Action.DECLARED,
-            date:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                (rec.registration.status[0] as GQLRegWorkflow).timestamp) ||
-              '',
-            usersName: userNamesMap[language],
-            usersRole:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                (rec.registration.status[0] as GQLRegWorkflow).user &&
-                ((rec.registration.status[0] as GQLRegWorkflow).user as GQLUser)
-                  .role &&
-                intl.formatMessage(
-                  messages[
-                    ((rec.registration.status[0] as GQLRegWorkflow)
-                      .user as GQLUser).role as string
-                  ]
-                )) ||
-              '',
-            office:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                (rec.registration.status[0] as GQLRegWorkflow).office &&
-                ((rec.registration.status[0] as GQLRegWorkflow)
-                  .office as GQLLocation).name) ||
-              ''
-          }
-        ]
+        regStatusHistory:
+          (rec.registration &&
+            rec.registration.status &&
+            rec.registration.status
+              .map((status: GQLRegWorkflow) => {
+                return {
+                  action:
+                    Action[status.type as GQLRegStatus] || Action.DECLARED,
+                  date: status.timestamp || '',
+                  usersName: userNamesMap[language],
+                  usersRole:
+                    (status.user &&
+                      (status.user as GQLUser).role &&
+                      intl.formatMessage(
+                        messages[(status.user as GQLUser).role as string]
+                      )) ||
+                    '',
+                  office:
+                    (status.office && (status.office as GQLLocation).name) || ''
+                }
+              })
+              .reverse()) ||
+          []
       }
     })
   }

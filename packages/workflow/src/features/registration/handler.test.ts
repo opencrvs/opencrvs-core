@@ -14,6 +14,8 @@ import {
   officeMock,
   testFhirBundleForDeath,
   testFhirBundleWithIdsForDeath,
+  motherMock,
+  compositionMock,
   testDeathFhirBundle
 } from '../../test/utils'
 import { cloneDeep } from 'lodash'
@@ -508,15 +510,37 @@ describe('markBirthAsRegisteredHandler handler', () => {
       }
     )
 
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            response: { location: 'Task/12423/_history/1' }
-          }
-        ]
-      })
+    fetch.resetMocks()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Task/12423/_history/1' }
+            }
+          ]
+        })
+      ],
+      [compositionMock, { status: 200 }],
+      [motherMock, { status: 200 }]
     )
     const taskBundle = {
       resourceType: 'Bundle',
@@ -527,6 +551,9 @@ describe('markBirthAsRegisteredHandler handler', () => {
           resource: {
             resourceType: 'Task',
             status: 'requested',
+            focus: {
+              reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
+            },
             code: {
               coding: [
                 {
