@@ -50,22 +50,22 @@ const messages = defineMessages({
   },
   applicantsGivenNames: {
     id: 'formFields.applicantsGivenNames',
-    defaultMessage: 'Given name (s)',
+    defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: Given names'
   },
   applicantsFamilyName: {
     id: 'formFields.applicantsFamilyName',
-    defaultMessage: 'Family Name',
+    defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   applicantsGivenNamesEng: {
     id: 'formFields.applicantsGivenNamesEng',
-    defaultMessage: 'Given Name (s) in English',
+    defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: Given names in english'
   },
   applicantsFamilyNameEng: {
     id: 'formFields.applicantsFamilyNameEng',
-    defaultMessage: 'Family Name in English',
+    defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   applicantsNationality: {

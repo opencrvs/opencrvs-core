@@ -74,22 +74,22 @@ const messages = defineMessages({
   },
   motherFirstNames: {
     id: 'formFields.motherFirstNames',
-    defaultMessage: 'First name(s)',
+    defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: First names'
   },
   motherFamilyName: {
     id: 'formFields.motherFamilyName',
-    defaultMessage: 'Family name',
+    defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   motherFirstNamesEng: {
     id: 'formFields.motherFirstNamesEng',
-    defaultMessage: 'First name(s) (in english)',
+    defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: First names in english'
   },
   motherFamilyNameEng: {
     id: 'formFields.motherFamilyNameEng',
-    defaultMessage: 'Family name (in english)',
+    defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   defaultLabel: {
