@@ -28,15 +28,13 @@ import {
 } from 'src/forms/mappings/mutation/field-mappings'
 import { eventLocationMutationTransformer } from './mappings/mutation/child-mappings'
 import {
-  eventLocationQueryTransformer,
-  eventLocationTypeQueryTransformer,
-  eventLocationIDQueryTransformer
-} from './mappings/query/child-mappings'
-import {
   nameToFieldTransformer,
   fieldValueTransformer,
   bundleFieldToSectionFieldTransformer,
-  sectionFieldExchangeTransformer
+  sectionFieldExchangeTransformer,
+  eventLocationTypeQueryTransformer,
+  eventLocationIDQueryTransformer,
+  eventLocationQueryTransformer
 } from 'src/forms/mappings/query/field-mappings'
 
 export interface IChildSectionFormData {

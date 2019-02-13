@@ -15,9 +15,19 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from 'src/forms/countries'
 import { conditionals } from 'src/forms/utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { sectionFieldToBundleFieldTransformer } from 'src/forms/mappings/mutation/field-mappings'
-import { deceasedDateTransformation } from './mappings/mutation/event-mappings'
-import { ignoreFieldTransformer } from 'src/forms/mappings/mutation/field-mappings'
+import {
+  sectionFieldToBundleFieldTransformer,
+  copyEventAddressTransformer
+} from 'src/forms/mappings/mutation/field-mappings'
+import {
+  deceasedDateTransformation,
+  eventLocationMutationTransformer
+} from './mappings/mutation/event-mappings'
+import {
+  sameEventAddressFieldTransformer,
+  eventLocationIDQueryTransformer,
+  eventLocationQueryTransformer
+} from 'src/forms/mappings/query/field-mappings'
 
 const messages = defineMessages({
   deathEventTab: {
@@ -177,22 +187,23 @@ export const eventSection: IFormSection = {
       validate: [],
       options: [
         {
-          value: 'sameAsPermanent',
+          value: 'PERMANENT',
           label: messages.deathPlaceAddressSameAsPermanent
         },
         {
-          value: 'sameAsCurrent',
+          value: 'CURRENT',
           label: messages.deathPlaceAddressSameAsCurrent
         },
-        { value: 'other', label: messages.deathPlaceAddressOther }
+        { value: 'OTHER', label: messages.deathPlaceAddressOther }
       ],
       conditionals: [],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: copyEventAddressTransformer('deceased'),
+        query: sameEventAddressFieldTransformer('deceased')
       }
     },
     {
-      name: 'addressType',
+      name: 'placeOfDeath',
       type: SELECT_WITH_OPTIONS,
       label: messages.deathPlaceAddressType,
       required: false,
@@ -209,7 +220,8 @@ export const eventSection: IFormSection = {
       ],
       conditionals: [conditionals.deathPlaceOther],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationIDQueryTransformer()
       }
     },
     {
@@ -222,7 +234,8 @@ export const eventSection: IFormSection = {
       options: countries,
       conditionals: [conditionals.deathPlaceOther],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationQueryTransformer()
       }
     },
     {
@@ -238,7 +251,8 @@ export const eventSection: IFormSection = {
       },
       conditionals: [conditionals.country, conditionals.deathPlaceOther],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationQueryTransformer()
       }
     },
     {
@@ -258,7 +272,8 @@ export const eventSection: IFormSection = {
         conditionals.deathPlaceOther
       ],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationQueryTransformer()
       }
     },
     {
@@ -279,7 +294,8 @@ export const eventSection: IFormSection = {
         conditionals.deathPlaceOther
       ],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(6),
+        query: eventLocationQueryTransformer(6)
       }
     },
     {
@@ -301,7 +317,28 @@ export const eventSection: IFormSection = {
         conditionals.deathPlaceOther
       ],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(4),
+        query: eventLocationQueryTransformer(4)
+      }
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherEventLocation,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(5),
+        query: eventLocationQueryTransformer(5)
       }
     },
     {
@@ -320,7 +357,48 @@ export const eventSection: IFormSection = {
         conditionals.deathPlaceOther
       ],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(3),
+        query: eventLocationQueryTransformer(3)
+      }
+    },
+    {
+      name: 'addressLine1CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherEventLocation,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(2),
+        query: eventLocationQueryTransformer(2)
+      }
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherEventLocation,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(0, 'postalCode'),
+        query: eventLocationQueryTransformer(0, 'postalCode')
       }
     },
     {
@@ -339,7 +417,8 @@ export const eventSection: IFormSection = {
         conditionals.deathPlaceOther
       ],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(1),
+        query: eventLocationQueryTransformer(1)
       }
     },
     {
@@ -358,7 +437,8 @@ export const eventSection: IFormSection = {
         conditionals.deathPlaceOther
       ],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: eventLocationMutationTransformer(0, 'postalCode'),
+        query: eventLocationQueryTransformer(0, 'postalCode')
       }
     }
   ]
