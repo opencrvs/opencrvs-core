@@ -6,5 +6,7 @@ export const convertToMSISDN = (phone: string) => {
     callingCountries[COUNTRY_ALPHA3.toUpperCase()].countryCallingCodes[0]
   return phone.startsWith(countryCode)
     ? phone
-    : `${countryCode}${phone.substring(1)}`
+    : phone.startsWith('0')
+    ? `${countryCode}${phone.substring(1)}`
+    : `${countryCode}${phone}`
 }
