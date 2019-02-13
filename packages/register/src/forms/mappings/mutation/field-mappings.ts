@@ -1,6 +1,6 @@
 import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
 
-export const nameTransformer = (
+export const fieldToNameTransformer = (
   language: string,
   transformedFieldName?: string
 ) => (
@@ -27,6 +27,16 @@ export const nameTransformer = (
   personName[!transformedFieldName ? field.name : transformedFieldName] =
     draftData[sectionId][field.name]
 
+  return transformedData
+}
+
+export function ignoreFieldTransformer(
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) {
+  /* do nothing */
   return transformedData
 }
 
@@ -136,7 +146,8 @@ export const copyAddressTransformer = (
   fromSection: string,
   toAddressType: string,
   toSection: string,
-  triggerValue: boolean = true
+  triggerValue: boolean = true,
+  nodeName?: string
 ) => (
   transformedData: any,
   draftData: IFormData,
@@ -147,7 +158,11 @@ export const copyAddressTransformer = (
     return transformedData
   }
 
-  const fromSectionData = transformedData[fromSection]
+  let fromSectionData = transformedData[fromSection]
+  if (nodeName) {
+    fromSectionData = transformedData[fromSection][nodeName]
+  }
+
   if (!fromSectionData.address) {
     throw new Error(`Address data not found on section ${sectionId}`)
   }
@@ -246,5 +261,19 @@ export function fieldToAttachmentTransformer(
     }
     transformedData[selectedSectionId].attachments = attachments
   }
+  return transformedData
+}
+
+export const fieldToPhoneNumberTransformer = (
+  transformedSectionId?: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  transformedData[
+    transformedSectionId ? transformedSectionId : sectionId
+  ].telecom = [{ system: 'phone', value: draftData[sectionId][field.name] }]
   return transformedData
 }

@@ -342,32 +342,32 @@ const messages = defineMessages({
     description: 'Print Certificate Button text'
   },
   FIELD_AGENT: {
-    id: 'register.home.hedaer.FIELD_AGENT',
+    id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
   REGISTRATION_CLERK: {
-    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    id: 'register.home.header.REGISTRATION_CLERK',
     defaultMessage: 'Registration Clerk',
     description: 'The description for REGISTRATION_CLERK role'
   },
   LOCAL_REGISTRAR: {
-    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    id: 'register.home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
     description: 'The description for LOCAL_REGISTRAR role'
   },
   DISTRICT_REGISTRAR: {
-    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    id: 'register.home.header.DISTRICT_REGISTRAR',
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role'
   },
   STATE_REGISTRAR: {
-    id: 'register.home.hedaer.STATE_REGISTRAR',
+    id: 'register.home.header.STATE_REGISTRAR',
     defaultMessage: 'State Registrar',
     description: 'The description for STATE_REGISTRAR role'
   },
   NATIONAL_REGISTRAR: {
-    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
   },
@@ -518,7 +518,7 @@ const ExpansionContainer = styled.div`
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  margin-bottom: 1px;
+  margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
   }
@@ -706,28 +706,30 @@ export class WorkQueueView extends React.Component<
           status:
             reg.registration &&
             reg.registration.status &&
-            reg.registration.status.map(status => {
-              return {
-                type: status && status.type,
-                practitionerName:
-                  (status &&
-                    status.user &&
-                    (createNamesMap(status.user.name as GQLHumanName[])[
-                      this.props.language
-                    ] as string)) ||
-                  (status &&
-                    status.user &&
-                    /* tslint:disable:no-string-literal */
-                    (createNamesMap(status.user.name as GQLHumanName[])[
-                      'default'
-                    ] as string)) ||
-                  /* tslint:enable:no-string-literal */
-                  '',
-                timestamp: status && formatLongDate(status.timestamp, locale),
-                practitionerRole: status && status.user && status.user.role,
-                officeName: status && status.office && status.office.name
-              }
-            }),
+            reg.registration.status
+              .map(status => {
+                return {
+                  type: status && status.type,
+                  practitionerName:
+                    (status &&
+                      status.user &&
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        this.props.language
+                      ] as string)) ||
+                    (status &&
+                      status.user &&
+                      /* tslint:disable:no-string-literal */
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        'default'
+                      ] as string)) ||
+                    /* tslint:enable:no-string-literal */
+                    '',
+                  timestamp: status && formatLongDate(status.timestamp, locale),
+                  practitionerRole: status && status.user && status.user.role,
+                  officeName: status && status.office && status.office.name
+                }
+              })
+              .reverse(),
           declaration_status:
             reg.registration &&
             reg.registration.status &&
@@ -770,16 +772,13 @@ export class WorkQueueView extends React.Component<
     })
   }
 
-  renderExpansionContent = (
-    item: {
-      [key: string]: string & Array<{ [key: string]: string }>
-    },
-    key: number
-  ): JSX.Element[] => {
-    return item.status.map(status => {
+  renderExpansionContent = (item: {
+    [key: string]: string & Array<{ [key: string]: string }>
+  }): JSX.Element[] => {
+    return item.status.map((status, i) => {
       const { practitionerName, practitionerRole, officeName } = status
       return (
-        <ExpansionContainer key={key}>
+        <ExpansionContainer key={i}>
           {this.getDeclarationStatusIcon(status.type)}
           <ExpansionContentContainer>
             <LabelValue
@@ -991,7 +990,7 @@ export class WorkQueueView extends React.Component<
         actions={listItemActions}
         expandedCellRenderer={() => (
           <ListItemExpansion actions={expansionActions}>
-            {this.renderExpansionContent(item, key)}
+            {this.renderExpansionContent(item)}
           </ListItemExpansion>
         )}
       />

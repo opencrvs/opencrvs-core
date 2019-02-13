@@ -15,7 +15,14 @@ import {
   goToTab as goToTabAction,
   goBack as goBackAction
 } from '../../navigation'
-import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
+import {
+  IForm,
+  IFormSection,
+  IFormField,
+  IFormSectionData,
+  Event,
+  Action
+} from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from 'src/store'
 import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
@@ -25,9 +32,6 @@ import {
   ViewFooter
 } from 'src/components/interface/footer'
 import { StickyFormTabs } from './StickyFormTabs'
-import gql from 'graphql-tag'
-import { Mutation } from 'react-apollo'
-import { draftToGqlTransformer } from 'src/transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
@@ -48,6 +52,10 @@ import {
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
+import {
+  MutationProvider,
+  MutationContext
+} from '../DataProvider/MutationProvider'
 import { toggleDraftSavedNotification } from 'src/notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
@@ -126,6 +134,10 @@ const Notice = styled.div`
   line-height: 24px;
   margin: 30px -25px;
 `
+const PreviewButton = styled.a`
+  text-decoration: underline;
+  color: ${({ theme }) => theme.colors.primary};
+`
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -203,10 +215,6 @@ const FormViewContainer = styled.div`
   flex-direction: column;
 `
 
-const PreviewButton = styled.a`
-  text-decoration: underline;
-  color: ${({ theme }) => theme.colors.primary};
-`
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
@@ -303,17 +311,6 @@ type State = {
   rejectFormOpen: boolean
   selectedTabId: string
 }
-
-const postMutation = gql`
-  mutation submitBirthRegistration($details: BirthRegistrationInput!) {
-    createBirthRegistration(details: $details)
-  }
-`
-const patchMutation = gql`
-  mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput) {
-    markBirthAsRegistered(id: $id, details: $details)
-  }
-`
 const VIEW_TYPE = {
   REVIEW: 'review',
   PREVIEW: 'preview'
@@ -380,9 +377,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   rejectSubmission = () => {
-    const { history, draft } = this.props
-    const childData = this.props.draft.data.child
-    const fullName: IFullName = getFullName(childData)
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    let personData
+    if (event === Event.DEATH) {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
     const duplicate = history.location.state && history.location.state.duplicate
     let eventName = DECLARATION
     if (duplicate) {
@@ -393,6 +399,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
+      eventType: event,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
@@ -401,27 +408,43 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   successfulSubmission = (response: string) => {
-    const { history, draft } = this.props
-    const childData = this.props.draft.data.child
-    const fullName = getFullName(childData)
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    let personData
+    if (event === Event.DEATH) {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
 
     const duplicate = history.location.state && history.location.state.duplicate
 
     let eventName = DECLARATION
+    let actionName = SUBMISSION
+    let nextSection = true
 
     if (this.userHasRegisterScope()) {
       eventName = REGISTRATION
+      actionName = REGISTERED
+      nextSection = false
     }
 
     if (duplicate) {
       eventName = DUPLICATION
+      actionName = REGISTERED
+      nextSection = false
     }
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
-      nextSection: true,
+      nextSection,
       trackingSection: true,
       eventName,
-      actionName: SUBMISSION,
+      eventType: event,
+      actionName,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
       duplicateContextId:
@@ -431,18 +454,28 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   successfullyRegistered = (response: string) => {
-    const { history, draft } = this.props
-    const childData = this.props.draft.data.child
-    const fullName = getFullName(childData)
-    this.props.deleteDraft({ ...draft })
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    let personData
+    if (event === Event.DEATH) {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       trackingSection: true,
       eventName: REGISTRATION,
+      eventType: event,
       actionName: REGISTERED,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
+    this.props.deleteDraft(draft)
   }
 
   submitForm = () => {
@@ -476,24 +509,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  processSubmitData = () => {
-    const { draft, registerForm } = this.props
-    const { showSubmitModal, showRegisterModal } = this.state
-    if (!showRegisterModal && !showSubmitModal) {
-      return
-    }
-    const data = draftToGqlTransformer(registerForm, draft.data)
-    if (!draft.review) {
-      return { details: data }
-    } else {
-      if (!this.state.isDataAltered) {
-        return { id: draft.id }
-      } else {
-        return { id: draft.id, details: data }
-      }
-    }
-  }
-
   generateSectionListForReview = (
     disabled: boolean,
     sections: IFormSection[]
@@ -516,6 +531,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.setState(state => ({
       rejectFormOpen: !state.rejectFormOpen
     }))
+  }
+
+  getEvent() {
+    const eventType = this.props.draft.event || 'BIRTH'
+    switch (eventType.toLocaleLowerCase()) {
+      case 'birth':
+        return Event.BIRTH
+      case 'death':
+        return Event.DEATH
+      default:
+        return Event.BIRTH
+    }
   }
 
   onSaveAsDraftClicked = () => {
@@ -701,101 +728,109 @@ class RegisterFormView extends React.Component<FullProps, State> {
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation
-          mutation={postMutation}
-          variables={this.processSubmitData()}
-          onCompleted={data =>
-            this.successfulSubmission(data.createBirthRegistration)
-          }
-        >
-          {(submitBirthRegistration, { loading, error, data }) => {
-            return (
-              <Modal
-                title="Are you ready to submit?"
-                actions={[
-                  <ConfirmBtn
-                    key="submit"
-                    id="submit_confirm"
-                    disabled={loading || data}
-                    onClick={() => submitBirthRegistration()}
-                  >
-                    {!loading && (
-                      <>
-                        <TickLarge />
-                        {intl.formatMessage(messages.submitButton)}
-                      </>
-                    )}
-                    {loading && <ButtonSpinner id="submit_confirm_spinner" />}
-                  </ConfirmBtn>,
-                  <PreviewButton
-                    id="preview-btn"
-                    key="preview"
-                    onClick={() => {
-                      this.toggleSubmitModalOpen()
-                      if (document.documentElement) {
-                        document.documentElement.scrollTop = 0
-                      }
-                    }}
-                  >
-                    {intl.formatMessage(messages.preview)}
-                  </PreviewButton>
-                ]}
-                show={this.state.showSubmitModal}
-                handleClose={this.toggleSubmitModalOpen}
-              >
-                {intl.formatMessage(messages.submitDescription)}
-              </Modal>
-            )
-          }}
-        </Mutation>
 
-        <Mutation
-          mutation={patchMutation}
-          variables={this.processSubmitData()}
-          onCompleted={data =>
-            this.successfullyRegistered(data.markBirthAsRegistered)
-          }
-        >
-          {(markBirthAsRegistered, { loading, error, data }) => {
-            return (
-              <Modal
-                title="Are you ready to submit?"
-                actions={[
-                  <ConfirmBtn
-                    key="register"
-                    id="register_confirm"
-                    disabled={loading || data}
-                    onClick={() => markBirthAsRegistered()}
-                  >
-                    {!loading && (
-                      <>
-                        <TickLarge />
-                        {intl.formatMessage(messages.submitButton)}
-                      </>
-                    )}
-                    {loading && <ButtonSpinner id="register_confirm_spinner" />}
-                  </ConfirmBtn>,
-                  <PreviewButton
-                    key="review"
-                    id="register_review"
-                    onClick={() => {
-                      this.toggleRegisterModalOpen()
-                      if (document.documentElement) {
-                        document.documentElement.scrollTop = 0
-                      }
-                    }}
-                  >
-                    {intl.formatMessage(messages.preview)}
-                  </PreviewButton>
-                ]}
-                show={this.state.showRegisterModal}
-                handleClose={this.toggleRegisterModalOpen}
-              >
-                {intl.formatMessage(messages.submitDescription)}
-              </Modal>
-            )
-          }}
-        </Mutation>
+        {this.state.showSubmitModal && (
+          <MutationProvider
+            event={this.getEvent()}
+            action={Action.SUBMIT_FOR_REVIEW}
+            form={registerForm}
+            draft={draft}
+            onCompleted={this.successfulSubmission}
+          >
+            <MutationContext.Consumer>
+              {({ mutation, loading, data }) => (
+                <Modal
+                  title="Are you ready to submit?"
+                  actions={[
+                    <ConfirmBtn
+                      key="submit"
+                      id="submit_confirm"
+                      disabled={loading || data}
+                      // @ts-ignore
+                      onClick={() => mutation()}
+                    >
+                      {!loading && (
+                        <>
+                          <TickLarge />
+                          {intl.formatMessage(messages.submitButton)}
+                        </>
+                      )}
+                      {loading && <ButtonSpinner id="submit_confirm_spinner" />}
+                    </ConfirmBtn>,
+                    <PreviewButton
+                      id="preview-btn"
+                      key="preview"
+                      onClick={() => {
+                        this.toggleSubmitModalOpen()
+                        if (document.documentElement) {
+                          document.documentElement.scrollTop = 0
+                        }
+                      }}
+                    >
+                      {intl.formatMessage(messages.preview)}
+                    </PreviewButton>
+                  ]}
+                  show={this.state.showSubmitModal}
+                  handleClose={this.toggleSubmitModalOpen}
+                >
+                  {intl.formatMessage(messages.submitDescription)}
+                </Modal>
+              )}
+            </MutationContext.Consumer>
+          </MutationProvider>
+        )}
+        {this.state.showRegisterModal && (
+          <MutationProvider
+            event={this.getEvent()}
+            action={Action.REGISTER_APPLICATION}
+            form={registerForm}
+            draft={draft}
+            onCompleted={this.successfullyRegistered}
+          >
+            <MutationContext.Consumer>
+              {({ mutation, loading, data }) => (
+                <Modal
+                  title="Are you ready to submit?"
+                  actions={[
+                    <ConfirmBtn
+                      key="register"
+                      id="register_confirm"
+                      disabled={loading || data}
+                      // @ts-ignore
+                      onClick={() => mutation()}
+                    >
+                      {!loading && (
+                        <>
+                          <TickLarge />
+                          {intl.formatMessage(messages.submitButton)}
+                        </>
+                      )}
+                      {loading && (
+                        <ButtonSpinner id="register_confirm_spinner" />
+                      )}
+                    </ConfirmBtn>,
+                    <PreviewButton
+                      key="review"
+                      id="register_review"
+                      onClick={() => {
+                        this.toggleRegisterModalOpen()
+                        if (document.documentElement) {
+                          document.documentElement.scrollTop = 0
+                        }
+                      }}
+                    >
+                      {intl.formatMessage(messages.preview)}
+                    </PreviewButton>
+                  ]}
+                  show={this.state.showRegisterModal}
+                  handleClose={this.toggleRegisterModalOpen}
+                >
+                  {intl.formatMessage(messages.submitDescription)}
+                </Modal>
+              )}
+            </MutationContext.Consumer>
+          </MutationProvider>
+        )}
 
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
@@ -805,6 +840,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             }}
             duplicate={duplicate}
             draftId={draft.id}
+            event={this.getEvent()}
           />
         )}
       </FormViewContainer>
