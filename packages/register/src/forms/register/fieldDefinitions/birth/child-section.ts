@@ -21,7 +21,7 @@ import {
 import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   sectionFieldToBundleFieldTransformer,
   fieldNameTransformer,
   fieldValueSectionExchangeTransformer
@@ -29,7 +29,7 @@ import {
 import { addressToPlaceOfBirthTransformer } from './mappings/mutation/child-mappings'
 import { placeOfBirthToAddressTransformer } from './mappings/query/child-mappings'
 import {
-  nameFieldTransformer,
+  nameToFieldTransformer,
   fieldValueTransformer,
   bundleFieldToSectionFieldTransformer,
   sectionFieldExchangeTransformer
@@ -245,8 +245,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -257,8 +257,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -269,8 +269,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames')
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -281,8 +281,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName')
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
       }
     },
     {
