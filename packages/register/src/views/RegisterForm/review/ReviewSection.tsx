@@ -54,8 +54,10 @@ import {
   ISelectOption,
   IDynamicOptions,
   IFormSectionData,
-  WARNING
+  WARNING,
+  DATE
 } from 'src/forms'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 const messages = defineMessages({
   valueYes: {
@@ -394,6 +396,11 @@ const renderValue = (
       language
     )
   }
+
+  if (field.type === DATE && typeof value === 'string') {
+    return formatLongDate(value)
+  }
+
   if (typeof value === 'string') {
     return value
   }
