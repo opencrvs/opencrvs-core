@@ -225,7 +225,7 @@ describe('WorkQueue tests', async () => {
         id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
         name: 'অনিক',
         dob: '',
-        date_of_application: '2018-05-23',
+        date_of_application: '23-05-2018',
         registrationNumber: '',
         tracking_id: 'B111111',
         createdAt: '2018-05-23T14:44:58+02:00',
@@ -235,7 +235,7 @@ describe('WorkQueue tests', async () => {
         status: [
           {
             officeName: 'Kaliganj Union Sub Center',
-            timestamp: '2018-12-07',
+            timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
             practitionerRole: 'LOCAL_REGISTRAR'
@@ -248,7 +248,7 @@ describe('WorkQueue tests', async () => {
         id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
         name: 'মাসুম',
         dob: '',
-        date_of_application: '2018-05-23',
+        date_of_application: '23-05-2018',
         registrationNumber: '',
         tracking_id: 'B222222',
         createdAt: '2018-05-23T14:44:58+02:00',
@@ -258,7 +258,7 @@ describe('WorkQueue tests', async () => {
         status: [
           {
             officeName: 'Kaliganj Union Sub Center',
-            timestamp: '2018-12-07',
+            timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
             practitionerRole: 'LOCAL_REGISTRAR'
