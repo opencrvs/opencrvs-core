@@ -852,21 +852,27 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
-
+    'formFields.fetchModalTitle': 'Checking',
+    'formFields.fetchModalSuccessTitle': 'ID valid',
+    'formFields.fetchModalErrorTitle': 'Invalid Id',
+    'formFields.fetchModalErrorText': 'No registration found for provided BRN',
+    'formFields.loaderButton.cancel': 'Cancel',
+    'formFields.fetchDeceasedDetails': "Retrieve Deceased's Details",
+    'formFields.fetchModalInfo': 'Birth Registration Number',
     'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
-    certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed} 
+    certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
     submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
-    'register.confirmationScreen.headerDesc': `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The declaration}} 
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The declaration}}
     {action, select, submitted {is now on its way for validation} completed {} registered {registered} rejected {rejected} approved {Approved}
     offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
-    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All done!} submitted {All done!} rejected {Application rejected} 
+    'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {All done!} submitted {All done!} rejected {Application rejected}
       approved {Application approved} registered {Application registered} offlineAction {Almost there}}`,
-    'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.} 
+    'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.}
       registration {The registration process is complete.} duplication {} certificate {}
       offlineEvent {All you need to do is login once you have internet connectivity on your device within the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.}}`,
-    'register.confirmationScreen.nextSectionDescDetails': `{event, select, 
-      declaration {The informant has given their contact details and will also be informed when the registration is complete.} 
-      registration {The certificate should only be printed once the informant goes to collect it.} duplication {} certificate {} 
+    'register.confirmationScreen.nextSectionDescDetails': `{event, select,
+      declaration {The informant has given their contact details and will also be informed when the registration is complete.}
+      registration {The certificate should only be printed once the informant goes to collect it.} duplication {} certificate {}
       offlineEvent {Once the application is succesfully submited, you and the informant will be notified when the registration is complete.}}`,
     'register.confirmationScreen.nextCard.title': 'What next?',
     'register.confirmationScreen.rejectedNoticeCardText2':
@@ -874,13 +880,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.buttons.back': 'Back to homescreen',
     'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
-    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: }
     duplication {Birth Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
-    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
+    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
       duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} certificate {Certificates have been collected from your jurisdiction.}
       offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}} `,
-    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The birth of } duplication 
+    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The birth of } duplication
       {The birth duplication of } certificate {The birth certificate of } offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been successfully submitted to the registration office.} rejected {has been rejected.} registered {has been registered}
       approved {has been approved.} offlineAction {is pending due to internet connection.}}`,

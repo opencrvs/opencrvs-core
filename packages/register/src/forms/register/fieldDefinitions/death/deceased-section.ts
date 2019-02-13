@@ -8,7 +8,8 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
   RADIO_GROUP,
-  FIELD_WITH_DYNAMIC_DEFINITIONS
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  LOADER_BUTTON
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
@@ -30,6 +31,7 @@ import { messages as addressMessages } from '../../../address'
 
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { conditionals } from 'src/forms/utils'
+import { FETCH_DECEASED } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
 
 const messages = defineMessages({
   deceasedTab: {
@@ -46,6 +48,41 @@ const messages = defineMessages({
     id: 'formFields.deceasedIdType',
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
+  },
+  noId: {
+    id: 'formFields.idTypeNoID',
+    defaultMessage: 'No ID available',
+    description: 'Option for form field: Type of ID'
+  },
+  fetchDeceasedDetails: {
+    id: 'formFields.fetchDeceasedDetails',
+    defaultMessage: "Retrieve Deceased's Details",
+    description: 'Label for loader button'
+  },
+  fetchModalTitle: {
+    id: 'formFields.fetchModalTitle',
+    defaultMessage: 'Checking',
+    description: 'Label for fetch modal title'
+  },
+  fetchModalSuccessTitle: {
+    id: 'formFields.fetchModalSuccessTitle',
+    defaultMessage: 'ID valid',
+    description: 'Label for fetch modal success title'
+  },
+  fetchModalErrorTitle: {
+    id: 'formFields.fetchModalErrorTitle',
+    defaultMessage: 'Invalid Id',
+    description: 'Label for fetch modal error title'
+  },
+  fetchModalErrorText: {
+    id: 'formFields.fetchModalErrorText',
+    defaultMessage: 'No registration found for provided BRN',
+    description: 'Label for fetch modal error title'
+  },
+  fetchModalInfo: {
+    id: 'formFields.fetchModalInfo',
+    defaultMessage: 'Birth Registration Number',
+    description: 'Label for loader button'
   },
   deceasedGivenNames: {
     id: 'formFields.deceasedGivenNames',
@@ -169,6 +206,29 @@ export const deceasedSection: IFormSection = {
       initialValue: '',
       validate: [],
       conditionals: [conditionals.iDAvailable]
+    },
+    {
+      name: 'loaderButton',
+      type: LOADER_BUTTON,
+      label: messages.fetchDeceasedDetails,
+      required: false,
+      initialValue: '',
+      query: FETCH_DECEASED,
+      inputs: [
+        {
+          name: 'identifier',
+          valueField: 'iD',
+          labelField: 'iDType'
+        }
+      ],
+      validate: [],
+      conditionals: [conditionals.deceasedBRNSelected],
+      modalTitle: messages.fetchModalTitle,
+      modalInfoText1: messages.fetchModalInfo,
+      modalInfoText2: messages.fetchModalInfo,
+      successTitle: messages.fetchModalSuccessTitle,
+      errorTitle: messages.fetchModalErrorTitle,
+      errorText: messages.fetchModalErrorText
     },
     {
       name: 'firstNames',
