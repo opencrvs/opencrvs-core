@@ -354,7 +354,7 @@ export const applicantsSection: IFormSection = {
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
-          fieldToPhoneNumberTransformer
+          fieldToPhoneNumberTransformer()
         )
       }
     },

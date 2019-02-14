@@ -75,6 +75,7 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
 
 export async function getInformantName(
   fhirBundle: fhir.Bundle,
+  sectionCode: string = CHILD_SECTION_CODE,
   language: string = 'bn'
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -83,7 +84,7 @@ export async function getInformantName(
     )
   }
 
-  const informant = await findPersonEntry(CHILD_SECTION_CODE, fhirBundle)
+  const informant = await findPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
   }
