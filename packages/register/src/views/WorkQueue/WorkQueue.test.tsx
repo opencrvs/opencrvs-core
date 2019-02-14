@@ -41,7 +41,7 @@ mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
 describe('WorkQueue tests', async () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -260,6 +260,137 @@ describe('WorkQueue tests', async () => {
             officeName: 'Kaliganj Union Sub Center',
             timestamp: '07-12-2018',
             type: 'REGISTERED',
+            practitionerName: 'Mohammad Ashraful',
+            practitionerRole: 'LOCAL_REGISTRAR'
+          }
+        ],
+        rejection_reason: '',
+        location: 'Kaliganj Union Sub Center'
+      }
+    ])
+
+    testComponent.component.unmount()
+  })
+
+  it('renders a false status when there is no status type in query response', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATION_QUERY,
+          variables: {
+            locationIds: ['123456789'],
+            skip: 0,
+            count: 10
+          }
+        },
+        result: {
+          data: {
+            listBirthRegistrations: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    id: '123',
+                    registrationNumber: null,
+                    trackingId: 'B111111',
+                    duplicates: null,
+                    status: [
+                      {
+                        id: '123',
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        type: '',
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        comments: [
+                          {
+                            comment: ''
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  child: {
+                    id: '123',
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: null
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <WorkQueue />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(declareScope)
+    testComponent.store.dispatch(checkAuth({ '?token': declareScope }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    const data = testComponent.component.find(DataTable).prop('data')
+    expect(data).toEqual([
+      {
+        id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+        name: 'অনিক',
+        dob: '',
+        date_of_application: '23-05-2018',
+        registrationNumber: '',
+        tracking_id: 'B111111',
+        createdAt: '2018-05-23T14:44:58+02:00',
+        declaration_status: '',
+        event: 'birth',
+        duplicates: null,
+        status: [
+          {
+            officeName: 'Kaliganj Union Sub Center',
+            timestamp: '07-12-2018',
+            type: '',
             practitionerName: 'Mohammad Ashraful',
             practitionerRole: 'LOCAL_REGISTRAR'
           }
@@ -1129,7 +1260,14 @@ describe('WorkQueue tests', async () => {
           .find('#reviewDuplicatesBtn_B111111')
           .hostNodes().length
       ).toBe(1)
-      testComponent.component.unmount()
+
+      testComponent.component
+        .find(DataTable)
+        .find('#reviewDuplicatesBtn_B111111')
+        .hostNodes()
+        .simulate('click')
+
+      expect(history.location.pathname).toContain('duplicates')
     })
   })
 
