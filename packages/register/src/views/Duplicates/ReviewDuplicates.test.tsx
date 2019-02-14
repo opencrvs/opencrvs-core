@@ -132,7 +132,7 @@ describe('Review Duplicates component', () => {
                   familyName: 'Spivak'
                 }
               ],
-              birthDate: null,
+              birthDate: '2018-08-01',
               gender: null,
               identifier: [
                 {
@@ -228,7 +228,7 @@ describe('Review Duplicates component', () => {
                   familyName: 'Spivak'
                 }
               ],
-              birthDate: null,
+              birthDate: '2018-08-01',
               gender: null,
               identifier: [
                 {
