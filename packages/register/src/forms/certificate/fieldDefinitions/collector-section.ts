@@ -181,8 +181,8 @@ export const collectCertificateFormSection: IFormSection = {
         { value: 'PASSPORT', label: identityMessages.iDTypePassport },
         { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
         {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
+          value: 'DRIVING_LICENSE',
+          label: identityMessages.iDTypeDrivingLicense
         },
         {
           value: 'BIRTH_REGISTRATION_NUMBER',

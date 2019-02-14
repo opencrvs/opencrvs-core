@@ -21,7 +21,7 @@ import {
 import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   sectionFieldToBundleFieldTransformer,
   fieldNameTransformer,
   fieldValueSectionExchangeTransformer
@@ -29,7 +29,7 @@ import {
 import { addressToPlaceOfBirthTransformer } from './mappings/mutation/child-mappings'
 import { placeOfBirthToAddressTransformer } from './mappings/query/child-mappings'
 import {
-  nameFieldTransformer,
+  nameToFieldTransformer,
   fieldValueTransformer,
   bundleFieldToSectionFieldTransformer,
   sectionFieldExchangeTransformer
@@ -56,22 +56,22 @@ const messages = defineMessages({
   },
   childFirstNames: {
     id: 'formFields.childFirstNames',
-    defaultMessage: 'First name(s)',
+    defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: First names'
   },
   childFamilyName: {
     id: 'formFields.childFamilyName',
-    defaultMessage: 'Family name',
+    defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   childFirstNamesEng: {
     id: 'formFields.childFirstNamesEng',
-    defaultMessage: 'First name(s) (in english)',
+    defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: First names in english'
   },
   childFamilyNameEng: {
     id: 'formFields.childFamilyNameEng',
-    defaultMessage: 'Family name (in english)',
+    defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   childSex: {
@@ -245,8 +245,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -257,8 +257,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -269,8 +269,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames')
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -281,8 +281,8 @@ export const childSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName')
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
       }
     },
     {

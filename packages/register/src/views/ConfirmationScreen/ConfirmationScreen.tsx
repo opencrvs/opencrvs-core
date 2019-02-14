@@ -48,7 +48,7 @@ const messages = defineMessages({
   headerDesc: {
     id: 'register.confirmationScreen.headerDesc',
     defaultMessage: `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The application}} 
-      {action, select, submitted {is now on its way for validation} completed {} registered {registered} rejected {rejected} approved {Approved}
+      {action, select, submitted {is now on its way for validation} completed {} registered {} rejected {rejected} approved {Approved}
       offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     description:
       'The Header description that appear on the confirmation screen '
@@ -61,8 +61,9 @@ const messages = defineMessages({
   },
   boxHeaderDescFirst: {
     id: 'register.confirmationScreen.boxHeaderDescFirst',
-    defaultMessage: `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The birth of } duplication 
-    {The birth duplication of } certificate {The birth certificate of } offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of } }`,
+    defaultMessage: `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The {eventType, select, birth {birth} death {death}} of } 
+    duplication {The {eventType, select, birth {birth} death {death}} duplication of } certificate {The {eventType, select, birth {birth} death {death}} certificate of } 
+    offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of } }`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
@@ -75,8 +76,8 @@ const messages = defineMessages({
   },
   trackingSectionTitle: {
     id: 'register.confirmationScreen.trackingSectionTitle',
-    defaultMessage: `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
-    duplication {Birth Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
+    defaultMessage: `{event, select, declaration {Tracking ID number: } registration {{eventType, select, birth {Birth} death {Death}} Registration Number: } 
+    duplication {{eventType, select, birth {Birth} death {Death}} Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
     description:
       'The tracking section title that appear on the confirmation screen'
   },
@@ -317,7 +318,8 @@ class ConfirmationScreenView extends React.Component<
             <TrackingBox>
               <TrackingHeader id="trackingSecHeader">
                 {intl.formatMessage(messages.trackingSectionTitle, {
-                  event: eventName
+                  event: eventName,
+                  eventType
                 })}
               </TrackingHeader>
               <TrackingNumber id="trackingIdViewer">

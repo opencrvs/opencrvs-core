@@ -1,6 +1,9 @@
 import { IFormField, IFormData } from 'src/forms'
+import { fieldToPhoneNumberTransformer } from 'src/forms/mappings/mutation/field-mappings'
 
-export const fieldToPhoneNumberTransformer = (dependentFieldName: string) => (
+export const fieldToBirthPhoneNumberTransformer = (
+  dependentFieldName: string
+) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
@@ -15,9 +18,12 @@ export const fieldToPhoneNumberTransformer = (dependentFieldName: string) => (
     toSectionID = undefined
   }
   if (toSectionID) {
-    transformedData[toSectionID].telecom = [
-      { system: 'phone', value: draftData[sectionId][field.name] }
-    ]
+    fieldToPhoneNumberTransformer(toSectionID)(
+      transformedData,
+      draftData,
+      sectionId,
+      field
+    )
   }
   return transformedData
 }

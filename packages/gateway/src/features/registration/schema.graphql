@@ -56,6 +56,12 @@ enum AttachmentType {
   SCHOOL_CERTIFICATE
   PROOF_OF_DEATH
   OTHER
+  POST_MORTEM_CERTIFICATE
+  HOSPITAL_DISCHARGE_CERTIFICATE
+  ATTESTED_DEATH_LETTER
+  ATTESTED_DEATH_CERTIFICATE
+  BURIAL_RECEIPT
+  FUNERAL_RECEIPT
 }
 
 enum AttachmentSubject {
@@ -63,6 +69,11 @@ enum AttachmentSubject {
   FATHER
   CHILD
   OTHER
+  DECEASED_ID_PROOF
+  DECEASED_PARMANENT_ADDRESS_PROOF
+  DECEASED_DEATH_PROOF
+  DECEASED_BIRTH_PROOF
+  APPLICANT_ID_PROOF
 }
 
 enum RegistrationType {
@@ -195,11 +206,7 @@ input DeathRegistrationInput {
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
-  mother: PersonInput # -> Only use for foetal death -> .section(code='mother-details').entry.reference
-  father: PersonInput # -> Only use for foetal death -> .section(code='father-details').entry.reference
   informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  informantRelationship: RelationshipType # -> RelatedPerson.relationship
-  otherInformantRelationship: String # -> RelatedPerson.relationship
   placeOfDeath: LocationInput
   deathLocation: String
   deathLocationType: AddressType
@@ -217,8 +224,6 @@ type DeathRegistration { # -> Composition
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  informantRelationship: RelationshipType # -> RelatedPerson.relationship
-  otherInformantRelationship: String # -> RelatedPerson.relationship
   placeOfDeath: Location
   deathLocation: String
   deathLocationType: AddressType

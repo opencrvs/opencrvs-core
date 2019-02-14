@@ -762,6 +762,187 @@ export const officeMock = JSON.stringify({
   }
 })
 
+export const compositionMock = JSON.stringify({
+  identifier: {
+    system: 'urn:ietf:rfc:3986',
+    value: 'B5JUNQO'
+  },
+  resourceType: 'Composition',
+  status: 'preliminary',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/doc-types',
+        code: 'birth-declaration'
+      }
+    ],
+    text: 'Birth Declaration'
+  },
+  class: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/doc-classes',
+        code: 'crvs-document'
+      }
+    ],
+    text: 'CRVS Document'
+  },
+  title: 'Birth Declaration',
+  section: [
+    {
+      title: 'Child details',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'child-details'
+          }
+        ],
+        text: 'Child details'
+      },
+      entry: [
+        {
+          reference: 'Patient/58efd5d1-d07f-4bac-af8e-771be81db047'
+        }
+      ]
+    },
+    {
+      title: "Mother's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'mother-details'
+          }
+        ],
+        text: "Mother's details"
+      },
+      entry: [
+        {
+          reference: 'Patient/0477b181-9e79-4f41-ac5b-54cdf3a4ca9d'
+        }
+      ]
+    },
+    {
+      title: 'Birth Encounter',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'birth-encounter'
+          }
+        ],
+        text: 'Birth encounter'
+      },
+      entry: [
+        {
+          reference: 'Encounter/a6ace176-f6fe-404d-9bed-236e1ce50b93'
+        }
+      ]
+    }
+  ],
+  subject: {},
+  date: '2019-02-06T11:24:04.264Z',
+  author: [],
+  meta: {
+    lastUpdated: '2019-02-06T11:24:06.089+00:00',
+    versionId: '7b6d3f45-f607-4f40-adc5-3a5a958882f9'
+  },
+  _request: {
+    method: 'POST'
+  },
+  id: '95035079-ec2c-451c-b514-664e838e8a5b'
+})
+
+export const motherMock = JSON.stringify({
+  resourceType: 'Patient',
+  active: true,
+  identifier: [
+    {
+      id: '12341234123412341',
+      type: 'NATIONAL_ID'
+    }
+  ],
+  name: [
+    {
+      use: 'bn',
+      family: ['নাম্বারো']
+    }
+  ],
+  telecom: [
+    {
+      system: 'phone',
+      value: '01711111111'
+    }
+  ],
+  maritalStatus: {
+    coding: [
+      {
+        system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+        code: 'M'
+      }
+    ],
+    text: 'MARRIED'
+  },
+  multipleBirthInteger: 1,
+  address: [
+    {
+      type: 'PERMANENT',
+      line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+      district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+      state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+      country: 'BGD'
+    },
+    {
+      type: 'CURRENT',
+      line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+      district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+      state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+      country: 'BGD'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+      extension: [
+        {
+          url: 'code',
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: 'urn:iso:std:iso:3166',
+                code: 'BGD'
+              }
+            ]
+          }
+        },
+        {
+          url: 'period',
+          valuePeriod: {
+            start: '',
+            end: ''
+          }
+        }
+      ]
+    }
+  ],
+  _transforms: {
+    matching: {
+      name: {
+        family: [['', '']]
+      }
+    }
+  },
+  meta: {
+    lastUpdated: '2019-02-06T11:24:06.097+00:00',
+    versionId: '66791cd4-2867-4414-bb3e-9d411038c3df'
+  },
+  _request: {
+    method: 'POST'
+  },
+  id: '0477b181-9e79-4f41-ac5b-54cdf3a4ca9d'
+})
+
 export const testFhirBundleForDeath = {
   resourceType: 'Bundle',
   type: 'document',

@@ -38,7 +38,7 @@ import { identityNameMapper } from 'src/forms/identity'
 import { IFormSection } from '../../../index'
 import { conditionals } from '../../../utils'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   fieldToArrayTransformer,
   fieldToIdentifierTransformer,
   fieldToAddressTransformer,
@@ -48,7 +48,7 @@ import {
 } from 'src/forms/mappings/mutation/field-mappings'
 
 import {
-  nameFieldTransformer,
+  nameToFieldTransformer,
   fieldValueTransformer,
   arrayToFieldTransformer,
   identifierToFieldTransformer,
@@ -95,22 +95,22 @@ export const messages = defineMessages({
   },
   fatherFirstNames: {
     id: 'formFields.fatherFirstNames',
-    defaultMessage: 'First name(s)',
+    defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: First name'
   },
   fatherFamilyName: {
     id: 'formFields.fatherFamilyName',
-    defaultMessage: 'Family name',
+    defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   fatherFirstNamesEng: {
     id: 'formFields.fatherFirstNamesEng',
-    defaultMessage: 'First name(s) (in english)',
+    defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: First names in english'
   },
   fatherFamilyNameEng: {
     id: 'formFields.fatherFamilyNameEng',
-    defaultMessage: 'Family name (in english)',
+    defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   defaultLabel: {
@@ -245,8 +245,8 @@ export const fatherSection: IFormSection = {
       validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -258,8 +258,8 @@ export const fatherSection: IFormSection = {
       validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -271,8 +271,8 @@ export const fatherSection: IFormSection = {
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames')
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -284,8 +284,8 @@ export const fatherSection: IFormSection = {
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
-        mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName')
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
       }
     },
     {

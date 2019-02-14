@@ -6,9 +6,12 @@ import {
   SMS_PROVIDER,
   CLICKATELL_API_ID,
   CLICKATELL_PASSWORD,
-  CLICKATELL_USER
+  CLICKATELL_USER,
+  INFOBIP_API_KEY,
+  INFOBIP_GATEWAY_ENDPOINT
 } from 'src/constants'
 import { logger } from 'src/logger'
+import { convertToMSISDN } from './utils'
 
 async function sendSMSClickatell(
   msisdn: string,
@@ -19,7 +22,7 @@ async function sendSMSClickatell(
     user: CLICKATELL_USER,
     password: CLICKATELL_PASSWORD,
     api_id: CLICKATELL_API_ID,
-    to: msisdn,
+    to: convertToMSISDN(msisdn),
     text: message,
     unicode: 0
   }
@@ -51,6 +54,36 @@ async function sendSMSClickatell(
   logger.info('Received success response from Clickatell: Success')
 }
 
+async function sendSMSInfobip(to: string, text: string) {
+  const body = JSON.stringify({
+    to: convertToMSISDN(to),
+    text
+  })
+  const headers = {
+    Authorization: `Basic ${INFOBIP_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+
+  let response
+  try {
+    response = await fetch(INFOBIP_GATEWAY_ENDPOINT, {
+      method: 'POST',
+      body,
+      headers
+    })
+  } catch (error) {
+    logger.error(error)
+    throw error
+  }
+
+  const responseBody = await response.text()
+  logger.info(`Response from Infobip: ${JSON.stringify(responseBody)}`)
+  if (!response.ok) {
+    logger.error(`Failed to send sms to ${to}`)
+    throw new Error(`Failed to send sms to ${to}`)
+  }
+}
+
 export async function sendSMS(
   msisdn: string,
   message: string,
@@ -59,6 +92,8 @@ export async function sendSMS(
   switch (SMS_PROVIDER) {
     case 'clickatell':
       return sendSMSClickatell(msisdn, message, convertUnicode)
+    case 'infobip':
+      return sendSMSInfobip(msisdn, message)
     default:
       throw new Error(`Unknown sms provider ${SMS_PROVIDER}`)
   }
