@@ -8,6 +8,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { client } from 'src/utils/apolloClient'
+import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 const messages = defineMessages({
   back: {
@@ -23,17 +24,17 @@ const messages = defineMessages({
 })
 
 interface ILoaderButtonProps {
+  id: string
   query: any
-  className?: string
   label: string
+  className?: string
   modalTitle: string
-  modalInfoText1: string
-  modalInfoText2: string
+  modalInfoText: string
   successTitle: string
   errorTitle: string
   errorText: string
+  variables: IDynamicValues
   onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
-  variables: any
 }
 
 interface ILoaderButtonState {
@@ -151,7 +152,7 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
       intl,
       label,
       modalTitle,
-      modalInfoText1,
+      modalInfoText,
       successTitle,
       errorTitle,
       errorText,
@@ -174,7 +175,7 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
               {modalTitle && loading && <Heading>{modalTitle}</Heading>}
               {errorTitle && error && <Heading>{errorTitle}</Heading>}
               {successTitle && success && <Heading>{successTitle}</Heading>}
-              {modalInfoText1 && <Info>{modalInfoText1}</Info>}
+              {modalInfoText && <Info>{modalInfoText}</Info>}
               {variables && <Info>{Object.values(variables)}</Info>}
 
               {loading && (

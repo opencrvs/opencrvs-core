@@ -843,6 +843,14 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',
+    'formFields.fetchDeceasedModalTitle': 'পরীক্ষা করা হচ্ছে',
+    'formFields.fetchDeceasedModalSuccessTitle': 'আইডি বৈধ',
+    'formFields.fetchDeceasedModalErrorTitle': 'অকার্যকর আইডি',
+    'formFields.fetchDeceasedModalErrorText':
+      'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
+    'formFields.loaderButton.cancel': 'বাতিল',
+    'formFields.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
+    'formFields.fetchDeceasedModalInfo': 'জন্ম নিবন্ধন নম্বর',
     'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন}
       certificate {সনদপত্র} offlineEvent {আবেদন }} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
       rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {সংযুক্তি স্থগিত}}`,
@@ -868,8 +876,6 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.fetchModalErrorTitle': 'অকার্যকর আইডি',
     'formFields.fetchModalErrorText':
       'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
-    'formFields.loaderButton.cancel': 'বাতিল',
-    'formFields.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
     'formFields.fetchModalInfo': 'জন্ম নিবন্ধন নম্বর',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর : } duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর : } certificate {} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }} `,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}

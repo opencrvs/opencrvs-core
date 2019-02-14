@@ -64,11 +64,8 @@ export const internationaliseFieldObject = (
     ;(base as any).modalTitle = intl.formatMessage(
       (field as ILoaderButton).modalTitle
     )
-    ;(base as any).modalInfoText1 = intl.formatMessage(
-      (field as ILoaderButton).modalInfoText1
-    )
-    ;(base as any).modalInfoText2 = intl.formatMessage(
-      (field as ILoaderButton).modalInfoText2
+    ;(base as any).modalInfoText = intl.formatMessage(
+      (field as ILoaderButton).modalInfoText
     )
     ;(base as any).successTitle = intl.formatMessage(
       (field as ILoaderButton).successTitle

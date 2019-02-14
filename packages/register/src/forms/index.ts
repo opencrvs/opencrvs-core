@@ -239,8 +239,7 @@ export interface ILoaderButton extends IFormFieldBase {
   inputs: IFieldInput[]
   onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
   modalTitle: FormattedMessage.MessageDescriptor
-  modalInfoText1: FormattedMessage.MessageDescriptor
-  modalInfoText2: FormattedMessage.MessageDescriptor
+  modalInfoText: FormattedMessage.MessageDescriptor
   successTitle: FormattedMessage.MessageDescriptor
   errorTitle: FormattedMessage.MessageDescriptor
   errorText: FormattedMessage.MessageDescriptor
@@ -455,8 +454,7 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   variables: IDynamicValues
   onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
   modalTitle: string
-  modalInfoText1: string
-  modalInfoText2: string
+  modalInfoText: string
   successTitle: string
   errorTitle: string
   errorText: string

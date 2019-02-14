@@ -304,11 +304,11 @@ function GeneratedInputField({
   if (fieldDefinition.type === LOADER_BUTTON) {
     return (
       <LoaderButtonField
+        id={fieldDefinition.name}
         query={fieldDefinition.query}
         modalTitle={fieldDefinition.modalTitle}
         label={fieldDefinition.label}
-        modalInfoText1={fieldDefinition.modalInfoText1}
-        modalInfoText2={fieldDefinition.modalInfoText2}
+        modalInfoText={fieldDefinition.modalInfoText}
         successTitle={fieldDefinition.successTitle}
         errorText={fieldDefinition.errorText}
         errorTitle={fieldDefinition.errorTitle}

@@ -73,28 +73,28 @@ const messages = defineMessages({
     defaultMessage: "Retrieve Deceased's Details",
     description: 'Label for loader button'
   },
-  fetchModalTitle: {
-    id: 'formFields.fetchModalTitle',
+  fetchDeceasedModalTitle: {
+    id: 'formFields.fetchDeceasedModalTitle',
     defaultMessage: 'Checking',
     description: 'Label for fetch modal title'
   },
-  fetchModalSuccessTitle: {
-    id: 'formFields.fetchModalSuccessTitle',
+  fetchDeceasedModalSuccessTitle: {
+    id: 'formFields.fetchDeceasedModalSuccessTitle',
     defaultMessage: 'ID valid',
     description: 'Label for fetch modal success title'
   },
-  fetchModalErrorTitle: {
-    id: 'formFields.fetchModalErrorTitle',
+  fetchDeceasedModalErrorTitle: {
+    id: 'formFields.fetchDeceasedModalErrorTitle',
     defaultMessage: 'Invalid Id',
     description: 'Label for fetch modal error title'
   },
-  fetchModalErrorText: {
-    id: 'formFields.fetchModalErrorText',
+  fetchDeceasedModalErrorText: {
+    id: 'formFields.fetchDeceasedModalErrorText',
     defaultMessage: 'No registration found for provided BRN',
     description: 'Label for fetch modal error title'
   },
-  fetchModalInfo: {
-    id: 'formFields.fetchModalInfo',
+  fetchDeceasedModalInfo: {
+    id: 'formFields.fetchDeceasedModalInfo',
     defaultMessage: 'Birth Registration Number',
     description: 'Label for loader button'
   },
@@ -245,12 +245,11 @@ export const deceasedSection: IFormSection = {
       ],
       validate: [],
       conditionals: [conditionals.deceasedBRNSelected],
-      modalTitle: messages.fetchModalTitle,
-      modalInfoText1: messages.fetchModalInfo,
-      modalInfoText2: messages.fetchModalInfo,
-      successTitle: messages.fetchModalSuccessTitle,
-      errorTitle: messages.fetchModalErrorTitle,
-      errorText: messages.fetchModalErrorText
+      modalTitle: messages.fetchDeceasedModalTitle,
+      modalInfoText: messages.fetchDeceasedModalInfo,
+      successTitle: messages.fetchDeceasedModalSuccessTitle,
+      errorTitle: messages.fetchDeceasedModalErrorTitle,
+      errorText: messages.fetchDeceasedModalErrorText
     },
     {
       name: 'firstNames',
