@@ -45,8 +45,8 @@ export const transformDeceasedData = (
     birthDate,
     gender,
     familyName: localName && localName.familyName,
-    familyNameEng: engName && engName.firstNames,
-    firstNames: localName && localName.familyName,
+    familyNameEng: engName && engName.familyName,
+    firstNames: localName && localName.firstNames,
     firstNamesEng: engName && engName.firstNames
   }
 }
