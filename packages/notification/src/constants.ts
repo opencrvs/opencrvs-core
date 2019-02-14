@@ -26,11 +26,11 @@ export const CLICKATELL_API_ID = process.env.CLICKATELL_API_ID_PATH
 export const INFOBIP_GATEWAY_ENDPOINT = process.env
   .INFOBIP_GATEWAY_ENDPOINT_PATH
   ? readFileSync(process.env.INFOBIP_GATEWAY_ENDPOINT_PATH).toString()
-  : 'https://j45mv.api.infobip.com/sms/1/text/single'
+  : ''
 
 export const INFOBIP_API_KEY = process.env.INFOBIP_API_KEY_PATH
   ? readFileSync(process.env.INFOBIP_API_KEY_PATH).toString()
-  : 'b2NydnNfcGxhbjpPY3J2czEyMw=='
+  : ''
 
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
