@@ -182,7 +182,7 @@ describe('when user is in the register form for death event', async () => {
       expect(component.find('#loaderButton').hostNodes()).toHaveLength(1)
     })
 
-    it.only("populates deceased's information after fetching data", async () => {
+    it('fetches deceased information by entered BRN', async () => {
       const graphqlMock = [
         {
           request: {
@@ -265,17 +265,84 @@ describe('when user is in the register form for death event', async () => {
         .childAt(0)
         .childAt(0)
         .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
       component.update()
+
+      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
+        1
+      )
+    })
+
+    it('displays error message if no registration found by BRN', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_DECEASED,
+            variables: {
+              identifier: '2019333494BQNXOHJ2'
+            }
+          },
+          error: new Error('boom')
+        }
+      ]
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component = testComponent.component
+      selectOption(component, '#iDType', 'Birth Registration Number')
+
+      const input = component.find('input#iD')
+      // @ts-ignore
+      input
+        .props()
+        // @ts-ignore
+        .onChange({
+          // @ts-ignore
+          target: {
+            // @ts-ignore
+            id: 'iD',
+            value: '2019333494BQNXOHJ2'
+          }
+        })
+      component.update()
+
+      component
+        .find('#loaderButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
       component.update()
-      expect(
-        component
-          .find('#firstNamesEng')
-          .hostNodes()
-          .text()
-      ).toEqual('Gayatri')
+
+      expect(component.find('#loader-button-error').hostNodes()).toHaveLength(1)
     })
   })
 })
