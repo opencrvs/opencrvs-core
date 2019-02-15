@@ -90,6 +90,7 @@ describe('when user wants to print certificate', async () => {
                   {
                     id: '123',
                     type: 'PASSPORT',
+                    otherType: '',
                     __typename: 'IdentityType'
                   }
                 ],
@@ -310,6 +311,7 @@ describe('when user wants to print certificate', async () => {
                 identifier: [
                   {
                     id: '4564',
+                    otherType: '',
                     type: 'NATIONAL_ID'
                   }
                 ],
@@ -560,6 +562,7 @@ describe('when user wants to print certificate', async () => {
                     {
                       id: '123',
                       type: 'PASSPORT',
+                      otherType: '',
                       __typename: 'IdentityType'
                     }
                   ],
