@@ -25,8 +25,14 @@ import {
   CHILD_TITLE,
   ATTACHMENT_DOCS_TITLE,
   ATTACHMENT_CONTEXT_KEY,
-  HEALTH_FACILITY_BIRTH_CODE,
-  BIRTH_LOCATION_TYPE_CODE
+  DEATH_ENCOUNTER_CODE,
+  CAUSE_OF_DEATH_CODE,
+  DECEASED_CODE,
+  DECEASED_TITLE,
+  INFORMANT_CODE,
+  INFORMANT_TITLE,
+  MANNER_OF_DEATH_CODE,
+  CAUSE_OF_DEATH_METHOD_CODE
 } from 'src/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -41,7 +47,10 @@ import {
   selectOrCreateCollectorPersonResource,
   setCertificateCollectorReference,
   selectOrCreatePaymentReconciliationResource,
-  selectOrCreateLocationRefResource
+  selectOrCreateLocationRefResource,
+  selectOrCreateEncounterLocationRef,
+  selectOrCreateInformantSection,
+  selectOrCreateInformantResource
 } from 'src/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -98,7 +107,6 @@ function createNameBuilder(sectionCode: string, sectionTitle: string) {
     }
   }
 }
-
 function createIDBuilder(sectionCode: string, sectionTitle: string) {
   return {
     id: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
@@ -646,46 +654,14 @@ const builders: IFieldBuilders = {
     composition: (fhirBundle, fieldValue) => {
       fhirBundle.entry[0].resource.id = fieldValue as string
     },
-    encounter: (fhirBundle, fieldValue) => {
-      const encounter = selectOrCreateEncounterResource(
-        BIRTH_ENCOUNTER_CODE,
-        fhirBundle
-      )
+    encounter: (fhirBundle, fieldValue, context) => {
+      const encounter = selectOrCreateEncounterResource(fhirBundle, context)
       encounter.id = fieldValue as string
     },
+    eventLocation: (fhirBundle, fieldValue) => {
+      return false
+    },
     observation: {
-      birthLocation: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          HEALTH_FACILITY_BIRTH_CODE,
-          'Health facility birth location',
-          fhirBundle,
-          context
-        )
-        observation.id = fieldValue as string
-      },
-      birthLocationType: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          BIRTH_LOCATION_TYPE_CODE,
-          'Type of birth location',
-          fhirBundle,
-          context
-        )
-        observation.id = fieldValue as string
-      },
       birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
@@ -1066,6 +1042,509 @@ const builders: IFieldBuilders = {
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
   },
+  deceased: {
+    _fhirID: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      person.id = fieldValue as string
+    },
+    gender: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      person.gender = fieldValue as string
+    },
+    identifier: createIDBuilder(DECEASED_CODE, DECEASED_TITLE),
+    name: createNameBuilder(DECEASED_CODE, DECEASED_TITLE),
+    telecom: createTelecomBuilder(DECEASED_CODE, DECEASED_TITLE),
+    birthDate: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      person.birthDate = fieldValue as string
+    },
+    maritalStatus: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createMaritalStatusBuilder(person, fieldValue as string)
+    },
+    multipleBirth: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      person.multipleBirthInteger = fieldValue as number
+    },
+    address: createAddressBuilder(DECEASED_CODE, DECEASED_TITLE),
+    photo: createPhotoBuilder(DECEASED_CODE, DECEASED_TITLE),
+    deceased: {
+      deceased: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreatePersonResource(
+          DECEASED_CODE,
+          DECEASED_TITLE,
+          fhirBundle
+        )
+        person.deceasedBoolean = fieldValue as boolean
+      },
+      deathDate: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreatePersonResource(
+          DECEASED_CODE,
+          DECEASED_TITLE,
+          fhirBundle
+        )
+        person.deceasedDateTime = fieldValue as string
+      }
+    },
+    nationality: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createNationalityBuilder(person, fieldValue)
+    },
+    dateOfMarriage: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createDateOfMarriageBuilder(person, fieldValue)
+    },
+    educationalAttainment: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createEducationalAttainmentBuilder(person, fieldValue)
+    }
+  },
+  informant: {
+    individual: {
+      _fhirID: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        person.id = fieldValue as string
+      },
+      gender: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        person.gender = fieldValue as string
+      },
+      identifier: {
+        id: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'identifier',
+            fieldValue,
+            'id',
+            context
+          )
+        },
+        type: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'identifier',
+            fieldValue,
+            'type',
+            context
+          )
+        },
+        otherType: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'identifier',
+            fieldValue,
+            'otherType',
+            context
+          )
+        }
+      },
+      name: {
+        use: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            fieldValue,
+            'use',
+            context
+          )
+        },
+        firstNames: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            fieldValue.split(' '),
+            'given',
+            context
+          )
+        },
+        familyName: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            [fieldValue],
+            'family',
+            context
+          )
+        }
+      },
+      telecom: {
+        system: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'telecom',
+            fieldValue,
+            'system',
+            context
+          )
+        },
+        value: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'telecom',
+            fieldValue,
+            'value',
+            context
+          )
+        },
+        use: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'telecom',
+            fieldValue,
+            'use',
+            context
+          )
+        }
+      },
+      birthDate: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        person.birthDate = fieldValue as string
+      },
+      maritalStatus: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createMaritalStatusBuilder(person, fieldValue as string)
+      },
+      multipleBirth: (fhirBundle, fieldValue, context) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        person.multipleBirthInteger = fieldValue as number
+      },
+      address: {
+        use: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'use',
+            context
+          )
+        },
+        type: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'type',
+            context
+          )
+        },
+        text: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'text',
+            context
+          )
+        },
+        line: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          if (!person.address) {
+            person.address = []
+          }
+          if (!person.address[context._index.address]) {
+            person.address[context._index.address] = {}
+          }
+          if (!person.address[context._index.address].line) {
+            person.address[context._index.address].line = []
+          }
+          ;(person.address[context._index.address].line as string[]).push(
+            fieldValue
+          )
+        },
+        city: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'city',
+            context
+          )
+        },
+        district: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'district',
+            context
+          )
+        },
+        state: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'state',
+            context
+          )
+        },
+        postalCode: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'postalCode',
+            context
+          )
+        },
+        country: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'address',
+            fieldValue,
+            'country',
+            context
+          )
+        }
+      },
+      photo: {
+        contentType: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'photo',
+            fieldValue,
+            'contentType',
+            context
+          )
+        },
+        data: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'photo',
+            fieldValue,
+            'data',
+            context
+          )
+        },
+        title: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'photo',
+            fieldValue,
+            'title',
+            context
+          )
+        }
+      },
+      nationality: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createNationalityBuilder(person, fieldValue)
+      },
+      dateOfMarriage: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createDateOfMarriageBuilder(person, fieldValue)
+      },
+      educationalAttainment: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createEducationalAttainmentBuilder(person, fieldValue)
+      }
+    },
+    relationship: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        INFORMANT_CODE,
+        INFORMANT_TITLE,
+        fhirBundle
+      )
+      if (!relatedPersonResource.relationship) {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
+      }
+    },
+    otherRelationship: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        INFORMANT_CODE,
+        INFORMANT_TITLE,
+        fhirBundle
+      )
+      if (!relatedPersonResource.relationship) {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER'
+            }
+          ]
+        }
+      }
+      relatedPersonResource.relationship.text = fieldValue
+    }
+  },
   registration: {
     _fhirID: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
@@ -1085,23 +1564,27 @@ const builders: IFieldBuilders = {
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return setResourceIdentifier(
-        taskResource,
-        'birth-tracking-id',
-        fieldValue
-      )
+      let trackingId
+      if (context.event === EVENT_TYPE.BIRTH) {
+        trackingId = 'birth-tracking-id'
+      } else {
+        trackingId = 'death-tracking-id'
+      }
+      return setResourceIdentifier(taskResource, `${trackingId}`, fieldValue)
     },
     registrationNumber: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
+      let regNumber
+      if (context.event === EVENT_TYPE.BIRTH) {
+        regNumber = 'birth-registration-number'
+      } else {
+        regNumber = 'death-registration-number'
+      }
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return setResourceIdentifier(
-        taskResource,
-        'birth-registration-number',
-        fieldValue
-      )
+      return setResourceIdentifier(taskResource, `${regNumber}`, fieldValue)
     },
     paperFormID: (
       fhirBundle: ITemplatedBundle,
@@ -1621,58 +2104,41 @@ const builders: IFieldBuilders = {
       }
     }
   },
-  birthLocation: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      BIRTH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      HEALTH_FACILITY_BIRTH_CODE,
-      'Health facility birth location',
-      fhirBundle,
-      context
-    )
-    observation.valueString = `Location/${fieldValue}`
-  },
-  birthLocationType: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      BIRTH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      BIRTH_LOCATION_TYPE_CODE,
-      'Type of birth location',
-      fhirBundle,
-      context
-    )
-    observation.valueString = fieldValue
-  },
-  placeOfBirth: {
+  eventLocation: {
     _fhirID: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
-      const location = selectOrCreateLocationRefResource(
-        BIRTH_ENCOUNTER_CODE,
+      const encounterLocationRef = selectOrCreateEncounterLocationRef(
         fhirBundle,
-        fieldValue
+        context
       )
-      location.id = fieldValue as string
+      encounterLocationRef.reference = `Location/${fieldValue}`
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const location = selectOrCreateLocationRefResource(
-        BIRTH_ENCOUNTER_CODE,
-        fhirBundle,
-        fieldValue
-      )
-      location.status = fieldValue
+      let location
+      if (context.event === EVENT_TYPE.BIRTH) {
+        location = selectOrCreateLocationRefResource(
+          BIRTH_ENCOUNTER_CODE,
+          fhirBundle,
+          context
+        )
+      } else {
+        location = selectOrCreateLocationRefResource(
+          DEATH_ENCOUNTER_CODE,
+          fhirBundle,
+          context
+        )
+      }
+      location.type = {
+        coding: [
+          {
+            system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
+            code: fieldValue
+          }
+        ]
+      }
     },
     partOf: (
       fhirBundle: ITemplatedBundle,
@@ -1685,7 +2151,7 @@ const builders: IFieldBuilders = {
         context
       )
       location.partOf = {
-        reference: `Location/${fieldValue}`
+        reference: fieldValue
       }
     },
     address: createLocationAddressBuilder(BIRTH_ENCOUNTER_CODE)
@@ -1831,21 +2297,95 @@ const builders: IFieldBuilders = {
       context
     )
     observation.valueDateTime = fieldValue
+  },
+  mannerOfDeath: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_VSIGN_CODE,
+      OBSERVATION_CATEGORY_VSIGN_DESC,
+      MANNER_OF_DEATH_CODE,
+      'Uncertified manner of death',
+      fhirBundle,
+      context
+    )
+    observation.valueCodeableConcept = {
+      coding: [
+        {
+          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          code: fieldValue
+        }
+      ]
+    }
+  },
+  causeOfDeathMethod: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_VSIGN_CODE,
+      OBSERVATION_CATEGORY_VSIGN_DESC,
+      CAUSE_OF_DEATH_METHOD_CODE,
+      'Cause of death method',
+      fhirBundle,
+      context
+    )
+    observation.valueCodeableConcept = {
+      coding: [
+        {
+          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          code: fieldValue
+        }
+      ]
+    }
+  },
+  causeOfDeath: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_VSIGN_CODE,
+      OBSERVATION_CATEGORY_VSIGN_DESC,
+      CAUSE_OF_DEATH_CODE,
+      'Cause of death',
+      fhirBundle,
+      context
+    )
+    observation.valueCodeableConcept = {
+      coding: [
+        {
+          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          code: fieldValue
+        }
+      ]
+    }
   }
 }
 
-export async function buildFHIRBundle(reg: object, authHeader?: IAuthHeader) {
+export async function buildFHIRBundle(
+  reg: object,
+  eventType: EVENT_TYPE,
+  authHeader?: IAuthHeader
+) {
   const ref = uuid()
-  const fhirBundle: ITemplatedBundle = {
+  const context: any = {
+    event: eventType
+  }
+  const fhirBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate(ref)]
+    entry: [createCompositionTemplate(ref, context)]
   }
-  let context = {}
+
   if (authHeader) {
-    context = {
-      authHeader
-    }
+    context.authHeader = authHeader
   }
   await transformObj(reg, fhirBundle, builders, context)
   return fhirBundle

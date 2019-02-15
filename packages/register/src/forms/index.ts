@@ -20,7 +20,7 @@ export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
-export const TEXT_WITH_DYNAMIC_DEFINITIONS = 'TEXT_WITH_DYNAMIC_DEFINITIONS'
+export const FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
@@ -39,6 +39,15 @@ export const messages = defineMessages({
 export enum Event {
   BIRTH = 'birth',
   DEATH = 'death'
+}
+
+export enum Action {
+  SUBMIT_FOR_REVIEW = 'submit for review',
+  REGISTER_APPLICATION = 'register',
+  COLLECT_CERTIFICATE = 'collect certificate',
+  REJECT_APPLICATION = 'reject',
+  LOAD_REVIEW_APPLICATION = 'load application data for review',
+  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection'
 }
 
 export interface ISelectOption {
@@ -66,23 +75,29 @@ export interface IDynamicItems {
   items: { [key: string]: FormattedMessage.MessageDescriptor[] }
 }
 
-export interface IDynamicTextFieldValidators {
+export interface IDynamicFormFieldValidators {
   validator: ValidationInitializer
   dependencies: string[]
 }
 
-export type IDynamicTextFieldLabelMapper = (
+export type IDynamicFormFieldLabelMapper = (
   key: string
 ) => FormattedMessage.MessageDescriptor
 
 export type IDynamicValueMapper = (key: string) => string
 
-export interface IDynamicTextFieldDefinitions {
+export type IDynamicFieldTypeMapper = (key: string) => string
+
+export interface IDynamicFormFieldDefinitions {
   label?: {
     dependency: string
-    labelMapper: IDynamicTextFieldLabelMapper
+    labelMapper: IDynamicFormFieldLabelMapper
   }
-  validate?: IDynamicTextFieldValidators[]
+  type?: {
+    dependency: string
+    typeMapper: IDynamicFieldTypeMapper
+  }
+  validate?: IDynamicFormFieldValidators[]
 }
 
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
@@ -135,9 +150,9 @@ export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   dynamicOptions: IDynamicOptions
 }
 
-export interface ITextFormFieldWithDynamicDefinitions extends IFormFieldBase {
-  type: typeof TEXT_WITH_DYNAMIC_DEFINITIONS
-  dynamicDefinitions: IDynamicTextFieldDefinitions
+export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
+  type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
+  dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 
 export interface IRadioGroupFormField extends IFormFieldBase {
@@ -214,7 +229,7 @@ export type IFormField =
   | INumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
-  | ITextFormFieldWithDynamicDefinitions
+  | IFormFieldWithDynamicDefinitions
   | IRadioGroupFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
@@ -231,7 +246,7 @@ export type IFormField =
   | IDynamicListFormField
 
 export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
-  ITextFormFieldWithDynamicDefinitions
+  IFormFieldWithDynamicDefinitions
 
 export interface IConditional {
   action: string
@@ -260,7 +275,9 @@ export interface IConditionals {
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
-  otherPlaceOfBirth: IConditional
+  placeOfDeathHospital: IConditional
+  otherBirthEventLocation: IConditional
+  otherDeathEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isNotCityLocationPermanent: IConditional

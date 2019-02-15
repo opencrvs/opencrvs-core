@@ -39,8 +39,8 @@ export type CertificateDetails = {
   registrationNo: string
   name: MultiLingualDetails
   dob: MultiLingualDetails
-  placeOfBirth?: MultiLingualDetails
   registrationLocation: MultiLingualDetails
+  eventLocation: MultiLingualDetails
   printDate?: MultiLingualDetails
 } | null
 
@@ -175,14 +175,11 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
       bn: NOT_FOUND,
       en: NOT_FOUND
     },
+    eventLocation: {
+      bn: NOT_FOUND,
+      en: NOT_FOUND
+    },
     ...certificateDetails
-  }
-  // TODO: Will replace in OCRVS-1183
-  if (!data.placeOfBirth) {
-    data.placeOfBirth = {
-      bn: 'গাজীপুর হাসপাতাল',
-      en: 'Gazipur Hospital'
-    }
   }
 
   data.printDate = {
@@ -191,6 +188,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
   }
 
   let nameRow
+  let eventLocationRow
   if (data.name.en) {
     nameRow = [
       {
@@ -232,6 +230,53 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
           },
           {
             text: data.name.bn,
+            bold: true
+          }
+        ]
+      }
+    ]
+  }
+
+  if (data.eventLocation.en) {
+    eventLocationRow = [
+      {
+        margin: [0, 39, 0, 0],
+        columns: [
+          {
+            text: 'Place of birth',
+            alignment: 'right'
+          },
+          {
+            text: data.eventLocation.en,
+            bold: true
+          }
+        ]
+      },
+      {
+        font: 'notosansbn',
+        columns: [
+          {
+            text: 'জন্মগ্রহণ করেন',
+            alignment: 'right'
+          },
+          {
+            text: data.eventLocation.bn,
+            bold: true
+          }
+        ]
+      }
+    ]
+  } else {
+    eventLocationRow = [
+      {
+        margin: [0, 39, 0, 0],
+        columns: [
+          {
+            text: '',
+            alignment: 'right'
+          },
+          {
+            text: '',
             bold: true
           }
         ]
@@ -301,34 +346,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
           ]
         }
       ],
-      [
-        {
-          margin: [0, 39, 0, 0],
-          columns: [
-            {
-              text: 'Place of birth',
-              alignment: 'right'
-            },
-            {
-              text: data.placeOfBirth.en,
-              bold: true
-            }
-          ]
-        },
-        {
-          font: 'notosansbn',
-          columns: [
-            {
-              text: 'জন্মগ্রহণ করেন',
-              alignment: 'right'
-            },
-            {
-              text: data.placeOfBirth.bn,
-              bold: true
-            }
-          ]
-        }
-      ],
+      eventLocationRow,
       [
         {
           text: `This event was registered at ${data.registrationLocation.en}`,
@@ -375,6 +393,16 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
           font: 'notosansbn',
           bold: true,
           alignment: 'center'
+        },
+        {
+          text: 'Date of issue',
+          alignment: 'center',
+          margin: [0, 10, 0, 0]
+        },
+        {
+          text: 'প্রদান এর তারিখ',
+          alignment: 'center',
+          font: 'notosansbn'
         }
       ]
     ],

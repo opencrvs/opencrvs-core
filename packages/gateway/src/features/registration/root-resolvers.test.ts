@@ -57,6 +57,159 @@ describe('Registration root resolvers', () => {
       expect(result.totalItems).toBe(2)
     })
   })
+  describe('createDeathRegistration()', () => {
+    const details = {
+      deceased: {
+        name: [{ use: 'bn', firstNames: 'অনিক', familyName: 'হক' }]
+      }
+    }
+    it('posts a fhir bundle', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: {
+                  status: '201',
+                  location:
+                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
+                }
+              }
+            ],
+            type: 'transaction-response'
+          })
+        ],
+        [
+          JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition',
+            identifier: {
+              system: 'urn:ietf:rfc:3986',
+              value: 'DewpkiM'
+            }
+          })
+        ]
+      )
+      // @ts-ignore
+      const result = await resolvers.Mutation.createDeathRegistration(
+        {},
+        { details }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.length).toBe(7)
+      expect(result).toMatch(/^D/)
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+    it('posts a fhir bundle as registrar', async () => {
+      const token = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: {
+                  status: '201',
+                  location:
+                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
+                }
+              }
+            ],
+            type: 'transaction-response'
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'DEATH'
+                      }
+                    ]
+                  },
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueReference: { reference: 'DUMMY' }
+                    }
+                  ],
+                  lastModified: '2018-11-28T15:13:57.492Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-11-28T15:13:57.492Z',
+                      authorString: 'DUMMY'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/death-tracking-id',
+                      value: 'D1mW7jA'
+                    },
+                    {
+                      system:
+                        'http://opencrvs.org/specs/id/death-registration-number',
+                      value: '2019123265B1234569'
+                    }
+                  ],
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'REJECTED'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-11-29T10:40:08.913+00:00',
+                    versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
+                  },
+                  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+                }
+              }
+            ]
+          })
+        ]
+      )
+      // @ts-ignore
+      const result = await resolvers.Mutation.createDeathRegistration(
+        {},
+        { details },
+        {
+          Authorization: `Bearer ${token}`
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('2019123265B1234569')
+    })
+  })
   describe('createBirthRegistration()', () => {
     const details = {
       child: {

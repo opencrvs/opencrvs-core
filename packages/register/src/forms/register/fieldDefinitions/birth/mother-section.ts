@@ -1,7 +1,8 @@
 import { defineMessages } from 'react-intl'
 import {
   messages as identityMessages,
-  identityOptions
+  birthIdentityOptions,
+  identityTypeMapper
 } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
@@ -14,7 +15,7 @@ import {
   SUBSECTION,
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  TEXT_WITH_DYNAMIC_DEFINITIONS
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -32,9 +33,9 @@ import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import { conditionals } from '../../../utils'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { iDType } from 'src/views/PrintCertificate/ParentDetails'
+import { identityNameMapper } from 'src/forms/identity'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   fieldToArrayTransformer,
   fieldToIdentifierTransformer,
   fieldToAddressTransformer,
@@ -42,7 +43,7 @@ import {
   copyAddressTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import {
-  nameFieldTransformer,
+  nameToFieldTransformer,
   fieldValueTransformer,
   arrayToFieldTransformer,
   identifierToFieldTransformer,
@@ -73,22 +74,22 @@ const messages = defineMessages({
   },
   motherFirstNames: {
     id: 'formFields.motherFirstNames',
-    defaultMessage: 'First name(s)',
+    defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: First names'
   },
   motherFamilyName: {
     id: 'formFields.motherFamilyName',
-    defaultMessage: 'Family name',
+    defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   motherFirstNamesEng: {
     id: 'formFields.motherFirstNamesEng',
-    defaultMessage: 'First name(s) (in english)',
+    defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: First names in english'
   },
   motherFamilyNameEng: {
     id: 'formFields.motherFamilyNameEng',
-    defaultMessage: 'Family name (in english)',
+    defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   defaultLabel: {
@@ -136,7 +137,7 @@ export const motherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: identityOptions,
+      options: birthIdentityOptions,
       mapping: {
         mutation: fieldToIdentifierTransformer('type'),
         query: identifierToFieldTransformer('type')
@@ -157,11 +158,15 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'iD',
-      type: TEXT_WITH_DYNAMIC_DEFINITIONS,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
           dependency: 'iDType',
-          labelMapper: iDType
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
         },
         validate: [
           {
@@ -200,8 +205,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -212,8 +217,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('bn'),
-        query: nameFieldTransformer('bn')
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
       }
     },
     {
@@ -224,8 +229,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'firstNames'),
-        query: nameFieldTransformer('en', 'firstNames')
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
       }
     },
     {
@@ -236,8 +241,8 @@ export const motherSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
-        mutation: nameTransformer('en', 'familyName'),
-        query: nameFieldTransformer('en', 'familyName')
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
       }
     },
     {

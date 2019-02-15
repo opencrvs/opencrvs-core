@@ -8,73 +8,71 @@ import {
   getRegStatusCode,
   getPaperFormID
 } from './fhir-utils'
-import { setTrackingId, pushBRN } from './fhir-bundle-modifier'
+import { setTrackingId, pushRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import * as fetch from 'jest-fetch-mock'
 
 describe('Verify getSharedContactMsisdn', () => {
-  it('Returned shared contact number properly', () => {
-    const phoneNumber = getSharedContactMsisdn(testFhirBundle)
+  it('Returned shared contact number properly', async () => {
+    const phoneNumber = await getSharedContactMsisdn(testFhirBundle)
     expect(phoneNumber).toEqual('+8801622688231')
   })
 
-  it('Throws error when invalid fhir bundle is sent', () => {
-    expect(() =>
+  it('Throws error when invalid fhir bundle is sent', async () => {
+    await expect(
       getSharedContactMsisdn({
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError('Invalid FHIR bundle found for declaration')
+    ).rejects.toThrow('Invalid FHIR bundle found for declaration')
   })
 
-  it('Throws error when invalid shared contact info given', () => {
+  it('Throws error when invalid shared contact info given', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'INVALID'
-    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
+    expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 
-  it('Throws error when telecom is missing for shared contact', () => {
+  it('Throws error when telecom is missing for shared contact', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[1].resource.extension[0].valueString = 'FATHER'
-    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
+    expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 
-  it('Throws error when phonenumber is missing for shared contact', () => {
+  it('Throws error when phonenumber is missing for shared contact', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[3].resource.telecom = []
-    expect(getSharedContactMsisdn(fhirBundle)).toEqual(false)
+    expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 })
 
 describe('Verify getInformantName', () => {
-  it('Returned informant name properly', () => {
-    const informantName = getInformantName(testFhirBundle)
+  it('Returned informant name properly', async () => {
+    const informantName = await getInformantName(testFhirBundle)
     expect(informantName).toEqual('অনিক অনিক')
   })
 
-  it('Throws error when invalid fhir bundle is sent', () => {
-    expect(() =>
+  it('Throws error when invalid fhir bundle is sent', async () => {
+    await expect(
       getInformantName({
         resourceType: 'Bundle',
         type: 'document'
       })
-    ).toThrowError(
-      'getInformantName: Invalid FHIR bundle found for declaration'
-    )
+    ).rejects.toThrow('Invalid FHIR bundle found for declaration')
   })
 
-  it('Throws error when child name section is missing', () => {
+  it('Throws error when child name section is missing', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = undefined
-    expect(() => getInformantName(fhirBundle)).toThrowError(
+    await expect(getInformantName(fhirBundle)).rejects.toThrow(
       "Didn't find informant's name information"
     )
   })
 
-  it("Throws error when child's bn name block is missing", () => {
+  it("Throws error when child's bn name block is missing", async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = []
-    expect(() => getInformantName(fhirBundle)).toThrowError(
+    await expect(getInformantName(fhirBundle)).rejects.toThrow(
       "Didn't found informant's bn name"
     )
   })
@@ -213,9 +211,10 @@ describe('Verify getBirthRegistrationNumber', () => {
     const birthTrackingId = 'B5WGYJE'
     const brnChecksum = 1
     testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
-    const taskResource = await pushBRN(
+    const taskResource = await pushRN(
       testFhirBundle.entry[1].resource as fhir.Task,
-      practitioner
+      practitioner,
+      'birth-registration-number'
     )
     const brn = getBirthRegistrationNumber(taskResource)
 

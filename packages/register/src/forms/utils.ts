@@ -13,11 +13,11 @@ import {
   ISelectFormFieldWithDynamicOptions,
   INFORMATIVE_RADIO_GROUP,
   PARAGRAPH,
-  IDynamicTextFieldValidators,
-  IDynamicFormField,
   IDynamicListFormField,
   IDynamicValueMapper,
-  IFormData
+  IFormData,
+  IDynamicFormFieldValidators,
+  IDynamicFormField
 } from './'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -88,6 +88,19 @@ export const generateOptions = (
   return optionsArray
 }
 
+export const getFieldType = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): string => {
+  if (!field.dynamicDefinitions.type) {
+    return field.type
+  }
+
+  return field.dynamicDefinitions.type.typeMapper(values[
+    field.dynamicDefinitions.type.dependency
+  ] as string)
+}
+
 export const getFieldLabel = (
   field: IDynamicFormField,
   values: IFormSectionData
@@ -111,7 +124,7 @@ export const getFieldValidation = (
     field.dynamicDefinitions.validate.length > 0
   ) {
     field.dynamicDefinitions.validate.map(
-      (element: IDynamicTextFieldValidators) => {
+      (element: IDynamicFormFieldValidators) => {
         const params: any[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
@@ -350,10 +363,20 @@ export const conditionals: IConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  otherPlaceOfBirth: {
+  placeOfDeathHospital: {
+    action: 'hide',
+    expression:
+      '(values.placeOfDeath!="HOSPITAL" && values.placeOfDeath!="OTHER_HEALTH_INSTITUTION")'
+  },
+  otherBirthEventLocation: {
     action: 'hide',
     expression:
       '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
+  },
+  otherDeathEventLocation: {
+    action: 'hide',
+    expression:
+      '(values.placeOfDeath!="OTHER" && values.placeOfDeath!="PRIVATE_HOME")'
   },
   isNotCityLocation: {
     action: 'hide',
@@ -385,7 +408,7 @@ export const conditionals: IConditionals = {
   },
   deathPlaceOther: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "other"'
+    expression: 'values.deathPlaceAddress !== "OTHER"'
   },
   causeOfDeathEstablished: {
     action: 'hide',

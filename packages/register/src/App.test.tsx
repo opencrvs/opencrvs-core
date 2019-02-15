@@ -705,7 +705,7 @@ describe('when user has a valid token in local storage', () => {
       fathersDetailsExist: true,
       iD: '23423442342423424',
       iDType: 'OTHER',
-      iDTypeOther: 'Custom type',
+      iDTypeOther: 'Taxpayer Identification Number',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
       country: 'BGD',
@@ -723,7 +723,7 @@ describe('when user has a valid token in local storage', () => {
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '234243453455',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       country: 'BGD',
       nationality: 'BGD',
@@ -781,65 +781,6 @@ describe('when user has a valid token in local storage', () => {
 
       app.update()
     })
-
-    it('Throws error for invalid formDefinition', () => {
-      const emptyObj = {}
-      expect(() => draftToGqlTransformer({} as IForm, emptyObj)).toThrowError(
-        'Sections are missing in form definition'
-      )
-    })
-
-    it('Check if father addresses are parsed properly', () => {
-      const clonedFather = clone(fatherDetails)
-      clonedFather.addressSameAsMother = false
-      clonedFather.permanentAddressSameAsMother = false
-      clonedFather.addressLine1 = 'Rd #10'
-      clonedFather.addressLine1Permanent = 'Rd#10'
-      clonedFather.addressLine2 = 'Akua'
-      clonedFather.addressLine2Permanent = 'Akua'
-      clonedFather.addressLine3 = 'union1'
-      clonedFather.addressLine3Permanent = 'union1'
-      clonedFather.addressLine4 = 'upazila10'
-      clonedFather.addressLine4Permanent = 'upazila10'
-      clonedFather.countryPermanent = 'BGD'
-      clonedFather.currentAddress = ''
-      clonedFather.district = 'district2'
-      clonedFather.districtPermanent = 'district2'
-      clonedFather.permanentAddress = ''
-      clonedFather.postCode = '1020'
-      clonedFather.postCodePermanent = '1010'
-      clonedFather.state = 'state4'
-      clonedFather.statePermanent = 'state4'
-
-      const data = {
-        child: childDetails,
-        father: clonedFather,
-        mother: motherDetails,
-        registration: registrationDetails,
-        documents: { image_uploader: '' }
-      }
-
-      expect(draftToGqlTransformer(form, data).father.address[1].line[0]).toBe(
-        'Rd#10'
-      )
-    })
-    it('Check if existing place of birth location is parsed properly', () => {
-      const data = {
-        child: childDetails,
-        father: fatherDetails,
-        mother: motherDetails,
-        registration: registrationDetails,
-        documents: { image_uploader: '' }
-      }
-
-      expect(draftToGqlTransformer(form, data).birthLocationType).toBe(
-        'HOSPITAL'
-      )
-
-      expect(draftToGqlTransformer(form, data).birthLocation).toBe(
-        '90d39759-7f02-4646-aca3-9272b4b5ce5a'
-      )
-    })
     it('Check if new place of birth location address is parsed properly', () => {
       const clonedChild = clone(childDetails)
       clonedChild.placeOfBirth = 'PRIVATE_HOME'
@@ -859,41 +800,9 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToGqlTransformer(form, data).birthLocationType).toBe(
+      expect(draftToGqlTransformer(form, data).eventLocation.type).toBe(
         'PRIVATE_HOME'
       )
-
-      expect(draftToGqlTransformer(form, data).placeOfBirth.type).toBe(
-        'PRIVATE_HOME'
-      )
-      expect(draftToGqlTransformer(form, data).placeOfBirth.partOf).toBe(
-        'upazila10'
-      )
-
-      expect(draftToGqlTransformer(form, data).placeOfBirth.address.type).toBe(
-        'BIRTH_PLACE'
-      )
-      expect(draftToGqlTransformer(form, data).placeOfBirth.address.state).toBe(
-        'state4'
-      )
-      expect(
-        draftToGqlTransformer(form, data).placeOfBirth.address.postalCode
-      ).toBe('1020')
-      expect(
-        draftToGqlTransformer(form, data).placeOfBirth.address.district
-      ).toBe('district2')
-      expect(
-        draftToGqlTransformer(form, data).placeOfBirth.address.line[0]
-      ).toBe('Rd #10')
-      expect(
-        draftToGqlTransformer(form, data).placeOfBirth.address.line[2]
-      ).toBe('Akua')
-      expect(
-        draftToGqlTransformer(form, data).placeOfBirth.address.line[3]
-      ).toBe('union1')
-      expect(
-        draftToGqlTransformer(form, data).placeOfBirth.address.line[5]
-      ).toBe('upazila10')
     })
     it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
       const registration = clone(registrationDetails)
@@ -1064,7 +973,7 @@ describe('when user has a valid token in local storage', () => {
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '234234423424234244',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
@@ -1084,7 +993,7 @@ describe('when user has a valid token in local storage', () => {
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '234243453455',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       country: 'BGD',
       nationality: 'BGD',

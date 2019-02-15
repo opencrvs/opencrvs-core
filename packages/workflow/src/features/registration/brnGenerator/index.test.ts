@@ -1,4 +1,4 @@
-import { generateBirthRegistrationNumber } from './index'
+import { generateRegistrationNumber } from './index'
 import { testFhirBundle } from 'src/test/utils'
 import * as fetch from 'jest-fetch-mock'
 import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
@@ -124,7 +124,7 @@ describe('Verify generateBirthRegistrationNumber', () => {
     }
     testFhirBundle.entry[1].resource.identifier.push(identifier)
 
-    const brn = await generateBirthRegistrationNumber(
+    const brn = await generateRegistrationNumber(
       testFhirBundle.entry[1].resource,
       practitioner
     )
@@ -137,7 +137,7 @@ describe('Verify generateBirthRegistrationNumber', () => {
   })
   it('Throws error for default BRN generator', async () => {
     expect(
-      generateBirthRegistrationNumber(testFhirBundle, practitioner, 'default')
+      generateRegistrationNumber(testFhirBundle, practitioner, 'default')
     ).rejects.toThrowError('Default BRN generator has not been impleted yet')
   })
 })

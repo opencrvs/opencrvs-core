@@ -1,7 +1,5 @@
-import {
-  FETCH_BIRTH_REGISTRATION_QUERY,
-  PrintCertificateAction
-} from './PrintCertificateAction'
+import { PrintCertificateAction } from './PrintCertificateAction'
+import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import * as React from 'react'
@@ -13,12 +11,13 @@ import {
   INFORMATIVE_RADIO_GROUP
 } from 'src/forms'
 import { ReactWrapper } from 'enzyme'
-import { iDType, ParentDetails } from './ParentDetails'
+import { ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
 import { paymentFormSection } from 'src/forms/certificate/fieldDefinitions/payment-section'
 import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/preview-section'
 import { calculateDays, timeElapsed } from './calculatePrice'
+import { identityNameMapper } from 'src/forms/identity'
 
 describe('when user wants to print certificate', async () => {
   const { store, history } = createStore()
@@ -29,7 +28,7 @@ describe('when user wants to print certificate', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
           variables: { id: 'asdhdqe2472487jsdfsdf' }
         },
         result: {
@@ -38,6 +37,7 @@ describe('when user wants to print certificate', async () => {
               _fhirIDMap: {
                 composition: '369fba87-12af-4428-8ced-21e9a3838159',
                 encounter: '8d308b0d-c460-438c-b06c-5b30931d3812',
+                eventLocation: '8d308b0d-c460-438c-b06c-5b30931d3123',
                 observation: {
                   birthType: 'd8b0e465-28b5-43bf-bcc9-1cf53b3736b8',
                   attendantAtBirth: '3440b511-4b47-47bf-bf4a-3c9d96a4da36'
@@ -90,6 +90,7 @@ describe('when user wants to print certificate', async () => {
                   {
                     id: '123',
                     type: 'PASSPORT',
+                    otherType: '',
                     __typename: 'IdentityType'
                   }
                 ],
@@ -163,6 +164,18 @@ describe('when user wants to print certificate', async () => {
               attendantAtBirth: null,
               weightAtBirth: null,
               birthType: null,
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
               presentAtBirthRegistration: null,
               __typename: 'BirthRegistration'
             }
@@ -251,7 +264,7 @@ describe('when user wants to print certificate', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
           variables: { id: '12345' }
         },
         result: {
@@ -298,6 +311,7 @@ describe('when user wants to print certificate', async () => {
                 identifier: [
                   {
                     id: '4564',
+                    otherType: '',
                     type: 'NATIONAL_ID'
                   }
                 ],
@@ -346,37 +360,42 @@ describe('when user wants to print certificate', async () => {
   })
 
   it('renders i18n idType', () => {
-    expect(iDType('NATIONAL_ID')).toEqual({
+    expect(identityNameMapper('NATIONAL_ID')).toEqual({
       id: 'formFields.iDTypeNationalID',
       defaultMessage: 'National ID',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('PASSPORT')).toEqual({
+    expect(identityNameMapper('PASSPORT')).toEqual({
       id: 'formFields.iDTypePassport',
       defaultMessage: 'Passport',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('BIRTH_REGISTRATION_NUMBER')).toEqual({
+    expect(identityNameMapper('DRIVING_LICENSE')).toEqual({
+      id: 'formFields.iDTypeDrivingLicense',
+      defaultMessage: 'Drivers License',
+      description: 'Option for form field: Type of ID'
+    })
+    expect(identityNameMapper('BIRTH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeBRN',
       defaultMessage: 'Birth Registration Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('DEATH_REGISTRATION_NUMBER')).toEqual({
+    expect(identityNameMapper('DEATH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeDRN',
       defaultMessage: 'Death Registration Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('REFUGEE_NUMBER')).toEqual({
+    expect(identityNameMapper('REFUGEE_NUMBER')).toEqual({
       id: 'formFields.iDTypeRefugeeNumber',
       defaultMessage: 'Refugee Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('ALIEN_NUMBER')).toEqual({
+    expect(identityNameMapper('ALIEN_NUMBER')).toEqual({
       id: 'formFields.iDTypeAlienNumber',
       defaultMessage: 'Alien Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('UNKNOWN')).toEqual({
+    expect(identityNameMapper('UNKNOWN')).toEqual({
       id: 'formFields.iD',
       defaultMessage: 'ID Number',
       description: 'Label for form field: ID Number'
@@ -481,7 +500,7 @@ describe('when user wants to print certificate', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_BIRTH_REGISTRATION_QUERY,
+            query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
             variables: { id: 'asdhdqe2472487jsdfsdf' }
           },
           result: {
@@ -490,6 +509,7 @@ describe('when user wants to print certificate', async () => {
                 _fhirIDMap: {
                   composition: '369fba87-12af-4428-8ced-21e9a3838159',
                   encounter: '8d308b0d-c460-438c-b06c-5b30931d3812',
+                  eventLocation: '8d308b0d-c460-438c-b06c-5b30931d3123',
                   observation: {
                     birthType: 'd8b0e465-28b5-43bf-bcc9-1cf53b3736b8',
                     attendantAtBirth: '3440b511-4b47-47bf-bf4a-3c9d96a4da36'
@@ -542,6 +562,7 @@ describe('when user wants to print certificate', async () => {
                     {
                       id: '123',
                       type: 'PASSPORT',
+                      otherType: '',
                       __typename: 'IdentityType'
                     }
                   ],
@@ -615,6 +636,18 @@ describe('when user wants to print certificate', async () => {
                 attendantAtBirth: null,
                 weightAtBirth: null,
                 birthType: null,
+                eventLocation: {
+                  address: {
+                    country: 'BGD',
+                    state: 'state4',
+                    district: 'district2',
+                    postalCode: '',
+                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                    postCode: '1020'
+                  },
+                  type: 'PRIVATE_HOME',
+                  partOf: 'Location/upazila10'
+                },
                 presentAtBirthRegistration: null,
                 __typename: 'BirthRegistration'
               }

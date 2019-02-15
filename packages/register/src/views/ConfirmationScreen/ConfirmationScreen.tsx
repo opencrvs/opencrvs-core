@@ -17,12 +17,7 @@ import {
 import { RouteComponentProps } from 'react-router'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
-import {
-  DECLARATION,
-  REJECTION,
-  DUPLICATION,
-  CERTIFICATION
-} from 'src/utils/constants'
+import { DECLARATION, REJECTION, DUPLICATION, BIRTH } from 'src/utils/constants'
 
 const messages = defineMessages({
   nextCardTitle: {
@@ -45,15 +40,15 @@ const messages = defineMessages({
   },
   title: {
     id: 'register.confirmationScreen.title',
-    defaultMessage: `{event, select, declaration {Application} registration {Registration} duplication {Application}
-      certificate {Certificate} offlineEvent {Application connectivity}} {action, select, completed {completed} 
-      submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending}}`,
+    defaultMessage: `{event, select, declaration {Application} registration {Application} duplication {Application}
+      certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
+      submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
     description: 'The title that appear on the confirmation screen '
   },
   headerDesc: {
     id: 'register.confirmationScreen.headerDesc',
-    defaultMessage: `{event, select, declaration {The application} registration {} duplication {The application} certificate {} offlineEvent {The application}} 
-      {action, select, submitted {is now on its way for validation} completed {} registered {registered} rejected {rejected} approved {Approved}
+    defaultMessage: `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The application}}
+      {action, select, submitted {is now on its way for validation} completed {} registered {} rejected {rejected} approved {Approved}
       offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     description:
       'The Header description that appear on the confirmation screen '
@@ -66,47 +61,50 @@ const messages = defineMessages({
   },
   boxHeaderDescFirst: {
     id: 'register.confirmationScreen.boxHeaderDescFirst',
-    defaultMessage: `{event, select, declaration {The birth application of } registration {The birth of } duplication 
-      {The birth application of } certificate {The birth certificate of } offlineEvent {The birth application of }}`,
+    defaultMessage: `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The {eventType, select, birth {birth} death {death}} of }
+    duplication {The {eventType, select, birth {birth} death {death}} duplication of } certificate {The {eventType, select, birth {birth} death {death}} certificate of }
+    offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of } }`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
   boxHeaderDescLast: {
     id: 'register.confirmationScreen.boxHeaderDescLast',
-    defaultMessage: `{action, select, completed {has been completed.} submitted {has been submitted.} rejected {has been rejected.} registered {has been registered}
+    defaultMessage: `{action, select, completed {has been completed.} submitted {has been successfully submitted to the registration office.} rejected {has been rejected.} registered {has been registered}
       approved {has been approved.} offlineAction {is pending due to internet connection.}}`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
   trackingSectionTitle: {
     id: 'register.confirmationScreen.trackingSectionTitle',
-    defaultMessage: `{event, select, declaration {Tracking ID number: } registration {Birth Registration Number: } 
-    duplication {...} certificate {...} offlineEvent {Tracking ID number: }}`,
+    defaultMessage: `{event, select, declaration {Tracking ID number: } registration {{eventType, select, birth {Birth} death {Death}} Registration Number: }
+    duplication {{eventType, select, birth {Birth} death {Death}} Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
     description:
       'The tracking section title that appear on the confirmation screen'
   },
   trackingSectionDesc: {
     id: 'register.confirmationScreen.trackingSectionDesc',
-    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-    duplication{...} certificate {Certificates have been collected from your jurisdiction.} offlineEvent {wait for internet connection}}`,
+    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
+    duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
+    certificate {Certificates have been collected from your jurisdiction.}
+    offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}} `,
     description:
       'The tracking section description that appear on the confirmation screen'
   },
   nextSectionDesc: {
     id: 'register.confirmationScreen.nextSectionDesc',
-    defaultMessage: `{event, select, declaration {You will be notified through OpenCRVS when registration is complete 
+    defaultMessage: `{event, select, declaration {You will be notified through OpenCRVS when registration is complete
       or if there are any delays in the process.} registration {The registration process is complete.} duplication {}
-      certificate {} offlineEvent {All you need to do is login once you have internet connectivity on your device within 
+      certificate {} offlineEvent {All you need to do is login once you have internet connectivity on your device within
       the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.}}`,
     description:
       'The next section description that appear on the confirmation screen'
   },
   nextSectionDescDetails: {
     id: 'register.confirmationScreen.nextSectionDescDetails',
-    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-      duplication{} certificate {Certificates have been collected from your jurisdiction.} 
+    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
+      duplication{} certificate {Certificates have been collected from your jurisdiction.}
       offlineEvent {wait for internet connection}}`,
     description:
       'The next section description details that appear on the confirmation screen'
@@ -246,19 +244,19 @@ class ConfirmationScreenView extends React.Component<
       event: eventName,
       action: actionName
     })
+    const eventType = history.location.state.eventType
+      ? history.location.state.eventType
+      : BIRTH
     const headerDesc = intl.formatMessage(messages.headerDesc, {
       event: eventName,
       action: actionName
     })
     const isRejection = actionName === REJECTION ? true : false
     const fullName =
-      language === 'en'
-        ? fullNameInEng !== ''
-          ? fullNameInEng
-          : fullNameInBn
-        : fullNameInBn
+      language === 'bn' || !fullNameInEng ? fullNameInBn : fullNameInEng
     const boxHeaderDescFirst = intl.formatMessage(messages.boxHeaderDescFirst, {
-      event: eventName
+      event: eventName,
+      eventType
     })
     const boxHeaderDescLast = intl.formatMessage(messages.boxHeaderDescLast, {
       action: actionName
@@ -275,8 +273,6 @@ class ConfirmationScreenView extends React.Component<
     const isDuplicate =
       history.location.state.eventName === DUPLICATION ? true : false
     const duplicateContextId = history.location.state.duplicateContextId
-    const isCertification =
-      history.location.state.eventName === CERTIFICATION ? true : false
 
     return (
       <>
@@ -284,7 +280,7 @@ class ConfirmationScreenView extends React.Component<
           <Header
             title={title}
             description={headerDesc}
-            hideBackButton={!isDeclaration}
+            hideBackButton={true}
             id="confirmation_screen_view"
           />
         </HeaderWrapper>
@@ -320,16 +316,16 @@ class ConfirmationScreenView extends React.Component<
           </Box>
           {isTrackingSection && (
             <TrackingBox>
-              <TrackingHeader>
-                {!isCertification &&
-                  intl.formatMessage(messages.trackingSectionTitle, {
-                    event: eventName
-                  })}
+              <TrackingHeader id="trackingSecHeader">
+                {intl.formatMessage(messages.trackingSectionTitle, {
+                  event: eventName,
+                  eventType
+                })}
               </TrackingHeader>
               <TrackingNumber id="trackingIdViewer">
                 {trackNumber}
               </TrackingNumber>
-              <StyledP>
+              <StyledP id="trackingSecText">
                 {intl.formatMessage(messages.trackingSectionDesc, {
                   event: eventName
                 })}
@@ -355,9 +351,20 @@ class ConfirmationScreenView extends React.Component<
           )}
         </Container>
         <Footer>
+          <FooterAction>
+            <FooterPrimaryButton
+              id="go_to_homepage_button"
+              onClick={() => (location.href = '/')}
+            >
+              {intl.formatMessage(messages.backButton)}
+            </FooterPrimaryButton>
+          </FooterAction>
           {!isRejection && isDeclaration && (
             <FooterAction>
-              <FooterPrimaryButton onClick={() => (location.href = '/')}>
+              <FooterPrimaryButton
+                id="go_to_new_declaration"
+                onClick={() => (location.href = '/')}
+              >
                 {intl.formatMessage(messages.newButton)}
               </FooterPrimaryButton>
             </FooterAction>
@@ -374,11 +381,6 @@ class ConfirmationScreenView extends React.Component<
               </FooterPrimaryButton>
             </FooterAction>
           )}
-          <FooterAction>
-            <FooterPrimaryButton onClick={() => (location.href = '/')}>
-              {intl.formatMessage(messages.backButton)}
-            </FooterPrimaryButton>
-          </FooterAction>
         </Footer>
       </>
     )

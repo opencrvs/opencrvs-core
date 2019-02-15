@@ -13,7 +13,10 @@ import {
   unionMock,
   officeMock,
   testFhirBundleForDeath,
-  testFhirBundleWithIdsForDeath
+  testFhirBundleWithIdsForDeath,
+  motherMock,
+  compositionMock,
+  testDeathFhirBundle
 } from '../../test/utils'
 import { cloneDeep } from 'lodash'
 
@@ -42,7 +45,7 @@ describe('Verify handler', () => {
         [officeMock, { status: 200 }]
       )
     })
-    it('returns OK for a correctly authenticated user', async () => {
+    it('returns OK for a correctly authenticated user  with birth declaration', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -71,6 +74,42 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('returns OK for a correctly authenticated user with death declaration', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+      jest
+        .spyOn(require('./utils'), 'sendEventNotification')
+        .mockReturnValue('')
+
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -471,15 +510,37 @@ describe('markBirthAsRegisteredHandler handler', () => {
       }
     )
 
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            response: { location: 'Task/12423/_history/1' }
-          }
-        ]
-      })
+    fetch.resetMocks()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Task/12423/_history/1' }
+            }
+          ]
+        })
+      ],
+      [compositionMock, { status: 200 }],
+      [motherMock, { status: 200 }]
     )
     const taskBundle = {
       resourceType: 'Bundle',
@@ -490,6 +551,9 @@ describe('markBirthAsRegisteredHandler handler', () => {
           resource: {
             resourceType: 'Task',
             status: 'requested',
+            focus: {
+              reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
+            },
             code: {
               coding: [
                 {

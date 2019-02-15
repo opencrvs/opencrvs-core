@@ -18,7 +18,7 @@ import {
   REG_STATUS_REGISTERED,
   REG_STATUS_CERTIFIED
 } from './constants'
-import { generateBirthRegistrationNumber } from '../brnGenerator'
+import { generateRegistrationNumber } from '../brnGenerator'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -68,10 +68,12 @@ export async function markBundleAsRegistered(
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
+  /* Setting registration number here */
   const eventType = getEventType(bundle)
-  /* Setting birth registration number here */
   if (eventType === EVENT_TYPE.BIRTH) {
-    await pushBRN(taskResource, practitioner)
+    await pushRN(taskResource, practitioner, 'birth-registration-number')
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    await pushRN(taskResource, practitioner, 'death-registration-number')
   }
 
   /* setting registration workflow status here */
@@ -114,15 +116,16 @@ export async function markBundleAsCertified(
   return bundle
 }
 
-export async function pushBRN(
+export async function pushRN(
   taskResource: fhir.Task,
-  practitioner: fhir.Practitioner
+  practitioner: fhir.Practitioner,
+  identifierName: string
 ): Promise<fhir.Task> {
   if (!taskResource) {
     throw new Error('Invalid Task resource found for registration')
   }
 
-  const brn = await generateBirthRegistrationNumber(taskResource, practitioner)
+  const brn = await generateRegistrationNumber(taskResource, practitioner)
 
   if (!taskResource.identifier) {
     taskResource.identifier = []
@@ -133,12 +136,12 @@ export async function pushBRN(
     taskResource.identifier.find(identifier => {
       return (
         identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+        `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`
       )
     })
   if (!brnIdentifier) {
     taskResource.identifier.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`,
+      system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
       value: brn
     })
   } else {
@@ -148,7 +151,7 @@ export async function pushBRN(
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
-  let trackingId = generateBirthTrackingId()
+  let trackingId: string
   let trackingIdFhirName: string
   const eventType = getEventType(fhirBundle)
   if (eventType === EVENT_TYPE.BIRTH) {

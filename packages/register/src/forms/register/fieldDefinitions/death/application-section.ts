@@ -8,22 +8,44 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   NUMBER,
   RADIO_GROUP,
-  TEL
+  TEL,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate
+  isValidBirthDate,
+  validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  identityNameMapper,
+  identityTypeMapper,
+  deathIdentityOptions
+} from '../../../identity'
 import { messages as addressMessages } from '../../../address'
 
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { conditionals } from 'src/forms/utils'
 import { phoneNumberFormat } from 'src/utils/validate'
+import {
+  fieldValueSectionExchangeTransformer,
+  fieldToAddressTransformer,
+  fieldToIdentifierTransformer,
+  fieldToNameTransformer,
+  fieldNameTransformer,
+  fieldToArrayTransformer,
+  copyAddressTransformer,
+  fieldToPhoneNumberTransformer
+} from 'src/forms/mappings/mutation/field-mappings'
+
+import {
+  fieldValueNestingTransformer,
+  OBJECT_TYPE
+} from './mappings/mutation/applicant-mapping'
 
 const messages = defineMessages({
   applicantTab: {
@@ -41,29 +63,24 @@ const messages = defineMessages({
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
   },
-  noId: {
-    id: 'formFields.idTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
-  },
   applicantsGivenNames: {
     id: 'formFields.applicantsGivenNames',
-    defaultMessage: 'Given name (s)',
+    defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: Given names'
   },
   applicantsFamilyName: {
     id: 'formFields.applicantsFamilyName',
-    defaultMessage: 'Family Name',
+    defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   applicantsGivenNamesEng: {
     id: 'formFields.applicantsGivenNamesEng',
-    defaultMessage: 'Given Name (s) in English',
+    defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: Given names in english'
   },
   applicantsFamilyNameEng: {
     id: 'formFields.applicantsFamilyNameEng',
-    defaultMessage: 'Family Name in English',
+    defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   applicantsNationality: {
@@ -140,46 +157,74 @@ const messages = defineMessages({
   }
 })
 
+const NESTED_SECTION = 'individual'
+
 export const applicantsSection: IFormSection = {
-  id: 'applicant',
+  id: 'informant',
   viewType: 'form' as ViewType,
   name: messages.applicantTab,
   title: messages.applicantTitle,
   fields: [
     {
-      name: 'applicantIdType',
+      name: 'iDType',
       type: SELECT_WITH_OPTIONS,
       label: messages.applicantsIdType,
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber },
-        { value: 'NO_ID', label: messages.noId }
-      ]
+      options: deathIdentityOptions,
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToIdentifierTransformer('type')
+        )
+      }
+    },
+    {
+      name: 'iDTypeOther',
+      type: TEXT,
+      label: identityMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.iDType],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToIdentifierTransformer('otherType')
+        )
+      }
     },
     {
       name: 'applicantID',
-      type: TEXT,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',
       validate: [],
-      conditionals: [conditionals.iDAvailable]
+      conditionals: [conditionals.iDAvailable],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToIdentifierTransformer('id')
+        )
+      }
     },
     {
       name: 'applicantFirstNames',
@@ -187,7 +232,14 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsGivenNames,
       required: false,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat]
+      validate: [bengaliOnlyNameFormat],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToNameTransformer('bn', 'firstNames'),
+          OBJECT_TYPE.NAME
+        )
+      }
     },
     {
       name: 'applicantFamilyName',
@@ -195,7 +247,14 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsFamilyName,
       required: true,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat]
+      validate: [bengaliOnlyNameFormat],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToNameTransformer('bn', 'familyName'),
+          OBJECT_TYPE.NAME
+        )
+      }
     },
     {
       name: 'applicantFirstNamesEng',
@@ -203,7 +262,14 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsGivenNamesEng,
       required: false,
       initialValue: '',
-      validate: [englishOnlyNameFormat]
+      validate: [englishOnlyNameFormat],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToNameTransformer('en', 'firstNames'),
+          OBJECT_TYPE.NAME
+        )
+      }
     },
     {
       name: 'applicantFamilyNameEng',
@@ -211,16 +277,29 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsFamilyNameEng,
       required: false,
       initialValue: '',
-      validate: [englishOnlyNameFormat]
+      validate: [englishOnlyNameFormat],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToNameTransformer('en', 'familyName'),
+          OBJECT_TYPE.NAME
+        )
+      }
     },
     {
-      name: 'applicantNationality',
+      name: 'nationality',
       type: SELECT_WITH_OPTIONS,
       label: messages.applicantsNationality,
       required: false,
       initialValue: 'BGD',
       validate: [],
-      options: countries
+      options: countries,
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToArrayTransformer
+        )
+      }
     },
     {
       name: 'applicantBirthDate',
@@ -228,7 +307,13 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [isValidBirthDate]
+      validate: [isValidBirthDate],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldNameTransformer('birthDate')
+        )
+      }
     },
     {
       name: 'applicantsRelationToDeceased',
@@ -257,7 +342,13 @@ export const applicantsSection: IFormSection = {
           value: 'OTHER',
           label: messages.relationOther
         }
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueSectionExchangeTransformer(
+          'informant',
+          'relationship'
+        )
+      }
     },
     {
       name: 'applicantPhone',
@@ -265,14 +356,19 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsPhone,
       required: false,
       initialValue: '',
-      validate: [phoneNumberFormat]
+      validate: [phoneNumberFormat],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToPhoneNumberTransformer
+        )
+      }
     },
     {
       name: 'currentAddress',
       type: SUBSECTION,
       label: messages.currentAddress,
       initialValue: '',
-      required: true,
       validate: [],
       conditionals: []
     },
@@ -283,7 +379,14 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
-      options: countries
+      options: countries,
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT'),
+          OBJECT_TYPE.NAME
+        )
+      }
     },
     {
       name: 'state',
@@ -296,7 +399,14 @@ export const applicantsSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
       },
-      conditionals: [conditionals.country]
+      conditionals: [conditionals.country],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'district',
@@ -309,7 +419,14 @@ export const applicantsSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'state'
       },
-      conditionals: [conditionals.country, conditionals.state]
+      conditionals: [conditionals.country, conditionals.state],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine4',
@@ -326,13 +443,20 @@ export const applicantsSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.district
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 6),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -343,8 +467,39 @@ export const applicantsSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.district,
-        conditionals.addressLine4
-      ]
+        conditionals.addressLine4,
+        conditionals.isNotCityLocation
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 4),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.currentAddressSameAsPermanent,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 5),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine2',
@@ -359,13 +514,66 @@ export const applicantsSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 3),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
+    },
+    {
+      name: 'addressLine1CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.currentAddressSameAsPermanent,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 2),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.currentAddressSameAsPermanent,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -374,7 +582,14 @@ export const applicantsSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 1),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'postCode',
@@ -389,15 +604,24 @@ export const applicantsSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'permanentAddress',
       type: SUBSECTION,
       label: messages.permanentAddress,
       initialValue: '',
-      required: false,
-      validate: []
+      validate: [],
+      mapping: {
+        mutation: fieldValueNestingTransformer(NESTED_SECTION)
+      }
     },
     {
       name: 'applicantPermanentAddressSameAsCurrent',
@@ -410,7 +634,21 @@ export const applicantsSection: IFormSection = {
         { value: true, label: addressMessages.confirm },
         { value: false, label: addressMessages.deny }
       ],
-      conditionals: []
+      conditionals: [],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          copyAddressTransformer(
+            'CURRENT',
+            'informant',
+            'PERMANENT',
+            'informant',
+            true,
+            NESTED_SECTION
+          ),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'countryPermanent',
@@ -420,7 +658,14 @@ export const applicantsSection: IFormSection = {
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.applicantPermanentAddressSameAsCurrent]
+      conditionals: [conditionals.applicantPermanentAddressSameAsCurrent],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 0, 'country'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'statePermanent',
@@ -436,7 +681,14 @@ export const applicantsSection: IFormSection = {
       conditionals: [
         conditionals.countryPermanent,
         conditionals.applicantPermanentAddressSameAsCurrent
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 0, 'state'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'districtPermanent',
@@ -453,7 +705,14 @@ export const applicantsSection: IFormSection = {
         conditionals.countryPermanent,
         conditionals.statePermanent,
         conditionals.applicantPermanentAddressSameAsCurrent
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 0, 'district'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine4Permanent',
@@ -471,13 +730,20 @@ export const applicantsSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent,
         conditionals.applicantPermanentAddressSameAsCurrent
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 6),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine3Permanent',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -489,8 +755,38 @@ export const applicantsSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent,
         conditionals.addressLine4Permanent,
+        conditionals.isNotCityLocationPermanent,
         conditionals.applicantPermanentAddressSameAsCurrent
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 4),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
+    },
+    {
+      name: 'addressLine3CityOptionPermanent',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 5),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine2Permanent',
@@ -506,13 +802,64 @@ export const applicantsSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent,
         conditionals.applicantPermanentAddressSameAsCurrent
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 3),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
+    },
+    {
+      name: 'addressLine1CityOptionPermanent',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 2),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
+    },
+    {
+      name: 'postCodeCityOptionPermanent',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'addressLine1Permanent',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -522,7 +869,14 @@ export const applicantsSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent,
         conditionals.applicantPermanentAddressSameAsCurrent
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 1),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     },
     {
       name: 'postCodePermanent',
@@ -538,7 +892,14 @@ export const applicantsSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent,
         conditionals.applicantPermanentAddressSameAsCurrent
-      ]
+      ],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
+          OBJECT_TYPE.ADDRESS
+        )
+      }
     }
   ]
 }
