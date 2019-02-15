@@ -427,11 +427,11 @@ export const childSection: IFormSection = {
       name: 'country',
       type: SELECT_WITH_OPTIONS,
       label: addressMessages.country,
-      required: false,
+      required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.otherEventLocation],
+      conditionals: [conditionals.otherBirthEventLocation],
       mapping: {
         mutation: eventLocationMutationTransformer(),
         query: eventLocationQueryTransformer()
@@ -441,14 +441,17 @@ export const childSection: IFormSection = {
       name: 'state',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.state,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
       },
-      conditionals: [conditionals.country, conditionals.otherEventLocation],
+      conditionals: [
+        conditionals.country,
+        conditionals.otherBirthEventLocation
+      ],
       mapping: {
         mutation: eventLocationMutationTransformer(),
         query: eventLocationQueryTransformer()
@@ -458,7 +461,7 @@ export const childSection: IFormSection = {
       name: 'district',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.district,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -468,7 +471,7 @@ export const childSection: IFormSection = {
       conditionals: [
         conditionals.country,
         conditionals.state,
-        conditionals.otherEventLocation
+        conditionals.otherBirthEventLocation
       ],
       mapping: {
         mutation: eventLocationMutationTransformer(),
@@ -479,7 +482,7 @@ export const childSection: IFormSection = {
       name: 'addressLine4',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine4,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -490,7 +493,7 @@ export const childSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.district,
-        conditionals.otherEventLocation
+        conditionals.otherBirthEventLocation
       ],
       mapping: {
         mutation: eventLocationMutationTransformer(6),
@@ -513,7 +516,7 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherEventLocation,
+        conditionals.otherBirthEventLocation,
         conditionals.isNotCityLocation
       ],
       mapping: {
@@ -533,7 +536,7 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherEventLocation,
+        conditionals.otherBirthEventLocation,
         conditionals.isCityLocation
       ],
       mapping: {
@@ -554,7 +557,7 @@ export const childSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.otherEventLocation
+        conditionals.otherBirthEventLocation
       ],
       mapping: {
         mutation: eventLocationMutationTransformer(3),
@@ -573,7 +576,7 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherEventLocation,
+        conditionals.otherBirthEventLocation,
         conditionals.isCityLocation
       ],
       mapping: {
@@ -593,7 +596,7 @@ export const childSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.otherEventLocation,
+        conditionals.otherBirthEventLocation,
         conditionals.isCityLocation
       ],
       mapping: {
@@ -614,7 +617,7 @@ export const childSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.otherEventLocation
+        conditionals.otherBirthEventLocation
       ],
       mapping: {
         mutation: eventLocationMutationTransformer(1),
@@ -634,7 +637,7 @@ export const childSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
-        conditionals.otherEventLocation
+        conditionals.otherBirthEventLocation
       ],
       mapping: {
         mutation: eventLocationMutationTransformer(0, 'postalCode'),

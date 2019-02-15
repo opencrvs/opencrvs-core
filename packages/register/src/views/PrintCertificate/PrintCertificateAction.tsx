@@ -291,6 +291,16 @@ const messages = defineMessages({
   certificateIsCorrect: {
     id: 'certificate.txt.isCorrectTxt'
   },
+  state: {
+    id: 'formFields.state',
+    defaultMessage: 'Division',
+    description: 'The label for state of event location'
+  },
+  district: {
+    id: 'formFields.district',
+    defaultMessage: 'District',
+    description: 'The label for district of event location'
+  },
   certificateConfirmationTxt: {
     id: 'certificate.txt.confirmationTxt'
   },
@@ -745,6 +755,7 @@ class PrintCertificateActionComponent extends React.Component<
 
     let eventLocationEn = ''
     let eventLocationBn = ''
+
     if (
       data &&
       data.eventLocation &&
@@ -752,109 +763,114 @@ class PrintCertificateActionComponent extends React.Component<
       data.eventLocation.address.state &&
       data.eventLocation.address.district
     ) {
-      eventLocationEn = [
-        renderSelectDynamicLabel(
-          data.eventLocation.address.district,
-          {
-            resource: OFFLINE_LOCATIONS_KEY,
-            dependency: 'state'
-          },
-          {},
-          intl,
-          offlineResources,
-          'en'
-        ),
-        renderSelectDynamicLabel(
-          data.eventLocation.address.state,
-          {
-            resource: OFFLINE_LOCATIONS_KEY,
-            dependency: 'country'
-          },
-          {},
-          intl,
-          offlineResources,
-          'en'
-        )
-      ].join(', ')
-      eventLocationBn = [
-        renderSelectDynamicLabel(
-          data.eventLocation.address.district,
-          {
-            resource: OFFLINE_LOCATIONS_KEY,
-            dependency: 'state'
-          },
-          {},
-          intl,
-          offlineResources,
-          'bn'
-        ),
-        renderSelectDynamicLabel(
-          data.eventLocation.address.state,
-          {
-            resource: OFFLINE_LOCATIONS_KEY,
-            dependency: 'country'
-          },
-          {},
-          intl,
-          offlineResources,
-          'bn'
-        )
-      ].join(', ')
-    } else if (data && data._fhirIDMap.eventLocation) {
-      const selectedLocation = offlineResources[OFFLINE_FACILITIES_KEY].filter(
-        (location: ILocation) => {
+      if (
+        data.eventLocation.type === 'HEALTH_FACILITY' &&
+        data._fhirIDMap.eventLocation
+      ) {
+        const selectedLocation = offlineResources[
+          OFFLINE_FACILITIES_KEY
+        ].filter((location: ILocation) => {
           return location.id === data._fhirIDMap.eventLocation
-        }
-      )[0]
-      const partOfID = selectedLocation.partOf.split('/')[1]
-      eventLocationEn = [
-        renderSelectDynamicLabel(
-          data._fhirIDMap.eventLocation,
-          {
-            resource: OFFLINE_FACILITIES_KEY,
-            dependency: 'placeOfBirth'
-          },
-          {},
-          intl,
-          offlineResources,
-          'en'
-        ),
-        renderSelectDynamicLabel(
-          partOfID,
-          {
-            resource: OFFLINE_LOCATIONS_KEY,
-            dependency: 'district'
-          },
-          {},
-          intl,
-          offlineResources,
-          'en'
-        )
-      ].join()
-      eventLocationBn = [
-        renderSelectDynamicLabel(
-          data._fhirIDMap.eventLocation,
-          {
-            resource: OFFLINE_FACILITIES_KEY,
-            dependency: 'placeOfBirth'
-          },
-          {},
-          intl,
-          offlineResources,
-          'bn'
-        ),
-        renderSelectDynamicLabel(
-          partOfID,
-          {
-            resource: OFFLINE_LOCATIONS_KEY,
-            dependency: 'district'
-          },
-          {},
-          intl,
-          offlineResources,
-          'bn'
-        )
-      ].join()
+        })[0]
+        const partOfID = selectedLocation.partOf.split('/')[1]
+        eventLocationEn = [
+          renderSelectDynamicLabel(
+            data._fhirIDMap.eventLocation,
+            {
+              resource: OFFLINE_FACILITIES_KEY,
+              dependency: 'placeOfBirth'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          ),
+          renderSelectDynamicLabel(
+            partOfID,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'district'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          )
+        ].join()
+        eventLocationBn = [
+          renderSelectDynamicLabel(
+            data._fhirIDMap.eventLocation,
+            {
+              resource: OFFLINE_FACILITIES_KEY,
+              dependency: 'placeOfBirth'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          ),
+          renderSelectDynamicLabel(
+            partOfID,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'district'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          )
+        ].join()
+      } else {
+        eventLocationEn = [
+          `${renderSelectDynamicLabel(
+            data.eventLocation.address.district,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'state'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          )} ${intl.formatMessage(messages.district)}`,
+          `${renderSelectDynamicLabel(
+            data.eventLocation.address.state,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'country'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          )} ${intl.formatMessage(messages.state)}`
+        ].join(', ')
+        eventLocationBn = [
+          renderSelectDynamicLabel(
+            data.eventLocation.address.district,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'state'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          ),
+          renderSelectDynamicLabel(
+            data.eventLocation.address.state,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'country'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          )
+        ].join(', ')
+      }
     }
 
     return {

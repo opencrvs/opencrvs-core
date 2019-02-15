@@ -275,7 +275,9 @@ export interface IConditionals {
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
-  otherEventLocation: IConditional
+  placeOfDeathHospital: IConditional
+  otherBirthEventLocation: IConditional
+  otherDeathEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isNotCityLocationPermanent: IConditional

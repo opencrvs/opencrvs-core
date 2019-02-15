@@ -873,13 +873,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.buttons.back': 'Back to homescreen',
     'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
-    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {{eventType, select, birth {Birth} death {Death}} Registration Number: } 
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking ID number: } registration {{eventType, select, birth {Birth} death {Death}} Registration Number: }
     duplication {{eventType, select, birth {Birth} death {Death}} Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
-    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
+    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
       duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} certificate {Certificates have been collected from your jurisdiction.}
       offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}} `,
-    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The {eventType, select, birth {birth} death {death}} of } 
+    'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The {eventType, select, birth {birth} death {death}} of }
       duplication {The {eventType, select, birth {birth} death {death}} duplication of } certificate {The {eventType, select, birth {birth} death {death}} certificate of } offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select, completed {has been completed.} submitted {has been successfully submitted to the registration office.} rejected {has been rejected.} registered {has been registered}
       approved {has been approved.} offlineAction {is pending due to internet connection.}}`,

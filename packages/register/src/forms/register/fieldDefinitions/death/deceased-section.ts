@@ -378,7 +378,7 @@ export const deceasedSection: IFormSection = {
       name: 'addressLine3Permanent',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -389,7 +389,8 @@ export const deceasedSection: IFormSection = {
         conditionals.countryPermanent,
         conditionals.statePermanent,
         conditionals.districtPermanent,
-        conditionals.addressLine4Permanent
+        conditionals.addressLine4Permanent,
+        conditionals.isNotCityLocationPermanent
       ],
       mapping: {
         mutation: fieldToAddressTransformer('PERMANENT', 4),
@@ -476,7 +477,7 @@ export const deceasedSection: IFormSection = {
       name: 'addressLine1Permanent',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -626,7 +627,7 @@ export const deceasedSection: IFormSection = {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -638,6 +639,7 @@ export const deceasedSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
+        conditionals.isNotCityLocation,
         conditionals.currentAddressSameAsPermanent
       ],
       mapping: {
@@ -729,7 +731,7 @@ export const deceasedSection: IFormSection = {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [

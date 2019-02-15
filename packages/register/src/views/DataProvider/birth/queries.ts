@@ -144,6 +144,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -173,6 +174,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
