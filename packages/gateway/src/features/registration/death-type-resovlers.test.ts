@@ -5,7 +5,8 @@ import {
   mockDeathComposition,
   mockPatient,
   mockObservations,
-  mockRelatedPerson
+  mockRelatedPerson,
+  mockLocation
 } from 'src/utils/testUtils'
 
 beforeEach(() => {
@@ -95,23 +96,35 @@ describe('Registration type resolvers', () => {
       )
     })
 
-    it('returns deathLocationType', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocationType))
-
+    it('returns eventLocation', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Encounter',
+            status: 'finished',
+            id: 'a1202918-d8fe-4dca-acf1-beb00c5d0cf8',
+            location: [
+              {
+                location: {
+                  reference: 'Location/420fa384-4d61-40db-96cf-6b3c7ca54943'
+                }
+              }
+            ],
+            meta: {
+              lastUpdated: '2019-02-11T08:45:42.960+00:00',
+              versionId: 'd9d41892-c5db-41b8-a0e1-6bf540dbf7e8'
+            }
+          }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockLocation), { status: 200 }]
+      )
       // @ts-ignore
-      const deaththLocationType = await typeResolvers.DeathRegistration.deathLocationType(
+      const eventLocation = await typeResolvers.DeathRegistration.eventLocation(
         mockDeathComposition
       )
-      expect(deaththLocationType).toEqual('BIRTH_PLACE')
-    })
-    it('returns deathLocation', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocation))
-      // @ts-ignore
-      const deathLocation = await typeResolvers.DeathRegistration.deathLocation(
-        mockDeathComposition
-      )
-      expect(deathLocation).toBeDefined()
-      expect(deathLocation).toEqual('123')
+      expect(eventLocation).toBeDefined()
+      expect(eventLocation).toEqual(mockLocation)
     })
     it('returns mannerOfDeath', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.mannerOfDeath))
@@ -223,25 +236,15 @@ describe('Registration type resolvers', () => {
       expect(deathDate).toBe('2010-01-01')
     })
 
-    it('deathLocationType is null when section does not exist', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocation))
+    it('eventLocation is null when section does not exist', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.eventLocation))
       // @ts-ignore
-      const deathLocationType = await typeResolvers.DeathRegistration.deathLocationType(
+      const eventLocation = await typeResolvers.DeathRegistration.eventLocation(
         {
           section: []
         }
       )
-      expect(deathLocationType).toBeNull()
-    })
-    it('deathLocation is null when section does not exist', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.deathLocation))
-      // @ts-ignore
-      const deathLocation = await typeResolvers.DeathRegistration.deathLocation(
-        {
-          section: []
-        }
-      )
-      expect(deathLocation).toBeNull()
+      expect(eventLocation).toBeNull()
     })
     it('mannerOfDeath is null when section does not exist', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.mannerOfDeath))

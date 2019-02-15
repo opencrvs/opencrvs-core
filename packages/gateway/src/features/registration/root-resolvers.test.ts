@@ -24,11 +24,11 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
-  describe('listBirthRegistrations()', () => {
+  describe('listEventRegistrations()', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}], total: 2 }))
       // @ts-ignore
-      const result = await resolvers.Query.listBirthRegistrations(
+      const result = await resolvers.Query.listEventRegistrations(
         {},
         { status: 'preliminary' }
       )
@@ -47,7 +47,7 @@ describe('Registration root resolvers', () => {
       )
 
       // @ts-ignore
-      const result = await resolvers.Query.listBirthRegistrations(
+      const result = await resolvers.Query.listEventRegistrations(
         {},
         { locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'] }
       )

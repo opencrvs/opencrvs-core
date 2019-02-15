@@ -290,7 +290,7 @@ class DuplicateDetailsClass extends React.Component<
             <b>{intl.formatMessage(messages.gender)}:</b> {data.child.gender}
             <br />
             <b>{intl.formatMessage(messages.dateOfApplication)}:</b>{' '}
-            <Moment format="YYYY-MM-DD">{data.dateOfApplication}</Moment>
+            <Moment format="DD-MM-YYYY">{data.dateOfApplication}</Moment>
             <br />
             <b>{intl.formatMessage(messages.trackingId)}:</b> {data.trackingId}
             <br />

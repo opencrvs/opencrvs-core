@@ -41,7 +41,7 @@ export const resolvers: GQLResolver = {
 
       return await fetchFHIR(`/${task.focus.reference}`, authHeader)
     },
-    async listBirthRegistrations(
+    async listEventRegistrations(
       _,
       { status, locationIds, count = 0, skip = 0 },
       authHeader

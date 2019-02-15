@@ -23,7 +23,10 @@ import {
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { Event } from '@opencrvs/register/src/forms'
+import { Event, IFormData } from '@opencrvs/register/src/forms'
+import { draftToGqlTransformer } from 'src/transformer'
+import { IForm } from 'src/forms'
+import { clone } from 'lodash'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
@@ -365,31 +368,34 @@ describe('When user is in Preview section death event', async () => {
   store.dispatch(setInitialDrafts())
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
+  let deathDraft
+  let deathForm: IForm
 
   const mock: any = jest.fn()
 
   beforeEach(async () => {
+    jest.clearAllMocks()
     // @ts-ignore
-    const nDraft = createReviewDraft(
+    deathDraft = createReviewDraft(
       uuid(),
       // @ts-ignore
       mockDeathApplicationData,
       Event.DEATH
     )
     store.dispatch(setInitialDrafts())
-    store.dispatch(storeDraft(nDraft))
+    store.dispatch(storeDraft(deathDraft))
 
-    const nform = getRegisterForm(store.getState())[Event.DEATH]
+    deathForm = getRegisterForm(store.getState())[Event.DEATH]
     const nTestComponent = createTestComponent(
       <RegisterForm
         location={mock}
         history={history}
         staticContext={mock}
-        registerForm={nform}
-        draft={nDraft}
+        registerForm={deathForm}
+        draft={deathDraft}
         tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
         match={{
-          params: { draftId: nDraft.id, tabId: 'preview' },
+          params: { draftId: deathDraft.id, tabId: 'preview' },
           isExact: true,
           path: '',
           url: ''
@@ -399,6 +405,20 @@ describe('When user is in Preview section death event', async () => {
       store
     )
     component = nTestComponent.component
+  })
+
+  it('Check if death location type is parsed properly', () => {
+    expect(
+      draftToGqlTransformer(deathForm, mockDeathApplicationData as IFormData)
+        .eventLocation.type
+    ).toBe('OTHER')
+  })
+
+  it('Check if death location partOf is parsed properly', () => {
+    expect(
+      draftToGqlTransformer(deathForm, mockDeathApplicationData as IFormData)
+        .eventLocation.partOf
+    ).toBe('Location/upazila')
   })
 
   it('Should be able to submit the form', () => {
@@ -422,5 +442,34 @@ describe('When user is in Preview section death event', async () => {
 
     const modalSubmitBtn = component.find('#submit_confirm').hostNodes()
     expect(modalSubmitBtn.length).toEqual(1)
+  })
+  it('Check if death location as hospital is parsed properly', () => {
+    const hospitalLocatioMockDeathApplicationData = clone(
+      mockDeathApplicationData
+    )
+    hospitalLocatioMockDeathApplicationData.deathEvent.placeOfDeath = 'HOSPITAL'
+    hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
+      '5e3736a0-090e-43b4-9012-f1cef399e123'
+    expect(
+      draftToGqlTransformer(
+        deathForm,
+        hospitalLocatioMockDeathApplicationData as IFormData
+      ).eventLocation.type
+    ).toBe(undefined)
+  })
+
+  it('Check if death location as hospital _fhirID is parsed properly', () => {
+    const hospitalLocatioMockDeathApplicationData = clone(
+      mockDeathApplicationData
+    )
+    hospitalLocatioMockDeathApplicationData.deathEvent.placeOfDeath = 'HOSPITAL'
+    hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
+      '5e3736a0-090e-43b4-9012-f1cef399e123'
+    expect(
+      draftToGqlTransformer(
+        deathForm,
+        hospitalLocatioMockDeathApplicationData as IFormData
+      ).eventLocation._fhirID
+    ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
   })
 })

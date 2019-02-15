@@ -312,7 +312,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
 
       return {
         id: rec.id,
-        dateOfApplication: formatLongDate(rec.createdAt, locale),
+        dateOfApplication: rec.createdAt,
         trackingId: (rec.registration && rec.registration.trackingId) || '',
         event:
           (rec.registration &&

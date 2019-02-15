@@ -37,6 +37,7 @@ describe('when user wants to print certificate', async () => {
               _fhirIDMap: {
                 composition: '369fba87-12af-4428-8ced-21e9a3838159',
                 encounter: '8d308b0d-c460-438c-b06c-5b30931d3812',
+                eventLocation: '8d308b0d-c460-438c-b06c-5b30931d3123',
                 observation: {
                   birthType: 'd8b0e465-28b5-43bf-bcc9-1cf53b3736b8',
                   attendantAtBirth: '3440b511-4b47-47bf-bf4a-3c9d96a4da36'
@@ -89,6 +90,7 @@ describe('when user wants to print certificate', async () => {
                   {
                     id: '123',
                     type: 'PASSPORT',
+                    otherType: '',
                     __typename: 'IdentityType'
                   }
                 ],
@@ -162,6 +164,18 @@ describe('when user wants to print certificate', async () => {
               attendantAtBirth: null,
               weightAtBirth: null,
               birthType: null,
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
               presentAtBirthRegistration: null,
               __typename: 'BirthRegistration'
             }
@@ -297,6 +311,7 @@ describe('when user wants to print certificate', async () => {
                 identifier: [
                   {
                     id: '4564',
+                    otherType: '',
                     type: 'NATIONAL_ID'
                   }
                 ],
@@ -494,6 +509,7 @@ describe('when user wants to print certificate', async () => {
                 _fhirIDMap: {
                   composition: '369fba87-12af-4428-8ced-21e9a3838159',
                   encounter: '8d308b0d-c460-438c-b06c-5b30931d3812',
+                  eventLocation: '8d308b0d-c460-438c-b06c-5b30931d3123',
                   observation: {
                     birthType: 'd8b0e465-28b5-43bf-bcc9-1cf53b3736b8',
                     attendantAtBirth: '3440b511-4b47-47bf-bf4a-3c9d96a4da36'
@@ -546,6 +562,7 @@ describe('when user wants to print certificate', async () => {
                     {
                       id: '123',
                       type: 'PASSPORT',
+                      otherType: '',
                       __typename: 'IdentityType'
                     }
                   ],
@@ -619,6 +636,18 @@ describe('when user wants to print certificate', async () => {
                 attendantAtBirth: null,
                 weightAtBirth: null,
                 birthType: null,
+                eventLocation: {
+                  address: {
+                    country: 'BGD',
+                    state: 'state4',
+                    district: 'district2',
+                    postalCode: '',
+                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                    postCode: '1020'
+                  },
+                  type: 'PRIVATE_HOME',
+                  partOf: 'Location/upazila10'
+                },
                 presentAtBirthRegistration: null,
                 __typename: 'BirthRegistration'
               }

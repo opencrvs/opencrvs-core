@@ -397,7 +397,7 @@ const renderValue = (
     )
   }
 
-  if (field.type === DATE && typeof value === 'string') {
+  if (field.type === DATE && value && typeof value === 'string') {
     return formatLongDate(value)
   }
 

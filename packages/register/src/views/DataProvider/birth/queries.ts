@@ -98,9 +98,9 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       attendantAtBirth
       weightAtBirth
       birthType
-      placeOfBirth {
+      eventLocation {
+        type
         address {
-          type
           line
           district
           state
@@ -108,8 +108,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
-      birthLocation
-      birthLocationType
       presentAtBirthRegistration
     }
   }
@@ -146,6 +144,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -175,6 +174,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         identifier {
           id
           type
+          otherType
         }
         address {
           type
@@ -223,6 +223,16 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      eventLocation {
+        type
+        address {
+          line
+          district
+          state
+          postalCode
+          country
+        }
+      }
       presentAtBirthRegistration
     }
   }
