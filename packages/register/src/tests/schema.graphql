@@ -1,10 +1,5 @@
 # source: http://localhost:7070/graphql
-# timestamp: Wed Jan 30 2019 18:56:39 GMT+0000 (Greenwich Mean Time)
-
-# graphql get-schema \
-# --endpoint http://localhost:7070/graphql \
-# --header Authorization=token \
-# --output schema.graphql
+# timestamp: Wed Feb 13 2019 16:07:29 GMT+0000 (Greenwich Mean Time)
 
 type Address {
   use: String
@@ -35,16 +30,15 @@ input AddressInput {
 }
 
 enum AddressType {
+  HEALTH_FACILITY
+  ADMIN_STRUCTURE
+  CRVS_OFFICE
+  PRIVATE_HOME
   CURRENT
   PERMANENT
-  BIRTH_PLACE
   MILITARY_BASE_OR_CANTONMENT
   IDP_CAMP
   UNHCR_CAMP
-  OTHER_HEALTH_INSTITUTION
-  HOSPITAL
-  HEALTH_INSTITUTION
-  PRIVATE_HOME
   OTHER
 }
 
@@ -80,6 +74,11 @@ enum AttachmentSubject {
   FATHER
   CHILD
   OTHER
+  DECEASED_ID_PROOF
+  DECEASED_PARMANENT_ADDRESS_PROOF
+  DECEASED_DEATH_PROOF
+  DECEASED_BIRTH_PROOF
+  APPLICANT_ID_PROOF
 }
 
 enum AttachmentType {
@@ -92,6 +91,12 @@ enum AttachmentType {
   SCHOOL_CERTIFICATE
   PROOF_OF_DEATH
   OTHER
+  POST_MORTEM_CERTIFICATE
+  HOSPITAL_DISCHARGE_CERTIFICATE
+  ATTESTED_DEATH_LETTER
+  ATTESTED_DEATH_CERTIFICATE
+  BURIAL_RECEIPT
+  FUNERAL_RECEIPT
 }
 
 enum AttendantType {
@@ -113,9 +118,7 @@ type BirthRegistration {
   mother: Person
   father: Person
   informant: Person
-  placeOfBirth: Location
-  birthLocation: String
-  birthLocationType: AddressType
+  eventLocation: Location
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -137,9 +140,7 @@ input BirthRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  placeOfBirth: LocationInput
-  birthLocation: String
-  birthLocationType: AddressType
+  eventLocation: LocationInput
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -160,6 +161,11 @@ enum BirthRegPresence {
   MOTHER_ONLY
   FATHER_ONLY
   OTHER
+}
+
+type BirthRegResultSet {
+  results: [BirthRegistration]
+  totalItems: Int
 }
 
 enum BirthRegType {
@@ -228,13 +234,8 @@ type DeathRegistration {
   id: ID!
   registration: Registration
   deceased: Person
-  mother: Person
-  father: Person
   informant: RelatedPerson
-  informantRelationship: RelationshipType
-  otherInformantRelationship: String
-  placeOfDeath: Location
-  deathLocation: String
+  eventLocation: Location
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
@@ -245,18 +246,28 @@ type DeathRegistration {
 input DeathRegistrationInput {
   registration: RegistrationInput
   deceased: PersonInput
-  mother: PersonInput
-  father: PersonInput
   informant: RelatedPersonInput
-  informantRelationship: RelationshipType
-  otherInformantRelationship: String
-  placeOfDeath: LocationInput
-  deathLocation: String
+  eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
   createdAt: Date
   updatedAt: Date
+}
+
+type DeathRegResultSet {
+  results: [DeathRegistration]
+  totalItems: Int
+}
+
+type Deceased {
+  deceased: Boolean
+  deathDate: String
+}
+
+input DeceasedInput {
+  deceased: Boolean
+  deathDate: String
 }
 
 type Dummy {
@@ -351,9 +362,16 @@ input LocationInput {
 
 enum LocationType {
   HEALTH_FACILITY
+  HOSPITAL
+  OTHER_HEALTH_INSTITUTION
   ADMIN_STRUCTURE
   CRVS_OFFICE
   PRIVATE_HOME
+  CURRENT
+  PERMANENT
+  MILITARY_BASE_OR_CANTONMENT
+  IDP_CAMP
+  UNHCR_CAMP
   OTHER
 }
 
@@ -380,27 +398,17 @@ type Mutation {
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): ID!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsVerified(
-    id: ID!
-    details: BirthRegistrationInput
-  ): BirthRegistration
+  markBirthAsVerified(id: ID!, details: BirthRegistrationInput): BirthRegistration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVoided(id: String!, reason: String!, comment: String): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
-  updateDeathRegistration(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): DeathRegistration!
-  markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsVoided(
-    id: ID!
-    reason: String!
-    location: LocationInput
-  ): DeathRegistration
+  updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsVerified(id: ID!, details: DeathRegistrationInput): DeathRegistration
+  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID!
+  markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsVoided(id: ID!, reason: String!, comment: String): ID!
 }
 
 type Notification {
@@ -465,7 +473,7 @@ type Person {
   multipleBirth: Int
   address: [Address]
   photo: [Attachment]
-  deceased: Boolean
+  deceased: Deceased
   nationality: [String]
   educationalAttainment: EducationType
 }
@@ -482,35 +490,18 @@ input PersonInput {
   multipleBirth: Int
   address: [AddressInput]
   photo: [AttachmentInput]
-  deceased: Boolean
+  deceased: DeceasedInput
   nationality: [String]
   educationalAttainment: EducationType
 }
 
 type Query {
-  listNotifications(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [Notification]
+  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
-  listBirthRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [BirthRegistration]
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [BirthRegistration]
+  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): BirthRegResultSet
+  fetchDeathRegistration(id: ID!): DeathRegistration
+  listDeathRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): DeathRegResultSet
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   getUser(userId: String): User
@@ -533,6 +524,7 @@ type Registration {
 }
 
 enum RegistrationContactType {
+  BOTH
   MOTHER
   FATHER
 }

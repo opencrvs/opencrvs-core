@@ -141,6 +141,53 @@ export const sectionFieldToBundleFieldTransformer = (
   return transformedData
 }
 
+export const copyEventAddressTransformer = (fromSection: string) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fromSectionData = transformedData[fromSection]
+
+  if (!fromSectionData.address) {
+    return transformedData
+  }
+  if (draftData[sectionId][field.name] === 'OTHER') {
+    return transformedData
+  }
+
+  const address = (fromSectionData.address as [fhir.Address]).find(
+    addr => addr.type === draftData[sectionId][field.name]
+  )
+  if (!address) {
+    return transformedData
+  }
+  if (!transformedData.eventLocation) {
+    transformedData.eventLocation = {
+      address: {
+        country: '',
+        state: '',
+        district: '',
+        postalCode: '',
+        line: ['', '', '', '', '', '']
+      } as fhir.Address
+    } as fhir.Location
+  } else {
+    transformedData.eventLocation = {
+      address: {
+        ...address
+      } as fhir.Address
+    } as fhir.Location
+  }
+
+  transformedData.eventLocation.type = draftData[sectionId][field.name]
+  if (address && address.line && address.line[5]) {
+    transformedData.eventLocation.partOf = `Location/${address.line[5]}`
+  }
+
+  return transformedData
+}
+
 export const copyAddressTransformer = (
   fromAddressType: string,
   fromSection: string,

@@ -41,13 +41,13 @@ const messages = defineMessages({
   title: {
     id: 'register.confirmationScreen.title',
     defaultMessage: `{event, select, declaration {Application} registration {Application} duplication {Application}
-      certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed} 
+      certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
       submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
     description: 'The title that appear on the confirmation screen '
   },
   headerDesc: {
     id: 'register.confirmationScreen.headerDesc',
-    defaultMessage: `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The application}} 
+    defaultMessage: `{event, select, declaration {The declaration} registration {} duplication {The application} certificate {} offlineEvent {The application}}
       {action, select, submitted {is now on its way for validation} completed {} registered {} rejected {rejected} approved {Approved}
       offlineAction {will automatically be sent out for validation once your device has internet connectivity}}`,
     description:
@@ -61,8 +61,8 @@ const messages = defineMessages({
   },
   boxHeaderDescFirst: {
     id: 'register.confirmationScreen.boxHeaderDescFirst',
-    defaultMessage: `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The {eventType, select, birth {birth} death {death}} of } 
-    duplication {The {eventType, select, birth {birth} death {death}} duplication of } certificate {The {eventType, select, birth {birth} death {death}} certificate of } 
+    defaultMessage: `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The {eventType, select, birth {birth} death {death}} of }
+    duplication {The {eventType, select, birth {birth} death {death}} duplication of } certificate {The {eventType, select, birth {birth} death {death}} certificate of }
     offlineEvent {The {eventType, select, birth {birth} death {death}} declaration of } }`,
     description:
       'The first box header description that appear on the confirmation screen '
@@ -76,16 +76,16 @@ const messages = defineMessages({
   },
   trackingSectionTitle: {
     id: 'register.confirmationScreen.trackingSectionTitle',
-    defaultMessage: `{event, select, declaration {Tracking ID number: } registration {{eventType, select, birth {Birth} death {Death}} Registration Number: } 
+    defaultMessage: `{event, select, declaration {Tracking ID number: } registration {{eventType, select, birth {Birth} death {Death}} Registration Number: }
     duplication {{eventType, select, birth {Birth} death {Death}} Registration Number: } certificate {} offlineEvent {Tracking ID number: }} `,
     description:
       'The tracking section title that appear on the confirmation screen'
   },
   trackingSectionDesc: {
     id: 'register.confirmationScreen.trackingSectionDesc',
-    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-    duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
+    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
+    duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
     certificate {Certificates have been collected from your jurisdiction.}
     offlineEvent {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}} `,
     description:
@@ -93,18 +93,18 @@ const messages = defineMessages({
   },
   nextSectionDesc: {
     id: 'register.confirmationScreen.nextSectionDesc',
-    defaultMessage: `{event, select, declaration {You will be notified through OpenCRVS when registration is complete 
+    defaultMessage: `{event, select, declaration {You will be notified through OpenCRVS when registration is complete
       or if there are any delays in the process.} registration {The registration process is complete.} duplication {}
-      certificate {} offlineEvent {All you need to do is login once you have internet connectivity on your device within 
+      certificate {} offlineEvent {All you need to do is login once you have internet connectivity on your device within
       the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.}}`,
     description:
       'The next section description that appear on the confirmation screen'
   },
   nextSectionDescDetails: {
     id: 'register.confirmationScreen.nextSectionDescDetails',
-    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.} 
-      duplication{} certificate {Certificates have been collected from your jurisdiction.} 
+    defaultMessage: `{event, select, declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+      registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration.}
+      duplication{} certificate {Certificates have been collected from your jurisdiction.}
       offlineEvent {wait for internet connection}}`,
     description:
       'The next section description details that appear on the confirmation screen'
