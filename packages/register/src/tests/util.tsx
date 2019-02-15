@@ -449,6 +449,8 @@ export const mockDeathApplicationData = {
     manner: 'ACCIDENT',
     deathPlace: '',
     deathPlaceAddress: 'sameAsCurrent',
+    placeOfDeath: 'OTHER',
+    deathLocation: '',
     addressType: '',
     country: 'BGD',
     state: '',

@@ -424,3 +424,76 @@ describe('When user is in Preview section death event', async () => {
     expect(modalSubmitBtn.length).toEqual(1)
   })
 })
+
+describe('When user is in Preview section death event', async () => {
+  const { store, history } = createStore()
+  const draft = createDraft(Event.DEATH)
+  store.dispatch(setInitialDrafts())
+  store.dispatch(storeDraft(draft))
+  let component: ReactWrapper<{}, {}>
+
+  const mock: any = jest.fn()
+
+  const hospitalLocatioMockDeathApplicationData = Object.assign(
+    {},
+    mockDeathApplicationData
+  )
+  hospitalLocatioMockDeathApplicationData.deathEvent.placeOfDeath = 'HOSPITAL'
+  hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
+    '5e3736a0-090e-43b4-9012-f1cef399e123'
+  beforeEach(async () => {
+    // @ts-ignore
+    const nDraft = createReviewDraft(
+      uuid(),
+      // @ts-ignore
+      hospitalLocatioMockDeathApplicationData,
+      Event.DEATH
+    )
+    store.dispatch(setInitialDrafts())
+    store.dispatch(storeDraft(nDraft))
+
+    const nform = getRegisterForm(store.getState())[Event.DEATH]
+    const nTestComponent = createTestComponent(
+      <RegisterForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={nform}
+        draft={nDraft}
+        tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: nDraft.id, tabId: 'preview' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        scope={[]}
+      />,
+      store
+    )
+    component = nTestComponent.component
+  })
+
+  it('Should be able to submit the form when eventLocation is a hospital', () => {
+    component
+      .find('#next_button_deceased')
+      .hostNodes()
+      .simulate('click')
+    component
+      .find('#next_button_informant')
+      .hostNodes()
+      .simulate('click')
+    component
+      .find('#next_button_deathEvent')
+      .hostNodes()
+      .simulate('click')
+
+    component
+      .find('#submit_form')
+      .hostNodes()
+      .simulate('click')
+
+    const modalSubmitBtn = component.find('#submit_confirm').hostNodes()
+    expect(modalSubmitBtn.length).toEqual(1)
+  })
+})
