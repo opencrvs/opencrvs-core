@@ -176,6 +176,7 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
             return (
               <div>
                 <StyledPrimaryButton
+                  disabled={!navigator.onLine}
                   onClick={async (event: React.MouseEvent<HTMLElement>) => {
                     this.performQuery(client)
                     event.preventDefault()
