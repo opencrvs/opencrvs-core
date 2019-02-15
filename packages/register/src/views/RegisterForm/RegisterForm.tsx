@@ -420,9 +420,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       personData = this.props.draft.data.child
     }
     const fullName = getFullName(personData)
-
     const duplicate = history.location.state && history.location.state.duplicate
-
+    const trackNumber = navigator.onLine ? response : 'UNAVAILABLE'
     let eventName = DECLARATION
     let actionName = SUBMISSION
     let nextSection = true
@@ -439,7 +438,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       nextSection = false
     }
     history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
+      trackNumber,
       nextSection,
       trackingSection: true,
       eventName,
@@ -736,6 +735,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             form={registerForm}
             draft={draft}
             onCompleted={this.successfulSubmission}
+            onError={this.successfulSubmission}
           >
             <MutationContext.Consumer>
               {({ mutation, loading, data }) => (
