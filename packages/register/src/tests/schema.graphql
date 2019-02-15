@@ -398,14 +398,20 @@ type Mutation {
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): ID!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsVerified(id: ID!, details: BirthRegistrationInput): BirthRegistration
+  markBirthAsVerified(
+    id: ID!
+    details: BirthRegistrationInput
+  ): BirthRegistration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVoided(id: String!, reason: String!, comment: String): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsVerified(id: ID!, details: DeathRegistrationInput): DeathRegistration
+  markDeathAsVerified(
+    id: ID!
+    details: DeathRegistrationInput
+  ): DeathRegistration
   markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsVoided(id: ID!, reason: String!, comment: String): ID!
@@ -496,12 +502,34 @@ input PersonInput {
 }
 
 type Query {
-  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
+  listNotifications(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
-  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): BirthRegResultSet
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): DeathRegResultSet
+  listDeathRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): DeathRegResultSet
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   getUser(userId: String): User
