@@ -187,7 +187,13 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      conditionals: [conditionals.iDType]
+      conditionals: [conditionals.iDType],
+      mapping: {
+        mutation: fieldValueNestingTransformer(
+          NESTED_SECTION,
+          fieldToIdentifierTransformer('otherType')
+        )
+      }
     },
     {
       name: 'applicantID',
