@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid'
-import { OPENCRVS_SPECIFICATION_URL } from './constants'
+import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
 import { getFromFhir } from './fhir-utils'
+import { getEventType } from '../utils'
 
 export const INFORMANT_CODE = 'informant-details'
 
@@ -26,7 +27,7 @@ export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
 export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
   let taskResource = getTaskResourceFromFhirBundle(fhirBundle) as fhir.Task
   if (!taskResource) {
-    const taskEntry = createTaskRefTemplate()
+    const taskEntry = createTaskRefTemplate(getEventType(fhirBundle))
     if (!fhirBundle.entry) {
       fhirBundle.entry = []
     }
@@ -52,7 +53,7 @@ export function getTaskResourceFromFhirBundle(fhirBundle: fhir.Bundle) {
   return taskEntry && taskEntry.resource
 }
 
-function createTaskRefTemplate() {
+function createTaskRefTemplate(event: EVENT_TYPE) {
   return {
     fullUrl: `urn:uuid:${uuid()}`,
     resource: {
@@ -62,7 +63,7 @@ function createTaskRefTemplate() {
         coding: [
           {
             system: `${OPENCRVS_SPECIFICATION_URL}types`,
-            code: 'birth-registration'
+            code: event.toString()
           }
         ]
       }
