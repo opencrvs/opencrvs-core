@@ -59,9 +59,15 @@ export async function createRegistrationHandler(
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      sendEventNotification(payload, event, msisdn, {
-        Authorization: request.headers.authorization
-      })
+      sendEventNotification(
+        payload,
+        event,
+        msisdn,
+        {
+          Authorization: request.headers.authorization
+        },
+        hasScope(request, 'register')
+      )
     }
 
     return resBundle
@@ -88,9 +94,15 @@ export async function markEventAsRegisteredHandler(
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      sendEventNotification(payload, event, msisdn, {
-        Authorization: request.headers.authorization
-      })
+      sendEventNotification(
+        payload,
+        event,
+        msisdn,
+        {
+          Authorization: request.headers.authorization
+        },
+        hasScope(request, 'register')
+      )
     }
 
     return resBundle
