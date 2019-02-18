@@ -30,7 +30,7 @@ const messages = defineMessages({
   paragraph: {
     id: 'register.form.section.documents.paragraph',
     defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text'
   },
   informantAttestation: {

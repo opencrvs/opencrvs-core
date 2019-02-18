@@ -387,7 +387,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
-      'For birth registration of children below 5 years old, one of the documents listed bellow is required:',
+      'For birth registration of children below 5 years old, one of the documents listed below is required:',
     'register.form.section.documents.list.informantAttestation':
       'Attestation of the informant, or',
     'register.form.section.documents.list.attestedVaccination':
