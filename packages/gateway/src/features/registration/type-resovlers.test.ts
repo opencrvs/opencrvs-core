@@ -9,6 +9,7 @@ import {
   mockPatient,
   mockDocumentReference,
   mockTask,
+  mockTaskForDeath,
   mockComposition,
   mockObservations,
   mockLocation
@@ -737,10 +738,31 @@ describe('Registration type resolvers', () => {
       expect(status[1].resourceType).toBe('Task')
     })
 
-    it('returns tracking ID from the task object', async () => {
+    it('returns birth tracking ID from the task object', async () => {
       const trackingID = await typeResolvers.Registration.trackingId(mockTask)
 
       expect(trackingID).toBe('123')
+    })
+    it('returns death tracking ID from the task object', async () => {
+      const trackingID = await typeResolvers.Registration.trackingId(
+        mockTaskForDeath
+      )
+
+      expect(trackingID).toBe('123')
+    })
+    it('returns birth registration number from the task object', async () => {
+      const registrationNumber = await typeResolvers.Registration.registrationNumber(
+        mockTask
+      )
+
+      expect(registrationNumber).toBe('123')
+    })
+    it('returns death registration number from the task object', async () => {
+      const registrationNumber = await typeResolvers.Registration.registrationNumber(
+        mockTaskForDeath
+      )
+
+      expect(registrationNumber).toBe('123')
     })
 
     it('returns paper form id from the task', async () => {
@@ -768,9 +790,14 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const regType = await typeResolvers.Registration.type(mockTask)
 
-      expect(regType).toBe('birth-registration')
+      expect(regType).toBe('BIRTH')
     })
+    it('returns registration type from the task', async () => {
+      // @ts-ignore
+      const regType = await typeResolvers.Registration.type(mockTaskForDeath)
 
+      expect(regType).toBe('DEATH')
+    })
     it('returns contact person from the task', async () => {
       // @ts-ignore
       const contact = await typeResolvers.Registration.contact(mockTask)
@@ -1008,5 +1035,32 @@ describe('Registration type resolvers', () => {
       const latitude = typeResolvers.Location.latitude(location)
       expect(latitude).toBe(-34.08002)
     })
+  })
+
+  it('return BirthRegistration type', () => {
+    const mock = {
+      type: {
+        coding: [
+          {
+            code: 'birth-declaration'
+          }
+        ]
+      }
+    }
+    const res = typeResolvers.EventRegistration.__resolveType(mock)
+    expect(res).toEqual('BirthRegistration')
+  })
+  it('return DeathRegistration type', () => {
+    const mock = {
+      type: {
+        coding: [
+          {
+            code: 'death-declaration'
+          }
+        ]
+      }
+    }
+    const res = typeResolvers.EventRegistration.__resolveType(mock)
+    expect(res).toEqual('DeathRegistration')
   })
 })
