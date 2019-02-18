@@ -41,7 +41,7 @@ mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
 describe('WorkQueue tests', async () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -230,7 +230,7 @@ describe('WorkQueue tests', async () => {
         name: 'অনিক',
         dob: '',
         dod: '',
-        date_of_application: '2018-05-23',
+        date_of_application: '23-05-2018',
         registrationNumber: '',
         tracking_id: 'B111111',
         createdAt: '2018-05-23T14:44:58+02:00',
@@ -240,7 +240,7 @@ describe('WorkQueue tests', async () => {
         status: [
           {
             officeName: 'Kaliganj Union Sub Center',
-            timestamp: '2018-12-07',
+            timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
             practitionerRole: 'LOCAL_REGISTRAR'
@@ -253,8 +253,8 @@ describe('WorkQueue tests', async () => {
         id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
         name: 'মাসুম',
         dob: '',
-        dod: '2010-10-10',
-        date_of_application: '2018-05-23',
+        dod: '10-10-2010',
+        date_of_application: '23-05-2018',
         registrationNumber: '',
         tracking_id: 'B222222',
         createdAt: '2018-05-23T14:44:58+02:00',
@@ -264,7 +264,7 @@ describe('WorkQueue tests', async () => {
         status: [
           {
             officeName: 'Kaliganj Union Sub Center',
-            timestamp: '2018-12-07',
+            timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
             practitionerRole: 'LOCAL_REGISTRAR'
@@ -1142,7 +1142,14 @@ describe('WorkQueue tests', async () => {
           .find('#reviewDuplicatesBtn_B111111')
           .hostNodes().length
       ).toBe(1)
-      testComponent.component.unmount()
+
+      testComponent.component
+        .find(DataTable)
+        .find('#reviewDuplicatesBtn_B111111')
+        .hostNodes()
+        .simulate('click')
+
+      expect(history.location.pathname).toContain('duplicates')
     })
   })
 

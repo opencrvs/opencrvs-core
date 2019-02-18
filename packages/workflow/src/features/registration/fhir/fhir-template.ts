@@ -179,12 +179,22 @@ export function selectInformantResource(
   const informantSectionEntry =
     informantSection && informantSection.entry && informantSection.entry[0]
 
-  const informantEntry =
+  const relatedPersonEntry =
     informantSectionEntry &&
     fhirBundle &&
     fhirBundle.entry &&
     fhirBundle.entry.find(
       entry => entry.fullUrl === informantSectionEntry.reference
+    )
+
+  const informantEntry =
+    relatedPersonEntry &&
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      entry =>
+        entry.fullUrl ===
+        (relatedPersonEntry.resource as fhir.RelatedPerson).patient.reference
     )
 
   return informantEntry && (informantEntry.resource as fhir.Patient)
