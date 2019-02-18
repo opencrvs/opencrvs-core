@@ -41,6 +41,7 @@ import {
   copyAddressTransformer,
   fieldToPhoneNumberTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
+import { identifierToFieldTransformer } from 'src/forms/mappings/query/field-mappings'
 
 import {
   fieldValueNestingTransformer,
@@ -177,7 +178,8 @@ export const applicantsSection: IFormSection = {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
           fieldToIdentifierTransformer('type')
-        )
+        ),
+        query: identifierToFieldTransformer('type')
       }
     },
     {
@@ -192,7 +194,8 @@ export const applicantsSection: IFormSection = {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
           fieldToIdentifierTransformer('otherType')
-        )
+        ),
+        query: identifierToFieldTransformer('otherType')
       }
     },
     {
@@ -223,7 +226,8 @@ export const applicantsSection: IFormSection = {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
           fieldToIdentifierTransformer('id')
-        )
+        ),
+        query: identifierToFieldTransformer('id')
       }
     },
     {

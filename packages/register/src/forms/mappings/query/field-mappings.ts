@@ -1,4 +1,9 @@
-import { IFormField, IFormData, IAttachment } from '../..'
+import {
+  IFormField,
+  IFormData,
+  IAttachment,
+  IFormFieldQueryMapFunction
+} from '../..'
 import {
   GQLHumanName,
   GQLAddress,
@@ -362,11 +367,35 @@ export const eventLocationIDQueryTransformer = () => (
   sectionId: string,
   field: IFormField
 ) => {
-  if (!queryData.eventLocation && !queryData._fhirIDMap.eventLocation) {
+  if (
+    !queryData.eventLocation ||
+    !queryData._fhirIDMap ||
+    !queryData._fhirIDMap.eventLocation
+  ) {
     return transformedData
   } else {
     transformedData[sectionId][field.name] = queryData._fhirIDMap
       .eventLocation as string
+  }
+  return transformedData
+}
+
+export const nestedValueToFieldTransformer = (
+  nestedFieldName: string,
+  transformMethod?: IFormFieldQueryMapFunction
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (transformMethod) {
+    transformMethod(
+      transformedData,
+      queryData[nestedFieldName],
+      sectionId,
+      field
+    )
   }
   return transformedData
 }

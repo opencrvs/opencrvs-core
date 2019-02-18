@@ -40,6 +40,7 @@ class QueryProviderComponent extends React.Component<IProps> {
         variables={this.props.payload || {}}
       >
         {({ loading, error, data }) => {
+          console.log(JSON.stringify(data))
           return (
             <QueryContext.Provider
               value={{
