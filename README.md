@@ -22,8 +22,8 @@ Then:
 
 1. Clone the repo
 2. Run `yarn` to install deps
-3. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose)
-4. Run `cd packages/user-mgnt/ && yarn populate && cd ../..` to populate the db with test users.
+3. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose` (dependencies) and `yarn start` (services in this repo)
+4. Run `yarn db:backup:restore` to restore a pre-populated database with user, location and facility data.
 
 Apps can be found running in following URLs:
 
@@ -34,13 +34,15 @@ Apps can be found running in following URLs:
 
 You can open all of them by running `yarn open`
 
-Optional: full backend setup
+**Troubleshooting:** If you have issue with the OpenHIM not being able to access services running locally (probably a hostname not found error) then you can try specify your IP address manually using: `LOCAL_IP=192.168.0.5 yarn compose`
 
-4. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
-5. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
-6. Click Channels and for each channel -
+### Manual backup setup (already done for you if you restore the pre-populated db dump)
+
+1. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
+2. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
+3. Click Channels and for each channel -
    1. click edit, and then go to routes tab and change the value of host from service name to your local IP address.
-7. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
+4. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
 
 ### tmuxed development setup
 
@@ -57,11 +59,11 @@ This will require installation of [tmux](https://github.com/tmux/tmux/wiki) whic
 
 There are a number of docker scripts available via `yarn`. `yarn dev` is the easiest command to run to get started (see above) but if you need to manage the docker containers some of these scripts may be useful.
 
-The `yarn compose:*` scripts only setup the dependencies in docker containers and not the applications in this repository. The `yarn compose:all:*` scripts setup everything including the applications in this repository in docker containers. These scripts are useful to test everything in an environment that more closely resembles staging and/or production.
+The `yarn compose:*` scripts only setup the dependencies in docker containers and not the applications in this repository.
 
-For each of the above there are:
+For the command above there is:
 
-- base scripts which build and start the containers. E.g. `yarn compose` and `yarn compose:all`
+- base scripts which build and start the containers. E.g. `yarn compose`
 - `*:build` scripts which just build the images
 - `*:up` scripts which just run pre-build images in containers
 - `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)
