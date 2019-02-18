@@ -36,7 +36,7 @@ describe('Verify fhir templates', () => {
           coding: [
             {
               system: `${OPENCRVS_SPECIFICATION_URL}types`,
-              code: 'birth-registration'
+              code: 'BIRTH'
             }
           ]
         }
