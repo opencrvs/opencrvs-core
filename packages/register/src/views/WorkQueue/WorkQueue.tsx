@@ -2,7 +2,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
-import * as moment from 'moment'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   IconAction,
@@ -59,6 +58,7 @@ import { getUserDetails } from 'src/profile/profileSelectors'
 import { createNamesMap } from 'src/utils/data-formating'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { messages as rejectionMessages } from 'src/review/reject-registration'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
@@ -700,6 +700,7 @@ export class WorkQueueView extends React.Component<
   }
 
   transformData = (data: GQLQuery) => {
+    const { locale } = this.props.intl
     if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
       return []
     }
@@ -737,14 +738,20 @@ export class WorkQueueView extends React.Component<
             (createNamesMap(names)['default'] as string) ||
             /* tslint:enable:no-string-literal */
             '',
-          dob: (birthReg && birthReg.child && birthReg.child.birthDate) || '',
+          dob:
+            (birthReg &&
+              birthReg.child &&
+              birthReg.child.birthDate &&
+              formatLongDate(birthReg.child.birthDate, locale)) ||
+            '',
           dod:
             (deathReg &&
               deathReg.deceased &&
               deathReg.deceased.deceased &&
-              deathReg.deceased.deceased.deathDate) ||
+              deathReg.deceased.deceased.deathDate &&
+              formatLongDate(deathReg.deceased.deceased.deathDate, locale)) ||
             '',
-          date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
+          date_of_application: formatLongDate(reg.createdAt, locale),
           registrationNumber:
             (reg.registration && reg.registration.registrationNumber) || '',
           tracking_id: (reg.registration && reg.registration.trackingId) || '',
@@ -770,8 +777,7 @@ export class WorkQueueView extends React.Component<
                       ] as string)) ||
                     /* tslint:enable:no-string-literal */
                     '',
-                  timestamp:
-                    status && moment(status.timestamp).format('YYYY-MM-DD'),
+                  timestamp: status && formatLongDate(status.timestamp, locale),
                   practitionerRole: status && status.user && status.user.role,
                   officeName: status && status.office && status.office.name
                 }
