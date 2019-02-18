@@ -132,7 +132,7 @@ describe('Review Duplicates component', () => {
                   familyName: 'Spivak'
                 }
               ],
-              birthDate: null,
+              birthDate: '2018-08-01',
               gender: null,
               identifier: [
                 {
@@ -228,7 +228,7 @@ describe('Review Duplicates component', () => {
                   familyName: 'Spivak'
                 }
               ],
-              birthDate: null,
+              birthDate: '2018-08-01',
               gender: null,
               identifier: [
                 {
@@ -266,6 +266,247 @@ describe('Review Duplicates component', () => {
     }
   ]
 
+  const graphqlMockMinimal = [
+    {
+      request: {
+        query: FETCH_DUPLICATES,
+        variables: {
+          id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+        }
+      },
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              id: '123',
+              duplicates: ['450ce5e3-b495-4868-bb6a-1183ffd0fff1']
+            }
+          }
+        }
+      }
+    },
+
+    {
+      request: {
+        query: FETCH_DUPLICATES,
+        variables: {
+          id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+        }
+      },
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              id: '123',
+              duplicates: []
+            }
+          }
+        }
+      }
+    },
+
+    {
+      request: {
+        query: createDuplicateDetailsQuery([
+          '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        ]),
+        variables: {
+          duplicate0Id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          duplicate1Id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        }
+      },
+      result: {
+        data: {
+          duplicate0: {
+            createdAt: '2019-01-22T09:46:02.547Z',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              id: '123',
+              trackingId: 'BFCJ02U',
+              type: 'BIRTH',
+              status: [
+                {
+                  type: 'DECLARED',
+                  timestamp: '2019-01-22T09:46:02.547Z',
+                  user: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Shakib',
+                        familyName: 'Al Hasan'
+                      },
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    role: 'FIELD_AGENT'
+                  },
+                  office: {
+                    name: null
+                  }
+                }
+              ]
+            },
+            child: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: 'female'
+            },
+            mother: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            },
+            father: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: null
+            }
+          },
+          duplicate1: {
+            createdAt: '2019-01-22T09:46:02.547Z',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1',
+            registration: {
+              id: 'hghgjhg',
+              trackingId: 'BFCJ02U',
+              type: 'BIRTH',
+              status: [
+                {
+                  type: 'REGISTERED',
+                  timestamp: '2019-01-22T09:46:02.547Z',
+                  user: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Shakib',
+                        familyName: 'Al Hasan'
+                      },
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    role: 'FIELD_AGENT'
+                  },
+                  office: {
+                    name: null
+                  }
+                }
+              ]
+            },
+            child: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: 'female'
+            },
+            mother: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            },
+            father: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: null
+            }
+          }
+        }
+      }
+    }
+  ]
+
   it('query gateway correctly and displays the returned duplicates correctly', async () => {
     const { store } = createStore()
     const testComponent = createTestComponent(
@@ -279,6 +520,31 @@ describe('Review Duplicates component', () => {
       />,
       store,
       graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+
+    testComponent.component.update()
+
+    expect(testComponent.component.find(DuplicateDetails)).toHaveLength(2)
+  })
+
+  it('query gateway correctly and displays the returned duplicates correctly in case of minimal data', async () => {
+    const { store } = createStore()
+    const testComponent = createTestComponent(
+      <ReviewDuplicates
+        // @ts-ignore
+        match={{
+          params: {
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }}
+      />,
+      store,
+      graphqlMockMinimal
     )
 
     // wait for mocked data to load mockedProvider
