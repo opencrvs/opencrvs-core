@@ -591,7 +591,7 @@ export function selectOrCreateTaskRefResource(
       return false
     })
   if (!taskEntry) {
-    taskEntry = createTaskRefTemplate(uuid())
+    taskEntry = createTaskRefTemplate(uuid(), context.event)
     const taskResource = taskEntry.resource as fhir.Task
     if (!taskResource.focus) {
       taskResource.focus = { reference: '' }

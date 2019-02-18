@@ -328,7 +328,7 @@ test('should build a minimal FHIR registration document without error', async ()
     coding: [
       {
         system: `${OPENCRVS_SPECIFICATION_URL}types`,
-        code: 'birth-registration'
+        code: 'BIRTH'
       }
     ]
   })
