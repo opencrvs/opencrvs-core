@@ -268,7 +268,7 @@ describe('when user is in the register form review section', () => {
     store.dispatch(setInitialDrafts())
     store.dispatch(storeDraft(draft))
     const mock: any = jest.fn()
-    const form = getReviewForm(store.getState())
+    const form = getReviewForm(store.getState()).birth
     const testComponent = createTestComponent(
       <RegisterForm
         location={mock}

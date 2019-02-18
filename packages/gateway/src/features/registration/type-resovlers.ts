@@ -526,7 +526,10 @@ export const typeResolvers: GQLResolver = {
         (observations &&
           observations.entry &&
           observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
+          observations.entry[0].resource.valueCodeableConcept &&
+          observations.entry[0].resource.valueCodeableConcept.coding &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
         null
       )
     },
@@ -552,7 +555,10 @@ export const typeResolvers: GQLResolver = {
         (observations &&
           observations.entry &&
           observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
+          observations.entry[0].resource.valueCodeableConcept &&
+          observations.entry[0].resource.valueCodeableConcept.coding &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
         null
       )
     },

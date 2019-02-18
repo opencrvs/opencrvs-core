@@ -31,7 +31,7 @@ describe('ReviewForm tests', async () => {
   const { store, history } = createStore()
   const scope = ['register']
   const mock: any = jest.fn()
-  const form = getReviewForm(store.getState())
+  const form = getReviewForm(store.getState()).birth
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)

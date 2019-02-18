@@ -97,6 +97,12 @@ export class App extends React.Component<IAppProps> {
                         />
 
                         <ProtectedRoute
+                          exact
+                          path={routes.REVIEW_DEATH_PARENT_FORM_TAB}
+                          component={ReviewForm}
+                        />
+
+                        <ProtectedRoute
                           path={routes.CONFIRMATION_SCREEN}
                           component={ConfirmationScreen}
                         />

@@ -11,7 +11,10 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import {
+  REVIEW_BIRTH_PARENT_FORM_TAB,
+  REVIEW_DEATH_PARENT_FORM_TAB
+} from '@opencrvs/register/src/navigation/routes'
 import {
   storeDraft,
   IDraft,
@@ -73,7 +76,7 @@ const ErrorText = styled.div`
 
 export class ReviewFormView extends React.Component<IProps> {
   getEvent() {
-    const eventType = (this.props.draft && this.props.draft.event) || 'BIRTH'
+    const eventType = (this.props.draft && this.props.draft.event) || 'DEATH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
         return Event.BIRTH
@@ -128,8 +131,9 @@ export class ReviewFormView extends React.Component<IProps> {
               )
               const reviewDraft = createReviewDraft(
                 draftId,
+                // @ts-ignore
                 transData,
-                Event.BIRTH
+                this.getEvent()
               )
               dispatch(storeDraft(reviewDraft))
 
@@ -149,7 +153,7 @@ function mapStatetoProps(
   props: RouteComponentProps<{ tabId: string; draftId: string }>
 ) {
   const { match, history } = props
-  const form = getReviewForm(state)
+  const form = getReviewForm(state).death
 
   const draft = state.drafts.drafts.find(
     ({ id, review }) => id === match.params.draftId && review === true
@@ -160,7 +164,10 @@ function mapStatetoProps(
     draftId: match.params.draftId,
     registerForm: form,
     duplicate: history.location.state && history.location.state.duplicate,
-    tabRoute: REVIEW_BIRTH_PARENT_FORM_TAB
+    tabRoute:
+      draft && draft.event === 'death'
+        ? REVIEW_DEATH_PARENT_FORM_TAB
+        : REVIEW_BIRTH_PARENT_FORM_TAB
   }
 }
 
