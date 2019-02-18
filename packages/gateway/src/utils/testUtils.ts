@@ -191,7 +191,74 @@ export const mockTask = {
     coding: [
       {
         system: 'http://opencrvs.org/specs/types',
-        code: 'birth-registration'
+        code: 'BIRTH'
+      }
+    ]
+  },
+  focus: {
+    reference: 'Composition/123' // the composition encompassing this registration
+  },
+  authoredOn: '2016-10-31T08:25:05+10:00',
+  lastModified: '2016-10-31T09:45:05+10:00',
+  note: [
+    {
+      authorString: '<username>',
+      text: 'Comment',
+      time: '2016-10-31T09:45:05+10:00'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastUser',
+      valueReference: { reference: 'Practitioner/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: { reference: 'Location/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: 'Location/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    }
+  ],
+  meta: {
+    versionId: '123'
+  }
+}
+
+export const mockTaskForDeath = {
+  resourceType: 'Task',
+  status: 'requested',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/death-tracking-id',
+      value: '123'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/death-registration-number',
+      value: '123'
+    },
+    { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-page', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-book', value: '123' }
+  ],
+  businessStatus: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/reg-status',
+        code: 'DECLARED | VERIFIED | REGISTERED | CERTIFIED'
+      }
+    ]
+  },
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'DEATH'
       }
     ]
   },
@@ -819,73 +886,6 @@ export const mockObservations = {
           valueQuantity: {
             value: 2
           }
-        }
-      }
-    ]
-  },
-  birthLocationType: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'birth-location-type',
-                display: 'Type of birth location'
-              }
-            ]
-          },
-          subject: {
-            reference: 'Patient/123' // reference deceased by fullUrl
-          },
-          effectiveDateTime: '2016-03-28', // same as birth date
-          valueString: 'CURRENT'
-        }
-      }
-    ]
-  },
-  birthLocation: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          category: [
-            {
-              coding: [
-                {
-                  system: 'http://hl7.org/fhir/observation-category',
-                  code: 'procedure',
-                  display: 'Procedure'
-                }
-              ]
-            }
-          ],
-          code: {
-            coding: [
-              {
-                system: 'http://loinc.org',
-                code: 'health-facility-birth',
-                display: 'Health facility birth location'
-              }
-            ]
-          },
-          subject: {
-            reference: 'Patient/123' // reference mother by fullUrl
-          },
-          effectiveDateTime: '2016-03-28', // same as birthdate
-          valueString: 'Location/123'
         }
       }
     ]

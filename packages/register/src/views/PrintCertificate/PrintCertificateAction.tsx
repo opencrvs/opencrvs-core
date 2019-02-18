@@ -2,7 +2,12 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { Spinner, InvertSpinner } from '@opencrvs/components/lib/interface'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import {
+  InjectedIntlProps,
+  injectIntl,
+  defineMessages,
+  InjectedIntl
+} from 'react-intl'
 import { FormFieldGenerator } from 'src/components/form'
 import {
   IFormSection,
@@ -66,6 +71,14 @@ import { RouteComponentProps } from 'react-router'
 import { goToHome } from 'src/navigation'
 import { CERTIFICATION, COMPLETION } from 'src/utils/constants'
 import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
+import {
+  IOfflineDataState,
+  OFFLINE_LOCATIONS_KEY,
+  OFFLINE_FACILITIES_KEY,
+  ILocation
+} from 'src/offline/reducer'
+import { getOfflineState } from 'src/offline/selectors'
+import { renderSelectDynamicLabel } from 'src/views/RegisterForm/review/ReviewSection'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -278,6 +291,16 @@ const messages = defineMessages({
   certificateIsCorrect: {
     id: 'certificate.txt.isCorrectTxt'
   },
+  state: {
+    id: 'formFields.state',
+    defaultMessage: 'Division',
+    description: 'The label for state of event location'
+  },
+  district: {
+    id: 'formFields.district',
+    defaultMessage: 'District',
+    description: 'The label for district of event location'
+  },
   certificateConfirmationTxt: {
     id: 'certificate.txt.confirmationTxt'
   },
@@ -358,6 +381,7 @@ type IProps = {
   certificatePreviewFormSection: IFormSection
   registerForm: IForm
   userDetails: IUserDetails
+  offlineResources: IOfflineDataState
 }
 
 type IFullProps = InjectedIntlProps &
@@ -695,7 +719,11 @@ class PrintCertificateActionComponent extends React.Component<
     return registrant
   }
 
-  getCertificateDetails(data: ICertDetails): CertificateDetails {
+  getCertificateDetails(
+    data: ICertDetails,
+    intl: InjectedIntl,
+    offlineResources: IOfflineDataState
+  ): CertificateDetails {
     const names = data.child.name as Array<{ [key: string]: {} }>
     const NameBn = names.find(name => name.use === 'bn')
     const NameEn = names.find(name => name.use === 'en')
@@ -707,8 +735,8 @@ class PrintCertificateActionComponent extends React.Component<
       CERTIFICATE_DATE_FORMAT
     )
 
-    let regLocationLocationEn = ''
-    let regLocationLocationBn = ''
+    let regLocationEn = ''
+    let regLocationBn = ''
     if (
       data &&
       data.registration &&
@@ -717,19 +745,143 @@ class PrintCertificateActionComponent extends React.Component<
       data.registration.status[0].office &&
       data.registration.status[0].office.address
     ) {
-      regLocationLocationEn = [
+      regLocationEn = [
         data.registration.status[0].office.name as string,
         data.registration.status[0].office.address.district as string,
         data.registration.status[0].office.address.state as string
       ].join(', ') as string
-      regLocationLocationBn = data.registration.status[0].office.alias as string
+      regLocationBn = data.registration.status[0].office.alias as string
+    }
+
+    let eventLocationEn = ''
+    let eventLocationBn = ''
+
+    if (
+      data &&
+      data.eventLocation &&
+      data.eventLocation.address &&
+      data.eventLocation.address.state &&
+      data.eventLocation.address.district
+    ) {
+      if (
+        data.eventLocation.type === 'HEALTH_FACILITY' &&
+        data._fhirIDMap.eventLocation
+      ) {
+        const selectedLocation = offlineResources[
+          OFFLINE_FACILITIES_KEY
+        ].filter((location: ILocation) => {
+          return location.id === data._fhirIDMap.eventLocation
+        })[0]
+        const partOfID = selectedLocation.partOf.split('/')[1]
+        eventLocationEn = [
+          renderSelectDynamicLabel(
+            data._fhirIDMap.eventLocation,
+            {
+              resource: OFFLINE_FACILITIES_KEY,
+              dependency: 'placeOfBirth'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          ),
+          renderSelectDynamicLabel(
+            partOfID,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'district'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          )
+        ].join()
+        eventLocationBn = [
+          renderSelectDynamicLabel(
+            data._fhirIDMap.eventLocation,
+            {
+              resource: OFFLINE_FACILITIES_KEY,
+              dependency: 'placeOfBirth'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          ),
+          renderSelectDynamicLabel(
+            partOfID,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'district'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          )
+        ].join()
+      } else {
+        eventLocationEn = [
+          `${renderSelectDynamicLabel(
+            data.eventLocation.address.district,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'state'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          )} ${intl.formatMessage(messages.district)}`,
+          `${renderSelectDynamicLabel(
+            data.eventLocation.address.state,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'country'
+            },
+            {},
+            intl,
+            offlineResources,
+            'en'
+          )} ${intl.formatMessage(messages.state)}`
+        ].join(', ')
+        eventLocationBn = [
+          renderSelectDynamicLabel(
+            data.eventLocation.address.district,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'state'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          ),
+          renderSelectDynamicLabel(
+            data.eventLocation.address.state,
+            {
+              resource: OFFLINE_LOCATIONS_KEY,
+              dependency: 'country'
+            },
+            {},
+            intl,
+            offlineResources,
+            'bn'
+          )
+        ].join(', ')
+      }
     }
 
     return {
       registrationNo: data.registration.registrationNumber as string,
       registrationLocation: {
-        en: regLocationLocationEn,
-        bn: regLocationLocationBn
+        en: regLocationEn,
+        bn: regLocationBn
+      },
+      eventLocation: {
+        en: eventLocationEn,
+        bn: eventLocationBn
       },
       name: {
         bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
@@ -786,7 +938,8 @@ class PrintCertificateActionComponent extends React.Component<
       collectCertificateForm,
       paymentFormSection,
       drafts: { drafts },
-      dispatch
+      dispatch,
+      offlineResources
     } = this.props
 
     const { currentForm } = this.state
@@ -873,7 +1026,9 @@ class PrintCertificateActionComponent extends React.Component<
                     )
 
                     const certificateData = this.getCertificateDetails(
-                      retrievedData
+                      retrievedData,
+                      intl,
+                      offlineResources
                     )
 
                     const transData: IFormData = gqlToDraftTransformer(
@@ -962,7 +1117,8 @@ function mapStatetoProps(
     drafts: state.drafts,
     registerForm: state.registerForm.registerForm[event],
     collectCertificateForm: state.printCertificateForm.collectCertificateForm,
-    userDetails: getUserDetails(state)
+    userDetails: getUserDetails(state),
+    offlineResources: getOfflineState(state)
   }
 }
 export const PrintCertificateAction = connect(

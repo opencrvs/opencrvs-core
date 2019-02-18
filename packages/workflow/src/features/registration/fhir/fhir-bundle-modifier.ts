@@ -36,6 +36,7 @@ export async function modifyRegistrationBundle(
   fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
+  taskResource.lastModified = new Date().toISOString()
   const eventType = getEventType(fhirBundle)
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
