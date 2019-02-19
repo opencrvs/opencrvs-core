@@ -44,6 +44,18 @@ export const resolvers: GQLResolver = {
 
       return await fetchFHIR(`/${task.focus.reference}`, authHeader)
     },
+    async queryPersonByIdentifier(_, { identifier }, authHeader) {
+      const personBundle = await fetchFHIR(
+        `/Patient?identifier=${identifier}`,
+        authHeader
+      )
+      if (!personBundle || !personBundle.entry || !personBundle.entry[0]) {
+        throw new Error(`Person does not exist for identifer ${identifier}`)
+      }
+      const person = personBundle.entry[0].resource as fhir.Person
+
+      return person
+    },
     async listEventRegistrations(
       _,
       { status, locationIds, count = 0, skip = 0 },

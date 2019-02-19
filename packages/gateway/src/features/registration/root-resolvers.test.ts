@@ -1029,4 +1029,62 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('Composition reference not found')
     })
   })
+
+  describe('queryPersonByIdentifier()', async () => {
+    it('returns person', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          id: '7ea15b04-961d-4a33-a50c-16f6464aab0e',
+          link: [
+            {
+              relation: 'self',
+              url: 'http://localhost:3447/fhir/Patient?identifier=1234567898765'
+            }
+          ],
+          entry: [
+            {
+              resource: {
+                resourceType: 'Patient',
+
+                name: [
+                  {
+                    use: 'bn',
+                    given: ['গায়ত্রী'],
+                    family: ['স্পিভক']
+                  },
+                  {
+                    use: 'en',
+                    given: ['Gayatri'],
+                    family: ['Spivak']
+                  }
+                ],
+
+                id: '96d2f69a-2572-46b1-a390-9b722265d037'
+              }
+            }
+          ]
+        })
+      )
+      // @ts-ignore
+      const composition = await resolvers.Query.queryPersonByIdentifier(
+        {},
+        { identifier: '1234567898765' }
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('96d2f69a-2572-46b1-a390-9b722265d037')
+    })
+    it("throws an error when the response isn't what we expect", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        // @ts-ignore
+        resolvers.Query.queryPersonByIdentifier(
+          {},
+          { identifier: '1234567898765' }
+        )
+      ).rejects.toThrowError(
+        'Person does not exist for identifer 1234567898765'
+      )
+    })
+  })
 })
