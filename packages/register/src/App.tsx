@@ -92,13 +92,7 @@ export class App extends React.Component<IAppProps> {
 
                         <ProtectedRoute
                           exact
-                          path={routes.REVIEW_BIRTH_PARENT_FORM_TAB}
-                          component={ReviewForm}
-                        />
-
-                        <ProtectedRoute
-                          exact
-                          path={routes.REVIEW_DEATH_PARENT_FORM_TAB}
+                          path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
                           component={ReviewForm}
                         />
 

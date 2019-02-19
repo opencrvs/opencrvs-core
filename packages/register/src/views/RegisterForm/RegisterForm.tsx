@@ -504,10 +504,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     draftId: string,
     selectedSection: IFormSection | null,
     tabRoute: string,
-    goToTab: (tabRoute: string, draftId: string, tabId: string) => void
+    event: string,
+    goToTab: (
+      tabRoute: string,
+      draftId: string,
+      tabId: string,
+      event: string
+    ) => void
   ): void => {
     if (selectedSection) {
-      goToTab(tabRoute, draftId, selectedSection.id)
+      goToTab(tabRoute, draftId, selectedSection.id, event)
     }
   }
 
@@ -591,7 +597,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
             sections={sectionForReview}
             activeTabId={activeSection.id}
             onTabClick={(tabId: string) =>
-              goToTab(this.props.tabRoute, draft.id, tabId)
+              goToTab(
+                this.props.tabRoute,
+                draft.id,
+                tabId,
+                draft.event.toLowerCase()
+              )
             }
           />
         </ViewHeaderWithTabs>
@@ -606,6 +617,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft.id,
                   nextSection,
                   this.props.tabRoute,
+                  draft.event.toLowerCase(),
                   goToTab
                 )
               }
@@ -614,6 +626,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft.id,
                   getPreviousSection(registerForm.sections, activeSection),
                   this.props.tabRoute,
+                  draft.event.toLowerCase(),
                   goToTab
                 )
               }
@@ -690,7 +703,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             goToTab(
                               this.props.tabRoute,
                               draft.id,
-                              nextSection.id
+                              nextSection.id,
+                              draft.event.toLowerCase()
                             )
                           }
                           id="next_section"
