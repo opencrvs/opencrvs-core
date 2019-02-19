@@ -43,15 +43,26 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
     this.mm = React.createRef()
     this.yyyy = React.createRef()
 
-    if (props.value && typeof props.value === 'string') {
-      const dateSegmentVals = props.value.split('-')
-      this.state = {
+    this.state = this.getInitialState()
+  }
+
+  componentDidUpdate(prevProps: IDateFieldProps) {
+    if (this.props.value !== prevProps.value) {
+      const state = this.getInitialState()
+      this.setState(() => state)
+    }
+  }
+
+  getInitialState() {
+    if (this.props.value && typeof this.props.value === 'string') {
+      const dateSegmentVals = this.props.value.split('-')
+      return {
         yyyy: dateSegmentVals[0],
         mm: dateSegmentVals[1],
         dd: dateSegmentVals[2]
       }
     } else {
-      this.state = {
+      return {
         yyyy: '',
         mm: '',
         dd: ''

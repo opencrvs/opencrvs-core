@@ -851,7 +851,14 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
-
+    'formFields.fetchDeceasedModalTitle': 'Checking',
+    'formFields.fetchDeceasedModalSuccessTitle': 'ID valid',
+    'formFields.fetchDeceasedModalErrorTitle': 'Invalid Id',
+    'formFields.fetchDeceasedModalErrorText':
+      'No registration found for provided BRN',
+    'formFields.loaderButton.cancel': 'Cancel',
+    'formFields.fetchDeceasedDetails': "Retrieve Deceased's Details",
+    'formFields.fetchDeceasedModalInfo': 'Birth Registration Number',
     'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
     certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
     submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,

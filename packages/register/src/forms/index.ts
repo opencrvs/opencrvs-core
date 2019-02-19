@@ -5,6 +5,8 @@ import {
   IRadioOption as RadioComponentOption,
   ICheckboxOption as CheckboxComponentOption
 } from '@opencrvs/components/lib/forms'
+import { ApolloQueryResult } from 'apollo-client'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -26,7 +28,10 @@ export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
+export const LOADER_BUTTON = 'LOADER_BUTTON'
+
 import { defineMessages } from 'react-intl'
+import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 export const messages = defineMessages({
   otherOption: {
@@ -98,6 +103,12 @@ export interface IDynamicFormFieldDefinitions {
     typeMapper: IDynamicFieldTypeMapper
   }
   validate?: IDynamicFormFieldValidators[]
+}
+
+export interface IFieldInput {
+  name: string
+  valueField: string
+  labelField: string
 }
 
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
@@ -222,6 +233,17 @@ export interface ILink extends IFormFieldBase {
 export interface IPDFDocumentViewerFormField extends IFormFieldBase {
   type: typeof PDF_DOCUMENT_VIEWER
 }
+export interface ILoaderButton extends IFormFieldBase {
+  type: typeof LOADER_BUTTON
+  query: any
+  inputs: IFieldInput[]
+  onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
+  modalTitle: FormattedMessage.MessageDescriptor
+  modalInfoText: FormattedMessage.MessageDescriptor
+  successTitle: FormattedMessage.MessageDescriptor
+  errorTitle: FormattedMessage.MessageDescriptor
+  errorText: FormattedMessage.MessageDescriptor
+}
 
 export type IFormField =
   | ITextFormField
@@ -244,6 +266,7 @@ export type IFormField =
   | ILink
   | IPDFDocumentViewerFormField
   | IDynamicListFormField
+  | ILoaderButton
 
 export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
   IFormFieldWithDynamicDefinitions
@@ -287,6 +310,7 @@ export interface IConditionals {
   deathPlaceOther: IConditional
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
+  deceasedBRNSelected: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
@@ -426,6 +450,18 @@ export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
   type: typeof PDF_DOCUMENT_VIEWER
 }
 
+export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
+  type: typeof LOADER_BUTTON
+  query: any
+  variables: IDynamicValues
+  onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
+  modalTitle: string
+  modalInfoText: string
+  successTitle: string
+  errorTitle: string
+  errorText: string
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -444,6 +480,7 @@ export type Ii18nFormField =
   | Ii18nWarningField
   | Ii18nLinkField
   | Ii18nPDFDocumentViewerFormField
+  | Ii18nLoaderButtonField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
