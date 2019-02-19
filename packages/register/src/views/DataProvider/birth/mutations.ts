@@ -15,7 +15,7 @@ const REGISTER_BIRTH_APPLICATION = gql`
 `
 const REJECT_BIRTH_APPLICATION = gql`
   mutation submitMutation($id: String!, $reason: String!, $comment: String!) {
-    markBirthAsVoided(id: $id, reason: $reason, comment: $comment)
+    markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
 const COLLECT_BIRTH_CERTIFICATE = gql`
@@ -60,7 +60,7 @@ export function getBirthMutationMappings(
         variables: {
           ...payload
         },
-        dataKey: 'markBirthAsVoided'
+        dataKey: 'markEventAsVoided'
       }
     case Action.COLLECT_CERTIFICATE:
       return {

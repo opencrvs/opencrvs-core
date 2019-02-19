@@ -413,7 +413,7 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
-  describe('markBirthAsVoided()', () => {
+  describe('markEventAsVoided()', () => {
     it('updates a task with rejected status, reason and comment', async () => {
       fetch.mockResponses(
         [
@@ -509,7 +509,7 @@ describe('Registration root resolvers', () => {
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
       // @ts-ignore
-      const result = await resolvers.Mutation.markBirthAsVoided(
+      const result = await resolvers.Mutation.markEventAsVoided(
         {},
         { id, reason, comment }
       )

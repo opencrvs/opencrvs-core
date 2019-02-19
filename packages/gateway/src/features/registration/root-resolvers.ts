@@ -135,7 +135,7 @@ export const resolvers: GQLResolver = {
         authHeader
       )
     },
-    async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
+    async markEventAsVoided(_, { id, reason, comment }, authHeader) {
       const taskBundle = await fetchFHIR(
         `/Task?focus=Composition/${id}`,
         authHeader
