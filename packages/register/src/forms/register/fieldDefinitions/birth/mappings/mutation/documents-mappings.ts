@@ -10,7 +10,8 @@ export const documentForWhomFhirMapping = {
 
 export const documentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
-  NID: 'NATIONAL_ID',
+  'National ID (front)': 'NATIONAL_ID_FRONT',
+  'National ID (back)': 'NATIONAL_ID_BACK',
   Passport: 'PASSPORT',
   'School Certificate': 'SCHOOL_CERTIFICATE',
   Other: 'OTHER',

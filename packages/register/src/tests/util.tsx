@@ -471,9 +471,9 @@ export const mockDeathApplicationData = {
       {
         data: 'base64-data',
         type: 'image/jpeg',
-        optionValues: ["Proof of Deceased's ID", 'NID'],
+        optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
         title: "Proof of Deceased's ID",
-        description: 'NID'
+        description: 'National ID (front)'
       }
     ]
   }
