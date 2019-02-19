@@ -828,6 +828,8 @@ describe('when user wants to print certificate', async () => {
     })
 
     it('when user clicks next button, renders certificate preview form', async () => {
+      jest.setTimeout(30000)
+
       const documentData = {
         personCollectingCertificate: 'MOTHER',
         motherDetails: true
