@@ -325,6 +325,7 @@ export interface GQLCertificate {
 }
 
 export interface GQLRelatedPerson {
+  id?: string
   relationship?: GQLRelationshipType
   otherRelationship?: string
   individual?: GQLPerson
@@ -1678,9 +1679,14 @@ export interface CertificateToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLRelatedPersonTypeResolver<TParent = any> {
+  id?: RelatedPersonToIdResolver<TParent>
   relationship?: RelatedPersonToRelationshipResolver<TParent>
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
   individual?: RelatedPersonToIndividualResolver<TParent>
+}
+
+export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface RelatedPersonToRelationshipResolver<

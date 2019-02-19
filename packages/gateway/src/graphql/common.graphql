@@ -96,6 +96,7 @@ input RelatedPersonInput {
 }
 
 type RelatedPerson { # -> Related Person
+  id: ID
   relationship: RelationshipType # -> .relationship.coding
   otherRelationship: String # -> .relationship.coding
   individual: Person # -> .patient.reference

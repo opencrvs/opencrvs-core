@@ -49,7 +49,10 @@ import {
   sameAddressFieldTransformer,
   sectionFieldExchangeTransformer
 } from 'src/forms/mappings/query/field-mappings'
-import { phoneNumberToFieldTransformer } from './mappings/query/application-mappings'
+import {
+  phoneNumberToFieldTransformer,
+  getInformantSectionTransformer
+} from './mappings/query/application-mappings'
 import {
   fieldValueNestingTransformer,
   OBJECT_TYPE
@@ -1047,5 +1050,8 @@ export const applicantsSection: IFormSection = {
         )
       }
     }
-  ]
+  ],
+  mapping: {
+    query: getInformantSectionTransformer
+  }
 }

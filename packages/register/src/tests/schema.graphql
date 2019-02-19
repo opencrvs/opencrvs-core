@@ -602,6 +602,7 @@ input RegWorkflowInput {
 }
 
 type RelatedPerson {
+  id: ID
   relationship: RelationshipType
   otherRelationship: String
   individual: Person

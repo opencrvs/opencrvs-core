@@ -16,3 +16,20 @@ export const phoneNumberToFieldTransformer = (
   }
   return transformedData
 }
+export function getInformantSectionTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string
+) {
+  if (
+    queryData[sectionId].id &&
+    queryData[sectionId].individual &&
+    queryData[sectionId].individual.id
+  ) {
+    transformedData[sectionId]._fhirIDMap = {
+      // @ts-ignore
+      relatedPerson: queryData[sectionId].id,
+      individual: queryData[sectionId].individual.id
+    }
+  }
+}

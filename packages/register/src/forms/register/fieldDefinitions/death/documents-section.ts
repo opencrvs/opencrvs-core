@@ -8,7 +8,10 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
 import { deathFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
-import { deathAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
+import {
+  deathAttachmentToFieldTransformer,
+  getRegistrationSectionTransformer
+} from './mappings/query/documents-mappings'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
@@ -254,5 +257,8 @@ export const documentsSection: IFormSection = {
         messages.applicantIDProof
       ]
     }
-  ]
+  ],
+  mapping: {
+    query: getRegistrationSectionTransformer
+  }
 }
