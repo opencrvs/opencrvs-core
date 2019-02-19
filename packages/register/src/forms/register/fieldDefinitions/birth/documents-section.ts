@@ -198,6 +198,7 @@ export const documentsSection: IFormSection = {
             label: messages.uploadDocForWhom,
             required: true,
             initialValue: '',
+            hideAsterisk: true,
             validate: [],
             options: [
               { value: 'Child', label: messages.uploadDocForChild },
@@ -211,6 +212,7 @@ export const documentsSection: IFormSection = {
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: messages.whatDocToUpload,
             required: true,
+            hideAsterisk: true,
             initialValue: '',
             validate: [],
             dynamicOptions: {
