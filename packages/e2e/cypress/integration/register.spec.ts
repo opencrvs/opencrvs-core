@@ -8,7 +8,7 @@ context('Register', () => {
   it('fills in all data into the register form', () => {
     cy.visit(`${Cypress.env('REGISTER_URL')}events`)
     // CHILD DETAILS
-    cy.get('#select_vital_event_view').should('be.visible')
+    cy.get('#select_vital_event_view', { timeout: 30000 }).should('be.visible')
     cy.get('#select_birth_event').click()
     cy.get('#select_parent_informant').click()
     cy.get('#firstNames').type('গায়ত্রী')
