@@ -604,7 +604,7 @@ describe('when user has a valid token in local storage', () => {
           })
           describe('when user selects the type of document', () => {
             beforeEach(async () => {
-              selectOption(app, '#whatDocToUpload', 'NID')
+              selectOption(app, '#whatDocToUpload', 'National ID (front)')
 
               await flushPromises()
               app.update()
@@ -1054,9 +1054,9 @@ describe('when user has a valid token in local storage', () => {
             {
               data: 'base64-data',
               type: 'image/jpeg',
-              optionValues: ['Mother', 'NID'],
+              optionValues: ['Mother', 'National ID (front)'],
               title: 'Mother',
-              description: 'NID'
+              description: 'National ID (front)'
             }
           ]
         }

@@ -34,6 +34,15 @@ import {
 import { ITemplatedComposition } from './fhir-builders'
 
 export const typeResolvers: GQLResolver = {
+  EventRegistration: {
+    __resolveType(obj) {
+      if (obj.type.coding[0].code === 'birth-declaration') {
+        return 'BirthRegistration'
+      } else {
+        return 'DeathRegistration'
+      }
+    }
+  },
   HumanName: {
     firstNames(name) {
       return (name.given && name.given.join(' ')) || ''
@@ -60,6 +69,9 @@ export const typeResolvers: GQLResolver = {
     },
     multipleBirth: person => {
       return person.multipleBirthInteger
+    },
+    deceased: person => {
+      return person
     },
     nationality: person => {
       const nationalityExtension = findExtension(
@@ -130,23 +142,44 @@ export const typeResolvers: GQLResolver = {
   },
   Registration: {
     async trackingId(task: fhir.Task) {
+      let trackingId =
+        task &&
+        task.code &&
+        task.code.coding &&
+        task.code.coding[0] &&
+        task.code.coding[0].code
+      if (trackingId === 'BIRTH') {
+        trackingId = 'birth-tracking-id'
+      } else {
+        trackingId = 'death-tracking-id'
+      }
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
           (identifier: fhir.Identifier) =>
             identifier.system ===
-            `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+            `${OPENCRVS_SPECIFICATION_URL}id/${trackingId}`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
     async registrationNumber(task: fhir.Task) {
+      let regNoType =
+        task &&
+        task.code &&
+        task.code.coding &&
+        task.code.coding[0] &&
+        task.code.coding[0].code
+      if (regNoType === 'BIRTH') {
+        regNoType = 'birth-registration-number'
+      } else {
+        regNoType = 'death-registration-number'
+      }
       const foundIdentifier =
         task.identifier &&
         task.identifier.find(
           (identifier: fhir.Identifier) =>
-            identifier.system ===
-            `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+            identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/${regNoType}`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null

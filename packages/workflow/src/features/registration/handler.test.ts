@@ -468,18 +468,8 @@ describe('markBirthAsRegisteredHandler handler', () => {
               },
               identifier: [
                 {
-                  system: 'http://opencrvs.org/specs/id/paper-form-id',
-                  value: '12345678'
-                },
-                {
-                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                  value: 'B5WGYJE'
-                }
-              ],
-              extension: [
-                {
-                  url: 'http://opencrvs.org/specs/extension/contact-person',
-                  valueString: 'MOTHER'
+                  system: 'http://opencrvs.org/specs/id/death-tracking-id',
+                  value: 'D5WGYJE'
                 }
               ],
               id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'

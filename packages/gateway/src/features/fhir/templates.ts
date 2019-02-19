@@ -257,7 +257,7 @@ export function createObservationEntryTemplate(refUuid: string) {
   }
 }
 
-export function createTaskRefTemplate(refUuid: string) {
+export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
@@ -267,7 +267,7 @@ export function createTaskRefTemplate(refUuid: string) {
         coding: [
           {
             system: 'http://opencrvs.org/specs/types',
-            code: 'birth-registration'
+            code: event.toString()
           }
         ]
       }

@@ -17,6 +17,8 @@ export interface GQLQuery {
   listBirthRegistrations?: GQLBirthRegResultSet
   fetchDeathRegistration?: GQLDeathRegistration
   listDeathRegistrations?: GQLDeathRegResultSet
+  fetchEventRegistration?: GQLEventRegistration
+  listEventRegistrations?: GQLEventRegResultSet
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
@@ -133,7 +135,8 @@ export interface GQLAttachment {
 
 export enum GQLAttachmentType {
   PASSPORT = 'PASSPORT',
-  NATIONAL_ID = 'NATIONAL_ID',
+  NATIONAL_ID_FRONT = 'NATIONAL_ID_FRONT',
+  NATIONAL_ID_BACK = 'NATIONAL_ID_BACK',
   IMMUNISATION_CERTIFICATE = 'IMMUNISATION_CERTIFICATE',
   PAPER_FORM = 'PAPER_FORM',
   PASSPORT_PHOTO = 'PASSPORT_PHOTO',
@@ -215,7 +218,7 @@ export enum GQLLocationType {
   OTHER = 'OTHER'
 }
 
-export interface GQLBirthRegistration {
+export interface GQLBirthRegistration extends GQLEventRegistration {
   id: string
   _fhirIDMap?: GQLMap
   registration?: GQLRegistration
@@ -238,7 +241,22 @@ export interface GQLBirthRegistration {
   updatedAt?: GQLDate
 }
 
-export type GQLMap = any
+export interface GQLEventRegistration {
+  id: string
+  registration?: GQLRegistration
+  createdAt?: GQLDate
+}
+
+/** Use this to resolve interface type EventRegistration */
+export type GQLPossibleEventRegistrationTypeNames =
+  | 'BirthRegistration'
+  | 'DeathRegistration'
+
+export interface GQLEventRegistrationNameMap {
+  EventRegistration: GQLEventRegistration
+  BirthRegistration: GQLBirthRegistration
+  DeathRegistration: GQLDeathRegistration
+}
 
 export interface GQLRegistration {
   id?: string
@@ -342,6 +360,8 @@ export enum GQLPaymentOutcomeType {
   PARTIAL = 'PARTIAL'
 }
 
+export type GQLMap = any
+
 export enum GQLBirthType {
   SINGLE = 'SINGLE',
   TWIN = 'TWIN',
@@ -382,7 +402,7 @@ export interface GQLBirthRegResultSet {
   totalItems?: number
 }
 
-export interface GQLDeathRegistration {
+export interface GQLDeathRegistration extends GQLEventRegistration {
   id: string
   registration?: GQLRegistration
   deceased?: GQLPerson
@@ -410,6 +430,11 @@ export enum GQLCauseOfDeathMethodType {
 
 export interface GQLDeathRegResultSet {
   results?: Array<GQLDeathRegistration | null>
+  totalItems?: number
+}
+
+export interface GQLEventRegResultSet {
+  results?: Array<GQLEventRegistration | null>
   totalItems?: number
 }
 
@@ -646,7 +671,10 @@ export interface GQLResolver {
   Location?: GQLLocationTypeResolver
   Identifier?: GQLIdentifierTypeResolver
   BirthRegistration?: GQLBirthRegistrationTypeResolver
-  Map?: GraphQLScalarType
+  EventRegistration?: {
+    __resolveType: GQLEventRegistrationTypeResolver
+  }
+
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
@@ -654,9 +682,11 @@ export interface GQLResolver {
   Certificate?: GQLCertificateTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
   Payment?: GQLPaymentTypeResolver
+  Map?: GraphQLScalarType
   BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   DeathRegResultSet?: GQLDeathRegResultSetTypeResolver
+  EventRegResultSet?: GQLEventRegResultSetTypeResolver
   Mutation?: GQLMutationTypeResolver
   Dummy?: GQLDummyTypeResolver
 }
@@ -669,6 +699,8 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
+  fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
+  listEventRegistrations?: QueryToListEventRegistrationsResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
@@ -775,6 +807,42 @@ export interface QueryToListDeathRegistrationsResolver<
   (
     parent: TParent,
     args: QueryToListDeathRegistrationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchEventRegistrationArgs {
+  id: string
+}
+export interface QueryToFetchEventRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchEventRegistrationArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToListEventRegistrationsArgs {
+  locationIds?: Array<string | null>
+  status?: string
+  userId?: string
+  from?: GQLDate
+  to?: GQLDate
+  count?: number
+  skip?: number
+}
+export interface QueryToListEventRegistrationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToListEventRegistrationsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -1398,6 +1466,11 @@ export interface BirthRegistrationToUpdatedAtResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLEventRegistrationTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'BirthRegistration'
+    | 'DeathRegistration'
+}
 export interface GQLRegistrationTypeResolver<TParent = any> {
   id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
@@ -1778,6 +1851,25 @@ export interface DeathRegResultSetToResultsResolver<
 }
 
 export interface DeathRegResultSetToTotalItemsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventRegResultSetTypeResolver<TParent = any> {
+  results?: EventRegResultSetToResultsResolver<TParent>
+  totalItems?: EventRegResultSetToTotalItemsResolver<TParent>
+}
+
+export interface EventRegResultSetToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventRegResultSetToTotalItemsResolver<
   TParent = any,
   TResult = any
 > {

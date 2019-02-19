@@ -41,7 +41,7 @@ mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
 describe('WorkQueue tests', async () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -68,7 +68,7 @@ describe('WorkQueue tests', async () => {
         },
         result: {
           data: {
-            listBirthRegistrations: {
+            listEventRegistrations: {
               totalItems: 2,
               results: [
                 {
@@ -78,6 +78,7 @@ describe('WorkQueue tests', async () => {
                     registrationNumber: null,
                     trackingId: 'B111111',
                     duplicates: null,
+                    type: 'BIRTH',
                     status: [
                       {
                         id: '123',
@@ -140,6 +141,7 @@ describe('WorkQueue tests', async () => {
                     id: '123',
                     registrationNumber: null,
                     trackingId: 'B222222',
+                    type: 'DEATH',
                     duplicates: null,
                     status: [
                       {
@@ -184,7 +186,7 @@ describe('WorkQueue tests', async () => {
                       }
                     ]
                   },
-                  child: {
+                  deceased: {
                     id: '123',
                     name: [
                       {
@@ -193,7 +195,9 @@ describe('WorkQueue tests', async () => {
                         familyName: 'মাসুম'
                       }
                     ],
-                    birthDate: null
+                    deceased: {
+                      deathDate: '2010-10-10'
+                    }
                   },
                   createdAt: '2018-05-23T14:44:58+02:00'
                 }
@@ -225,17 +229,18 @@ describe('WorkQueue tests', async () => {
         id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
         name: 'অনিক',
         dob: '',
-        date_of_application: '2018-05-23',
+        dod: '',
+        date_of_application: '23-05-2018',
         registrationNumber: '',
         tracking_id: 'B111111',
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
-        event: 'birth',
+        event: 'BIRTH',
         duplicates: null,
         status: [
           {
             officeName: 'Kaliganj Union Sub Center',
-            timestamp: '2018-12-07',
+            timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
             practitionerRole: 'LOCAL_REGISTRAR'
@@ -248,17 +253,18 @@ describe('WorkQueue tests', async () => {
         id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
         name: 'মাসুম',
         dob: '',
-        date_of_application: '2018-05-23',
+        dod: '10-10-2010',
+        date_of_application: '23-05-2018',
         registrationNumber: '',
         tracking_id: 'B222222',
         createdAt: '2018-05-23T14:44:58+02:00',
         declaration_status: 'REGISTERED',
-        event: 'birth',
+        event: 'DEATH',
         duplicates: null,
         status: [
           {
             officeName: 'Kaliganj Union Sub Center',
-            timestamp: '2018-12-07',
+            timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
             practitionerRole: 'LOCAL_REGISTRAR'
@@ -329,7 +335,7 @@ describe('WorkQueue tests', async () => {
           },
           result: {
             data: {
-              listBirthRegistrations: {
+              listEventRegistrations: {
                 totalItems: 1,
                 results: [
                   {
@@ -338,6 +344,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
+                      type: 'BIRTH',
                       duplicates: null,
                       status: [
                         {
@@ -465,7 +472,7 @@ describe('WorkQueue tests', async () => {
           },
           result: {
             data: {
-              listBirthRegistrations: {
+              listEventRegistrations: {
                 totalItems: 1,
                 results: [
                   {
@@ -474,6 +481,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
+                      type: 'BIRTH',
                       duplicates: null,
                       status: [
                         {
@@ -589,7 +597,7 @@ describe('WorkQueue tests', async () => {
           },
           result: {
             data: {
-              listBirthRegistrations: {
+              listEventRegistrations: {
                 totalItems: 4,
                 results: [
                   {
@@ -598,6 +606,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
+                      type: 'BIRTH',
                       duplicates: null,
                       status: [
                         {
@@ -781,6 +790,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B2222',
+                      type: 'BIRTH',
                       duplicates: null,
                       status: [
                         {
@@ -844,6 +854,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B33333',
+                      type: 'BIRTH',
                       duplicates: null,
                       status: [
                         {
@@ -908,6 +919,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B444444',
+                      type: 'BIRTH',
                       duplicates: null,
                       status: [
                         {
@@ -1029,7 +1041,7 @@ describe('WorkQueue tests', async () => {
           },
           result: {
             data: {
-              listBirthRegistrations: {
+              listEventRegistrations: {
                 totalItems: 1,
                 results: [
                   {
@@ -1038,6 +1050,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
+                      type: 'BIRTH',
                       duplicates: ['e302f7c5-ad87-4117-91c1-35eaf2ea7be8'],
                       status: [
                         {
@@ -1129,7 +1142,14 @@ describe('WorkQueue tests', async () => {
           .find('#reviewDuplicatesBtn_B111111')
           .hostNodes().length
       ).toBe(1)
-      testComponent.component.unmount()
+
+      testComponent.component
+        .find(DataTable)
+        .find('#reviewDuplicatesBtn_B111111')
+        .hostNodes()
+        .simulate('click')
+
+      expect(history.location.pathname).toContain('duplicates')
     })
   })
 
@@ -1151,7 +1171,7 @@ describe('WorkQueue tests', async () => {
           },
           result: {
             data: {
-              listBirthRegistrations: {
+              listEventRegistrations: {
                 totalItems: 1,
                 results: [
                   {
@@ -1160,6 +1180,7 @@ describe('WorkQueue tests', async () => {
                       id: '123',
                       registrationNumber: null,
                       trackingId: 'B111111',
+                      type: 'BIRTH',
                       duplicates: null,
                       status: [
                         {

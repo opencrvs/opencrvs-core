@@ -60,16 +60,17 @@ docker stack ps -f "desired-state=running" opencrvs
 
 docker ps
 
-To access mongo:
+#To access mongo:
 
 docker exec -it <mongo-container-id> mongo
 
-To access bash:
+#To access bash:
 
 docker exec -it <resources-or-user-mgnt-container-id> /bin/bash
 
-in resource service container: FHIR_URL=http://hearth:3447/fhir yarn populate
-in user mgnt service container: yarn populate
+# in resource service container run:
+
+FHIR_URL=http://hearth:3447/fhir yarn populate
 
 # Copy the 2 locations.json files that are generated in the following directory in the resource package to the other running resources container.
 
@@ -79,12 +80,12 @@ docker cp <resources-replica-1-containerId>:/usr/src/app/src/features/facilities
 # exit and copy files to local env
 
 scp root@<remote-ip-of-node-with-replica1>:/tmp/compose/administrative/locations.json /where/to/store/temporarily/administrative/locations.json
-scp root@<remote-ip-of-node-with-replica1>:/tmp/compose/facilities/generated/bn/locations.json /where/to/store/temporarily/facilities/locations.json
+scp root@<remote-ip-of-node-with-replica1>:/tmp/compose/facilities/locations.json /where/to/store/temporarily/facilities/locations.json
 
 # copy files to node containing replica 2 of resources package
 
 scp /where/to/store/temporarily/administrative/locations.json root@<remote-ip-of-node-with-replica2>:/tmp/compose/administrative/locations.json
-scp where/to/store/temporarily/facilities/locations.json root@<remote-ip-of-node-with-replica2>:/tmp/compose/facilities/generated/bn/locations.json
+scp where/to/store/temporarily/facilities/locations.json root@<remote-ip-of-node-with-replica2>:/tmp/compose/facilities/locations.json
 
 # SSH into node with replica 2 and copy into container with replica 2
 
@@ -94,3 +95,7 @@ docker cp /tmp/compose/facilities/locations.json <resources-replica-2-containerI
 #Clear Elastic Search data by accessing bask of the running elastic search container then run:
 
 curl -XDELETE 'http://localhost:9200/*'
+
+# in user mgnt service container:
+
+yarn populate

@@ -130,7 +130,7 @@ const messages = defineMessages({
   },
   otherInstitution: {
     id: 'formFields.otherInstitution',
-    defaultMessage: 'Other Institution',
+    defaultMessage: 'Other',
     description: 'Select item for Other Institution'
   }
 })

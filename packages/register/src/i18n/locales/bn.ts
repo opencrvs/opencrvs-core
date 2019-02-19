@@ -620,7 +620,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.uploadDocForOther': 'অন্যান্য',
     'formFields.whatDocToUpload': 'আপনি কোন প্রকার কাগজপত্র আপলোড করছেন?',
     'formFields.docTypeBR': 'জন্ম নিবন্ধন',
-    'formFields.docTypeNID': 'জাতীয় পরিচয়পত্র',
+    'formFields.docTypeNIDFront': 'জাতীয় পরিচয়পত্র (সামনের দিক)',
+    'formFields.docTypeNIDBack': 'জাতীয় পরিচয়পত্র (পিছন দিক)',
     'formFields.docTypePassport': 'পাসপোর্ট',
     'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
     'formFields.docTypeOther': 'অন্যান্য',
@@ -843,6 +844,20 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',
+    'formFields.fetchDeceasedModalTitle': 'পরীক্ষা করা হচ্ছে',
+    'formFields.fetchDeceasedModalSuccessTitle': 'আইডি বৈধ',
+    'formFields.fetchDeceasedModalErrorTitle': 'অকার্যকর আইডি',
+    'formFields.fetchDeceasedModalErrorText':
+      'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
+    'formFields.loaderButton.cancel': 'বাতিল',
+    'formFields.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
+    'formFields.fetchDeceasedModalInfo': 'জন্ম নিবন্ধন নম্বর',
+    'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন}
+      certificate {সনদপত্র} offlineEvent {আবেদন }} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
+      rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {সংযুক্তি স্থগিত}}`,
+    'register.confirmationScreen.headerDesc': `{event, select, declaration {তথ্য বিবরনী ঘোষণা} registration {} duplication {তথ্য বিবরনী আবেদন} certificate {}
+      offlineEvent {তথ্য বিবরনী ঘোষণাটি}} {action, select, submitted {বৈধতার জন্য পর্যালোচিত হচ্ছে।} completed {} rejected {প্রত্যাখ্যাত হচ্ছে।} approved {অনুমোদিত হচ্ছে।}
+      registered {নিবন্ধভুক্তকরন করা হচ্ছে।} offlineAction {ডিভাইসে ইন্টারনেট সংযোগ কালীন স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।}}`,
     'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত!} submitted {সমাপ্ত!} rejected {আবেদন প্রত্যাখ্যাত!}
       approved {আবেদন অনুমোদিত}  registered {আবেদন নিবন্ধভুক্তকরন} offlineAction {সম্পূর্ণ হচ্ছে}}`,
     'register.confirmationScreen.rejectedNoticeCardText2':
@@ -852,6 +867,12 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং নম্বর : } registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} 
       rejection {ট্র্যাকিং নম্বর : } certificate {} offline {ট্র্যাকিং নম্বর :}} `,
+    'formFields.fetchModalTitle': 'পরীক্ষা করা হচ্ছে',
+    'formFields.fetchModalSuccessTitle': 'আইডি বৈধ',
+    'formFields.fetchModalErrorTitle': 'অকার্যকর আইডি',
+    'formFields.fetchModalErrorText':
+      'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
+    'formFields.fetchModalInfo': 'জন্ম নিবন্ধন নম্বর',
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select,declaration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা } registration { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন}
      duplication { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নকল} certificate { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন সনদ} offline {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select,

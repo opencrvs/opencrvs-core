@@ -30,7 +30,7 @@ const messages = defineMessages({
   paragraph: {
     id: 'register.form.section.documents.paragraph',
     defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed bellow is required:',
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text'
   },
   informantAttestation: {
@@ -106,10 +106,15 @@ const messages = defineMessages({
     defaultMessage: 'Birth Registration',
     description: 'Label for radio option Birth Registration'
   },
-  docTypeNID: {
-    id: 'formFields.docTypeNID',
-    defaultMessage: 'NID',
-    description: 'Label for radio option NID'
+  docTypeNIDFront: {
+    id: 'formFields.docTypeNIDFront',
+    defaultMessage: 'National ID (front)',
+    description: 'Label for select option radio option NID front'
+  },
+  docTypeNIDBack: {
+    id: 'formFields.docTypeNIDBack',
+    defaultMessage: 'National ID (back)',
+    description: 'Label for select option radio option NID back'
   },
   docTypePassport: {
     id: 'formFields.docTypePassport',
@@ -230,21 +235,42 @@ export const documentsSection: IFormSection = {
                 ],
                 Mother: [
                   { value: 'Birth Registration', label: messages.docTypeBR },
-                  { value: 'NID', label: messages.docTypeNID },
+                  {
+                    value: 'National ID (front)',
+                    label: messages.docTypeNIDFront
+                  },
+                  {
+                    value: 'National ID (back)',
+                    label: messages.docTypeNIDBack
+                  },
                   { value: 'Passport', label: messages.docTypePassport },
                   { value: 'School Certificate', label: messages.docTypeSC },
                   { value: 'Other', label: messages.docTypeOther }
                 ],
                 Father: [
                   { value: 'Birth Registration', label: messages.docTypeBR },
-                  { value: 'NID', label: messages.docTypeNID },
+                  {
+                    value: 'National ID (front)',
+                    label: messages.docTypeNIDFront
+                  },
+                  {
+                    value: 'National ID (back)',
+                    label: messages.docTypeNIDBack
+                  },
                   { value: 'Passport', label: messages.docTypePassport },
                   { value: 'School Certificate', label: messages.docTypeSC },
                   { value: 'Other', label: messages.docTypeOther }
                 ],
                 Other: [
                   { value: 'Birth Registration', label: messages.docTypeBR },
-                  { value: 'NID', label: messages.docTypeNID },
+                  {
+                    value: 'National ID (front)',
+                    label: messages.docTypeNIDFront
+                  },
+                  {
+                    value: 'National ID (back)',
+                    label: messages.docTypeNIDBack
+                  },
                   { value: 'Passport', label: messages.docTypePassport },
                   { value: 'School Certificate', label: messages.docTypeSC },
                   { value: 'Other', label: messages.docTypeOther }
