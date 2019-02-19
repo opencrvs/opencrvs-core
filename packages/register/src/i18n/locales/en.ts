@@ -689,7 +689,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.list.buttons.print': 'Print',
     'register.workQueue.title.certificateCollection': 'Certificate Collection',
     'register.workQueue.list.buttons.printCertificate': 'Print certificate',
-    'register.workQueue.buttons.newApplication': 'New birth application',
+    'register.workQueue.buttons.newApplication': 'New application',
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
     'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',

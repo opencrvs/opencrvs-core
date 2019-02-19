@@ -1,6 +1,8 @@
 import { IFormField, IFormData } from 'src/forms'
 
-export const deceasedDateTransformation = (alternativeSectionId?: string) => (
+export const fieldToDeceasedDateTransformation = (
+  alternativeSectionId?: string
+) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
@@ -12,7 +14,7 @@ export const deceasedDateTransformation = (alternativeSectionId?: string) => (
   transformedData[
     alternativeSectionId ? alternativeSectionId : sectionId
   ].deceased = {
-    deceased: false,
+    deceased: true,
     deathDate: draftData[sectionId][field.name]
   }
   return transformedData

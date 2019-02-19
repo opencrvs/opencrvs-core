@@ -75,6 +75,18 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         trackingId
         registrationNumber
       }
+      eventLocation {
+        id
+        type
+        address {
+          type
+          line
+          district
+          state
+          postalCode
+          country
+        }
+      }
       mannerOfDeath
       causeOfDeathMethod
       causeOfDeath

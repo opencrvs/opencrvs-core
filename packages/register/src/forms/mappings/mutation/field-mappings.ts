@@ -162,23 +162,12 @@ export const copyEventAddressTransformer = (fromSection: string) => (
   if (!address) {
     return transformedData
   }
-  if (!transformedData.eventLocation) {
-    transformedData.eventLocation = {
-      address: {
-        country: '',
-        state: '',
-        district: '',
-        postalCode: '',
-        line: ['', '', '', '', '', '']
-      } as fhir.Address
-    } as fhir.Location
-  } else {
-    transformedData.eventLocation = {
-      address: {
-        ...address
-      } as fhir.Address
-    } as fhir.Location
-  }
+
+  transformedData.eventLocation = {
+    address: {
+      ...address
+    } as fhir.Address
+  } as fhir.Location
 
   transformedData.eventLocation.type = draftData[sectionId][field.name]
   if (address && address.line && address.line[5]) {

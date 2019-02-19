@@ -19,7 +19,6 @@ import {
   validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
-
 import {
   messages as identityMessages,
   identityNameMapper,
@@ -27,7 +26,6 @@ import {
   deathIdentityOptions
 } from '../../../identity'
 import { messages as addressMessages } from '../../../address'
-
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
 import { conditionals } from 'src/forms/utils'
 import { phoneNumberFormat } from 'src/utils/validate'
@@ -41,8 +39,17 @@ import {
   copyAddressTransformer,
   fieldToPhoneNumberTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
-import { identifierToFieldTransformer } from 'src/forms/mappings/query/field-mappings'
-
+import {
+  nestedValueToFieldTransformer,
+  identifierToFieldTransformer,
+  nameToFieldTransformer,
+  arrayToFieldTransformer,
+  fieldValueTransformer,
+  addressToFieldTransformer,
+  sameAddressFieldTransformer,
+  sectionFieldExchangeTransformer
+} from 'src/forms/mappings/query/field-mappings'
+import { phoneNumberToFieldTransformer } from './mappings/query/application-mappings'
 import {
   fieldValueNestingTransformer,
   OBJECT_TYPE
@@ -179,7 +186,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToIdentifierTransformer('type')
         ),
-        query: identifierToFieldTransformer('type')
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          identifierToFieldTransformer('type')
+        )
       }
     },
     {
@@ -195,7 +205,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToIdentifierTransformer('otherType')
         ),
-        query: identifierToFieldTransformer('otherType')
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          identifierToFieldTransformer('otherType')
+        )
       }
     },
     {
@@ -227,7 +240,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToIdentifierTransformer('id')
         ),
-        query: identifierToFieldTransformer('id')
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          identifierToFieldTransformer('id')
+        )
       }
     },
     {
@@ -242,6 +258,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToNameTransformer('bn', 'firstNames'),
           OBJECT_TYPE.NAME
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          nameToFieldTransformer('bn', 'firstNames')
         )
       }
     },
@@ -257,6 +277,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToNameTransformer('bn', 'familyName'),
           OBJECT_TYPE.NAME
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          nameToFieldTransformer('bn', 'familyName')
         )
       }
     },
@@ -272,6 +296,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToNameTransformer('en', 'firstNames'),
           OBJECT_TYPE.NAME
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          nameToFieldTransformer('en', 'firstNames')
         )
       }
     },
@@ -287,6 +315,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToNameTransformer('en', 'familyName'),
           OBJECT_TYPE.NAME
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          nameToFieldTransformer('en', 'familyName')
         )
       }
     },
@@ -302,6 +334,10 @@ export const applicantsSection: IFormSection = {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
           fieldToArrayTransformer
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          arrayToFieldTransformer
         )
       }
     },
@@ -316,6 +352,10 @@ export const applicantsSection: IFormSection = {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
           fieldNameTransformer('birthDate')
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          fieldValueTransformer('birthDate')
         )
       }
     },
@@ -351,7 +391,8 @@ export const applicantsSection: IFormSection = {
         mutation: fieldValueSectionExchangeTransformer(
           'informant',
           'relationship'
-        )
+        ),
+        query: sectionFieldExchangeTransformer('informant', 'relationship')
       }
     },
     {
@@ -365,6 +406,10 @@ export const applicantsSection: IFormSection = {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
           fieldToPhoneNumberTransformer()
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          phoneNumberToFieldTransformer
         )
       }
     },
@@ -389,6 +434,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT'),
           OBJECT_TYPE.NAME
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT')
         )
       }
     },
@@ -409,6 +458,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT')
         )
       }
     },
@@ -429,6 +482,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT')
         )
       }
     },
@@ -453,6 +510,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 6),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 6)
         )
       }
     },
@@ -479,6 +540,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 4),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 4)
         )
       }
     },
@@ -502,6 +567,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 5),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 5)
         )
       }
     },
@@ -524,6 +593,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 3),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 3)
         )
       }
     },
@@ -547,6 +620,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 2),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 2)
         )
       }
     },
@@ -570,6 +647,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 0, 'postalCode')
         )
       }
     },
@@ -592,6 +673,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 1),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 1)
         )
       }
     },
@@ -614,6 +699,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('CURRENT', 0, 'postalCode')
         )
       }
     },
@@ -651,6 +740,15 @@ export const applicantsSection: IFormSection = {
             NESTED_SECTION
           ),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          sameAddressFieldTransformer(
+            'CURRENT',
+            NESTED_SECTION,
+            'PERMANENT',
+            NESTED_SECTION
+          )
         )
       }
     },
@@ -668,6 +766,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 0, 'country'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 0, 'country')
         )
       }
     },
@@ -691,6 +793,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 0, 'state'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 0, 'state')
         )
       }
     },
@@ -715,6 +821,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 0, 'district'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 0, 'district')
         )
       }
     },
@@ -740,6 +850,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 6),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 6)
         )
       }
     },
@@ -767,6 +881,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 4),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 4)
         )
       }
     },
@@ -789,6 +907,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 5),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 5)
         )
       }
     },
@@ -812,6 +934,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 3),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 3)
         )
       }
     },
@@ -834,6 +960,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 2),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 2)
         )
       }
     },
@@ -856,6 +986,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 0, 'postalCode')
         )
       }
     },
@@ -879,6 +1013,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 1),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 1)
         )
       }
     },
@@ -902,6 +1040,10 @@ export const applicantsSection: IFormSection = {
           NESTED_SECTION,
           fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
           OBJECT_TYPE.ADDRESS
+        ),
+        query: nestedValueToFieldTransformer(
+          NESTED_SECTION,
+          addressToFieldTransformer('PERMANENT', 0, 'postalCode')
         )
       }
     }

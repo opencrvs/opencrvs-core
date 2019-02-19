@@ -302,7 +302,7 @@ const messages = defineMessages({
   },
   newApplication: {
     id: 'register.workQueue.buttons.newApplication',
-    defaultMessage: 'New Birth Application',
+    defaultMessage: 'New Application',
     description: 'The title of new application button'
   },
   reviewAndRegister: {

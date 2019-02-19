@@ -23,14 +23,18 @@ import {
   copyEventAddressTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import {
-  deceasedDateTransformation,
+  fieldToDeceasedDateTransformation,
   eventLocationMutationTransformer
 } from './mappings/mutation/event-mappings'
 import {
-  sameEventAddressFieldTransformer,
   eventLocationIDQueryTransformer,
+  bundleFieldToSectionFieldTransformer,
   eventLocationQueryTransformer
 } from 'src/forms/mappings/query/field-mappings'
+import {
+  deceasedDateToFieldTransformation,
+  deathPlaceToFieldTransformer
+} from './mappings/query/event-mappings'
 
 const messages = defineMessages({
   deathEventTab: {
@@ -149,7 +153,8 @@ export const eventSection: IFormSection = {
       initialValue: '',
       validate: [dateFormat],
       mapping: {
-        mutation: deceasedDateTransformation('deceased')
+        mutation: fieldToDeceasedDateTransformation('deceased'),
+        query: deceasedDateToFieldTransformation('deceased')
       }
     },
     {
@@ -176,7 +181,8 @@ export const eventSection: IFormSection = {
         }
       ],
       mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath')
+        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath'),
+        query: bundleFieldToSectionFieldTransformer('mannerOfDeath')
       }
     },
     {
@@ -207,7 +213,7 @@ export const eventSection: IFormSection = {
       conditionals: [],
       mapping: {
         mutation: copyEventAddressTransformer('deceased'),
-        query: sameEventAddressFieldTransformer('deceased')
+        query: deathPlaceToFieldTransformer
       }
     },
     {
