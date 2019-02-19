@@ -151,14 +151,16 @@ export const messages = defineMessages({
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
     description: 'The message that appears for new vital event registration'
   },
-  previewBirthRegistration: {
-    id: 'register.form.previewBirthRegistration',
-    defaultMessage: 'Birth Application Preview',
+  previewEventRegistration: {
+    id: 'register.form.previewEventRegistration',
+    defaultMessage:
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
     description: 'The message that appears for new birth registrations'
   },
-  reviewBirthRegistration: {
-    id: 'register.form.reviewBirthRegistration',
-    defaultMessage: 'Birth Application Review',
+  reviewEventRegistration: {
+    id: 'register.form.reviewEventRegistration',
+    defaultMessage:
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Review',
     description: 'The message that appears for new birth registrations'
   },
   saveDraft: {
@@ -568,9 +570,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
-      ? messages.reviewBirthRegistration
+      ? messages.reviewEventRegistration
       : activeSection.viewType === VIEW_TYPE.PREVIEW
-      ? messages.previewBirthRegistration
+      ? messages.previewEventRegistration
       : messages.newVitalEventRegistration
     const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
     const sectionForReview = isReviewForm

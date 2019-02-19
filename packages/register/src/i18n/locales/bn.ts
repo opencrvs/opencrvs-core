@@ -511,8 +511,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
     'register.form.newVitalEventRegistration':
       '{event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
-    'register.form.previewBirthRegistration': ' জন্ম ঘোষণাপত্র প্রদর্শন',
-    'register.form.reviewBirthRegistration': ' জন্ম ঘোষণাপত্র পর্যালোচনা',
+    'register.form.previewEventRegistration':
+      ' {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণাপত্র প্রদর্শন',
+    'register.form.reviewEventRegistration':
+      ' {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণাপত্র পর্যালোচনা',
     'register.form.saveDraft': 'খসড়া সংরক্ষণ',
     'register.form.next': 'পরবর্তী',
     'register.form.modal.preview': 'প্রিভিউ',

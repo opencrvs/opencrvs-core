@@ -509,8 +509,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
-    'register.form.previewBirthRegistration': 'Birth Application Preview',
-    'register.form.reviewBirthRegistration': 'Birth Registration Review',
+    'register.form.previewEventRegistration':
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
+    'register.form.reviewEventRegistration':
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Registration Review',
     'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
