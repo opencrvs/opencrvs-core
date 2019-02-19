@@ -57,21 +57,22 @@ export type Issuer = {
   issuedAt: string
 }
 
-const certificateDefinitionText = {}
-;(certificateDefinitionText[Event.BIRTH] = {
-  REGIATRATION_NO: 'Birth Registration No',
-  OCCURANCE: {
-    en: 'Was born on',
-    bn: 'জন্মগ্রহণ করেন'
-  }
-}),
-  (certificateDefinitionText[Event.DEATH] = {
+const certificateDefinitionText = {
+  [Event.BIRTH]: {
+    REGIATRATION_NO: 'Birth Registration No',
+    OCCURANCE: {
+      en: 'Was born on',
+      bn: 'জন্মগ্রহণ করেন'
+    }
+  },
+  [Event.DEATH]: {
     REGIATRATION_NO: 'Death Registration No',
     OCCURANCE: {
       en: 'Died on',
       bn: 'মারা যান'
     }
-  })
+  }
+}
 
 export function generateMoneyReceipt(
   intl: InjectedIntl,
