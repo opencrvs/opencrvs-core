@@ -32,4 +32,5 @@ export function getInformantSectionTransformer(
       individual: queryData[sectionId].individual.id
     }
   }
+  return transformedData
 }

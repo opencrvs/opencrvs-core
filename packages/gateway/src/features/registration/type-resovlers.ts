@@ -113,6 +113,9 @@ export const typeResolvers: GQLResolver = {
     }
   },
   RelatedPerson: {
+    id: relatedPerson => {
+      return relatedPerson && relatedPerson.id
+    },
     relationship: relatedPerson => {
       return (
         relatedPerson &&
