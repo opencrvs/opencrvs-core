@@ -13,8 +13,10 @@ import { getRegisterForm } from '@opencrvs/register/src/forms/register/applicati
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { Event } from 'src/forms'
+import { Scope } from 'src/utils/authUtils'
 
-type IProps = IFormProps & InjectedIntlProps & RouteComponentProps<{}>
+type IProps = IFormProps &
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
 
 const tabRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_TAB,

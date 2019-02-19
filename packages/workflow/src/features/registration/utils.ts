@@ -3,7 +3,12 @@ import { NOTIFICATION_SERVICE_URL } from 'src/constants'
 import fetch from 'node-fetch'
 import { logger } from 'src/logger'
 import { getInformantName, getTrackingId } from './fhir/fhir-utils'
-import { EVENT_TYPE } from './fhir/constants'
+import {
+  EVENT_TYPE,
+  CHILD_SECTION_CODE,
+  DECEASED_SECTION_CODE
+} from './fhir/constants'
+import { Events } from '../events/handler'
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -25,20 +30,71 @@ export function convertStringToASCII(str: string): string {
 
 export async function sendEventNotification(
   fhirBundle: fhir.Bundle,
+  event: Events,
   msisdn: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  hasRegistrarScope: boolean
 ) {
-  const eventType = getEventType(fhirBundle)
-  if (eventType === EVENT_TYPE.BIRTH) {
-    sendNotification(fhirBundle, msisdn, 'birthDeclarationSMS', authHeader)
-  } else {
-    sendNotification(fhirBundle, msisdn, 'deathDeclarationSMS', authHeader)
+  switch (event) {
+    case Events.BIRTH_NEW_DEC:
+      hasRegistrarScope
+        ? await sendRegistrationNotification(
+            fhirBundle,
+            msisdn,
+            CHILD_SECTION_CODE,
+            'birthRegistrationSMS',
+            authHeader
+          )
+        : await sendDeclarationNotification(
+            fhirBundle,
+            msisdn,
+            CHILD_SECTION_CODE,
+            'birthDeclarationSMS',
+            authHeader
+          )
+      break
+    case Events.BIRTH_MARK_REG:
+      await sendRegistrationNotification(
+        fhirBundle,
+        msisdn,
+        CHILD_SECTION_CODE,
+        'birthRegistrationSMS',
+        authHeader
+      )
+      break
+    case Events.DEATH_NEW_DEC:
+      hasRegistrarScope
+        ? await sendRegistrationNotification(
+            fhirBundle,
+            msisdn,
+            DECEASED_SECTION_CODE,
+            'deathRegistrationSMS',
+            authHeader
+          )
+        : await sendDeclarationNotification(
+            fhirBundle,
+            msisdn,
+            DECEASED_SECTION_CODE,
+            'deathDeclarationSMS',
+            authHeader
+          )
+      break
+    case Events.DEATH_MARK_REG:
+      await sendRegistrationNotification(
+        fhirBundle,
+        msisdn,
+        DECEASED_SECTION_CODE,
+        'deathRegistrationSMS',
+        authHeader
+      )
+      break
   }
 }
 
-async function sendNotification(
+async function sendDeclarationNotification(
   fhirBundle: fhir.Bundle,
   msisdn: string,
+  recipientSectionCode: string,
   smsType: string,
   authHeader: { Authorization: string }
 ) {
@@ -48,7 +104,31 @@ async function sendNotification(
       body: JSON.stringify({
         trackingid: getTrackingId(fhirBundle),
         msisdn,
-        name: getInformantName(fhirBundle)
+        name: await getInformantName(fhirBundle, recipientSectionCode)
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    })
+  } catch (err) {
+    logger.error(`Unable to send notification for error : ${err}`)
+  }
+}
+
+async function sendRegistrationNotification(
+  fhirBundle: fhir.Bundle,
+  msisdn: string,
+  recipientSectionCode: string,
+  smsType: string,
+  authHeader: { Authorization: string }
+) {
+  try {
+    await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        msisdn,
+        name: await getInformantName(fhirBundle, recipientSectionCode)
       }),
       headers: {
         'Content-Type': 'application/json',

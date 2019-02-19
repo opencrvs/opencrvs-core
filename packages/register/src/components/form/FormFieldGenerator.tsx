@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { withFormik, Field, FormikProps, FieldProps } from 'formik'
+import { withFormik, FastField, Field, FormikProps, FieldProps } from 'formik'
 import { isEqual } from 'lodash'
 import {
   InjectedIntlProps,
@@ -22,7 +22,11 @@ import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
-  getFieldOptions
+  getFieldOptions,
+  getFieldLabel,
+  getFieldOptionsByValueMapper,
+  getFieldType,
+  getInputValues
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -41,28 +45,39 @@ import {
   NUMBER,
   SUBSECTION,
   LIST,
-  ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions,
   PARAGRAPH,
   IMAGE_UPLOADER_WITH_OPTIONS,
   IFileValue,
   TEL,
   INFORMATIVE_RADIO_GROUP,
   WARNING,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  ITextFormField,
+  IDynamicFormField,
   LINK,
-  PDF_DOCUMENT_VIEWER
+  PDF_DOCUMENT_VIEWER,
+  DYNAMIC_LIST,
+  IDynamicListFormField,
+  IListFormField,
+  IFormData,
+  LOADER_BUTTON,
+  ILoaderButton
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
 import { IOfflineDataState } from 'src/offline/reducer'
-
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { InputField } from 'src/components/form/InputField'
 import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
 
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
+import { LoaderButtonField } from './LoaderButton'
+
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
+import { transformDeceasedData } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -141,7 +156,10 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
-          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          onChange={(val: string) => {
+            resetDependentSelectValues(fieldDefinition.name)
+            onSetFieldValue(fieldDefinition.name, val)
+          }}
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
@@ -184,7 +202,7 @@ function GeneratedInputField({
         <DateField
           {...inputProps}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
-          value={inputProps.value as string}
+          value={value as string}
         />
       </InputField>
     )
@@ -230,7 +248,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === LIST) {
-    return <FormList list={fieldDefinition.items} />
+    return <FormList {...inputProps} list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
     return (
@@ -261,7 +279,12 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
-    return <PDFViewer id={fieldDefinition.name} pdfSource={value as string} />
+    return (
+      <PDFViewer
+        id={fieldDefinition.name}
+        pdfSource={fieldDefinition.initialValue as string}
+      />
+    )
   }
 
   if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
@@ -274,6 +297,23 @@ function GeneratedInputField({
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
         }
+      />
+    )
+  }
+
+  if (fieldDefinition.type === LOADER_BUTTON) {
+    return (
+      <LoaderButtonField
+        id={fieldDefinition.name}
+        query={fieldDefinition.query}
+        modalTitle={fieldDefinition.modalTitle}
+        label={fieldDefinition.label}
+        modalInfoText={fieldDefinition.modalInfoText}
+        successTitle={fieldDefinition.successTitle}
+        errorText={fieldDefinition.errorText}
+        errorTitle={fieldDefinition.errorTitle}
+        onFetch={fieldDefinition.onFetch}
+        variables={fieldDefinition.variables}
       />
     )
   }
@@ -301,6 +341,7 @@ interface IFormSectionProps {
   setAllFieldsDirty: boolean
   offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
+  draftData?: IFormData
 }
 
 type Props = IFormSectionProps &
@@ -357,7 +398,9 @@ class FormSectionComponent extends React.Component<Props> {
       setFieldValue,
       touched,
       offlineResources,
-      intl
+      intl,
+      draftData,
+      setValues
     } = this.props
 
     const errors = (this.props.errors as any) as {
@@ -389,10 +432,10 @@ class FormSectionComponent extends React.Component<Props> {
             const [firstError] = fieldErrors
             error = intl.formatMessage(firstError.message, firstError.props)
           }
-
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            values
+            values,
+            offlineResources
           )
 
           if (conditionalActions.includes('hide')) {
@@ -410,27 +453,90 @@ class FormSectionComponent extends React.Component<Props> {
                     offlineResources
                   )
                 } as ISelectFormFieldWithOptions)
+              : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+              ? ({
+                  ...field,
+                  type: getFieldType(field as IDynamicFormField, values),
+                  label: getFieldLabel(field as IDynamicFormField, values)
+                } as ITextFormField)
+              : field.type === DYNAMIC_LIST
+              ? ({
+                  ...field,
+                  type: LIST,
+                  items: getFieldOptionsByValueMapper(
+                    field as IDynamicListFormField,
+                    draftData as IFormData,
+                    field.dynamicItems.valueMapper
+                  )
+                } as IListFormField)
+              : field.type === LOADER_BUTTON
+              ? ({
+                  ...field,
+                  variables: getInputValues(field as ILoaderButton, values),
+                  draftData: draftData as IFormData,
+                  onFetch: response => {
+                    const transformedData = transformDeceasedData(response)
+                    const updatedValues = Object.assign(
+                      {},
+                      values,
+                      transformedData
+                    )
+                    setValues(updatedValues)
+                  }
+                } as ILoaderButton)
               : field
 
-          return (
-            <FormItem key={`${field.name}`}>
-              <Field name={field.name}>
-                {(formikFieldProps: FieldProps<any>) => (
-                  <GeneratedInputField
-                    fieldDefinition={internationaliseFieldObject(
-                      intl,
-                      withDynamicallyGeneratedFields
-                    )}
-                    onSetFieldValue={setFieldValue}
-                    resetDependentSelectValues={this.resetDependentSelectValues}
-                    {...formikFieldProps.field}
-                    touched={touched[field.name] || false}
-                    error={error}
-                  />
-                )}
-              </Field>
-            </FormItem>
-          )
+          if (
+            field.type === PDF_DOCUMENT_VIEWER ||
+            field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
+            field.type === LOADER_BUTTON
+          ) {
+            return (
+              <FormItem key={`${field.name}`}>
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => (
+                    <GeneratedInputField
+                      fieldDefinition={internationaliseFieldObject(
+                        intl,
+                        withDynamicallyGeneratedFields
+                      )}
+                      onSetFieldValue={setFieldValue}
+                      resetDependentSelectValues={
+                        this.resetDependentSelectValues
+                      }
+                      {...formikFieldProps.field}
+                      touched={touched[field.name] || false}
+                      error={error}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+            )
+          } else {
+            return (
+              <FormItem key={`${field.name}`}>
+                <FastField name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => (
+                    <GeneratedInputField
+                      fieldDefinition={internationaliseFieldObject(
+                        intl,
+                        withDynamicallyGeneratedFields
+                      )}
+                      onSetFieldValue={setFieldValue}
+                      resetDependentSelectValues={
+                        this.resetDependentSelectValues
+                      }
+                      {...formikFieldProps.field}
+                      touched={touched[field.name] || false}
+                      error={error}
+                    />
+                  )}
+                </FastField>
+              </FormItem>
+            )
+          }
         })}
       </section>
     )
@@ -446,5 +552,5 @@ export const FormFieldGenerator = withFormik<
     console.log(values)
   },
   validate: (values, props: IFormSectionProps) =>
-    getValidationErrorsForForm(props.fields, values)
+    getValidationErrorsForForm(props.fields, values, props.offlineResources)
 })(injectIntl(FormSectionComponent))

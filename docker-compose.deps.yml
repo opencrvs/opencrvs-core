@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   mongo:
-    image: mongo:3.4
+    image: mongo:3.6
     restart: unless-stopped
     volumes:
       - '/data/mongo:/data/db'
@@ -13,7 +13,7 @@ services:
           - node.role == manager
 
   redis:
-    image: redis
+    image: redis:5
     restart: unless-stopped
 
   elasticsearch:
@@ -28,7 +28,7 @@ services:
           - node.role == manager
 
   influxdb:
-    image: influxdb
+    image: influxdb:1.7
     restart: unless-stopped
     volumes:
       - '/data/influxdb:/var/lib/influxdb'
@@ -39,7 +39,7 @@ services:
           - node.role == manager
 
   hearth:
-    image: jembi/hearth:latest
+    image: jembi/hearth:v1.0.0-beta.1
     environment:
       - mongodb__url=mongodb://mongo/hearth-dev
       - logger__level=error
@@ -51,7 +51,7 @@ services:
       replicas: 2
 
   openhim-core:
-    image: jembi/openhim-core
+    image: jembi/openhim-core:5
     environment:
       - mongo_url=mongodb://mongo/openhim-dev
       - mongo_atnaUrl=mongodb://mongo/openhim-dev
@@ -67,7 +67,7 @@ services:
       replicas: 2
 
   openhim-console:
-    image: jembi/openhim-console
+    image: jembi/openhim-console:1.13
     ports:
       - '8888:80'
     restart: unless-stopped

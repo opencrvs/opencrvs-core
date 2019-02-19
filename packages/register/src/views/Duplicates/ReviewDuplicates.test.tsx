@@ -12,21 +12,24 @@ import { ReactWrapper } from 'enzyme'
 import { DuplicateDetails } from 'src/components/DuplicateDetails'
 import { clone } from 'lodash'
 
+const assign = window.location.assign as jest.Mock
+
 describe('Review Duplicates component', () => {
   const graphqlMock = [
     {
       request: {
         query: FETCH_DUPLICATES,
         variables: {
-          id: '123'
+          id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
         }
       },
       result: {
         data: {
           fetchBirthRegistration: {
-            id: '123',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             registration: {
-              duplicates: ['111']
+              id: '123',
+              duplicates: ['450ce5e3-b495-4868-bb6a-1183ffd0fff1']
             }
           }
         }
@@ -35,10 +38,33 @@ describe('Review Duplicates component', () => {
 
     {
       request: {
-        query: createDuplicateDetailsQuery(['123', '111']),
+        query: FETCH_DUPLICATES,
         variables: {
-          duplicate0Id: '123',
-          duplicate1Id: '111'
+          id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+        }
+      },
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              id: '123',
+              duplicates: []
+            }
+          }
+        }
+      }
+    },
+
+    {
+      request: {
+        query: createDuplicateDetailsQuery([
+          '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        ]),
+        variables: {
+          duplicate0Id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          duplicate1Id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
         }
       },
       result: {
@@ -47,6 +73,7 @@ describe('Review Duplicates component', () => {
             createdAt: '2019-01-22T09:46:02.547Z',
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             registration: {
+              id: '123',
               trackingId: 'BFCJ02U',
               type: 'BIRTH',
               status: [
@@ -75,6 +102,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             child: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -91,6 +119,7 @@ describe('Review Duplicates component', () => {
               gender: 'female'
             },
             mother: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -103,7 +132,7 @@ describe('Review Duplicates component', () => {
                   familyName: 'Spivak'
                 }
               ],
-              birthDate: null,
+              birthDate: '2018-08-01',
               gender: null,
               identifier: [
                 {
@@ -113,6 +142,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             father: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -139,11 +169,12 @@ describe('Review Duplicates component', () => {
             createdAt: '2019-01-22T09:46:02.547Z',
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1',
             registration: {
+              id: 'hghgjhg',
               trackingId: 'BFCJ02U',
               type: 'BIRTH',
               status: [
                 {
-                  type: 'DECLARED',
+                  type: 'REGISTERED',
                   timestamp: '2019-01-22T09:46:02.547Z',
                   user: {
                     name: [
@@ -167,6 +198,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             child: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -183,6 +215,7 @@ describe('Review Duplicates component', () => {
               gender: 'female'
             },
             mother: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -195,7 +228,7 @@ describe('Review Duplicates component', () => {
                   familyName: 'Spivak'
                 }
               ],
-              birthDate: null,
+              birthDate: '2018-08-01',
               gender: null,
               identifier: [
                 {
@@ -205,6 +238,7 @@ describe('Review Duplicates component', () => {
               ]
             },
             father: {
+              id: '123',
               name: [
                 {
                   use: 'bn',
@@ -232,6 +266,247 @@ describe('Review Duplicates component', () => {
     }
   ]
 
+  const graphqlMockMinimal = [
+    {
+      request: {
+        query: FETCH_DUPLICATES,
+        variables: {
+          id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+        }
+      },
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              id: '123',
+              duplicates: ['450ce5e3-b495-4868-bb6a-1183ffd0fff1']
+            }
+          }
+        }
+      }
+    },
+
+    {
+      request: {
+        query: FETCH_DUPLICATES,
+        variables: {
+          id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+        }
+      },
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            id: '460ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              id: '123',
+              duplicates: []
+            }
+          }
+        }
+      }
+    },
+
+    {
+      request: {
+        query: createDuplicateDetailsQuery([
+          '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        ]),
+        variables: {
+          duplicate0Id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          duplicate1Id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        }
+      },
+      result: {
+        data: {
+          duplicate0: {
+            createdAt: '2019-01-22T09:46:02.547Z',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            registration: {
+              id: '123',
+              trackingId: 'BFCJ02U',
+              type: 'BIRTH',
+              status: [
+                {
+                  type: 'DECLARED',
+                  timestamp: '2019-01-22T09:46:02.547Z',
+                  user: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Shakib',
+                        familyName: 'Al Hasan'
+                      },
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    role: 'FIELD_AGENT'
+                  },
+                  office: {
+                    name: null
+                  }
+                }
+              ]
+            },
+            child: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: 'female'
+            },
+            mother: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            },
+            father: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: null
+            }
+          },
+          duplicate1: {
+            createdAt: '2019-01-22T09:46:02.547Z',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1',
+            registration: {
+              id: 'hghgjhg',
+              trackingId: 'BFCJ02U',
+              type: 'BIRTH',
+              status: [
+                {
+                  type: 'REGISTERED',
+                  timestamp: '2019-01-22T09:46:02.547Z',
+                  user: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Shakib',
+                        familyName: 'Al Hasan'
+                      },
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    role: 'FIELD_AGENT'
+                  },
+                  office: {
+                    name: null
+                  }
+                }
+              ]
+            },
+            child: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: 'female'
+            },
+            mother: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: [
+                {
+                  id: '1',
+                  type: 'NATIONAL_ID'
+                }
+              ]
+            },
+            father: {
+              id: '123',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: 'গায়ত্রী',
+                  familyName: 'স্পিভক'
+                },
+                {
+                  use: 'en',
+                  firstNames: 'Gayatri',
+                  familyName: 'Spivak'
+                }
+              ],
+              birthDate: null,
+              gender: null,
+              identifier: null
+            }
+          }
+        }
+      }
+    }
+  ]
+
   it('query gateway correctly and displays the returned duplicates correctly', async () => {
     const { store } = createStore()
     const testComponent = createTestComponent(
@@ -239,12 +514,37 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '123'
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
       store,
       graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+
+    testComponent.component.update()
+
+    expect(testComponent.component.find(DuplicateDetails)).toHaveLength(2)
+  })
+
+  it('query gateway correctly and displays the returned duplicates correctly in case of minimal data', async () => {
+    const { store } = createStore()
+    const testComponent = createTestComponent(
+      <ReviewDuplicates
+        // @ts-ignore
+        match={{
+          params: {
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }}
+      />,
+      store,
+      graphqlMockMinimal
     )
 
     // wait for mocked data to load mockedProvider
@@ -263,15 +563,15 @@ describe('Review Duplicates component', () => {
         request: {
           query: FETCH_DUPLICATES,
           variables: {
-            id: '123'
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
         result: {
           data: {
             fetchBirthRegistration: {
-              id: '123',
+              id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
               registration: {
-                duplicates: ['111']
+                duplicates: ['450ce5e3-b495-4868-bb6a-1183ffd0fff1']
               }
             }
           }
@@ -280,10 +580,13 @@ describe('Review Duplicates component', () => {
 
       {
         request: {
-          query: createDuplicateDetailsQuery(['123', '111']),
+          query: createDuplicateDetailsQuery([
+            '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+          ]),
           variables: {
-            duplicate0Id: '123',
-            duplicate1Id: '111'
+            duplicate0Id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            duplicate1Id: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
           }
         },
         error: new Error('boom!')
@@ -296,7 +599,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '123'
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -325,7 +628,7 @@ describe('Review Duplicates component', () => {
         request: {
           query: FETCH_DUPLICATES,
           variables: {
-            id: '123'
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
         error: new Error('boom!')
@@ -338,7 +641,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '123'
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -369,7 +672,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -443,7 +746,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -486,7 +789,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -530,14 +833,14 @@ describe('Review Duplicates component', () => {
       )
     })
 
-    it('successfuly rejects the application', async () => {
+    it('successfully removes duplicate from application', async () => {
       const mock = clone(graphqlMock)
       // @ts-ignore
       mock.push({
         request: {
           query: notADuplicateMutation,
           variables: {
-            id: '123',
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
@@ -554,7 +857,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '123'
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -587,5 +890,120 @@ describe('Review Duplicates component', () => {
         testComponent.component.find('#not_duplicate_confirm').hostNodes()
       ).toHaveLength(0)
     })
+
+    it('successfully redirects to work queue if all duplicates removed', async () => {
+      const mock = clone(graphqlMock)
+      // @ts-ignore
+      mock.push({
+        request: {
+          query: notADuplicateMutation,
+          variables: {
+            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+          }
+        },
+        result: {
+          data: {
+            // @ts-ignore
+            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }
+      })
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            }
+          }}
+        />,
+        store,
+        mock
+      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fff1')
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.update()
+
+      testComponent.component
+        .find('#not_duplicate_confirm')
+        .hostNodes()
+        .simulate('click')
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(assign).toBeCalledWith('/work-queue')
+    })
+
+    it('successfully redirects to work queue if no duplicates returned from fetch query', async () => {
+      const { store } = createStore()
+      const testComponent = createTestComponent(
+        <ReviewDuplicates
+          // @ts-ignore
+          match={{
+            params: {
+              applicationId: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            }
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(assign).toBeCalledWith('/work-queue')
+    })
+  })
+
+  it('takes user back to work queue page when back button is pressed', async () => {
+    const { store } = createStore()
+    const testComponent = createTestComponent(
+      <ReviewDuplicates
+        // @ts-ignore
+        match={{
+          params: {
+            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+          }
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+
+    testComponent.component.update()
+
+    testComponent.component
+      .find('#action_page_back_button')
+      .hostNodes()
+      .simulate('click')
+    testComponent.component.update()
+
+    expect(assign).toBeCalledWith('/work-queue')
   })
 })

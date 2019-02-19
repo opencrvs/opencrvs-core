@@ -14,6 +14,7 @@ enum BirthRegType {
 }
 
 enum RegistrationContactType {
+  BOTH
   MOTHER
   FATHER
 }
@@ -47,7 +48,8 @@ enum AttendantType {
 
 enum AttachmentType {
   PASSPORT
-  NATIONAL_ID
+  NATIONAL_ID_FRONT
+  NATIONAL_ID_BACK
   IMMUNISATION_CERTIFICATE
   PAPER_FORM
   PASSPORT_PHOTO
@@ -55,6 +57,12 @@ enum AttachmentType {
   SCHOOL_CERTIFICATE
   PROOF_OF_DEATH
   OTHER
+  POST_MORTEM_CERTIFICATE
+  HOSPITAL_DISCHARGE_CERTIFICATE
+  ATTESTED_DEATH_LETTER
+  ATTESTED_DEATH_CERTIFICATE
+  BURIAL_RECEIPT
+  FUNERAL_RECEIPT
 }
 
 enum AttachmentSubject {
@@ -62,6 +70,11 @@ enum AttachmentSubject {
   FATHER
   CHILD
   OTHER
+  DECEASED_ID_PROOF
+  DECEASED_PARMANENT_ADDRESS_PROOF
+  DECEASED_DEATH_PROOF
+  DECEASED_BIRTH_PROOF
+  APPLICANT_ID_PROOF
 }
 
 enum RegistrationType {
@@ -141,6 +154,12 @@ type RegWorkflow { # Task
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
 }
 
+interface EventRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  createdAt: Date
+}
+
 input BirthRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -148,8 +167,7 @@ input BirthRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  placeOfBirth: AddressInput
-  birthLocation: LocationInput
+  eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
@@ -164,7 +182,7 @@ input BirthRegistrationInput {
   updatedAt: Date
 }
 
-type BirthRegistration { # -> Composition
+type BirthRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
   _fhirIDMap: Map
   registration: Registration
@@ -172,8 +190,7 @@ type BirthRegistration { # -> Composition
   mother: Person # -> .section(code='mother-details').entry.reference
   father: Person # -> .section(code='father-details').entry.reference
   informant: Person # -> .section(code='informant-details').entry.reference
-  placeOfBirth: Address # -> Create birthLocation
-  birthLocation: Location # -> .section(code='birth-encounter').entry.reference.location
+  eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
@@ -192,13 +209,8 @@ input DeathRegistrationInput {
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
-  mother: PersonInput # -> Only use for foetal death -> .section(code='mother-details').entry.reference
-  father: PersonInput # -> Only use for foetal death -> .section(code='father-details').entry.reference
   informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  informantRelationship: RelationshipType # -> RelatedPerson.relationship
-  otherInformantRelationship: String # -> RelatedPerson.relationship
-  placeOfDeath: AddressInput # -> Create deathLocation
-  deathLocation: LocationInput # -> .section(code='death-encounter').entry.reference.location
+  eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -207,18 +219,13 @@ input DeathRegistrationInput {
 }
 
 # In BDRIS2 BRN is used to link to birth - Must have BRN to register death. Only deathLocation and current address is captures for death as the rest is the same as birth registration
-type DeathRegistration { # -> Composition
+type DeathRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  mother: Person # -> Only use for foetal death -> .section(code='mother-details').entry.reference
-  father: Person # -> Only use for foetal death -> .section(code='father-details').entry.reference
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  informantRelationship: RelationshipType # -> RelatedPerson.relationship
-  otherInformantRelationship: String # -> RelatedPerson.relationship
-  placeOfDeath: Address # -> Create deathLocation
-  deathLocation: Location # -> .section(code='death-encounter').entry.reference.location
+  eventLocation: Location
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept
@@ -306,22 +313,53 @@ type Attachment { # -> DocumentReference
   createdAt: Date # -> .created
 }
 
+type BirthRegResultSet {
+  results: [BirthRegistration]
+  totalItems: Int
+}
+
+type DeathRegResultSet {
+  results: [DeathRegistration]
+  totalItems: Int
+}
+
+type EventRegResultSet {
+  results: [EventRegistration]
+  totalItems: Int
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
+  queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
+  fetchDeathRegistration(id: ID!): DeathRegistration
   listDeathRegistrations(
     locationIds: [String]
     status: String
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): DeathRegResultSet
+  fetchEventRegistration(id: ID!): EventRegistration
+  listEventRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): EventRegResultSet
 }
 
 type Mutation {
@@ -339,17 +377,13 @@ type Mutation {
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): ID!
-  updateDeathRegistration(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): DeathRegistration!
+  updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   # process transitions
-  markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
-  markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
-  markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration # updates status to 'certified' - a printed certificate has been produced
-  markDeathAsVoided(
+  markDeathAsVerified(
     id: ID!
-    reason: String!
-    location: LocationInput
-  ): DeathRegistration # updated status to 'voided' - the registration was captured in error
+    details: DeathRegistrationInput
+  ): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsVoided(id: ID!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
 }

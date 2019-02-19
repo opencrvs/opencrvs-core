@@ -11,11 +11,26 @@ import {
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { dateFormat } from 'src/utils/validate'
-
 import { messages as addressMessages } from '../../../address'
 import { countries } from 'src/forms/countries'
 import { conditionals } from 'src/forms/utils'
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import {
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
+} from 'src/offline/reducer'
+import {
+  sectionFieldToBundleFieldTransformer,
+  copyEventAddressTransformer
+} from 'src/forms/mappings/mutation/field-mappings'
+import {
+  deceasedDateTransformation,
+  eventLocationMutationTransformer
+} from './mappings/mutation/event-mappings'
+import {
+  sameEventAddressFieldTransformer,
+  eventLocationIDQueryTransformer,
+  eventLocationQueryTransformer
+} from 'src/forms/mappings/query/field-mappings'
 
 const messages = defineMessages({
   deathEventTab: {
@@ -68,6 +83,11 @@ const messages = defineMessages({
     defaultMessage: 'Place of Occurrence of Death',
     description: 'Title for place of occurrence of death'
   },
+  deathLocation: {
+    id: 'formFields.birthLocation',
+    defaultMessage: 'Hospital / Clinic',
+    description: 'Label for form field: Hospital or Health Institution'
+  },
   deathPlaceAddress: {
     id: 'formFields.deathPlaceAddress',
     defaultMessage: 'Where did the death occur?',
@@ -110,7 +130,7 @@ const messages = defineMessages({
   },
   otherInstitution: {
     id: 'formFields.otherInstitution',
-    defaultMessage: 'Other Institution',
+    defaultMessage: 'Other',
     description: 'Select item for Other Institution'
   }
 })
@@ -127,7 +147,10 @@ export const eventSection: IFormSection = {
       label: messages.deathDate,
       required: true,
       initialValue: '',
-      validate: [dateFormat]
+      validate: [dateFormat],
+      mapping: {
+        mutation: deceasedDateTransformation('deceased')
+      }
     },
     {
       name: 'manner',
@@ -151,14 +174,16 @@ export const eventSection: IFormSection = {
           value: 'MANNER_UNDETERMINED',
           label: messages.mannerUndetermined
         }
-      ]
+      ],
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath')
+      }
     },
     {
       name: 'deathPlace',
       type: SUBSECTION,
       label: messages.deathPlace,
       initialValue: '',
-      required: true,
       validate: []
     },
     {
@@ -170,19 +195,23 @@ export const eventSection: IFormSection = {
       validate: [],
       options: [
         {
-          value: 'sameAsPermanent',
+          value: 'PERMANENT',
           label: messages.deathPlaceAddressSameAsPermanent
         },
         {
-          value: 'sameAsCurrent',
+          value: 'CURRENT',
           label: messages.deathPlaceAddressSameAsCurrent
         },
-        { value: 'other', label: messages.deathPlaceAddressOther }
+        { value: 'OTHER', label: messages.deathPlaceAddressOther }
       ],
-      conditionals: []
+      conditionals: [],
+      mapping: {
+        mutation: copyEventAddressTransformer('deceased'),
+        query: sameEventAddressFieldTransformer('deceased')
+      }
     },
     {
-      name: 'addressType',
+      name: 'placeOfDeath',
       type: SELECT_WITH_OPTIONS,
       label: messages.deathPlaceAddressType,
       required: false,
@@ -197,7 +226,28 @@ export const eventSection: IFormSection = {
         { value: 'PRIVATE_HOME', label: messages.privateHome },
         { value: 'OTHER', label: messages.otherInstitution }
       ],
-      conditionals: [conditionals.deathPlaceOther]
+      conditionals: [conditionals.deathPlaceOther],
+      mapping: {
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationIDQueryTransformer()
+      }
+    },
+    {
+      name: 'deathLocation',
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
+      label: messages.deathLocation,
+      required: false,
+      initialValue: '',
+      validate: [],
+      dynamicOptions: {
+        resource: OFFLINE_FACILITIES_KEY,
+        dependency: 'placeOfDeath'
+      },
+      conditionals: [conditionals.placeOfDeathHospital],
+      mapping: {
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationIDQueryTransformer()
+      }
     },
     {
       name: 'country',
@@ -207,7 +257,14 @@ export const eventSection: IFormSection = {
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.deathPlaceOther]
+      conditionals: [
+        conditionals.deathPlaceOther,
+        conditionals.otherDeathEventLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationQueryTransformer()
+      }
     },
     {
       name: 'state',
@@ -220,7 +277,15 @@ export const eventSection: IFormSection = {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
       },
-      conditionals: [conditionals.country, conditionals.deathPlaceOther]
+      conditionals: [
+        conditionals.country,
+        conditionals.deathPlaceOther,
+        conditionals.otherDeathEventLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationQueryTransformer()
+      }
     },
     {
       name: 'district',
@@ -236,8 +301,13 @@ export const eventSection: IFormSection = {
       conditionals: [
         conditionals.country,
         conditionals.state,
+        conditionals.otherDeathEventLocation,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(),
+        query: eventLocationQueryTransformer()
+      }
     },
     {
       name: 'addressLine4',
@@ -254,14 +324,19 @@ export const eventSection: IFormSection = {
         conditionals.country,
         conditionals.state,
         conditionals.district,
+        conditionals.otherDeathEventLocation,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(6),
+        query: eventLocationQueryTransformer(6)
+      }
     },
     {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -273,8 +348,34 @@ export const eventSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
+        conditionals.isNotCityLocation,
+        conditionals.otherDeathEventLocation,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(4),
+        query: eventLocationQueryTransformer(4)
+      }
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherDeathEventLocation,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(5),
+        query: eventLocationQueryTransformer(5)
+      }
     },
     {
       name: 'addressLine2',
@@ -289,14 +390,59 @@ export const eventSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
+        conditionals.otherDeathEventLocation,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(3),
+        query: eventLocationQueryTransformer(3)
+      }
+    },
+    {
+      name: 'addressLine1CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherDeathEventLocation,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(2),
+        query: eventLocationQueryTransformer(2)
+      }
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.otherDeathEventLocation,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(0, 'postalCode'),
+        query: eventLocationQueryTransformer(0, 'postalCode')
+      }
     },
     {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -305,8 +451,13 @@ export const eventSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
+        conditionals.otherDeathEventLocation,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(1),
+        query: eventLocationQueryTransformer(1)
+      }
     },
     {
       name: 'postCode',
@@ -321,8 +472,13 @@ export const eventSection: IFormSection = {
         conditionals.district,
         conditionals.addressLine4,
         conditionals.addressLine3,
+        conditionals.otherDeathEventLocation,
         conditionals.deathPlaceOther
-      ]
+      ],
+      mapping: {
+        mutation: eventLocationMutationTransformer(0, 'postalCode'),
+        query: eventLocationQueryTransformer(0, 'postalCode')
+      }
     }
   ]
 }

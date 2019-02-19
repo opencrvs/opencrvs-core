@@ -15,7 +15,14 @@ import {
   goToTab as goToTabAction,
   goBack as goBackAction
 } from '../../navigation'
-import { IForm, IFormSection, IFormField, IFormSectionData } from '../../forms'
+import {
+  IForm,
+  IFormSection,
+  IFormField,
+  IFormSectionData,
+  Event,
+  Action
+} from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from 'src/store'
 import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
@@ -25,19 +32,33 @@ import {
   ViewFooter
 } from 'src/components/interface/footer'
 import { StickyFormTabs } from './StickyFormTabs'
-import gql from 'graphql-tag'
-import { Mutation } from 'react-apollo'
-import { draftToMutationTransformer } from '../../transformer'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
-import { merge } from 'lodash'
+import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
-import {
-  SAVED_REGISTRATION,
-  REJECTED_REGISTRATION
-} from 'src/navigation/routes'
+import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+
+import {
+  DECLARATION,
+  SUBMISSION,
+  REJECTION,
+  REGISTRATION,
+  REGISTERED,
+  DUPLICATION
+} from 'src/utils/constants'
+
+import { getScope } from 'src/profile/profileSelectors'
+import { Scope } from 'src/utils/authUtils'
+import { isMobileDevice } from 'src/utils/commonUtils'
+import {
+  MutationProvider,
+  MutationContext
+} from '../DataProvider/MutationProvider'
+import { toggleDraftSavedNotification } from 'src/notification/actions'
+import { InvertSpinner } from '@opencrvs/components/lib/interface'
+import { TickLarge } from '@opencrvs/components/lib/icons'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -112,6 +133,10 @@ const Notice = styled.div`
   font-size: 18px;
   line-height: 24px;
   margin: 30px -25px;
+`
+const PreviewButton = styled.a`
+  text-decoration: underline;
+  color: ${({ theme }) => theme.colors.primary};
 `
 
 export const messages = defineMessages({
@@ -190,10 +215,6 @@ const FormViewContainer = styled.div`
   flex-direction: column;
 `
 
-const PreviewButton = styled.a`
-  text-decoration: underline;
-  color: ${({ theme }) => theme.colors.primary};
-`
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
@@ -202,6 +223,27 @@ const Optional = styled.span.attrs<
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
+`
+
+const ButtonSpinner = styled(InvertSpinner)`
+  width: 15px;
+  height: 15px;
+  top: 0px !important;
+`
+
+const ConfirmBtn = styled(PrimaryButton)`
+  font-weight: bold;
+  padding: 15px 20px 15px 20px;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  &:disabled {
+    background: ${({ theme }) => theme.colors.primary};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
 `
 
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
@@ -239,6 +281,7 @@ export interface IFormProps {
   draft: IDraft
   registerForm: IForm
   tabRoute: string
+  duplicate?: boolean
 }
 
 type DispatchProps = {
@@ -246,6 +289,7 @@ type DispatchProps = {
   goBack: typeof goBackAction
   modifyDraft: typeof modifyDraft
   deleteDraft: typeof deleteDraft
+  toggleDraftSavedNotification: typeof toggleDraftSavedNotification
   handleSubmit: (values: unknown) => void
 }
 
@@ -258,8 +302,7 @@ type Props = {
 type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps &
-  RouteComponentProps<{}>
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
 
 type State = {
   showSubmitModal: boolean
@@ -268,17 +311,6 @@ type State = {
   rejectFormOpen: boolean
   selectedTabId: string
 }
-
-const postMutation = gql`
-  mutation submitBirthRegistration($details: BirthRegistrationInput!) {
-    createBirthRegistration(details: $details)
-  }
-`
-const patchMutation = gql`
-  mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput) {
-    markBirthAsRegistered(id: $id, details: $details)
-  }
-`
 const VIEW_TYPE = {
   REVIEW: 'review',
   PREVIEW: 'preview'
@@ -326,6 +358,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
   modifyDraft = (sectionData: IFormSectionData) => {
     const { activeSection, draft } = this.props
     if (draft.review && !this.state.isDataAltered) {
@@ -341,33 +377,104 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   rejectSubmission = () => {
-    const { history, draft } = this.props
-    const childData = this.props.draft.data.child
-    const fullName: IFullName = getFullName(childData)
-    history.push(REJECTED_REGISTRATION, {
-      rejection: true,
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    let personData
+    if (event === Event.DEATH) {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
+    const duplicate = history.location.state && history.location.state.duplicate
+    let eventName = DECLARATION
+    if (duplicate) {
+      eventName = DUPLICATION
+    }
+    history.push(CONFIRMATION_SCREEN, {
+      eventName,
+      actionName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      eventType: event,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
+
     this.props.deleteDraft(draft)
   }
 
   successfulSubmission = (response: string) => {
-    const { history, draft } = this.props
-    const childData = this.props.draft.data.child
-    const fullName = getFullName(childData)
-    history.push(SAVED_REGISTRATION, {
-      trackingId: response,
-      declaration: true,
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    let personData
+    if (event === Event.DEATH) {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
+
+    const duplicate = history.location.state && history.location.state.duplicate
+
+    let eventName = DECLARATION
+    let actionName = SUBMISSION
+    let nextSection = true
+
+    if (this.userHasRegisterScope()) {
+      eventName = REGISTRATION
+      actionName = REGISTERED
+      nextSection = false
+    }
+
+    if (duplicate) {
+      eventName = DUPLICATION
+      actionName = REGISTERED
+      nextSection = false
+    }
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      nextSection,
+      trackingSection: true,
+      eventName,
+      eventType: event,
+      actionName,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
     this.props.deleteDraft(draft)
   }
 
-  successfullyRegistered = () => {
-    const { draft } = this.props
-    window.location.href = '/work-queue'
+  successfullyRegistered = (response: string) => {
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    let personData
+    if (event === Event.DEATH) {
+      personData = this.props.draft.data.deceased
+    } else {
+      personData = this.props.draft.data.child
+    }
+    const fullName = getFullName(personData)
+    history.push(CONFIRMATION_SCREEN, {
+      trackNumber: response,
+      trackingSection: true,
+      eventName: REGISTRATION,
+      eventType: event,
+      actionName: REGISTERED,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
+    })
     this.props.deleteDraft(draft)
   }
 
@@ -402,24 +509,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  processSubmitData = () => {
-    const { draft, registerForm } = this.props
-    const { showSubmitModal, showRegisterModal } = this.state
-    if (!showRegisterModal && !showSubmitModal) {
-      return
-    }
-    const data = draftToMutationTransformer(registerForm, draft.data)
-    if (!draft.review) {
-      return { details: data }
-    } else {
-      if (!this.state.isDataAltered) {
-        return { id: draft.id }
-      } else {
-        return { id: draft.id, details: data }
-      }
-    }
-  }
-
   generateSectionListForReview = (
     disabled: boolean,
     sections: IFormSection[]
@@ -444,6 +533,23 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
+  getEvent() {
+    const eventType = this.props.draft.event || 'BIRTH'
+    switch (eventType.toLocaleLowerCase()) {
+      case 'birth':
+        return Event.BIRTH
+      case 'death':
+        return Event.DEATH
+      default:
+        return Event.BIRTH
+    }
+  }
+
+  onSaveAsDraftClicked = () => {
+    this.props.history.push('/')
+    this.props.toggleDraftSavedNotification()
+  }
+
   render() {
     const {
       goToTab,
@@ -455,8 +561,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
       history,
       registerForm,
       offlineResources,
-      handleSubmit
+      handleSubmit,
+      duplicate
     } = this.props
+
     const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
@@ -488,7 +596,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         <FormContainer>
           <HeaderContent>
             <Swipeable
-              disabled={isReviewSection}
+              disabled={isReviewSection || !isMobileDevice()}
               id="swipeable_block"
               trackMouse
               onSwipedLeft={() =>
@@ -513,7 +621,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   tabRoute={this.props.tabRoute}
                   draft={draft}
                   submitClickEvent={this.submitForm}
-                  saveDraftClickEvent={() => history.push('/')}
+                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
                   deleteApplicationClickEvent={() => {
                     this.props.deleteDraft(draft)
                     history.push('/')
@@ -561,6 +669,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={activeSection.fields}
                       offlineResources={offlineResources}
+                      draftData={draft.data}
                     />
                   </form>
                   <FormActionSection>
@@ -592,7 +701,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <FormActionDivider />
                     <FormAction>
                       {
-                        <DraftButtonContainer onClick={() => history.push('/')}>
+                        <DraftButtonContainer
+                          id="save_as_draft"
+                          onClick={() => this.onSaveAsDraftClicked()}
+                        >
                           <DraftSimple />
                           <DraftButtonText>
                             {intl.formatMessage(messages.valueSaveAsDraft)}
@@ -610,87 +722,115 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <FooterAction>
             <FooterPrimaryButton
               id="save_draft"
-              onClick={() => history.push(SAVED_REGISTRATION)}
+              onClick={() => history.push(CONFIRMATION_SCREEN)}
             >
               {intl.formatMessage(messages.saveDraft)}
             </FooterPrimaryButton>
           </FooterAction>
         </ViewFooter>
-        <Mutation mutation={postMutation} variables={this.processSubmitData()}>
-          {(submitBirthRegistration, { data }) => {
-            if (data && data.createBirthRegistration) {
-              this.successfulSubmission(data.createBirthRegistration)
-            }
-            return (
-              <Modal
-                title="Are you ready to submit?"
-                actions={[
-                  <PrimaryButton
-                    key="submit"
-                    id="submit_confirm"
-                    onClick={() => submitBirthRegistration()}
-                  >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
-                  <PreviewButton
-                    key="preview"
-                    onClick={() => {
-                      this.toggleSubmitModalOpen()
-                      if (document.documentElement) {
-                        document.documentElement.scrollTop = 0
-                      }
-                    }}
-                  >
-                    {intl.formatMessage(messages.preview)}
-                  </PreviewButton>
-                ]}
-                show={this.state.showSubmitModal}
-                handleClose={this.toggleSubmitModalOpen}
-              >
-                {intl.formatMessage(messages.submitDescription)}
-              </Modal>
-            )
-          }}
-        </Mutation>
 
-        <Mutation mutation={patchMutation} variables={this.processSubmitData()}>
-          {(markBirthAsRegistered, { data }) => {
-            if (data && data.markBirthAsRegistered) {
-              this.successfullyRegistered()
-            }
-
-            return (
-              <Modal
-                title="Are you ready to submit?"
-                actions={[
-                  <PrimaryButton
-                    key="register"
-                    id="register_confirm"
-                    onClick={() => markBirthAsRegistered()}
-                  >
-                    {intl.formatMessage(messages.submitButton)}
-                  </PrimaryButton>,
-                  <PreviewButton
-                    key="review"
-                    id="register_review"
-                    onClick={() => {
-                      this.toggleRegisterModalOpen()
-                      if (document.documentElement) {
-                        document.documentElement.scrollTop = 0
-                      }
-                    }}
-                  >
-                    {intl.formatMessage(messages.preview)}
-                  </PreviewButton>
-                ]}
-                show={this.state.showRegisterModal}
-                handleClose={this.toggleRegisterModalOpen}
-              >
-                {intl.formatMessage(messages.submitDescription)}
-              </Modal>
-            )
-          }}
-        </Mutation>
+        {this.state.showSubmitModal && (
+          <MutationProvider
+            event={this.getEvent()}
+            action={Action.SUBMIT_FOR_REVIEW}
+            form={registerForm}
+            draft={draft}
+            onCompleted={this.successfulSubmission}
+          >
+            <MutationContext.Consumer>
+              {({ mutation, loading, data }) => (
+                <Modal
+                  title="Are you ready to submit?"
+                  actions={[
+                    <ConfirmBtn
+                      key="submit"
+                      id="submit_confirm"
+                      disabled={loading || data}
+                      // @ts-ignore
+                      onClick={() => mutation()}
+                    >
+                      {!loading && (
+                        <>
+                          <TickLarge />
+                          {intl.formatMessage(messages.submitButton)}
+                        </>
+                      )}
+                      {loading && <ButtonSpinner id="submit_confirm_spinner" />}
+                    </ConfirmBtn>,
+                    <PreviewButton
+                      id="preview-btn"
+                      key="preview"
+                      onClick={() => {
+                        this.toggleSubmitModalOpen()
+                        if (document.documentElement) {
+                          document.documentElement.scrollTop = 0
+                        }
+                      }}
+                    >
+                      {intl.formatMessage(messages.preview)}
+                    </PreviewButton>
+                  ]}
+                  show={this.state.showSubmitModal}
+                  handleClose={this.toggleSubmitModalOpen}
+                >
+                  {intl.formatMessage(messages.submitDescription)}
+                </Modal>
+              )}
+            </MutationContext.Consumer>
+          </MutationProvider>
+        )}
+        {this.state.showRegisterModal && (
+          <MutationProvider
+            event={this.getEvent()}
+            action={Action.REGISTER_APPLICATION}
+            form={registerForm}
+            draft={draft}
+            onCompleted={this.successfullyRegistered}
+          >
+            <MutationContext.Consumer>
+              {({ mutation, loading, data }) => (
+                <Modal
+                  title="Are you ready to submit?"
+                  actions={[
+                    <ConfirmBtn
+                      key="register"
+                      id="register_confirm"
+                      disabled={loading || data}
+                      // @ts-ignore
+                      onClick={() => mutation()}
+                    >
+                      {!loading && (
+                        <>
+                          <TickLarge />
+                          {intl.formatMessage(messages.submitButton)}
+                        </>
+                      )}
+                      {loading && (
+                        <ButtonSpinner id="register_confirm_spinner" />
+                      )}
+                    </ConfirmBtn>,
+                    <PreviewButton
+                      key="review"
+                      id="register_review"
+                      onClick={() => {
+                        this.toggleRegisterModalOpen()
+                        if (document.documentElement) {
+                          document.documentElement.scrollTop = 0
+                        }
+                      }}
+                    >
+                      {intl.formatMessage(messages.preview)}
+                    </PreviewButton>
+                  ]}
+                  show={this.state.showRegisterModal}
+                  handleClose={this.toggleRegisterModalOpen}
+                >
+                  {intl.formatMessage(messages.submitDescription)}
+                </Modal>
+              )}
+            </MutationContext.Consumer>
+          </MutationProvider>
+        )}
 
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
@@ -698,7 +838,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
             confirmRejectionEvent={() => {
               this.rejectSubmission()
             }}
+            duplicate={duplicate}
             draftId={draft.id}
+            event={this.getEvent()}
           />
         )}
       </FormViewContainer>
@@ -709,7 +851,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
 function replaceInitialValues(fields: IFormField[], sectionValues: object) {
   return fields.map(field => ({
     ...field,
-    initialValue: sectionValues[field.name] || field.initialValue
+    initialValue:
+      isUndefined(sectionValues[field.name]) ||
+      isNull(sectionValues[field.name])
+        ? field.initialValue
+        : sectionValues[field.name]
   }))
 }
 
@@ -754,6 +900,7 @@ function mapStateToProps(
 
   return {
     registerForm,
+    scope: getScope(state),
     setAllFieldsDirty,
     offlineResources,
     activeSection: {
@@ -771,6 +918,7 @@ export const RegisterForm = connect<Props, DispatchProps>(
     deleteDraft,
     goToTab: goToTabAction,
     goBack: goBackAction,
+    toggleDraftSavedNotification,
     handleSubmit: values => {
       console.log(values)
     }

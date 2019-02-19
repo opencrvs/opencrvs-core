@@ -12,3 +12,8 @@ export const declarationNotificationSchema = Joi.object({
     .required(),
   name: Joi.string().required()
 })
+
+export const registrationNotificationSchema = Joi.object({
+  msisdn: Joi.string().required(),
+  name: Joi.string().required()
+})

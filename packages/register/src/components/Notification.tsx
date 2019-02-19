@@ -6,23 +6,32 @@ import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { Notification } from '@opencrvs/components/lib/interface'
+import {
+  Notification,
+  NOTIFICATION_TYPE
+} from '@opencrvs/components/lib/interface'
 import {
   hideNewContentAvailableNotification,
-  hideBackgroundSyncedNotification
+  hideBackgroundSyncedNotification,
+  hideConfigurationErrorNotification,
+  toggleDraftSavedNotification
 } from 'src/notification/actions'
 
 type NotificationProps = {
   language?: string
   newContentAvailable: boolean
+  configurationErrorVisible: boolean
   backgroundSyncMessageVisible: boolean
   syncCount: number
   waitingSW: ServiceWorker | null
+  saveDraftClicked: boolean
 }
 
 type DispatchProps = {
   hideNewContentAvailableNotification: typeof hideNewContentAvailableNotification
   hideBackgroundSyncedNotification: typeof hideBackgroundSyncedNotification
+  hideConfigurationErrorNotification: typeof hideConfigurationErrorNotification
+  toggleDraftSavedNotification: typeof toggleDraftSavedNotification
 }
 
 export const messages = defineMessages({
@@ -38,6 +47,12 @@ export const messages = defineMessages({
       'As you have connectivity, we have synced {syncCount} new birth declarations.',
     description:
       'The message that appears in notification when background sync takes place'
+  },
+  draftsSaved: {
+    id: 'register.notification.draftsSaved',
+    defaultMessage: 'Your draft has been saved',
+    description:
+      'The message that appears in notification when save drafts button is clicked'
   }
 })
 
@@ -59,13 +74,23 @@ class Component extends React.Component<
     this.props.hideBackgroundSyncedNotification()
   }
 
+  hideConfigurationErrorNotification = () => {
+    this.props.hideConfigurationErrorNotification()
+  }
+
+  hideDraftsSavedNotification = () => {
+    this.props.toggleDraftSavedNotification()
+  }
+
   render() {
     const {
       children,
       newContentAvailable,
       backgroundSyncMessageVisible,
+      configurationErrorVisible,
       syncCount,
-      intl
+      intl,
+      saveDraftClicked
     } = this.props
 
     return (
@@ -91,6 +116,26 @@ class Component extends React.Component<
             })}
           </Notification>
         )}
+        {configurationErrorVisible && (
+          <Notification
+            type={NOTIFICATION_TYPE.ERROR}
+            id="configErrorShowNotification"
+            show={configurationErrorVisible}
+            callback={this.hideConfigurationErrorNotification}
+          >
+            OpenCRVS has been only partially configured - Awaiting facilities
+            and locations
+          </Notification>
+        )}
+        {saveDraftClicked && (
+          <Notification
+            id="draftsSavedNotification"
+            show={saveDraftClicked}
+            callback={this.hideDraftsSavedNotification}
+          >
+            {intl.formatMessage(messages.draftsSaved)}
+          </Notification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -103,14 +148,21 @@ const mapStateToProps = (store: IStoreState) => {
     newContentAvailable: store.notification.newContentAvailable,
     backgroundSyncMessageVisible:
       store.notification.backgroundSyncMessageVisible,
+    configurationErrorVisible: store.notification.configurationErrorVisible,
     syncCount: store.notification.syncCount,
-    waitingSW: store.notification.waitingSW
+    waitingSW: store.notification.waitingSW,
+    saveDraftClicked: store.notification.saveDraftClicked
   }
 }
 
 export const NotificationComponent = withRouter(
-  connect<NotificationProps, DispatchProps>(mapStateToProps, {
-    hideNewContentAvailableNotification,
-    hideBackgroundSyncedNotification
-  })(injectIntl(Component))
+  connect<NotificationProps, DispatchProps>(
+    mapStateToProps,
+    {
+      hideNewContentAvailableNotification,
+      hideBackgroundSyncedNotification,
+      hideConfigurationErrorNotification,
+      toggleDraftSavedNotification
+    }
+  )(injectIntl(Component))
 )

@@ -1,10 +1,12 @@
-import { Validation } from '../utils/validate'
+import { Validation, ValidationInitializer } from '../utils/validate'
 import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
   ICheckboxOption as CheckboxComponentOption
 } from '@opencrvs/components/lib/forms'
+import { ApolloQueryResult } from 'apollo-client'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -20,14 +22,37 @@ export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
+export const FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
+export const DYNAMIC_LIST = 'DYNAMIC_LIST'
+export const LOADER_BUTTON = 'LOADER_BUTTON'
+
+import { defineMessages } from 'react-intl'
+import { IDynamicValues } from '@opencrvs/register/src/navigation'
+
+export const messages = defineMessages({
+  otherOption: {
+    id: 'formFields.otherOption',
+    defaultMessage: 'Other',
+    description: 'Other option for select'
+  }
+})
 
 export enum Event {
   BIRTH = 'birth',
   DEATH = 'death'
+}
+
+export enum Action {
+  SUBMIT_FOR_REVIEW = 'submit for review',
+  REGISTER_APPLICATION = 'register',
+  COLLECT_CERTIFICATE = 'collect certificate',
+  REJECT_APPLICATION = 'reject',
+  LOAD_REVIEW_APPLICATION = 'load application data for review',
+  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection'
 }
 
 export interface ISelectOption {
@@ -49,6 +74,43 @@ export interface IDynamicOptions {
   options?: { [key: string]: ISelectOption[] }
 }
 
+export interface IDynamicItems {
+  dependency: string
+  valueMapper: IDynamicValueMapper
+  items: { [key: string]: FormattedMessage.MessageDescriptor[] }
+}
+
+export interface IDynamicFormFieldValidators {
+  validator: ValidationInitializer
+  dependencies: string[]
+}
+
+export type IDynamicFormFieldLabelMapper = (
+  key: string
+) => FormattedMessage.MessageDescriptor
+
+export type IDynamicValueMapper = (key: string) => string
+
+export type IDynamicFieldTypeMapper = (key: string) => string
+
+export interface IDynamicFormFieldDefinitions {
+  label?: {
+    dependency: string
+    labelMapper: IDynamicFormFieldLabelMapper
+  }
+  type?: {
+    dependency: string
+    typeMapper: IDynamicFieldTypeMapper
+  }
+  validate?: IDynamicFormFieldValidators[]
+}
+
+export interface IFieldInput {
+  name: string
+  valueField: string
+  labelField: string
+}
+
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
 
 export type IFileValue = {
@@ -57,13 +119,24 @@ export type IFileValue = {
   data: string
 }
 
-export type IFormFieldMapFunction = (
+export type IFormFieldMutationMapFunction = (
   transFormedData: any,
   draftData: IFormData,
   sectionId: string,
   fieldDefinition: IFormField
 ) => void
 
+export type IFormFieldQueryMapFunction = (
+  transFormedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  fieldDefinition: IFormField
+) => void
+
+export type IFormFieldMapping = {
+  mutation?: IFormFieldMutationMapFunction
+  query?: IFormFieldQueryMapFunction
+}
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
@@ -76,7 +149,7 @@ export interface IFormFieldBase {
   initialValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
-  mapping?: IFormFieldMapFunction
+  mapping?: IFormFieldMapping
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -86,6 +159,11 @@ export interface ISelectFormFieldWithOptions extends IFormFieldBase {
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
   dynamicOptions: IDynamicOptions
+}
+
+export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
+  type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
+  dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 
 export interface IRadioGroupFormField extends IFormFieldBase {
@@ -130,6 +208,11 @@ export interface IListFormField extends IFormFieldBase {
   type: typeof LIST
   items: FormattedMessage.MessageDescriptor[]
 }
+
+export interface IDynamicListFormField extends IFormFieldBase {
+  type: typeof DYNAMIC_LIST
+  dynamicItems: IDynamicItems
+}
 export interface IParagraphFormField extends IFormFieldBase {
   type: typeof PARAGRAPH
   fontSize?: string
@@ -150,6 +233,17 @@ export interface ILink extends IFormFieldBase {
 export interface IPDFDocumentViewerFormField extends IFormFieldBase {
   type: typeof PDF_DOCUMENT_VIEWER
 }
+export interface ILoaderButton extends IFormFieldBase {
+  type: typeof LOADER_BUTTON
+  query: any
+  inputs: IFieldInput[]
+  onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
+  modalTitle: FormattedMessage.MessageDescriptor
+  modalInfoText: FormattedMessage.MessageDescriptor
+  successTitle: FormattedMessage.MessageDescriptor
+  errorTitle: FormattedMessage.MessageDescriptor
+  errorText: FormattedMessage.MessageDescriptor
+}
 
 export type IFormField =
   | ITextFormField
@@ -157,6 +251,7 @@ export type IFormField =
   | INumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
+  | IFormFieldWithDynamicDefinitions
   | IRadioGroupFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
@@ -170,6 +265,11 @@ export type IFormField =
   | IWarningField
   | ILink
   | IPDFDocumentViewerFormField
+  | IDynamicListFormField
+  | ILoaderButton
+
+export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
+  IFormFieldWithDynamicDefinitions
 
 export interface IConditional {
   action: string
@@ -177,6 +277,7 @@ export interface IConditional {
 }
 
 export interface IConditionals {
+  iDType: IConditional
   fathersDetailsExist: IConditional
   permanentAddressSameAsMother: IConditional
   addressSameAsMother: IConditional
@@ -196,19 +297,40 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   certificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
+  placeOfBirthHospital: IConditional
+  placeOfDeathHospital: IConditional
+  otherBirthEventLocation: IConditional
+  otherDeathEventLocation: IConditional
+  isNotCityLocation: IConditional
+  isCityLocation: IConditional
+  isNotCityLocationPermanent: IConditional
+  isCityLocationPermanent: IConditional
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   causeOfDeathEstablished: IConditional
+  isMarried: IConditional
+  deceasedBRNSelected: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review'
 
-export type IFormSectionMapFunction = (
+export type IFormSectionMutationMapFunction = (
   transFormedData: any,
   draftData: IFormData,
   sectionId: string
 ) => void
+
+export type IFormSectionQueryMapFunction = (
+  transFormedData: IFormData,
+  queryData: any,
+  sectionId: string
+) => void
+
+export type IFormSectionMapping = {
+  mutation?: IFormSectionMutationMapFunction
+  query?: IFormSectionQueryMapFunction
+}
 export interface IFormSection {
   id: string
   viewType: ViewType
@@ -218,7 +340,7 @@ export interface IFormSection {
   disabled?: boolean
   optional?: boolean
   notice?: FormattedMessage.MessageDescriptor
-  mapping?: IFormSectionMapFunction
+  mapping?: IFormSectionMapping
 }
 
 export interface IForm {
@@ -328,6 +450,18 @@ export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
   type: typeof PDF_DOCUMENT_VIEWER
 }
 
+export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
+  type: typeof LOADER_BUTTON
+  query: any
+  variables: IDynamicValues
+  onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
+  modalTitle: string
+  modalInfoText: string
+  successTitle: string
+  errorTitle: string
+  errorText: string
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -346,6 +480,7 @@ export type Ii18nFormField =
   | Ii18nWarningField
   | Ii18nLinkField
   | Ii18nPDFDocumentViewerFormField
+  | Ii18nLoaderButtonField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

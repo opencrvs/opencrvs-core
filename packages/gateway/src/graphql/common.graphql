@@ -27,11 +27,12 @@ enum Relationship {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
-  DRIVING_LICENCE
+  DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
+  OTHER
 }
 
 enum EducationType {
@@ -54,15 +55,15 @@ enum MaritalStatusType {
 }
 
 enum AddressType {
+  HEALTH_FACILITY
+  ADMIN_STRUCTURE
+  CRVS_OFFICE
+  PRIVATE_HOME
   CURRENT
   PERMANENT
-  # BIRTH_PLACE
-  MILITARY_BASE_OR_CANTONMENT # Move the next three out to catchment areas
+  MILITARY_BASE_OR_CANTONMENT
   IDP_CAMP # -> Disaster Camp
   UNHCR_CAMP # -> UNHCR Camp
-  HOSPITAL
-  HEALTH_INSTITUTION
-  PRIVATE_HOME
   OTHER
 }
 
@@ -79,11 +80,13 @@ enum RelationshipType {
 input IdentityInput {
   id: ID
   type: IdentityIDType
+  otherType: String
 }
 
 type IdentityType { # -> Identifier
   id: ID # -> .value
   type: IdentityIDType # -> .system
+  otherType: String
 }
 
 input RelatedPersonInput {
@@ -96,6 +99,16 @@ type RelatedPerson { # -> Related Person
   relationship: RelationshipType # -> .relationship.coding
   otherRelationship: String # -> .relationship.coding
   individual: Person # -> .patient.reference
+}
+
+input DeceasedInput {
+  deceased: Boolean
+  deathDate: String
+}
+
+type Deceased {
+  deceased: Boolean
+  deathDate: String
 }
 
 input PersonInput {
@@ -111,7 +124,7 @@ input PersonInput {
   multipleBirth: Int # Not in BDRIS2
   address: [AddressInput]
   photo: [AttachmentInput]
-  deceased: Boolean
+  deceased: DeceasedInput
   nationality: [String] # In BDRIS2 for father and mother only
   educationalAttainment: EducationType # Not in BDRIS2
 }
@@ -130,7 +143,7 @@ type Person { # -> Patient
   multipleBirth: Int # -> .multipleBirthInteger
   address: [Address] # -> .address
   photo: [Attachment] # -> .photo
-  deceased: Boolean # -> .deceasedBoolean
+  deceased: Deceased # -> .deceased
   nationality: [String] # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
   educationalAttainment: EducationType # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
 }

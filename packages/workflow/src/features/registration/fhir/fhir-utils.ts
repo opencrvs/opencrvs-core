@@ -4,47 +4,61 @@ import {
   MOTHER_SECTION_CODE,
   FATHER_SECTION_CODE,
   REG_STATUS_DECLARED,
-  REG_STATUS_REGISTERED
+  REG_STATUS_REGISTERED,
+  EVENT_TYPE
 } from './constants'
 import { HEARTH_URL } from 'src/constants'
-import { getTaskResource, findPersonEntry } from './fhir-template'
+import {
+  getTaskResource,
+  findPersonEntry,
+  selectInformantResource
+} from './fhir-template'
 import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
 import fetch from 'node-fetch'
+import { getEventType } from '../utils'
 
 enum CONTACT {
   MOTHER,
-  FATHER
+  FATHER,
+  BOTH
 }
 
-export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
+export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
       'phoneNumberExists: Invalid FHIR bundle found for declaration'
     )
   }
-  const taskResource = getTaskResource(fhirBundle) as fhir.Task
-  const sharedContact =
-    taskResource &&
-    taskResource.extension &&
-    taskResource.extension.find(extension => {
-      return (
-        extension.url ===
-        `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`
-      )
-    })
+  let contact
+  const eventType = getEventType(fhirBundle)
+  if (eventType === EVENT_TYPE.BIRTH) {
+    const taskResource = getTaskResource(fhirBundle) as fhir.Task
+    const sharedContact =
+      taskResource &&
+      taskResource.extension &&
+      taskResource.extension.find(extension => {
+        return (
+          extension.url ===
+          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`
+        )
+      })
 
-  if (
-    !sharedContact ||
-    !sharedContact.valueString ||
-    Object.keys(CONTACT).indexOf(sharedContact.valueString.toUpperCase()) < 0
-  ) {
-    return false
+    if (
+      !sharedContact ||
+      !sharedContact.valueString ||
+      Object.keys(CONTACT).indexOf(sharedContact.valueString.toUpperCase()) < 0
+    ) {
+      return false
+    }
+
+    contact = await findPersonEntry(
+      getContactSection(CONTACT[sharedContact.valueString.toUpperCase()]),
+      fhirBundle
+    )
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    contact = selectInformantResource(fhirBundle)
   }
 
-  const contact = findPersonEntry(
-    getContactSection(CONTACT[sharedContact.valueString.toUpperCase()]),
-    fhirBundle
-  )
   if (!contact || !contact.telecom) {
     return false
   }
@@ -59,8 +73,9 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   return phoneNumber.value
 }
 
-export function getInformantName(
+export async function getInformantName(
   fhirBundle: fhir.Bundle,
+  sectionCode: string = CHILD_SECTION_CODE,
   language: string = 'bn'
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -69,7 +84,7 @@ export function getInformantName(
     )
   }
 
-  const informant = findPersonEntry(CHILD_SECTION_CODE, fhirBundle)
+  const informant = await findPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
   }
@@ -105,7 +120,9 @@ export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
     taskResource.identifier.find(identifier => {
       return (
         identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`
+          `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id` ||
+        identifier.system ===
+          `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`
       )
     })
   if (!trackingIdentifier || !trackingIdentifier.value) {
@@ -180,6 +197,7 @@ export function getPaperFormID(taskResource: fhir.Task) {
 function getContactSection(contact: CONTACT) {
   switch (contact) {
     case CONTACT.MOTHER:
+    case CONTACT.BOTH:
       return MOTHER_SECTION_CODE
     case CONTACT.FATHER:
       return FATHER_SECTION_CODE

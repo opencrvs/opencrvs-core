@@ -1,13 +1,8 @@
 import * as React from 'react'
 import styled from '../../styled-components'
-import {
-  injectIntl,
-  InjectedIntlProps,
-  defineMessages,
-  FormattedMessage
-} from 'react-intl'
-import { messages as identityMessages } from 'src/forms/identity'
+import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { countries } from 'src/forms/countries'
+import { identityNameMapper } from 'src/forms/identity'
 
 const messages = defineMessages({
   firstName: {
@@ -98,29 +93,11 @@ interface IProps {
   information: ParentDetails
 }
 
-export function iDType(code: string): FormattedMessage.MessageDescriptor {
-  switch (code) {
-    case 'NATIONAL_ID':
-      return identityMessages.iDTypeNationalID
-    case 'PASSPORT':
-      return identityMessages.iDTypePassport
-    case 'BIRTH_REGISTRATION_NUMBER':
-      return identityMessages.iDTypeBRN
-    case 'DEATH_REGISTRATION_NUMBER':
-      return identityMessages.iDTypeDRN
-    case 'REFUGEE_NUMBER':
-      return identityMessages.iDTypeRefugeeNumber
-    case 'ALIEN_NUMBER':
-      return identityMessages.iDTypeAlienNumber
-    default:
-      return identityMessages.iD
-  }
-}
-
 function ParentDetailsComponent({
   intl,
   information
 }: IProps & InjectedIntlProps) {
+  information = information || { nationality: '', name: [] }
   const nationalities = countries.filter(country =>
     information.nationality.includes(country.value)
   )
@@ -131,16 +108,16 @@ function ParentDetailsComponent({
   return (
     <Wrapper id="parent_details">
       <Label>{intl.formatMessage(messages.firstName)}:</Label>
-      <Text>{information.name[0].firstNames}</Text>
+      <Text>{information.name[0] ? information.name[0].firstNames : ''}</Text>
       <Divider />
       <Label>{intl.formatMessage(messages.familyName)}:</Label>
-      <Text>{information.name[0].familyName}</Text>
+      <Text>{information.name[0] ? information.name[0].familyName : ''}</Text>
       <br />
       <Label>{intl.formatMessage(messages.firstNameInEng)}:</Label>
-      <Text>{information.name[1].firstNames}</Text>
+      <Text>{information.name[1] ? information.name[1].firstNames : ''}</Text>
       <Divider />
       <Label>{intl.formatMessage(messages.familyNameInEng)}:</Label>
-      <Text>{information.name[1].familyName}</Text>
+      <Text>{information.name[1] ? information.name[1].familyName : ''}</Text>
       <br />
       <Label>{intl.formatMessage(messages.dateOfBirth)}:</Label>
       <Text>{information.birthDate}</Text>
@@ -153,7 +130,9 @@ function ParentDetailsComponent({
         {information.identifier &&
           information.identifier[0].type &&
           intl.formatMessage(
-            iDType(information.identifier && information.identifier[0].type)
+            identityNameMapper(
+              information.identifier && information.identifier[0].type
+            )
           )}
       </Text>
       <Divider />

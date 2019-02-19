@@ -384,18 +384,18 @@ export const testFhirBundleWithIdsForDeath = {
         subject: {},
         date: '2018-05-23T14:44:58+02:00',
         author: [],
-        title: 'Birth Declaration',
+        title: 'Death Declaration',
         section: [
           {
-            title: 'Child details',
+            title: 'Deceased details',
             code: {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-sections',
-                  code: 'child-details'
+                  code: 'deceased-details'
                 }
               ],
-              text: 'Child details'
+              text: 'Deceased details'
             },
             entry: [
               {
@@ -404,36 +404,19 @@ export const testFhirBundleWithIdsForDeath = {
             ]
           },
           {
-            title: "Mother's details",
+            title: "Informant's details",
             code: {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-sections',
-                  code: 'mother-details'
+                  code: 'informant-details'
                 }
               ],
-              text: "Mother's details"
+              text: "Informant's details"
             },
             entry: [
               {
-                reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
-              }
-            ]
-          },
-          {
-            title: "Father's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'father-details'
-                }
-              ],
-              text: "Father's details"
-            },
-            entry: [
-              {
-                reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
+                reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc'
               }
             ]
           }
@@ -456,18 +439,8 @@ export const testFhirBundleWithIdsForDeath = {
         },
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/paper-form-id',
-            value: '12345678'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B5WGYJE'
-          }
-        ],
-        extension: [
-          {
-            url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'MOTHER'
+            system: 'http://opencrvs.org/specs/id/death-tracking-id',
+            value: 'D5WGYJE'
           }
         ]
       }
@@ -489,6 +462,23 @@ export const testFhirBundleWithIdsForDeath = {
       }
     },
     {
+      fullUrl: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc',
+      resource: {
+        resourceType: 'RelatedPerson',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER'
+            }
+          ],
+          text: 'Nephew'
+        },
+        patient: { reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' }
+      }
+    },
+    {
       fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57',
       resource: {
         id: '444',
@@ -507,21 +497,6 @@ export const testFhirBundleWithIdsForDeath = {
             value: '+8801622688231'
           }
         ]
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221',
-      resource: {
-        id: '555',
-        resourceType: 'Patient',
-        active: true,
-        name: [
-          {
-            given: ['Jack'],
-            family: ['Doe']
-          }
-        ],
-        gender: 'male'
       }
     }
   ]
@@ -762,6 +737,187 @@ export const officeMock = JSON.stringify({
   }
 })
 
+export const compositionMock = JSON.stringify({
+  identifier: {
+    system: 'urn:ietf:rfc:3986',
+    value: 'B5JUNQO'
+  },
+  resourceType: 'Composition',
+  status: 'preliminary',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/doc-types',
+        code: 'birth-declaration'
+      }
+    ],
+    text: 'Birth Declaration'
+  },
+  class: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/doc-classes',
+        code: 'crvs-document'
+      }
+    ],
+    text: 'CRVS Document'
+  },
+  title: 'Birth Declaration',
+  section: [
+    {
+      title: 'Child details',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'child-details'
+          }
+        ],
+        text: 'Child details'
+      },
+      entry: [
+        {
+          reference: 'Patient/58efd5d1-d07f-4bac-af8e-771be81db047'
+        }
+      ]
+    },
+    {
+      title: "Mother's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'mother-details'
+          }
+        ],
+        text: "Mother's details"
+      },
+      entry: [
+        {
+          reference: 'Patient/0477b181-9e79-4f41-ac5b-54cdf3a4ca9d'
+        }
+      ]
+    },
+    {
+      title: 'Birth Encounter',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'birth-encounter'
+          }
+        ],
+        text: 'Birth encounter'
+      },
+      entry: [
+        {
+          reference: 'Encounter/a6ace176-f6fe-404d-9bed-236e1ce50b93'
+        }
+      ]
+    }
+  ],
+  subject: {},
+  date: '2019-02-06T11:24:04.264Z',
+  author: [],
+  meta: {
+    lastUpdated: '2019-02-06T11:24:06.089+00:00',
+    versionId: '7b6d3f45-f607-4f40-adc5-3a5a958882f9'
+  },
+  _request: {
+    method: 'POST'
+  },
+  id: '95035079-ec2c-451c-b514-664e838e8a5b'
+})
+
+export const motherMock = JSON.stringify({
+  resourceType: 'Patient',
+  active: true,
+  identifier: [
+    {
+      id: '12341234123412341',
+      type: 'NATIONAL_ID'
+    }
+  ],
+  name: [
+    {
+      use: 'bn',
+      family: ['নাম্বারো']
+    }
+  ],
+  telecom: [
+    {
+      system: 'phone',
+      value: '01711111111'
+    }
+  ],
+  maritalStatus: {
+    coding: [
+      {
+        system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+        code: 'M'
+      }
+    ],
+    text: 'MARRIED'
+  },
+  multipleBirthInteger: 1,
+  address: [
+    {
+      type: 'PERMANENT',
+      line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+      district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+      state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+      country: 'BGD'
+    },
+    {
+      type: 'CURRENT',
+      line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+      district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+      state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+      country: 'BGD'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+      extension: [
+        {
+          url: 'code',
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: 'urn:iso:std:iso:3166',
+                code: 'BGD'
+              }
+            ]
+          }
+        },
+        {
+          url: 'period',
+          valuePeriod: {
+            start: '',
+            end: ''
+          }
+        }
+      ]
+    }
+  ],
+  _transforms: {
+    matching: {
+      name: {
+        family: [['', '']]
+      }
+    }
+  },
+  meta: {
+    lastUpdated: '2019-02-06T11:24:06.097+00:00',
+    versionId: '66791cd4-2867-4414-bb3e-9d411038c3df'
+  },
+  _request: {
+    method: 'POST'
+  },
+  id: '0477b181-9e79-4f41-ac5b-54cdf3a4ca9d'
+})
+
 export const testFhirBundleForDeath = {
   resourceType: 'Bundle',
   type: 'document',
@@ -933,4 +1089,385 @@ export const testFhirBundleForDeath = {
       }
     }
   ]
+}
+
+export const testDeathFhirBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:98df1315-47fd-4fc8-a505-9439ad7c6778',
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: '98df1315-47fd-4fc8-a505-9439ad7c6778'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'death-declaration'
+            }
+          ],
+          text: 'Death Declaration'
+        },
+        class: {
+          coding: [
+            { system: 'http://opencrvs.org/doc-classes', code: 'crvs-document' }
+          ],
+          text: 'CRVS Document'
+        },
+        title: 'Death Declaration',
+        section: [
+          {
+            title: 'Deceased details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'deceased-details'
+                }
+              ],
+              text: 'Deceased details'
+            },
+            entry: [
+              { reference: 'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624' }
+            ]
+          },
+          {
+            title: "Informant's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'informant-details'
+                }
+              ],
+              text: "Informant's details"
+            },
+            entry: [
+              { reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc' }
+            ]
+          },
+          {
+            title: 'Death encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'death-encounter'
+                }
+              ],
+              text: 'Death encounter'
+            },
+            entry: [
+              { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' }
+            ]
+          }
+        ],
+        subject: {},
+        date: '2019-02-11',
+        author: []
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
+        name: [{ use: 'en', given: ['Jane'], family: ['Doe'] }],
+        gender: 'female',
+        birthDate: '2000-01-28',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/date-of-marriage',
+            valueDateTime: '2014-01-28'
+          },
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [{ system: 'urn:iso:std:iso:3166', code: 'BGD' }]
+                }
+              },
+              { url: 'period', valuePeriod: { start: '', end: '' } }
+            ]
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/educational-attainment',
+            valueString: 'UPPER_SECONDARY_ISCED_3'
+          }
+        ],
+        multipleBirthInteger: 1,
+        deceasedBoolean: true,
+        deceasedDateTime: '2014-01-28'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc',
+      resource: {
+        resourceType: 'RelatedPerson',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER'
+            }
+          ],
+          text: 'Nephew'
+        },
+        patient: { reference: 'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7' }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
+        name: [{ use: 'en', given: ['John'], family: ['Doe'] }],
+        telecom: [{ system: 'phone', value: '0171111111', use: 'mobile' }],
+        gender: 'male',
+        birthDate: '2000-01-28',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/date-of-marriage',
+            valueDateTime: '2014-01-28'
+          },
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [{ system: 'urn:iso:std:iso:3166', code: 'BGD' }]
+                }
+              },
+              { url: 'period', valuePeriod: { start: '', end: '' } }
+            ]
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/educational-attainment',
+            valueString: 'UPPER_SECONDARY_ISCED_3'
+          }
+        ],
+        multipleBirthInteger: 1,
+        address: [
+          {
+            use: 'home',
+            type: 'CURRENT',
+            line: ['2760 Mlosi Street', 'Wallacedene'],
+            city: 'Cape Town',
+            district: 'Kraaifontein',
+            state: 'Western Cape',
+            postalCode: '7570',
+            country: 'BGD'
+          },
+          {
+            use: 'home',
+            type: 'PERMANENT',
+            text: 'Optional address text',
+            line: ['40 Orbis Wharf', 'Wallacedene'],
+            city: 'Cape Town',
+            district: 'Kraaifontein',
+            state: 'Western Cape',
+            postalCode: '7570',
+            country: 'BGD'
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a',
+      resource: { resourceType: 'Encounter', status: 'finished' }
+    },
+    {
+      fullUrl: 'urn:uuid:fff280db-e146-40bf-a53d-850bb7972f0e',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'procedure',
+                display: 'Procedure'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'health-facility-death',
+              display: 'Health facility death location'
+            }
+          ]
+        },
+        valueString: 'Location/123'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:dc488e79-0cf9-4fa1-b9d0-3dd142d01d03',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'procedure',
+                display: 'Procedure'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'death-location-type',
+              display: 'Type of death location'
+            }
+          ]
+        },
+        valueString: 'PRIVATE_HOME'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:eb58c885-606b-46ef-9a44-c06a8d073ced',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'vital-signs',
+                display: 'Vital Signs'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'uncertified-manner-of-death',
+              display: 'Uncertified manner of death'
+            }
+          ]
+        },
+        valueCodeableConcept: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/ValueSet/icd-10',
+              code: 'NATURAL_CAUSES'
+            }
+          ]
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:04b79f83-779c-4a33-a1c9-714ea0b1d020',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'vital-signs',
+                display: 'Vital Signs'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'cause-of-death-method',
+              display: 'Cause of death method'
+            }
+          ]
+        },
+        valueCodeableConcept: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/ValueSet/icd-10',
+              code: 'MEDICALLY_CERTIFIED'
+            }
+          ]
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:e01d0427-d219-41b3-8452-f23def5b824f',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'vital-signs',
+                display: 'Vital Signs'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'ICD10',
+              display: 'Cause of death'
+            }
+          ]
+        },
+        valueCodeableConcept: {
+          coding: [
+            { system: 'http://hl7.org/fhir/ValueSet/icd-10', code: 'age' }
+          ]
+        }
+      }
+    }
+  ],
+  meta: { lastUpdated: '2019-02-11' }
 }

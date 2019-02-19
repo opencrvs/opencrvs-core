@@ -1,9 +1,9 @@
 import * as ReactApollo from 'react-apollo'
 import {
   createTestApp,
-  mockUserResponseWithName,
   mockOfflineData,
-  userDetails
+  userDetails,
+  selectOption
 } from './tests/util'
 import { v4 as uuid } from 'uuid'
 import {
@@ -20,18 +20,21 @@ import { storeDraft, createDraft, IDraft } from './drafts'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import { storage } from 'src/storage'
-import { queries } from 'src/profile/queries'
-import { draftToMutationTransformer } from 'src/transformer'
+import { draftToGqlTransformer } from 'src/transformer'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import {
   checkAuth,
   getStorageUserDetailsSuccess
 } from '@opencrvs/register/src/profile/profileActions'
 import { getOfflineDataSuccess } from 'src/offline/actions'
-import { referenceApi } from 'src/utils/referenceApi'
 import { createClient } from './utils/apolloClient'
 import { Event, IForm } from '@opencrvs/register/src/forms'
 import { clone } from 'lodash'
+import {
+  mockFetchLocations,
+  mockFetchFacilities
+} from 'src/utils/referenceApi.test'
+import * as nock from 'nock'
 
 interface IPersonDetails {
   [key: string]: any
@@ -42,25 +45,6 @@ storage.setItem = jest.fn()
 const assign = window.location.assign as jest.Mock
 const getItem = window.localStorage.getItem as jest.Mock
 const setItem = window.localStorage.setItem as jest.Mock
-const mockFetchUserDetails = jest.fn()
-mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
-queries.fetchUserDetails = mockFetchUserDetails
-
-const mockFetchLocations = jest.fn()
-mockFetchLocations.mockReturnValue({
-  data: [
-    {
-      id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
-      name: 'Barisal',
-      nameBn: 'বরিশাল',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    }
-  ]
-})
-referenceApi.loadLocations = mockFetchLocations
 
 function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
@@ -353,6 +337,60 @@ describe('when user has a valid token in local storage', () => {
       })
     })
 
+    describe('when user enters childBirthDate and clicks to documents tab', () => {
+      beforeEach(async () => {
+        Date.now = jest.fn(() => 1549607679507)
+        app
+          .find('#childBirthDate-dd')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childBirthDate-dd', value: '19' }
+          })
+        app
+          .find('#childBirthDate-mm')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childBirthDate-mm', value: '11' }
+          })
+        app
+          .find('#childBirthDate-yyyy')
+          .hostNodes()
+          .simulate('change', {
+            target: { id: 'childBirthDate-yyyy', value: '2018' }
+          })
+        await flushPromises()
+        app.update()
+      })
+
+      describe('when user goes to documents tab', () => {
+        beforeEach(async () => {
+          app
+            .find('#tab_documents')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+        })
+
+        it('renders list of document requirements', () => {
+          expect(
+            app
+              .find('#list')
+              .hostNodes()
+              .children()
+          ).toHaveLength(5)
+
+          expect(
+            app
+              .find('#list')
+              .hostNodes()
+              .childAt(4)
+              .text()
+          ).toBe('EPI Card of Child')
+        })
+      })
+    })
+
     describe('when user swipes left from the "child" section', () => {
       beforeEach(async () => {
         app
@@ -484,7 +522,6 @@ describe('when user has a valid token in local storage', () => {
         })
       })
     })
-
     describe('when user clicks "next" button', () => {
       beforeEach(async () => {
         app
@@ -567,10 +604,7 @@ describe('when user has a valid token in local storage', () => {
           })
           describe('when user selects the type of document', () => {
             beforeEach(async () => {
-              app
-                .find('#whatDocToUpload_NID')
-                .hostNodes()
-                .simulate('change')
+              selectOption(app, '#whatDocToUpload', 'National ID (front)')
 
               await flushPromises()
               app.update()
@@ -626,6 +660,13 @@ describe('when user has a valid token in local storage', () => {
                     .find('#file_item_0_delete_link')
                     .hostNodes()
                     .simulate('click')
+                  nock(window.config.RESOURCES_URL)
+                    .get('/locations')
+                    .reply(200, mockFetchLocations)
+
+                  nock(window.config.RESOURCES_URL)
+                    .get('/facilities')
+                    .reply(200, mockFetchFacilities)
 
                   await flushPromises()
                   app.update()
@@ -647,28 +688,30 @@ describe('when user has a valid token in local storage', () => {
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
-      birthDate: '1999-10-10',
+      childBirthDate: '1999-10-10',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
-      multipleBirth: '2',
       placeOfBirth: 'HOSPITAL',
+      birthLocation: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
+      multipleBirth: '2',
       birthType: 'SINGLE',
       weightAtBirth: '5'
     }
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '234234423424234244',
-      iDType: 'NATIONAL_ID',
+      iD: '23423442342423424',
+      iDType: 'OTHER',
+      iDTypeOther: 'Taxpayer Identification Number',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
       country: 'BGD',
       countryPermanent: 'BGD',
       currentAddress: '',
-      birthDate: '1999-10-10',
+      motherBirthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       familyName: 'ইসলাম',
@@ -680,7 +723,7 @@ describe('when user has a valid token in local storage', () => {
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '234243453455',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       country: 'BGD',
       nationality: 'BGD',
@@ -690,7 +733,7 @@ describe('when user has a valid token in local storage', () => {
       firstNamesEng: 'Rokeya',
       maritalStatus: 'MARRIED',
       dateOfMarriage: '2010-10-10',
-      birthDate: '1999-10-10',
+      fatherBirthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       currentAddressSameAsPermanent: true,
       addressLine1: 'Rd #10',
@@ -738,47 +781,28 @@ describe('when user has a valid token in local storage', () => {
 
       app.update()
     })
-
-    it('Throws error for invalid formDefinition', () => {
-      const emptyObj = {}
-      expect(() =>
-        draftToMutationTransformer({} as IForm, emptyObj)
-      ).toThrowError('Sections are missing in form definition')
-    })
-
-    it('Check if father addresses are parsed properly', () => {
-      const clonedFather = clone(fatherDetails)
-      clonedFather.addressSameAsMother = false
-      clonedFather.permanentAddressSameAsMother = false
-      clonedFather.addressLine1 = 'Rd #10'
-      clonedFather.addressLine1Permanent = 'Rd#10'
-      clonedFather.addressLine2 = 'Akua'
-      clonedFather.addressLine2Permanent = 'Akua'
-      clonedFather.addressLine3 = 'union1'
-      clonedFather.addressLine3Permanent = 'union1'
-      clonedFather.addressLine4 = 'upazila10'
-      clonedFather.addressLine4Permanent = 'upazila10'
-      clonedFather.countryPermanent = 'BGD'
-      clonedFather.currentAddress = ''
-      clonedFather.district = 'district2'
-      clonedFather.districtPermanent = 'district2'
-      clonedFather.permanentAddress = ''
-      clonedFather.postCode = '1020'
-      clonedFather.postCodePermanent = '1010'
-      clonedFather.state = 'state4'
-      clonedFather.statePermanent = 'state4'
-
+    it('Check if new place of birth location address is parsed properly', () => {
+      const clonedChild = clone(childDetails)
+      clonedChild.placeOfBirth = 'PRIVATE_HOME'
+      clonedChild.addressLine1 = 'Rd #10'
+      clonedChild.addressLine2 = 'Akua'
+      clonedChild.addressLine3 = 'union1'
+      clonedChild.addressLine4 = 'upazila10'
+      clonedChild.country = 'BGD'
+      clonedChild.district = 'district2'
+      clonedChild.postCode = '1020'
+      clonedChild.state = 'state4'
       const data = {
-        child: childDetails,
-        father: clonedFather,
+        child: clonedChild,
+        father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
         documents: { image_uploader: '' }
       }
 
-      expect(
-        draftToMutationTransformer(form, data).father.address[1].line[0]
-      ).toBe('Rd#10')
+      expect(draftToGqlTransformer(form, data).eventLocation.type).toBe(
+        'PRIVATE_HOME'
+      )
     })
     it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
       const registration = clone(registrationDetails)
@@ -792,7 +816,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToMutationTransformer(form, data).father.telecom).toBeFalsy()
+      expect(draftToGqlTransformer(form, data).father.telecom).toBeFalsy()
     })
 
     it('Pass FATHER as whoseContactDetails value', () => {
@@ -807,9 +831,9 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(
-        draftToMutationTransformer(form, data).father.telecom[0].value
-      ).toBe('01736478884')
+      expect(draftToGqlTransformer(form, data).father.telecom[0].value).toBe(
+        '01736478884'
+      )
     })
 
     it('Pass false as fathersDetailsExist on father section', () => {
@@ -824,7 +848,7 @@ describe('when user has a valid token in local storage', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToMutationTransformer(form, data).father).toBeUndefined()
+      expect(draftToGqlTransformer(form, data).father).toBeUndefined()
     })
 
     describe('when user clicks the "submit" button', () => {
@@ -865,6 +889,7 @@ describe('when user has a valid token in local storage', () => {
         })
 
         it('Should be able to click SEND FOR REVIEW Button', () => {
+          // console.log(app.debug())
           expect(
             app
               .find('#submit_form')
@@ -903,20 +928,44 @@ describe('when user has a valid token in local storage', () => {
         })
       })
     })
+
+    describe('when user clicks save as draft button', () => {
+      beforeEach(async () => {
+        app
+          .find('#save_as_draft')
+          .hostNodes()
+          .simulate('click')
+
+        await flushPromises()
+        app.update()
+      })
+      it('should display draft saved notification', () => {
+        expect(app.find('#draftsSavedNotification').hostNodes()).toHaveLength(1)
+      })
+      it('should hide draft saved notification when clicked', async () => {
+        app
+          .find('#draftsSavedNotification')
+          .hostNodes()
+          .simulate('click')
+
+        await flushPromises()
+        app.update()
+        expect(app.find('#draftsSavedNotification').hostNodes()).toHaveLength(0)
+      })
+    })
   })
   describe('when user is in the review section', () => {
     let customDraft: IDraft
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
-      birthDate: '1999-10-10',
+      childBirthDate: '1999-10-10',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'নাইম',
       firstNamesEng: 'Naim',
       gender: 'male',
       multipleBirth: '2',
-      placeOfBirth: 'HOSPITAL',
       birthType: 'SINGLE',
       weightAtBirth: '6',
       _fhirID: '1'
@@ -924,14 +973,14 @@ describe('when user has a valid token in local storage', () => {
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '234234423424234244',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       addressSameAsMother: true,
       permanentAddressSameAsMother: true,
       country: 'BGD',
       countryPermanent: 'BGD',
       currentAddress: '',
-      birthDate: '1999-10-10',
+      fatherBirthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       familyName: 'ইসলাম',
@@ -944,7 +993,7 @@ describe('when user has a valid token in local storage', () => {
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '234243453455',
+      iD: '2342434534565',
       iDType: 'NATIONAL_ID',
       country: 'BGD',
       nationality: 'BGD',
@@ -954,7 +1003,7 @@ describe('when user has a valid token in local storage', () => {
       firstNamesEng: 'Rokeya',
       maritalStatus: 'MARRIED',
       dateOfMarriage: '2010-10-10',
-      birthDate: '1999-10-10',
+      motherBirthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
       addressLine1: 'Rd #10',
       addressLine1Permanent: 'Rd#10',
@@ -1005,9 +1054,9 @@ describe('when user has a valid token in local storage', () => {
             {
               data: 'base64-data',
               type: 'image/jpeg',
-              optionValues: ['Mother', 'NID'],
+              optionValues: ['Mother', 'National ID (front)'],
               title: 'Mother',
-              description: 'NID'
+              description: 'National ID (front)'
             }
           ]
         }

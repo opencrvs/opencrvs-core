@@ -2,7 +2,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
-import * as moment from 'moment'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   IconAction,
@@ -28,7 +27,10 @@ import {
   GQLRegWorkflow,
   GQLLocation,
   GQLHumanName,
-  GQLQuery
+  GQLQuery,
+  GQLComment,
+  GQLEventRegistration,
+  GQLDeathRegistration
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   StatusGray,
@@ -45,52 +47,93 @@ import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   goToEvents as goToEventsAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
+  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToPrintCertificate as goToPrintCertificateAction
 } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
 import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { IUserDetails, ILocation, IIdentifier } from 'src/utils/userUtils'
-import { PrintCertificateAction } from '../PrintCertificate/PrintCertificateAction'
-import { IFormSection } from 'src/forms'
+import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { createNamesMap } from 'src/utils/data-formating'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { messages as rejectionMessages } from 'src/review/reject-registration'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 export const FETCH_REGISTRATION_QUERY = gql`
-  query list($locationIds: [String]) {
-    listBirthRegistrations(locationIds: $locationIds) {
-      id
-      registration {
-        trackingId
-        registrationNumber
-        status {
-          user {
+  query list($locationIds: [String], $count: Int, $skip: Int) {
+    listEventRegistrations(
+      locationIds: $locationIds
+      count: $count
+      skip: $skip
+    ) {
+      totalItems
+      results {
+        id
+        registration {
+          id
+          trackingId
+          registrationNumber
+          type
+          status {
+            id
+            user {
+              id
+              name {
+                use
+                firstNames
+                familyName
+              }
+              role
+            }
+            location {
+              id
+              name
+              alias
+            }
+            office {
+              name
+              alias
+              address {
+                district
+                state
+              }
+            }
+            type
+            timestamp
+            comments {
+              comment
+            }
+          }
+          duplicates
+        }
+        createdAt
+        ... on BirthRegistration {
+          child {
+            id
             name {
               use
               firstNames
               familyName
             }
-            role
+            birthDate
           }
-          location {
-            name
-            alias
+        }
+        ... on DeathRegistration {
+          deceased {
+            id
+            name {
+              use
+              firstNames
+              familyName
+            }
+            birthDate
+            deceased {
+              deathDate
+            }
           }
-          type
-          timestamp
         }
-        duplicates
       }
-      child {
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-      }
-      createdAt
     }
   }
 `
@@ -217,6 +260,11 @@ const messages = defineMessages({
     defaultMessage: 'D.o.B',
     description: 'Label for DoB in work queue list item'
   },
+  listItemDod: {
+    id: 'register.workQueue.labels.results.dod',
+    defaultMessage: 'D.o.D',
+    description: 'Label for DoD in work queue list item'
+  },
   listItemDateOfApplication: {
     id: 'register.workQueue.labels.results.dateOfApplication',
     defaultMessage: 'Date of application',
@@ -237,9 +285,14 @@ const messages = defineMessages({
     defaultMessage: 'Possible duplicate found',
     description: 'Label for duplicate indication in work queue'
   },
+  listItemRejectionReasonLabel: {
+    id: 'register.workQueue.labels.results.rejectionReason',
+    defaultMessage: 'Reason',
+    description: 'Label for rejection reason'
+  },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New birth registration',
+    defaultMessage: 'New registration',
     description: 'The title of new registration button'
   },
   newApplication: {
@@ -268,11 +321,6 @@ const messages = defineMessages({
     id: 'register.workQueue.list.buttons.print',
     defaultMessage: 'Print',
     description: 'The title of print button in list item actions'
-  },
-  certificateCollectionActionTitle: {
-    id: 'register.workQueue.title.certificateCollection',
-    defaultMessage: 'Certificate Collection',
-    description: 'The title of print certificate action'
   },
   printCertificate: {
     id: 'register.workQueue.list.buttons.printCertificate',
@@ -307,12 +355,6 @@ const messages = defineMessages({
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
   },
-  back: {
-    id: 'menu.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  },
-
   EditBtnText: {
     id: 'review.edit.modal.editButton',
     defaultMessage: 'Edit',
@@ -324,34 +366,54 @@ const messages = defineMessages({
     description: 'Print Certificate Button text'
   },
   FIELD_AGENT: {
-    id: 'register.home.hedaer.FIELD_AGENT',
+    id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
   REGISTRATION_CLERK: {
-    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    id: 'register.home.header.REGISTRATION_CLERK',
     defaultMessage: 'Registration Clerk',
     description: 'The description for REGISTRATION_CLERK role'
   },
   LOCAL_REGISTRAR: {
-    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    id: 'register.home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
     description: 'The description for LOCAL_REGISTRAR role'
   },
   DISTRICT_REGISTRAR: {
-    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    id: 'register.home.header.DISTRICT_REGISTRAR',
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role'
   },
   STATE_REGISTRAR: {
-    id: 'register.home.hedaer.STATE_REGISTRAR',
+    id: 'register.home.header.STATE_REGISTRAR',
     defaultMessage: 'State Registrar',
     description: 'The description for STATE_REGISTRAR role'
   },
   NATIONAL_REGISTRAR: {
-    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
+  },
+  application: {
+    id: 'register.workQueue.statusLabel.application',
+    defaultMessage: 'application',
+    description: 'The status label for application'
+  },
+  registered: {
+    id: 'register.workQueue.statusLabel.registered',
+    defaultMessage: 'registered',
+    description: 'The status label for registered'
+  },
+  rejected: {
+    id: 'register.workQueue.statusLabel.rejected',
+    defaultMessage: 'rejected',
+    description: 'The status label for rejected'
+  },
+  collected: {
+    id: 'register.workQueue.statusLabel.collected',
+    defaultMessage: 'collected',
+    description: 'The status label for collected'
   }
 })
 
@@ -459,13 +521,28 @@ function formatRoleCode(str: string) {
   return formattedString.join(' ')
 }
 
+function getRejectionReasonDisplayValue(reason: string) {
+  switch (reason) {
+    case 'duplicate':
+      return rejectionMessages.rejectionReasonDuplicate
+    case 'misspelling':
+      return rejectionMessages.rejectionReasonMisspelling
+    case 'missing_supporting_doc':
+      return rejectionMessages.rejectionReasonMissingSupportingDoc
+    case 'other':
+      return rejectionMessages.rejectionReasonOther
+    default:
+      return rejectionMessages.rejectionReasonOther
+  }
+}
+
 const ExpansionContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  margin-bottom: 1px;
+  margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
   }
@@ -497,6 +574,11 @@ const StatusIcon = styled.div`
   margin-top: 3px;
 `
 
+const StatusIconCollected = styled.div`
+  padding-left: 6px;
+  margin-top: 3px;
+`
+
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -505,7 +587,7 @@ interface IBaseWorkQueueProps {
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
-  printForm: IFormSection
+  goToPrintCertificate: typeof goToPrintCertificateAction
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -516,6 +598,7 @@ type IWorkQueueProps = InjectedIntlProps &
 interface IWorkQueueState {
   printCertificateModalVisible: boolean
   regId: string | null
+  currentPage: number
 }
 
 interface IData {
@@ -530,7 +613,8 @@ export class WorkQueueView extends React.Component<
   IWorkQueueProps,
   IWorkQueueState
 > {
-  state = { printCertificateModalVisible: false, regId: null }
+  state = { printCertificateModalVisible: false, regId: null, currentPage: 1 }
+  pageSize = 10
 
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
@@ -552,11 +636,11 @@ export class WorkQueueView extends React.Component<
             <StatusRejected />
           </StatusIcon>
         )
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return (
-          <StatusIcon>
+          <StatusIconCollected>
             <StatusCollected />
-          </StatusIcon>
+          </StatusIconCollected>
         )
       default:
         return (
@@ -564,6 +648,21 @@ export class WorkQueueView extends React.Component<
             <StatusOrange />
           </StatusIcon>
         )
+    }
+  }
+
+  getDeclarationStatusLabel = (status: string) => {
+    switch (status) {
+      case 'APPLICATION':
+        return this.props.intl.formatMessage(messages.application)
+      case 'REGISTERED':
+        return this.props.intl.formatMessage(messages.registered)
+      case 'REJECTED':
+        return this.props.intl.formatMessage(messages.rejected)
+      case 'CERTIFIED':
+        return this.props.intl.formatMessage(messages.collected)
+      default:
+        return this.props.intl.formatMessage(messages.application)
     }
   }
 
@@ -575,83 +674,138 @@ export class WorkQueueView extends React.Component<
         return messages.workflowStatusDateRegistered
       case 'REJECTED':
         return messages.workflowStatusDateRejected
-      case 'COLLECTED':
+      case 'CERTIFIED':
         return messages.workflowStatusDateCollected
       default:
         return messages.workflowStatusDateApplication
     }
   }
 
-  togglePrintModal = (id?: string) => {
-    this.setState(prevState => ({
-      printCertificateModalVisible: !prevState.printCertificateModalVisible,
-      regId: id ? id : ''
-    }))
+  getEventLabel = (status: string) => {
+    switch (status) {
+      case 'BIRTH':
+        return this.props.intl.formatMessage(messages.filtersBirth)
+      case 'DEATH':
+        return this.props.intl.formatMessage(messages.filtersDeath)
+      case 'MARRIAGE':
+        return this.props.intl.formatMessage(messages.filtersMarriage)
+      default:
+        return this.props.intl.formatMessage(messages.filtersBirth)
+    }
   }
 
   transformData = (data: GQLQuery) => {
-    if (!data.listBirthRegistrations) {
+    const { locale } = this.props.intl
+    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
       return []
     }
 
-    return data.listBirthRegistrations.map((reg: GQLBirthRegistration) => {
-      const childNames = (reg.child && (reg.child.name as GQLHumanName[])) || []
-      const lang = 'bn'
-      return {
-        id: reg.id,
-        name:
-          (createNamesMap(childNames)[lang] as string) ||
-          /* tslint:disable:no-string-literal */
-          (createNamesMap(childNames)['default'] as string) ||
-          /* tslint:enable:no-string-literal */
-          '',
-        dob: (reg.child && reg.child.birthDate) || '',
-        date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
-        registrationNumber:
-          (reg.registration && reg.registration.registrationNumber) || '',
-        tracking_id: (reg.registration && reg.registration.trackingId) || '',
-        createdAt: reg.createdAt as string,
-        status:
+    return data.listEventRegistrations.results.map(
+      (reg: GQLEventRegistration) => {
+        let birthReg
+        let deathReg
+        let names
+        if (reg.registration && reg.registration.type === 'BIRTH') {
+          birthReg = reg as GQLBirthRegistration
+          names =
+            (birthReg &&
+              birthReg.child &&
+              (birthReg.child.name as GQLHumanName[])) ||
+            []
+        } else {
+          deathReg = reg as GQLDeathRegistration
+          names =
+            (deathReg &&
+              deathReg.deceased &&
+              (deathReg.deceased.name as GQLHumanName[])) ||
+            []
+        }
+        const lang = 'bn'
+        const type =
           reg.registration &&
           reg.registration.status &&
-          reg.registration.status.map(status => {
-            return {
-              type: status && status.type,
-              practitionerName:
-                (status &&
-                  status.user &&
-                  (createNamesMap(status.user.name as GQLHumanName[])[
-                    this.props.language
-                  ] as string)) ||
-                (status &&
-                  status.user &&
-                  /* tslint:disable:no-string-literal */
-                  (createNamesMap(status.user.name as GQLHumanName[])[
-                    'default'
-                  ] as string)) ||
-                /* tslint:enable:no-string-literal */
-                '',
-              timestamp:
-                status && moment(status.timestamp).format('YYYY-MM-DD'),
-              practitionerRole: status && status.user && status.user.role,
-              location: status && status.location && status.location.name
-            }
-          }),
-        declaration_status:
-          reg.registration &&
-          reg.registration.status &&
-          (reg.registration.status[0] as GQLRegWorkflow).type,
-        event: 'birth',
-        duplicates: reg.registration && reg.registration.duplicates,
-        location:
-          (reg.registration &&
+          (reg.registration.status[0] as GQLRegWorkflow).type
+        return {
+          id: reg.id,
+          name:
+            (createNamesMap(names)[lang] as string) ||
+            /* tslint:disable:no-string-literal */
+            (createNamesMap(names)['default'] as string) ||
+            /* tslint:enable:no-string-literal */
+            '',
+          dob:
+            (birthReg &&
+              birthReg.child &&
+              birthReg.child.birthDate &&
+              formatLongDate(birthReg.child.birthDate, locale)) ||
+            '',
+          dod:
+            (deathReg &&
+              deathReg.deceased &&
+              deathReg.deceased.deceased &&
+              deathReg.deceased.deceased.deathDate &&
+              formatLongDate(deathReg.deceased.deceased.deathDate, locale)) ||
+            '',
+          date_of_application: formatLongDate(reg.createdAt, locale),
+          registrationNumber:
+            (reg.registration && reg.registration.registrationNumber) || '',
+          tracking_id: (reg.registration && reg.registration.trackingId) || '',
+          createdAt: reg.createdAt as string,
+          status:
+            reg.registration &&
             reg.registration.status &&
-            (reg.registration.status[0] as GQLRegWorkflow).location &&
-            ((reg.registration.status[0] as GQLRegWorkflow)
-              .location as GQLLocation).name) ||
-          ''
+            reg.registration.status
+              .map(status => {
+                return {
+                  type: status && status.type,
+                  practitionerName:
+                    (status &&
+                      status.user &&
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        this.props.language
+                      ] as string)) ||
+                    (status &&
+                      status.user &&
+                      /* tslint:disable:no-string-literal */
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        'default'
+                      ] as string)) ||
+                    /* tslint:enable:no-string-literal */
+                    '',
+                  timestamp: status && formatLongDate(status.timestamp, locale),
+                  practitionerRole: status && status.user && status.user.role,
+                  officeName: status && status.office && status.office.name
+                }
+              })
+              .reverse(),
+          declaration_status:
+            reg.registration &&
+            reg.registration.status &&
+            (reg.registration.status[0] as GQLRegWorkflow).type,
+          event: reg.registration && reg.registration.type,
+          rejection_reason:
+            (type === 'REJECTED' &&
+              (reg.registration &&
+                reg.registration.status &&
+                (reg.registration.status[0] as GQLRegWorkflow).comments &&
+                ((reg.registration.status[0] as GQLRegWorkflow)
+                  .comments as GQLComment[]) &&
+                ([
+                  ...((reg.registration.status[0] as GQLRegWorkflow)
+                    .comments as GQLComment[])
+                ].pop() as GQLComment).comment)) ||
+            '',
+          duplicates: reg.registration && reg.registration.duplicates,
+          location:
+            (reg.registration &&
+              reg.registration.status &&
+              (reg.registration.status[0] as GQLRegWorkflow).location &&
+              ((reg.registration.status[0] as GQLRegWorkflow)
+                .location as GQLLocation).name) ||
+            ''
+        }
       }
-    })
+    )
   }
 
   getApplicationData = (
@@ -666,16 +820,13 @@ export class WorkQueueView extends React.Component<
     })
   }
 
-  renderExpansionContent = (
-    item: {
-      [key: string]: string & Array<{ [key: string]: string }>
-    },
-    key: number
-  ): JSX.Element[] => {
-    return item.status.map(status => {
-      const { practitionerName, practitionerRole, location } = status
+  renderExpansionContent = (item: {
+    [key: string]: string & Array<{ [key: string]: string }>
+  }): JSX.Element[] => {
+    return item.status.map((status, i) => {
+      const { practitionerName, practitionerRole, officeName } = status
       return (
-        <ExpansionContainer key={key}>
+        <ExpansionContainer key={i}>
           {this.getDeclarationStatusIcon(status.type)}
           <ExpansionContentContainer>
             <LabelValue
@@ -695,7 +846,7 @@ export class WorkQueueView extends React.Component<
                 strings={[
                   practitionerName,
                   formatRoleCode(practitionerRole),
-                  location
+                  officeName
                 ]}
                 separator={<Separator />}
               />
@@ -721,6 +872,7 @@ export class WorkQueueView extends React.Component<
     key: number
   ): JSX.Element => {
     const applicationIsRegistered = item.declaration_status === 'REGISTERED'
+    const applicationIsCertified = item.declaration_status === 'CERTIFIED'
     const applicationIsRejected = item.declaration_status === 'REJECTED'
     const info = []
     const status = []
@@ -730,21 +882,29 @@ export class WorkQueueView extends React.Component<
       label: this.props.intl.formatMessage(messages.listItemName),
       value: item.name
     })
-    info.push({
-      label: this.props.intl.formatMessage(messages.listItemDob),
-      value: item.dob
-    })
+    if (item.dob) {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemDob),
+        value: item.dob
+      })
+    }
+    if (item.dod) {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemDod),
+        value: item.dod
+      })
+    }
     info.push({
       label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
       value: item.date_of_application
     })
-    if (!applicationIsRegistered) {
+    if (!applicationIsRegistered || !applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
         value: item.tracking_id
       })
     }
-    if (applicationIsRegistered) {
+    if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
           messages.listItemBirthRegistrationNumber
@@ -753,11 +913,39 @@ export class WorkQueueView extends React.Component<
       })
     }
 
-    status.push({ icon: <StatusGray />, label: item.event })
+    status.push({
+      icon: <StatusGray />,
+      label: this.getEventLabel(item.event)
+    })
     status.push({
       icon: this.getDeclarationStatusIcon(item.declaration_status),
-      label: item.declaration_status
+      label: this.getDeclarationStatusLabel(item.declaration_status)
     })
+
+    if (applicationIsRejected && item.rejection_reason) {
+      const parsedComment = item.rejection_reason.split('&')[0]
+      const parsedReason = parsedComment && parsedComment.split('=')[1]
+      const reasons = parsedReason && parsedReason.split(',')
+
+      info.push({
+        label: this.props.intl.formatMessage(
+          messages.listItemRejectionReasonLabel
+        ),
+        value:
+          reasons &&
+          reasons
+            .reduce(
+              (prev, curr) => [
+                ...prev,
+                this.props.intl.formatMessage(
+                  getRejectionReasonDisplayValue(curr)
+                )
+              ],
+              []
+            )
+            .join(', ')
+      })
+    }
 
     if (item.duplicates && item.duplicates.length > 0) {
       icons.push(<Duplicate />)
@@ -767,16 +955,16 @@ export class WorkQueueView extends React.Component<
 
     const expansionActions: JSX.Element[] = []
     if (this.userHasCertifyScope()) {
-      if (applicationIsRegistered) {
+      if (applicationIsRegistered || applicationIsCertified) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.print),
-          handler: () => this.togglePrintModal(item.id)
+          handler: () => this.props.goToPrintCertificate(item.id)
         })
 
         expansionActions.push(
           <StyledPrimaryButton
             id={`printCertificate_${item.tracking_id}`}
-            onClick={() => this.togglePrintModal(item.id)}
+            onClick={() => this.props.goToPrintCertificate(item.id)}
           >
             {this.props.intl.formatMessage(messages.printCertificateBtnText)}
           </StyledPrimaryButton>
@@ -786,9 +974,10 @@ export class WorkQueueView extends React.Component<
 
     if (this.userHasRegisterScope()) {
       if (
-        !item.duplicates &&
+        !(item.duplicates && item.duplicates.length > 0) &&
         !applicationIsRegistered &&
-        !applicationIsRejected
+        !applicationIsRejected &&
+        !applicationIsCertified
       ) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
@@ -857,7 +1046,7 @@ export class WorkQueueView extends React.Component<
         actions={listItemActions}
         expandedCellRenderer={() => (
           <ListItemExpansion actions={expansionActions}>
-            {this.renderExpansionContent(item, key)}
+            {this.renderExpansionContent(item)}
           </ListItemExpansion>
         )}
       />
@@ -878,7 +1067,7 @@ export class WorkQueueView extends React.Component<
     const area = this.props.userDetails && this.props.userDetails.catchmentArea
     const identifier =
       area &&
-      area.find((location: ILocation) => {
+      area.find((location: IGQLLocation) => {
         return (
           (location.identifier &&
             location.identifier.find((areaIdentifier: IIdentifier) => {
@@ -903,34 +1092,12 @@ export class WorkQueueView extends React.Component<
     }
   }
 
-  getIssuerDetails() {
-    const { intl, userDetails, language } = this.props
-    let fullName = ''
-
-    if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
-      ) as GQLHumanName
-      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-    }
-
-    return {
-      name: fullName,
-      role:
-        userDetails && userDetails.role
-          ? intl.formatMessage(messages[userDetails.role])
-          : '',
-      issuedAt:
-        userDetails &&
-        userDetails.primaryOffice &&
-        userDetails.primaryOffice.name
-          ? userDetails.primaryOffice.name
-          : ''
-    }
+  onPageChange = async (newPageNumber: number) => {
+    this.setState({ currentPage: newPageNumber })
   }
 
   render() {
-    const { intl, theme, printForm } = this.props
+    const { intl, theme, userDetails, language } = this.props
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -993,15 +1160,15 @@ export class WorkQueueView extends React.Component<
                 label: intl.formatMessage(messages.filtersAllStatuses)
               },
               {
-                value: 'application',
+                value: 'DECLARED',
                 label: intl.formatMessage(messages.filtersApplication)
               },
               {
-                value: 'registered',
+                value: 'REGISTERED',
                 label: intl.formatMessage(messages.filtersRegistered)
               },
               {
-                value: 'collected',
+                value: 'CERTIFIED',
                 label: intl.formatMessage(messages.filtersCollected)
               }
             ],
@@ -1026,13 +1193,27 @@ export class WorkQueueView extends React.Component<
         ]
       }
     }
+
+    let fullName = ''
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName) => storedName.use === language
+      ) as GQLHumanName
+      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    }
+
+    const role =
+      userDetails && userDetails.role
+        ? intl.formatMessage(messages[userDetails.role])
+        : ''
+
     return (
       <>
         <HomeViewHeader
           title={intl.formatMessage(messages.hello, {
-            fullName: this.getIssuerDetails().name
+            fullName
           })}
-          description={this.getIssuerDetails().role}
+          description={role}
           id="home_view"
         />
         <Container>
@@ -1040,7 +1221,9 @@ export class WorkQueueView extends React.Component<
             <Query
               query={FETCH_REGISTRATION_QUERY}
               variables={{
-                locationIds: [this.getLocalLocationId()]
+                locationIds: [this.getLocalLocationId()],
+                count: this.pageSize,
+                skip: (this.state.currentPage - 1) * this.pageSize
               }}
             >
               {({ loading, error, data }) => {
@@ -1094,6 +1277,16 @@ export class WorkQueueView extends React.Component<
                       noResultText={intl.formatMessage(
                         messages.dataTableNoResults
                       )}
+                      onPageChange={(currentPage: number) => {
+                        this.onPageChange(currentPage)
+                      }}
+                      pageSize={this.pageSize}
+                      totalPages={Math.ceil(
+                        ((data.listEventRegistrations &&
+                          data.listEventRegistrations.totalItems) ||
+                          0) / this.pageSize
+                      )}
+                      initialPage={this.state.currentPage}
                     />
                   </>
                 )
@@ -1101,18 +1294,6 @@ export class WorkQueueView extends React.Component<
             </Query>
           </HeaderContent>
         </Container>
-        {this.state.printCertificateModalVisible ? (
-          <PrintCertificateAction
-            title={this.props.intl.formatMessage(
-              messages.certificateCollectionActionTitle
-            )}
-            backLabel={this.props.intl.formatMessage(messages.back)}
-            registrationId={(this.state.regId && this.state.regId) || ''}
-            togglePrintCertificateSection={this.togglePrintModal}
-            printCertificateFormSection={printForm}
-            IssuerDetails={this.getIssuerDetails()}
-          />
-        ) : null}
       </>
     )
   }
@@ -1121,12 +1302,12 @@ export const WorkQueue = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: getUserDetails(state),
-    printForm: state.printCertificateForm.collectCertificateFrom
+    userDetails: getUserDetails(state)
   }),
   {
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
-    goToReviewDuplicate: goToReviewDuplicateAction
+    goToReviewDuplicate: goToReviewDuplicateAction,
+    goToPrintCertificate: goToPrintCertificateAction
   }
 )(injectIntl(withTheme(WorkQueueView)))

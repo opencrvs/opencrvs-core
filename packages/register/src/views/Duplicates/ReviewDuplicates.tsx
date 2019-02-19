@@ -29,6 +29,7 @@ import {
   GQLLocation,
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 interface IMatchParams {
   applicationId: string
@@ -78,14 +79,34 @@ const messages = defineMessages({
     description: 'The duplicates text for female'
   },
   FIELD_AGENT: {
-    id: 'register.duplicates.field-agent',
-    defaultMessage: 'Field agent',
-    description: 'The duplicates text for field agent'
+    id: 'register.home.header.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
   },
-  REGISTRAR: {
-    id: 'register.duplicates.registrar',
+  REGISTRATION_CLERK: {
+    id: 'register.home.header.REGISTRATION_CLERK',
+    defaultMessage: 'Registration Clerk',
+    description: 'The description for REGISTRATION_CLERK role'
+  },
+  LOCAL_REGISTRAR: {
+    id: 'register.home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
-    description: 'The duplicates text for registrar'
+    description: 'The description for LOCAL_REGISTRAR role'
+  },
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.header.DISTRICT_REGISTRAR',
+    defaultMessage: 'District Registrar',
+    description: 'The description for DISTRICT_REGISTRAR role'
+  },
+  STATE_REGISTRAR: {
+    id: 'register.home.header.STATE_REGISTRAR',
+    defaultMessage: 'State Registrar',
+    description: 'The description for STATE_REGISTRAR role'
+  },
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.header.NATIONAL_REGISTRAR',
+    defaultMessage: 'National Registrar',
+    description: 'The description for NATIONAL_REGISTRAR role'
   },
   queryError: {
     id: 'register.duplicates.queryError',
@@ -149,6 +170,7 @@ export const FETCH_DUPLICATES = gql`
     fetchBirthRegistration(id: $id) {
       id
       registration {
+        id
         duplicates
       }
     }
@@ -165,6 +187,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
       createdAt
       id
       registration {
+        id
         trackingId
         type
         status {
@@ -184,6 +207,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
         }
       }
       child {
+        id
         name {
           use
           firstNames
@@ -193,6 +217,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
         gender
       }
       mother {
+        id
         name {
           use
           firstNames
@@ -206,6 +231,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
         }
       }
       father {
+        id
         name {
           use
           firstNames
@@ -258,6 +284,8 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     language: string,
     intl: ReactIntl.InjectedIntl
   ) {
+    const { locale } = this.props.intl
+
     return Object.keys(data).map(key => {
       const rec = data[key]
 
@@ -293,7 +321,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           Event.BIRTH,
         child: {
           name: childNamesMap[language],
-          dob: (rec.child && rec.child.birthDate) || '',
+          dob:
+            (rec.child &&
+              rec.child.birthDate &&
+              formatLongDate(rec.child.birthDate, locale)) ||
+            '',
           gender:
             (rec.child &&
               rec.child.gender &&
@@ -303,7 +335,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         mother: {
           name: motherNamesMap[language],
           dob:
-            (rec.mother && rec.mother.birthDate && rec.mother.birthDate) || '',
+            (rec.mother &&
+              rec.mother.birthDate &&
+              formatLongDate(rec.mother.birthDate, locale)) ||
+            '',
           id:
             (rec.mother &&
               rec.mother.identifier &&
@@ -314,7 +349,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         father: {
           name: fatherNamesMap[language],
           dob:
-            (rec.father && rec.father.birthDate && rec.father.birthDate) || '',
+            (rec.father &&
+              rec.father.birthDate &&
+              formatLongDate(rec.father.birthDate, locale)) ||
+            '',
           id:
             (rec.father &&
               rec.father.identifier &&
@@ -322,48 +360,29 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               (rec.father.identifier[0] as GQLIdentityType).id) ||
             ''
         },
-        regStatusHistory: [
-          {
-            action:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                Action[
-                  (rec.registration.status[0] as GQLRegWorkflow)
-                    .type as GQLRegStatus
-                ]) ||
-              Action.DECLARED,
-            date:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                (rec.registration.status[0] as GQLRegWorkflow).timestamp) ||
-              '',
-            usersName: userNamesMap[language],
-            usersRole:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                (rec.registration.status[0] as GQLRegWorkflow).user &&
-                ((rec.registration.status[0] as GQLRegWorkflow).user as GQLUser)
-                  .role &&
-                intl.formatMessage(
-                  messages[
-                    ((rec.registration.status[0] as GQLRegWorkflow)
-                      .user as GQLUser).role as string
-                  ]
-                )) ||
-              '',
-            office:
-              (rec.registration &&
-                rec.registration.status &&
-                rec.registration.status[0] &&
-                (rec.registration.status[0] as GQLRegWorkflow).office &&
-                ((rec.registration.status[0] as GQLRegWorkflow)
-                  .office as GQLLocation).name) ||
-              ''
-          }
-        ]
+        regStatusHistory:
+          (rec.registration &&
+            rec.registration.status &&
+            rec.registration.status
+              .map((status: GQLRegWorkflow) => {
+                return {
+                  action:
+                    Action[status.type as GQLRegStatus] || Action.DECLARED,
+                  date: formatLongDate(status.timestamp, locale) || '',
+                  usersName: userNamesMap[language],
+                  usersRole:
+                    (status.user &&
+                      (status.user as GQLUser).role &&
+                      intl.formatMessage(
+                        messages[(status.user as GQLUser).role as string]
+                      )) ||
+                    '',
+                  office:
+                    (status.office && (status.office as GQLLocation).name) || ''
+                }
+              })
+              .reverse()) ||
+          []
       }
     })
   }
@@ -386,7 +405,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
 
   successfulDuplicateRemoval = (response: string) => {
     this.toggleNotDuplicateModal()
-    window.location.reload()
+    if (response === this.state.selectedCompositionID) {
+      window.location.assign('/work-queue')
+    } else {
+      window.location.reload()
+    }
   }
 
   render() {
@@ -397,7 +420,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     return (
       <ActionPage
         goBack={() => {
-          window.location.href = WORK_QUEUE
+          window.location.assign(WORK_QUEUE)
         }}
         title={intl.formatMessage(messages.pageTitle)}
       >
@@ -426,6 +449,12 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               )
             }
 
+            if (
+              data.fetchBirthRegistration.registration.duplicates.length <= 0
+            ) {
+              window.location.assign(WORK_QUEUE)
+            }
+
             let duplicateIds = [applicationId]
             if (data.fetchBirthRegistration.registration.duplicates) {
               duplicateIds = duplicateIds.concat(
@@ -452,7 +481,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   }
 
                   if (errorDetails) {
-                    console.error(error)
+                    console.error(errorDetails)
 
                     return (
                       <ErrorText id="duplicates-error-text">
@@ -483,6 +512,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                           <DuplicateDetails
                             id={`duplicate-details-item-${i}`}
                             key={i}
+                            duplicateContextId={applicationId}
                             data={duplicateData}
                             notDuplicateHandler={() =>
                               this.toggleNotDuplicateModal(duplicateData.id)

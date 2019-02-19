@@ -1,7 +1,10 @@
 import ApolloClient from 'apollo-client'
 import { setContext } from 'apollo-link-context'
 import { createHttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
+import {
+  InMemoryCache,
+  IntrospectionFragmentMatcher
+} from 'apollo-cache-inmemory'
 import { resolve } from 'url'
 import { onError } from 'apollo-link-error'
 import { showSessionExpireConfirmation } from 'src/notification/actions'
@@ -36,9 +39,21 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
     }
   })
 
+  /*
+  Use IntrospectionFragmentMatcher to remove the warning of using inteface in GraphQL Query
+  This change is suggested in the following link:
+  https://www.apollographql.com/docs/react/advanced/fragments.html#fragment-matcher
+   */
+  const fragmentMatcher = new IntrospectionFragmentMatcher({
+    introspectionQueryResultData: {
+      __schema: {
+        types: [] // no types provided
+      }
+    }
+  })
   client = new ApolloClient({
     link: from([errorLink, authLink, httpLink]),
-    cache: new InMemoryCache()
+    cache: new InMemoryCache({ fragmentMatcher })
   })
   return client
 }

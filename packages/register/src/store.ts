@@ -35,10 +35,7 @@ import {
   IRejectState,
   rejectReducer
 } from '@opencrvs/register/src/review/reducer'
-import {
-  IPrintFormState,
-  printReducer
-} from './views/PrintCertificate/printReducer'
+import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -75,7 +72,6 @@ export type AppStore = Store<IStoreState, AnyAction>
 export const createStore = (): { store: AppStore; history: History } => {
   const history = createBrowserHistory()
   const middleware = routerMiddleware(history)
-
   const enhancer = compose(
     install(),
     applyMiddleware(middleware),

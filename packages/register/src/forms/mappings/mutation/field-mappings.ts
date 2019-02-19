@@ -1,11 +1,6 @@
-import {
-  IFormField,
-  IFormData,
-  IFormFieldValue,
-  IAttachment
-} from '../../../forms'
+import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
 
-export const nameTransformer = (
+export const fieldToNameTransformer = (
   language: string,
   transformedFieldName?: string
 ) => (
@@ -35,6 +30,16 @@ export const nameTransformer = (
   return transformedData
 }
 
+export function ignoreFieldTransformer(
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) {
+  /* do nothing */
+  return transformedData
+}
+
 export function fieldToArrayTransformer(
   transformedData: any,
   draftData: IFormData,
@@ -45,35 +50,21 @@ export function fieldToArrayTransformer(
   return transformedData
 }
 
-export function identifierTransformer(
+export const fieldToIdentifierTransformer = (identifierField: string) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
-) {
+) => {
   const sectionData = transformedData[sectionId]
   if (!sectionData.identifier) {
     sectionData.identifier = [{}]
   }
-  sectionData.identifier[0].id = draftData[sectionId][field.name]
+  sectionData.identifier[0][identifierField] = draftData[sectionId][field.name]
   return transformedData
 }
 
-export function identifierTypeTransformer(
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = [{}]
-  }
-  sectionData.identifier[0].type = draftData[sectionId][field.name]
-  return transformedData
-}
-
-export const addressTransformer = (
+export const fieldToAddressTransformer = (
   addressType: string,
   lineNumber: number = 0,
   transformedFieldName?: string
@@ -93,7 +84,7 @@ export const addressTransformer = (
   if (!address) {
     address = {
       type: addressType,
-      line: ['', '', '', '']
+      line: ['', '', '', '', '', '']
     }
     sectionData.address.push(address)
   }
@@ -117,13 +108,83 @@ export const fieldNameTransformer = (transformedFieldName: string) => (
   return transformedData
 }
 
-export function sectionFieldToBundleFieldTransformer(
+export const fieldValueSectionExchangeTransformer = (
+  toSectionId: string,
+  toSectionField?: string
+) => (
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
-) {
-  transformedData[field.name] = draftData[sectionId][field.name]
+) => {
+  if (!transformedData[toSectionId]) {
+    transformedData[toSectionId] = {}
+  }
+  transformedData[toSectionId][toSectionField ? toSectionField : field.name] =
+    draftData[sectionId][field.name]
+  return transformedData
+}
+
+export const sectionFieldToBundleFieldTransformer = (
+  transformedFieldName?: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (transformedFieldName) {
+    transformedData[transformedFieldName] = draftData[sectionId][field.name]
+  } else {
+    transformedData[field.name] = draftData[sectionId][field.name]
+  }
+  return transformedData
+}
+
+export const copyEventAddressTransformer = (fromSection: string) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fromSectionData = transformedData[fromSection]
+
+  if (!fromSectionData.address) {
+    return transformedData
+  }
+  if (draftData[sectionId][field.name] === 'OTHER') {
+    return transformedData
+  }
+
+  const address = (fromSectionData.address as [fhir.Address]).find(
+    addr => addr.type === draftData[sectionId][field.name]
+  )
+  if (!address) {
+    return transformedData
+  }
+  if (!transformedData.eventLocation) {
+    transformedData.eventLocation = {
+      address: {
+        country: '',
+        state: '',
+        district: '',
+        postalCode: '',
+        line: ['', '', '', '', '', '']
+      } as fhir.Address
+    } as fhir.Location
+  } else {
+    transformedData.eventLocation = {
+      address: {
+        ...address
+      } as fhir.Address
+    } as fhir.Location
+  }
+
+  transformedData.eventLocation.type = draftData[sectionId][field.name]
+  if (address && address.line && address.line[5]) {
+    transformedData.eventLocation.partOf = `Location/${address.line[5]}`
+  }
+
   return transformedData
 }
 
@@ -132,7 +193,8 @@ export const copyAddressTransformer = (
   fromSection: string,
   toAddressType: string,
   toSection: string,
-  triggerValue: boolean = true
+  triggerValue: boolean = true,
+  nodeName?: string
 ) => (
   transformedData: any,
   draftData: IFormData,
@@ -143,7 +205,11 @@ export const copyAddressTransformer = (
     return transformedData
   }
 
-  const fromSectionData = transformedData[fromSection]
+  let fromSectionData = transformedData[fromSection]
+  if (nodeName) {
+    fromSectionData = transformedData[fromSection][nodeName]
+  }
+
   if (!fromSectionData.address) {
     throw new Error(`Address data not found on section ${sectionId}`)
   }
@@ -187,7 +253,7 @@ export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
   return transformedData
 }
 
-export function commentTransformer(
+export function fieldToCommentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
@@ -197,7 +263,7 @@ export function commentTransformer(
     {
       comments: [
         {
-          comment: draftData[sectionId][field.name],
+          comment: draftData[sectionId][field.name] || '',
           createdAt: new Date()
         }
       ],
@@ -207,17 +273,7 @@ export function commentTransformer(
   return transformedData
 }
 
-export function ignoreValueTransformer(
-  transformedData: any,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) {
-  /* don't include the value on transformed data */
-  return transformedData
-}
-
-export function attachmentTransformer(
+export function fieldToAttachmentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
@@ -226,6 +282,9 @@ export function attachmentTransformer(
   subjectMapper?: any,
   typeMapper?: any
 ) {
+  if (draftData[sectionId][field.name] === []) {
+    return transformedData
+  }
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     attachment => {
       return {
@@ -241,9 +300,27 @@ export function attachmentTransformer(
     }
   )
   if (attachments) {
-    transformedData[
-      alternateSectionId ? alternateSectionId : sectionId
-    ].attachments = attachments
+    const selectedSectionId = alternateSectionId
+      ? alternateSectionId
+      : sectionId
+    if (!transformedData[selectedSectionId]) {
+      transformedData[selectedSectionId] = {}
+    }
+    transformedData[selectedSectionId].attachments = attachments
   }
+  return transformedData
+}
+
+export const fieldToPhoneNumberTransformer = (
+  transformedSectionId?: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  transformedData[
+    transformedSectionId ? transformedSectionId : sectionId
+  ].telecom = [{ system: 'phone', value: draftData[sectionId][field.name] }]
   return transformedData
 }

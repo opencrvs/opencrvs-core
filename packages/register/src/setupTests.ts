@@ -28,5 +28,6 @@ Object.defineProperty(window, 'localStorage', {
   LANGUAGE: 'en',
   LOGIN_URL: 'http://localhost:3020',
   PERFORMANCE_URL: 'http://localhost:3001',
-  RESOURCES_URL: 'http://localhost:3040/'
+  RESOURCES_URL: 'http://localhost:3040/',
+  HEALTH_FACILITY_FILTER: 'UPAZILA'
 }

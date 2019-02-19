@@ -25,6 +25,7 @@ import { getOfflineState } from 'src/offline/selectors'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
+  OFFLINE_FACILITIES_KEY,
   ILocation
 } from 'src/offline/reducer'
 import { getLanguage } from 'src/i18n/selectors'
@@ -53,8 +54,10 @@ import {
   ISelectOption,
   IDynamicOptions,
   IFormSectionData,
-  Event
+  WARNING,
+  DATE
 } from 'src/forms'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 const messages = defineMessages({
   valueYes: {
@@ -264,7 +267,7 @@ const DraftButtonContainer = styled.div`
 `
 interface IProps {
   draft: IDraft
-  registerForm: IForm
+  registerForm: { [key: string]: IForm }
   tabRoute: string
   registerClickEvent?: () => void
   rejectApplicationClickEvent?: () => void
@@ -343,7 +346,13 @@ export function renderSelectDynamicLabel(
     return selectedOption ? intl.formatMessage(selectedOption.label) : value
   } else {
     if (options.resource) {
-      const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+      let locations: ILocation[]
+      if (options.resource === 'locations') {
+        locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+      } else {
+        locations = resources[OFFLINE_FACILITIES_KEY] as ILocation[]
+      }
+
       const selectedLocation = locations.filter((location: ILocation) => {
         return location.id === value
       })[0]
@@ -387,6 +396,11 @@ const renderValue = (
       language
     )
   }
+
+  if (field.type === DATE && value && typeof value === 'string') {
+    return formatLongDate(value)
+  }
+
   if (typeof value === 'string') {
     return value
   }
@@ -458,11 +472,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
 
+    const event = this.props.draft.event
+
     this.state = {
       displayEditDialog: false,
       allSectionVisited: false,
       editClickedSectionId: '',
-      sectionExpansionConfig: getSectionExpansionConfig(props.registerForm)
+      sectionExpansionConfig: getSectionExpansionConfig(
+        props.registerForm[event]
+      )
     }
   }
 
@@ -536,22 +554,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       deleteApplicationClickEvent,
       offlineResources,
       language,
-      tabRoute
+      tabRoute,
+      draft: { event }
     } = this.props
 
-    const formSections = getViewableSection(registerForm)
+    const formSections = getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
 
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
-        draft.data[section.id] || {}
+        draft.data[section.id] || {},
+        offlineResources
       )
       return !conditionalActions.includes('hide')
     }
     const isViewOnly = (field: IFormField) => {
-      return [LIST, PARAGRAPH].find(type => type === field.type)
+      return [LIST, PARAGRAPH, WARNING].find(type => type === field.type)
     }
 
     const numberOfErrors = flatten(
@@ -611,7 +631,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                     )
                                   }}
                                 >
-                                  {intl.formatMessage(errorsOnField[0].message)}
+                                  {intl.formatMessage(
+                                    errorsOnField[0].message,
+                                    errorsOnField[0].props
+                                  )}
                                 </RequiredFieldLink>
                               ) : (
                                 renderValue(
@@ -689,13 +712,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   onClick={submitClickEvent}
                   disabled={numberOfErrors > 0 || !this.state.allSectionVisited}
                 >
-                  {intl.formatMessage(messages.valueSendForReview)}
+                  {intl.formatMessage(
+                    this.userHasRegisterScope()
+                      ? messages.valueRegister
+                      : messages.valueSendForReview
+                  )}
                 </RegisterApplication>
               </ButtonContainer>
             )}
 
             {!!saveDraftClickEvent && (
-              <DraftButtonContainer onClick={saveDraftClickEvent}>
+              <DraftButtonContainer
+                onClick={saveDraftClickEvent}
+                id="save-draft"
+              >
                 <DraftSimple />
                 <SaveDraftText>
                   {intl.formatMessage(messages.valueSaveAsDraft)}
@@ -718,7 +748,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         </Row>
         {deleteApplicationClickEvent && (
           <DButtonContainer>
-            <DeleteApplication onClick={deleteApplicationClickEvent}>
+            <DeleteApplication
+              onClick={deleteApplicationClickEvent}
+              id="delete-application"
+            >
               <Delete />
               {intl.formatMessage(messages.deleteApplicationBtnTxt)}
             </DeleteApplication>
@@ -731,7 +764,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
 export const ReviewSection = connect(
   (state: IStoreState) => ({
-    registerForm: getRegisterForm(state)[Event.BIRTH],
+    registerForm: getRegisterForm(state),
     scope: getScope(state),
     offlineResources: getOfflineState(state),
     language: getLanguage(state)

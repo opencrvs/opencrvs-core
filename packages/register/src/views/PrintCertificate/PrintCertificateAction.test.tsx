@@ -1,98 +1,183 @@
-import {
-  FETCH_BIRTH_REGISTRATION_QUERY,
-  PrintCertificateAction
-} from './PrintCertificateAction'
+import { PrintCertificateAction } from './PrintCertificateAction'
+import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import * as React from 'react'
 
 import { FormFieldGenerator } from 'src/components/form'
-import { collectCertificateFormSection } from './print-certificate'
+import { collectCertificateFormSection } from 'src/forms/certificate/fieldDefinitions/collector-section'
 import {
   IInformativeRadioGroupFormField,
   INFORMATIVE_RADIO_GROUP
 } from 'src/forms'
 import { ReactWrapper } from 'enzyme'
-import { iDType, ParentDetails } from './ParentDetails'
+import { ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
-import { paymentFormSection } from './payment-section'
-import { certificatePreview } from './certificate-preview'
+import { paymentFormSection } from 'src/forms/certificate/fieldDefinitions/payment-section'
+import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/preview-section'
 import { calculateDays, timeElapsed } from './calculatePrice'
+import { identityNameMapper } from 'src/forms/identity'
 
 describe('when user wants to print certificate', async () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   const mock: () => void = jest.fn()
-  const formSection = store.getState().printCertificateForm
-    .collectCertificateFrom
+  const mockLocation: any = jest.fn()
 
   it('renders fields after successful graphql query', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
           variables: { id: 'asdhdqe2472487jsdfsdf' }
         },
         result: {
           data: {
             fetchBirthRegistration: {
-              id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+              _fhirIDMap: {
+                composition: '369fba87-12af-4428-8ced-21e9a3838159',
+                encounter: '8d308b0d-c460-438c-b06c-5b30931d3812',
+                eventLocation: '8d308b0d-c460-438c-b06c-5b30931d3123',
+                observation: {
+                  birthType: 'd8b0e465-28b5-43bf-bcc9-1cf53b3736b8',
+                  attendantAtBirth: '3440b511-4b47-47bf-bf4a-3c9d96a4da36'
+                }
+              },
+              id: '369fba87-12af-4428-8ced-21e9a3838159',
               child: {
+                id: 'aedbe50f-dec4-4134-8e84-a4e74700f02b',
                 name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Mokbul',
-                    familyName: 'Islam'
-                  },
                   {
                     use: 'bn',
-                    firstNames: 'নাম',
-                    familyName: 'নাম'
+                    firstNames: 'ফাহিম',
+                    familyName: 'মাশরুর',
+                    __typename: 'HumanName'
+                  },
+                  {
+                    use: 'en',
+                    firstNames: 'Fahim',
+                    familyName: 'Mashrur',
+                    __typename: 'HumanName'
                   }
                 ],
-                birthDate: '2014-02-15'
+                birthDate: '2018-02-16',
+                gender: 'male',
+                __typename: 'Person'
               },
               mother: {
+                id: '8baa73b4-6c31-4e7e-8c12-413159c0467f',
                 name: [
                   {
-                    firstNames: 'মা',
-                    familyName: 'নাম'
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'মাশরুর',
+                    __typename: 'HumanName'
                   },
                   {
-                    firstNames: 'Mother',
-                    familyName: 'Name'
+                    use: 'en',
+                    firstNames: '',
+                    familyName: '',
+                    __typename: 'HumanName'
                   }
                 ],
+                birthDate: null,
+                maritalStatus: 'MARRIED',
+                dateOfMarriage: null,
+                educationalAttainment: null,
+                nationality: ['BGD'],
+                multipleBirth: 1,
                 identifier: [
                   {
-                    id: '4564',
-                    type: 'NATIONAL_ID'
+                    id: '123',
+                    type: 'PASSPORT',
+                    otherType: '',
+                    __typename: 'IdentityType'
                   }
                 ],
-                birthDate: '1960-08-18',
-                nationality: ['BGD']
-              },
-              father: {
-                name: [
+                address: [
                   {
-                    firstNames: 'পিতা',
-                    familyName: 'নাম'
+                    type: 'PERMANENT',
+                    line: [
+                      '2015',
+                      '',
+                      '',
+                      '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                      '',
+                      '5518aef0-1d67-46cd-97c5-d46e9a44732a'
+                    ],
+                    district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
+                    state: '843ba812-e05f-4fc1-8276-a135a47225be',
+                    postalCode: null,
+                    country: 'BGD',
+                    __typename: 'Address'
                   },
                   {
-                    firstNames: 'Father',
-                    familyName: 'Name'
+                    type: 'CURRENT',
+                    line: [
+                      '2015',
+                      '',
+                      '',
+                      '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                      '',
+                      '5518aef0-1d67-46cd-97c5-d46e9a44732a'
+                    ],
+                    district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
+                    state: '843ba812-e05f-4fc1-8276-a135a47225be',
+                    postalCode: null,
+                    country: 'BGD',
+                    __typename: 'Address'
                   }
                 ],
-                identifier: [
-                  {
-                    id: '4564',
-                    type: 'NATIONAL_ID'
-                  }
-                ],
-                birthDate: '1955-08-18',
-                nationality: ['BGD']
+                telecom: null,
+                __typename: 'Person'
               },
-              createdAt: '2018-12-07T13:11:49.380Z'
+              father: null,
+              registration: {
+                id: '6e10ee71-24c8-446a-a6b1-09c62330a975',
+                contact: null,
+                attachments: null,
+                status: [
+                  {
+                    comments: null,
+
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    },
+                    __typename: 'RegWorkflow'
+                  }
+                ],
+                trackingId: 'B48RKLD',
+                registrationNumber: '2019333494B48RKLD2',
+                __typename: 'Registration'
+              },
+              attendantAtBirth: null,
+              weightAtBirth: null,
+              birthType: null,
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
+              presentAtBirthRegistration: null,
+              __typename: 'BirthRegistration'
             }
           }
         }
@@ -101,15 +186,16 @@ describe('when user wants to print certificate', async () => {
 
     const testComponent = createTestComponent(
       <PrintCertificateAction
-        backLabel="Back"
-        title="Print certificate"
-        registrationId="asdhdqe2472487jsdfsdf"
-        togglePrintCertificateSection={mock}
-        printCertificateFormSection={formSection}
-        IssuerDetails={{
-          name: 'Some name',
-          role: 'Registrar',
-          issuedAt: 'some location'
+        location={mockLocation}
+        history={history}
+        staticContext={mockLocation}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf'
+          },
+          isExact: true,
+          path: '',
+          url: ''
         }}
       />,
       store,
@@ -178,13 +264,16 @@ describe('when user wants to print certificate', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
           variables: { id: '12345' }
         },
         result: {
           data: {
             fetchBirthRegistration: {
               id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+              registration: {
+                registrationNumber: '485736202837'
+              },
               child: {
                 birthDate: '2014-02-15'
               },
@@ -222,6 +311,7 @@ describe('when user wants to print certificate', async () => {
                 identifier: [
                   {
                     id: '4564',
+                    otherType: '',
                     type: 'NATIONAL_ID'
                   }
                 ],
@@ -237,15 +327,16 @@ describe('when user wants to print certificate', async () => {
 
     const testComponent = createTestComponent(
       <PrintCertificateAction
-        backLabel="Back"
-        title="Print certificate"
-        registrationId="asdhdqe2472487jsdfsdf"
-        togglePrintCertificateSection={mock}
-        printCertificateFormSection={formSection}
-        IssuerDetails={{
-          name: '',
-          role: '',
-          issuedAt: ''
+        location={mockLocation}
+        history={history}
+        staticContext={mockLocation}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf'
+          },
+          isExact: true,
+          path: '',
+          url: ''
         }}
       />,
       store,
@@ -269,37 +360,42 @@ describe('when user wants to print certificate', async () => {
   })
 
   it('renders i18n idType', () => {
-    expect(iDType('NATIONAL_ID')).toEqual({
+    expect(identityNameMapper('NATIONAL_ID')).toEqual({
       id: 'formFields.iDTypeNationalID',
       defaultMessage: 'National ID',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('PASSPORT')).toEqual({
+    expect(identityNameMapper('PASSPORT')).toEqual({
       id: 'formFields.iDTypePassport',
       defaultMessage: 'Passport',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('BIRTH_REGISTRATION_NUMBER')).toEqual({
+    expect(identityNameMapper('DRIVING_LICENSE')).toEqual({
+      id: 'formFields.iDTypeDrivingLicense',
+      defaultMessage: 'Drivers License',
+      description: 'Option for form field: Type of ID'
+    })
+    expect(identityNameMapper('BIRTH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeBRN',
       defaultMessage: 'Birth Registration Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('DEATH_REGISTRATION_NUMBER')).toEqual({
+    expect(identityNameMapper('DEATH_REGISTRATION_NUMBER')).toEqual({
       id: 'formFields.iDTypeDRN',
       defaultMessage: 'Death Registration Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('REFUGEE_NUMBER')).toEqual({
+    expect(identityNameMapper('REFUGEE_NUMBER')).toEqual({
       id: 'formFields.iDTypeRefugeeNumber',
       defaultMessage: 'Refugee Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('ALIEN_NUMBER')).toEqual({
+    expect(identityNameMapper('ALIEN_NUMBER')).toEqual({
       id: 'formFields.iDTypeAlienNumber',
       defaultMessage: 'Alien Number',
       description: 'Option for form field: Type of ID'
     })
-    expect(iDType('UNKNOWN')).toEqual({
+    expect(identityNameMapper('UNKNOWN')).toEqual({
       id: 'formFields.iD',
       defaultMessage: 'ID Number',
       description: 'Label for form field: ID Number'
@@ -404,69 +500,156 @@ describe('when user wants to print certificate', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_BIRTH_REGISTRATION_QUERY,
+            query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
             variables: { id: 'asdhdqe2472487jsdfsdf' }
           },
           result: {
             data: {
               fetchBirthRegistration: {
-                id: '9aa15499-4d2f-48c6-9ced-b0b1b077bbb7',
+                _fhirIDMap: {
+                  composition: '369fba87-12af-4428-8ced-21e9a3838159',
+                  encounter: '8d308b0d-c460-438c-b06c-5b30931d3812',
+                  eventLocation: '8d308b0d-c460-438c-b06c-5b30931d3123',
+                  observation: {
+                    birthType: 'd8b0e465-28b5-43bf-bcc9-1cf53b3736b8',
+                    attendantAtBirth: '3440b511-4b47-47bf-bf4a-3c9d96a4da36'
+                  }
+                },
+                id: '369fba87-12af-4428-8ced-21e9a3838159',
                 child: {
+                  id: 'aedbe50f-dec4-4134-8e84-a4e74700f02b',
                   name: [
-                    {
-                      use: 'en',
-                      firstNames: 'Mokbul',
-                      familyName: 'Islam'
-                    },
                     {
                       use: 'bn',
-                      firstNames: 'নাম',
-                      familyName: 'নাম'
+                      firstNames: 'ফাহিম',
+                      familyName: 'মাশরুর',
+                      __typename: 'HumanName'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Fahim',
+                      familyName: 'Mashrur',
+                      __typename: 'HumanName'
                     }
                   ],
-                  birthDate: '2014-02-15'
+                  birthDate: '2018-02-16',
+                  gender: 'male',
+                  __typename: 'Person'
                 },
                 mother: {
+                  id: '8baa73b4-6c31-4e7e-8c12-413159c0467f',
                   name: [
                     {
-                      firstNames: 'মা',
-                      familyName: 'নাম'
+                      use: 'bn',
+                      firstNames: '',
+                      familyName: 'মাশরুর',
+                      __typename: 'HumanName'
                     },
                     {
-                      firstNames: 'Mother',
-                      familyName: 'Name'
+                      use: 'en',
+                      firstNames: '',
+                      familyName: '',
+                      __typename: 'HumanName'
                     }
                   ],
+                  birthDate: null,
+                  maritalStatus: 'MARRIED',
+                  dateOfMarriage: null,
+                  educationalAttainment: null,
+                  nationality: ['BGD'],
+                  multipleBirth: 1,
                   identifier: [
                     {
-                      id: '4564',
-                      type: 'PASSPORT'
+                      id: '123',
+                      type: 'PASSPORT',
+                      otherType: '',
+                      __typename: 'IdentityType'
                     }
                   ],
-                  birthDate: '1960-08-18',
-                  nationality: ['BGD']
-                },
-                father: {
-                  name: [
+                  address: [
                     {
-                      firstNames: 'পিতা',
-                      familyName: 'নাম'
+                      type: 'PERMANENT',
+                      line: [
+                        '2015',
+                        '',
+                        '',
+                        '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                        '',
+                        '5518aef0-1d67-46cd-97c5-d46e9a44732a'
+                      ],
+                      district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
+                      state: '843ba812-e05f-4fc1-8276-a135a47225be',
+                      postalCode: null,
+                      country: 'BGD',
+                      __typename: 'Address'
                     },
                     {
-                      firstNames: 'Father',
-                      familyName: 'Name'
+                      type: 'CURRENT',
+                      line: [
+                        '2015',
+                        '',
+                        '',
+                        '2b74f5ee-fb3d-4a2c-9b93-beb36e3850ff',
+                        '',
+                        '5518aef0-1d67-46cd-97c5-d46e9a44732a'
+                      ],
+                      district: 'c5c14965-c754-4d62-bdf5-008e30ca57e8',
+                      state: '843ba812-e05f-4fc1-8276-a135a47225be',
+                      postalCode: null,
+                      country: 'BGD',
+                      __typename: 'Address'
                     }
                   ],
-                  identifier: [
-                    {
-                      id: '4564',
-                      type: 'BIRTH_REGISTRATION_NUMBER'
-                    }
-                  ],
-                  birthDate: '1955-08-18',
-                  nationality: ['BGD']
+                  telecom: null,
+                  __typename: 'Person'
                 },
-                createdAt: '2018-12-07T13:11:49.380Z'
+                father: null,
+                registration: {
+                  id: '6e10ee71-24c8-446a-a6b1-09c62330a975',
+                  contact: null,
+                  attachments: null,
+                  status: [
+                    {
+                      comments: null,
+
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      __typename: 'RegWorkflow'
+                    }
+                  ],
+                  trackingId: 'B48RKLD',
+                  registrationNumber: '2019333494B48RKLD2',
+                  __typename: 'Registration'
+                },
+                attendantAtBirth: null,
+                weightAtBirth: null,
+                birthType: null,
+                eventLocation: {
+                  address: {
+                    country: 'BGD',
+                    state: 'state4',
+                    district: 'district2',
+                    postalCode: '',
+                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                    postCode: '1020'
+                  },
+                  type: 'PRIVATE_HOME',
+                  partOf: 'Location/upazila10'
+                },
+                presentAtBirthRegistration: null,
+                __typename: 'BirthRegistration'
               }
             }
           }
@@ -475,15 +658,16 @@ describe('when user wants to print certificate', async () => {
 
       const testComponent = createTestComponent(
         <PrintCertificateAction
-          backLabel="Back"
-          title="Print certificate"
-          registrationId="asdhdqe2472487jsdfsdf"
-          togglePrintCertificateSection={mock}
-          printCertificateFormSection={formSection}
-          IssuerDetails={{
-            name: '',
-            role: '',
-            issuedAt: ''
+          location={mockLocation}
+          history={history}
+          staticContext={mockLocation}
+          match={{
+            params: {
+              registrationId: 'asdhdqe2472487jsdfsdf'
+            },
+            isExact: true,
+            path: '',
+            url: ''
           }}
         />,
         store,
@@ -673,23 +857,20 @@ describe('when user wants to print certificate', async () => {
     it('timeElapsedInWords function returns required time duration in words', () => {
       Date.now = jest.fn(() => new Date('2019-01-01'))
 
-      let days = calculateDays('2018-08-18')
+      let days = calculateDays('1985-08-18')
 
       let time = timeElapsed(days)
-      expect(time.value).toBe(4)
-      expect(time.unit).toBe('Month')
+      expect(time.value).toBe(33)
+      expect(time.unit).toBe('Year')
       days = calculateDays('2018-12-16')
       time = timeElapsed(days)
       expect(time.value).toBe(16)
       expect(time.unit).toBe('Day')
 
-      let error
-      try {
-        calculateDays('16-12-2018')
-      } catch (e) {
-        error = e
-      }
-      expect(error).toBeInstanceOf(Error)
+      days = calculateDays('2018-10-16')
+      time = timeElapsed(days)
+      expect(time.value).toBe(2)
+      expect(time.unit).toBe('Month')
     })
 
     it('Should generate the PDF', () => {

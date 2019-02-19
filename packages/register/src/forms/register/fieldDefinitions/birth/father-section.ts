@@ -1,7 +1,11 @@
 import { defineMessages } from 'react-intl'
 import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
-import { messages as identityMessages } from '../../../identity'
+import {
+  messages as identityMessages,
+  birthIdentityOptions,
+  identityTypeMapper
+} from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
 import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
@@ -13,12 +17,15 @@ import {
   DATE,
   SUBSECTION,
   SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat
+  dateFormat,
+  validIDNumber,
+  isValidBirthDate
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -27,17 +34,28 @@ export interface IFatherSectionFormData {
   bar: string
   baz: string
 }
+import { identityNameMapper } from 'src/forms/identity'
 import { IFormSection } from '../../../index'
 import { conditionals } from '../../../utils'
 import {
-  nameTransformer,
+  fieldToNameTransformer,
   fieldToArrayTransformer,
-  identifierTransformer,
-  identifierTypeTransformer,
-  addressTransformer,
+  fieldToIdentifierTransformer,
+  fieldToAddressTransformer,
   copyAddressTransformer,
-  sectionRemoveTransformer
-} from '../field-mappings'
+  sectionRemoveTransformer,
+  fieldNameTransformer
+} from 'src/forms/mappings/mutation/field-mappings'
+
+import {
+  nameToFieldTransformer,
+  fieldValueTransformer,
+  arrayToFieldTransformer,
+  identifierToFieldTransformer,
+  addressToFieldTransformer,
+  sameAddressFieldTransformer
+} from 'src/forms/mappings/query/field-mappings'
+import { emptyFatherSectionTransformer } from './mappings/query/father-mappings'
 
 export const messages = defineMessages({
   fatherTab: {
@@ -77,22 +95,22 @@ export const messages = defineMessages({
   },
   fatherFirstNames: {
     id: 'formFields.fatherFirstNames',
-    defaultMessage: 'First name(s)',
+    defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: First name'
   },
   fatherFamilyName: {
     id: 'formFields.fatherFamilyName',
-    defaultMessage: 'Family name',
+    defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   fatherFirstNamesEng: {
     id: 'formFields.fatherFirstNamesEng',
-    defaultMessage: 'First name(s) (in english)',
+    defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: First names in english'
   },
   fatherFamilyNameEng: {
     id: 'formFields.fatherFamilyNameEng',
-    defaultMessage: 'Family name (in english)',
+    defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   defaultLabel: {
@@ -144,7 +162,9 @@ export const fatherSection: IFormSection = {
         { value: true, label: messages.confirm },
         { value: false, label: messages.deny }
       ],
-      mapping: sectionRemoveTransformer
+      mapping: {
+        mutation: sectionRemoveTransformer
+      }
     },
     {
       name: 'iDType',
@@ -153,39 +173,54 @@ export const fatherSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
-        {
-          value: 'DRIVING_LICENCE',
-          label: identityMessages.iDTypeDrivingLicence
-        },
-        {
-          value: 'BIRTH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeBRN
-        },
-        {
-          value: 'DEATH_REGISTRATION_NUMBER',
-          label: identityMessages.iDTypeDRN
-        },
-        {
-          value: 'REFUGEE_NUMBER',
-          label: identityMessages.iDTypeRefugeeNumber
-        },
-        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
-      ],
+      options: birthIdentityOptions,
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: identifierTypeTransformer
+      mapping: {
+        mutation: fieldToIdentifierTransformer('type'),
+        query: identifierToFieldTransformer('type')
+      }
+    },
+    {
+      name: 'iDTypeOther',
+      type: TEXT,
+      label: identityMessages.iDTypeOtherLabel,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.fathersDetailsExist, conditionals.iDType],
+      mapping: {
+        mutation: fieldToIdentifierTransformer('otherType'),
+        query: identifierToFieldTransformer('otherType')
+      }
     },
     {
       name: 'iD',
-      type: TEXT,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'iDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'iDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['iDType']
+          }
+        ]
+      },
       label: identityMessages.iD,
       required: true,
       initialValue: '',
       validate: [],
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: identifierTransformer
+      mapping: {
+        mutation: fieldToIdentifierTransformer('id'),
+        query: identifierToFieldTransformer('id')
+      }
     },
     {
       name: 'nationality',
@@ -196,7 +231,10 @@ export const fatherSection: IFormSection = {
       validate: [],
       options: countries,
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: fieldToArrayTransformer
+      mapping: {
+        mutation: fieldToArrayTransformer,
+        query: arrayToFieldTransformer
+      }
     },
     {
       name: 'firstNames',
@@ -206,7 +244,10 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: nameTransformer('bn')
+      mapping: {
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
+      }
     },
     {
       name: 'familyName',
@@ -216,7 +257,10 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [bengaliOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: nameTransformer('bn')
+      mapping: {
+        mutation: fieldToNameTransformer('bn'),
+        query: nameToFieldTransformer('bn')
+      }
     },
     {
       name: 'firstNamesEng',
@@ -226,7 +270,10 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: nameTransformer('en', 'firstNames')
+      mapping: {
+        mutation: fieldToNameTransformer('en', 'firstNames'),
+        query: nameToFieldTransformer('en', 'firstNames')
+      }
     },
     {
       name: 'familyNameEng',
@@ -236,16 +283,23 @@ export const fatherSection: IFormSection = {
       initialValue: '',
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: nameTransformer('en', 'familyName')
+      mapping: {
+        mutation: fieldToNameTransformer('en', 'familyName'),
+        query: nameToFieldTransformer('en', 'familyName')
+      }
     },
     {
-      name: 'birthDate',
+      name: 'fatherBirthDate',
       type: DATE,
       label: messages.fatherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      validate: [isValidBirthDate],
+      conditionals: [conditionals.fathersDetailsExist],
+      mapping: {
+        mutation: fieldNameTransformer('birthDate'),
+        query: fieldValueTransformer('birthDate')
+      }
     },
     {
       name: 'maritalStatus',
@@ -276,7 +330,7 @@ export const fatherSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [dateFormat],
-      conditionals: [conditionals.fathersDetailsExist]
+      conditionals: [conditionals.fathersDetailsExist, conditionals.isMarried]
     },
     {
       name: 'educationalAttainment',
@@ -333,7 +387,20 @@ export const fatherSection: IFormSection = {
         { value: false, label: addressMessages.deny }
       ],
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: copyAddressTransformer('CURRENT', 'mother', 'CURRENT', 'father')
+      mapping: {
+        mutation: copyAddressTransformer(
+          'CURRENT',
+          'mother',
+          'CURRENT',
+          'father'
+        ),
+        query: sameAddressFieldTransformer(
+          'CURRENT',
+          'mother',
+          'CURRENT',
+          'father'
+        )
+      }
     },
     {
       name: 'currentAddress',
@@ -355,7 +422,10 @@ export const fatherSection: IFormSection = {
       validate: [],
       options: countries,
       conditionals: [conditionals.addressSameAsMother],
-      mapping: addressTransformer('CURRENT')
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT'),
+        query: addressToFieldTransformer('CURRENT')
+      }
     },
     {
       name: 'state',
@@ -369,7 +439,10 @@ export const fatherSection: IFormSection = {
         dependency: 'country'
       },
       conditionals: [conditionals.country, conditionals.addressSameAsMother],
-      mapping: addressTransformer('CURRENT')
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT'),
+        query: addressToFieldTransformer('CURRENT')
+      }
     },
     {
       name: 'district',
@@ -387,7 +460,10 @@ export const fatherSection: IFormSection = {
         conditionals.state,
         conditionals.addressSameAsMother
       ],
-      mapping: addressTransformer('CURRENT')
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT'),
+        query: addressToFieldTransformer('CURRENT')
+      }
     },
     {
       name: 'addressLine4',
@@ -406,13 +482,16 @@ export const fatherSection: IFormSection = {
         conditionals.district,
         conditionals.addressSameAsMother
       ],
-      mapping: addressTransformer('CURRENT', 4)
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 6),
+        query: addressToFieldTransformer('CURRENT', 6)
+      }
     },
     {
       name: 'addressLine3',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -424,9 +503,33 @@ export const fatherSection: IFormSection = {
         conditionals.state,
         conditionals.district,
         conditionals.addressLine4,
-        conditionals.addressSameAsMother
+        conditionals.addressSameAsMother,
+        conditionals.isNotCityLocation
       ],
-      mapping: addressTransformer('CURRENT', 3)
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 4),
+        query: addressToFieldTransformer('CURRENT', 4)
+      }
+    },
+    {
+      name: 'addressLine3CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressSameAsMother,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 5),
+        query: addressToFieldTransformer('CURRENT', 5)
+      }
     },
     {
       name: 'addressLine2',
@@ -443,13 +546,56 @@ export const fatherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.addressSameAsMother
       ],
-      mapping: addressTransformer('CURRENT', 3)
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 3),
+        query: addressToFieldTransformer('CURRENT', 3)
+      }
+    },
+    {
+      name: 'addressLine1CityOption',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.isCityLocation,
+        conditionals.addressSameAsMother
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 2),
+        query: addressToFieldTransformer('CURRENT', 2)
+      }
+    },
+    {
+      name: 'postCodeCityOption',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.country,
+        conditionals.state,
+        conditionals.district,
+        conditionals.addressLine4,
+        conditionals.addressSameAsMother,
+        conditionals.isCityLocation
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
+        query: addressToFieldTransformer('CURRENT', 0, 'postalCode')
+      }
     },
     {
       name: 'addressLine1',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -460,7 +606,10 @@ export const fatherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.addressSameAsMother
       ],
-      mapping: addressTransformer('CURRENT', 1)
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 1),
+        query: addressToFieldTransformer('CURRENT', 1)
+      }
     },
     {
       name: 'postCode',
@@ -477,7 +626,10 @@ export const fatherSection: IFormSection = {
         conditionals.addressLine3,
         conditionals.addressSameAsMother
       ],
-      mapping: addressTransformer('CURRENT', 0, 'postalCode')
+      mapping: {
+        mutation: fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
+        query: addressToFieldTransformer('CURRENT', 0, 'postalCode')
+      }
     },
     {
       name: 'permanentAddressSameAsMother',
@@ -491,12 +643,20 @@ export const fatherSection: IFormSection = {
         { value: false, label: messages.deny }
       ],
       conditionals: [conditionals.fathersDetailsExist],
-      mapping: copyAddressTransformer(
-        'PERMANENT',
-        'mother',
-        'PERMANENT',
-        'father'
-      )
+      mapping: {
+        mutation: copyAddressTransformer(
+          'PERMANENT',
+          'mother',
+          'PERMANENT',
+          'father'
+        ),
+        query: sameAddressFieldTransformer(
+          'PERMANENT',
+          'mother',
+          'PERMANENT',
+          'father'
+        )
+      }
     },
     {
       name: 'permanentAddress',
@@ -517,8 +677,14 @@ export const fatherSection: IFormSection = {
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
       options: countries,
-      conditionals: [conditionals.permanentAddressSameAsMother],
-      mapping: addressTransformer('PERMANENT', 0, 'country')
+      conditionals: [
+        conditionals.fathersDetailsExist,
+        conditionals.permanentAddressSameAsMother
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'country'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'country')
+      }
     },
     {
       name: 'statePermanent',
@@ -535,7 +701,10 @@ export const fatherSection: IFormSection = {
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 0, 'state')
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'state'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'state')
+      }
     },
     {
       name: 'districtPermanent',
@@ -553,7 +722,10 @@ export const fatherSection: IFormSection = {
         conditionals.countryPermanent,
         conditionals.statePermanent
       ],
-      mapping: addressTransformer('PERMANENT', 0, 'district')
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'district'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'district')
+      }
     },
     {
       name: 'addressLine4Permanent',
@@ -572,13 +744,16 @@ export const fatherSection: IFormSection = {
         conditionals.statePermanent,
         conditionals.districtPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 4)
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 6),
+        query: addressToFieldTransformer('PERMANENT', 6)
+      }
     },
     {
       name: 'addressLine3Permanent',
       type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: addressMessages.addressLine3,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       dynamicOptions: {
@@ -590,9 +765,33 @@ export const fatherSection: IFormSection = {
         conditionals.countryPermanent,
         conditionals.statePermanent,
         conditionals.districtPermanent,
-        conditionals.addressLine4Permanent
+        conditionals.addressLine4Permanent,
+        conditionals.isNotCityLocationPermanent
       ],
-      mapping: addressTransformer('PERMANENT', 3)
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 4),
+        query: addressToFieldTransformer('PERMANENT', 4)
+      }
+    },
+    {
+      name: 'addressLine3CityOptionPermanent',
+      type: TEXT,
+      label: addressMessages.addressLine3CityOption,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.permanentAddressSameAsMother,
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 5),
+        query: addressToFieldTransformer('PERMANENT', 5)
+      }
     },
     {
       name: 'addressLine2Permanent',
@@ -609,13 +808,56 @@ export const fatherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent
       ],
-      mapping: addressTransformer('PERMANENT', 2)
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 3),
+        query: addressToFieldTransformer('PERMANENT', 3)
+      }
+    },
+    {
+      name: 'addressLine1CityOptionPermanent',
+      type: TEXT,
+      label: addressMessages.addressLine1,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.permanentAddressSameAsMother,
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 2),
+        query: addressToFieldTransformer('PERMANENT', 2)
+      }
+    },
+    {
+      name: 'postCodeCityOptionPermanent',
+      type: NUMBER,
+      label: addressMessages.postCode,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.permanentAddressSameAsMother,
+        conditionals.countryPermanent,
+        conditionals.statePermanent,
+        conditionals.districtPermanent,
+        conditionals.addressLine4Permanent,
+        conditionals.isCityLocationPermanent
+      ],
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'postalCode')
+      }
     },
     {
       name: 'addressLine1Permanent',
       type: TEXT,
       label: addressMessages.addressLine1,
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -626,7 +868,10 @@ export const fatherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent
       ],
-      mapping: addressTransformer('PERMANENT', 1)
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 1),
+        query: addressToFieldTransformer('PERMANENT', 1)
+      }
     },
     {
       name: 'postCodePermanent',
@@ -643,7 +888,13 @@ export const fatherSection: IFormSection = {
         conditionals.addressLine4Permanent,
         conditionals.addressLine3Permanent
       ],
-      mapping: addressTransformer('PERMANENT', 0, 'postalCode')
+      mapping: {
+        mutation: fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
+        query: addressToFieldTransformer('PERMANENT', 0, 'postalCode')
+      }
     }
-  ]
+  ],
+  mapping: {
+    query: emptyFatherSectionTransformer
+  }
 }

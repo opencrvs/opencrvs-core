@@ -54,8 +54,6 @@ class PDFViewer extends React.Component<IPDFViewerProps, IPDFViewerState> {
         {this.state.numPages > 1 && (
           <Pagination
             initialPage={currentPage}
-            pageSize={1}
-            totalItemCount={1}
             totalPages={numPages}
             onPageChange={this.onPageChange}
           />

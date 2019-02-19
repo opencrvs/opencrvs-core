@@ -16,177 +16,194 @@ import {
   BIRTH_REG_PRESENT_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
-  LAST_LIVE_BIRTH_CODE
+  LAST_LIVE_BIRTH_CODE,
+  HEALTH_FACILITY_BIRTH_CODE,
+  BIRTH_LOCATION_TYPE_CODE
 } from 'src/features/fhir/templates'
 
 test('should build a minimal FHIR registration document without error', async () => {
-  const fhir = await buildFHIRBundle({
-    mother: {
-      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
-      identifier: [{ id: '123456', type: 'PASSPORT' }],
-      gender: 'female',
-      birthDate: '2000-01-28',
-      maritalStatus: 'MARRIED',
-      name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
-      deceased: false,
-      multipleBirth: 1,
-      dateOfMarriage: '2014-01-28',
-      nationality: ['BGD'],
-      educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
-    },
-    father: {
-      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb40',
-      gender: 'male',
-      name: [],
-      telecom: [{ use: 'mobile', system: 'phone', value: '0171111111' }],
-      maritalStatus: 'MARRIED',
-      birthDate: '2000-09-28',
-      deceased: false,
-      multipleBirth: 2,
-      address: [
-        {
-          use: 'home',
-          type: 'both',
-          line: ['2760 Mlosi Street', 'Wallacedene'],
-          district: 'Kraaifontein',
-          state: 'Western Cape',
-          city: 'Cape Town',
-          postalCode: '7570',
-          country: 'BGD'
-        },
-        {
-          use: 'home',
-          type: 'both',
-          line: ['40 Orbis Wharf', 'Wallacedene'],
-          text: 'Optional address text',
-          district: 'Kraaifontein',
-          state: 'Western Cape',
-          city: 'Cape Town',
-          postalCode: '7570',
-          country: 'BGD'
-        }
-      ],
-      photo: [
-        {
-          contentType: 'image/jpeg',
-          data: '123456',
-          title: 'father-national-id'
-        }
-      ],
-      dateOfMarriage: '2014-01-28',
-      nationality: ['BGD'],
-      educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
-    },
-    child: {
-      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
-      gender: 'male',
-      name: [],
-      birthDate: '2018-01-28',
-      maritalStatus: 'NOT_STATED',
-      deceased: false,
-      multipleBirth: 3,
-      dateOfMarriage: '',
-      nationality: ['BGD'],
-      educationalAttainment: 'NO_SCHOOLING'
-    },
-    registration: {
-      _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-      contact: 'MOTHER',
-      paperFormID: '12345678',
-      trackingId: 'B123456',
-      registrationNumber: '201923324512345671',
-      status: [
-        {
-          comments: [
-            {
-              comment: 'This is just a test data',
-              createdAt: '2018-10-31T09:45:05+10:00'
-            }
-          ],
-          timestamp: '2018-10-31T09:45:05+10:00'
-        }
-      ],
-      attachments: [
-        {
-          _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce11',
-          contentType: 'image/jpeg',
-          data: 'SampleData',
-          status: 'final',
-          originalFileName: 'original.jpg',
-          systemFileName: 'system.jpg',
-          type: 'NATIONAL_ID',
-          createdAt: '2018-10-21'
-        },
-        {
-          _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce22',
-          contentType: 'image/png',
-          data: 'ExampleData',
-          status: 'deleted',
-          originalFileName: 'original.png',
-          systemFileName: 'system.png',
-          type: 'PASSPORT',
-          createdAt: '2018-10-22',
-          subject: 'MOTHER'
-        }
-      ],
-      certificates: [
-        {
-          collector: {
-            relationship: 'OTHER',
-            individual: {
-              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-              identifier: [{ id: '123456', type: 'PASSPORT' }]
-            }
+  const fhir = await buildFHIRBundle(
+    {
+      mother: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
+        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
+        gender: 'female',
+        birthDate: '2000-01-28',
+        maritalStatus: 'MARRIED',
+        name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
+        deceased: false,
+        multipleBirth: 1,
+        dateOfMarriage: '2014-01-28',
+        nationality: ['BGD'],
+        educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
+      },
+      father: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb40',
+        gender: 'male',
+        name: [],
+        telecom: [{ use: 'mobile', system: 'phone', value: '0171111111' }],
+        maritalStatus: 'MARRIED',
+        birthDate: '2000-09-28',
+        deceased: false,
+        multipleBirth: 2,
+        address: [
+          {
+            use: 'home',
+            type: 'both',
+            line: ['2760 Mlosi Street', 'Wallacedene'],
+            district: 'Kraaifontein',
+            state: 'Western Cape',
+            city: 'Cape Town',
+            postalCode: '7570',
+            country: 'BGD'
           },
-          hasShowedVerifiedDocument: true,
-          payments: [
-            {
-              paymentId: '1234',
-              type: 'MANUAL',
-              total: 50.0,
-              amount: 50.0,
-              outcome: 'COMPLETED',
-              date: '2018-10-22'
-            }
-          ],
-          data: 'DUMMY-DATA'
+          {
+            use: 'home',
+            type: 'both',
+            line: ['40 Orbis Wharf', 'Wallacedene'],
+            text: 'Optional address text',
+            district: 'Kraaifontein',
+            state: 'Western Cape',
+            city: 'Cape Town',
+            postalCode: '7570',
+            country: 'BGD'
+          }
+        ],
+        photo: [
+          {
+            contentType: 'image/jpeg',
+            data: '123456',
+            title: 'father-national-id'
+          }
+        ],
+        dateOfMarriage: '2014-01-28',
+        nationality: ['BGD'],
+        educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
+      },
+      child: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
+        gender: 'male',
+        name: [],
+        birthDate: '2018-01-28',
+        maritalStatus: 'NOT_STATED',
+        deceased: false,
+        multipleBirth: 3,
+        dateOfMarriage: '',
+        nationality: ['BGD'],
+        educationalAttainment: 'NO_SCHOOLING'
+      },
+      registration: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
+        contact: 'MOTHER',
+        paperFormID: '12345678',
+        trackingId: 'B123456',
+        registrationNumber: '201923324512345671',
+        status: [
+          {
+            comments: [
+              {
+                comment: 'This is just a test data',
+                createdAt: '2018-10-31T09:45:05+10:00'
+              }
+            ],
+            timestamp: '2018-10-31T09:45:05+10:00'
+          }
+        ],
+        attachments: [
+          {
+            _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce11',
+            contentType: 'image/jpeg',
+            data: 'SampleData',
+            status: 'final',
+            originalFileName: 'original.jpg',
+            systemFileName: 'system.jpg',
+            type: 'NATIONAL_ID_FRONT',
+            createdAt: '2018-10-21'
+          },
+          {
+            _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce22',
+            contentType: 'image/png',
+            data: 'ExampleData',
+            status: 'deleted',
+            originalFileName: 'original.png',
+            systemFileName: 'system.png',
+            type: 'PASSPORT',
+            createdAt: '2018-10-22',
+            subject: 'MOTHER'
+          }
+        ],
+        certificates: [
+          {
+            collector: {
+              relationship: 'OTHER',
+              individual: {
+                name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+                identifier: [{ id: '123456', type: 'PASSPORT' }]
+              }
+            },
+            hasShowedVerifiedDocument: true,
+            payments: [
+              {
+                paymentId: '1234',
+                type: 'MANUAL',
+                total: 50.0,
+                amount: 50.0,
+                outcome: 'COMPLETED',
+                date: '2018-10-22'
+              }
+            ],
+            data: 'DUMMY-DATA'
+          }
+        ]
+      },
+      eventLocation: {
+        type: 'PRIVATE_HOME',
+        partOf: 'Location/456',
+        address: {
+          country: '789',
+          state: '101112',
+          district: '131415',
+          postalCode: 'sw11',
+          line: [
+            'addressLine1',
+            'addressLine1CityOption',
+            'addressLine2',
+            '123',
+            '456',
+            '789'
+          ]
         }
-      ]
-    },
-    birthLocation: {
-      name: 'HOSPITAL',
-      status: 'active',
-      latitude: 23.777176,
-      longitude: 90.399452
-    },
-    birthType: 2,
-    weightAtBirth: 3,
-    attendantAtBirth: 'NURSE',
-    birthRegistrationType: 'INFORMANT_ONLY',
-    presentAtBirthRegistration: 'INFORMANT_ONLY',
-    childrenBornAliveToMother: 2,
-    foetalDeathsToMother: 0,
-    lastPreviousLiveBirth: '2014-01-28',
-    createdAt: new Date(),
-    _fhirIDMap: {
-      composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
-      encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
-      observation: {
-        birthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
-        weightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
-        attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
-        birthRegistrationType: '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
-        presentAtBirthRegistration:
-          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
-        childrenBornAliveToMother:
-          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
-        foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
-        lastPreviousLiveBirth:
-          '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
+      },
+      birthType: 2,
+      weightAtBirth: 3,
+      attendantAtBirth: 'NURSE',
+      birthRegistrationType: 'INFORMANT_ONLY',
+      presentAtBirthRegistration: 'INFORMANT_ONLY',
+      childrenBornAliveToMother: 2,
+      foetalDeathsToMother: 0,
+      lastPreviousLiveBirth: '2014-01-28',
+      createdAt: new Date(),
+      _fhirIDMap: {
+        composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
+        encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
+        observation: {
+          birthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
+          weightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
+          attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
+          birthRegistrationType:
+            '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
+          presentAtBirthRegistration:
+            '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
+          childrenBornAliveToMother:
+            '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
+          foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
+          lastPreviousLiveBirth:
+            '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
+        }
       }
-    }
-  })
-
+    },
+    'BIRTH'
+  )
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(6)
   expect(fhir.entry[0].resource.date).toBeDefined()
@@ -200,7 +217,8 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[1].resource.name[0].family[0]).toBe('Doe')
   expect(fhir.entry[1].resource.name[0].use).toBe('en')
   expect(fhir.entry[1].resource.identifier[0].id).toBe('123456')
-  expect(fhir.entry[1].resource.identifier[0].type).toBe('PASSPORT')
+  expect(fhir.entry[1].resource.identifier[0].type).toBe('OTHER')
+  expect(fhir.entry[1].resource.identifier[0].otherType).toBe('Custom type')
   expect(fhir.entry[1].resource.birthDate).toBe('2000-01-28')
   expect(fhir.entry[1].resource.maritalStatus.text).toBe('MARRIED')
   expect(fhir.entry[1].resource.maritalStatus.coding[0].code).toBe('M')
@@ -310,7 +328,7 @@ test('should build a minimal FHIR registration document without error', async ()
     coding: [
       {
         system: `${OPENCRVS_SPECIFICATION_URL}types`,
-        code: 'birth-registration'
+        code: 'BIRTH'
       }
     ]
   })
@@ -346,7 +364,7 @@ test('should build a minimal FHIR registration document without error', async ()
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
-        code: 'NATIONAL_ID'
+        code: 'NATIONAL_ID_FRONT'
       }
     ]
   })
@@ -490,14 +508,13 @@ test('should build a minimal FHIR registration document without error', async ()
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
   )
   expect(fhir.entry[11].resource.resourceType).toBe('Encounter')
-  expect(fhir.entry[11].resource.location[0].location.reference).toEqual(
-    fhir.entry[12].fullUrl
-  )
-  // Location
-  expect(fhir.entry[12].resource.name).toBe('HOSPITAL')
-  expect(fhir.entry[12].resource.status).toBe('active')
-  expect(fhir.entry[12].resource.position.latitude).toBe(23.777176)
-  expect(fhir.entry[12].resource.position.longitude).toBe(90.399452)
+
+  expect(fhir.entry[12].resource.resourceType).toBe('Location')
+  expect(fhir.entry[12].resource.partOf.reference).toBe('Location/456')
+  expect(fhir.entry[12].resource.address.country).toBe('789')
+  expect(fhir.entry[12].resource.address.state).toBe('101112')
+  expect(fhir.entry[12].resource.address.district).toBe('131415')
+  expect(fhir.entry[12].resource.address.postalCode).toBe('sw11')
 
   // Observation
   expect(fhir.entry[13].resource.id).toBe(

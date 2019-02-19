@@ -8,10 +8,15 @@ import {
   SELECT_VITAL_EVENT,
   MY_RECORDS,
   MY_DRAFTS,
-  REVIEW_DUPLICATES
+  REVIEW_DUPLICATES,
+  PRINT_CERTIFICATE
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
+
+export interface IDynamicValues {
+  [key: string]: any
+}
 
 function formatUrl(url: string, props: { [key: string]: string }) {
   return Object.keys(props).reduce(
@@ -28,6 +33,7 @@ type GoToTabAction = {
     draftId: string
     tabId: string
     fieldNameHash?: string
+    historyState?: IDynamicValues
   }
 }
 
@@ -74,6 +80,12 @@ export function goToReviewDuplicate(applicationId: string) {
   )
 }
 
+export function goToPrintCertificate(registrationId: string) {
+  return push(
+    formatUrl(PRINT_CERTIFICATE, { registrationId: registrationId.toString() })
+  )
+}
+
 export function goToDeathRegistration(draftId: string) {
   return push(formatUrl(DRAFT_DEATH_FORM, { draftId: draftId.toString() }))
 }
@@ -82,11 +94,12 @@ export function goToTab(
   tabRoute: string,
   draftId: string,
   tabId: string,
-  fieldNameHash?: string
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
 ) {
   return {
     type: GO_TO_TAB,
-    payload: { draftId, tabId, fieldNameHash, tabRoute }
+    payload: { draftId, tabId, fieldNameHash, tabRoute, historyState }
   }
 }
 
@@ -95,7 +108,13 @@ export type INavigationState = undefined
 export function navigationReducer(state: INavigationState, action: Action) {
   switch (action.type) {
     case GO_TO_TAB:
-      const { fieldNameHash, draftId, tabId, tabRoute } = action.payload
+      const {
+        fieldNameHash,
+        draftId,
+        tabId,
+        tabRoute,
+        historyState
+      } = action.payload
       return loop(
         state,
         Cmd.action(
@@ -103,7 +122,8 @@ export function navigationReducer(state: INavigationState, action: Action) {
             formatUrl(tabRoute, {
               draftId: draftId.toString(),
               tabId
-            }) + (fieldNameHash ? `#${fieldNameHash}` : '')
+            }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
+            historyState
           )
         )
       )

@@ -1,9 +1,9 @@
-# THIS WAS GENERATED WITH THE COMMAND LINE TOOL get-graphql-schema
-# get-graphql-schema http://localhost:7070/graphql > schema.graphql
+# source: http://localhost:7070/graphql
+# timestamp: Wed Feb 13 2019 16:07:29 GMT+0000 (Greenwich Mean Time)
 
 type Address {
   use: String
-  type: String
+  type: AddressType
   text: String
   line: [String]
   city: String
@@ -17,7 +17,7 @@ type Address {
 
 input AddressInput {
   use: String
-  type: String
+  type: AddressType
   text: String
   line: [String]
   city: String
@@ -29,97 +29,75 @@ input AddressInput {
   to: Date
 }
 
+enum AddressType {
+  HEALTH_FACILITY
+  ADMIN_STRUCTURE
+  CRVS_OFFICE
+  PRIVATE_HOME
+  CURRENT
+  PERMANENT
+  MILITARY_BASE_OR_CANTONMENT
+  IDP_CAMP
+  UNHCR_CAMP
+  OTHER
+}
+
 type Attachment {
   id: ID!
+  _fhirID: ID
+  contentType: String
   data: String
   status: String
   originalFileName: String
   systemFileName: String
+  type: AttachmentType
+  description: String
+  subject: AttachmentSubject
   createdAt: Date
 }
 
 input AttachmentInput {
+  _fhirID: ID
+  contentType: String
   data: String
   status: String
   originalFileName: String
   systemFileName: String
+  type: AttachmentType
+  description: String
+  subject: AttachmentSubject
   createdAt: Date
 }
 
-type BirthRegistration {
-  id: ID!
-  registration: Registration
-  child: Person
-  mother: Person
-  father: Person
-  informant: Person
-  birthType: BirthType # Not in BDRIS2
-  weightAtBirth: Float
-  attendantAtBirth: AttendantType
-  presentAtBirthRegistration: BirthRegPresence
-  placeOfBirth: Address
-  birthLocation: Location
-  birthRegistrationType: BirthRegType
-  createdAt: Date
-  updatedAt: Date
-}
-
-input BirthRegistrationInput {
-  registration: RegistrationInput
-  child: PersonInput
-  mother: PersonInput
-  father: PersonInput
-  informant: PersonInput
-  birthType: BirthType # Not in BDRIS2
-  weightAtBirth: Float
-  attendantAtBirth: AttendantType
-  presentAtBirthRegistration: BirthRegPresence
-  placeOfBirth: AddressInput
-  birthLocation: LocationInput
-  birthRegistrationType: BirthRegType
-  createdAt: Date
-  updatedAt: Date
-}
-
-enum BirthRegType {
-  SELF
-  STATELESS
-  REFUGEE
-  INFORMANT_ONLY
-  SINGLE_PARENT
-  TEST
-}
-
-enum BirthRegPresence {
-  BOTH_PARENTS
-  INFORMANT_ONLY
-  MOTHER_ONLY
-  FATHER_ONLY
-  OTHER
-}
-
-enum RegistrationContactType {
+enum AttachmentSubject {
   MOTHER
   FATHER
+  CHILD
+  OTHER
+  DECEASED_ID_PROOF
+  DECEASED_PARMANENT_ADDRESS_PROOF
+  DECEASED_DEATH_PROOF
+  DECEASED_BIRTH_PROOF
+  APPLICANT_ID_PROOF
 }
 
-enum MaritalStatusType {
-  SINGLE
-  MARRIED
-  WIDOWED
-  DIVORCED
-  NOT_STATED
-}
-
-enum EducationType {
-  NO_SCHOOLING
-  PRIMARY_ISCED_1
-  LOWER_SECONDARY_ISCED_2
-  UPPER_SECONDARY_ISCED_3
-  POST_SECONDARY_ISCED_4
-  FIRST_STAGE_TERTIARY_ISCED_5
-  SECOND_STAGE_TERTIARY_ISCED_6
-  NOT_STATED
+enum AttachmentType {
+  PASSPORT
+  NATIONAL_ID_FRONT
+  NATIONAL_ID_BACK
+  IMMUNISATION_CERTIFICATE
+  PAPER_FORM
+  PASSPORT_PHOTO
+  BIRTH_REGISTRATION
+  SCHOOL_CERTIFICATE
+  PROOF_OF_DEATH
+  OTHER
+  POST_MORTEM_CERTIFICATE
+  HOSPITAL_DISCHARGE_CERTIFICATE
+  ATTESTED_DEATH_LETTER
+  ATTESTED_DEATH_CERTIFICATE
+  BURIAL_RECEIPT
+  FUNERAL_RECEIPT
 }
 
 enum AttendantType {
@@ -133,6 +111,72 @@ enum AttendantType {
   OTHER
 }
 
+type BirthRegistration {
+  id: ID!
+  _fhirIDMap: Map
+  registration: Registration
+  child: Person
+  mother: Person
+  father: Person
+  informant: Person
+  eventLocation: Location
+  birthType: BirthType
+  weightAtBirth: Float
+  attendantAtBirth: AttendantType
+  otherAttendantAtBirth: String
+  birthRegistrationType: BirthRegType
+  presentAtBirthRegistration: BirthRegPresence
+  otherPresentAtBirthRegistration: String
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+input BirthRegistrationInput {
+  _fhirIDMap: Map
+  registration: RegistrationInput
+  child: PersonInput
+  mother: PersonInput
+  father: PersonInput
+  informant: PersonInput
+  eventLocation: LocationInput
+  birthType: BirthType
+  weightAtBirth: Float
+  attendantAtBirth: AttendantType
+  otherAttendantAtBirth: String
+  birthRegistrationType: BirthRegType
+  presentAtBirthRegistration: BirthRegPresence
+  otherPresentAtBirthRegistration: String
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+enum BirthRegPresence {
+  BOTH_PARENTS
+  INFORMANT_ONLY
+  MOTHER_ONLY
+  FATHER_ONLY
+  OTHER
+}
+
+type BirthRegResultSet {
+  results: [BirthRegistration]
+  totalItems: Int
+}
+
+enum BirthRegType {
+  BOTH_PARENTS
+  SELF
+  INFORMANT_ONLY
+  MOTHER_ONLY
+  FATHER_ONLY
+}
+
 enum BirthType {
   SINGLE
   TWIN
@@ -141,9 +185,36 @@ enum BirthType {
   HIGHER_MULTIPLE_DELIVERY
 }
 
-enum CauseOfDeath {
-  NATURAL
-  ACCIDENT
+enum CauseOfDeathMethodType {
+  VERBAL_AUTOPSY
+  MEDICALLY_CERTIFIED
+}
+
+type Certificate {
+  collector: RelatedPerson
+  hasShowedVerifiedDocument: Boolean
+  payments: [Payment]
+  data: String
+}
+
+input CertificateInput {
+  collector: RelatedPersonInput
+  hasShowedVerifiedDocument: Boolean
+  payments: [PaymentInput]
+  data: String
+}
+
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+input CommentInput {
+  user: UserInput
+  comment: String
+  createdAt: Date
 }
 
 type ContactPoint {
@@ -164,12 +235,11 @@ type DeathRegistration {
   id: ID!
   registration: Registration
   deceased: Person
-  mother: Person
-  father: Person
-  informant: Person
-  spouse: Person
-  deathLocation: Location
-  causeOfDeath: CauseOfDeath
+  informant: RelatedPerson
+  eventLocation: Location
+  mannerOfDeath: MannerOfDeath
+  causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeath: String
   createdAt: Date
   updatedAt: Date
 }
@@ -177,18 +247,43 @@ type DeathRegistration {
 input DeathRegistrationInput {
   registration: RegistrationInput
   deceased: PersonInput
-  mother: PersonInput
-  father: PersonInput
-  informant: PersonInput
-  spouse: PersonInput
-  deathLocation: LocationInput
-  causeOfDeath: CauseOfDeath
+  informant: RelatedPersonInput
+  eventLocation: LocationInput
+  mannerOfDeath: MannerOfDeath
+  causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeath: String
   createdAt: Date
   updatedAt: Date
 }
 
+type DeathRegResultSet {
+  results: [DeathRegistration]
+  totalItems: Int
+}
+
+type Deceased {
+  deceased: Boolean
+  deathDate: String
+}
+
+input DeceasedInput {
+  deceased: Boolean
+  deathDate: String
+}
+
 type Dummy {
   dummy: String!
+}
+
+enum EducationType {
+  NO_SCHOOLING
+  PRIMARY_ISCED_1
+  LOWER_SECONDARY_ISCED_2
+  UPPER_SECONDARY_ISCED_3
+  POST_SECONDARY_ISCED_4
+  FIRST_STAGE_TERTIARY_ISCED_5
+  SECOND_STAGE_TERTIARY_ISCED_6
+  NOT_STATED
 }
 
 type HumanName {
@@ -203,59 +298,124 @@ input HumanNameInput {
   familyName: String
 }
 
+type Identifier {
+  system: String
+  value: String
+}
+
+enum IdentityIDType {
+  PASSPORT
+  NATIONAL_ID
+  DRIVING_LICENSE
+  BIRTH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER
+  REFUGEE_NUMBER
+  ALIEN_NUMBER
+  OTHER
+}
+
+input IdentityInput {
+  id: ID
+  type: IdentityIDType
+  otherType: String
+}
+
+type IdentityType {
+  id: ID
+  type: IdentityIDType
+  otherType: String
+}
+
 type Location {
   id: ID!
-  identifier: [ID]
+  _fhirID: ID
+  identifier: [Identifier]
   status: String
   name: String
   alias: [String]
   description: String
+  partOf: String
+  type: LocationType
   telecom: [ContactPoint]
   address: Address
   longitude: Float
   latitude: Float
   altitude: Float
+  geoData: String
 }
 
 input LocationInput {
+  _fhirID: ID
   identifier: [ID]
   status: String
   name: String
   alias: [String]
   description: String
+  partOf: String
+  type: LocationType
   telecom: [ContactPointInput]
   address: AddressInput
   longitude: Float
   latitude: Float
   altitude: Float
+  geoData: String
+}
+
+enum LocationType {
+  HEALTH_FACILITY
+  HOSPITAL
+  OTHER_HEALTH_INSTITUTION
+  ADMIN_STRUCTURE
+  CRVS_OFFICE
+  PRIVATE_HOME
+  CURRENT
+  PERMANENT
+  MILITARY_BASE_OR_CANTONMENT
+  IDP_CAMP
+  UNHCR_CAMP
+  OTHER
+}
+
+enum MannerOfDeath {
+  NATURAL_CAUSES
+  ACCIDENT
+  SUICIDE
+  HOMICIDE
+  UNDETERMINED
+}
+
+scalar Map
+
+enum MaritalStatusType {
+  SINGLE
+  MARRIED
+  WIDOWED
+  DIVORCED
+  NOT_STATED
 }
 
 type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): ID!
-  updateBirthRegistration(
+  updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
+  markBirthAsVerified(
     id: ID!
-    details: BirthRegistrationInput!
-  ): BirthRegistration!
-  markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration
+    details: BirthRegistrationInput
+  ): BirthRegistration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
-  notADuplicate(id: String!, duplicateId: String!): ID!
   markBirthAsVoided(id: String!, reason: String!, comment: String): ID!
+  notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
-  updateDeathRegistration(
+  updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsVerified(
     id: ID!
-    details: DeathRegistrationInput!
-  ): DeathRegistration!
-  markDeathAsVerified(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsRegistered(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsCertified(id: ID!, location: LocationInput): DeathRegistration
-  markDeathAsVoided(
-    id: ID!
-    reason: String!
-    location: LocationInput
+    details: DeathRegistrationInput
   ): DeathRegistration
+  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID!
+  markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsVoided(id: ID!, reason: String!, comment: String): ID!
 }
 
 type Notification {
@@ -279,30 +439,67 @@ input NotificationInput {
   updatedAt: Date
 }
 
+type Payment {
+  paymentId: ID
+  type: PaymentType
+  total: Float
+  amount: Float
+  outcome: PaymentOutcomeType
+  date: Date
+}
+
+input PaymentInput {
+  paymentId: ID
+  type: PaymentType
+  total: Float
+  amount: Float
+  outcome: PaymentOutcomeType
+  date: Date
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
+}
+
+enum PaymentType {
+  MANUAL
+}
+
 type Person {
   id: ID
-  identifier: [ID]
+  _fhirID: ID
+  identifier: [IdentityType]
   name: [HumanName]
   telecom: [ContactPoint]
   gender: String
   birthDate: String
+  maritalStatus: MaritalStatusType
+  dateOfMarriage: Date
+  multipleBirth: Int
   address: [Address]
-  photo: Attachment
+  photo: [Attachment]
+  deceased: Deceased
+  nationality: [String]
+  educationalAttainment: EducationType
 }
 
 input PersonInput {
-  identifier: [ID]
+  _fhirID: ID
+  identifier: [IdentityInput]
   name: [HumanNameInput]
   telecom: [ContactPointInput]
   gender: String
   birthDate: String
-  address: [AddressInput]
-  photo: AttachmentInput
-  nationality: [String]
   maritalStatus: MaritalStatusType
   dateOfMarriage: Date
-  educationalAttainment: EducationType
   multipleBirth: Int
+  address: [AddressInput]
+  photo: [AttachmentInput]
+  deceased: DeceasedInput
+  nationality: [String]
+  educationalAttainment: EducationType
 }
 
 type Query {
@@ -313,44 +510,67 @@ type Query {
     from: Date
     to: Date
   ): [Notification]
-  fetchBirthRegistration(id: ID): BirthRegistration
+  fetchBirthRegistration(id: ID!): BirthRegistration
+  queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   listBirthRegistrations(
     locationIds: [String]
     status: String
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
+  fetchDeathRegistration(id: ID!): DeathRegistration
   listDeathRegistrations(
     locationIds: [String]
     status: String
     userId: String
     from: Date
     to: Date
-  ): [BirthRegistration]
+    count: Int
+    skip: Int
+  ): DeathRegResultSet
+  locationsByParent(parentId: String, type: String): [Location]
+  locationById(locationId: String): Location
+  getUser(userId: String): User
 }
 
 type Registration {
-  id: ID!
+  id: ID
+  _fhirID: ID
   trackingId: String
   registrationNumber: String
-  bookId: ID
+  paperFormID: String
+  page: String
+  book: String
+  contact: RegistrationContactType
   status: [RegWorkflow]
   type: RegistrationType
   attachments: [Attachment]
-  location: Location
-  contact: RegistrationContactType
+  certificates: [Certificate]
+  duplicates: [ID]
+}
+
+enum RegistrationContactType {
+  BOTH
+  MOTHER
+  FATHER
 }
 
 input RegistrationInput {
+  _fhirID: ID
   trackingId: String
   registrationNumber: String
-  bookId: ID
+  paperFormID: String
+  page: String
+  book: String
+  contact: RegistrationContactType
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]
+  certificates: [CertificateInput]
   location: LocationInput
-  contact: RegistrationContactType
 }
 
 enum RegistrationType {
@@ -360,22 +580,9 @@ enum RegistrationType {
 
 enum RegStatus {
   DECLARED
-  VERIFIED
   REGISTERED
   CERTIFIED
-}
-
-input CommentInput {
-  user: UserInput
-  comment: String
-  createdAt: Date
-}
-
-type Comment { # Annotation
-  id: ID!
-  user: User # -> .authorString
-  comment: String # -> .text
-  createdAt: Date # -> .time
+  REJECTED
 }
 
 type RegWorkflow {
@@ -385,6 +592,7 @@ type RegWorkflow {
   timestamp: Date
   comments: [Comment]
   location: Location
+  office: Location
 }
 
 input RegWorkflowInput {
@@ -395,42 +603,41 @@ input RegWorkflowInput {
   location: LocationInput
 }
 
+type RelatedPerson {
+  relationship: RelationshipType
+  otherRelationship: String
+  individual: Person
+}
+
+input RelatedPersonInput {
+  relationship: RelationshipType
+  otherRelationship: String
+  individual: PersonInput
+}
+
+enum RelationshipType {
+  FATHER
+  MOTHER
+  SPOUSE
+  SON
+  DAUGHTER
+  EXTENDED_FAMILY
+  OTHER
+}
+
 type User {
   id: ID!
-  userName: String
-  created: Date
-  lastLoggedIn: Date
-  firstName: String
-  lastName: String
-  email: String
-  telecom: [ContactPoint]
-  role: [UserRole]!
-  address: Address
+  name: [HumanName]
+  role: String
   primaryOffice: Location
   currentLocation: Location
   catchmentArea: [Location]
 }
 
 input UserInput {
-  userName: String
-  created: Date
-  lastLoggedIn: Date
-  firstName: String
-  lastName: String
-  email: String
-  telecom: [ContactPointInput]
-  role: [UserRoleInput]!
-  address: AddressInput
+  name: [HumanNameInput]
+  role: String
   primaryOffice: LocationInput
   currentLocation: LocationInput
   catchmentArea: [LocationInput]
-}
-
-type UserRole {
-  id: ID!
-  type: String
-}
-
-input UserRoleInput {
-  type: String
 }

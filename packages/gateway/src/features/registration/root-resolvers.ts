@@ -7,10 +7,12 @@ import {
   fetchFHIR,
   getIDFromResponse,
   getTrackingIdFromResponse,
-  getBRNFromResponse,
+  getRegistrationNumberFromResponse,
   removeDuplicatesFromComposition
 } from 'src/features/fhir/utils'
 import { IAuthHeader } from 'src/common-types'
+import { hasScope } from 'src/features/user/utils'
+import { EVENT_TYPE } from '../fhir/constants'
 
 const statusMap = {
   declared: 'preliminary',
@@ -22,29 +24,82 @@ export const resolvers: GQLResolver = {
     async fetchBirthRegistration(_, { id }, authHeader) {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
-    async listBirthRegistrations(_, { status, locationIds }, authHeader) {
-      if (locationIds) {
-        return getCompositionsByLocation(locationIds, authHeader)
-      }
-      const bundle = await fetchFHIR(
-        `/Composition${status ? `?status=${statusMap[status]}&` : '?'}_count=0`,
+    async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
+      const taskBundle = await fetchFHIR(
+        `/Task?identifier=${identifier}`,
         authHeader
       )
 
-      return bundle.entry.map((entry: { resource: {} }) => entry.resource)
+      if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+        throw new Error(`Task does not exist for identifer ${identifier}`)
+      }
+      const task = taskBundle.entry[0].resource as fhir.Task
+
+      if (!task.focus || !task.focus.reference) {
+        throw new Error(`Composition reference not found`)
+      }
+
+      return await fetchFHIR(`/${task.focus.reference}`, authHeader)
+    },
+    async listEventRegistrations(
+      _,
+      { status, locationIds, count = 0, skip = 0 },
+      authHeader
+    ) {
+      if (locationIds) {
+        return getCompositionsByLocation(locationIds, authHeader, count, skip)
+      } else {
+        const bundle = await fetchFHIR(
+          `/Composition${
+            status ? `?status=${statusMap[status]}&` : '?'
+          }_count=${count}&_getpagesoffset=${skip}`,
+          authHeader
+        )
+        return {
+          results: bundle.entry.map(
+            (entry: { resource: {} }) => entry.resource
+          ),
+          totalItems: bundle.total
+        }
+      }
     }
   },
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details)
+      const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      // return tracking-id
-      return await getTrackingIdFromResponse(res, authHeader)
+      if (hasScope(authHeader, 'register')) {
+        // return the brn
+        return await getRegistrationNumberFromResponse(
+          res,
+          EVENT_TYPE.BIRTH,
+          authHeader
+        )
+      } else {
+        // return tracking-id
+        return await getTrackingIdFromResponse(res, authHeader)
+      }
+    },
+    async createDeathRegistration(_, { details }, authHeader) {
+      const doc = await buildFHIRBundle(details, EVENT_TYPE.DEATH)
+
+      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+      if (hasScope(authHeader, 'register')) {
+        // return the brn
+        return await getRegistrationNumberFromResponse(
+          res,
+          EVENT_TYPE.DEATH,
+          authHeader
+        )
+      } else {
+        // return tracking-id
+        return await getTrackingIdFromResponse(res, authHeader)
+      }
     },
     async updateBirthRegistration(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details)
+      const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       // return composition-id
@@ -66,12 +121,16 @@ export const resolvers: GQLResolver = {
           entry: taskBundle.entry
         }
       } else {
-        doc = await buildFHIRBundle(details)
+        doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
       }
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       // return the brn
-      return await getBRNFromResponse(res, authHeader)
+      return await getRegistrationNumberFromResponse(
+        res,
+        EVENT_TYPE.BIRTH,
+        authHeader
+      )
     },
     async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
       const taskBundle = await fetchFHIR(
@@ -94,7 +153,7 @@ export const resolvers: GQLResolver = {
       return taskEntry.resource.id
     },
     async markBirthAsCertified(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details)
+      const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
 
       const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
       // return composition-id
@@ -120,11 +179,16 @@ export const resolvers: GQLResolver = {
 
 async function getCompositionsByLocation(
   locationIds: Array<string | null>,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  count: number,
+  skip: number
 ) {
   const tasksResponses = await Promise.all(
     locationIds.map(locationId => {
-      return fetchFHIR(`/Task?location=Location/${locationId}`, authHeader)
+      return fetchFHIR(
+        `/Task?location=Location/${locationId}&_count=0`,
+        authHeader
+      )
     })
   )
 
@@ -138,7 +202,13 @@ async function getCompositionsByLocation(
 
   const filteredComposition =
     flattened && flattened.filter(composition => composition !== undefined)
-  return filteredComposition
+
+  // TODO: we should rather try do the skip and count in Hearth directly for efficiency, that would require a more complex query
+  return {
+    totalItems: (filteredComposition && filteredComposition.length) || 0,
+    results:
+      filteredComposition && filteredComposition.slice(skip, skip + count)
+  }
 }
 
 async function getComposition(

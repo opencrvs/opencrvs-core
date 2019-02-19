@@ -9,13 +9,22 @@ import {
 import { phoneNumberFormat } from 'src/utils/validate'
 import {
   fieldNameTransformer,
-  commentTransformer,
+  fieldToCommentTransformer,
   sectionFieldToBundleFieldTransformer
-} from '../field-mappings'
+} from 'src/forms/mappings/mutation/field-mappings'
 import {
-  phoneNumberTransformer,
-  registrationSectionTransformer
-} from './mappings/registration-mappings'
+  fieldValueTransformer,
+  bundleFieldToSectionFieldTransformer,
+  commentToFieldTransformer
+} from 'src/forms/mappings/query/field-mappings'
+import {
+  fieldToBirthPhoneNumberTransformer,
+  setRegistrationSectionTransformer
+} from './mappings/mutation/registration-mappings'
+import {
+  phoneNumberToFieldTransformer,
+  getRegistrationSectionTransformer
+} from './mappings/query/registration-mappings'
 
 const messages = defineMessages({
   registrationTab: {
@@ -154,7 +163,10 @@ export const registrationSection: IFormSection = {
           label: messages.presentOther
         }
       ],
-      mapping: sectionFieldToBundleFieldTransformer
+      mapping: {
+        mutation: sectionFieldToBundleFieldTransformer(),
+        query: bundleFieldToSectionFieldTransformer()
+      }
     },
     {
       name: 'whoseContactDetails',
@@ -177,7 +189,10 @@ export const registrationSection: IFormSection = {
           label: messages.contactDetailsFather
         }
       ],
-      mapping: fieldNameTransformer('contact')
+      mapping: {
+        mutation: fieldNameTransformer('contact'),
+        query: fieldValueTransformer('contact')
+      }
     },
     {
       name: 'registrationPhone',
@@ -186,7 +201,10 @@ export const registrationSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [phoneNumberFormat],
-      mapping: phoneNumberTransformer('whoseContactDetails')
+      mapping: {
+        mutation: fieldToBirthPhoneNumberTransformer('whoseContactDetails'),
+        query: phoneNumberToFieldTransformer('contact')
+      }
     },
     {
       name: 'phoneVerificationWarning',
@@ -203,8 +221,14 @@ export const registrationSection: IFormSection = {
       initialValue: '',
       validate: [],
       description: messages.commentsOrNotesDescription,
-      mapping: commentTransformer
+      mapping: {
+        mutation: fieldToCommentTransformer,
+        query: commentToFieldTransformer
+      }
     }
   ],
-  mapping: registrationSectionTransformer
+  mapping: {
+    mutation: setRegistrationSectionTransformer,
+    query: getRegistrationSectionTransformer
+  }
 }

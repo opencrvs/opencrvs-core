@@ -6,6 +6,10 @@ export interface ILocationDataResponse {
   data: ILocation[]
 }
 
+export interface IFacilitiesDataResponse {
+  data: ILocation[]
+}
+
 async function loadLocations(): Promise<ILocationDataResponse> {
   const url = resolve(window.config.RESOURCES_URL, 'locations')
 
@@ -23,6 +27,24 @@ async function loadLocations(): Promise<ILocationDataResponse> {
   }
 }
 
+async function loadFacilities(): Promise<ILocationDataResponse> {
+  const url = resolve(window.config.RESOURCES_URL, 'facilities')
+
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  if (res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const body = await res.json()
+  return {
+    data: body.data
+  }
+}
+
 export const referenceApi = {
-  loadLocations
+  loadLocations,
+  loadFacilities
 }

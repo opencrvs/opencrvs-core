@@ -1,5 +1,9 @@
 import { v4 as uuid } from 'uuid'
-import { OPENCRVS_SPECIFICATION_URL } from './constants'
+import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
+import { getFromFhir } from './fhir-utils'
+import { getEventType } from '../utils'
+
+export const INFORMANT_CODE = 'informant-details'
 
 export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
   if (
@@ -23,7 +27,7 @@ export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
 export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
   let taskResource = getTaskResourceFromFhirBundle(fhirBundle) as fhir.Task
   if (!taskResource) {
-    const taskEntry = createTaskRefTemplate()
+    const taskEntry = createTaskRefTemplate(getEventType(fhirBundle))
     if (!fhirBundle.entry) {
       fhirBundle.entry = []
     }
@@ -49,7 +53,7 @@ export function getTaskResourceFromFhirBundle(fhirBundle: fhir.Bundle) {
   return taskEntry && taskEntry.resource
 }
 
-function createTaskRefTemplate() {
+function createTaskRefTemplate(event: EVENT_TYPE) {
   return {
     fullUrl: `urn:uuid:${uuid()}`,
     resource: {
@@ -59,7 +63,7 @@ function createTaskRefTemplate() {
         coding: [
           {
             system: `${OPENCRVS_SPECIFICATION_URL}types`,
-            code: 'birth-registration'
+            code: event.toString()
           }
         ]
       }
@@ -67,15 +71,76 @@ function createTaskRefTemplate() {
   }
 }
 
-export function findPersonEntry(
+export async function findPersonEntry(
   sectionCode: string,
   fhirBundle: fhir.Bundle
-): fhir.Patient {
+): Promise<fhir.Patient | undefined> {
+  const resource =
+    fhirBundle && fhirBundle.entry && fhirBundle.entry[0].resource
+  if (!resource) {
+    throw new Error('No resource found')
+  }
+  switch (resource.resourceType) {
+    case 'Composition':
+      return findPersonEntryByComposition(sectionCode, fhirBundle)
+    case 'Task':
+      return findPersonEntryByTask(sectionCode, fhirBundle)
+    default:
+      return undefined
+  }
+}
+
+export async function findPersonEntryByComposition(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle
+): Promise<fhir.Patient | undefined> {
   const composition =
     fhirBundle &&
     fhirBundle.entry &&
     (fhirBundle.entry[0].resource as fhir.Composition)
 
+  const personSectionEntry = getSectionEntryBySectionCode(
+    composition,
+    sectionCode
+  )
+  const personEntry =
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      entry => entry.fullUrl === personSectionEntry.reference
+    )
+
+  if (!personEntry) {
+    throw new Error(
+      'Patient referenced from composition section not found in FHIR bundle'
+    )
+  }
+  return personEntry.resource as fhir.Patient
+}
+
+export async function findPersonEntryByTask(
+  sectionCode: string,
+  fhirBundle: fhir.Bundle
+): Promise<fhir.Patient | undefined> {
+  const task =
+    fhirBundle &&
+    fhirBundle.entry &&
+    (fhirBundle.entry[0].resource as fhir.Task)
+  const compositionRef = task && task.focus && task.focus.reference
+  if (!compositionRef) {
+    throw new Error(`No composition reference found`)
+  }
+  const composition: fhir.Composition = await getFromFhir(`/${compositionRef}`)
+  const personSectionEntry = getSectionEntryBySectionCode(
+    composition,
+    sectionCode
+  )
+  return await getFromFhir(`/${personSectionEntry.reference}`)
+}
+
+function getSectionEntryBySectionCode(
+  composition: fhir.Composition | undefined,
+  sectionCode: string
+): fhir.Reference {
   const personSection =
     composition &&
     composition.section &&
@@ -91,17 +156,47 @@ export function findPersonEntry(
       `Invalid person section found for given code: ${sectionCode}`
     )
   }
-  const personSectionEntry = personSection.entry[0]
-  const personEntry =
+  return personSection.entry[0]
+}
+
+export function selectInformantResource(
+  fhirBundle: fhir.Bundle
+): fhir.Patient | undefined {
+  const composition =
+    fhirBundle &&
+    fhirBundle.entry &&
+    (fhirBundle.entry[0].resource as fhir.Composition)
+
+  const informantSection =
+    composition &&
+    composition.section &&
+    composition.section.find((section: fhir.CompositionSection) => {
+      if (!section.code || !section.code.coding || !section.code.coding.some) {
+        return false
+      }
+      return section.code.coding.some(coding => coding.code === INFORMANT_CODE)
+    })
+
+  const informantSectionEntry =
+    informantSection && informantSection.entry && informantSection.entry[0]
+
+  const relatedPersonEntry =
+    informantSectionEntry &&
+    fhirBundle &&
     fhirBundle.entry &&
     fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      entry => entry.fullUrl === informantSectionEntry.reference
     )
 
-  if (!personEntry) {
-    throw new Error(
-      'Patient referenced from composition section not found in FHIR bundle'
+  const informantEntry =
+    relatedPersonEntry &&
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      entry =>
+        entry.fullUrl ===
+        (relatedPersonEntry.resource as fhir.RelatedPerson).patient.reference
     )
-  }
-  return personEntry.resource as fhir.Patient
+
+  return informantEntry && (informantEntry.resource as fhir.Patient)
 }

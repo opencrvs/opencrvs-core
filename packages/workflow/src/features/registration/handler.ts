@@ -7,10 +7,11 @@ import {
   markBundleAsCertified,
   setTrackingId
 } from './fhir/fhir-bundle-modifier'
+import { getToken, hasScope } from 'src/utils/authUtils'
 import { sendEventNotification } from './utils'
-import { getToken } from 'src/utils/authUtils'
 import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
+import { Events } from 'src/features/events/handler'
 
 async function sendBundleToHearth(
   payload: fhir.Bundle,
@@ -39,44 +40,74 @@ async function sendBundleToHearth(
 
 export async function createRegistrationHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
-    const payload = await modifyRegistrationBundle(
+    let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-
+    if (hasScope(request, 'register')) {
+      payload = await markBundleAsRegistered(
+        payload as fhir.Bundle,
+        getToken(request)
+      )
+    }
     const resBundle = await sendBundleToHearth(payload)
 
-    const msisdn = getSharedContactMsisdn(payload)
+    const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      sendEventNotification(payload, msisdn, {
-        Authorization: request.headers.authorization
-      })
+      sendEventNotification(
+        payload,
+        event,
+        msisdn,
+        {
+          Authorization: request.headers.authorization
+        },
+        hasScope(request, 'register')
+      )
     }
 
     return resBundle
   } catch (error) {
-    logger.error(`Workflow/createBirthRegistrationHandler: error: ${error}`)
+    logger.error(
+      `Workflow/createRegistrationHandler[${event}]: error: ${error}`
+    )
     throw new Error(error)
   }
 }
 
 export async function markEventAsRegisteredHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
     const payload = await markBundleAsRegistered(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
-    // TODO: need to send notification here
-    return await postToHearth(payload)
+    const resBundle = await postToHearth(payload)
+
+    const msisdn = await getSharedContactMsisdn(payload)
+    /* sending notification to the contact */
+    if (msisdn) {
+      sendEventNotification(
+        payload,
+        event,
+        msisdn,
+        {
+          Authorization: request.headers.authorization
+        },
+        hasScope(request, 'register')
+      )
+    }
+
+    return resBundle
   } catch (error) {
-    logger.error(`Workflow/markBirthAsRegisteredHandler: error: ${error}`)
+    logger.error(`Workflow/markAsRegisteredHandler[${event}]: error: ${error}`)
     throw new Error(error)
   }
 }

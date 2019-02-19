@@ -1,5 +1,5 @@
 import { IFormField, IFormData } from 'src/forms'
-import { attachmentTransformer } from '../../field-mappings'
+import { fieldToAttachmentTransformer } from 'src/forms/mappings/mutation/field-mappings'
 
 export const documentForWhomFhirMapping = {
   Child: 'CHILD',
@@ -10,19 +10,23 @@ export const documentForWhomFhirMapping = {
 
 export const documentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
-  NID: 'NATIONAL_ID',
+  'National ID (front)': 'NATIONAL_ID_FRONT',
+  'National ID (back)': 'NATIONAL_ID_BACK',
   Passport: 'PASSPORT',
   'School Certificate': 'SCHOOL_CERTIFICATE',
-  Other: 'OTHER'
+  Other: 'OTHER',
+  'EPI Card': 'EPI_CARD',
+  'Doctor Certificate': 'DOCTOR_CERTIFICATE',
+  'Proof of Place and Date of Birth': 'BIRTH_PLACE_DATE_PROOF'
 }
 
-export function birthAttachmentTransformer(
+export function birthFieldToAttachmentTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) {
-  return attachmentTransformer(
+  return fieldToAttachmentTransformer(
     transformedData,
     draftData,
     sectionId,
