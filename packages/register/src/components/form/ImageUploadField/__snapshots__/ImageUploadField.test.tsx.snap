@@ -107,11 +107,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -149,11 +157,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -191,11 +207,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -365,11 +389,19 @@ ShallowWrapper {
                   },
                   Object {
                     "label": Object {
-                      "defaultMessage": "NID",
-                      "description": "Label for radio option NID",
-                      "id": "formFields.docTypeNID",
+                      "defaultMessage": "National ID (front)",
+                      "description": "Label for select option radio option NID front",
+                      "id": "formFields.docTypeNIDFront",
                     },
-                    "value": "NID",
+                    "value": "National ID (front)",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "National ID (back)",
+                      "description": "Label for select option radio option NID back",
+                      "id": "formFields.docTypeNIDBack",
+                    },
+                    "value": "National ID (back)",
                   },
                   Object {
                     "label": Object {
@@ -407,11 +439,19 @@ ShallowWrapper {
                   },
                   Object {
                     "label": Object {
-                      "defaultMessage": "NID",
-                      "description": "Label for radio option NID",
-                      "id": "formFields.docTypeNID",
+                      "defaultMessage": "National ID (front)",
+                      "description": "Label for select option radio option NID front",
+                      "id": "formFields.docTypeNIDFront",
                     },
-                    "value": "NID",
+                    "value": "National ID (front)",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "National ID (back)",
+                      "description": "Label for select option radio option NID back",
+                      "id": "formFields.docTypeNIDBack",
+                    },
+                    "value": "National ID (back)",
                   },
                   Object {
                     "label": Object {
@@ -449,11 +489,19 @@ ShallowWrapper {
                   },
                   Object {
                     "label": Object {
-                      "defaultMessage": "NID",
-                      "description": "Label for radio option NID",
-                      "id": "formFields.docTypeNID",
+                      "defaultMessage": "National ID (front)",
+                      "description": "Label for select option radio option NID front",
+                      "id": "formFields.docTypeNIDFront",
                     },
-                    "value": "NID",
+                    "value": "National ID (front)",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "National ID (back)",
+                      "description": "Label for select option radio option NID back",
+                      "id": "formFields.docTypeNIDBack",
+                    },
+                    "value": "National ID (back)",
                   },
                   Object {
                     "label": Object {
@@ -618,11 +666,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -660,11 +716,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -702,11 +766,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
