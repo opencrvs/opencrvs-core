@@ -119,7 +119,7 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         person,
         'identifier',
         fieldValue,
-        'id',
+        'value',
         context
       )
     },
