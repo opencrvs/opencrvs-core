@@ -42,11 +42,11 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 import {
   DECLARATION,
-  SUBMISSION,
   REJECTION,
   REGISTRATION,
   REGISTERED,
-  DUPLICATION
+  DUPLICATION,
+  OFFLINE
 } from 'src/utils/constants'
 
 import { getScope } from 'src/profile/profileSelectors'
@@ -382,24 +382,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       draft: { event }
     } = this.props
-    let personData
-    if (event === Event.DEATH) {
-      personData = this.props.draft.data.deceased
-    } else {
-      personData = this.props.draft.data.child
-    }
+
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
     const fullName = getFullName(personData)
-    const duplicate = history.location.state && history.location.state.duplicate
-    let eventName = DECLARATION
-    if (duplicate) {
-      eventName = DUPLICATION
-    }
+
     history.push(CONFIRMATION_SCREEN, {
-      eventName,
-      actionName: REJECTION,
+      trackNumber: draft.data.registration.trackingId,
+      eventName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
       eventType: event,
+      trackingSection: true,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
@@ -421,29 +417,44 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
     const fullName = getFullName(personData)
     const duplicate = history.location.state && history.location.state.duplicate
-    const trackNumber = navigator.onLine ? response : 'UNAVAILABLE'
     let eventName = DECLARATION
-    let actionName = SUBMISSION
-    let nextSection = true
 
     if (this.userHasRegisterScope()) {
       eventName = REGISTRATION
-      actionName = REGISTERED
-      nextSection = false
     }
 
     if (duplicate) {
       eventName = DUPLICATION
-      actionName = REGISTERED
-      nextSection = false
     }
     history.push(CONFIRMATION_SCREEN, {
-      trackNumber,
-      nextSection,
+      trackNumber: response,
       trackingSection: true,
       eventName,
       eventType: event,
-      actionName,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
+    })
+    this.props.deleteDraft(draft)
+  }
+
+  offlineSubmission = () => {
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
+    const fullName = getFullName(personData)
+
+    history.push(CONFIRMATION_SCREEN, {
+      trackingSection: true,
+      eventName: OFFLINE,
+      eventType: event,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
       duplicateContextId:
@@ -735,7 +746,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             form={registerForm}
             draft={draft}
             onCompleted={this.successfulSubmission}
-            onError={this.successfulSubmission}
+            onError={this.offlineSubmission}
           >
             <MutationContext.Consumer>
               {({ mutation, loading, data }) => (
@@ -835,9 +846,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}
-            confirmRejectionEvent={() => {
-              this.rejectSubmission()
-            }}
+            confirmRejectionEvent={this.rejectSubmission}
             duplicate={duplicate}
             draftId={draft.id}
             event={this.getEvent()}
