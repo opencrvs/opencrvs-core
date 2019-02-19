@@ -33,6 +33,9 @@ export const eventLocationMutationTransformer = (
     if (transformedData.eventLocation.type) {
       delete transformedData.eventLocation.type
     }
+  } else if (transformedFieldName) {
+    transformedData.eventLocation.address[transformedFieldName] =
+      draftData[sectionId][field.name]
   } else {
     transformedData.eventLocation.address[field.name] =
       draftData[sectionId][field.name]
