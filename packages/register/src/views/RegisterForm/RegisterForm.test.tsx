@@ -23,6 +23,7 @@ import {
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+import { FETCH_DECEASED } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
 import { Event, IFormData } from '@opencrvs/register/src/forms'
 import { draftToGqlTransformer } from 'src/transformer'
 import { IForm } from 'src/forms'
@@ -111,6 +112,241 @@ describe('when user is in the register form for birth event', async () => {
         .hostNodes()
         .simulate('click')
       expect(history.location.pathname).toEqual('/confirm')
+    })
+  })
+})
+
+describe('when user is in the register form for death event', async () => {
+  const { store, history } = createStore()
+  const draft = createDraft(Event.DEATH)
+  store.dispatch(setInitialDrafts())
+  store.dispatch(storeDraft(draft))
+  let component: ReactWrapper<{}, {}>
+
+  const mock: any = jest.fn()
+  const form = getRegisterForm(store.getState())[Event.DEATH]
+
+  describe('when user is in optional cause of death section', () => {
+    beforeEach(async () => {
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'causeOfDeath' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+    })
+    it('renders the optional label', () => {
+      expect(
+        component.find('#form_section_optional_label_causeOfDeath').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('renders the notice component', () => {
+      expect(
+        component.find('#form_section_notice_causeOfDeath').hostNodes()
+      ).toHaveLength(1)
+    })
+  })
+
+  describe('when user is in deceased section', () => {
+    it('renders loader button when idType is Birth Registration Number', () => {
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+      selectOption(component, '#iDType', 'Birth Registration Number')
+      expect(component.find('#loaderButton').hostNodes()).toHaveLength(1)
+    })
+
+    it('fetches deceased information by entered BRN', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_DECEASED,
+            variables: {
+              identifier: '2019333494BQNXOHJ2'
+            }
+          },
+          result: {
+            data: {
+              queryRegistrationByIdentifier: {
+                id: '47cc78a6-3d42-4253-8050-843b278d496b',
+                child: {
+                  id: 'e969527e-be14-4577-99b6-8e1f8000c274',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'গায়ত্রী',
+                      familyName: 'স্পিভক'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Gayatri',
+                      familyName: 'Spivak'
+                    }
+                  ],
+                  birthDate: '2018-08-01',
+                  gender: 'female'
+                }
+              }
+            }
+          }
+        }
+      ]
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component = testComponent.component
+      selectOption(component, '#iDType', 'Birth Registration Number')
+
+      const input = component.find('input#iD')
+      // @ts-ignore
+      input
+        .props()
+        // @ts-ignore
+        .onChange({
+          // @ts-ignore
+          target: {
+            // @ts-ignore
+            id: 'iD',
+            value: '2019333494BQNXOHJ2'
+          }
+        })
+      component.update()
+
+      component
+        .find('#loaderButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
+      component.update()
+
+      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
+        1
+      )
+    })
+
+    it('displays error message if no registration found by BRN', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_DECEASED,
+            variables: {
+              identifier: '2019333494BQNXOHJ2'
+            }
+          },
+          error: new Error('boom')
+        }
+      ]
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component = testComponent.component
+      selectOption(component, '#iDType', 'Birth Registration Number')
+
+      const input = component.find('input#iD')
+      // @ts-ignore
+      input
+        .props()
+        // @ts-ignore
+        .onChange({
+          // @ts-ignore
+          target: {
+            // @ts-ignore
+            id: 'iD',
+            value: '2019333494BQNXOHJ2'
+          }
+        })
+      component.update()
+
+      component
+        .find('#loaderButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+
+      expect(component.find('#loader-button-error').hostNodes()).toHaveLength(1)
     })
   })
 })

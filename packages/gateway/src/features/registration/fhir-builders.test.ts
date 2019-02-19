@@ -117,7 +117,7 @@ test('should build a minimal FHIR registration document without error', async ()
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID',
+            type: 'NATIONAL_ID_FRONT',
             createdAt: '2018-10-21'
           },
           {
@@ -364,7 +364,7 @@ test('should build a minimal FHIR registration document without error', async ()
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
-        code: 'NATIONAL_ID'
+        code: 'NATIONAL_ID_FRONT'
       }
     ]
   })
