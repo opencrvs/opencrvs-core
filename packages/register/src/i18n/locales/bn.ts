@@ -862,12 +862,12 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.notDuplicate.modal.yes': 'হাঁ',
     'register.duplicates.notDuplicate.modal.confirmationText':
       'আপনি কি নিশ্চিত এই আবেদন নকল না?',
-    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন পর্যালোচনার জন্য পাঠানো হয়েছে।} 
-      registration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
-      duplication {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
-      rejection {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন প্রত্যাখ্যাত হয়েছে।} 
-      certificate {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} সনদপত্র সম্পূর্ণ হয়েছে।} 
-      offline {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদনটি আপনি পুনরায় সংযুক্ত হলে পাঠানো হবে।} }`,
+    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন পর্যালোচনার জন্য পাঠানো হয়েছে।} 
+      registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
+      duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
+      rejection {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন প্রত্যাখ্যাত হয়েছে।} 
+      certificate {{eventType, select, birth {জন্ম} death {মৃত্যু}} সনদপত্র সম্পূর্ণ হয়েছে।} 
+      offline {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদনটি আপনি পুনরায় সংযুক্ত হলে পাঠানো হবে।} }`,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।}
       declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
       registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।} 

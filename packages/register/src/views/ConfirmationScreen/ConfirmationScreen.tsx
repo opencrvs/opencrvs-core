@@ -190,7 +190,9 @@ class ConfirmationScreenView extends React.Component<
       : ''
     const isRejection = eventName === REJECTION ? true : false
     const fullName =
-      language === 'bn' || !fullNameInEng ? fullNameInBn : fullNameInEng + "'s"
+      language === 'bn' || !fullNameInEng
+        ? fullNameInBn + ' - এর'
+        : fullNameInEng + "'s"
     const trackNumber = history.location.state.trackNumber
       ? history.location.state.trackNumber
       : 'UNAVAILABLE'

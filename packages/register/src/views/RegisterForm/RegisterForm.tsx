@@ -337,9 +337,10 @@ const getFullName = (childData: IFormSectionData): IFullName => {
     fullNameInEng = `${String(childData.firstNamesEng)} ${String(
       childData.familyNameEng
     )}`
-  } else {
+  } else if (childData.familyNameEng) {
     fullNameInEng = String(childData.familyNameEng)
   }
+
   return {
     fullNameInBn,
     fullNameInEng
