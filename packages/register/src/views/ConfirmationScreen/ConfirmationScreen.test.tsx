@@ -5,14 +5,13 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '../../store'
 import {
   DECLARATION,
-  SUBMISSION,
-  DEATH,
+  OFFLINE,
   REGISTRATION,
-  REGISTERED,
   CERTIFICATION,
-  COMPLETION,
   REJECTION,
-  DUPLICATION
+  DUPLICATION,
+  BIRTH,
+  DEATH
 } from 'src/utils/constants'
 
 const fullNameInBn = 'টম ব্র্যাডি'
@@ -23,240 +22,182 @@ describe('when user is in the confirmation screen page for birth declaration', (
   const mock: any = jest.fn()
   let confirmationScreenComponent: ReactWrapper<{}, {}>
   history.push('/confirm', {
-    trackNumber: '1245lsajd',
-    nextSection: true,
+    trackNumber: '1245LSAJD',
     trackingSection: true,
     eventName: DECLARATION,
-    actionName: SUBMISSION,
+    eventType: BIRTH,
     fullNameInBn,
     fullNameInEng
   })
-  describe('when the application is online', () => {
-    beforeEach(async () => {
-      window.location.assign = jest.fn()
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show the online title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual('All done!')
-    })
-    it('should show the online text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(
-        `The birth declaration of ${fullNameInEng} has been successfully submitted to the registration office.`
-      )
-    })
-    it('should show the online whats next title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#whats_next_title')
-          .first()
-          .text()
-      ).toEqual(
-        'You will be notified through OpenCRVS when registration is complete or if there are any delays in the process.'
-      )
-    })
-    it('should show the online whats next text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#whats_next_text')
-          .first()
-          .text()
-      ).toEqual(
-        'The informant has given their contact details and will also be informed when the registration is complete.'
-      )
-    })
-    it('Should redirect the user to the register app', async () => {
-      confirmationScreenComponent
-        .find('#go_to_homepage_button')
-        .hostNodes()
-        .simulate('click')
-      await wait()
-      expect(history.location.pathname).toContain('/')
-    })
-    it('Should redirect the user to the register app', async () => {
-      confirmationScreenComponent
-        .find('#go_to_new_declaration')
-        .hostNodes()
-        .simulate('click')
-      await wait()
-      expect(history.location.pathname).toContain('/')
-    })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
   })
-  describe('when the application is offline', () => {
-    beforeEach(async () => {
-      Object.defineProperty(window.navigator, 'onLine', {
-        value: false,
-        writable: true
-      })
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show the offline title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual('Almost there')
-    })
-    it('should show the offline text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(
-        `The birth declaration of ${fullNameInEng} is pending due to internet connection.`
-      )
-    })
-    it('should show the offline whats next title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#whats_next_title')
-          .first()
-          .text()
-      ).toEqual(
-        'All you need to do is login once you have internet connectivity on your device within the next 7 days. OpenCRVS will automatically submit the form, so you won’t need to do anything else.'
-      )
-    })
-    it('should show the offline whats next text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#whats_next_text')
-          .first()
-          .text()
-      ).toEqual(
-        'Once the application is succesfully submited, you and the informant will be notified when the registration is complete.'
-      )
-    })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`birth application has been sent for review.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Tracking number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`1245LSAJD`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+  it('Should redirect the user to the new application', async () => {
+    confirmationScreenComponent
+      .find('#go_to_new_declaration')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
   })
 })
 
-describe('when user is in the confirmation screen page for death declarartion', () => {
+describe('when user is in the confirmation screen page for birth declaration in offline', () => {
   const { store, history } = createStore()
   const mock: any = jest.fn()
   let confirmationScreenComponent: ReactWrapper<{}, {}>
   history.push('/confirm', {
-    trackNumber: '1245lsajd',
+    trackNumber: '1245LSAJD',
     trackingSection: true,
-    eventName: DECLARATION,
-    actionName: SUBMISSION,
-    eventType: DEATH,
+    eventName: OFFLINE,
+    eventType: BIRTH,
     fullNameInBn,
     fullNameInEng
   })
-
-  describe('when the application is online', () => {
-    beforeEach(async () => {
-      Object.defineProperty(window.navigator, 'onLine', { value: true })
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show the online title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual('All done!')
-    })
-    it('should show the online text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(
-        `The death declaration of ${fullNameInEng} has been successfully submitted to the registration office.`
-      )
-    })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
   })
-  describe('when the application is offline', () => {
-    beforeEach(async () => {
-      Object.defineProperty(window.navigator, 'onLine', { value: false })
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show the offline title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual('Almost there')
-    })
-    it('should show the offline text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(
-        `The death declaration of ${fullNameInEng} is pending due to internet connection.`
-      )
-    })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`birth application will be sent when you reconnect.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Tracking number: `)
+  })
+  it('should show the tracking number', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`1245LSAJD`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive the tracking ID number via SMS when the application has been sent for review. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
   })
 })
 
@@ -265,75 +206,174 @@ describe('when user is in the confirmation screen page for birth registration', 
   const mock: any = jest.fn()
   let confirmationScreenComponent: ReactWrapper<{}, {}>
   history.push('/confirm', {
-    trackNumber: '1258764130017892446',
+    trackNumber: '123456789123456789',
     trackingSection: true,
     eventName: REGISTRATION,
-    actionName: REGISTERED,
+    eventType: BIRTH,
     fullNameInBn,
     fullNameInEng
   })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`birth has been registered.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Birth Registration Number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`123456789123456789`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive this number via SMS with instructions on how and where to collect the certificate. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+})
 
-  describe('when the application is online', () => {
-    beforeEach(async () => {
-      Object.defineProperty(window.navigator, 'onLine', { value: true })
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show icon header title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual(`Application registered`)
-    })
-    it('should show the icon header text ', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(`The birth of ${fullNameInEng} has been registered`)
-    })
-    it('should show tracking header', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#trackingSecHeader')
-          .first()
-          .text()
-      ).toEqual(`Birth Registration Number:  `)
-    })
-    it('should show the tracking id', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#trackingIdViewer')
-          .first()
-          .text()
-      ).toEqual(`1258764130017892446`)
-    })
-    it('should show the tracking text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#trackingSecText')
-          .first()
-          .text()
-      ).toEqual(
-        `The informant will receive this number via SMS with instructions on how and where to collect the certificate. They should use the number as a reference if enquiring about their registration. `
-      )
-    })
+describe('when user is in the confirmation screen page for birth rejection', () => {
+  const { store, history } = createStore()
+  const mock: any = jest.fn()
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '123456789123456789',
+    trackingSection: true,
+    eventName: REJECTION,
+    eventType: BIRTH,
+    fullNameInBn,
+    fullNameInEng
+  })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`birth application has been rejected.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Tracking number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`123456789123456789`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The application agent will be informed about the reasons for rejection and instructed to follow up. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
   })
 })
 
@@ -345,169 +385,702 @@ describe('when user is in the confirmation screen page for birth certification',
     trackNumber: '103',
     trackingSection: true,
     eventName: CERTIFICATION,
-    actionName: COMPLETION,
+    eventType: BIRTH,
     fullNameInBn,
     fullNameInEng
   })
-
-  describe('when the application is online', () => {
-    beforeEach(async () => {
-      Object.defineProperty(window.navigator, 'onLine', { value: true })
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show icon header title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual(`All done!`)
-    })
-    it('should show the icon header text ', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(`The birth certificate of ${fullNameInEng} has been completed.`)
-    })
-    it('should show the tracking id', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#trackingIdViewer')
-          .first()
-          .text()
-      ).toEqual(`103`)
-    })
-    it('should show the tracking text', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#trackingSecText')
-          .first()
-          .text()
-      ).toEqual(`Certificates have been collected from your jurisdiction. `)
-    })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`birth certificate has been completed.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(` `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`103`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(`Certificates have been collected from your jurisdiction. `)
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
   })
 })
 
-describe('when user is in the confirmation screen page for birth declaration rejection', () => {
+describe('when user is in the confirmation screen page for birth duplication', () => {
   const { store, history } = createStore()
   const mock: any = jest.fn()
   let confirmationScreenComponent: ReactWrapper<{}, {}>
   history.push('/confirm', {
-    trackNumber: '123456',
-    eventName: DECLARATION,
-    actionName: REJECTION,
-    fullNameInBn,
-    fullNameInEng
-  })
-
-  describe('when the application is online', () => {
-    beforeEach(async () => {
-      Object.defineProperty(window.navigator, 'onLine', { value: true })
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show icon header title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual(`Application rejected`)
-    })
-    it('should show the icon header text ', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(`The birth declaration of ${fullNameInEng} has been rejected.`)
-    })
-  })
-})
-
-describe('when user is in the confirmation screen page for birth duplication rejection', () => {
-  const { store, history } = createStore()
-  const mock: any = jest.fn()
-  let confirmationScreenComponent: ReactWrapper<{}, {}>
-  history.push('/confirm', {
-    trackNumber: '123456',
+    trackNumber: '123456789123456789',
+    trackingSection: true,
     eventName: DUPLICATION,
-    actionName: REJECTION,
+    eventType: BIRTH,
     fullNameInBn,
     fullNameInEng
   })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`birth has been registered.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Birth Registration Number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`123456789123456789`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive this number via SMS with instructions on how and where to collect the certificate. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+})
 
-  describe('when the application is online', () => {
-    beforeEach(async () => {
-      Object.defineProperty(window.navigator, 'onLine', { value: true })
-      const testComponent = createTestComponent(
-        <ConfirmationScreen
-          location={mock}
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      confirmationScreenComponent = testComponent.component
-    })
-    it('should show icon header title', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_title')
-          .first()
-          .text()
-      ).toEqual(`Application rejected`)
-    })
-    it('should show the icon header text ', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#submission_text')
-          .first()
-          .text()
-      ).toEqual(`The birth duplication of ${fullNameInEng} has been rejected.`)
-    })
-    it('should show the back to duplication text ', () => {
-      expect(
-        confirmationScreenComponent
-          .find('#go_to_duplicate_button')
-          .first()
-          .text()
-      ).toEqual(`Back to duplicate`)
-    })
+describe('when user is in the confirmation screen page for death declaration', () => {
+  const { store, history } = createStore()
+  const mock: any = jest.fn()
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '1245LSAJD',
+    trackingSection: true,
+    eventName: DECLARATION,
+    eventType: DEATH,
+    fullNameInBn,
+    fullNameInEng
+  })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`death application has been sent for review.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Tracking number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`1245LSAJD`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+  it('Should redirect the user to the new application', async () => {
+    confirmationScreenComponent
+      .find('#go_to_new_declaration')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+})
+
+describe('when user is in the confirmation screen page for death declaration in offline', () => {
+  const { store, history } = createStore()
+  const mock: any = jest.fn()
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '1245LSAJD',
+    trackingSection: true,
+    eventName: OFFLINE,
+    eventType: DEATH,
+    fullNameInBn,
+    fullNameInEng
+  })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`death application will be sent when you reconnect.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Tracking number: `)
+  })
+  it('should show the tracking number', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`1245LSAJD`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive the tracking ID number via SMS when the application has been sent for review. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+})
+
+describe('when user is in the confirmation screen page for death registration', () => {
+  const { store, history } = createStore()
+  const mock: any = jest.fn()
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '123456789123456789',
+    trackingSection: true,
+    eventName: REGISTRATION,
+    eventType: DEATH,
+    fullNameInBn,
+    fullNameInEng
+  })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`death has been registered.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Death Registration Number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`123456789123456789`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive this number via SMS with instructions on how and where to collect the certificate. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+})
+
+describe('when user is in the confirmation screen page for death rejection', () => {
+  const { store, history } = createStore()
+  const mock: any = jest.fn()
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '123456789123456789',
+    trackingSection: true,
+    eventName: REJECTION,
+    eventType: DEATH,
+    fullNameInBn,
+    fullNameInEng
+  })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`death application has been rejected.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Tracking number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`123456789123456789`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The application agent will be informed about the reasons for rejection and instructed to follow up. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+})
+
+describe('when user is in the confirmation screen page for death certification', () => {
+  const { store, history } = createStore()
+  const mock: any = jest.fn()
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '103',
+    trackingSection: true,
+    eventName: CERTIFICATION,
+    eventType: DEATH,
+    fullNameInBn,
+    fullNameInEng
+  })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`death certificate has been completed.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(` `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`103`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(`Certificates have been collected from your jurisdiction. `)
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
+  })
+})
+
+describe('when user is in the confirmation screen page for death duplication', () => {
+  const { store, history } = createStore()
+  const mock: any = jest.fn()
+  let confirmationScreenComponent: ReactWrapper<{}, {}>
+  history.push('/confirm', {
+    trackNumber: '123456789123456789',
+    trackingSection: true,
+    eventName: DUPLICATION,
+    eventType: DEATH,
+    fullNameInBn,
+    fullNameInEng
+  })
+  beforeEach(async () => {
+    window.location.assign = jest.fn()
+    const testComponent = createTestComponent(
+      <ConfirmationScreen
+        location={mock}
+        history={history}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    confirmationScreenComponent = testComponent.component
+  })
+  it('should show the submission text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_text')
+        .first()
+        .text()
+    ).toEqual(`death has been registered.`)
+  })
+  it('should show the submission icon', () => {
+    expect(
+      confirmationScreenComponent.find('#success_screen_icon').hostNodes()
+        .length
+    ).toEqual(1)
+  })
+  it('should show the online submission name', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#submission_name')
+        .first()
+        .text()
+    ).toEqual(`Tom Brady's`)
+  })
+  it('should show the tracking section header', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_header')
+        .first()
+        .text()
+    ).toEqual(`Death Registration Number: `)
+  })
+  it('should show the tracking number ', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_id_viewer')
+        .first()
+        .text()
+    ).toEqual(`123456789123456789`)
+  })
+  it('should show the tracking section text', () => {
+    expect(
+      confirmationScreenComponent
+        .find('#tracking_sec_text')
+        .first()
+        .text()
+    ).toEqual(
+      `The informant will receive this number via SMS with instructions on how and where to collect the certificate. `
+    )
+  })
+  it('Should redirect the user to the homepage', async () => {
+    confirmationScreenComponent
+      .find('#go_to_homepage_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('/')
   })
 })

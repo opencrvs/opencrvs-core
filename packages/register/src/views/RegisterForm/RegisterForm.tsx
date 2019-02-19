@@ -409,32 +409,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       draft: { event }
     } = this.props
-    let personData
-    if (event === Event.DEATH) {
-      personData = this.props.draft.data.deceased
-    } else {
-      personData = this.props.draft.data.child
-    }
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
     const fullName = getFullName(personData)
-    const duplicate = history.location.state && history.location.state.duplicate
-    let eventName = DECLARATION
+    const eventName = this.userHasRegisterScope() ? REGISTRATION : DECLARATION
 
-    if (this.userHasRegisterScope()) {
-      eventName = REGISTRATION
-    }
-
-    if (duplicate) {
-      eventName = DUPLICATION
-    }
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       trackingSection: true,
       eventName,
       eventType: event,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
+      fullNameInEng: fullName.fullNameInEng
     })
     this.props.deleteDraft(draft)
   }
@@ -456,9 +444,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       eventName: OFFLINE,
       eventType: event,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
+      fullNameInEng: fullName.fullNameInEng
     })
     this.props.deleteDraft(draft)
   }
@@ -469,21 +455,24 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       draft: { event }
     } = this.props
-    let personData
-    if (event === Event.DEATH) {
-      personData = this.props.draft.data.deceased
-    } else {
-      personData = this.props.draft.data.child
-    }
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
     const fullName = getFullName(personData)
+    const duplicate = history.location.state && history.location.state.duplicate
+    const eventName = duplicate ? DUPLICATION : REGISTRATION
+
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       trackingSection: true,
-      eventName: REGISTRATION,
+      eventName,
       eventType: event,
       actionName: REGISTERED,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
     this.props.deleteDraft(draft)
   }

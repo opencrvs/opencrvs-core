@@ -16,13 +16,7 @@ import {
 import { RouteComponentProps } from 'react-router'
 import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
-import {
-  DECLARATION,
-  REJECTION,
-  DUPLICATION,
-  BIRTH,
-  OFFLINE
-} from 'src/utils/constants'
+import { DECLARATION, REJECTION, BIRTH, OFFLINE } from 'src/utils/constants'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 
 const messages = defineMessages({
@@ -205,8 +199,7 @@ class ConfirmationScreenView extends React.Component<
     const isTrackingSection = history.location.state.trackingSection
       ? true
       : false
-    const isDuplicate =
-      history.location.state.eventName === DUPLICATION ? true : false
+    const isDuplicate = history.location.state.duplicateContextId ? true : false
     const duplicateContextId = history.location.state.duplicateContextId
 
     return (
@@ -215,7 +208,7 @@ class ConfirmationScreenView extends React.Component<
         <Container>
           <Box>
             <ImgHeaderContainer>
-              <BoxIconDiv>
+              <BoxIconDiv id="success_screen_icon">
                 {isRejection ? (
                   <Rejected />
                 ) : offLine ? (
@@ -225,7 +218,7 @@ class ConfirmationScreenView extends React.Component<
                 )}
               </BoxIconDiv>
               <BoxTextDiv>
-                <SubmissionName>
+                <SubmissionName id="submission_name">
                   <strong>{fullName}</strong>
                 </SubmissionName>
               </BoxTextDiv>
@@ -241,16 +234,16 @@ class ConfirmationScreenView extends React.Component<
           </Box>
           {isTrackingSection && (
             <TrackingBox offline={offLine}>
-              <TrackingHeader id="trackingSecHeader">
+              <TrackingHeader id="tracking_sec_header">
                 {intl.formatMessage(messages.trackingSectionTitle, {
                   event: eventName,
                   eventType
                 })}
               </TrackingHeader>
-              <TrackingNumber id="trackingIdViewer">
+              <TrackingNumber id="tracking_id_viewer">
                 <strong>{trackNumber}</strong>
               </TrackingNumber>
-              <StyledP id="trackingSecText">
+              <StyledP id="tracking_sec_text">
                 {intl.formatMessage(messages.trackingSectionDesc, {
                   event: eventName
                 })}
@@ -267,7 +260,7 @@ class ConfirmationScreenView extends React.Component<
               {intl.formatMessage(messages.backButton)}
             </FooterPrimaryButton>
           </FooterAction>
-          {!isRejection && isDeclaration && (
+          {!isRejection && (isDeclaration || offLine) && (
             <FooterAction>
               <FooterPrimaryButton
                 id="go_to_new_declaration"
