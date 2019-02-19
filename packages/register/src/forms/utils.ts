@@ -17,7 +17,10 @@ import {
   IDynamicValueMapper,
   IFormData,
   IDynamicFormFieldValidators,
-  IDynamicFormField
+  IDynamicFormField,
+  LOADER_BUTTON,
+  ILoaderButton,
+  IFieldInput
 } from './'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -29,6 +32,7 @@ import {
 } from 'src/offline/reducer'
 import { Validation } from 'src/utils/validate'
 import * as moment from 'moment'
+import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 interface IRange {
   start: number
@@ -55,6 +59,25 @@ export const internationaliseFieldObject = (
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
+
+  if (base.type === LOADER_BUTTON) {
+    ;(base as any).modalTitle = intl.formatMessage(
+      (field as ILoaderButton).modalTitle
+    )
+    ;(base as any).modalInfoText = intl.formatMessage(
+      (field as ILoaderButton).modalInfoText
+    )
+    ;(base as any).successTitle = intl.formatMessage(
+      (field as ILoaderButton).successTitle
+    )
+    ;(base as any).errorTitle = intl.formatMessage(
+      (field as ILoaderButton).errorTitle
+    )
+    ;(base as any).errorText = intl.formatMessage(
+      (field as ILoaderButton).errorText
+    )
+  }
+
   return base as Ii18nFormField
 }
 
@@ -247,6 +270,17 @@ export function isCityLocation(
   }
 }
 
+export function getInputValues(
+  field: ILoaderButton,
+  values: IFormSectionData
+): IDynamicValues {
+  const variables = {}
+  field.inputs.forEach((input: IFieldInput) => {
+    variables[input.name] = values[input.valueField]
+  })
+  return variables
+}
+
 export const getConditionalActionsForField = (
   field: IFormField,
   values: IFormSectionData,
@@ -363,10 +397,20 @@ export const conditionals: IConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  otherPlaceOfBirth: {
+  placeOfDeathHospital: {
+    action: 'hide',
+    expression:
+      '(values.placeOfDeath!="HOSPITAL" && values.placeOfDeath!="OTHER_HEALTH_INSTITUTION")'
+  },
+  otherBirthEventLocation: {
     action: 'hide',
     expression:
       '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
+  },
+  otherDeathEventLocation: {
+    action: 'hide',
+    expression:
+      '(values.placeOfDeath!="OTHER" && values.placeOfDeath!="PRIVATE_HOME")'
   },
   isNotCityLocation: {
     action: 'hide',
@@ -398,7 +442,7 @@ export const conditionals: IConditionals = {
   },
   deathPlaceOther: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "other"'
+    expression: 'values.deathPlaceAddress !== "OTHER"'
   },
   causeOfDeathEstablished: {
     action: 'hide',
@@ -407,5 +451,10 @@ export const conditionals: IConditionals = {
   isMarried: {
     action: 'hide',
     expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
+  },
+  deceasedBRNSelected: {
+    action: 'hide',
+    expression:
+      '(!values.iDType || values.iDType !== "BIRTH_REGISTRATION_NUMBER")'
   }
 }

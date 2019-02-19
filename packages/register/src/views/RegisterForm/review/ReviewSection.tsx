@@ -54,9 +54,10 @@ import {
   ISelectOption,
   IDynamicOptions,
   IFormSectionData,
-  Event,
-  WARNING
+  WARNING,
+  DATE
 } from 'src/forms'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 const messages = defineMessages({
   valueYes: {
@@ -266,7 +267,7 @@ const DraftButtonContainer = styled.div`
 `
 interface IProps {
   draft: IDraft
-  registerForm: IForm
+  registerForm: { [key: string]: IForm }
   tabRoute: string
   registerClickEvent?: () => void
   rejectApplicationClickEvent?: () => void
@@ -395,6 +396,11 @@ const renderValue = (
       language
     )
   }
+
+  if (field.type === DATE && value && typeof value === 'string') {
+    return formatLongDate(value)
+  }
+
   if (typeof value === 'string') {
     return value
   }
@@ -466,11 +472,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
 
+    const event = this.props.draft.event
+
     this.state = {
       displayEditDialog: false,
       allSectionVisited: false,
       editClickedSectionId: '',
-      sectionExpansionConfig: getSectionExpansionConfig(props.registerForm)
+      sectionExpansionConfig: getSectionExpansionConfig(
+        props.registerForm[event]
+      )
     }
   }
 
@@ -544,10 +554,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       deleteApplicationClickEvent,
       offlineResources,
       language,
-      tabRoute
+      tabRoute,
+      draft: { event }
     } = this.props
 
-    const formSections = getViewableSection(registerForm)
+    const formSections = getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
 
@@ -620,7 +631,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                     )
                                   }}
                                 >
-                                  {intl.formatMessage(errorsOnField[0].message)}
+                                  {intl.formatMessage(
+                                    errorsOnField[0].message,
+                                    errorsOnField[0].props
+                                  )}
                                 </RequiredFieldLink>
                               ) : (
                                 renderValue(
@@ -750,7 +764,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
 export const ReviewSection = connect(
   (state: IStoreState) => ({
-    registerForm: getRegisterForm(state)[Event.BIRTH],
+    registerForm: getRegisterForm(state),
     scope: getScope(state),
     offlineResources: getOfflineState(state),
     language: getLanguage(state)

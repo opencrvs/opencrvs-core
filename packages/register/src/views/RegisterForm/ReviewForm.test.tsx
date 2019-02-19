@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { ReviewForm, FETCH_BIRTH_REGISTRATION_QUERY } from './ReviewForm'
+import { ReviewForm } from './ReviewForm'
+import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -42,7 +43,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW
         },
         error: new Error('boom')
       }
@@ -88,7 +89,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -99,8 +100,6 @@ describe('ReviewForm tests', async () => {
                 composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
                 encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
                 observation: {
-                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
-                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
@@ -188,9 +187,18 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              placeOfBirth: null,
-              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-              birthLocationType: 'HOSPITAL',
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -233,8 +241,17 @@ describe('ReviewForm tests', async () => {
       familyName: 'আকাশ',
       familyNameEng: 'Akash',
       gender: 'male',
-      birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-      placeOfBirth: 'HOSPITAL',
+      placeOfBirth: 'PRIVATE_HOME',
+      birthLocation: undefined,
+      country: 'BGD',
+      state: 'state4',
+      district: 'district2',
+      addressLine1: 'Rd #10',
+      addressLine1CityOption: '',
+      addressLine2: 'Akua',
+      addressLine3: 'union1',
+      addressLine3CityOption: '',
+      addressLine4: 'upazila10',
       multipleBirth: 1,
       birthType: 'SINGLE',
       weightAtBirth: 2
@@ -247,7 +264,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -261,8 +278,6 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
-                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -326,9 +341,18 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              placeOfBirth: null,
-              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-              birthLocationType: 'HOSPITAL',
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -372,7 +396,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -386,8 +410,6 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
-                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -407,9 +429,18 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              placeOfBirth: null,
-              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-              birthLocationType: 'HOSPITAL',
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -455,7 +486,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -469,8 +500,6 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
-                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -497,9 +526,18 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              placeOfBirth: null,
-              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-              birthLocationType: 'HOSPITAL',
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -553,7 +591,7 @@ describe('ReviewForm tests', async () => {
     const graphqlMock = [
       {
         request: {
-          query: FETCH_BIRTH_REGISTRATION_QUERY,
+          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
           variables: { id: draft.id }
         },
         result: {
@@ -567,8 +605,6 @@ describe('ReviewForm tests', async () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  birthLocation: '7b7d477f-722a-473d-9d22-0b72fd9f49c8',
-                  birthLocationType: '77a6fcee-3aa8-4ab9-bcbd-511f25ac9b64',
                   presentAtBirthRegistration:
                     'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
@@ -641,18 +677,18 @@ describe('ReviewForm tests', async () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              placeOfBirth: {
+              eventLocation: {
                 address: {
-                  type: 'PERMANENT',
-                  line: ['12', '', '', 'union1', '', 'upazila10'],
+                  country: 'BGD',
+                  state: 'state4',
                   district: 'district2',
-                  state: 'state2',
                   postalCode: '',
-                  country: 'BGD'
-                }
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
               },
-              birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-              birthLocationType: 'HOSPITAL',
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -786,7 +822,7 @@ describe('ReviewForm tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_BIRTH_REGISTRATION_QUERY,
+            query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
             variables: { id: draft.id }
           },
           result: {
@@ -804,9 +840,18 @@ describe('ReviewForm tests', async () => {
                 attendantAtBirth: 'NURSE',
                 weightAtBirth: 2,
                 birthType: 'SINGLE',
-                placeOfBirth: null,
-                birthLocation: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-                birthLocationType: 'HOSPITAL',
+                eventLocation: {
+                  address: {
+                    country: 'BGD',
+                    state: 'state4',
+                    district: 'district2',
+                    postalCode: '',
+                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                    postCode: '1020'
+                  },
+                  type: 'PRIVATE_HOME',
+                  partOf: 'Location/upazila10'
+                },
                 presentAtBirthRegistration: 'MOTHER_ONLY'
               }
             }

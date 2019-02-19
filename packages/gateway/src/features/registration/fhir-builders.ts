@@ -25,14 +25,10 @@ import {
   CHILD_TITLE,
   ATTACHMENT_DOCS_TITLE,
   ATTACHMENT_CONTEXT_KEY,
-  HEALTH_FACILITY_BIRTH_CODE,
-  BIRTH_LOCATION_TYPE_CODE,
   DEATH_ENCOUNTER_CODE,
   CAUSE_OF_DEATH_CODE,
-  HEALTH_FACILITY_DEATH_CODE,
   DECEASED_CODE,
   DECEASED_TITLE,
-  DEATH_LOCATION_TYPE_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE,
   MANNER_OF_DEATH_CODE,
@@ -52,6 +48,7 @@ import {
   setCertificateCollectorReference,
   selectOrCreatePaymentReconciliationResource,
   selectOrCreateLocationRefResource,
+  selectOrCreateEncounterLocationRef,
   selectOrCreateInformantSection,
   selectOrCreateInformantResource
 } from 'src/features/fhir/utils'
@@ -661,39 +658,10 @@ const builders: IFieldBuilders = {
       const encounter = selectOrCreateEncounterResource(fhirBundle, context)
       encounter.id = fieldValue as string
     },
+    eventLocation: (fhirBundle, fieldValue) => {
+      return false
+    },
     observation: {
-      birthLocation: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          HEALTH_FACILITY_BIRTH_CODE,
-          'Health facility birth location',
-          fhirBundle,
-          context
-        )
-        observation.id = fieldValue as string
-      },
-      birthLocationType: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          BIRTH_LOCATION_TYPE_CODE,
-          'Type of birth location',
-          fhirBundle,
-          context
-        )
-        observation.id = fieldValue as string
-      },
       birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
@@ -2136,58 +2104,41 @@ const builders: IFieldBuilders = {
       }
     }
   },
-  birthLocation: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      BIRTH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      HEALTH_FACILITY_BIRTH_CODE,
-      'Health facility birth location',
-      fhirBundle,
-      context
-    )
-    observation.valueString = `Location/${fieldValue}`
-  },
-  birthLocationType: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      BIRTH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      BIRTH_LOCATION_TYPE_CODE,
-      'Type of birth location',
-      fhirBundle,
-      context
-    )
-    observation.valueString = fieldValue
-  },
-  placeOfBirth: {
+  eventLocation: {
     _fhirID: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
-      const location = selectOrCreateLocationRefResource(
-        BIRTH_ENCOUNTER_CODE,
+      const encounterLocationRef = selectOrCreateEncounterLocationRef(
         fhirBundle,
         context
       )
-      location.id = fieldValue as string
+      encounterLocationRef.reference = `Location/${fieldValue}`
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const location = selectOrCreateLocationRefResource(
-        BIRTH_ENCOUNTER_CODE,
-        fhirBundle,
-        context
-      )
-      location.status = fieldValue
+      let location
+      if (context.event === EVENT_TYPE.BIRTH) {
+        location = selectOrCreateLocationRefResource(
+          BIRTH_ENCOUNTER_CODE,
+          fhirBundle,
+          context
+        )
+      } else {
+        location = selectOrCreateLocationRefResource(
+          DEATH_ENCOUNTER_CODE,
+          fhirBundle,
+          context
+        )
+      }
+      location.type = {
+        coding: [
+          {
+            system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
+            code: fieldValue
+          }
+        ]
+      }
     },
     partOf: (
       fhirBundle: ITemplatedBundle,
@@ -2200,7 +2151,7 @@ const builders: IFieldBuilders = {
         context
       )
       location.partOf = {
-        reference: `Location/${fieldValue}`
+        reference: fieldValue
       }
     },
     address: createLocationAddressBuilder(BIRTH_ENCOUNTER_CODE)
@@ -2346,75 +2297,6 @@ const builders: IFieldBuilders = {
       context
     )
     observation.valueDateTime = fieldValue
-  },
-  placeOfDeath: {
-    _fhirID: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const location = selectOrCreateLocationRefResource(
-        DEATH_ENCOUNTER_CODE,
-        fhirBundle,
-        context
-      )
-      location.id = fieldValue as string
-    },
-    type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const location = selectOrCreateLocationRefResource(
-        DEATH_ENCOUNTER_CODE,
-        fhirBundle,
-        context
-      )
-      location.status = fieldValue
-    },
-    partOf: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const location = selectOrCreateLocationRefResource(
-        DEATH_ENCOUNTER_CODE,
-        fhirBundle,
-        context
-      )
-      location.partOf = {
-        reference: `Location/${fieldValue}`
-      }
-    },
-    address: createLocationAddressBuilder(DEATH_ENCOUNTER_CODE)
-  },
-  deathLocation: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      DEATH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      HEALTH_FACILITY_DEATH_CODE,
-      'Health facility death location',
-      fhirBundle,
-      context
-    )
-    observation.valueString = `Location/${fieldValue}`
-  },
-  deathLocationType: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      DEATH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      DEATH_LOCATION_TYPE_CODE,
-      'Type of death location',
-      fhirBundle,
-      context
-    )
-    observation.valueString = fieldValue
   },
   mannerOfDeath: (
     fhirBundle: ITemplatedBundle,

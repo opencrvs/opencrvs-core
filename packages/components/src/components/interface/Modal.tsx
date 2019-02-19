@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Cross } from '../icons'
 
 interface IProps {
-  title: string
+  title?: string
   actions: JSX.Element[]
   show: boolean
   handleClose?: () => void
@@ -17,7 +17,7 @@ const Backdrop = styled.div`
   width: 100%;
   height: 100%;
   background-color: rgba(53, 73, 93, 0.78);
-  z-index: 1;
+  z-index: 5;
   display: flex;
   justify-content: center;
   align-items: center;

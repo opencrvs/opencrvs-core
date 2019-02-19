@@ -19,10 +19,11 @@ import { getEventType } from '../utils'
 
 enum CONTACT {
   MOTHER,
-  FATHER
+  FATHER,
+  BOTH
 }
 
-export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
+export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
       'phoneNumberExists: Invalid FHIR bundle found for declaration'
@@ -50,7 +51,7 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
       return false
     }
 
-    contact = findPersonEntry(
+    contact = await findPersonEntry(
       getContactSection(CONTACT[sharedContact.valueString.toUpperCase()]),
       fhirBundle
     )
@@ -72,8 +73,9 @@ export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   return phoneNumber.value
 }
 
-export function getInformantName(
+export async function getInformantName(
   fhirBundle: fhir.Bundle,
+  sectionCode: string = CHILD_SECTION_CODE,
   language: string = 'bn'
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -82,7 +84,7 @@ export function getInformantName(
     )
   }
 
-  const informant = findPersonEntry(CHILD_SECTION_CODE, fhirBundle)
+  const informant = await findPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
   }
@@ -195,6 +197,7 @@ export function getPaperFormID(taskResource: fhir.Task) {
 function getContactSection(contact: CONTACT) {
   switch (contact) {
     case CONTACT.MOTHER:
+    case CONTACT.BOTH:
       return MOTHER_SECTION_CODE
     case CONTACT.FATHER:
       return FATHER_SECTION_CODE

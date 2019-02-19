@@ -36,7 +36,7 @@ describe('Verify fhir templates', () => {
           coding: [
             {
               system: `${OPENCRVS_SPECIFICATION_URL}types`,
-              code: 'birth-registration'
+              code: 'BIRTH'
             }
           ]
         }
@@ -77,8 +77,8 @@ describe('Verify fhir templates', () => {
     })
   })
   describe('FindPersonEntry', () => {
-    it('returns the right person entry', () => {
-      const personEntryResourse = findPersonEntry(
+    it('returns the right person entry', async () => {
+      const personEntryResourse = await findPersonEntry(
         MOTHER_SECTION_CODE,
         testFhirBundle
       )
@@ -102,20 +102,20 @@ describe('Verify fhir templates', () => {
         ]
       })
     })
-    it('throws error for invalid section code', () => {
-      expect(() =>
+    it('throws error for invalid section code', async () => {
+      await expect(
         findPersonEntry('INVALID_SECTION_CODE', testFhirBundle)
-      ).toThrowError(
+      ).rejects.toThrow(
         'Invalid person section found for given code: INVALID_SECTION_CODE'
       )
     })
-    it('throws error for invalid section reference on composite entry', () => {
+    it('throws error for invalid section reference on composite entry', async () => {
       const fhirBundle = cloneDeep(testFhirBundle)
       fhirBundle.entry[0].resource.section[1].entry[0].reference =
         'INVALID_REF_MOTHER_ENTRY'
-      expect(() =>
+      await expect(
         findPersonEntry(MOTHER_SECTION_CODE, fhirBundle)
-      ).toThrowError(
+      ).rejects.toThrow(
         'Patient referenced from composition section not found in FHIR bundle'
       )
     })

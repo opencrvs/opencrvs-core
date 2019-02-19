@@ -18,7 +18,7 @@ import {
   commentToFieldTransformer
 } from 'src/forms/mappings/query/field-mappings'
 import {
-  fieldToPhoneNumberTransformer,
+  fieldToBirthPhoneNumberTransformer,
   setRegistrationSectionTransformer
 } from './mappings/mutation/registration-mappings'
 import {
@@ -202,7 +202,7 @@ export const registrationSection: IFormSection = {
       initialValue: '',
       validate: [phoneNumberFormat],
       mapping: {
-        mutation: fieldToPhoneNumberTransformer('whoseContactDetails'),
+        mutation: fieldToBirthPhoneNumberTransformer('whoseContactDetails'),
         query: phoneNumberToFieldTransformer('contact')
       }
     },

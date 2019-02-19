@@ -2,7 +2,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
-import * as moment from 'moment'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   IconAction,
@@ -29,7 +28,9 @@ import {
   GQLLocation,
   GQLHumanName,
   GQLQuery,
-  GQLComment
+  GQLComment,
+  GQLEventRegistration,
+  GQLDeathRegistration
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   StatusGray,
@@ -57,10 +58,11 @@ import { getUserDetails } from 'src/profile/profileSelectors'
 import { createNamesMap } from 'src/utils/data-formating'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { messages as rejectionMessages } from 'src/review/reject-registration'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
-    listBirthRegistrations(
+    listEventRegistrations(
       locationIds: $locationIds
       count: $count
       skip: $skip
@@ -72,6 +74,7 @@ export const FETCH_REGISTRATION_QUERY = gql`
           id
           trackingId
           registrationNumber
+          type
           status {
             id
             user {
@@ -104,16 +107,32 @@ export const FETCH_REGISTRATION_QUERY = gql`
           }
           duplicates
         }
-        child {
-          id
-          name {
-            use
-            firstNames
-            familyName
-          }
-          birthDate
-        }
         createdAt
+        ... on BirthRegistration {
+          child {
+            id
+            name {
+              use
+              firstNames
+              familyName
+            }
+            birthDate
+          }
+        }
+        ... on DeathRegistration {
+          deceased {
+            id
+            name {
+              use
+              firstNames
+              familyName
+            }
+            birthDate
+            deceased {
+              deathDate
+            }
+          }
+        }
       }
     }
   }
@@ -241,6 +260,11 @@ const messages = defineMessages({
     defaultMessage: 'D.o.B',
     description: 'Label for DoB in work queue list item'
   },
+  listItemDod: {
+    id: 'register.workQueue.labels.results.dod',
+    defaultMessage: 'D.o.D',
+    description: 'Label for DoD in work queue list item'
+  },
   listItemDateOfApplication: {
     id: 'register.workQueue.labels.results.dateOfApplication',
     defaultMessage: 'Date of application',
@@ -342,32 +366,32 @@ const messages = defineMessages({
     description: 'Print Certificate Button text'
   },
   FIELD_AGENT: {
-    id: 'register.home.hedaer.FIELD_AGENT',
+    id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
   REGISTRATION_CLERK: {
-    id: 'register.home.hedaer.REGISTRATION_CLERK',
+    id: 'register.home.header.REGISTRATION_CLERK',
     defaultMessage: 'Registration Clerk',
     description: 'The description for REGISTRATION_CLERK role'
   },
   LOCAL_REGISTRAR: {
-    id: 'register.home.hedaer.LOCAL_REGISTRAR',
+    id: 'register.home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
     description: 'The description for LOCAL_REGISTRAR role'
   },
   DISTRICT_REGISTRAR: {
-    id: 'register.home.hedaer.DISTRICT_REGISTRAR',
+    id: 'register.home.header.DISTRICT_REGISTRAR',
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role'
   },
   STATE_REGISTRAR: {
-    id: 'register.home.hedaer.STATE_REGISTRAR',
+    id: 'register.home.header.STATE_REGISTRAR',
     defaultMessage: 'State Registrar',
     description: 'The description for STATE_REGISTRAR role'
   },
   NATIONAL_REGISTRAR: {
-    id: 'register.home.hedaer.NATIONAL_REGISTRAR',
+    id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
   },
@@ -518,7 +542,7 @@ const ExpansionContainer = styled.div`
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  margin-bottom: 1px;
+  margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
   }
@@ -659,11 +683,11 @@ export class WorkQueueView extends React.Component<
 
   getEventLabel = (status: string) => {
     switch (status) {
-      case 'birth':
+      case 'BIRTH':
         return this.props.intl.formatMessage(messages.filtersBirth)
-      case 'death':
+      case 'DEATH':
         return this.props.intl.formatMessage(messages.filtersDeath)
-      case 'marriage':
+      case 'MARRIAGE':
         return this.props.intl.formatMessage(messages.filtersMarriage)
       default:
         return this.props.intl.formatMessage(messages.filtersBirth)
@@ -671,14 +695,31 @@ export class WorkQueueView extends React.Component<
   }
 
   transformData = (data: GQLQuery) => {
-    if (!data.listBirthRegistrations || !data.listBirthRegistrations.results) {
+    const { locale } = this.props.intl
+    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
       return []
     }
 
-    return data.listBirthRegistrations.results.map(
-      (reg: GQLBirthRegistration) => {
-        const childNames =
-          (reg.child && (reg.child.name as GQLHumanName[])) || []
+    return data.listEventRegistrations.results.map(
+      (reg: GQLEventRegistration) => {
+        let birthReg
+        let deathReg
+        let names
+        if (reg.registration && reg.registration.type === 'BIRTH') {
+          birthReg = reg as GQLBirthRegistration
+          names =
+            (birthReg &&
+              birthReg.child &&
+              (birthReg.child.name as GQLHumanName[])) ||
+            []
+        } else {
+          deathReg = reg as GQLDeathRegistration
+          names =
+            (deathReg &&
+              deathReg.deceased &&
+              (deathReg.deceased.name as GQLHumanName[])) ||
+            []
+        }
         const lang = 'bn'
         const type =
           reg.registration &&
@@ -687,13 +728,25 @@ export class WorkQueueView extends React.Component<
         return {
           id: reg.id,
           name:
-            (createNamesMap(childNames)[lang] as string) ||
+            (createNamesMap(names)[lang] as string) ||
             /* tslint:disable:no-string-literal */
-            (createNamesMap(childNames)['default'] as string) ||
+            (createNamesMap(names)['default'] as string) ||
             /* tslint:enable:no-string-literal */
             '',
-          dob: (reg.child && reg.child.birthDate) || '',
-          date_of_application: moment(reg.createdAt).format('YYYY-MM-DD'),
+          dob:
+            (birthReg &&
+              birthReg.child &&
+              birthReg.child.birthDate &&
+              formatLongDate(birthReg.child.birthDate, locale)) ||
+            '',
+          dod:
+            (deathReg &&
+              deathReg.deceased &&
+              deathReg.deceased.deceased &&
+              deathReg.deceased.deceased.deathDate &&
+              formatLongDate(deathReg.deceased.deceased.deathDate, locale)) ||
+            '',
+          date_of_application: formatLongDate(reg.createdAt, locale),
           registrationNumber:
             (reg.registration && reg.registration.registrationNumber) || '',
           tracking_id: (reg.registration && reg.registration.trackingId) || '',
@@ -701,34 +754,35 @@ export class WorkQueueView extends React.Component<
           status:
             reg.registration &&
             reg.registration.status &&
-            reg.registration.status.map(status => {
-              return {
-                type: status && status.type,
-                practitionerName:
-                  (status &&
-                    status.user &&
-                    (createNamesMap(status.user.name as GQLHumanName[])[
-                      this.props.language
-                    ] as string)) ||
-                  (status &&
-                    status.user &&
-                    /* tslint:disable:no-string-literal */
-                    (createNamesMap(status.user.name as GQLHumanName[])[
-                      'default'
-                    ] as string)) ||
-                  /* tslint:enable:no-string-literal */
-                  '',
-                timestamp:
-                  status && moment(status.timestamp).format('YYYY-MM-DD'),
-                practitionerRole: status && status.user && status.user.role,
-                officeName: status && status.office && status.office.name
-              }
-            }),
+            reg.registration.status
+              .map(status => {
+                return {
+                  type: status && status.type,
+                  practitionerName:
+                    (status &&
+                      status.user &&
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        this.props.language
+                      ] as string)) ||
+                    (status &&
+                      status.user &&
+                      /* tslint:disable:no-string-literal */
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        'default'
+                      ] as string)) ||
+                    /* tslint:enable:no-string-literal */
+                    '',
+                  timestamp: status && formatLongDate(status.timestamp, locale),
+                  practitionerRole: status && status.user && status.user.role,
+                  officeName: status && status.office && status.office.name
+                }
+              })
+              .reverse(),
           declaration_status:
             reg.registration &&
             reg.registration.status &&
             (reg.registration.status[0] as GQLRegWorkflow).type,
-          event: 'birth',
+          event: reg.registration && reg.registration.type,
           rejection_reason:
             (type === 'REJECTED' &&
               (reg.registration &&
@@ -766,16 +820,13 @@ export class WorkQueueView extends React.Component<
     })
   }
 
-  renderExpansionContent = (
-    item: {
-      [key: string]: string & Array<{ [key: string]: string }>
-    },
-    key: number
-  ): JSX.Element[] => {
-    return item.status.map(status => {
+  renderExpansionContent = (item: {
+    [key: string]: string & Array<{ [key: string]: string }>
+  }): JSX.Element[] => {
+    return item.status.map((status, i) => {
       const { practitionerName, practitionerRole, officeName } = status
       return (
-        <ExpansionContainer key={key}>
+        <ExpansionContainer key={i}>
           {this.getDeclarationStatusIcon(status.type)}
           <ExpansionContentContainer>
             <LabelValue
@@ -831,10 +882,18 @@ export class WorkQueueView extends React.Component<
       label: this.props.intl.formatMessage(messages.listItemName),
       value: item.name
     })
-    info.push({
-      label: this.props.intl.formatMessage(messages.listItemDob),
-      value: item.dob
-    })
+    if (item.dob) {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemDob),
+        value: item.dob
+      })
+    }
+    if (item.dod) {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemDod),
+        value: item.dod
+      })
+    }
     info.push({
       label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
       value: item.date_of_application
@@ -987,7 +1046,7 @@ export class WorkQueueView extends React.Component<
         actions={listItemActions}
         expandedCellRenderer={() => (
           <ListItemExpansion actions={expansionActions}>
-            {this.renderExpansionContent(item, key)}
+            {this.renderExpansionContent(item)}
           </ListItemExpansion>
         )}
       />
@@ -1223,8 +1282,8 @@ export class WorkQueueView extends React.Component<
                       }}
                       pageSize={this.pageSize}
                       totalPages={Math.ceil(
-                        ((data.listBirthRegistrations &&
-                          data.listBirthRegistrations.totalItems) ||
+                        ((data.listEventRegistrations &&
+                          data.listEventRegistrations.totalItems) ||
                           0) / this.pageSize
                       )}
                       initialPage={this.state.currentPage}

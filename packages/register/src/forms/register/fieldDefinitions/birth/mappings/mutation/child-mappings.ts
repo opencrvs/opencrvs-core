@@ -1,6 +1,6 @@
 import { IFormField, IFormData } from 'src/forms'
 
-export const addressToPlaceOfBirthTransformer = (
+export const eventLocationMutationTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (
@@ -9,31 +9,42 @@ export const addressToPlaceOfBirthTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  if (!transformedData.placeOfBirth) {
-    transformedData.placeOfBirth = {
-      type: draftData[sectionId].placeOfBirth
-        ? draftData[sectionId].placeOfBirth
-        : '',
-      partOf: draftData[sectionId].addressLine4
-        ? draftData[sectionId].addressLine4
-        : '',
+  if (!transformedData.eventLocation) {
+    transformedData.eventLocation = {
       address: {
-        type: `BIRTH_PLACE`,
         country: '',
         state: '',
         district: '',
         postalCode: '',
         line: ['', '', '', '', '', '']
       }
-    }
+    } as fhir.Location
   }
   if (lineNumber > 0) {
-    transformedData.placeOfBirth.address.line[lineNumber - 1] =
+    transformedData.eventLocation.address.line[lineNumber - 1] =
+      draftData[sectionId][field.name]
+  } else if (field.name === 'placeOfBirth') {
+    transformedData.eventLocation.type = draftData[sectionId][field.name]
+  } else if (field.name === 'birthLocation') {
+    transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
+    if (transformedData.eventLocation.address) {
+      delete transformedData.eventLocation.address
+    }
+    if (transformedData.eventLocation.type) {
+      delete transformedData.eventLocation.type
+    }
+  } else if (transformedFieldName) {
+    transformedData.eventLocation.address[transformedFieldName] =
       draftData[sectionId][field.name]
   } else {
-    transformedData.placeOfBirth.address[
-      !transformedFieldName ? field.name : transformedFieldName
-    ] = draftData[sectionId][field.name]
+    transformedData.eventLocation.address[field.name] =
+      draftData[sectionId][field.name]
   }
+  if (field.name === 'addressLine4') {
+    transformedData.eventLocation.partOf = `Location/${
+      draftData[sectionId][field.name]
+    }`
+  }
+
   return transformedData
 }

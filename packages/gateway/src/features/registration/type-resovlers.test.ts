@@ -9,6 +9,7 @@ import {
   mockPatient,
   mockDocumentReference,
   mockTask,
+  mockTaskForDeath,
   mockComposition,
   mockObservations,
   mockLocation
@@ -244,95 +245,117 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns a fhirIDMap object', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              resource: {
-                resourceType: 'Observation',
-                context: {
-                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
-                },
-                code: {
-                  coding: [
-                    {
-                      system: 'http://loinc.org',
-                      code: '57722-1',
-                      display: 'Birth plurality of Pregnancy'
-                    }
-                  ]
-                },
-                valueQuantity: {
-                  value: 'SINGLE'
-                },
-                id: 'aef33762-c5a3-4642-8d03-6e21c0ef6445'
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                resource: {
+                  resourceType: 'Observation',
+                  context: {
+                    reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                  },
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://loinc.org',
+                        code: '57722-1',
+                        display: 'Birth plurality of Pregnancy'
+                      }
+                    ]
+                  },
+                  valueQuantity: {
+                    value: 'SINGLE'
+                  },
+                  id: 'aef33762-c5a3-4642-8d03-6e21c0ef6445'
+                }
+              },
+              {
+                resource: {
+                  resourceType: 'Observation',
+                  context: {
+                    reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                  },
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://loinc.org',
+                        code: '3141-9',
+                        display: 'Body weight Measured'
+                      }
+                    ]
+                  },
+                  valueQuantity: {
+                    value: 5,
+                    unit: 'kg',
+                    system: 'http://unitsofmeasure.org',
+                    code: 'kg'
+                  },
+                  id: '5f761077-9623-4626-8ce6-648724614485'
+                }
+              },
+              {
+                resource: {
+                  resourceType: 'Observation',
+                  context: {
+                    reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                  },
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://loinc.org',
+                        code: '73764-3',
+                        display: 'Birth attendant title'
+                      }
+                    ]
+                  },
+                  valueString: 'PHYSICIAN',
+                  id: '305cf792-dd96-40b7-bdad-909861faa4b4'
+                }
+              },
+              {
+                resource: {
+                  resourceType: 'Observation',
+                  context: {
+                    reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
+                  },
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://loinc.org',
+                        code: 'present-at-birth-reg',
+                        display: 'Present at birth registration'
+                      }
+                    ]
+                  },
+                  valueString: 'MOTHER_ONLY',
+                  id: '0280e498-5d70-4666-ae4e-12431dcea163'
+                }
               }
-            },
-            {
-              resource: {
-                resourceType: 'Observation',
-                context: {
-                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
-                },
-                code: {
-                  coding: [
-                    {
-                      system: 'http://loinc.org',
-                      code: '3141-9',
-                      display: 'Body weight Measured'
-                    }
-                  ]
-                },
-                valueQuantity: {
-                  value: 5,
-                  unit: 'kg',
-                  system: 'http://unitsofmeasure.org',
-                  code: 'kg'
-                },
-                id: '5f761077-9623-4626-8ce6-648724614485'
+            ]
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Encounter',
+            status: 'finished',
+            id: 'a1202918-d8fe-4dca-acf1-beb00c5d0cf8',
+            location: [
+              {
+                location: {
+                  reference: 'Location/420fa384-4d61-40db-96cf-6b3c7ca54943'
+                }
               }
-            },
-            {
-              resource: {
-                resourceType: 'Observation',
-                context: {
-                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
-                },
-                code: {
-                  coding: [
-                    {
-                      system: 'http://loinc.org',
-                      code: '73764-3',
-                      display: 'Birth attendant title'
-                    }
-                  ]
-                },
-                valueString: 'PHYSICIAN',
-                id: '305cf792-dd96-40b7-bdad-909861faa4b4'
-              }
-            },
-            {
-              resource: {
-                resourceType: 'Observation',
-                context: {
-                  reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
-                },
-                code: {
-                  coding: [
-                    {
-                      system: 'http://loinc.org',
-                      code: 'present-at-birth-reg',
-                      display: 'Present at birth registration'
-                    }
-                  ]
-                },
-                valueString: 'MOTHER_ONLY',
-                id: '0280e498-5d70-4666-ae4e-12431dcea163'
-              }
+            ],
+            meta: {
+              lastUpdated: '2019-02-11T08:45:42.960+00:00',
+              versionId: 'd9d41892-c5db-41b8-a0e1-6bf540dbf7e8'
             }
-          ]
-        })
+          }),
+          { status: 200 }
+        ]
       )
       const mockCompositionCloned = clone(mockComposition)
       mockCompositionCloned.id = '123'
@@ -344,6 +367,7 @@ describe('Registration type resolvers', () => {
       expect(idMap).toEqual({
         composition: '123',
         encounter: '456',
+        eventLocation: '420fa384-4d61-40db-96cf-6b3c7ca54943',
         observation: {
           birthType: 'aef33762-c5a3-4642-8d03-6e21c0ef6445',
           weightAtBirth: '5f761077-9623-4626-8ce6-648724614485',
@@ -435,36 +459,35 @@ describe('Registration type resolvers', () => {
       )
       expect(foetalDeathsToMother).toEqual(null)
     })
-    it('returns birthLocation', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocation))
-      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
+    it('returns eventLocation', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Encounter',
+            status: 'finished',
+            id: 'a1202918-d8fe-4dca-acf1-beb00c5d0cf8',
+            location: [
+              {
+                location: {
+                  reference: 'Location/420fa384-4d61-40db-96cf-6b3c7ca54943'
+                }
+              }
+            ],
+            meta: {
+              lastUpdated: '2019-02-11T08:45:42.960+00:00',
+              versionId: 'd9d41892-c5db-41b8-a0e1-6bf540dbf7e8'
+            }
+          }),
+          { status: 200 }
+        ],
+        [JSON.stringify(mockLocation), { status: 200 }]
+      )
       // @ts-ignore
-      const birthLocation = await typeResolvers.BirthRegistration.birthLocation(
+      const eventLocation = await typeResolvers.BirthRegistration.eventLocation(
         mockComposition
       )
-      expect(birthLocation).toBeDefined()
-      expect(birthLocation).toEqual('123')
-    })
-
-    it('returns birthLocationType', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocationType))
-      // fetch.mockResponseOnce(JSON.stringify(mockLocation))
-      // @ts-ignore
-      const birthLocationType = await typeResolvers.BirthRegistration.birthLocationType(
-        mockComposition
-      )
-      expect(birthLocationType).toBeDefined()
-      expect(birthLocationType).toEqual('CURRENT')
-    })
-    it('birthLocationType is null when section does not exist', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthLocationType))
-      // @ts-ignore
-      const birthLocationType = await typeResolvers.BirthRegistration.birthLocationType(
-        {
-          section: []
-        }
-      )
-      expect(birthLocationType).toBeNull()
+      expect(eventLocation).toBeDefined()
+      expect(eventLocation).toEqual(mockLocation)
     })
   })
 
@@ -566,15 +589,6 @@ describe('Registration type resolvers', () => {
         }
       )
       expect(lastPreviousLiveBirth).toEqual(null)
-    })
-    it('returns birthLocation null', async () => {
-      // @ts-ignore
-      const birthLocation = await typeResolvers.BirthRegistration.birthLocation(
-        {
-          section: []
-        }
-      )
-      expect(birthLocation).toEqual(null)
     })
   })
 
@@ -708,18 +722,47 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns a correct status from a task object', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [{ resource: mockTask }, { resource: mockTask }]
+        })
+      )
+
       // @ts-ignore
       const status = await typeResolvers.Registration.status(mockTask)
 
       expect(status).toBeDefined()
-      expect(status).toHaveLength(1)
+      expect(status).toHaveLength(2)
       expect(status[0].resourceType).toBe('Task')
+      expect(status[1].resourceType).toBe('Task')
     })
 
-    it('returns tracking ID from the task object', async () => {
+    it('returns birth tracking ID from the task object', async () => {
       const trackingID = await typeResolvers.Registration.trackingId(mockTask)
 
       expect(trackingID).toBe('123')
+    })
+    it('returns death tracking ID from the task object', async () => {
+      const trackingID = await typeResolvers.Registration.trackingId(
+        mockTaskForDeath
+      )
+
+      expect(trackingID).toBe('123')
+    })
+    it('returns birth registration number from the task object', async () => {
+      const registrationNumber = await typeResolvers.Registration.registrationNumber(
+        mockTask
+      )
+
+      expect(registrationNumber).toBe('123')
+    })
+    it('returns death registration number from the task object', async () => {
+      const registrationNumber = await typeResolvers.Registration.registrationNumber(
+        mockTaskForDeath
+      )
+
+      expect(registrationNumber).toBe('123')
     })
 
     it('returns paper form id from the task', async () => {
@@ -747,9 +790,14 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const regType = await typeResolvers.Registration.type(mockTask)
 
-      expect(regType).toBe('birth-registration')
+      expect(regType).toBe('BIRTH')
     })
+    it('returns registration type from the task', async () => {
+      // @ts-ignore
+      const regType = await typeResolvers.Registration.type(mockTaskForDeath)
 
+      expect(regType).toBe('DEATH')
+    })
     it('returns contact person from the task', async () => {
       // @ts-ignore
       const contact = await typeResolvers.Registration.contact(mockTask)
@@ -987,5 +1035,32 @@ describe('Registration type resolvers', () => {
       const latitude = typeResolvers.Location.latitude(location)
       expect(latitude).toBe(-34.08002)
     })
+  })
+
+  it('return BirthRegistration type', () => {
+    const mock = {
+      type: {
+        coding: [
+          {
+            code: 'birth-declaration'
+          }
+        ]
+      }
+    }
+    const res = typeResolvers.EventRegistration.__resolveType(mock)
+    expect(res).toEqual('BirthRegistration')
+  })
+  it('return DeathRegistration type', () => {
+    const mock = {
+      type: {
+        coding: [
+          {
+            code: 'death-declaration'
+          }
+        ]
+      }
+    }
+    const res = typeResolvers.EventRegistration.__resolveType(mock)
+    expect(res).toEqual('DeathRegistration')
   })
 })

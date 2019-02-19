@@ -36,6 +36,10 @@ interface IDeclarationPayload extends ISMSPayload {
   name: string
 }
 
+interface IRegistrationPayload extends ISMSPayload {
+  name: string
+}
+
 export async function sendBirthDeclarationConfirmation(
   request: HapiRequest,
   h: Hapi.ResponseToolkit
@@ -58,6 +62,27 @@ export async function sendBirthDeclarationConfirmation(
   return h.response().code(200)
 }
 
+export async function sendBirthRegistrationConfirmation(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IRegistrationPayload
+  try {
+    await sendSMS(
+      payload.msisdn,
+      request.i18n.__('birthRegistrationNotification', {
+        name: payload.name
+      }),
+      /* send unicoded sms if provided local is not in non unicoded set */
+      NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
+    )
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
 export async function sendDeathDeclarationConfirmation(
   request: HapiRequest,
   h: Hapi.ResponseToolkit
@@ -69,6 +94,27 @@ export async function sendDeathDeclarationConfirmation(
       request.i18n.__('deathDeclarationNotification', {
         name: payload.name,
         trackingid: payload.trackingid
+      }),
+      /* send unicoded sms if provided local is not in non unicoded set */
+      NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
+    )
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function sendDeathRegistrationConfirmation(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IRegistrationPayload
+  try {
+    await sendSMS(
+      payload.msisdn,
+      request.i18n.__('deathRegistrationNotification', {
+        name: payload.name
       }),
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0

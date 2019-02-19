@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from 'src/components/form'
-import { IFormSectionData } from 'src/forms'
+import { IFormSectionData, Event, Action } from 'src/forms'
 import { hasFormError } from 'src/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
 import { IStoreState } from '@opencrvs/register/src/store'
@@ -12,8 +12,10 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
 import { Dispatch } from 'redux'
 import { goToWorkQueue } from 'src/navigation'
-import gql from 'graphql-tag'
-import { Mutation } from 'react-apollo'
+import {
+  MutationProvider,
+  MutationContext
+} from 'src/views/DataProvider/MutationProvider'
 
 const messages = defineMessages({
   back: {
@@ -55,19 +57,9 @@ interface IState {
   data: IFormSectionData
   enableUploadButton: boolean
 }
-
-export const postMutation = gql`
-  mutation rejectRegistration(
-    $id: String!
-    $reason: String!
-    $comment: String!
-  ) {
-    markBirthAsVoided(id: $id, reason: $reason, comment: $comment)
-  }
-`
-
 interface IProps {
   draftId: string
+  event: Event
   duplicate?: boolean
   onBack: () => void
   confirmRejectionEvent: () => void
@@ -101,7 +93,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
     )
   }
 
-  processSubmitData = (registrationID: string) => {
+  processSubmitData = () => {
     const reasons = this.state.data.rejectionReason as string[]
     let reason
     if (reasons) {
@@ -110,14 +102,14 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
       reason = ''
     }
     return {
-      id: registrationID,
+      id: this.props.draftId,
       reason,
       comment: this.state.data.rejectionCommentForHealthWorker
     }
   }
 
   render = () => {
-    const { form, intl, draftId, confirmRejectionEvent, duplicate } = this.props
+    const { event, form, intl, confirmRejectionEvent, duplicate } = this.props
     const { fields } = form
     if (duplicate) {
       fields.map(field => {
@@ -128,13 +120,14 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
     }
 
     return (
-      <Mutation
-        mutation={postMutation}
-        variables={this.processSubmitData(draftId)}
-        onCompleted={() => confirmRejectionEvent()}
+      <MutationProvider
+        event={event}
+        action={Action.REJECT_APPLICATION}
+        payload={this.processSubmitData()}
+        onCompleted={confirmRejectionEvent}
       >
-        {rejectRegistration => {
-          return (
+        <MutationContext.Consumer>
+          {({ mutation }) => (
             <OverlayContainer id="reject-registration-form-container">
               <ActionPage
                 title={intl.formatMessage(messages.rejectionFormTitle)}
@@ -152,7 +145,8 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
 
                     <StyledPrimaryButton
                       id="submit_reject_form"
-                      onClick={() => rejectRegistration()}
+                      // @ts-ignore
+                      onClick={() => mutation()}
                       disabled={!this.state.enableUploadButton}
                     >
                       {intl.formatMessage(messages.rejectionReasonSubmit)}
@@ -161,9 +155,9 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
                 </FormContainer>
               </ActionPage>
             </OverlayContainer>
-          )
-        }}
-      </Mutation>
+          )}
+        </MutationContext.Consumer>
+      </MutationProvider>
     )
   }
 }
