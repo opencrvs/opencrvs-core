@@ -699,6 +699,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.print.collector.mother': 'মা',
     'register.workQueue.print.collector.father': 'পিতা',
     'register.workQueue.print.collector.other': 'অন্যান্য',
+    'register.workQueue.print.collector.informant': 'তথ্যদাতা',
     'formFields.print.confirmMotherInformation':
       'আইডি নথি তাদের প্রমাণ নিম্নলিখিত বিবরণ মেলে?',
     'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',

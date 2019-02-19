@@ -174,6 +174,7 @@ export interface IRadioGroupFormField extends IFormFieldBase {
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
   information: IFormSectionData
+  dynamicInformationRetriever?: (obj: any) => IFormSectionData
   options: IRadioOption[]
 }
 
@@ -294,8 +295,10 @@ export interface IConditionals {
   uploadDocForWhom: IConditional
   motherCollectsCertificate: IConditional
   fatherCollectsCertificate: IConditional
+  informantCollectsCertificate: IConditional
   otherPersonCollectsCertificate: IConditional
-  certificateCollectorNotVerified: IConditional
+  birthCertificateCollectorNotVerified: IConditional
+  deathCertificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
   placeOfDeathHospital: IConditional

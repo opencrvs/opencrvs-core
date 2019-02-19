@@ -5,7 +5,7 @@ import { createStore } from 'src/store'
 import * as React from 'react'
 
 import { FormFieldGenerator } from 'src/components/form'
-import { collectCertificateFormSection } from 'src/forms/certificate/fieldDefinitions/collector-section'
+import { collectBirthCertificateFormSection } from 'src/forms/certificate/fieldDefinitions/collector-section'
 import {
   IInformativeRadioGroupFormField,
   INFORMATIVE_RADIO_GROUP
@@ -208,7 +208,7 @@ describe('when user wants to print certificate', async () => {
     })
 
     testComponent.component.update()
-    const fields = collectCertificateFormSection.fields
+    const fields = collectBirthCertificateFormSection.fields
     ;(fields[1] as IInformativeRadioGroupFormField).information = {
       // @ts-ignore
       name: [
@@ -688,7 +688,7 @@ describe('when user wants to print certificate', async () => {
     })
 
     it('renders the form', () => {
-      const fields = collectCertificateFormSection.fields
+      const fields = collectBirthCertificateFormSection.fields
       ;(fields[1] as IInformativeRadioGroupFormField).information = {
         // @ts-ignore
         name: [
