@@ -326,6 +326,7 @@ export interface GQLCertificate {
 
 export interface GQLRelatedPerson {
   id?: string
+  _fhirID?: string
   relationship?: GQLRelationshipType
   otherRelationship?: string
   individual?: GQLPerson
@@ -404,6 +405,7 @@ export interface GQLBirthRegResultSet {
 
 export interface GQLDeathRegistration extends GQLEventRegistration {
   id: string
+  _fhirIDMap?: GQLMap
   registration?: GQLRegistration
   deceased?: GQLPerson
   informant?: GQLRelatedPerson
@@ -616,6 +618,8 @@ export interface GQLCertificateInput {
 }
 
 export interface GQLRelatedPersonInput {
+  id?: string
+  _fhirID?: string
   relationship?: GQLRelationshipType
   otherRelationship?: string
   individual?: GQLPersonInput
@@ -631,6 +635,7 @@ export interface GQLPaymentInput {
 }
 
 export interface GQLDeathRegistrationInput {
+  _fhirIDMap?: GQLMap
   registration?: GQLRegistrationInput
   deceased?: GQLPersonInput
   informant?: GQLRelatedPersonInput
@@ -1680,12 +1685,17 @@ export interface CertificateToDataResolver<TParent = any, TResult = any> {
 
 export interface GQLRelatedPersonTypeResolver<TParent = any> {
   id?: RelatedPersonToIdResolver<TParent>
+  _fhirID?: RelatedPersonTo_fhirIDResolver<TParent>
   relationship?: RelatedPersonToRelationshipResolver<TParent>
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
   individual?: RelatedPersonToIndividualResolver<TParent>
 }
 
 export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RelatedPersonTo_fhirIDResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1764,6 +1774,7 @@ export interface BirthRegResultSetToTotalItemsResolver<
 
 export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   id?: DeathRegistrationToIdResolver<TParent>
+  _fhirIDMap?: DeathRegistrationTo_fhirIDMapResolver<TParent>
   registration?: DeathRegistrationToRegistrationResolver<TParent>
   deceased?: DeathRegistrationToDeceasedResolver<TParent>
   informant?: DeathRegistrationToInformantResolver<TParent>
@@ -1776,6 +1787,13 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
 }
 
 export interface DeathRegistrationToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationTo_fhirIDMapResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

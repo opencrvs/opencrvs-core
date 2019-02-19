@@ -4,6 +4,7 @@ import { Action } from 'src/forms'
 export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
   query data($id: ID!) {
     fetchDeathRegistration(id: $id) {
+      _fhirIDMap
       id
       deceased {
         id

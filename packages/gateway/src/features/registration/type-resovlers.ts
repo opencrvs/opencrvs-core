@@ -454,6 +454,11 @@ export const typeResolvers: GQLResolver = {
     address: location => location.address
   },
   DeathRegistration: {
+    async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+      return {
+        composition: composition.id
+      }
+    },
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },

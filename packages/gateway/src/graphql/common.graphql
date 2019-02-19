@@ -90,6 +90,8 @@ type IdentityType { # -> Identifier
 }
 
 input RelatedPersonInput {
+  id: ID
+  _fhirID: ID # -> .id
   relationship: RelationshipType
   otherRelationship: String
   individual: PersonInput
@@ -97,6 +99,7 @@ input RelatedPersonInput {
 
 type RelatedPerson { # -> Related Person
   id: ID
+  _fhirID: ID # -> .id
   relationship: RelationshipType # -> .relationship.coding
   otherRelationship: String # -> .relationship.coding
   individual: Person # -> .patient.reference

@@ -68,3 +68,27 @@ export const eventLocationMutationTransformer = (
 
   return transformedData
 }
+
+export function setRegistrationSectionTransformer(
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string
+) {
+  if (draftData.registration) {
+    if (!transformedData.registration) {
+      transformedData.registration = {}
+    }
+    if (draftData.registration._fhirID) {
+      transformedData.registration._fhirID = draftData.registration._fhirID
+    }
+    if (draftData.registration.trackingId) {
+      transformedData.registration.trackingId =
+        draftData.registration.trackingId
+    }
+    if (draftData.registration.registrationNumber) {
+      transformedData.registration.registrationNumber =
+        draftData.registration.registrationNumber
+    }
+  }
+  return transformedData
+}

@@ -55,6 +55,7 @@ import {
 } from './mappings/query/application-mappings'
 import {
   fieldValueNestingTransformer,
+  setInformantSectionTransformer,
   OBJECT_TYPE
 } from './mappings/mutation/applicant-mapping'
 
@@ -1052,6 +1053,7 @@ export const applicantsSection: IFormSection = {
     }
   ],
   mapping: {
+    mutation: setInformantSectionTransformer,
     query: getInformantSectionTransformer
   }
 }

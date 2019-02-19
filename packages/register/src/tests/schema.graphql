@@ -232,6 +232,7 @@ scalar Date
 
 type DeathRegistration {
   id: ID!
+  _fhirIDMap: Map
   registration: Registration
   deceased: Person
   informant: RelatedPerson
@@ -244,6 +245,7 @@ type DeathRegistration {
 }
 
 input DeathRegistrationInput {
+  _fhirIDMap: Map
   registration: RegistrationInput
   deceased: PersonInput
   informant: RelatedPersonInput

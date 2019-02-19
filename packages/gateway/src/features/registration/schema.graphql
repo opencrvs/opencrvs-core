@@ -205,6 +205,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
 }
 
 input DeathRegistrationInput {
+  _fhirIDMap: Map
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
@@ -220,6 +221,7 @@ input DeathRegistrationInput {
 # In BDRIS2 BRN is used to link to birth - Must have BRN to register death. Only deathLocation and current address is captures for death as the rest is the same as birth registration
 type DeathRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
+  _fhirIDMap: Map
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference

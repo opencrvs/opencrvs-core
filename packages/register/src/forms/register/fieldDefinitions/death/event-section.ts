@@ -35,6 +35,8 @@ import {
   deceasedDateToFieldTransformation,
   deathPlaceToFieldTransformer
 } from './mappings/query/event-mappings'
+import { setRegistrationSectionTransformer } from './mappings/mutation/event-mappings'
+import { getRegistrationSectionTransformer } from './mappings/query/event-mappings'
 
 const messages = defineMessages({
   deathEventTab: {
@@ -486,5 +488,9 @@ export const eventSection: IFormSection = {
         query: eventLocationQueryTransformer(0, 'postalCode')
       }
     }
-  ]
+  ],
+  mapping: {
+    mutation: setRegistrationSectionTransformer,
+    query: getRegistrationSectionTransformer
+  }
 }

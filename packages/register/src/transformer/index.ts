@@ -111,8 +111,5 @@ export const gqlToDraftTransformer = (
   if (queryData._fhirIDMap) {
     transformedData._fhirIDMap = queryData._fhirIDMap
   }
-  if (queryData.id) {
-    transformedData._fhirID = queryData.id
-  }
   return transformedData
 }
