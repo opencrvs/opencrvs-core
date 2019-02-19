@@ -269,6 +269,24 @@ export function selectOrCreateLocationRefResource(
   return locationEntry.resource as fhir.Location
 }
 
+export function selectOrCreateEncounterLocationRef(
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Reference {
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  if (!encounter.location) {
+    encounter.location = []
+    encounter.location.push({
+      location: { reference: '' }
+    })
+  } else {
+    if (!encounter.location || !encounter.location[0]) {
+      throw new Error('Encounter is expected to have a location property')
+    }
+  }
+  return encounter.location[0].location
+}
+
 export function selectOrCreateDocRefResource(
   sectionCode: string,
   sectionTitle: string,
@@ -573,7 +591,7 @@ export function selectOrCreateTaskRefResource(
       return false
     })
   if (!taskEntry) {
-    taskEntry = createTaskRefTemplate(uuid())
+    taskEntry = createTaskRefTemplate(uuid(), context.event)
     const taskResource = taskEntry.resource as fhir.Task
     if (!taskResource.focus) {
       taskResource.focus = { reference: '' }

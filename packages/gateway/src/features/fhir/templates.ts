@@ -30,14 +30,10 @@ export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
 export const CERTIFICATE_DOCS_TITLE = 'Certificates'
 export const ATTACHMENT_CONTEXT_KEY = 'attachments'
 export const CERTIFICATE_CONTEXT_KEY = 'certificates'
-export const HEALTH_FACILITY_BIRTH_CODE = 'health-facility-birth'
-export const BIRTH_LOCATION_TYPE_CODE = 'birth-location-type'
 export const DEATH_ENCOUNTER_CODE = 'death-encounter'
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const CAUSE_OF_DEATH_METHOD_CODE = 'cause-of-death-method'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
-export const HEALTH_FACILITY_DEATH_CODE = 'health-facility-death'
-export const DEATH_LOCATION_TYPE_CODE = 'death-location-type'
 
 export function createPersonSection(
   refUuid: string,
@@ -261,7 +257,7 @@ export function createObservationEntryTemplate(refUuid: string) {
   }
 }
 
-export function createTaskRefTemplate(refUuid: string) {
+export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
@@ -271,7 +267,7 @@ export function createTaskRefTemplate(refUuid: string) {
         coding: [
           {
             system: 'http://opencrvs.org/specs/types',
-            code: 'birth-registration'
+            code: event.toString()
           }
         ]
       }

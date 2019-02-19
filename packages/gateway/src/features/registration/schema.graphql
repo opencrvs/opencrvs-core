@@ -153,6 +153,12 @@ type RegWorkflow { # Task
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
 }
 
+interface EventRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  createdAt: Date
+}
+
 input BirthRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -160,9 +166,7 @@ input BirthRegistrationInput {
   mother: PersonInput
   father: PersonInput
   informant: PersonInput
-  placeOfBirth: LocationInput
-  birthLocation: String
-  birthLocationType: AddressType
+  eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
@@ -177,7 +181,7 @@ input BirthRegistrationInput {
   updatedAt: Date
 }
 
-type BirthRegistration { # -> Composition
+type BirthRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
   _fhirIDMap: Map
   registration: Registration
@@ -185,9 +189,7 @@ type BirthRegistration { # -> Composition
   mother: Person # -> .section(code='mother-details').entry.reference
   father: Person # -> .section(code='father-details').entry.reference
   informant: Person # -> .section(code='informant-details').entry.reference
-  placeOfBirth: Location
-  birthLocation: String # -> .section(code='birth-encounter').entry.reference.location
-  birthLocationType: AddressType
+  eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
@@ -207,9 +209,7 @@ input DeathRegistrationInput {
   # Remember to mark person as deceased
   deceased: PersonInput
   informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  placeOfDeath: LocationInput
-  deathLocation: String
-  deathLocationType: AddressType
+  eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -218,15 +218,13 @@ input DeathRegistrationInput {
 }
 
 # In BDRIS2 BRN is used to link to birth - Must have BRN to register death. Only deathLocation and current address is captures for death as the rest is the same as birth registration
-type DeathRegistration { # -> Composition
+type DeathRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  placeOfDeath: Location
-  deathLocation: String
-  deathLocationType: AddressType
+  eventLocation: Location
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept
@@ -324,6 +322,11 @@ type DeathRegResultSet {
   totalItems: Int
 }
 
+type EventRegResultSet {
+  results: [EventRegistration]
+  totalItems: Int
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
@@ -346,6 +349,16 @@ type Query {
     count: Int
     skip: Int
   ): DeathRegResultSet
+  fetchEventRegistration(id: ID!): EventRegistration
+  listEventRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): EventRegResultSet
 }
 
 type Mutation {

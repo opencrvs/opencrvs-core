@@ -29,6 +29,7 @@ import {
   GQLLocation,
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 interface IMatchParams {
   applicationId: string
@@ -283,6 +284,8 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     language: string,
     intl: ReactIntl.InjectedIntl
   ) {
+    const { locale } = this.props.intl
+
     return Object.keys(data).map(key => {
       const rec = data[key]
 
@@ -318,7 +321,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           Event.BIRTH,
         child: {
           name: childNamesMap[language],
-          dob: (rec.child && rec.child.birthDate) || '',
+          dob:
+            (rec.child &&
+              rec.child.birthDate &&
+              formatLongDate(rec.child.birthDate, locale)) ||
+            '',
           gender:
             (rec.child &&
               rec.child.gender &&
@@ -328,7 +335,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         mother: {
           name: motherNamesMap[language],
           dob:
-            (rec.mother && rec.mother.birthDate && rec.mother.birthDate) || '',
+            (rec.mother &&
+              rec.mother.birthDate &&
+              formatLongDate(rec.mother.birthDate, locale)) ||
+            '',
           id:
             (rec.mother &&
               rec.mother.identifier &&
@@ -339,7 +349,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         father: {
           name: fatherNamesMap[language],
           dob:
-            (rec.father && rec.father.birthDate && rec.father.birthDate) || '',
+            (rec.father &&
+              rec.father.birthDate &&
+              formatLongDate(rec.father.birthDate, locale)) ||
+            '',
           id:
             (rec.father &&
               rec.father.identifier &&
@@ -355,7 +368,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                 return {
                   action:
                     Action[status.type as GQLRegStatus] || Action.DECLARED,
-                  date: status.timestamp || '',
+                  date: formatLongDate(status.timestamp, locale) || '',
                   usersName: userNamesMap[language],
                   usersRole:
                     (status.user &&

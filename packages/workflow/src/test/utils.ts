@@ -384,18 +384,18 @@ export const testFhirBundleWithIdsForDeath = {
         subject: {},
         date: '2018-05-23T14:44:58+02:00',
         author: [],
-        title: 'Birth Declaration',
+        title: 'Death Declaration',
         section: [
           {
-            title: 'Child details',
+            title: 'Deceased details',
             code: {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-sections',
-                  code: 'child-details'
+                  code: 'deceased-details'
                 }
               ],
-              text: 'Child details'
+              text: 'Deceased details'
             },
             entry: [
               {
@@ -404,36 +404,19 @@ export const testFhirBundleWithIdsForDeath = {
             ]
           },
           {
-            title: "Mother's details",
+            title: "Informant's details",
             code: {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-sections',
-                  code: 'mother-details'
+                  code: 'informant-details'
                 }
               ],
-              text: "Mother's details"
+              text: "Informant's details"
             },
             entry: [
               {
-                reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
-              }
-            ]
-          },
-          {
-            title: "Father's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'father-details'
-                }
-              ],
-              text: "Father's details"
-            },
-            entry: [
-              {
-                reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
+                reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc'
               }
             ]
           }
@@ -456,18 +439,8 @@ export const testFhirBundleWithIdsForDeath = {
         },
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/paper-form-id',
-            value: '12345678'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B5WGYJE'
-          }
-        ],
-        extension: [
-          {
-            url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'MOTHER'
+            system: 'http://opencrvs.org/specs/id/death-tracking-id',
+            value: 'D5WGYJE'
           }
         ]
       }
@@ -489,6 +462,23 @@ export const testFhirBundleWithIdsForDeath = {
       }
     },
     {
+      fullUrl: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc',
+      resource: {
+        resourceType: 'RelatedPerson',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER'
+            }
+          ],
+          text: 'Nephew'
+        },
+        patient: { reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' }
+      }
+    },
+    {
       fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57',
       resource: {
         id: '444',
@@ -507,21 +497,6 @@ export const testFhirBundleWithIdsForDeath = {
             value: '+8801622688231'
           }
         ]
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221',
-      resource: {
-        id: '555',
-        resourceType: 'Patient',
-        active: true,
-        name: [
-          {
-            given: ['Jack'],
-            family: ['Doe']
-          }
-        ],
-        gender: 'male'
       }
     }
   ]
