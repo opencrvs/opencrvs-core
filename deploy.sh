@@ -66,5 +66,5 @@ if [ $2 == "--restore-metadata=yes" ] ; then
     echo
     echo "Restoring metadata..."
     echo
-    ssh root@$HOST '/tmp/compose/infrastructure/clear-all-data.sh'
+    ssh root@$HOST '/tmp/compose/infrastructure/restore-metadata.sh'
 fi
