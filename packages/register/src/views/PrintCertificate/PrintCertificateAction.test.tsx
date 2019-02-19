@@ -827,7 +827,7 @@ describe('when user wants to print certificate', async () => {
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(fields)
     })
 
-    it('when user clicks next button, renders certificate preview form', () => {
+    it('when user clicks next button, renders certificate preview form', async () => {
       const documentData = {
         personCollectingCertificate: 'MOTHER',
         motherDetails: true
@@ -836,12 +836,21 @@ describe('when user wants to print certificate', async () => {
       component.find(FormFieldGenerator).prop('onChange')(documentData)
       component.update()
 
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
       component
         .find('#print-confirm-button')
         .hostNodes()
         .simulate('click')
 
       component.update()
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
       expect(
         component.find('#payment-confirm-button').hostNodes()
       ).toHaveLength(1)
@@ -850,6 +859,11 @@ describe('when user wants to print certificate', async () => {
         .hostNodes()
         .simulate('click')
       component.update()
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(
         certificatePreview.fields
       )
