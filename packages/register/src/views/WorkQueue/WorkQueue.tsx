@@ -17,7 +17,8 @@ import {
   ListItem,
   Spinner,
   ListItemExpansion,
-  SelectFieldType
+  SelectFieldType,
+  ISelectGroupValue
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import gql from 'graphql-tag'
@@ -61,9 +62,10 @@ import { messages as rejectionMessages } from 'src/review/reject-registration'
 import { formatLongDate } from 'src/utils/date-formatting'
 
 export const FETCH_REGISTRATION_QUERY = gql`
-  query list($locationIds: [String], $count: Int, $skip: Int) {
+  query list($status: String, $event: String, $count: Int, $skip: Int) {
     listEventRegistrations(
-      locationIds: $locationIds
+      status: $status
+      event: $event
       count: $count
       skip: $skip
     ) {
@@ -600,10 +602,15 @@ type IWorkQueueProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseWorkQueueProps
 
+interface IFilter {
+  event?: string
+  declarationStatus?: string
+}
 interface IWorkQueueState {
   printCertificateModalVisible: boolean
   regId: string | null
   currentPage: number
+  filter: IFilter | null
 }
 
 interface IData {
@@ -618,9 +625,16 @@ export class WorkQueueView extends React.Component<
   IWorkQueueProps,
   IWorkQueueState
 > {
-  state = { printCertificateModalVisible: false, regId: null, currentPage: 1 }
+  state = {
+    printCertificateModalVisible: false,
+    regId: null,
+    currentPage: 1,
+    filter: {
+      event: '',
+      declarationStatus: ''
+    }
+  }
   pageSize = 10
-
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'APPLICATION':
@@ -1157,19 +1171,19 @@ export class WorkQueueView extends React.Component<
                 label: intl.formatMessage(messages.filtersAllEvents)
               },
               {
-                value: 'birth',
+                value: 'BIRTH',
                 label: intl.formatMessage(messages.filtersBirth)
               },
               {
-                value: 'death',
+                value: 'DEATH',
                 label: intl.formatMessage(messages.filtersDeath)
               },
               {
-                value: 'marriage',
+                value: 'MARRIAGE',
                 label: intl.formatMessage(messages.filtersMarriage)
               }
             ],
-            value: ''
+            value: this.state.filter.event
           },
           {
             name: 'declaration_status',
@@ -1191,23 +1205,7 @@ export class WorkQueueView extends React.Component<
                 label: intl.formatMessage(messages.filtersCollected)
               }
             ],
-            value: ''
-          },
-          {
-            name: 'location',
-            options: [
-              {
-                value: '',
-                label: intl.formatMessage(messages.filtersAllLocations)
-              },
-              // TODO these need to be translated but those needs to be read from our backend when we have locations setup
-              { value: 'gazipur', label: 'Gazipur Union' },
-              { value: 'badda', label: 'Badda Union' },
-              { value: 'dhamrai', label: 'Dhamrai Union' },
-              { value: 'savar', label: 'Savar Union' },
-              { value: 'dohar', label: 'Dohar Union' }
-            ],
-            value: ''
+            value: this.state.filter.declarationStatus
           }
         ]
       }
@@ -1240,12 +1238,14 @@ export class WorkQueueView extends React.Component<
             <Query
               query={FETCH_REGISTRATION_QUERY}
               variables={{
-                locationIds: [this.getLocalLocationId()],
+                status: this.state.filter.declarationStatus,
+                event: this.state.filter.event,
                 count: this.pageSize,
                 skip: (this.state.currentPage - 1) * this.pageSize
               }}
             >
-              {({ loading, error, data }) => {
+              {({ loading, error, data, refetch }) => {
+                console.log(error)
                 if (loading) {
                   return (
                     <StyledSpinner
@@ -1296,6 +1296,20 @@ export class WorkQueueView extends React.Component<
                       noResultText={intl.formatMessage(
                         messages.dataTableNoResults
                       )}
+                      onFilterChange={(values: ISelectGroupValue) => {
+                        this.setState({
+                          filter: {
+                            event: values.event,
+                            declarationStatus: values.declaration_status
+                          }
+                        })
+                        refetch({
+                          event: this.state.filter.event,
+                          status: this.state.filter.declarationStatus,
+                          count: this.pageSize,
+                          skip: (this.state.currentPage - 1) * this.pageSize
+                        })
+                      }}
                       onPageChange={(currentPage: number) => {
                         this.onPageChange(currentPage)
                       }}

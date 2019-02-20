@@ -61,7 +61,8 @@ describe('WorkQueue tests', async () => {
         request: {
           query: FETCH_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789'],
+            status: '',
+            event: '',
             skip: 0,
             count: 10
           }
@@ -284,7 +285,8 @@ describe('WorkQueue tests', async () => {
         request: {
           query: FETCH_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789'],
+            status: '',
+            event: '',
             skip: 0,
             count: 10
           }
@@ -328,7 +330,8 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789'],
+              status: '',
+              event: '',
               skip: 0,
               count: 10
             }
@@ -465,7 +468,8 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789'],
+              status: '',
+              event: '',
               skip: 0,
               count: 10
             }
@@ -590,7 +594,8 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789'],
+              status: '',
+              event: '',
               skip: 0,
               count: 10
             }
@@ -1034,7 +1039,8 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789'],
+              status: '',
+              event: '',
               skip: 0,
               count: 10
             }
@@ -1164,7 +1170,8 @@ describe('WorkQueue tests', async () => {
           request: {
             query: FETCH_REGISTRATION_QUERY,
             variables: {
-              locationIds: ['123456789'],
+              status: '',
+              event: '',
               skip: 0,
               count: 10
             }
