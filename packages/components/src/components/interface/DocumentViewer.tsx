@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as Sticky from 'react-stickynode'
 import styled from 'styled-components'
 import { SupportingDocument } from './../icons'
 import { Select, ISelectOption as SelectComponentOptions } from './../forms'
@@ -71,32 +72,34 @@ export class DocumentViewer extends React.Component<IProps, IState> {
   render() {
     const { title, tagline, options, icon } = this.props
     return (
-      <WhiteBackground>
-        <Header>
-          <Icon>{icon || <SupportingDocument />}</Icon>
-          <TitleContainer>
-            <Title>{title}</Title>
-            {tagline}
-          </TitleContainer>
-        </Header>
+      <Sticky enabled={true} top="#form_tabs_container">
+        <WhiteBackground>
+          <Header>
+            <Icon>{icon || <SupportingDocument />}</Icon>
+            <TitleContainer>
+              <Title>{title}</Title>
+              {tagline}
+            </TitleContainer>
+          </Header>
 
-        <SelectContainer>
-          <Select
-            id="selectDocument"
-            options={options}
-            value={this.state.selectedOption as string}
-            onChange={(val: string) => {
-              this.setState({ selectedOption: val })
-            }}
-          />
-        </SelectContainer>
+          <SelectContainer>
+            <Select
+              id="selectDocument"
+              options={options}
+              value={this.state.selectedOption as string}
+              onChange={(val: string) => {
+                this.setState({ selectedOption: val })
+              }}
+            />
+          </SelectContainer>
 
-        <ImageContainer>
-          {this.state.selectedOption && (
-            <Image src={this.state.selectedOption} />
-          )}
-        </ImageContainer>
-      </WhiteBackground>
+          <ImageContainer>
+            {this.state.selectedOption && (
+              <Image src={this.state.selectedOption} />
+            )}
+          </ImageContainer>
+        </WhiteBackground>
+      </Sticky>
     )
   }
 }
