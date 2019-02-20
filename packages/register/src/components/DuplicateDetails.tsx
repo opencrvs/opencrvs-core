@@ -13,7 +13,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { goToTab as goToTabAction } from 'src/navigation'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import Moment from 'react-moment'
 
 export enum Event {
@@ -375,9 +375,10 @@ class DuplicateDetailsClass extends React.Component<
               id={`review_link_${data.id}`}
               onClick={() => {
                 this.props.gotoTab(
-                  REVIEW_BIRTH_PARENT_FORM_TAB,
+                  REVIEW_EVENT_PARENT_FORM_TAB,
                   data.id,
                   'review',
+                  'birth',
                   '',
                   { duplicate: true, duplicateContextId }
                 )

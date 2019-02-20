@@ -11,7 +11,7 @@ import {
   storeDraft
 } from '@opencrvs/register/src/drafts'
 import { v4 as uuid } from 'uuid'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { Event } from '@opencrvs/register/src/forms'
@@ -31,7 +31,7 @@ describe('ReviewForm tests', async () => {
   const { store, history } = createStore()
   const scope = ['register']
   const mock: any = jest.fn()
-  const form = getReviewForm(store.getState())
+  const form = getReviewForm(store.getState()).birth
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
@@ -56,9 +56,14 @@ describe('ReviewForm tests', async () => {
         staticContext={mock}
         registerForm={form}
         scope={scope}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        event={draft.event}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -211,10 +216,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         scope={scope}
         staticContext={mock}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -365,10 +375,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -453,10 +468,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -550,10 +570,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -701,10 +726,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -767,10 +797,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -864,10 +899,15 @@ describe('ReviewForm tests', async () => {
           history={history}
           staticContext={mock}
           scope={scope}
+          event={draft.event}
           registerForm={form}
-          tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'review' },
+            params: {
+              draftId: draft.id,
+              tabId: 'review',
+              event: draft.event.toLowerCase()
+            },
             isExact: true,
             path: '',
             url: ''

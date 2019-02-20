@@ -1,4 +1,9 @@
-import { IFormField, IFormData, IAttachment } from '../..'
+import {
+  IFormField,
+  IFormData,
+  IAttachment,
+  IFormFieldQueryMapFunction
+} from '../..'
 import {
   GQLHumanName,
   GQLAddress,
@@ -6,7 +11,7 @@ import {
   GQLComment,
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
-import { isEqual } from 'lodash'
+import { cloneDeep } from 'lodash'
 
 export const nameToFieldTransformer = (
   language: string,
@@ -124,55 +129,6 @@ export const addressToFieldTransformer = (
     transformedData[sectionId][field.name] =
       address[transformedFieldName ? transformedFieldName : field.name]
   }
-  return transformedData
-}
-
-export const sameEventAddressFieldTransformer = (fromSection: string) => (
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (!queryData.eventLocation || !queryData.eventLocation.address) {
-    return transformedData
-  }
-  const eventLocation = queryData.eventLocation as fhir.Location
-  const address = eventLocation.address as GQLAddress
-
-  const permanentAddress =
-    queryData[fromSection] &&
-    queryData[fromSection].address &&
-    (queryData[fromSection].address as [GQLAddress]).find(
-      addr => addr.type === 'PERMANENT'
-    )
-  const currentAddress =
-    queryData[fromSection] &&
-    queryData[fromSection].address &&
-    (queryData[fromSection].address as [GQLAddress]).find(
-      addr => addr.type === 'CURRENT'
-    )
-  if (permanentAddress) {
-    delete permanentAddress.type
-  }
-  if (currentAddress) {
-    delete currentAddress.type
-  }
-  if (
-    !isEqual(address, permanentAddress) &&
-    !isEqual(address, currentAddress)
-  ) {
-    transformedData[sectionId][field.name] = 'OTHER'
-    return transformedData
-  }
-
-  if (isEqual(address, permanentAddress)) {
-    transformedData[sectionId][field.name] = 'PERMANENT'
-  }
-
-  if (isEqual(address, currentAddress)) {
-    transformedData[sectionId][field.name] = 'CURRENT'
-  }
-
   return transformedData
 }
 
@@ -362,11 +318,36 @@ export const eventLocationIDQueryTransformer = () => (
   sectionId: string,
   field: IFormField
 ) => {
-  if (!queryData.eventLocation && !queryData._fhirIDMap.eventLocation) {
+  if (
+    !queryData.eventLocation ||
+    !queryData._fhirIDMap ||
+    !queryData._fhirIDMap.eventLocation
+  ) {
     return transformedData
   } else {
     transformedData[sectionId][field.name] = queryData._fhirIDMap
       .eventLocation as string
+  }
+  return transformedData
+}
+
+export const nestedValueToFieldTransformer = (
+  nestedFieldName: string,
+  transformMethod?: IFormFieldQueryMapFunction
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (transformMethod) {
+    const clonedData = cloneDeep(transformedData)
+    if (!clonedData[nestedFieldName]) {
+      clonedData[nestedFieldName] = {}
+    }
+    transformMethod(clonedData, queryData[sectionId], nestedFieldName, field)
+    transformedData[sectionId][field.name] =
+      clonedData[nestedFieldName][field.name]
   }
   return transformedData
 }

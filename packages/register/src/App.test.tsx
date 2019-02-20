@@ -11,7 +11,7 @@ import {
   SELECT_VITAL_EVENT,
   SELECT_INFORMANT,
   DRAFT_BIRTH_PARENT_FORM,
-  REVIEW_BIRTH_PARENT_FORM_TAB
+  REVIEW_EVENT_PARENT_FORM_TAB
 } from './navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -1065,10 +1065,12 @@ describe('when user has a valid token in local storage', () => {
       customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
       store.dispatch(storeDraft(customDraft))
       history.replace(
-        REVIEW_BIRTH_PARENT_FORM_TAB.replace(
+        REVIEW_EVENT_PARENT_FORM_TAB.replace(
           ':draftId',
           customDraft.id.toString()
-        ).replace(':tabId', 'review')
+        )
+          .replace(':tabId', 'review')
+          .replace(':event', 'birth')
       )
       app.update()
       app

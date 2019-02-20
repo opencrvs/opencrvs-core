@@ -509,8 +509,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
-    'register.form.previewBirthRegistration': 'Birth Application Preview',
-    'register.form.reviewBirthRegistration': 'Birth Registration Review',
+    'register.form.previewEventRegistration':
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
+    'register.form.reviewEventRegistration':
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Registration Review',
     'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
@@ -690,7 +692,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.list.buttons.print': 'Print',
     'register.workQueue.title.certificateCollection': 'Certificate Collection',
     'register.workQueue.list.buttons.printCertificate': 'Print certificate',
-    'register.workQueue.buttons.newApplication': 'New birth application',
+    'register.workQueue.buttons.newApplication': 'New application',
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
     'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',

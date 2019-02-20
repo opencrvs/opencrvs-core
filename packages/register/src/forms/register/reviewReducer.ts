@@ -6,6 +6,11 @@ import { motherSection } from 'src/forms/register/fieldDefinitions/birth/mother-
 import { fatherSection } from 'src/forms/register/fieldDefinitions/birth/father-section'
 import { registrationSection } from 'src/forms/register/fieldDefinitions/birth/registration-section'
 import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
+import { deceasedSection } from './fieldDefinitions/death/deceased-section'
+import { applicantsSection } from './fieldDefinitions/death/application-section'
+import { eventSection } from './fieldDefinitions/death/event-section'
+import { causeOfDeathSection } from './fieldDefinitions/death/cause-of-death-section'
+import { documentsSection as deathDocumentsSection } from './fieldDefinitions/death/documents-section'
 
 const messages = defineMessages({
   reviewTab: {
@@ -21,25 +26,46 @@ const messages = defineMessages({
 })
 
 export interface IReviewFormState {
-  reviewForm: IForm
+  reviewForm: {
+    birth: IForm
+    death: IForm
+  }
 }
 
 export const initialState: IReviewFormState = {
   reviewForm: {
-    sections: [
-      childSection,
-      motherSection,
-      fatherSection,
-      registrationSection,
-      documentsSection,
-      {
-        id: 'review',
-        viewType: 'review',
-        name: messages.reviewTab,
-        title: messages.reviewTitle,
-        fields: []
-      }
-    ]
+    birth: {
+      sections: [
+        childSection,
+        motherSection,
+        fatherSection,
+        registrationSection,
+        documentsSection,
+        {
+          id: 'review',
+          viewType: 'review',
+          name: messages.reviewTab,
+          title: messages.reviewTitle,
+          fields: []
+        }
+      ]
+    },
+    death: {
+      sections: [
+        deceasedSection,
+        applicantsSection,
+        eventSection,
+        causeOfDeathSection,
+        deathDocumentsSection,
+        {
+          id: 'review',
+          viewType: 'review',
+          name: messages.reviewTab,
+          title: messages.reviewTitle,
+          fields: []
+        }
+      ]
+    }
   }
 }
 
