@@ -9,6 +9,7 @@ ShallowWrapper {
       Object {
         "fields": Array [
           Object {
+            "hideAsterisk": true,
             "initialValue": "",
             "label": Object {
               "defaultMessage": "Whose suppoting document are you uploading?",
@@ -244,6 +245,7 @@ ShallowWrapper {
                 ],
               },
             },
+            "hideAsterisk": true,
             "initialValue": "",
             "label": Object {
               "defaultMessage": "Which document type are you uploading?",
@@ -297,6 +299,7 @@ ShallowWrapper {
                 fields={
                   Array [
                     Object {
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Whose suppoting document are you uploading?",
@@ -532,6 +535,7 @@ ShallowWrapper {
                           ],
                         },
                       },
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Which document type are you uploading?",
@@ -568,6 +572,7 @@ ShallowWrapper {
                 fields={
                   Array [
                     Object {
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Whose suppoting document are you uploading?",
@@ -803,6 +808,7 @@ ShallowWrapper {
                           ],
                         },
                       },
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Which document type are you uploading?",
@@ -838,6 +844,7 @@ ShallowWrapper {
                 fields={
                   Array [
                     Object {
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Whose suppoting document are you uploading?",
@@ -1073,6 +1080,7 @@ ShallowWrapper {
                           ],
                         },
                       },
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Which document type are you uploading?",
@@ -1104,6 +1112,7 @@ ShallowWrapper {
                 fields={
                   Array [
                     Object {
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Whose suppoting document are you uploading?",
@@ -1339,6 +1348,7 @@ ShallowWrapper {
                           ],
                         },
                       },
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Which document type are you uploading?",
@@ -1369,6 +1379,7 @@ ShallowWrapper {
                   fields={
                     Array [
                       Object {
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Whose suppoting document are you uploading?",
@@ -1604,6 +1615,7 @@ ShallowWrapper {
                             ],
                           },
                         },
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Which document type are you uploading?",
@@ -1633,6 +1645,7 @@ ShallowWrapper {
                 "props": Object {
                   "fields": Array [
                     Object {
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Whose suppoting document are you uploading?",
@@ -1868,6 +1881,7 @@ ShallowWrapper {
                           ],
                         },
                       },
+                      "hideAsterisk": true,
                       "initialValue": "",
                       "label": Object {
                         "defaultMessage": "Which document type are you uploading?",
@@ -1918,6 +1932,7 @@ ShallowWrapper {
                   fields={
                     Array [
                       Object {
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Whose suppoting document are you uploading?",
@@ -2153,6 +2168,7 @@ ShallowWrapper {
                             ],
                           },
                         },
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Which document type are you uploading?",
@@ -2189,6 +2205,7 @@ ShallowWrapper {
                   fields={
                     Array [
                       Object {
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Whose suppoting document are you uploading?",
@@ -2424,6 +2441,7 @@ ShallowWrapper {
                             ],
                           },
                         },
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Which document type are you uploading?",
@@ -2459,6 +2477,7 @@ ShallowWrapper {
                   fields={
                     Array [
                       Object {
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Whose suppoting document are you uploading?",
@@ -2694,6 +2713,7 @@ ShallowWrapper {
                             ],
                           },
                         },
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Which document type are you uploading?",
@@ -2725,6 +2745,7 @@ ShallowWrapper {
                   fields={
                     Array [
                       Object {
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Whose suppoting document are you uploading?",
@@ -2960,6 +2981,7 @@ ShallowWrapper {
                             ],
                           },
                         },
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Which document type are you uploading?",
@@ -2990,6 +3012,7 @@ ShallowWrapper {
                     fields={
                       Array [
                         Object {
+                          "hideAsterisk": true,
                           "initialValue": "",
                           "label": Object {
                             "defaultMessage": "Whose suppoting document are you uploading?",
@@ -3225,6 +3248,7 @@ ShallowWrapper {
                               ],
                             },
                           },
+                          "hideAsterisk": true,
                           "initialValue": "",
                           "label": Object {
                             "defaultMessage": "Which document type are you uploading?",
@@ -3254,6 +3278,7 @@ ShallowWrapper {
                   "props": Object {
                     "fields": Array [
                       Object {
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Whose suppoting document are you uploading?",
@@ -3489,6 +3514,7 @@ ShallowWrapper {
                             ],
                           },
                         },
+                        "hideAsterisk": true,
                         "initialValue": "",
                         "label": Object {
                           "defaultMessage": "Which document type are you uploading?",

@@ -2,7 +2,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
-import { ITheme } from 'src/components/theme'
 
 const InputHeader = styled.div`
   display: flex;
@@ -16,6 +15,16 @@ const Optional = styled.span.attrs<
   font-size: 18px;
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
+  flex-grow: 0;
+`
+
+const Required = styled.span.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-size: 18px;
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.danger};
   flex-grow: 0;
 `
 
@@ -62,6 +71,7 @@ export interface IInputFieldProps {
   optionalLabel: string
   children: React.ReactNode
   ignoreMediaQuery?: boolean
+  hideAsterisk?: boolean
 }
 
 export class InputField extends React.Component<IInputFieldProps, {}> {
@@ -69,12 +79,12 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     const {
       id,
       label,
-      optionalLabel,
       required = true,
       description,
       error,
       touched,
-      ignoreMediaQuery
+      ignoreMediaQuery,
+      hideAsterisk
     } = this.props
 
     const postfix = this.props.postfix as React.ComponentClass<any> | string
@@ -91,10 +101,8 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
               ignoreMediaQuery={ignoreMediaQuery}
             >
               {label}
-              {!required && (
-                <Optional disabled={this.props.disabled}>
-                  &nbsp;&nbsp;•&nbsp;{optionalLabel}
-                </Optional>
+              {required && !hideAsterisk && (
+                <Required disabled={this.props.disabled}>&nbsp;*</Required>
               )}
             </InputLabel>
           )}
