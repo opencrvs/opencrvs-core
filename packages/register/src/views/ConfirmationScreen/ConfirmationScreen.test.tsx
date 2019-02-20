@@ -473,7 +473,8 @@ describe('when user is in the confirmation screen page for birth duplication', (
     eventName: DUPLICATION,
     eventType: BIRTH,
     fullNameInBn,
-    fullNameInEng
+    fullNameInEng,
+    duplicateContextId: 'xesd123456fhjlsjskxc34'
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
@@ -548,6 +549,17 @@ describe('when user is in the confirmation screen page for birth duplication', (
       .simulate('click')
     await wait()
     expect(history.location.pathname).toContain('/')
+  })
+  it('Should redirect the user to the duplicate page', async () => {
+    confirmationScreenComponent
+      .find('#go_to_duplicate_button')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    history.push('duplicates/xesd123456fhjlsjskxc34')
+    expect(history.location.pathname).toContain(
+      'duplicates/xesd123456fhjlsjskxc34'
+    )
   })
 })
 
