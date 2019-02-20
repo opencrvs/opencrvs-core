@@ -845,7 +845,7 @@ export interface QueryToFetchEventRegistrationResolver<
 }
 
 export interface QueryToListEventRegistrationsArgs {
-  locationIds?: Array<string | null>
+  event?: string
   status?: string
   userId?: string
   from?: GQLDate

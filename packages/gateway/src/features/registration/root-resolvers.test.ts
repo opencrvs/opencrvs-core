@@ -28,17 +28,14 @@ describe('Registration root resolvers', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}], total: 2 }))
       // @ts-ignore
-      const result = await resolvers.Query.listEventRegistrations(
-        {},
-        { status: 'preliminary' }
-      )
+      const result = await resolvers.Query.listEventRegistrations({}, {})
 
       expect(result).toBeDefined()
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(2)
     })
 
-    it('returns an array of composition results when location ids provided', async () => {
+    it('returns an array of composition results when event and status provided', async () => {
       fetch.mockResponse(
         JSON.stringify({
           entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }],
@@ -49,7 +46,43 @@ describe('Registration root resolvers', () => {
       // @ts-ignore
       const result = await resolvers.Query.listEventRegistrations(
         {},
-        { locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'] }
+        { status: 'DECLARED', event: 'BIRTH' }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(2)
+    })
+    it('returns an array of composition results when only status provided', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }],
+          total: 2
+        })
+      )
+
+      // @ts-ignore
+      const result = await resolvers.Query.listEventRegistrations(
+        {},
+        { status: 'DECLARED' }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(2)
+    })
+    it('returns an array of composition results when only event provided', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }],
+          total: 2
+        })
+      )
+
+      // @ts-ignore
+      const result = await resolvers.Query.listEventRegistrations(
+        {},
+        { event: 'BIRTH' }
       )
 
       expect(result).toBeDefined()

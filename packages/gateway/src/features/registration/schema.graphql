@@ -353,7 +353,7 @@ type Query {
   ): DeathRegResultSet
   fetchEventRegistration(id: ID!): EventRegistration
   listEventRegistrations(
-    locationIds: [String]
+    event: String
     status: String
     userId: String
     from: Date

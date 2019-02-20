@@ -14,11 +14,6 @@ import { IAuthHeader } from 'src/common-types'
 import { hasScope } from 'src/features/user/utils'
 import { EVENT_TYPE } from '../fhir/constants'
 
-const statusMap = {
-  declared: 'preliminary',
-  registered: 'final'
-}
-
 export const resolvers: GQLResolver = {
   Query: {
     async fetchBirthRegistration(_, { id }, authHeader) {
@@ -55,16 +50,14 @@ export const resolvers: GQLResolver = {
     },
     async listEventRegistrations(
       _,
-      { status, locationIds, count = 0, skip = 0 },
+      { status = null, event = null, count = 0, skip = 0 },
       authHeader
     ) {
-      if (locationIds) {
-        return getCompositionsByLocation(locationIds, authHeader, count, skip)
+      if (event || status) {
+        return getCompositions(status, event, authHeader, count, skip)
       } else {
         const bundle = await fetchFHIR(
-          `/Composition${
-            status ? `?status=${statusMap[status]}&` : '?'
-          }_count=${count}&_getpagesoffset=${skip}`,
+          `/Composition?_count=${count}&_getpagesoffset=${skip}`,
           authHeader
         )
         return {
@@ -189,31 +182,37 @@ export const resolvers: GQLResolver = {
   }
 }
 
-async function getCompositionsByLocation(
-  locationIds: Array<string | null>,
+async function getCompositions(
+  status: string | null,
+  event: string | null,
   authHeader: IAuthHeader,
   count: number,
   skip: number
 ) {
-  const tasksResponses = await Promise.all(
-    locationIds.map(locationId => {
-      return fetchFHIR(
-        `/Task?location=Location/${locationId}&_count=0`,
-        authHeader
-      )
-    })
-  )
+  const tasksResponse = (await fetchFHIR(
+    `/Task?_count=0${event ? `&code=${event}` : ''}${
+      status ? `&business-status=${status}` : ''
+    }`,
+    authHeader
+  )) as fhir.Bundle
 
-  const compositions = await Promise.all(
-    tasksResponses.map(tasksResponse => {
-      return getComposition(tasksResponse, authHeader)
-    })
-  )
-
+  const compositions =
+    (tasksResponse.entry &&
+      (await Promise.all(
+        tasksResponse.entry.map((task: fhir.BundleEntry) => {
+          const resource = task.resource as fhir.Task
+          return (
+            resource.focus &&
+            fetchFHIR(`/${resource.focus.reference}`, authHeader)
+          )
+        })
+      ))) ||
+    []
   const flattened = compositions.reduce((a, b) => a && a.concat(b), [])
 
   const filteredComposition =
-    flattened && flattened.filter(composition => composition !== undefined)
+    flattened &&
+    flattened.filter((composition: any) => composition !== undefined)
 
   // TODO: we should rather try do the skip and count in Hearth directly for efficiency, that would require a more complex query
   return {
@@ -221,22 +220,4 @@ async function getCompositionsByLocation(
     results:
       filteredComposition && filteredComposition.slice(skip, skip + count)
   }
-}
-
-async function getComposition(
-  tasksResponse: fhir.Bundle,
-  authHeader: IAuthHeader
-) {
-  return (
-    tasksResponse.entry &&
-    (await Promise.all(
-      tasksResponse.entry.map((task: fhir.BundleEntry) => {
-        const resource = task.resource as fhir.Task
-        return (
-          resource.focus &&
-          fetchFHIR(`/${resource.focus.reference}`, authHeader)
-        )
-      })
-    ))
-  )
 }
