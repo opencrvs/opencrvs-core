@@ -22,8 +22,9 @@ Then:
 
 1. Clone the repo
 2. Run `yarn` to install deps
-3. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose` (dependencies) and `yarn start` (services in this repo)
-4. Run `yarn db:backup:restore` to restore a pre-populated database with user, location and facility data.
+3. Run `docker swarm init` - out host has to be a swarm to use the overlay network as we use in staging and qa
+4. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose` (dependencies) and `yarn start` (services in this repo)
+5. Run `yarn db:backup:restore` to restore a pre-populated database with user, location and facility data.
 
 Apps can be found running in following URLs:
 

@@ -12,6 +12,7 @@ jobs:
       script:
         - yarn global add wait-on
         - yarn dev:secrets:gen
+        - docker swarm init
         - yarn compose -d
         - sleep 10
         - yarn start:prod &
