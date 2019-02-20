@@ -887,10 +887,11 @@ class PrintCertificateActionComponent extends React.Component<
         bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
         en: NameEn ? NameEn.firstNames + ' ' + NameEn.familyName : ''
       },
-      dob: {
+      doe: {
         bn: DOBBn,
         en: DOBEn
-      }
+      },
+      event: this.getEvent()
     }
   }
   getEvent() {
