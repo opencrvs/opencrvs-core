@@ -582,11 +582,7 @@ describe('when user has a valid token in local storage', () => {
               .find('#uploadDocForWhom_label')
               .hostNodes()
               .text()
-          ).toEqual(
-            `Whose suppoting document are you uploading?${String.fromCharCode(
-              160
-            )}*`
-          )
+          ).toEqual('Whose suppoting document are you uploading?')
         })
         describe('when user selects for whom they want to upload document', () => {
           beforeEach(async () => {
@@ -604,11 +600,7 @@ describe('when user has a valid token in local storage', () => {
                 .find('#whatDocToUpload_label')
                 .hostNodes()
                 .text()
-            ).toEqual(
-              `Which document type are you uploading?${String.fromCharCode(
-                160
-              )}*`
-            )
+            ).toEqual('Which document type are you uploading?')
           })
           describe('when user selects the type of document', () => {
             beforeEach(async () => {
