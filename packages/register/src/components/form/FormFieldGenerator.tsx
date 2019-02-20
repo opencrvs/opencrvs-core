@@ -25,7 +25,8 @@ import {
   getFieldOptions,
   getFieldLabel,
   getFieldOptionsByValueMapper,
-  getFieldType
+  getFieldType,
+  getInputValues
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -60,7 +61,9 @@ import {
   DYNAMIC_LIST,
   IDynamicListFormField,
   IListFormField,
-  IFormData
+  IFormData,
+  LOADER_BUTTON,
+  ILoaderButton
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -71,7 +74,10 @@ import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
 
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
+import { LoaderButtonField } from './LoaderButton'
+
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
+import { transformDeceasedData } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -197,7 +203,7 @@ function GeneratedInputField({
         <DateField
           {...inputProps}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
-          value={inputProps.value as string}
+          value={value as string}
         />
       </InputField>
     )
@@ -296,6 +302,23 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === LOADER_BUTTON) {
+    return (
+      <LoaderButtonField
+        id={fieldDefinition.name}
+        query={fieldDefinition.query}
+        modalTitle={fieldDefinition.modalTitle}
+        label={fieldDefinition.label}
+        modalInfoText={fieldDefinition.modalInfoText}
+        successTitle={fieldDefinition.successTitle}
+        errorText={fieldDefinition.errorText}
+        errorTitle={fieldDefinition.errorTitle}
+        onFetch={fieldDefinition.onFetch}
+        variables={fieldDefinition.variables}
+      />
+    )
+  }
+
   return (
     <InputField {...inputFieldProps}>
       <TextInput
@@ -377,7 +400,8 @@ class FormSectionComponent extends React.Component<Props> {
       touched,
       offlineResources,
       intl,
-      draftData
+      draftData,
+      setValues
     } = this.props
 
     const errors = (this.props.errors as any) as {
@@ -409,7 +433,6 @@ class FormSectionComponent extends React.Component<Props> {
             const [firstError] = fieldErrors
             error = intl.formatMessage(firstError.message, firstError.props)
           }
-
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             values,
@@ -447,13 +470,29 @@ class FormSectionComponent extends React.Component<Props> {
                     field.dynamicItems.valueMapper
                   )
                 } as IListFormField)
+              : field.type === LOADER_BUTTON
+              ? ({
+                  ...field,
+                  variables: getInputValues(field as ILoaderButton, values),
+                  draftData: draftData as IFormData,
+                  onFetch: response => {
+                    const transformedData = transformDeceasedData(response)
+                    const updatedValues = Object.assign(
+                      {},
+                      values,
+                      transformedData
+                    )
+                    setValues(updatedValues)
+                  }
+                } as ILoaderButton)
               : field
 
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
             field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
+            field.type === LOADER_BUTTON
           ) {
             return (
               <FormItem key={`${field.name}`}>

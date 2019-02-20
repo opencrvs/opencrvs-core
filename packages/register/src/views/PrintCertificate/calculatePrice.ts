@@ -1,33 +1,58 @@
-const DAY: number = 1000 * 60 * 60 * 24
+import { Event } from 'src/forms'
+import * as moment from 'moment'
+
 const MONTH_IN_DAYS: number = 30
 const YEAR_IN_DAYS: number = 365
 
-function parseDate(dateString: string) {
-  const ymdRegexString = '^\\d{4}-\\d{2}-\\d{2}$'
-  const ymdRegex = new RegExp(ymdRegexString)
-
-  if (!ymdRegex.test(dateString)) {
-    throw new Error('Invalid date format')
-  }
-
-  const ymd = dateString.split('-')
-
-  const year: number = Number(ymd[0])
-  const month: number = Number(ymd[1]) - 1
-  const day: number = Number(ymd[2])
-
-  return new Date(year, month, day)
+interface IRange {
+  start: number
+  end?: number
+  value: number
 }
 
-export function calculateDays(dob: string) {
-  const currentDate = Date.now()
-  const dateOfBirth = parseDate(dob)
+interface IDayRange {
+  rangeData: { [key in Event]?: IRange[] }
+  getValue: (event: string, days: number) => IRange['value']
+}
 
-  const differenceInDays = Math.floor(
-    (Number(currentDate) - Number(dateOfBirth)) / DAY
+const ranges: IRange[] = [
+  { start: 0, end: 45, value: 0 },
+  {
+    start: 46,
+    end: 5 * YEAR_IN_DAYS,
+    value: 25
+  },
+  { start: 5 * YEAR_IN_DAYS + 1, value: 50 }
+]
+
+function getValue(
+  this: IDayRange,
+  event: Event,
+  check: number
+): IRange['value'] {
+  const rangeByEvent = this.rangeData[event] as IRange[]
+  const foundRange = rangeByEvent.find(range =>
+    range.end
+      ? check >= range.start && check <= range.end
+      : check >= range.start
   )
+  return foundRange ? foundRange.value : rangeByEvent[0].value
+}
 
-  return differenceInDays
+export const dayRange: IDayRange = {
+  rangeData: {
+    [Event.BIRTH]: ranges,
+    [Event.DEATH]: ranges
+  },
+  getValue
+}
+
+export function calculateDays(doE: string) {
+  const todaysDate = moment(Date.now())
+  const eventDate = moment(doE)
+  const diffInDays = todaysDate.diff(eventDate, 'days')
+
+  return diffInDays
 }
 
 export function timeElapsed(days: number) {
@@ -49,32 +74,9 @@ export function timeElapsed(days: number) {
   return output
 }
 
-interface IRange {
-  start: number
-  end?: number
-  value: number
-}
+export function calculatePrice(event: Event, eventDate: string) {
+  const days = calculateDays(eventDate)
+  const result = dayRange.getValue(event, days)
 
-const betweenRange = (range: IRange, check: number) =>
-  range.end ? check >= range.start && check <= range.end : check >= range.start
-
-export function calculatePrice(dateOfBirth: string) {
-  const days = calculateDays(dateOfBirth)
-
-  const ranges: IRange[] = []
-
-  const between45Days: IRange = { start: 0, end: 45, value: 0 }
-  const between45DaysTo5yr: IRange = {
-    start: 46,
-    end: 5 * YEAR_IN_DAYS,
-    value: 25
-  }
-  const above5years: IRange = { start: 5 * YEAR_IN_DAYS + 1, value: 50 }
-
-  ranges.push(between45Days, between45DaysTo5yr, above5years)
-
-  let result
-  result = ranges.find(range => betweenRange(range, days))
-
-  return result && result.value.toFixed(2)
+  return result.toFixed(2)
 }

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Cross } from '../icons'
 
 interface IProps {
-  title: string
+  title?: string
   actions: JSX.Element[]
   show: boolean
   handleClose?: () => void

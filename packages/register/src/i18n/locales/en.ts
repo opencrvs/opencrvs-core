@@ -379,7 +379,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.hospital': 'Hospital',
     'formFields.otherHealthInstitution': 'Other Health Institution',
     'formFields.privateHome': 'Private Home',
-    'formFields.otherInstitution': 'Other Institution',
+    'formFields.otherInstitution': 'Other',
     'register.form.tabs.documentsTab': 'Documents',
     'register.form.section.documentsTitle': 'Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
@@ -387,7 +387,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
-      'For birth registration of children below 5 years old, one of the documents listed bellow is required:',
+      'For birth registration of children below 5 years old, one of the documents listed below is required:',
     'register.form.section.documents.list.informantAttestation':
       'Attestation of the informant, or',
     'register.form.section.documents.list.attestedVaccination':
@@ -620,7 +620,8 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.uploadDocForOther': 'Other',
     'formFields.whatDocToUpload': 'Which document type are you uploading?',
     'formFields.docTypeBR': 'Birth Registration',
-    'formFields.docTypeNID': 'NID',
+    'formFields.docTypeNIDFront': 'National ID (front)',
+    'formFields.docTypeNIDBack': 'National ID (back)',
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
     'formFields.docTypeOther': 'Other',
@@ -851,7 +852,14 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
-
+    'formFields.fetchDeceasedModalTitle': 'Checking',
+    'formFields.fetchDeceasedModalSuccessTitle': 'ID valid',
+    'formFields.fetchDeceasedModalErrorTitle': 'Invalid Id',
+    'formFields.fetchDeceasedModalErrorText':
+      'No registration found for provided BRN',
+    'formFields.loaderButton.cancel': 'Cancel',
+    'formFields.fetchDeceasedDetails': "Retrieve Deceased's Details",
+    'formFields.fetchDeceasedModalInfo': 'Birth Registration Number',
     'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
     certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
     submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,

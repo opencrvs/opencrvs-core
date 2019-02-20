@@ -14,6 +14,7 @@ export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
   fetchBirthRegistration?: GQLBirthRegistration
   queryRegistrationByIdentifier?: GQLBirthRegistration
+  queryPersonByIdentifier?: GQLPerson
   listBirthRegistrations?: GQLBirthRegResultSet
   fetchDeathRegistration?: GQLDeathRegistration
   listDeathRegistrations?: GQLDeathRegResultSet
@@ -135,7 +136,8 @@ export interface GQLAttachment {
 
 export enum GQLAttachmentType {
   PASSPORT = 'PASSPORT',
-  NATIONAL_ID = 'NATIONAL_ID',
+  NATIONAL_ID_FRONT = 'NATIONAL_ID_FRONT',
+  NATIONAL_ID_BACK = 'NATIONAL_ID_BACK',
   IMMUNISATION_CERTIFICATE = 'IMMUNISATION_CERTIFICATE',
   PAPER_FORM = 'PAPER_FORM',
   PASSPORT_PHOTO = 'PASSPORT_PHOTO',
@@ -695,6 +697,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<
     TParent
   >
+  queryPersonByIdentifier?: QueryToQueryPersonByIdentifierResolver<TParent>
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
@@ -749,6 +752,21 @@ export interface QueryToQueryRegistrationByIdentifierResolver<
   (
     parent: TParent,
     args: QueryToQueryRegistrationByIdentifierArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToQueryPersonByIdentifierArgs {
+  identifier: string
+}
+export interface QueryToQueryPersonByIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToQueryPersonByIdentifierArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
