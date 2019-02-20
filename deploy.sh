@@ -1,3 +1,5 @@
+set -e
+
 print_usage_and_exit () {
     echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no HOST VERSION'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
@@ -52,7 +54,7 @@ if [ $1 == "--clear-data=yes" ] || [ $2 == "--restore-metadata=yes" ] ; then
     echo
     echo "Waiting 2 mins for stack to deploy before working with data..."
     echo
-    sleep 2
+    sleep 120
 fi
 
 if [ $1 == "--clear-data=yes" ] ; then

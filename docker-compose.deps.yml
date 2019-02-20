@@ -11,6 +11,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+    networks:
+      - overlay_net
 
   redis:
     image: redis:5
@@ -26,6 +28,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+    networks:
+      - overlay_net
 
   influxdb:
     image: influxdb:1.7
@@ -37,6 +41,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+    networks:
+      - overlay_net
 
   hearth:
     image: jembi/hearth:v1.0.0-beta.1
@@ -49,6 +55,8 @@ services:
     restart: unless-stopped
     deploy:
       replicas: 2
+    networks:
+      - overlay_net
 
   openhim-core:
     image: jembi/openhim-core:5
@@ -65,6 +73,8 @@ services:
     restart: unless-stopped
     deploy:
       replicas: 2
+    networks:
+      - overlay_net
 
   openhim-console:
     image: jembi/openhim-console:1.13
@@ -73,3 +83,10 @@ services:
     restart: unless-stopped
     deploy:
       replicas: 2
+    networks:
+      - overlay_net
+
+networks:
+  overlay_net:
+    driver: overlay
+    attachable: true
