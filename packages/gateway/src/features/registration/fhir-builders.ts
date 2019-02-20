@@ -1176,7 +1176,7 @@ const builders: IFieldBuilders = {
             person,
             'identifier',
             fieldValue,
-            'id',
+            'value',
             context
           )
         },

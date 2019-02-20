@@ -54,7 +54,17 @@ export const typeResolvers: GQLResolver = {
       return name.family.join(' ')
     }
   },
-
+  IdentityType: {
+    id: identifier => {
+      return identifier.value
+    },
+    type: identifier => {
+      return identifier.type
+    },
+    otherType: identifier => {
+      return identifier.type
+    }
+  },
   Person: {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
     dateOfMarriage: person => {
