@@ -704,6 +704,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.print.collector.mother': 'Mother',
     'register.workQueue.print.collector.father': 'Father',
     'register.workQueue.print.collector.other': 'Other',
+    'register.workQueue.print.collector.informant': 'Informant',
     'formFields.print.confirmMotherInformation':
       'Does their proof of ID document match the following details?',
     'formFields.print.otherPersonGivenNames': 'Given name',

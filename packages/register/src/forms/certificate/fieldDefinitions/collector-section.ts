@@ -33,6 +33,12 @@ const messages = defineMessages({
     defaultMessage: 'Who is collecting the certificate?',
     description: 'The label for collector of certificate select'
   },
+  informant: {
+    id: 'register.workQueue.print.collector.informant',
+    defaultMessage: 'Informant',
+    description:
+      'The label for select value when informant is the collector of certificate'
+  },
   mother: {
     id: 'register.workQueue.print.collector.mother',
     defaultMessage: 'Mother',
@@ -128,7 +134,7 @@ export const fatherDataDoesNotExist: IFormField = {
   ]
 }
 
-export const collectCertificateFormSection: IFormSection = {
+export const collectBirthCertificateFormSection: IFormSection = {
   id: 'collectCertificate',
   viewType: 'form',
   name: messages.printCertificate,
@@ -141,6 +147,7 @@ export const collectCertificateFormSection: IFormSection = {
       required: true,
       initialValue: '',
       information: {},
+      dynamicInformationRetriever: data => data.mother,
       validate: [],
       options: [
         { value: true, label: messages.confirm },
@@ -155,6 +162,7 @@ export const collectCertificateFormSection: IFormSection = {
       required: true,
       initialValue: '',
       information: {},
+      dynamicInformationRetriever: data => data.father,
       validate: [],
       options: [
         { value: true, label: messages.confirm },
@@ -246,7 +254,129 @@ export const collectCertificateFormSection: IFormSection = {
       label: messages.warningNotVerified,
       initialValue: '',
       validate: [],
-      conditionals: [conditionals.certificateCollectorNotVerified]
+      conditionals: [conditionals.birthCertificateCollectorNotVerified]
+    }
+  ]
+}
+
+export const collectDeathCertificateFormSection: IFormSection = {
+  id: 'collectDeathCertificate',
+  viewType: 'form',
+  name: messages.printCertificate,
+  title: messages.certificateCollectionTitle,
+  fields: [
+    {
+      name: 'personCollectingCertificate',
+      type: SELECT_WITH_OPTIONS,
+      label: messages.whoToCollect,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: 'INFORMANT', label: messages.informant },
+        { value: 'OTHER', label: messages.other }
+      ]
+    },
+    {
+      name: 'informantDetails',
+      type: INFORMATIVE_RADIO_GROUP,
+      label: messages.confirmMotherDetails,
+      required: true,
+      initialValue: '',
+      information: {},
+      dynamicInformationRetriever: data => data.informant.individual,
+      validate: [],
+      options: [
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
+      ],
+      conditionals: [conditionals.informantCollectsCertificate]
+    },
+    {
+      name: 'otherPersonPrompt',
+      type: PARAGRAPH,
+      label: messages.prompt,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'otherPersonIDType',
+      type: SELECT_WITH_OPTIONS,
+      label: identityMessages.iDType,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: 'PASSPORT', label: identityMessages.iDTypePassport },
+        { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
+        {
+          value: 'DRIVING_LICENSE',
+          label: identityMessages.iDTypeDrivingLicense
+        },
+        {
+          value: 'BIRTH_REGISTRATION_NUMBER',
+          label: identityMessages.iDTypeBRN
+        },
+        {
+          value: 'DEATH_REGISTRATION_NUMBER',
+          label: identityMessages.iDTypeDRN
+        },
+        {
+          value: 'REFUGEE_NUMBER',
+          label: identityMessages.iDTypeRefugeeNumber
+        },
+        { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
+      ],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'documentNumber',
+      type: TEXT,
+      label: messages.documentNumber,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'otherPersonGivenNames',
+      type: TEXT,
+      label: messages.givenNames,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'otherPersonFamilyName',
+      type: TEXT,
+      label: messages.familyName,
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'otherPersonSignedAffidavit',
+      type: RADIO_GROUP,
+      label: messages.signedAffidavitConfirmation,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: true, label: messages.confirm },
+        { value: false, label: messages.deny }
+      ],
+      conditionals: [conditionals.otherPersonCollectsCertificate]
+    },
+    {
+      name: 'warningNotVerified',
+      type: WARNING,
+      label: messages.warningNotVerified,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.deathCertificateCollectorNotVerified]
     }
   ]
 }
