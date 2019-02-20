@@ -4,6 +4,7 @@ import {
   selectOption,
   mockApplicationData,
   mockDeathApplicationData,
+  mockDeathApplicationDataWithoutFirstNames,
   wait
 } from 'src/tests/util'
 import { RegisterForm } from './RegisterForm'
@@ -732,7 +733,7 @@ describe('When user is in Preview section death event in offline mode', async ()
     deathDraft = createReviewDraft(
       uuid(),
       // @ts-ignore
-      mockDeathApplicationData,
+      mockDeathApplicationDataWithoutFirstNames,
       Event.DEATH
     )
     store.dispatch(setInitialDrafts())
