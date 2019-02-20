@@ -90,12 +90,14 @@ const SubmissionName = styled(StyledP)`
   margin-right: 4px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-right: 0px;
+    text-align: center;
   }
 `
 
 const SubmissionText = styled(StyledP)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: -15px;
+    text-align: center;
   }
 `
 
