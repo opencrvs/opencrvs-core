@@ -939,7 +939,7 @@ class PrintCertificateActionComponent extends React.Component<
       case Event.BIRTH:
         return data.child.birthDate
       case Event.DEATH:
-        return data.deceased.deceasedDateTime
+        return data.deceased.deceased.deathDate
     }
   }
 
