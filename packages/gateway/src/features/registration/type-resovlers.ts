@@ -62,7 +62,7 @@ export const typeResolvers: GQLResolver = {
       return identifier.type
     },
     otherType: identifier => {
-      return identifier.type
+      return identifier.otherType
     }
   },
   Person: {

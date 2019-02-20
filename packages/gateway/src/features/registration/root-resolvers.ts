@@ -139,11 +139,10 @@ export const resolvers: GQLResolver = {
       return taskEntry.resource.id
     },
     async markBirthAsCertified(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
-
-      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      // return composition-id
-      return getIDFromResponse(res)
+      return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
+    },
+    async markDeathAsCertified(_, { details }, authHeader) {
+      return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
     },
     async notADuplicate(_, { id, duplicateId }, authHeader) {
       const composition = await fetchFHIR(
@@ -207,6 +206,18 @@ async function markEventAsRegistered(
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return the registrationNumber
   return await getRegistrationNumberFromResponse(res, event, authHeader)
+}
+
+async function markEventAsCertified(
+  details: any,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE
+) {
+  const doc = await buildFHIRBundle(details, event, authHeader)
+
+  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  // return composition-id
+  return getIDFromResponse(res)
 }
 
 async function getCompositionsByLocation(
