@@ -168,6 +168,23 @@ describe('Registration type resolvers', () => {
       expect(informant.resource.relationship.text).toEqual('Nephew')
     })
 
+    it('returns RelatedPerson id', async () => {
+      const resourceID = await typeResolvers.RelatedPerson.id({
+        id: '1',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER' // or string for unsupported other
+            }
+          ],
+          text: 'Nephew'
+        }
+      })
+      expect(resourceID).toEqual('1')
+    })
+
     it('returns RelatedPerson relationship', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
