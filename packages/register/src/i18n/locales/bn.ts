@@ -519,12 +519,12 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
-    'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.header.FIELD_AGENT': 'কমিউনিটি হেল্‌থ অ্যাসিস্ট্যান্ট',
+    'register.home.header.REGISTRATION_CLERK': 'ইউডিসি উদ্যোক্তা',
     'register.home.header.LOCAL_REGISTRAR': 'রেজিস্ট্রার',
-    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.header.STATE_REGISTRAR': 'State Registrar',
-    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
+    'register.home.header.DISTRICT_REGISTRAR': 'রেজিস্ট্রার',
+    'register.home.header.STATE_REGISTRAR': 'রেজিস্ট্রার',
+    'register.home.header.NATIONAL_REGISTRAR': 'রেজিস্ট্রার',
     'register.notification.newContentAvailable':
       'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
