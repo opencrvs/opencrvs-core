@@ -44,6 +44,10 @@ const SelectContainer = styled.div`
 `
 const WhiteBackground = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 
 interface IProps {
