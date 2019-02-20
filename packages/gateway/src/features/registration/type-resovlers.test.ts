@@ -100,6 +100,38 @@ describe('Registration type resolvers', () => {
 
     expect(patient).toBeNull()
   })
+  it('returns id from identifier', () => {
+    const id = typeResolvers.IdentityType.id({
+      value: '123456789',
+      type: 'PASSPORT'
+    })
+    expect(id).toBe('123456789')
+  })
+
+  it('returns type from identifier', () => {
+    const type = typeResolvers.IdentityType.type({
+      value: '123456789',
+      type: 'PASSPORT'
+    })
+    expect(type).toBe('PASSPORT')
+  })
+
+  it('returns otherType from identifier', () => {
+    const type = typeResolvers.IdentityType.otherType({
+      value: '123456789',
+      type: 'OTHER',
+      otherType: 'Office ID'
+    })
+    expect(type).toBe('Office ID')
+  })
+
+  it('returns id from identifier', () => {
+    const id = typeResolvers.IdentityType.id({
+      value: '123456789',
+      type: 'PASSPORT'
+    })
+    expect(id).toBe('123456789')
+  })
 
   it('returns first names part with one name', () => {
     // @ts-ignore
