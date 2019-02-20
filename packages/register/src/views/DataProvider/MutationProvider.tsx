@@ -41,7 +41,6 @@ class MutationProviderComponent extends React.Component<IProps> {
     if (!eventMutationMapping) {
       return null
     }
-    console.log(JSON.stringify(eventMutationMapping.variables))
     return (
       <Mutation
         mutation={eventMutationMapping.mutation}
