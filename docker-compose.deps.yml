@@ -17,6 +17,8 @@ services:
   redis:
     image: redis:5
     restart: unless-stopped
+    networks:
+      - overlay_net
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
