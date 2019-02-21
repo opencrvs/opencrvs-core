@@ -512,6 +512,7 @@ type Query {
   ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
+  queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
     locationIds: [String]
     status: String

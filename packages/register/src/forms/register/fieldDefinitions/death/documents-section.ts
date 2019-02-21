@@ -150,6 +150,7 @@ export const documentsSection: IFormSection = {
             type: RADIO_GROUP,
             label: messages.whatDocToUpload,
             required: true,
+            hideAsterisk: true,
             initialValue: '',
             validate: [],
             options: [
@@ -180,6 +181,7 @@ export const documentsSection: IFormSection = {
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: messages.typeOfDocument,
             required: true,
+            hideAsterisk: true,
             validate: [],
             initialValue: '',
             dynamicOptions: {

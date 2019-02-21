@@ -24,7 +24,7 @@ const registrationClerk = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'Registration Clerk',
-  scope: ['declare', 'performance', 'certify', 'demo']
+  scope: ['register', 'performance', 'certify', 'demo']
 })
 
 const localRegistrar = new User({
@@ -67,10 +67,76 @@ const nationalRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo']
 })
 
+const fieldAgent2 = new User({
+  name: 'Md. Ariful Islam',
+  email: 'test@test.org',
+  mobile: '+8801740012994',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Field Agent',
+  scope: ['declare', 'demo']
+})
+
+const fieldAgent3 = new User({
+  name: 'Md. Ashraful Alam',
+  email: 'test@test.org',
+  mobile: '+8801723438160',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Field Agent',
+  scope: ['declare', 'demo']
+})
+
+const registrationClerk2 = new User({
+  name: 'Lovely Khatun',
+  email: 'test@test.org',
+  mobile: '+8801797602268',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Registration Clerk',
+  scope: ['register', 'performance', 'certify', 'demo']
+})
+
+const registrationClerk3 = new User({
+  name: 'Md. Seikh Farid',
+  email: 'test@test.org',
+  mobile: '+8801767332319',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Registration Clerk',
+  scope: ['register', 'performance', 'certify', 'demo']
+})
+
+const localRegistrar2 = new User({
+  name: 'Md. Jahangir Alam',
+  email: 'test@test.org',
+  mobile: '+8801722038795',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Local Registrar',
+  scope: ['register', 'performance', 'certify', 'demo']
+})
+
+const localRegistrar3 = new User({
+  name: 'A.K.M Mahmudur Rohman',
+  email: 'test@test.org',
+  mobile: '+8801712142796',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Local Registrar',
+  scope: ['register', 'performance', 'certify', 'demo']
+})
+
 const testUsers = [
   fieldAgent,
+  fieldAgent2,
+  fieldAgent3,
   registrationClerk,
+  registrationClerk2,
+  registrationClerk3,
   localRegistrar,
+  localRegistrar2,
+  localRegistrar3,
   districtRegistrar,
   stateRegistrar,
   nationalRegistrar

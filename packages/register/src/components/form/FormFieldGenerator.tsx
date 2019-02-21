@@ -121,6 +121,7 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled,
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
+    hideAsterisk: fieldDefinition.hideAsterisk,
     error,
     touched
   }
