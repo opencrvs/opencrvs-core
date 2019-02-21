@@ -35,7 +35,7 @@ Apps can be found running in following URLs:
 
 You can open all of them by running `yarn open`
 
-**Troubleshooting:** If you have issue with the OpenHIM not being able to access services running locally (probably a hostname not found error) then you can try specify your IP address manually using: `LOCAL_IP=192.168.0.5 yarn compose`
+**Troubleshooting (necessary for OSX):** If you have issue with the OpenHIM not being able to access services running locally (probably a hostname not found error) then you can try specify your IP address manually using: `LOCAL_IP=192.168.0.5 yarn compose`
 
 ### Manual backup setup (already done for you if you restore the pre-populated db dump)
 
@@ -44,6 +44,14 @@ You can open all of them by running `yarn open`
 3. Click Channels and for each channel -
    1. click edit, and then go to routes tab and change the value of host from service name to your local IP address.
 4. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
+
+### Create a new metadata db dump
+
+Start the development environment as described above, then:
+
+1. `cd packages/resource && yarn populate && cd ../..`
+2. `cd packages/user-mgnt && yarn populate && cd ../..`
+3. Login to the OpenHIM console and update the base config file.
 
 ### tmuxed development setup
 
