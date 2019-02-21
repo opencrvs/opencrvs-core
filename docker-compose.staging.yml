@@ -19,6 +19,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+    networks:
+      - overlay_net
 
   register:
     configs:
@@ -31,7 +33,7 @@ services:
         - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
         - 'traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}'
         - 'traefik.port=5000'
-        - 'traefik.docker.network=opencrvs_default'
+        - 'traefik.docker.network=opencrvs_overlay_net'
 
   performance:
     configs:
@@ -42,7 +44,7 @@ services:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: performance.{{hostname}}'
         - 'traefik.port=5000'
-        - 'traefik.docker.network=opencrvs_default'
+        - 'traefik.docker.network=opencrvs_overlay_net'
 
   login:
     configs:
@@ -53,7 +55,7 @@ services:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: login.{{hostname}}'
         - 'traefik.port=5000'
-        - 'traefik.docker.network=opencrvs_default'
+        - 'traefik.docker.network=opencrvs_overlay_net'
 
   auth:
     secrets:
@@ -67,7 +69,7 @@ services:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: auth.{{hostname}}'
         - 'traefik.port=4040'
-        - 'traefik.docker.network=opencrvs_default'
+        - 'traefik.docker.network=opencrvs_overlay_net'
 
   user-mgnt:
     secrets:
@@ -86,7 +88,7 @@ services:
     environment:
       - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
       - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
-      - CLICKATELL_API_ID_PATH=/run/secret/clickatell-api-id
+      - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
       - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
@@ -103,7 +105,7 @@ services:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: gateway.{{hostname}}'
         - 'traefik.port=7070'
-        - 'traefik.docker.network=opencrvs_default'
+        - 'traefik.docker.network=opencrvs_overlay_net'
 
   workflow:
     secrets:
@@ -127,7 +129,7 @@ services:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: resources.{{hostname}}'
         - 'traefik.port=3040'
-        - 'traefik.docker.network=opencrvs_default'
+        - 'traefik.docker.network=opencrvs_overlay_net'
 
   hearth:
     secrets:

@@ -1,4 +1,4 @@
-DIR=`dirname $(readlink -f $0)`
+DIR=DIR=$(cd "$(dirname "$0")"; pwd)
 echo "Working dir: $DIR"
 
 docker run --rm -v $DIR/backups:/backups --network=opencrvs_overlay_net mongo:3.6 bash \
