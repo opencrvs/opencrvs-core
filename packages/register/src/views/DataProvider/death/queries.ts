@@ -74,6 +74,24 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           contentType
           subject
         }
+        status {
+          comments {
+            comment
+          }
+
+          location {
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+        }
         type
         trackingId
         registrationNumber
