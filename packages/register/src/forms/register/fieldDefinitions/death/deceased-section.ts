@@ -45,7 +45,14 @@ import {
   addressToFieldTransformer,
   sameAddressFieldTransformer
 } from 'src/forms/mappings/query/field-mappings'
-import { FETCH_DECEASED } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
+import {
+  FETCH_REGISTRATION,
+  transformRegistrationData
+} from '@opencrvs/register/src/forms/register/queries/registration'
+import {
+  FETCH_DECEASED,
+  transformDeceasedData
+} from '@opencrvs/register/src/forms/register/queries/person'
 
 const messages = defineMessages({
   deceasedTab: {
@@ -239,14 +246,32 @@ export const deceasedSection: IFormSection = {
       label: messages.fetchDeceasedDetails,
       required: false,
       initialValue: '',
-      query: FETCH_DECEASED,
-      inputs: [
-        {
-          name: 'identifier',
-          valueField: 'iD',
-          labelField: 'iDType'
+      queryMap: {
+        NATIONAL_ID: {
+          query: FETCH_REGISTRATION,
+          inputs: [
+            {
+              name: 'identifier',
+              valueField: 'iD'
+            }
+          ],
+          transformer: transformRegistrationData
+        },
+        BIRTH_REGISTRATION_NUMBER: {
+          query: FETCH_DECEASED,
+          inputs: [
+            {
+              name: 'identifier',
+              valueField: 'iD'
+            }
+          ],
+          transformer: transformDeceasedData
         }
-      ],
+      },
+      querySelectorInput: {
+        name: 'identifier',
+        valueField: 'iD'
+      },
       validate: [],
       conditionals: [conditionals.deceasedBRNSelected],
       modalTitle: messages.fetchDeceasedModalTitle,

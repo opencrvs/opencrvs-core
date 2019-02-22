@@ -108,7 +108,6 @@ export interface IDynamicFormFieldDefinitions {
 export interface IFieldInput {
   name: string
   valueField: string
-  labelField: string
 }
 
 export type IFormFieldValue = string | string[] | boolean | IFileValue[]
@@ -234,11 +233,19 @@ export interface ILink extends IFormFieldBase {
 export interface IPDFDocumentViewerFormField extends IFormFieldBase {
   type: typeof PDF_DOCUMENT_VIEWER
 }
-export interface ILoaderButton extends IFormFieldBase {
-  type: typeof LOADER_BUTTON
+export interface IQuery {
   query: any
   inputs: IFieldInput[]
-  onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
+  transformer: (response: ApolloQueryResult<GQLQuery>) => void
+}
+export interface IQueryMap {
+  [key: string]: IQuery
+}
+export interface ILoaderButton extends IFormFieldBase {
+  type: typeof LOADER_BUTTON
+  queryMap: IQueryMap
+  querySelectorInput: IFieldInput
+  onFetch?: (response: any) => void
   modalTitle: FormattedMessage.MessageDescriptor
   modalInfoText: FormattedMessage.MessageDescriptor
   successTitle: FormattedMessage.MessageDescriptor
@@ -454,9 +461,9 @@ export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
 
 export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   type: typeof LOADER_BUTTON
-  query: any
-  variables: IDynamicValues
-  onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
+  queryMap: IQueryMap
+  querySelectorInput: IFieldInput
+  onFetch?: (response: any) => void
   modalTitle: string
   modalInfoText: string
   successTitle: string

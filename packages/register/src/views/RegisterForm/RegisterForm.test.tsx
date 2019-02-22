@@ -23,11 +23,11 @@ import {
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { FETCH_DECEASED } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
 import { Event, IFormData } from '@opencrvs/register/src/forms'
 import { draftToGqlTransformer } from 'src/transformer'
 import { IForm } from 'src/forms'
 import { clone } from 'lodash'
+import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
@@ -190,7 +190,7 @@ describe('when user is in the register form for death event', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_DECEASED,
+            query: FETCH_REGISTRATION,
             variables: {
               identifier: '2019333494BQNXOHJ2'
             }
@@ -284,7 +284,7 @@ describe('when user is in the register form for death event', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_DECEASED,
+            query: FETCH_REGISTRATION,
             variables: {
               identifier: '2019333494BQNXOHJ2'
             }

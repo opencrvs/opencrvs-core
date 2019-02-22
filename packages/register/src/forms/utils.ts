@@ -270,6 +270,11 @@ export function isCityLocation(
   }
 }
 
+export function getQuery(field: ILoaderButton, values: IFormSectionData) {
+  const selectedValue = values[field.querySelectorInput.valueField] as string
+  return field.queryMap[selectedValue]
+}
+
 export function getInputValues(
   field: ILoaderButton,
   values: IFormSectionData

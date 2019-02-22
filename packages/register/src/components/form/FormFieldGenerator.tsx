@@ -77,7 +77,6 @@ import { ImageUploadField } from './ImageUploadField'
 import { LoaderButtonField } from './LoaderButton'
 
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
-import { transformDeceasedData } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -476,12 +475,7 @@ class FormSectionComponent extends React.Component<Props> {
                   variables: getInputValues(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
-                    const transformedData = transformDeceasedData(response)
-                    const updatedValues = Object.assign(
-                      {},
-                      values,
-                      transformedData
-                    )
+                    const updatedValues = Object.assign({}, values, response)
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)
