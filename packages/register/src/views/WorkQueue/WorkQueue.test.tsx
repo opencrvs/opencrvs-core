@@ -244,7 +244,7 @@ describe('WorkQueue tests', async () => {
             timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
-            practitionerRole: 'LOCAL_REGISTRAR'
+            practitionerRole: 'Registrar'
           }
         ],
         rejection_reason: '',
@@ -268,7 +268,7 @@ describe('WorkQueue tests', async () => {
             timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
-            practitionerRole: 'LOCAL_REGISTRAR'
+            practitionerRole: 'Registrar'
           }
         ],
         rejection_reason: '',
@@ -1292,7 +1292,7 @@ describe('WorkQueue tests', async () => {
           .find('#new_registration')
           .hostNodes()
           .text()
-      ).toContain('New birth application')
+      ).toContain('New application')
 
       testComponent.component.unmount()
     })

@@ -446,7 +446,7 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
-  describe('markBirthAsVoided()', () => {
+  describe('markEventAsVoided()', () => {
     it('updates a task with rejected status, reason and comment', async () => {
       fetch.mockResponses(
         [
@@ -542,7 +542,7 @@ describe('Registration root resolvers', () => {
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
       // @ts-ignore
-      const result = await resolvers.Mutation.markBirthAsVoided(
+      const result = await resolvers.Mutation.markEventAsVoided(
         {},
         { id, reason, comment }
       )
@@ -893,6 +893,196 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
+  describe('markDeathAsRegistered', () => {
+    it('updates status successfully when only composition id is sent', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: '0a84365d-1925-40cf-a48b-17fcf3425040',
+            meta: {
+              lastUpdated: '2018-12-13T03:55:12.629+00:00'
+            },
+            type: 'searchset',
+            total: 1,
+            link: [
+              {
+                relation: 'self',
+                url:
+                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+              }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'DEATH'
+                      }
+                    ]
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/death-tracking-id',
+                      value: 'DlAqHa7'
+                    }
+                  ],
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueReference: {
+                        reference:
+                          'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                      }
+                    },
+                    {
+                      url:
+                        'http://opencrvs.org/specs/extension/regLastLocation',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
+                    }
+                  ],
+                  lastModified: '2018-12-11T11:55:46.775Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-12-11T11:55:46.775Z',
+                      authorString:
+                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                  },
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'DECLARED'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-12-11T12:29:48.862+00:00',
+                    versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
+                  },
+                  id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Task',
+            status: 'requested',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/types',
+                  code: 'DEATH'
+                }
+              ]
+            },
+            identifier: [
+              {
+                system: 'http://opencrvs.org/specs/id/death-tracking-id',
+                value: 'DlAqHa7'
+              },
+              {
+                system:
+                  'http://opencrvs.org/specs/id/death-registration-number',
+                value: '2018333417123456786'
+              }
+            ],
+            extension: [
+              {
+                url: 'http://opencrvs.org/specs/extension/regLastUser',
+                valueReference: {
+                  reference: 'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                }
+              },
+              {
+                url: 'http://opencrvs.org/specs/extension/regLastLocation',
+                valueReference: {
+                  reference: 'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                }
+              },
+              {
+                url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                valueReference: {
+                  reference: 'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                }
+              }
+            ],
+            lastModified: '2018-12-11T11:55:46.775Z',
+            note: [
+              {
+                text: '',
+                time: '2018-12-11T11:55:46.775Z',
+                authorString:
+                  'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+              }
+            ],
+            focus: {
+              reference: 'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+            },
+            businessStatus: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/reg-status',
+                  code: 'REGISTER'
+                }
+              ]
+            },
+            meta: {
+              lastUpdated: '2018-12-11T12:29:48.862+00:00',
+              versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
+            },
+            id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
+          })
+        ]
+      )
+      const result = await resolvers.Mutation.markDeathAsRegistered(
+        {},
+        { id: compositionID }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('2018333417123456786')
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+  })
   describe('updateBirthRegistration()', () => {
     const details = {
       child: {
@@ -990,6 +1180,55 @@ describe('Registration root resolvers', () => {
         // @ts-ignore
         resolvers.Mutation.markBirthAsCertified({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
+    })
+  })
+  describe('markDeathAsCertified()', () => {
+    const details = {
+      deceased: {
+        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
+      },
+      informant: {
+        relationship: 'MOTHER',
+        individual: {
+          name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
+          telecom: [{ system: 'phone', value: '+8801622688231' }]
+        }
+      },
+      registration: {
+        certificates: [
+          {
+            collector: {
+              relationship: 'informant'
+            },
+            hasShowedVerifiedDocument: true,
+            data: 'DUMMY'
+          }
+        ]
+      }
+    }
+    it('posts a fhir bundle', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Mutation.markDeathAsCertified(
+        {},
+        { details }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('1')
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
     })
   })
   describe('queryRegistrationByIdentifier()', async () => {

@@ -707,3 +707,102 @@ export const mockOfflineData = {
     }
   ]
 }
+
+export const mockDeathApplicationDataWithoutFirstNames = {
+  deceased: {
+    iDType: 'NATIONAL_ID',
+    iD: '1230000000000',
+    firstNames: '',
+    familyName: 'ইসলাম',
+    firstNamesEng: '',
+    familyNameEng: 'Islam',
+    nationality: 'BGD',
+    gender: 'male',
+    maritalStatus: 'MARRIED',
+    birthDate: '1987-02-16',
+    permanentAddress: '',
+    countryPermanent: 'BGD',
+    statePermanent: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
+    districtPermanent: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
+    addressLine4Permanent: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
+    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
+    addressLine2Permanent: '193 Kalibari Road',
+    addressLine1Permanent: '193 Kalibari Road',
+    postCodePermanent: '2200',
+    currentAddress: '',
+    currentAddressSameAsPermanent: true,
+    country: 'BGD',
+    state: '',
+    district: '',
+    addressLine4: '',
+    addressLine3: '',
+    addressLine2: '',
+    addressLine1: '',
+    postCode: ''
+  },
+  informant: {
+    applicantIdType: 'NATIONAL_ID',
+    iDType: 'NATIONAL_ID',
+    applicantID: '1230000000000',
+    applicantFirstNames: '',
+    applicantFamilyName: 'ইসলাম',
+    applicantFirstNamesEng: 'Islam',
+    applicantFamilyNameEng: '',
+    nationality: 'BGD',
+    applicantBirthDate: '',
+    applicantsRelationToDeceased: 'MOTHER',
+    applicantPhone: '',
+    currentAddress: '',
+    country: 'BGD',
+    state: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
+    district: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
+    addressLine4: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
+    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
+    addressLine2: '',
+    addressLine1: '193 Kalibari Road',
+    postCode: '2200',
+    permanentAddress: '',
+    applicantPermanentAddressSameAsCurrent: true,
+    countryPermanent: 'BGD',
+    statePermanent: '',
+    districtPermanent: '',
+    addressLine4Permanent: '',
+    addressLine3Permanent: '',
+    addressLine2Permanent: '',
+    addressLine1Permanent: '',
+    postCodePermanent: ''
+  },
+  deathEvent: {
+    deathDate: '1987-02-16',
+    manner: 'ACCIDENT',
+    deathPlace: '',
+    deathPlaceAddress: 'OTHER',
+    placeOfDeath: 'OTHER',
+    deathLocation: '',
+    addressType: '',
+    country: 'BGD',
+    state: 'state',
+    district: 'district',
+    addressLine4: 'upazila',
+    addressLine3: 'union',
+    addressLine2: '',
+    addressLine1: '',
+    postCode: ''
+  },
+  causeOfDeath: {
+    causeOfDeathEstablished: false,
+    methodOfCauseOfDeath: '',
+    causeOfDeathCode: ''
+  },
+  documents: {
+    image_uploader: [
+      {
+        data: 'base64-data',
+        type: 'image/jpeg',
+        optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
+        title: "Proof of Deceased's ID",
+        description: 'National ID (front)'
+      }
+    ]
+  }
+}

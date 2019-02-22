@@ -19,6 +19,9 @@ export const resolvers: GQLResolver = {
     async fetchBirthRegistration(_, { id }, authHeader) {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
+    async fetchDeathRegistration(_, { id }, authHeader) {
+      return await fetchFHIR(`/Composition/${id}`, authHeader)
+    },
     async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
       const taskBundle = await fetchFHIR(
         `/Task?identifier=${identifier}`,
@@ -72,36 +75,18 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
-
-      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      if (hasScope(authHeader, 'register')) {
-        // return the brn
-        return await getRegistrationNumberFromResponse(
-          res,
-          EVENT_TYPE.BIRTH,
-          authHeader
-        )
-      } else {
-        // return tracking-id
-        return await getTrackingIdFromResponse(res, authHeader)
-      }
+      return await createEventRegistration(
+        details,
+        authHeader,
+        EVENT_TYPE.BIRTH
+      )
     },
     async createDeathRegistration(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details, EVENT_TYPE.DEATH)
-
-      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      if (hasScope(authHeader, 'register')) {
-        // return the brn
-        return await getRegistrationNumberFromResponse(
-          res,
-          EVENT_TYPE.DEATH,
-          authHeader
-        )
-      } else {
-        // return tracking-id
-        return await getTrackingIdFromResponse(res, authHeader)
-      }
+      return await createEventRegistration(
+        details,
+        authHeader,
+        EVENT_TYPE.DEATH
+      )
     },
     async updateBirthRegistration(_, { details }, authHeader) {
       const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
@@ -111,33 +96,22 @@ export const resolvers: GQLResolver = {
       return getIDFromResponse(res)
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
-      let doc
-      if (!details) {
-        const taskBundle = await fetchFHIR(
-          `/Task?focus=Composition/${id}`,
-          authHeader
-        )
-        if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
-          throw new Error('Task does not exist')
-        }
-        doc = {
-          resourceType: 'Bundle',
-          type: 'document',
-          entry: taskBundle.entry
-        }
-      } else {
-        doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
-      }
-
-      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      // return the brn
-      return await getRegistrationNumberFromResponse(
-        res,
+      return await markEventAsRegistered(
+        id,
+        authHeader,
         EVENT_TYPE.BIRTH,
-        authHeader
+        details
       )
     },
-    async markBirthAsVoided(_, { id, reason, comment }, authHeader) {
+    async markDeathAsRegistered(_, { id, details }, authHeader) {
+      return await markEventAsRegistered(
+        id,
+        authHeader,
+        EVENT_TYPE.DEATH,
+        details
+      )
+    },
+    async markEventAsVoided(_, { id, reason, comment }, authHeader) {
       const taskBundle = await fetchFHIR(
         `/Task?focus=Composition/${id}`,
         authHeader
@@ -158,11 +132,10 @@ export const resolvers: GQLResolver = {
       return taskEntry.resource.id
     },
     async markBirthAsCertified(_, { details }, authHeader) {
-      const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
-
-      const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-      // return composition-id
-      return getIDFromResponse(res)
+      return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
+    },
+    async markDeathAsCertified(_, { details }, authHeader) {
+      return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
     },
     async notADuplicate(_, { id, duplicateId }, authHeader) {
       const composition = await fetchFHIR(
@@ -180,6 +153,64 @@ export const resolvers: GQLResolver = {
       return composition.id
     }
   }
+}
+
+async function createEventRegistration(
+  details: any,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE
+) {
+  const doc = await buildFHIRBundle(details, event)
+
+  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  if (hasScope(authHeader, 'register')) {
+    // return the registrationNumber
+    return await getRegistrationNumberFromResponse(res, event, authHeader)
+  } else {
+    // return tracking-id
+    return await getTrackingIdFromResponse(res, authHeader)
+  }
+}
+
+async function markEventAsRegistered(
+  id: string,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE,
+  details?: any
+) {
+  let doc
+  if (!details) {
+    const taskBundle = await fetchFHIR(
+      `/Task?focus=Composition/${id}`,
+      authHeader
+    )
+    if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+      throw new Error('Task does not exist')
+    }
+    doc = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: taskBundle.entry
+    }
+  } else {
+    doc = await buildFHIRBundle(details, event)
+  }
+
+  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  // return the registrationNumber
+  return await getRegistrationNumberFromResponse(res, event, authHeader)
+}
+
+async function markEventAsCertified(
+  details: any,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE
+) {
+  const doc = await buildFHIRBundle(details, event, authHeader)
+
+  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  // return composition-id
+  return getIDFromResponse(res)
 }
 
 async function getCompositions(

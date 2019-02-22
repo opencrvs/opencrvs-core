@@ -102,3 +102,19 @@ export const fieldValueNestingTransformer = (
   }
   return transformedData
 }
+
+export function setInformantSectionTransformer(
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string
+) {
+  if (
+    draftData[sectionId]._fhirIDMap &&
+    transformedData[sectionId].individual
+  ) {
+    transformedData[sectionId].individual._fhirID =
+      // @ts-ignore
+      draftData[sectionId]._fhirIDMap.individual
+  }
+  return transformedData
+}

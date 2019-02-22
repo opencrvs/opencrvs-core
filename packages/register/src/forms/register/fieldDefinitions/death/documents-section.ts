@@ -8,6 +8,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
 import { deathFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
+import { deathAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
@@ -150,6 +151,7 @@ export const documentsSection: IFormSection = {
             type: RADIO_GROUP,
             label: messages.whatDocToUpload,
             required: true,
+            hideAsterisk: true,
             initialValue: '',
             validate: [],
             options: [
@@ -180,6 +182,7 @@ export const documentsSection: IFormSection = {
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: messages.typeOfDocument,
             required: true,
+            hideAsterisk: true,
             validate: [],
             initialValue: '',
             dynamicOptions: {
@@ -261,7 +264,8 @@ export const documentsSection: IFormSection = {
         ]
       },
       mapping: {
-        mutation: deathFieldToAttachmentTransformer
+        mutation: deathFieldToAttachmentTransformer,
+        query: deathAttachmentToFieldTransformer
       }
     },
     {
