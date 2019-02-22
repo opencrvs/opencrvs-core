@@ -13,6 +13,7 @@ interface IMutationProviderProps {
   draft?: IDraft
   payload?: any
   onCompleted: (data: any) => void
+  onError?: (error: any) => void
 }
 type IProps = IMutationProviderProps & InjectedIntlProps
 /* Need to add mappings for events here */
@@ -36,7 +37,7 @@ class MutationProviderComponent extends React.Component<IProps> {
   }
 
   render() {
-    const { onCompleted } = this.props
+    const { onCompleted, onError } = this.props
     const eventMutationMapping = this.getMapping()
     if (!eventMutationMapping) {
       return null
@@ -46,6 +47,7 @@ class MutationProviderComponent extends React.Component<IProps> {
         mutation={eventMutationMapping.mutation}
         variables={eventMutationMapping.variables || null}
         onCompleted={data => onCompleted(data[eventMutationMapping.dataKey])}
+        onError={onError}
       >
         {(submitMutation, { loading, data }) => {
           return (
