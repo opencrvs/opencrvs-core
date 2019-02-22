@@ -209,6 +209,12 @@ const isNumber = (value: string): boolean => !value || !isNaN(Number(value))
 const isRegexpMatched = (value: string, regexp: string): boolean =>
   !value || value.match(regexp) !== null
 
+export const match = (
+  regexp: string,
+  message: FormattedMessage.MessageDescriptor
+) => (value: string) =>
+  isRegexpMatched(value, regexp) ? undefined : { message }
+
 export const numeric: Validation = (value: string) =>
   isNumber(value) ? undefined : { message: messages.numberRequired }
 
