@@ -1,7 +1,7 @@
 version: '3.3'
 
-# Expose ports locally for dev
 services:
+# For dependencies, expose ports locally for dev
   mongo:
     ports:
       - '27017:27017'
@@ -36,3 +36,13 @@ services:
   openhim-console:
     volumes:
       - './infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json'
+
+  openhim-core:
+    extra_hosts:
+      - "gateway:${LOCAL_IP-172.17.0.1}"
+      - "workflow:${LOCAL_IP-172.17.0.1}"
+      - "deduplication:${LOCAL_IP-172.17.0.1}"
+      - "auth:${LOCAL_IP-172.17.0.1}"
+      - "user-mgnt:${LOCAL_IP-172.17.0.1}"
+      - "notification:${LOCAL_IP-172.17.0.1}"
+      - "resources:${LOCAL_IP-172.17.0.1}"

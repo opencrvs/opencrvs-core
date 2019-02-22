@@ -79,6 +79,7 @@ export function getLocationIDByDescription(
 const kaliganjA2IIdescription = 'division=3&district=20&upazila=165'
 const narsingdiA2IIdescription = 'division=3&district=29&upazila=229'
 const kurigramA2IIdescription = 'division=6&district=55&upazila=417'
+const bhurungamariA2IIdescription = 'division=6&district=55&upazila=413'
 
 export async function getUpazilaID(
   upazilas: fhir.Location[],
@@ -89,6 +90,8 @@ export async function getUpazilaID(
     description = kaliganjA2IIdescription
   } else if (name === 'Narsingdi Sadar') {
     description = narsingdiA2IIdescription
+  } else if (name === 'Bhurungamari') {
+    description = bhurungamariA2IIdescription
   } else {
     description = kurigramA2IIdescription
   }

@@ -243,7 +243,7 @@ describe('WorkQueue tests', async () => {
             timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
-            practitionerRole: 'LOCAL_REGISTRAR'
+            practitionerRole: 'Registrar'
           }
         ],
         rejection_reason: '',
@@ -267,7 +267,7 @@ describe('WorkQueue tests', async () => {
             timestamp: '07-12-2018',
             type: 'REGISTERED',
             practitionerName: 'Mohammad Ashraful',
-            practitionerRole: 'LOCAL_REGISTRAR'
+            practitionerRole: 'Registrar'
           }
         ],
         rejection_reason: '',
