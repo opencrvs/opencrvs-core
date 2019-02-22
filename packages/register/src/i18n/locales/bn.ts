@@ -490,11 +490,13 @@ export const BENGALI_STATE: ILanguage = {
     'validations.validNationalId':
       'জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validBirthRegistrationNumber':
-      'জন্ম নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+      'জন্ম নিবন্ধন নম্বরে ইংরেজি বড় অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {min} থেকে {max} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validDeathRegistrationNumber':
       'মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
       'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'validations.blockAlphaNumericDot':
+      'শুধুমাত্র ইংরেজি বড় অক্ষর, সংখ্যা এবং ডট হতে পারে (উদাঃ, C91.5)',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',
