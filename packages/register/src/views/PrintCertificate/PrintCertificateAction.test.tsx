@@ -191,7 +191,8 @@ describe('when user wants to print certificate', async () => {
         staticContext={mockLocation}
         match={{
           params: {
-            registrationId: 'asdhdqe2472487jsdfsdf'
+            registrationId: 'asdhdqe2472487jsdfsdf',
+            eventType: 'BIRTH'
           },
           isExact: true,
           path: '',
@@ -332,7 +333,8 @@ describe('when user wants to print certificate', async () => {
         staticContext={mockLocation}
         match={{
           params: {
-            registrationId: 'asdhdqe2472487jsdfsdf'
+            registrationId: 'asdhdqe2472487jsdfsdf',
+            eventType: 'BIRTH'
           },
           isExact: true,
           path: '',
@@ -663,7 +665,8 @@ describe('when user wants to print certificate', async () => {
           staticContext={mockLocation}
           match={{
             params: {
-              registrationId: 'asdhdqe2472487jsdfsdf'
+              registrationId: 'asdhdqe2472487jsdfsdf',
+              eventType: 'BIRTH'
             },
             isExact: true,
             path: '',

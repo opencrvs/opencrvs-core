@@ -14,6 +14,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           familyName
         }
         birthDate
+        gender
         maritalStatus
         nationality
         identifier {
@@ -99,6 +100,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
 export function getDeathQueryMappings(action: Action) {
   switch (action) {
     case Action.LOAD_REVIEW_APPLICATION:
+      return {
+        query: GET_DEATH_REGISTRATION_FOR_REVIEW,
+        dataKey: 'fetchDeathRegistration'
+      }
+    case Action.LOAD_CERTIFICATE_APPLICATION:
       return {
         query: GET_DEATH_REGISTRATION_FOR_REVIEW,
         dataKey: 'fetchDeathRegistration'

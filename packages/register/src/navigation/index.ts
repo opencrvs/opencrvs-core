@@ -81,9 +81,12 @@ export function goToReviewDuplicate(applicationId: string) {
   )
 }
 
-export function goToPrintCertificate(registrationId: string) {
+export function goToPrintCertificate(registrationId: string, event: string) {
   return push(
-    formatUrl(PRINT_CERTIFICATE, { registrationId: registrationId.toString() })
+    formatUrl(PRINT_CERTIFICATE, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString()
+    })
   )
 }
 

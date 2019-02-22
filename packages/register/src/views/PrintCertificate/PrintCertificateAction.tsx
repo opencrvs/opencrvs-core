@@ -1104,10 +1104,14 @@ class PrintCertificateActionComponent extends React.Component<
   }
 }
 
-const getDraft = (drafts: IDraft[], registrationId: string) =>
+const getDraft = (
+  drafts: IDraft[],
+  registrationId: string,
+  eventType: string
+) =>
   drafts.find(draftItem => draftItem.id === registrationId) || {
     data: {},
-    eventType: Event.BIRTH
+    event: getEvent(eventType)
   }
 
 const getEvent = (eventType: string | undefined) => {
@@ -1132,12 +1136,12 @@ const getCollectCertificateForm = (event: Event, state: IStoreState) => {
 
 function mapStatetoProps(
   state: IStoreState,
-  props: RouteComponentProps<{ registrationId: string }>
+  props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
-  const { registrationId } = props.match.params
+  const { registrationId, eventType } = props.match.params
 
-  const draft = getDraft(state.drafts.drafts, registrationId)
-  const event = getEvent(draft.eventType)
+  const draft = getDraft(state.drafts.drafts, registrationId, eventType)
+  const event = getEvent(draft.event)
 
   return {
     event,
