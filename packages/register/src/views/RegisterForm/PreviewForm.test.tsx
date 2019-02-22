@@ -228,7 +228,7 @@ describe('when user is previewing the form data', () => {
             await flushPromises()
             app.update()
 
-            expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
+            expect(app.find('#tracking_id_viewer').hostNodes()).toHaveLength(1)
           })
         })
       })
@@ -496,10 +496,10 @@ describe('when user is previewing the form data', () => {
 
       expect(
         app
-          .find('#view_title')
+          .find('#submission_text')
           .hostNodes()
           .text()
-      ).toEqual('Application rejected')
+      ).toEqual('birth application has been rejected.')
     })
   })
   describe('when user is in the death review section', () => {
@@ -727,10 +727,10 @@ describe('when user is previewing the form data', () => {
 
       expect(
         app
-          .find('#view_title')
+          .find('#submission_text')
           .hostNodes()
           .text()
-      ).toEqual('Application rejected')
+      ).toEqual('death application has been rejected.')
     })
   })
 })
