@@ -490,11 +490,13 @@ export const BENGALI_STATE: ILanguage = {
     'validations.validNationalId':
       'জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validBirthRegistrationNumber':
-      'জন্ম নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+      'জন্ম নিবন্ধন নম্বরে ইংরেজি বড় অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {min} থেকে {max} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validDeathRegistrationNumber':
       'মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
       'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'validations.blockAlphaNumericDot':
+      'শুধুমাত্র ইংরেজি বড় অক্ষর, সংখ্যা এবং ডট হতে পারে (উদাঃ, C91.5)',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
     'validations.phoneNumberFormat':
       '১১ সংখ্যার যথাযথ মোবাইল ফোন নাম্বার হতে হবে, যা ০১ দিয়ে শুরু হয়',
@@ -843,6 +845,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantRelation.daughter': 'কন্যা',
     'formFields.applicantRelation.extendedFamily': 'বর্ধিত পরিবার',
     'formFields.applicantRelation.other': 'অন্যান্য (উল্লেখ করুন)',
+    'formFields.applicantOtherRelationship': 'অন্যান্য সম্পর্ক',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',
@@ -862,31 +865,21 @@ export const BENGALI_STATE: ILanguage = {
       registered {নিবন্ধভুক্তকরন করা হচ্ছে।} offlineAction {ডিভাইসে ইন্টারনেট সংযোগ কালীন স্বয়ংক্রিয়ভাবে যাচাইয়ের জন্য পাঠানো হবে।}}`,
     'register.confirmationScreen.boxHeaderTitle': `{action, select, completed {সমাপ্ত!} submitted {সমাপ্ত!} rejected {আবেদন প্রত্যাখ্যাত!}
       approved {আবেদন অনুমোদিত}  registered {আবেদন নিবন্ধভুক্তকরন} offlineAction {সম্পূর্ণ হচ্ছে}}`,
-    'register.confirmationScreen.nextSectionDesc': `{event, select, declaration {রেজিস্ট্রেশন সম্পূর্ণ হলে অথবা প্রক্রিয়ায় কোন বিলম্ব থাকলে আপনাকে OpenCRVS এর মাধ্যমে জানানো হবে।}
-      registration {নিবন্ধন প্রক্রিয়া সম্পূর্ণ।} duplication {} certificate {}
-      offlineEvent {পরবর্তী 7 দিনের মধ্যে ডিভাইসে ইন্টারনেট সংযোগ স্থাপন করার পরে আপনাকে লগইন করতে হবে। OpenCRVS স্বয়ংক্রিয়ভাবে ফর্ম জমা দেবে, তাই আপনাকে অন্য কিছু করার প্রয়োজন হবে না।}}`,
-    'register.confirmationScreen.nextSectionDescDetails': `{event, select, declaration {
-      ইনফরম্যান্ট তাদের যোগাযোগের বিবরণ দিয়েছেন এবং যখন নিবন্ধন সম্পূর্ণ হবে তখন জানানো হবে।} registration {সনদপত্রটি তথ্য সরবরাহকারী সংগ্রহ করতে গেলেই কেবল মুদ্রণ করতে হবে।}
-      duplication {} certificate {} offlineEvent {আবেদন একবার সফলভাবে জমা দেয়ার পর রেজিস্ট্রেশন সম্পূর্ণ হলে আপনাকে  এবং সংবাদদাতাকে অবহিত করা হবে।}}`,
-    'register.confirmationScreen.nextCard.title': 'পরবর্তী',
     'register.confirmationScreen.rejectedNoticeCardText2':
       'বাতিল করা হয়েছে এবং এজেন্টকে প্রত্যাখ্যানের কারণগুলি সম্পর্কে জানানো হবে এবং অনুসরণ করার নির্দেশ দেওয়া হবে।',
     'register.confirmationScreen.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.confirmationScreen.buttons.newDeclaration': 'নতুন আবেদন',
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং নম্বর : } registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} 
+      rejection {ট্র্যাকিং নম্বর : } certificate {} offline {ট্র্যাকিং নম্বর :}} `,
     'formFields.fetchModalTitle': 'পরীক্ষা করা হচ্ছে',
     'formFields.fetchModalSuccessTitle': 'আইডি বৈধ',
     'formFields.fetchModalErrorTitle': 'অকার্যকর আইডি',
     'formFields.fetchModalErrorText':
       'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
     'formFields.fetchModalInfo': 'জন্ম নিবন্ধন নম্বর',
-    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং আইডি  নম্বর : } registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর : } duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর : } certificate {} offlineEvent {ট্র্যাকিং আইডি  নম্বর : }} `,
-    'register.confirmationScreen.trackingSectionDesc': `{event, select, declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}
-      registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।}
-      duplication {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এই নম্বরটি এসএমএসের মাধ্যমে পাবেন। তাদের নিবন্ধন সম্পর্কে জিজ্ঞাসা করা হলে তারা একটি রেফারেন্স হিসাবে নম্বর ব্যবহার করা উচিত।} certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।}
-      offlineEvent {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}} `,
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select,declaration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা } registration { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন}
-     duplication { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নকল} certificate { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন সনদ} offlineEvent {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা }}`,
+     duplication { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নকল} certificate { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন সনদ} offline {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা }}`,
     'register.confirmationScreen.boxHeaderDescLast': `{action, select,
       completed {সম্পূর্ণ হয়েছে।} submitted {সফলভাবে রেজিস্ট্রেশান অফিসে জমা দেওয়া হয়েছে।} rejected {প্রত্যাখ্যাত হয়েছে।} registered {আবেদন নিবন্ধভুক্তকরন হয়েছে।}
       approved {অনুমোদিত হয়েছে।} offlineAction {জমা দেওয়া হচ্ছে।}}`,
@@ -894,6 +887,18 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.notDuplicate.modal.back': 'পিছনে',
     'register.duplicates.notDuplicate.modal.yes': 'হাঁ',
     'register.duplicates.notDuplicate.modal.confirmationText':
-      'আপনি কি নিশ্চিত এই আবেদন নকল না?'
+      'আপনি কি নিশ্চিত এই আবেদন নকল না?',
+    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন পর্যালোচনার জন্য পাঠানো হয়েছে।} 
+      registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
+      duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
+      rejection {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন প্রত্যাখ্যাত হয়েছে।} 
+      certificate {{eventType, select, birth {জন্ম} death {মৃত্যু}} সনদপত্র সম্পূর্ণ হয়েছে।} 
+      offline {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদনটি আপনি পুনরায় সংযুক্ত হলে পাঠানো হবে।} }`,
+    'register.confirmationScreen.trackingSectionDesc': `{event, select, certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।}
+      declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
+      registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।} 
+      duplication{সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
+      rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।} 
+      offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `
   }
 }

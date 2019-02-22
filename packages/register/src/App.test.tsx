@@ -923,7 +923,7 @@ describe('when user has a valid token in local storage', () => {
             await flushPromises()
             app.update()
 
-            expect(app.find('#trackingIdViewer').hostNodes()).toHaveLength(1)
+            expect(app.find('#tracking_id_viewer').hostNodes()).toHaveLength(1)
           })
         })
       })
@@ -1191,10 +1191,10 @@ describe('when user has a valid token in local storage', () => {
 
       expect(
         app
-          .find('#view_title')
+          .find('#submission_text')
           .hostNodes()
           .text()
-      ).toEqual('Application rejected')
+      ).toEqual('birth application has been rejected.')
     })
   })
   describe('when user is in the death review section', () => {
@@ -1422,10 +1422,10 @@ describe('when user has a valid token in local storage', () => {
 
       expect(
         app
-          .find('#view_title')
+          .find('#submission_text')
           .hostNodes()
           .text()
-      ).toEqual('Application rejected')
+      ).toEqual('death application has been rejected.')
     })
   })
 })

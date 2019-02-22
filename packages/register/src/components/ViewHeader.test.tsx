@@ -15,3 +15,19 @@ describe('view header component', () => {
     expect(testComponent).toMatchSnapshot()
   })
 })
+
+describe('view header component with logo', () => {
+  const hideBackButton = true
+  const testComponent = createShallowRenderedComponent(
+    <ViewHeader
+      id="test_heaader"
+      title="Test title"
+      description="Test description"
+      hideBackButton={hideBackButton}
+    />
+  )
+
+  it('renders without crashing', () => {
+    expect(testComponent).toMatchSnapshot()
+  })
+})

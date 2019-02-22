@@ -145,6 +145,11 @@ const messages = defineMessages({
     defaultMessage: 'Other(Specify)',
     description: 'Label for option Other'
   },
+  applicantOtherRelationship: {
+    id: 'formFields.applicantOtherRelationship',
+    defaultMessage: 'Other relation',
+    description: 'Label for form field: Other relation'
+  },
   permanentAddressSameAsCurrent: {
     id: 'formFields.applicantsCurrentAddressSameAsPermanent',
     defaultMessage:
@@ -398,6 +403,22 @@ export const applicantsSection: IFormSection = {
         ),
         query: sectionFieldExchangeTransformer('informant', 'relationship')
       }
+    },
+    {
+      name: 'applicantOtherRelationship',
+      type: TEXT,
+      label: messages.applicantOtherRelationship,
+      required: true,
+      initialValue: '',
+      validate: [],
+      mapping: {
+        mutation: fieldValueSectionExchangeTransformer(
+          'informant',
+          'otherRelationship'
+        ),
+        query: sectionFieldExchangeTransformer('informant', 'otherRelationship')
+      },
+      conditionals: [conditionals.otherRelationship]
     },
     {
       name: 'applicantPhone',
