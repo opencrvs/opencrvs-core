@@ -118,12 +118,10 @@ describe('when user is in the confirmation screen page for birth declaration in 
   const mock: any = jest.fn()
   let confirmationScreenComponent: ReactWrapper<{}, {}>
   history.push('/confirm', {
-    trackNumber: '1245LSAJD',
     trackingSection: true,
     eventName: OFFLINE,
-    eventType: BIRTH,
     fullNameInBn,
-    fullNameInEng
+    fullNameInEng: ''
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
@@ -163,7 +161,7 @@ describe('when user is in the confirmation screen page for birth declaration in 
         .find('#submission_name')
         .first()
         .text()
-    ).toEqual(`Tom Brady's`)
+    ).toEqual(`টম ব্র্যাডি - এর`)
   })
   it('should show the tracking section header', () => {
     expect(
@@ -179,7 +177,7 @@ describe('when user is in the confirmation screen page for birth declaration in 
         .find('#tracking_id_viewer')
         .first()
         .text()
-    ).toEqual(`1245LSAJD`)
+    ).toEqual(`UNAVAILABLE`)
   })
   it('should show the tracking section text', () => {
     expect(
@@ -210,7 +208,7 @@ describe('when user is in the confirmation screen page for birth registration', 
     trackingSection: true,
     eventName: REGISTRATION,
     eventType: BIRTH,
-    fullNameInBn,
+    fullNameInBn: '',
     fullNameInEng
   })
   beforeEach(async () => {
@@ -477,7 +475,7 @@ describe('when user is in the confirmation screen page for birth duplication', (
     duplicateContextId: 'xesd123456fhjlsjskxc34'
   })
   beforeEach(async () => {
-    window.location.assign = jest.fn()
+    // window.location.assign = jest.fn()
     const testComponent = createTestComponent(
       <ConfirmationScreen
         location={mock}
@@ -542,6 +540,14 @@ describe('when user is in the confirmation screen page for birth duplication', (
       `The informant will receive this number via SMS with instructions on how and where to collect the certificate. `
     )
   })
+  it('Should show the user duplicate button text', async () => {
+    expect(
+      confirmationScreenComponent
+        .find('#go_to_duplicate_button')
+        .first()
+        .text()
+    ).toEqual(`Back to duplicate`)
+  })
   it('Should redirect the user to the homepage', async () => {
     confirmationScreenComponent
       .find('#go_to_homepage_button')
@@ -551,14 +557,15 @@ describe('when user is in the confirmation screen page for birth duplication', (
     expect(history.location.pathname).toContain('/')
   })
   it('Should redirect the user to the duplicate page', async () => {
+    window.location.assign = jest.fn()
     confirmationScreenComponent
       .find('#go_to_duplicate_button')
       .hostNodes()
       .simulate('click')
     await wait()
-    history.push('duplicates/xesd123456fhjlsjskxc34')
-    expect(history.location.pathname).toContain(
-      'duplicates/xesd123456fhjlsjskxc34'
+    confirmationScreenComponent.update()
+    expect(window.location.assign).toHaveBeenCalledWith(
+      '/duplicates/xesd123456fhjlsjskxc34'
     )
   })
 })

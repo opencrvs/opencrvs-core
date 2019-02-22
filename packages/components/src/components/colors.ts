@@ -34,6 +34,6 @@ export const colors = {
   rejectionIconColor: '#cc755f',
   saveDraftBtn: '#5391E8',
   disabledTab: '#C4C9D4',
-  stormGrey: '#747987',
-  casal: '#41485F'
+  offlineBoxText: '#747987',
+  offlineBoxTitle: '#41485F'
 }

@@ -112,7 +112,7 @@ const TrackingBox = styled(Box)<StyleProps>`
       100%
   );
   color: ${({ theme, offline }) =>
-    offline ? theme.colors.casal : theme.colors.white};
+    offline ? theme.colors.offlineBoxTitle : theme.colors.white};
 
   text-align: center;
   margin: 15px 0;
@@ -121,7 +121,7 @@ const TrackingBox = styled(Box)<StyleProps>`
   ${StyledP} {
     /* stylelint-enable */
     color: ${({ theme, offline }) =>
-      offline ? theme.colors.stormGrey : theme.colors.white};
+      offline ? theme.colors.offlineBoxText : theme.colors.white};
   }
 `
 
