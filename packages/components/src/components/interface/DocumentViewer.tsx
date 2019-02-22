@@ -87,8 +87,6 @@ export class DocumentViewer extends React.Component<IProps, IState> {
 
   render() {
     const { title, tagline, options, icon } = this.props
-    // tslint:disable-next-line no-console
-    console.log('rendering, ', JSON.stringify(this.state.selectedOption))
     return (
       <Sticky enabled={true} top="#form_tabs_container">
         <WhiteBackground>
