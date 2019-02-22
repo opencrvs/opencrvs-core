@@ -721,8 +721,10 @@ export const BENGALI_STATE: ILanguage = {
       'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.serviceYear':
       'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.service':
+    'register.workQueue.print.birthService':
       'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.deathService':
+      'সেবা: <strong>মৃত্যুদিবসের {service} পরে মৃত্যু নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',

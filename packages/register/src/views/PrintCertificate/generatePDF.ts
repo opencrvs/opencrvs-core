@@ -61,16 +61,24 @@ export type Issuer = {
 const certificateDefinitionText = {
   [Event.BIRTH]: {
     REGIATRATION_NO: 'Birth Registration No',
-    OCCURANCE: {
+    OCCURANCE_DATE: {
       en: 'Was born on',
+      bn: 'জন্মগ্রহণ করেন'
+    },
+    OCCURANCE_PLACE: {
+      en: 'Place of birth',
       bn: 'জন্মগ্রহণ করেন'
     }
   },
   [Event.DEATH]: {
     REGIATRATION_NO: 'Death Registration No',
-    OCCURANCE: {
+    OCCURANCE_DATE: {
       en: 'Died on',
-      bn: 'মারা যান'
+      bn: 'মৃত্যু তারিখ'
+    },
+    OCCURANCE_PLACE: {
+      en: 'Place of death',
+      bn: 'মৃত্যুবরণ করেন'
     }
   }
 }
@@ -266,7 +274,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
         margin: [0, 39, 0, 0],
         columns: [
           {
-            text: 'Place of birth',
+            text: certificateDynamicText.OCCURANCE_PLACE.en,
             alignment: 'right'
           },
           {
@@ -279,7 +287,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
         font: 'notosansbn',
         columns: [
           {
-            text: 'জন্মগ্রহণ করেন',
+            text: certificateDynamicText.OCCURANCE_PLACE.bn,
             alignment: 'right'
           },
           {
@@ -350,7 +358,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
           margin: [0, 39, 0, 0],
           columns: [
             {
-              text: certificateDynamicText.OCCURANCE.en,
+              text: certificateDynamicText.OCCURANCE_DATE.en,
               alignment: 'right'
             },
             {
@@ -363,7 +371,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
           font: 'notosansbn',
           columns: [
             {
-              text: certificateDynamicText.OCCURANCE.bn,
+              text: certificateDynamicText.OCCURANCE_DATE.bn,
               alignment: 'right'
             },
             {

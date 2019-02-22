@@ -254,11 +254,11 @@ const messages = defineMessages({
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
   },
-  service: {
-    id: 'register.workQueue.print.service',
-    defaultMessage:
-      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph'
+  birthService: {
+    id: 'register.workQueue.print.birthService'
+  },
+  deathService: {
+    id: 'register.workQueue.print.deathService'
   },
   certificateHeader: {
     id: 'register.work-queue.certificate.header'
@@ -587,7 +587,9 @@ class PrintCertificateActionComponent extends React.Component<
           <>
             <Box>
               <Info>
-                <B>{intl.formatMessage(messages.certificateIsCorrect)}</B>
+                <B>
+                  {intl.formatMessage(messages.certificateIsCorrect, { event })}
+                </B>
                 {intl.formatMessage(messages.certificateConfirmationTxt)}
               </Info>
               <MutationProvider
@@ -1021,7 +1023,7 @@ class PrintCertificateActionComponent extends React.Component<
                         field.name === 'service'
                       ) {
                         field.initialValue = eventDateDiff.toString()
-                        field.label = messages[`service`]
+                        field.label = messages[`${event}Service`]
                       }
                     })
 
