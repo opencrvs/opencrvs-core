@@ -905,7 +905,7 @@ class PrintCertificateActionComponent extends React.Component<
         bn: DOBBn,
         en: DOBEn
       },
-      event: this.getEvent()
+      event: this.props.event
     }
   }
 
