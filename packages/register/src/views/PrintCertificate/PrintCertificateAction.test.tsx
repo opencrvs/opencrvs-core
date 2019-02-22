@@ -1,4 +1,4 @@
-import { PrintCertificateAction } from './PrintCertificateAction'
+import { PrintCertificateAction, getFullName } from './PrintCertificateAction'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
@@ -903,6 +903,33 @@ describe('when user wants to print certificate', async () => {
       globalAny.open = jest.fn()
       PrintReceiptBtn.simulate('click')
       expect(globalAny.open).toBeCalled()
+    })
+  })
+
+  describe('When testing PrintCertificateAction utility method', () => {
+    it('Should return fullname object', () => {
+      const certificateDetails = {
+        registrationNo: 'string',
+        name: {
+          en: 'John',
+          bn: 'হাসাইন'
+        },
+        doe: {
+          en: '',
+          bn: ''
+        },
+        registrationLocation: {
+          en: '',
+          bn: ''
+        },
+        eventLocation: {
+          en: '',
+          bn: ''
+        },
+        event: 'death'
+      }
+      const result = getFullName(certificateDetails)
+      expect(result).toEqual({ fullNameInBn: 'হাসাইন', fullNameInEng: 'John' })
     })
   })
 })

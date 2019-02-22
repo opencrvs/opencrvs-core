@@ -347,7 +347,9 @@ interface IFullName {
   fullNameInEng: string
 }
 
-const getFullName = (certificateDetails: CertificateDetails): IFullName => {
+export const getFullName = (
+  certificateDetails: CertificateDetails
+): IFullName => {
   let fullNameInBn = ''
   let fullNameInEng = ''
   if (certificateDetails && certificateDetails.name) {
