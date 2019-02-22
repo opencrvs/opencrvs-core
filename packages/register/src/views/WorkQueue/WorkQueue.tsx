@@ -51,7 +51,7 @@ import {
   goToPrintCertificate as goToPrintCertificateAction
 } from 'src/navigation'
 import { goToTab as goToTabAction } from '../../navigation'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
@@ -280,6 +280,11 @@ const messages = defineMessages({
     defaultMessage: 'BRN',
     description: 'Label for BRN in work queue list item'
   },
+  listItemDeathRegistrationNumber: {
+    id: 'register.workQueue.labels.results.deathRegistrationNumber',
+    defaultMessage: 'DRN',
+    description: 'Label for BRN in work queue list item'
+  },
   listItemDuplicateLabel: {
     id: 'register.workQueue.labels.results.duplicate',
     defaultMessage: 'Possible duplicate found',
@@ -297,7 +302,7 @@ const messages = defineMessages({
   },
   newApplication: {
     id: 'register.workQueue.buttons.newApplication',
-    defaultMessage: 'New Birth Application',
+    defaultMessage: 'New Application',
     description: 'The title of new application button'
   },
   reviewAndRegister: {
@@ -915,7 +920,9 @@ export class WorkQueueView extends React.Component<
     if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
-          messages.listItemBirthRegistrationNumber
+          item.dob
+            ? messages.listItemBirthRegistrationNumber
+            : messages.listItemDeathRegistrationNumber
         ),
         value: item.registrationNumber
       })
@@ -990,7 +997,12 @@ export class WorkQueueView extends React.Component<
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
           handler: () =>
-            this.props.gotoTab(REVIEW_BIRTH_PARENT_FORM_TAB, item.id, 'review')
+            this.props.gotoTab(
+              REVIEW_EVENT_PARENT_FORM_TAB,
+              item.id,
+              'review',
+              item.event.toLowerCase()
+            )
         })
 
         expansionActions.push(
@@ -998,9 +1010,10 @@ export class WorkQueueView extends React.Component<
             id={`reviewAndRegisterBtn_${item.tracking_id}`}
             onClick={() =>
               this.props.gotoTab(
-                REVIEW_BIRTH_PARENT_FORM_TAB,
+                REVIEW_EVENT_PARENT_FORM_TAB,
                 item.id,
-                'review'
+                'review',
+                item.event.toLowerCase()
               )
             }
           >

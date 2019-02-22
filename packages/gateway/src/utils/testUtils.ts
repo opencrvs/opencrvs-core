@@ -1167,7 +1167,13 @@ export const mockObservations = {
             reference: 'Patient/123' // reference deceased by fullUrl
           },
           effectiveDateTime: '2016-03-28', // same as death date
-          valueString: 'NATURAL_CAUSES'
+          valueCodeableConcept: {
+            coding: [
+              {
+                code: 'NATURAL_CAUSES'
+              }
+            ]
+          }
         }
       }
     ]
@@ -1195,7 +1201,13 @@ export const mockObservations = {
             reference: 'Patient/123' // reference deceased by fullUrl
           },
           effectiveDateTime: '2016-03-28', // same as death date
-          valueString: 'VERBAL_AUTOPSY'
+          valueCodeableConcept: {
+            coding: [
+              {
+                code: 'VERBAL_AUTOPSY'
+              }
+            ]
+          }
         }
       }
     ]
