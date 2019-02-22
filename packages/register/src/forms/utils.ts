@@ -465,5 +465,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(!values.iDType || values.iDType !== "BIRTH_REGISTRATION_NUMBER")'
+  },
+  otherRelationship: {
+    action: 'hide',
+    expression: 'values.applicantsRelationToDeceased !== "OTHER"'
   }
 }

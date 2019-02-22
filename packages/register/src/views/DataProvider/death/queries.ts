@@ -134,6 +134,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       informant {
         id
         relationship
+        otherRelationship
         individual {
           id
           identifier {

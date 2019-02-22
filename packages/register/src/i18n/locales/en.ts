@@ -490,11 +490,13 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.validNationalId':
       'The National ID can only be numeric and must be {validLength} digits long',
     'validations.validBirthRegistrationNumber':
-      'The Birth Registration Number can only be alpha numeric and must be {validLength} characters long',
+      'The Birth Registration Number can only contain block character and number where the length must be within {min} and {max}',
     'validations.validDeathRegistrationNumber':
       'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
     'validations.validPassportNumber':
       'The Passport Number can only be alpha numeric and must be {validLength} characters long',
+    'validations.blockAlphaNumericDot':
+      'Can contain only block character, number and dot (e.g. C91.5)',
     'validations.phoneNumberFormat':
       'Must be 11 digit valid mobile phone number that stars with 01',
     'validations.emailAddressFormat': 'Must be a valid email address',
@@ -854,6 +856,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantRelation.daughter': 'Daughter',
     'formFields.applicantRelation.extendedFamily': 'Extended Family',
     'formFields.applicantRelation.other': 'Other(Specify)',
+    'formFields.applicantOtherRelationship': 'Other relation',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',

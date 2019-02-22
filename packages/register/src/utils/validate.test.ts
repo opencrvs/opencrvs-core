@@ -201,18 +201,19 @@ describe('validate', () => {
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
     })
     it('Should error when supplied a bad value as Birth Registration Number.', () => {
-      const badValue = '2019333453BRTVSRJ'
+      const badValue = '2019333453BRTVSR'
       const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
       const response = {
         message: {
           id: 'validations.validBirthRegistrationNumber',
           defaultMessage:
-            'The Birth Registration Number can only be alpha numeric and must be {validLength} characters long',
+            'The Birth Registration Number can only contain block character and number where the length must be within {min} and {max}',
           description:
             'The error message that appears when an invalid value is used as brn'
         },
         props: {
-          validLength: 18
+          min: 17,
+          max: 18
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)

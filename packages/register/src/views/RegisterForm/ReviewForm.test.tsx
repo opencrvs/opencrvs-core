@@ -927,6 +927,7 @@ describe('ReviewForm tests', async () => {
                 informant: {
                   id: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
                   relationship: 'EXTENDED_FAMILY',
+                  otherRelationship: 'Patternal uncle',
                   individual: {
                     id: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1',
                     identifier: [
@@ -1169,6 +1170,7 @@ describe('ReviewForm tests', async () => {
                 informant: {
                   id: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
                   relationship: 'EXTENDED_FAMILY',
+                  otherRelationship: null,
                   individual: {
                     id: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1',
                     identifier: [
