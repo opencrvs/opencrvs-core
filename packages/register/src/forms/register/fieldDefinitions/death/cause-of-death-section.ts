@@ -6,7 +6,7 @@ import {
   TEXT
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
-import { maxLength, numeric } from 'src/utils/validate'
+import { maxLength, match } from 'src/utils/validate'
 import { conditionals } from 'src/forms/utils'
 import {
   sectionFieldToBundleFieldTransformer,
@@ -14,6 +14,7 @@ import {
 } from 'src/forms/mappings/mutation/field-mappings'
 import { bundleFieldToSectionFieldTransformer } from 'src/forms/mappings/query/field-mappings'
 import { hasCaseOfDeathSectionTransformer } from './mappings/query/cause-of-death-mappings'
+import { REGEXP_BLOCK_ALPHA_NUMERIC_DOT } from 'src/utils/constants'
 
 const messages = defineMessages({
   causeOfDeathTab: {
@@ -66,6 +67,12 @@ const messages = defineMessages({
     id: 'formFields.medicallyCertified',
     defaultMessage: 'Medically Certified Cause of Death',
     description: 'Option for form field: Method of Cause of Death'
+  },
+  blockAlphaNumericDot: {
+    id: 'validations.blockAlphaNumericDot',
+    defaultMessage:
+      'Can contain only block character, number and dot (e.g. C91.5)',
+    description: 'The error message that appears when an invalid value is used'
   }
 })
 
@@ -126,7 +133,10 @@ export const causeOfDeathSection: IFormSection = {
       label: messages.causeOfDeathCode,
       required: false,
       conditionals: [conditionals.causeOfDeathEstablished],
-      validate: [numeric, maxLength(17)],
+      validate: [
+        match(REGEXP_BLOCK_ALPHA_NUMERIC_DOT, messages.blockAlphaNumericDot),
+        maxLength(17)
+      ],
       mapping: {
         mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
         query: bundleFieldToSectionFieldTransformer('causeOfDeath')
