@@ -843,6 +843,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantRelation.daughter': 'কন্যা',
     'formFields.applicantRelation.extendedFamily': 'বর্ধিত পরিবার',
     'formFields.applicantRelation.other': 'অন্যান্য (উল্লেখ করুন)',
+    'formFields.applicantOtherRelationship': 'অন্যান্য সম্পর্ক',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',

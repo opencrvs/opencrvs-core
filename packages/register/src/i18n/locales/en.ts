@@ -851,6 +851,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.applicantRelation.daughter': 'Daughter',
     'formFields.applicantRelation.extendedFamily': 'Extended Family',
     'formFields.applicantRelation.other': 'Other(Specify)',
+    'formFields.applicantOtherRelationship': 'Other relation',
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
