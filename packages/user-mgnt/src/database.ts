@@ -22,9 +22,7 @@ const connect = async (): Promise<void> => {
       { autoReconnect: true }
     )
   } catch (err) {
-    logger.info(
-      'MongoDB takes a while to start. Retrying connection. Please wait'
-    )
+    logger.error(err)
     await wait(1000)
     return connect()
   }
