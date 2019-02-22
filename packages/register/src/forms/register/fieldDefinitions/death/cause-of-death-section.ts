@@ -12,6 +12,8 @@ import {
   sectionFieldToBundleFieldTransformer,
   ignoreFieldTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
+import { bundleFieldToSectionFieldTransformer } from 'src/forms/mappings/query/field-mappings'
+import { hasCaseOfDeathSectionTransformer } from './mappings/query/cause-of-death-mappings'
 
 const messages = defineMessages({
   causeOfDeathTab: {
@@ -90,7 +92,8 @@ export const causeOfDeathSection: IFormSection = {
         { value: true, label: messages.confirm }
       ],
       mapping: {
-        mutation: ignoreFieldTransformer
+        mutation: ignoreFieldTransformer,
+        query: hasCaseOfDeathSectionTransformer
       }
     },
     {
@@ -112,7 +115,8 @@ export const causeOfDeathSection: IFormSection = {
       ],
       conditionals: [conditionals.causeOfDeathEstablished],
       mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('causeOfDeathMethod')
+        mutation: sectionFieldToBundleFieldTransformer('causeOfDeathMethod'),
+        query: bundleFieldToSectionFieldTransformer('causeOfDeathMethod')
       }
     },
     {
@@ -124,7 +128,8 @@ export const causeOfDeathSection: IFormSection = {
       conditionals: [conditionals.causeOfDeathEstablished],
       validate: [numeric, maxLength(17)],
       mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('causeOfDeath')
+        mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
+        query: bundleFieldToSectionFieldTransformer('causeOfDeath')
       }
     }
   ]

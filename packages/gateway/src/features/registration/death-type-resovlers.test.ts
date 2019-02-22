@@ -64,7 +64,7 @@ describe('Registration type resolvers', () => {
       expect(registration).toBeDefined()
       expect(registration.resourceType).toBe('Task')
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Task?focus=Composition/123',
+        'http://localhost:5001/fhir/Task?focus=Composition/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -87,7 +87,7 @@ describe('Registration type resolvers', () => {
       })
       expect(registration).toBeNull()
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Task?focus=Composition/123',
+        'http://localhost:5001/fhir/Task?focus=Composition/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -166,6 +166,23 @@ describe('Registration type resolvers', () => {
       expect(informant.resource.resourceType).toEqual('RelatedPerson')
       expect(informant.resource.relationship.coding[0].code).toEqual('OTHER')
       expect(informant.resource.relationship.text).toEqual('Nephew')
+    })
+
+    it('returns RelatedPerson id', async () => {
+      const resourceID = await typeResolvers.RelatedPerson.id({
+        id: '1',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER' // or string for unsupported other
+            }
+          ],
+          text: 'Nephew'
+        }
+      })
+      expect(resourceID).toEqual('1')
     })
 
     it('returns RelatedPerson relationship', async () => {

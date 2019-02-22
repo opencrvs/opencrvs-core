@@ -511,20 +511,22 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.newBirthRegistration': ' জন্ম ঘোষণা',
     'register.form.newVitalEventRegistration':
       '{event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
-    'register.form.previewBirthRegistration': ' জন্ম ঘোষণাপত্র প্রদর্শন',
-    'register.form.reviewBirthRegistration': ' জন্ম ঘোষণাপত্র পর্যালোচনা',
+    'register.form.previewEventRegistration':
+      ' {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণাপত্র প্রদর্শন',
+    'register.form.reviewEventRegistration':
+      ' {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণাপত্র পর্যালোচনা',
     'register.form.saveDraft': 'খসড়া সংরক্ষণ',
     'register.form.next': 'পরবর্তী',
     'register.form.modal.preview': 'প্রিভিউ',
     'register.form.modal.submitDescription':
       '“জমা দিন” ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
-    'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.header.FIELD_AGENT': 'কমিউনিটি হেল্‌থ অ্যাসিস্ট্যান্ট',
+    'register.home.header.REGISTRATION_CLERK': 'ইউডিসি উদ্যোক্তা',
     'register.home.header.LOCAL_REGISTRAR': 'রেজিস্ট্রার',
-    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.header.STATE_REGISTRAR': 'State Registrar',
-    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
+    'register.home.header.DISTRICT_REGISTRAR': 'রেজিস্ট্রার',
+    'register.home.header.STATE_REGISTRAR': 'রেজিস্ট্রার',
+    'register.home.header.NATIONAL_REGISTRAR': 'রেজিস্ট্রার',
     'register.notification.newContentAvailable':
       'আমরা কিছু আপডেট করেছি, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
@@ -686,7 +688,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.list.buttons.print': 'মুদ্রণ',
     'register.workQueue.title.certificateCollection': 'সার্টিফিকেট সংগ্রহ',
     'register.workQueue.list.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
-    'register.workQueue.buttons.newApplication': 'নতুন জন্ম ঘোষণা',
+    'register.workQueue.buttons.newApplication': 'নতুন ঘোষণা',
     'register.workQueue.listItem.status.dateLabel.application': 'আবেদন জমা',
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.rejected': 'প্রত্যাখ্যাত',

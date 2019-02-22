@@ -18,7 +18,7 @@ import { v4 as uuid } from 'uuid'
 import { createStore } from '../../store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
-  REVIEW_BIRTH_PARENT_FORM_TAB,
+  REVIEW_EVENT_PARENT_FORM_TAB,
   DRAFT_DEATH_FORM_TAB
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
@@ -504,7 +504,7 @@ describe('when user is in the register form review section', () => {
     store.dispatch(setInitialDrafts())
     store.dispatch(storeDraft(draft))
     const mock: any = jest.fn()
-    const form = getReviewForm(store.getState())
+    const form = getReviewForm(store.getState()).birth
     const testComponent = createTestComponent(
       <RegisterForm
         location={mock}
@@ -513,9 +513,13 @@ describe('when user is in the register form review section', () => {
         staticContext={mock}
         registerForm={form}
         draft={draft}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''

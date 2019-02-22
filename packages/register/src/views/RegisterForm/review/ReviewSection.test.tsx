@@ -4,7 +4,7 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from 'src/store'
 import { createTestComponent, mockOfflineData, intl } from 'src/tests/util'
 import { createDraft } from 'src/drafts'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { Event } from 'src/forms'
 
 const { store } = createStore()
@@ -23,7 +23,7 @@ describe('when user is in the review page', () => {
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <ReviewSection
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         draft={draft}
         registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}

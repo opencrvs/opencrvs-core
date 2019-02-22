@@ -750,7 +750,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 this.props.goToTab(
                   tabRoute,
                   draft.id,
-                  this.state.editClickedSectionId
+                  this.state.editClickedSectionId,
+                  draft.event.toLowerCase()
                 )
               }}
             />

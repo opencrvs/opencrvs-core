@@ -6,7 +6,7 @@ describe('when user in review form review tab should be there', () => {
   it('renders the page', () => {
     const reviewForm = getReviewForm(store.getState())
 
-    const activeSection = reviewForm.sections.find(
+    const activeSection = reviewForm.birth.sections.find(
       ({ id }: any) => id === 'review'
     )
     expect(activeSection && activeSection.id).toEqual('review')

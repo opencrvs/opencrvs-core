@@ -13,7 +13,7 @@ ENV REACT_APP_LANGUAGE=en
 
 # Install and configure `serve`.
 RUN yarn global add serve
-CMD cd packages/performance; serve -s build
+CMD serve -s build
 EXPOSE 5000
 
 # Copy all local files into the image (including all packages in the repo)
@@ -27,3 +27,5 @@ RUN yarn install
 
 # Build for production.
 RUN cd packages/performance; yarn build --production
+
+WORKDIR /usr/src/app/packages/performance

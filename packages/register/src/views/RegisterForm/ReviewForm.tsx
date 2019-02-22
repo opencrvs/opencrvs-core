@@ -11,7 +11,6 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 import {
   storeDraft,
   IDraft,
@@ -44,6 +43,7 @@ interface IReviewProps {
   theme: ITheme
   dispatch: Dispatch
   scope: Scope
+  event: Event
 }
 interface IDraftProp {
   draft: IDraft | undefined
@@ -72,18 +72,6 @@ const ErrorText = styled.div`
 `
 
 export class ReviewFormView extends React.Component<IProps> {
-  getEvent() {
-    const eventType = (this.props.draft && this.props.draft.event) || 'BIRTH'
-    switch (eventType.toLocaleLowerCase()) {
-      case 'birth':
-        return Event.BIRTH
-      case 'death':
-        return Event.DEATH
-      default:
-        return Event.BIRTH
-    }
-  }
-
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
@@ -99,7 +87,7 @@ export class ReviewFormView extends React.Component<IProps> {
     if (!draft) {
       return (
         <QueryProvider
-          event={this.getEvent()}
+          event={this.props.event}
           action={Action.LOAD_REVIEW_APPLICATION}
           payload={{ id: this.props.draftId }}
         >
@@ -128,8 +116,9 @@ export class ReviewFormView extends React.Component<IProps> {
               )
               const reviewDraft = createReviewDraft(
                 draftId,
+                // @ts-ignore
                 transData,
-                Event.BIRTH
+                this.props.event
               )
               dispatch(storeDraft(reviewDraft))
 
@@ -143,13 +132,26 @@ export class ReviewFormView extends React.Component<IProps> {
     }
   }
 }
+function getEvent(eventType: string) {
+  switch (eventType && eventType.toLocaleLowerCase()) {
+    case 'birth':
+      return Event.BIRTH
+    case 'death':
+      return Event.DEATH
+    default:
+      return Event.BIRTH
+  }
+}
 
 function mapStatetoProps(
   state: IStoreState,
-  props: RouteComponentProps<{ tabId: string; draftId: string }>
+  props: RouteComponentProps<{ tabId: string; draftId: string; event: string }>
 ) {
   const { match, history } = props
-  const form = getReviewForm(state)
+  if (!match.params.event) {
+    throw new Error('Event is not provided as path param')
+  }
+  const form = getReviewForm(state)[match.params.event.toLowerCase()]
 
   const draft = state.drafts.drafts.find(
     ({ id, review }) => id === match.params.draftId && review === true
@@ -158,9 +160,9 @@ function mapStatetoProps(
     draft,
     scope: getScope(state),
     draftId: match.params.draftId,
+    event: getEvent(match.params.event),
     registerForm: form,
-    duplicate: history.location.state && history.location.state.duplicate,
-    tabRoute: REVIEW_BIRTH_PARENT_FORM_TAB
+    duplicate: history.location.state && history.location.state.duplicate
   }
 }
 
