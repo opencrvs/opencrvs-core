@@ -490,7 +490,7 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.validNationalId':
       'The National ID can only be numeric and must be {validLength} digits long',
     'validations.validBirthRegistrationNumber':
-      'The Birth Registration Number can only be alpha numeric and must be {validLength} characters long',
+      'The Birth Registration Number can only contain block character and number where the length must be within {min} and {max}',
     'validations.validDeathRegistrationNumber':
       'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
     'validations.validPassportNumber':
