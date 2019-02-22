@@ -10,7 +10,7 @@ db.on('disconnected', () => {
 })
 
 db.on('connected', () => {
-  logger.info('Connected to MongoBD')
+  logger.info('Connected to MongoDB')
 })
 
 const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
@@ -22,7 +22,9 @@ const connect = async (): Promise<void> => {
       { autoReconnect: true }
     )
   } catch (err) {
-    logger.error(err)
+    logger.info(
+      'MongoDB takes a while to start. Retrying connection. Please wait'
+    )
     await wait(1000)
     return connect()
   }
