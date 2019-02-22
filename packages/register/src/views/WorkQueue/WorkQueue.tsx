@@ -692,8 +692,6 @@ export class WorkQueueView extends React.Component<
         return this.props.intl.formatMessage(messages.filtersBirth)
       case 'DEATH':
         return this.props.intl.formatMessage(messages.filtersDeath)
-      case 'MARRIAGE':
-        return this.props.intl.formatMessage(messages.filtersMarriage)
       default:
         return this.props.intl.formatMessage(messages.filtersBirth)
     }
