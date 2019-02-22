@@ -1191,10 +1191,10 @@ describe('when user has a valid token in local storage', () => {
 
       expect(
         app
-          .find('#view_title')
+          .find('#submission_text')
           .hostNodes()
           .text()
-      ).toEqual('Application rejected')
+      ).toEqual('birth application has been rejected.')
     })
   })
   describe('when user is in the death review section', () => {
@@ -1425,7 +1425,7 @@ describe('when user has a valid token in local storage', () => {
           .find('#submission_text')
           .hostNodes()
           .text()
-      ).toEqual('birth application has been rejected.')
+      ).toEqual('death application has been rejected.')
     })
   })
 })
