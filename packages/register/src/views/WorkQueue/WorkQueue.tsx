@@ -778,8 +778,16 @@ export class WorkQueueView extends React.Component<
                     /* tslint:enable:no-string-literal */
                     '',
                   timestamp: status && formatLongDate(status.timestamp, locale),
-                  practitionerRole: status && status.user && status.user.role,
-                  officeName: status && status.office && status.office.name
+                  practitionerRole:
+                    status && status.user && status.user.role
+                      ? this.props.intl.formatMessage(
+                          messages[status.user.role as string]
+                        )
+                      : '',
+                  officeName:
+                    locale === 'en'
+                      ? status && status.office && status.office.name
+                      : status && status.office && status.office.alias
                 }
               })
               .reverse(),

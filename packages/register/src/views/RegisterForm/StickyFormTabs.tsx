@@ -27,7 +27,7 @@ function StickyFormTabsComponent({
   onTabClick
 }: IStickyFormTabProps & InjectedIntlProps) {
   return (
-    <StickyFormTabsContainer>
+    <StickyFormTabsContainer id="form_tabs_container">
       <Sticky enabled={true} innerZ={2}>
         <FormTabs
           sections={sections}

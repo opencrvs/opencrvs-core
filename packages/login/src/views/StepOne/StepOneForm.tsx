@@ -132,6 +132,7 @@ const MobileInput = injectIntl((props: Props) => {
       label={intl.formatMessage(mobileField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
+      hideAsterisk
     >
       <TextInput
         {...mobileField}
@@ -156,6 +157,7 @@ const PasswordInput = injectIntl((props: Props) => {
       label={intl.formatMessage(passwordField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
+      hideAsterisk
     >
       <TextInput
         {...passwordField}

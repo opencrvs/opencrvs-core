@@ -150,6 +150,7 @@ export interface IFormFieldBase {
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
+  hideAsterisk?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -364,6 +365,7 @@ export interface Ii18nFormFieldBase {
   postfix?: string
   disabled?: boolean
   conditionals?: IConditional[]
+  hideAsterisk?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

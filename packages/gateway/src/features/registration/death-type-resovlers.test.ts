@@ -64,7 +64,7 @@ describe('Registration type resolvers', () => {
       expect(registration).toBeDefined()
       expect(registration.resourceType).toBe('Task')
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Task?focus=Composition/123',
+        'http://localhost:5001/fhir/Task?focus=Composition/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -87,7 +87,7 @@ describe('Registration type resolvers', () => {
       })
       expect(registration).toBeNull()
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Task?focus=Composition/123',
+        'http://localhost:5001/fhir/Task?focus=Composition/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
