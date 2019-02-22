@@ -11,6 +11,7 @@ import {
   DEATH_REGISTRATION_NUMBER,
   PASSPORT
 } from 'src/forms/identity'
+import { REGEXP_ALPHA_NUMERIC, REGEXP_BLOCK_ALPHA_NUMERIC } from './constants'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
@@ -205,11 +206,8 @@ export const maxLength = (max: number) => (value: string) => {
 
 const isNumber = (value: string): boolean => !value || !isNaN(Number(value))
 
-const isAlphaNumeric = (value: string): boolean =>
-  !value || value.match(/^[0-9a-zA-Z]+$/) !== null
-
-const isAllCapsAlphaNumeric = (value: string): boolean =>
-  !value || value.match(/^[0-9A-Z]+$/) !== null
+const isRegexpMatched = (value: string, regexp: string): boolean =>
+  !value || value.match(regexp) !== null
 
 export const numeric: Validation = (value: string) =>
   isNumber(value) ? undefined : { message: messages.numberRequired }
@@ -375,7 +373,7 @@ export const validIDNumber: ValidationInitializer = (
       return hasValidLength(
         value.toString(),
         validBirthRegistrationNumberLength
-      ) && isAllCapsAlphaNumeric(value.toString())
+      ) && isRegexpMatched(value.toString(), REGEXP_BLOCK_ALPHA_NUMERIC)
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
@@ -386,7 +384,7 @@ export const validIDNumber: ValidationInitializer = (
       return hasValidLength(
         value.toString(),
         validDeathRegistrationNumberLength
-      ) && isAllCapsAlphaNumeric(value.toString())
+      ) && isRegexpMatched(value.toString(), REGEXP_BLOCK_ALPHA_NUMERIC)
         ? undefined
         : {
             message: messages.validDeathRegistrationNumber,
@@ -395,7 +393,7 @@ export const validIDNumber: ValidationInitializer = (
 
     case PASSPORT:
       return hasValidLength(value.toString(), validPassportLength) &&
-        isAlphaNumeric(value.toString())
+        isRegexpMatched(value.toString(), REGEXP_ALPHA_NUMERIC)
         ? undefined
         : {
             message: messages.validPassportNumber,
