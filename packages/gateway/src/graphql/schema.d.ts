@@ -341,7 +341,8 @@ export enum GQLRelationshipType {
   SON = 'SON',
   DAUGHTER = 'DAUGHTER',
   EXTENDED_FAMILY = 'EXTENDED_FAMILY',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  INFORMANT = 'INFORMANT'
 }
 
 export interface GQLPayment {
