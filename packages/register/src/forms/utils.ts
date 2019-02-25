@@ -383,14 +383,23 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: 'values.personCollectingCertificate!="FATHER"'
   },
+  informantCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="INFORMANT"'
+  },
   otherPersonCollectsCertificate: {
     action: 'hide',
     expression: 'values.personCollectingCertificate!="OTHER"'
   },
-  certificateCollectorNotVerified: {
+  birthCertificateCollectorNotVerified: {
     action: 'hide',
     expression:
       '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
+  },
+  deathCertificateCollectorNotVerified: {
+    action: 'hide',
+    expression:
+      '!(values.personCollectingCertificate=="INFORMANT" && values.informantDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
   },
   placeOfBirthHospital: {
     action: 'hide',

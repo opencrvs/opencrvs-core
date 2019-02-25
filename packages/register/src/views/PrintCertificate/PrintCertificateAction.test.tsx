@@ -1,11 +1,11 @@
-import { PrintCertificateAction } from './PrintCertificateAction'
+import { PrintCertificateAction, getFullName } from './PrintCertificateAction'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from 'src/views/DataProvider/birth/queries'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import * as React from 'react'
 
 import { FormFieldGenerator } from 'src/components/form'
-import { collectCertificateFormSection } from 'src/forms/certificate/fieldDefinitions/collector-section'
+import { collectBirthCertificateFormSection } from 'src/forms/certificate/fieldDefinitions/collector-section'
 import {
   IInformativeRadioGroupFormField,
   INFORMATIVE_RADIO_GROUP
@@ -191,7 +191,8 @@ describe('when user wants to print certificate', async () => {
         staticContext={mockLocation}
         match={{
           params: {
-            registrationId: 'asdhdqe2472487jsdfsdf'
+            registrationId: 'asdhdqe2472487jsdfsdf',
+            eventType: 'BIRTH'
           },
           isExact: true,
           path: '',
@@ -208,7 +209,7 @@ describe('when user wants to print certificate', async () => {
     })
 
     testComponent.component.update()
-    const fields = collectCertificateFormSection.fields
+    const fields = collectBirthCertificateFormSection.fields
     ;(fields[1] as IInformativeRadioGroupFormField).information = {
       // @ts-ignore
       name: [
@@ -332,7 +333,8 @@ describe('when user wants to print certificate', async () => {
         staticContext={mockLocation}
         match={{
           params: {
-            registrationId: 'asdhdqe2472487jsdfsdf'
+            registrationId: 'asdhdqe2472487jsdfsdf',
+            eventType: 'BIRTH'
           },
           isExact: true,
           path: '',
@@ -663,7 +665,8 @@ describe('when user wants to print certificate', async () => {
           staticContext={mockLocation}
           match={{
             params: {
-              registrationId: 'asdhdqe2472487jsdfsdf'
+              registrationId: 'asdhdqe2472487jsdfsdf',
+              eventType: 'BIRTH'
             },
             isExact: true,
             path: '',
@@ -688,7 +691,7 @@ describe('when user wants to print certificate', async () => {
     })
 
     it('renders the form', () => {
-      const fields = collectCertificateFormSection.fields
+      const fields = collectBirthCertificateFormSection.fields
       ;(fields[1] as IInformativeRadioGroupFormField).information = {
         // @ts-ignore
         name: [
@@ -900,6 +903,33 @@ describe('when user wants to print certificate', async () => {
       globalAny.open = jest.fn()
       PrintReceiptBtn.simulate('click')
       expect(globalAny.open).toBeCalled()
+    })
+  })
+
+  describe('When testing PrintCertificateAction utility method', () => {
+    it('Should return fullname object', () => {
+      const certificateDetails = {
+        registrationNo: 'string',
+        name: {
+          en: 'John',
+          bn: 'হাসাইন'
+        },
+        doe: {
+          en: '',
+          bn: ''
+        },
+        registrationLocation: {
+          en: '',
+          bn: ''
+        },
+        eventLocation: {
+          en: '',
+          bn: ''
+        },
+        event: 'death'
+      }
+      const result = getFullName(certificateDetails)
+      expect(result).toEqual({ fullNameInBn: 'হাসাইন', fullNameInEng: 'John' })
     })
   })
 })

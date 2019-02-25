@@ -75,6 +75,7 @@ enum RelationshipType {
   DAUGHTER
   EXTENDED_FAMILY
   OTHER
+  INFORMANT
 }
 
 input IdentityInput {

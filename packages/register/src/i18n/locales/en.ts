@@ -708,6 +708,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.print.collector.mother': 'Mother',
     'register.workQueue.print.collector.father': 'Father',
     'register.workQueue.print.collector.other': 'Other',
+    'register.workQueue.print.collector.informant': 'Informant',
     'formFields.print.confirmMotherInformation':
       'Does their proof of ID document match the following details?',
     'formFields.print.otherPersonGivenNames': 'Given name',
@@ -727,8 +728,10 @@ export const ENGLISH_STATE: ILanguage = {
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     'register.workQueue.print.serviceYear':
       'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
-    'register.workQueue.print.service':
+    'register.workQueue.print.birthService':
       'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
+    'register.workQueue.print.deathService':
+      'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
@@ -783,7 +786,7 @@ export const ENGLISH_STATE: ILanguage = {
     'certificate.parent.details.label.typeOfID': 'Type of ID',
     'certificate.parent.details.label.number': 'Number',
     'certificate.btn.editRegistration': 'Edit Registration',
-    'certificate.txt.isCorrectTxt': 'Is the birth certificate correct?',
+    'certificate.txt.isCorrectTxt': 'Is the {event} certificate correct?',
     'certificate.txt.confirmationTxt':
       'Please confirm that the applicant has reviewed that the information on the certificate is correct and that you are ready to print.',
     'review.form.section.reviewTitle': 'Review',

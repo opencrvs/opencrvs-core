@@ -692,8 +692,6 @@ export class WorkQueueView extends React.Component<
         return this.props.intl.formatMessage(messages.filtersBirth)
       case 'DEATH':
         return this.props.intl.formatMessage(messages.filtersDeath)
-      case 'MARRIAGE':
-        return this.props.intl.formatMessage(messages.filtersMarriage)
       default:
         return this.props.intl.formatMessage(messages.filtersBirth)
     }
@@ -973,13 +971,13 @@ export class WorkQueueView extends React.Component<
       if (applicationIsRegistered || applicationIsCertified) {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.print),
-          handler: () => this.props.goToPrintCertificate(item.id)
+          handler: () => this.props.goToPrintCertificate(item.id, item.event)
         })
 
         expansionActions.push(
           <StyledPrimaryButton
             id={`printCertificate_${item.tracking_id}`}
-            onClick={() => this.props.goToPrintCertificate(item.id)}
+            onClick={() => this.props.goToPrintCertificate(item.id, item.event)}
           >
             {this.props.intl.formatMessage(messages.printCertificateBtnText)}
           </StyledPrimaryButton>

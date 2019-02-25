@@ -703,6 +703,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.print.collector.mother': 'মা',
     'register.workQueue.print.collector.father': 'পিতা',
     'register.workQueue.print.collector.other': 'অন্যান্য',
+    'register.workQueue.print.collector.informant': 'তথ্যদাতা',
     'formFields.print.confirmMotherInformation':
       'আইডি নথি তাদের প্রমাণ নিম্নলিখিত বিবরণ মেলে?',
     'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',
@@ -722,8 +723,10 @@ export const BENGALI_STATE: ILanguage = {
       'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.serviceYear':
       'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.service':
+    'register.workQueue.print.birthService':
       'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
+    'register.workQueue.print.deathService':
+      'সেবা: <strong>মৃত্যুদিবসের {service} পরে মৃত্যু নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
