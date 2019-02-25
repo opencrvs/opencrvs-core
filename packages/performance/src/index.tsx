@@ -36,7 +36,6 @@ if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
           resolve(url)
         })
       })
-      console.log(sessionUrl)
       event.extra.sessionURL = sessionUrl
       return event
     })
