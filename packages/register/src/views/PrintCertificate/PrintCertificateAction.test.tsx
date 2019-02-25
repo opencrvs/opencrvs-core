@@ -793,7 +793,7 @@ describe('when user wants to print certificate', async () => {
         otherPersonGivenNames: 'John',
         otherPersonFamilyName: 'Doe',
         otherPersonIDType: 'NATIONAL_ID',
-        documentNumber: '2345',
+        documentNumber: '1234567890987',
         otherPersonSignedAffidavit: true
       }
       component.find(FormFieldGenerator).prop('onChange')(documentData)

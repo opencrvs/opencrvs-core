@@ -6,11 +6,17 @@ import {
   TEXT,
   INFORMATIVE_RADIO_GROUP,
   WARNING,
-  PARAGRAPH
+  PARAGRAPH,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import { conditionals } from 'src/forms/utils'
-import { messages as identityMessages } from 'src/forms/identity'
+import {
+  messages as identityMessages,
+  identityTypeMapper,
+  identityNameMapper
+} from 'src/forms/identity'
+import { validIDNumber } from 'src/utils/validate'
 
 const messages = defineMessages({
   certificateCollectionTitle: {
@@ -202,7 +208,23 @@ export const collectCertificateFormSection: IFormSection = {
     },
     {
       name: 'documentNumber',
-      type: TEXT,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'otherPersonIDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'otherPersonIDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['otherPersonIDType']
+          }
+        ]
+      },
       label: messages.documentNumber,
       required: true,
       initialValue: '',
