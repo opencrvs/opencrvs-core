@@ -408,7 +408,7 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   finishSubmission = (certificateDetails: CertificateDetails) => {
-    const { history } = this.props
+    const { history, event } = this.props
     const fullName = getFullName(certificateDetails)
     const noOfCertificate = 103
 
@@ -418,7 +418,8 @@ class PrintCertificateActionComponent extends React.Component<
       eventName: CERTIFICATION,
       actionName: COMPLETION,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      eventType: event
     })
   }
 
