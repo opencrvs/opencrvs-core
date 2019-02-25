@@ -20,7 +20,8 @@ import {
   IDynamicFormField,
   LOADER_BUTTON,
   ILoaderButton,
-  IFieldInput
+  IFieldInput,
+  IQuery
 } from './'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -64,18 +65,28 @@ export const internationaliseFieldObject = (
     ;(base as any).modalTitle = intl.formatMessage(
       (field as ILoaderButton).modalTitle
     )
-    ;(base as any).modalInfoText = intl.formatMessage(
-      (field as ILoaderButton).modalInfoText
-    )
     ;(base as any).successTitle = intl.formatMessage(
       (field as ILoaderButton).successTitle
     )
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
     )
-    ;(base as any).errorText = intl.formatMessage(
-      (field as ILoaderButton).errorText
-    )
+    // const queryData = (field as ILoaderButton).queryData
+    // if (queryData && typeof queryData.modalInfoText !== 'string') {
+    //   console.log(field)
+    //   // @ts-ignore
+    //   base.queryData.modalInfoText = intl.formatMessage(
+    //     // @ts-ignore
+    //     field.queryData.modalInfoText
+    //   )
+    // }
+    // if (queryData && typeof queryData.errorText !== 'string') {
+    //   // @ts-ignore
+    //   base.queryData.errorText = intl.formatMessage(
+    //     // @ts-ignore
+    //     field.queryData.errorText
+    //   )
+    // }
   }
 
   return base as Ii18nFormField
@@ -270,17 +281,38 @@ export function isCityLocation(
   }
 }
 
-export function getQuery(field: ILoaderButton, values: IFormSectionData) {
+export function getQueryData(
+  field: ILoaderButton,
+  values: IFormSectionData
+): IQuery {
   const selectedValue = values[field.querySelectorInput.valueField] as string
-  return field.queryMap[selectedValue]
+  const queryData = field.queryMap[selectedValue]
+  const variables = getInputValues(queryData.inputs, values)
+  queryData.variables = variables
+  return queryData
 }
 
+// export function getQuery(field: ILoaderButton, values: IFormSectionData) {
+//   const selectedValue = values[field.querySelectorInput.valueField] as string
+//   return field.queryMap[selectedValue] && field.queryMap[selectedValue].query
+// }
+
+// export function getResponseTransformer(
+//   field: ILoaderButton,
+//   values: IFormSectionData
+// ) {
+//   const selectedValue = values[field.querySelectorInput.valueField] as string
+//   return (
+//     field.queryMap[selectedValue] && field.queryMap[selectedValue].transformer
+//   )
+// }
+
 export function getInputValues(
-  field: ILoaderButton,
+  inputs: IFieldInput[],
   values: IFormSectionData
 ): IDynamicValues {
   const variables = {}
-  field.inputs.forEach((input: IFieldInput) => {
+  inputs.forEach((input: IFieldInput) => {
     variables[input.name] = values[input.valueField]
   })
   return variables
@@ -457,10 +489,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
   },
-  deceasedBRNSelected: {
+  deceasedIDSelected: {
     action: 'hide',
     expression:
-      '(!values.iDType || values.iDType !== "BIRTH_REGISTRATION_NUMBER")'
+      '(!values.iDType && (values.iDType !== "BIRTH_REGISTRATION_NUMBER" || values.iDType !== "NATIONAL_ID"))'
   },
   otherRelationship: {
     action: 'hide',

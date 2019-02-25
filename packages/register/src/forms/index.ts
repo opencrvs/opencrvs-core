@@ -236,7 +236,10 @@ export interface IPDFDocumentViewerFormField extends IFormFieldBase {
 export interface IQuery {
   query: any
   inputs: IFieldInput[]
-  transformer: (response: ApolloQueryResult<GQLQuery>) => void
+  variables?: IDynamicValues
+  modalInfoText: FormattedMessage.MessageDescriptor
+  errorText: FormattedMessage.MessageDescriptor
+  responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
 export interface IQueryMap {
   [key: string]: IQuery
@@ -244,13 +247,12 @@ export interface IQueryMap {
 export interface ILoaderButton extends IFormFieldBase {
   type: typeof LOADER_BUTTON
   queryMap: IQueryMap
+  queryData?: IQuery
   querySelectorInput: IFieldInput
   onFetch?: (response: any) => void
   modalTitle: FormattedMessage.MessageDescriptor
-  modalInfoText: FormattedMessage.MessageDescriptor
   successTitle: FormattedMessage.MessageDescriptor
   errorTitle: FormattedMessage.MessageDescriptor
-  errorText: FormattedMessage.MessageDescriptor
 }
 
 export type IFormField =
@@ -318,7 +320,7 @@ export interface IConditionals {
   deathPlaceOther: IConditional
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
-  deceasedBRNSelected: IConditional
+  deceasedIDSelected: IConditional
   otherRelationship: IConditional
 }
 
@@ -463,10 +465,10 @@ export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
 export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   type: typeof LOADER_BUTTON
   queryMap: IQueryMap
+  queryData?: IQuery
   querySelectorInput: IFieldInput
   onFetch?: (response: any) => void
   modalTitle: string
-  modalInfoText: string
   successTitle: string
   errorTitle: string
   errorText: string

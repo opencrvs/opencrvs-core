@@ -26,7 +26,7 @@ import {
   getFieldLabel,
   getFieldOptionsByValueMapper,
   getFieldType,
-  getInputValues
+  getQueryData
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -305,15 +305,12 @@ function GeneratedInputField({
     return (
       <LoaderButtonField
         id={fieldDefinition.name}
-        query={fieldDefinition.query}
+        queryData={fieldDefinition.queryData}
         modalTitle={fieldDefinition.modalTitle}
         label={fieldDefinition.label}
-        modalInfoText={fieldDefinition.modalInfoText}
         successTitle={fieldDefinition.successTitle}
-        errorText={fieldDefinition.errorText}
         errorTitle={fieldDefinition.errorTitle}
         onFetch={fieldDefinition.onFetch}
-        variables={fieldDefinition.variables}
       />
     )
   }
@@ -406,7 +403,6 @@ class FormSectionComponent extends React.Component<Props> {
     const errors = (this.props.errors as any) as {
       [key: string]: IValidationResult[]
     }
-
     /*
      * HACK
      *
@@ -472,10 +468,11 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === LOADER_BUTTON
               ? ({
                   ...field,
-                  variables: getInputValues(field as ILoaderButton, values),
+                  queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
                     const updatedValues = Object.assign({}, values, response)
+                    console.log(updatedValues)
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)
