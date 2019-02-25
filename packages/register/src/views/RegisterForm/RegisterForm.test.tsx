@@ -3,7 +3,9 @@ import {
   createTestComponent,
   selectOption,
   mockApplicationData,
-  mockDeathApplicationData
+  mockDeathApplicationData,
+  mockDeathApplicationDataWithoutFirstNames,
+  wait
 } from 'src/tests/util'
 import { RegisterForm } from './RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -18,7 +20,7 @@ import { v4 as uuid } from 'uuid'
 import { createStore } from '../../store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
-  REVIEW_BIRTH_PARENT_FORM_TAB,
+  REVIEW_EVENT_PARENT_FORM_TAB,
   DRAFT_DEATH_FORM_TAB
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
@@ -504,7 +506,7 @@ describe('when user is in the register form review section', () => {
     store.dispatch(setInitialDrafts())
     store.dispatch(storeDraft(draft))
     const mock: any = jest.fn()
-    const form = getReviewForm(store.getState())
+    const form = getReviewForm(store.getState()).birth
     const testComponent = createTestComponent(
       <RegisterForm
         location={mock}
@@ -513,9 +515,13 @@ describe('when user is in the register form review section', () => {
         staticContext={mock}
         registerForm={form}
         draft={draft}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -707,5 +713,82 @@ describe('When user is in Preview section death event', async () => {
         hospitalLocatioMockDeathApplicationData as IFormData
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
+  })
+})
+
+describe('When user is in Preview section death event in offline mode', async () => {
+  const { store, history } = createStore()
+  const draft = createDraft(Event.DEATH)
+  store.dispatch(setInitialDrafts())
+  store.dispatch(storeDraft(draft))
+  let component: ReactWrapper<{}, {}>
+  let deathDraft
+  let deathForm: IForm
+
+  const mock: any = jest.fn()
+
+  beforeEach(async () => {
+    Object.defineProperty(window.navigator, 'onLine', {
+      value: false,
+      writable: true
+    })
+    jest.clearAllMocks()
+    // @ts-ignore
+    deathDraft = createReviewDraft(
+      uuid(),
+      // @ts-ignore
+      mockDeathApplicationDataWithoutFirstNames,
+      Event.DEATH
+    )
+    store.dispatch(setInitialDrafts())
+    store.dispatch(storeDraft(deathDraft))
+
+    deathForm = getRegisterForm(store.getState())[Event.DEATH]
+    const nTestComponent = createTestComponent(
+      <RegisterForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={deathForm}
+        draft={deathDraft}
+        tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+        match={{
+          params: { draftId: deathDraft.id, tabId: 'preview' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        scope={[]}
+      />,
+      store
+    )
+    component = nTestComponent.component
+  })
+
+  it('Should be able to submit the form', async () => {
+    component
+      .find('#next_button_deceased')
+      .hostNodes()
+      .simulate('click')
+    component
+      .find('#next_button_informant')
+      .hostNodes()
+      .simulate('click')
+    component
+      .find('#next_button_deathEvent')
+      .hostNodes()
+      .simulate('click')
+
+    component
+      .find('#submit_form')
+      .hostNodes()
+      .simulate('click')
+
+    component
+      .find('#submit_confirm')
+      .hostNodes()
+      .simulate('click')
+    await wait()
+    expect(history.location.pathname).toContain('confirm')
   })
 })

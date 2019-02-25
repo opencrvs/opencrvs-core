@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { ReviewForm } from './ReviewForm'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/birth/queries'
+import { GET_DEATH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/death/queries'
 import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -11,7 +12,7 @@ import {
   storeDraft
 } from '@opencrvs/register/src/drafts'
 import { v4 as uuid } from 'uuid'
-import { REVIEW_BIRTH_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { Event } from '@opencrvs/register/src/forms'
@@ -31,7 +32,7 @@ describe('ReviewForm tests', async () => {
   const { store, history } = createStore()
   const scope = ['register']
   const mock: any = jest.fn()
-  const form = getReviewForm(store.getState())
+  const form = getReviewForm(store.getState()).birth
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
@@ -56,9 +57,14 @@ describe('ReviewForm tests', async () => {
         staticContext={mock}
         registerForm={form}
         scope={scope}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        event={draft.event}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -211,10 +217,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         scope={scope}
         staticContext={mock}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -365,10 +376,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -453,10 +469,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -550,10 +571,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -701,10 +727,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -767,10 +798,15 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
+        event={draft.event}
         registerForm={form}
-        tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
-          params: { draftId: draft.id, tabId: 'review' },
+          params: {
+            draftId: draft.id,
+            tabId: 'review',
+            event: draft.event.toLowerCase()
+          },
           isExact: true,
           path: '',
           url: ''
@@ -810,6 +846,463 @@ describe('ReviewForm tests', async () => {
     })
 
     testComponent.component.unmount()
+  })
+  describe('Death review flow', () => {
+    it('it returns death registration', async () => {
+      const draft = createReviewDraft(uuid(), {}, Event.DEATH)
+      const graphqlMock = [
+        {
+          request: {
+            query: GET_DEATH_REGISTRATION_FOR_REVIEW,
+            variables: { id: draft.id }
+          },
+          result: {
+            data: {
+              fetchDeathRegistration: {
+                id: '4f5ff6f7-cf61-42e1-9e1e-dc4b73517aa6',
+                _fhirIDMap: {
+                  composition: '4f5ff6f7-cf61-42e1-9e1e-dc4b73517aa6'
+                },
+                deceased: {
+                  id: '50fbd713-c86d-49fe-bc6a-52094b40d8dd',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'অনিক',
+                      familyName: 'অনিক'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'anik'
+                    }
+                  ],
+                  birthDate: '1983-01-01',
+                  maritalStatus: 'MARRIED',
+                  nationality: ['BGD'],
+                  identifier: [
+                    {
+                      id: '123456789',
+                      type: 'PASSPORT',
+                      otherType: null
+                    }
+                  ],
+                  gender: 'male',
+                  deceased: {
+                    deathDate: '2019-01-01'
+                  },
+                  address: [
+                    {
+                      type: 'PERMANENT',
+                      line: [
+                        '121',
+                        '',
+                        '12',
+                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                        '',
+                        '34c377a0-2223-4361-851c-5e230a96d957'
+                      ],
+                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      postalCode: '12',
+                      country: 'BGD'
+                    },
+                    {
+                      type: 'CURRENT',
+                      line: [
+                        '121',
+                        '',
+                        '12',
+                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                        '',
+                        '34c377a0-2223-4361-851c-5e230a96d957'
+                      ],
+                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      postalCode: '12',
+                      country: 'BGD'
+                    }
+                  ]
+                },
+                informant: {
+                  id: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
+                  relationship: 'EXTENDED_FAMILY',
+                  otherRelationship: 'Patternal uncle',
+                  individual: {
+                    id: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1',
+                    identifier: [
+                      {
+                        id: '123456789',
+                        type: 'PASSPORT',
+                        otherType: null
+                      }
+                    ],
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: 'অনিক',
+                        familyName: 'অনিক'
+                      },
+                      {
+                        use: 'en',
+                        firstNames: 'Anik',
+                        familyName: 'Anik'
+                      }
+                    ],
+                    nationality: ['BGD'],
+                    birthDate: '1996-01-01',
+                    telecom: [
+                      {
+                        system: 'phone',
+                        value: '01622688231'
+                      }
+                    ],
+                    address: [
+                      {
+                        type: 'CURRENT',
+                        line: [
+                          '12',
+                          '',
+                          '12',
+                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                          '',
+                          '34c377a0-2223-4361-851c-5e230a96d957'
+                        ],
+                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        postalCode: '12',
+                        country: 'BGD'
+                      },
+                      {
+                        type: 'PERMANENT',
+                        line: [
+                          '12',
+                          '',
+                          '12',
+                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                          '',
+                          '34c377a0-2223-4361-851c-5e230a96d957'
+                        ],
+                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        postalCode: '12',
+                        country: 'BGD'
+                      }
+                    ]
+                  }
+                },
+                registration: {
+                  id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
+                  attachments: null,
+                  type: 'DEATH',
+                  trackingId: 'DS8QZ0Z',
+                  registrationNumber: null
+                },
+                eventLocation: {
+                  id: 'fccf6eac-4dae-43d3-af33-2c977d1daf99',
+                  type: 'CURRENT',
+                  address: {
+                    type: '',
+                    line: ['', '', '', '', '', ''],
+                    district: '',
+                    state: '',
+                    postalCode: '',
+                    country: 'BGD'
+                  }
+                },
+                mannerOfDeath: 'ACCIDENT',
+                causeOfDeathMethod: null,
+                causeOfDeath: null
+              }
+            }
+          }
+        }
+      ]
+      const testComponent = createTestComponent(
+        <ReviewForm
+          location={mock}
+          history={history}
+          scope={scope}
+          staticContext={mock}
+          event={draft.event}
+          registerForm={getReviewForm(store.getState()).death}
+          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          match={{
+            params: {
+              draftId: draft.id,
+              tabId: 'review',
+              event: draft.event.toLowerCase()
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          draftId={draft.id}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      testComponent.component.update()
+      const data = testComponent.component
+        .find(RegisterForm)
+        .prop('draft') as IDraft
+
+      expect(data.data.deceased).toEqual({
+        iDType: 'PASSPORT',
+        iD: '123456789',
+        firstNames: 'অনিক',
+        familyName: 'অনিক',
+        firstNamesEng: 'Anik',
+        familyNameEng: 'anik',
+        nationality: 'BGD',
+        gender: 'male',
+        maritalStatus: 'MARRIED',
+        birthDate: '1983-01-01',
+        countryPermanent: 'BGD',
+        statePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+        districtPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+        addressLine4Permanent: '34c377a0-2223-4361-851c-5e230a96d957',
+        addressLine3Permanent: '1f06d980-e254-4e6b-b049-a9b4e7155180',
+        addressLine3CityOptionPermanent: '',
+        addressLine2Permanent: '12',
+        addressLine1CityOptionPermanent: '',
+        postCodeCityOptionPermanent: '12',
+        addressLine1Permanent: '121',
+        postCodePermanent: '12',
+        currentAddressSameAsPermanent: true,
+        country: 'BGD',
+        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+        addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
+        addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
+        addressLine3CityOption: '',
+        addressLine2: '12',
+        addressLine1CityOption: '',
+        postCodeCityOption: '12',
+        addressLine1: '121',
+        postCode: '12',
+        _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
+      })
+
+      testComponent.component.unmount()
+    })
+    it('populates proper casue of death section', async () => {
+      const draft = createReviewDraft(uuid(), {}, Event.DEATH)
+      const graphqlMock = [
+        {
+          request: {
+            query: GET_DEATH_REGISTRATION_FOR_REVIEW,
+            variables: { id: draft.id }
+          },
+          result: {
+            data: {
+              fetchDeathRegistration: {
+                id: '4f5ff6f7-cf61-42e1-9e1e-dc4b73517aa6',
+                _fhirIDMap: {
+                  composition: '4f5ff6f7-cf61-42e1-9e1e-dc4b73517aa6'
+                },
+                deceased: {
+                  id: '50fbd713-c86d-49fe-bc6a-52094b40d8dd',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'অনিক',
+                      familyName: 'অনিক'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'anik'
+                    }
+                  ],
+                  birthDate: '1983-01-01',
+                  maritalStatus: 'MARRIED',
+                  nationality: ['BGD'],
+                  identifier: [
+                    {
+                      id: '123456789',
+                      type: 'PASSPORT',
+                      otherType: null
+                    }
+                  ],
+                  gender: 'male',
+                  deceased: {
+                    deathDate: '2019-01-01'
+                  },
+                  address: [
+                    {
+                      type: 'PERMANENT',
+                      line: [
+                        '121',
+                        '',
+                        '12',
+                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                        '',
+                        '34c377a0-2223-4361-851c-5e230a96d957'
+                      ],
+                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      postalCode: '12',
+                      country: 'BGD'
+                    },
+                    {
+                      type: 'CURRENT',
+                      line: [
+                        '121',
+                        '',
+                        '12',
+                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                        '',
+                        '34c377a0-2223-4361-851c-5e230a96d957'
+                      ],
+                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      postalCode: '12',
+                      country: 'BGD'
+                    }
+                  ]
+                },
+                informant: {
+                  id: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
+                  relationship: 'EXTENDED_FAMILY',
+                  otherRelationship: null,
+                  individual: {
+                    id: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1',
+                    identifier: [
+                      {
+                        id: '123456789',
+                        type: 'PASSPORT',
+                        otherType: null
+                      }
+                    ],
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: 'অনিক',
+                        familyName: 'অনিক'
+                      },
+                      {
+                        use: 'en',
+                        firstNames: 'Anik',
+                        familyName: 'Anik'
+                      }
+                    ],
+                    nationality: ['BGD'],
+                    birthDate: '1996-01-01',
+                    telecom: [
+                      {
+                        system: 'phone',
+                        value: '01622688231'
+                      }
+                    ],
+                    address: [
+                      {
+                        type: 'CURRENT',
+                        line: [
+                          '12',
+                          '',
+                          '12',
+                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                          '',
+                          '34c377a0-2223-4361-851c-5e230a96d957'
+                        ],
+                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        postalCode: '12',
+                        country: 'BGD'
+                      },
+                      {
+                        type: 'PERMANENT',
+                        line: [
+                          '12',
+                          '',
+                          '12',
+                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
+                          '',
+                          '34c377a0-2223-4361-851c-5e230a96d957'
+                        ],
+                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        postalCode: '12',
+                        country: 'BGD'
+                      }
+                    ]
+                  }
+                },
+                registration: {
+                  id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
+                  attachments: null,
+                  type: 'DEATH',
+                  trackingId: 'DS8QZ0Z',
+                  registrationNumber: '2019123223DS8QZ0Z1'
+                },
+                eventLocation: {
+                  id: 'fccf6eac-4dae-43d3-af33-2c977d1daf99',
+                  type: 'CURRENT',
+                  address: {
+                    type: '',
+                    line: ['', '', '', '', '', ''],
+                    district: '',
+                    state: '',
+                    postalCode: '',
+                    country: 'BGD'
+                  }
+                },
+                mannerOfDeath: 'ACCIDENT',
+                causeOfDeathMethod: 'Natural',
+                causeOfDeath: '123'
+              }
+            }
+          }
+        }
+      ]
+      const testComponent = createTestComponent(
+        <ReviewForm
+          location={mock}
+          history={history}
+          scope={scope}
+          staticContext={mock}
+          event={draft.event}
+          registerForm={getReviewForm(store.getState()).death}
+          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          match={{
+            params: {
+              draftId: draft.id,
+              tabId: 'review',
+              event: draft.event.toLowerCase()
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          draftId={draft.id}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      testComponent.component.update()
+      const data = testComponent.component
+        .find(RegisterForm)
+        .prop('draft') as IDraft
+
+      expect(data.data.causeOfDeath).toEqual({
+        causeOfDeathEstablished: true,
+        causeOfDeathCode: '123',
+        methodOfCauseOfDeath: 'Natural'
+      })
+
+      testComponent.component.unmount()
+    })
   })
   describe('ReviewForm tests for register scope', () => {
     beforeAll(() => {
@@ -864,10 +1357,15 @@ describe('ReviewForm tests', async () => {
           history={history}
           staticContext={mock}
           scope={scope}
+          event={draft.event}
           registerForm={form}
-          tabRoute={REVIEW_BIRTH_PARENT_FORM_TAB}
+          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'review' },
+            params: {
+              draftId: draft.id,
+              tabId: 'review',
+              event: draft.event.toLowerCase()
+            },
             isExact: true,
             path: '',
             url: ''

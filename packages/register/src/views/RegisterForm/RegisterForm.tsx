@@ -42,11 +42,11 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 import {
   DECLARATION,
-  SUBMISSION,
   REJECTION,
   REGISTRATION,
   REGISTERED,
-  DUPLICATION
+  DUPLICATION,
+  OFFLINE
 } from 'src/utils/constants'
 
 import { getScope } from 'src/profile/profileSelectors'
@@ -151,14 +151,16 @@ export const messages = defineMessages({
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
     description: 'The message that appears for new vital event registration'
   },
-  previewBirthRegistration: {
-    id: 'register.form.previewBirthRegistration',
-    defaultMessage: 'Birth Application Preview',
+  previewEventRegistration: {
+    id: 'register.form.previewEventRegistration',
+    defaultMessage:
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
     description: 'The message that appears for new birth registrations'
   },
-  reviewBirthRegistration: {
-    id: 'register.form.reviewBirthRegistration',
-    defaultMessage: 'Birth Application Review',
+  reviewEventRegistration: {
+    id: 'register.form.reviewEventRegistration',
+    defaultMessage:
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Review',
     description: 'The message that appears for new birth registrations'
   },
   saveDraft: {
@@ -337,9 +339,10 @@ const getFullName = (childData: IFormSectionData): IFullName => {
     fullNameInEng = `${String(childData.firstNamesEng)} ${String(
       childData.familyNameEng
     )}`
-  } else {
+  } else if (childData.familyNameEng) {
     fullNameInEng = String(childData.familyNameEng)
   }
+
   return {
     fullNameInBn,
     fullNameInEng
@@ -382,24 +385,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       draft: { event }
     } = this.props
-    let personData
-    if (event === Event.DEATH) {
-      personData = this.props.draft.data.deceased
-    } else {
-      personData = this.props.draft.data.child
-    }
+
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
     const fullName = getFullName(personData)
-    const duplicate = history.location.state && history.location.state.duplicate
-    let eventName = DECLARATION
-    if (duplicate) {
-      eventName = DUPLICATION
-    }
+
     history.push(CONFIRMATION_SCREEN, {
-      eventName,
-      actionName: REJECTION,
+      trackNumber: draft.data.registration.trackingId,
+      eventName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
       eventType: event,
+      trackingSection: true,
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
@@ -413,42 +412,42 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       draft: { event }
     } = this.props
-    let personData
-    if (event === Event.DEATH) {
-      personData = this.props.draft.data.deceased
-    } else {
-      personData = this.props.draft.data.child
-    }
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
     const fullName = getFullName(personData)
+    const eventName = this.userHasRegisterScope() ? REGISTRATION : DECLARATION
 
-    const duplicate = history.location.state && history.location.state.duplicate
-
-    let eventName = DECLARATION
-    let actionName = SUBMISSION
-    let nextSection = true
-
-    if (this.userHasRegisterScope()) {
-      eventName = REGISTRATION
-      actionName = REGISTERED
-      nextSection = false
-    }
-
-    if (duplicate) {
-      eventName = DUPLICATION
-      actionName = REGISTERED
-      nextSection = false
-    }
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
-      nextSection,
       trackingSection: true,
       eventName,
       eventType: event,
-      actionName,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
+      fullNameInEng: fullName.fullNameInEng
+    })
+    this.props.deleteDraft(draft)
+  }
+
+  offlineSubmission = () => {
+    const {
+      history,
+      draft,
+      draft: { event }
+    } = this.props
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
+    const fullName = getFullName(personData)
+
+    history.push(CONFIRMATION_SCREEN, {
+      trackingSection: true,
+      eventName: OFFLINE,
+      eventType: event,
+      fullNameInBn: fullName.fullNameInBn,
+      fullNameInEng: fullName.fullNameInEng
     })
     this.props.deleteDraft(draft)
   }
@@ -459,21 +458,24 @@ class RegisterFormView extends React.Component<FullProps, State> {
       draft,
       draft: { event }
     } = this.props
-    let personData
-    if (event === Event.DEATH) {
-      personData = this.props.draft.data.deceased
-    } else {
-      personData = this.props.draft.data.child
-    }
+    const personData =
+      event === Event.DEATH
+        ? this.props.draft.data.deceased
+        : this.props.draft.data.child
     const fullName = getFullName(personData)
+    const duplicate = history.location.state && history.location.state.duplicate
+    const eventName = duplicate ? DUPLICATION : REGISTRATION
+
     history.push(CONFIRMATION_SCREEN, {
       trackNumber: response,
       trackingSection: true,
-      eventName: REGISTRATION,
+      eventName,
       eventType: event,
       actionName: REGISTERED,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      duplicateContextId:
+        history.location.state && history.location.state.duplicateContextId
     })
     this.props.deleteDraft(draft)
   }
@@ -502,10 +504,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     draftId: string,
     selectedSection: IFormSection | null,
     tabRoute: string,
-    goToTab: (tabRoute: string, draftId: string, tabId: string) => void
+    event: string,
+    goToTab: (
+      tabRoute: string,
+      draftId: string,
+      tabId: string,
+      event: string
+    ) => void
   ): void => {
     if (selectedSection) {
-      goToTab(tabRoute, draftId, selectedSection.id)
+      goToTab(tabRoute, draftId, selectedSection.id, event)
     }
   }
 
@@ -568,9 +576,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const isReviewForm = draft.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
-      ? messages.reviewBirthRegistration
+      ? messages.reviewEventRegistration
       : activeSection.viewType === VIEW_TYPE.PREVIEW
-      ? messages.previewBirthRegistration
+      ? messages.previewEventRegistration
       : messages.newVitalEventRegistration
     const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
     const sectionForReview = isReviewForm
@@ -589,7 +597,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
             sections={sectionForReview}
             activeTabId={activeSection.id}
             onTabClick={(tabId: string) =>
-              goToTab(this.props.tabRoute, draft.id, tabId)
+              goToTab(
+                this.props.tabRoute,
+                draft.id,
+                tabId,
+                draft.event.toLowerCase()
+              )
             }
           />
         </ViewHeaderWithTabs>
@@ -604,6 +617,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft.id,
                   nextSection,
                   this.props.tabRoute,
+                  draft.event.toLowerCase(),
                   goToTab
                 )
               }
@@ -612,6 +626,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft.id,
                   getPreviousSection(registerForm.sections, activeSection),
                   this.props.tabRoute,
+                  draft.event.toLowerCase(),
                   goToTab
                 )
               }
@@ -688,7 +703,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             goToTab(
                               this.props.tabRoute,
                               draft.id,
-                              nextSection.id
+                              nextSection.id,
+                              draft.event.toLowerCase()
                             )
                           }
                           id="next_section"
@@ -736,6 +752,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             form={registerForm}
             draft={draft}
             onCompleted={this.successfulSubmission}
+            onError={this.offlineSubmission}
           >
             <MutationContext.Consumer>
               {({ mutation, loading, data }) => (
@@ -835,9 +852,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}
-            confirmRejectionEvent={() => {
-              this.rejectSubmission()
-            }}
+            confirmRejectionEvent={this.rejectSubmission}
             duplicate={duplicate}
             draftId={draft.id}
             event={this.getEvent()}
