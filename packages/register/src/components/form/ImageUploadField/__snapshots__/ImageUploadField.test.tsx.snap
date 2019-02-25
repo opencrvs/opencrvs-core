@@ -13,6 +13,7 @@ ShallowWrapper {
         Object {
           "fields": Array [
             Object {
+              "hideAsterisk": true,
               "initialValue": "",
               "label": Object {
                 "defaultMessage": "Whose suppoting document are you uploading?",
@@ -107,11 +108,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -149,11 +158,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -191,11 +208,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -224,6 +249,7 @@ ShallowWrapper {
                   ],
                 },
               },
+              "hideAsterisk": true,
               "initialValue": "",
               "label": Object {
                 "defaultMessage": "Which document type are you uploading?",
@@ -271,6 +297,7 @@ ShallowWrapper {
       "optionSection": Object {
         "fields": Array [
           Object {
+            "hideAsterisk": true,
             "initialValue": "",
             "label": Object {
               "defaultMessage": "Whose suppoting document are you uploading?",
@@ -365,11 +392,19 @@ ShallowWrapper {
                   },
                   Object {
                     "label": Object {
-                      "defaultMessage": "NID",
-                      "description": "Label for radio option NID",
-                      "id": "formFields.docTypeNID",
+                      "defaultMessage": "National ID (front)",
+                      "description": "Label for select option radio option NID front",
+                      "id": "formFields.docTypeNIDFront",
                     },
-                    "value": "NID",
+                    "value": "National ID (front)",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "National ID (back)",
+                      "description": "Label for select option radio option NID back",
+                      "id": "formFields.docTypeNIDBack",
+                    },
+                    "value": "National ID (back)",
                   },
                   Object {
                     "label": Object {
@@ -407,11 +442,19 @@ ShallowWrapper {
                   },
                   Object {
                     "label": Object {
-                      "defaultMessage": "NID",
-                      "description": "Label for radio option NID",
-                      "id": "formFields.docTypeNID",
+                      "defaultMessage": "National ID (front)",
+                      "description": "Label for select option radio option NID front",
+                      "id": "formFields.docTypeNIDFront",
                     },
-                    "value": "NID",
+                    "value": "National ID (front)",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "National ID (back)",
+                      "description": "Label for select option radio option NID back",
+                      "id": "formFields.docTypeNIDBack",
+                    },
+                    "value": "National ID (back)",
                   },
                   Object {
                     "label": Object {
@@ -449,11 +492,19 @@ ShallowWrapper {
                   },
                   Object {
                     "label": Object {
-                      "defaultMessage": "NID",
-                      "description": "Label for radio option NID",
-                      "id": "formFields.docTypeNID",
+                      "defaultMessage": "National ID (front)",
+                      "description": "Label for select option radio option NID front",
+                      "id": "formFields.docTypeNIDFront",
                     },
-                    "value": "NID",
+                    "value": "National ID (front)",
+                  },
+                  Object {
+                    "label": Object {
+                      "defaultMessage": "National ID (back)",
+                      "description": "Label for select option radio option NID back",
+                      "id": "formFields.docTypeNIDBack",
+                    },
+                    "value": "National ID (back)",
                   },
                   Object {
                     "label": Object {
@@ -482,6 +533,7 @@ ShallowWrapper {
                 ],
               },
             },
+            "hideAsterisk": true,
             "initialValue": "",
             "label": Object {
               "defaultMessage": "Which document type are you uploading?",
@@ -524,6 +576,7 @@ ShallowWrapper {
         "optionSection": Object {
           "fields": Array [
             Object {
+              "hideAsterisk": true,
               "initialValue": "",
               "label": Object {
                 "defaultMessage": "Whose suppoting document are you uploading?",
@@ -618,11 +671,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -660,11 +721,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -702,11 +771,19 @@ ShallowWrapper {
                     },
                     Object {
                       "label": Object {
-                        "defaultMessage": "NID",
-                        "description": "Label for radio option NID",
-                        "id": "formFields.docTypeNID",
+                        "defaultMessage": "National ID (front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "formFields.docTypeNIDFront",
                       },
-                      "value": "NID",
+                      "value": "National ID (front)",
+                    },
+                    Object {
+                      "label": Object {
+                        "defaultMessage": "National ID (back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "formFields.docTypeNIDBack",
+                      },
+                      "value": "National ID (back)",
                     },
                     Object {
                       "label": Object {
@@ -735,6 +812,7 @@ ShallowWrapper {
                   ],
                 },
               },
+              "hideAsterisk": true,
               "initialValue": "",
               "label": Object {
                 "defaultMessage": "Which document type are you uploading?",

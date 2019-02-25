@@ -96,26 +96,27 @@ export const profileReducer: LoopReducer<
       )
     case actions.SET_USER_DETAILS:
       const result: ApolloQueryResult<GQLQuery> = action.payload
-      const data: GQLQuery = result.data
-      if (!data.getUser) {
+      const data: GQLQuery = result && result.data
+
+      if (data && data.getUser) {
+        const userDetails = getUserDetails(data.getUser)
+        return loop(
+          {
+            ...state,
+            userDetailsFetched: true,
+            userDetails
+          },
+          Cmd.list([
+            Cmd.run(() => storeUserDetails(userDetails)),
+            Cmd.action(offlineActions.setOfflineData(userDetails))
+          ])
+        )
+      } else {
         return {
           ...state,
           userDetailsFetched: false
         }
       }
-
-      const userDetails = getUserDetails(data.getUser)
-      return loop(
-        {
-          ...state,
-          userDetailsFetched: true,
-          userDetails
-        },
-        Cmd.list([
-          Cmd.run(() => storeUserDetails(userDetails)),
-          Cmd.action(offlineActions.setOfflineData(userDetails))
-        ])
-      )
     case actions.SET_INITIAL_USER_DETAILS:
       return loop(
         {

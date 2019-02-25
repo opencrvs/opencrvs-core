@@ -32,6 +32,7 @@ type GoToTabAction = {
     tabRoute: string
     draftId: string
     tabId: string
+    event: string
     fieldNameHash?: string
     historyState?: IDynamicValues
   }
@@ -94,12 +95,13 @@ export function goToTab(
   tabRoute: string,
   draftId: string,
   tabId: string,
+  event: string,
   fieldNameHash?: string,
   historyState?: IDynamicValues
 ) {
   return {
     type: GO_TO_TAB,
-    payload: { draftId, tabId, fieldNameHash, tabRoute, historyState }
+    payload: { draftId, tabId, event, fieldNameHash, tabRoute, historyState }
   }
 }
 
@@ -112,6 +114,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
         fieldNameHash,
         draftId,
         tabId,
+        event,
         tabRoute,
         historyState
       } = action.payload
@@ -121,7 +124,8 @@ export function navigationReducer(state: INavigationState, action: Action) {
           push(
             formatUrl(tabRoute, {
               draftId: draftId.toString(),
-              tabId
+              tabId,
+              event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState
           )

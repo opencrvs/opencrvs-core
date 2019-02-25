@@ -65,6 +65,7 @@ test('should build a minimal FHIR registration document without error', async ()
             }
           ]
         },
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7xxy33',
         relationship: 'OTHER',
         otherRelationship: 'Nephew'
       },
@@ -93,7 +94,7 @@ test('should build a minimal FHIR registration document without error', async ()
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID',
+            type: 'NATIONAL_ID_FRONT',
             createdAt: '2018-10-21'
           },
           {
@@ -203,6 +204,7 @@ test('should build a minimal FHIR registration document without error', async ()
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
       },
       informant: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7xxy33',
         individual: {
           _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
           identifier: [
@@ -218,4 +220,7 @@ test('should build a minimal FHIR registration document without error', async ()
   // informant relationship
   expect(fhir.entry[2].resource.relationship.coding[0].code).toEqual('OTHER')
   expect(fhir.entry[2].resource.relationship.text).toEqual('Nephew')
+  expect(fhir.entry[2].resource.id).toEqual(
+    '8f18a6ea-89d1-4b03-80b3-57509a7xxy33'
+  )
 })

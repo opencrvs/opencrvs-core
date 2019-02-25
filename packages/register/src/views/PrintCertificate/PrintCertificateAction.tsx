@@ -887,10 +887,11 @@ class PrintCertificateActionComponent extends React.Component<
         bn: NameBn ? NameBn.firstNames + ' ' + NameBn.familyName : '',
         en: NameEn ? NameEn.firstNames + ' ' + NameEn.familyName : ''
       },
-      dob: {
+      doe: {
         bn: DOBBn,
         en: DOBEn
-      }
+      },
+      event: this.getEvent()
     }
   }
   getEvent() {
@@ -944,6 +945,7 @@ class PrintCertificateActionComponent extends React.Component<
 
     const { currentForm } = this.state
     const form = this.getForm(currentForm)
+    const eventFromDraft = this.getEvent()
 
     return (
       <ActionPageWrapper>
@@ -956,7 +958,7 @@ class PrintCertificateActionComponent extends React.Component<
         >
           <HeaderContent>
             <QueryProvider
-              event={this.getEvent()}
+              event={eventFromDraft}
               action={Action.LOAD_CERTIFICATE_APPLICATION}
               payload={{ id: registrationId }}
             >
@@ -988,6 +990,7 @@ class PrintCertificateActionComponent extends React.Component<
                     })
 
                     const paymentAmount = calculatePrice(
+                      eventFromDraft,
                       retrievedData.child.birthDate
                     )
 

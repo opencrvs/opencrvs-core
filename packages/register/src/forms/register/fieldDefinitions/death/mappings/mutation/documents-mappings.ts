@@ -11,7 +11,8 @@ export const documentForWhomFhirMapping = {
 
 export const documentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
-  NID: 'NATIONAL_ID',
+  'National ID (front)': 'NATIONAL_ID_FRONT',
+  'National ID (back)': 'NATIONAL_ID_BACK',
   'Certified Post Mortem Report': 'POST_MORTEM_CERTIFICATE',
   'Hospital Discharge Certificate': 'HOSPITAL_DISCHARGE_CERTIFICATE',
   'Attested Letter of Death': 'ATTESTED_DEATH_LETTER',

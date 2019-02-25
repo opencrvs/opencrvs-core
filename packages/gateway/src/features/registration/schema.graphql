@@ -48,7 +48,8 @@ enum AttendantType {
 
 enum AttachmentType {
   PASSPORT
-  NATIONAL_ID
+  NATIONAL_ID_FRONT
+  NATIONAL_ID_BACK
   IMMUNISATION_CERTIFICATE
   PAPER_FORM
   PASSPORT_PHOTO
@@ -205,6 +206,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
 }
 
 input DeathRegistrationInput {
+  _fhirIDMap: Map
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
@@ -220,6 +222,7 @@ input DeathRegistrationInput {
 # In BDRIS2 BRN is used to link to birth - Must have BRN to register death. Only deathLocation and current address is captures for death as the rest is the same as birth registration
 type DeathRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
+  _fhirIDMap: Map
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
@@ -330,6 +333,7 @@ type EventRegResultSet {
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
+  queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
     locationIds: [String]
     status: String
@@ -372,7 +376,7 @@ type Mutation {
   ): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration - internally call update if details exists
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
-  markBirthAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
+  markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): ID!
@@ -384,5 +388,4 @@ type Mutation {
   ): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
   markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
-  markDeathAsVoided(id: ID!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
 }

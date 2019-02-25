@@ -887,14 +887,6 @@ describe('when user wants to print certificate', async () => {
       time = timeElapsed(days)
       expect(time.value).toBe(2)
       expect(time.unit).toBe('Month')
-
-      let error
-      try {
-        calculateDays('16-12-2018')
-      } catch (e) {
-        error = e
-      }
-      expect(error).toBeInstanceOf(Error)
     })
 
     it('Should generate the PDF', () => {

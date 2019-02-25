@@ -19,6 +19,15 @@ import { ENGLISH_STATE } from '../i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { I18nContainer } from '@opencrvs/register/src/i18n/components/I18nContainer'
 
+export const validToken =
+  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
+export function flushPromises() {
+  return new Promise(resolve => setImmediate(resolve))
+}
+export const assign = window.location.assign as jest.Mock
+export const getItem = window.localStorage.getItem as jest.Mock
+export const setItem = window.localStorage.setItem as jest.Mock
+
 configure({ adapter: new Adapter() })
 
 function createGraphQLClient() {
@@ -471,9 +480,9 @@ export const mockDeathApplicationData = {
       {
         data: 'base64-data',
         type: 'image/jpeg',
-        optionValues: ["Proof of Deceased's ID", 'NID'],
+        optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
         title: "Proof of Deceased's ID",
-        description: 'NID'
+        description: 'National ID (front)'
       }
     ]
   }
@@ -706,4 +715,103 @@ export const mockOfflineData = {
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     }
   ]
+}
+
+export const mockDeathApplicationDataWithoutFirstNames = {
+  deceased: {
+    iDType: 'NATIONAL_ID',
+    iD: '1230000000000',
+    firstNames: '',
+    familyName: 'ইসলাম',
+    firstNamesEng: '',
+    familyNameEng: 'Islam',
+    nationality: 'BGD',
+    gender: 'male',
+    maritalStatus: 'MARRIED',
+    birthDate: '1987-02-16',
+    permanentAddress: '',
+    countryPermanent: 'BGD',
+    statePermanent: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
+    districtPermanent: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
+    addressLine4Permanent: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
+    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
+    addressLine2Permanent: '193 Kalibari Road',
+    addressLine1Permanent: '193 Kalibari Road',
+    postCodePermanent: '2200',
+    currentAddress: '',
+    currentAddressSameAsPermanent: true,
+    country: 'BGD',
+    state: '',
+    district: '',
+    addressLine4: '',
+    addressLine3: '',
+    addressLine2: '',
+    addressLine1: '',
+    postCode: ''
+  },
+  informant: {
+    applicantIdType: 'NATIONAL_ID',
+    iDType: 'NATIONAL_ID',
+    applicantID: '1230000000000',
+    applicantFirstNames: '',
+    applicantFamilyName: 'ইসলাম',
+    applicantFirstNamesEng: 'Islam',
+    applicantFamilyNameEng: '',
+    nationality: 'BGD',
+    applicantBirthDate: '',
+    applicantsRelationToDeceased: 'MOTHER',
+    applicantPhone: '',
+    currentAddress: '',
+    country: 'BGD',
+    state: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
+    district: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
+    addressLine4: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
+    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
+    addressLine2: '',
+    addressLine1: '193 Kalibari Road',
+    postCode: '2200',
+    permanentAddress: '',
+    applicantPermanentAddressSameAsCurrent: true,
+    countryPermanent: 'BGD',
+    statePermanent: '',
+    districtPermanent: '',
+    addressLine4Permanent: '',
+    addressLine3Permanent: '',
+    addressLine2Permanent: '',
+    addressLine1Permanent: '',
+    postCodePermanent: ''
+  },
+  deathEvent: {
+    deathDate: '1987-02-16',
+    manner: 'ACCIDENT',
+    deathPlace: '',
+    deathPlaceAddress: 'OTHER',
+    placeOfDeath: 'OTHER',
+    deathLocation: '',
+    addressType: '',
+    country: 'BGD',
+    state: 'state',
+    district: 'district',
+    addressLine4: 'upazila',
+    addressLine3: 'union',
+    addressLine2: '',
+    addressLine1: '',
+    postCode: ''
+  },
+  causeOfDeath: {
+    causeOfDeathEstablished: false,
+    methodOfCauseOfDeath: '',
+    causeOfDeathCode: ''
+  },
+  documents: {
+    image_uploader: [
+      {
+        data: 'base64-data',
+        type: 'image/jpeg',
+        optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
+        title: "Proof of Deceased's ID",
+        description: 'National ID (front)'
+      }
+    ]
+  }
 }

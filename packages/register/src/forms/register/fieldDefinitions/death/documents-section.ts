@@ -8,6 +8,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS
 } from 'src/forms'
 import { deathFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
+import { deathAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
@@ -83,10 +84,15 @@ const messages = defineMessages({
     defaultMessage: 'Birth Registration',
     description: 'Label for select option Birth Registration'
   },
-  docTypeNID: {
-    id: 'formFields.docTypeNID',
-    defaultMessage: 'NID',
-    description: 'Label for select option radio option NID'
+  docTypeNIDFront: {
+    id: 'formFields.docTypeNIDFront',
+    defaultMessage: 'National ID (front)',
+    description: 'Label for select option radio option NID front'
+  },
+  docTypeNIDBack: {
+    id: 'formFields.docTypeNIDBack',
+    defaultMessage: 'National ID (back)',
+    description: 'Label for select option radio option NID back'
   },
   docTypePostMortemReport: {
     id: 'formFields.docTypePostMortemReport',
@@ -145,6 +151,7 @@ export const documentsSection: IFormSection = {
             type: RADIO_GROUP,
             label: messages.whatDocToUpload,
             required: true,
+            hideAsterisk: true,
             initialValue: '',
             validate: [],
             options: [
@@ -175,6 +182,7 @@ export const documentsSection: IFormSection = {
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: messages.typeOfDocument,
             required: true,
+            hideAsterisk: true,
             validate: [],
             initialValue: '',
             dynamicOptions: {
@@ -182,11 +190,25 @@ export const documentsSection: IFormSection = {
               options: {
                 "Proof of Deceased's ID": [
                   { value: 'Birth Registration', label: messages.docTypeBR },
-                  { value: 'NID', label: messages.docTypeNID }
+                  {
+                    value: 'National ID (front)',
+                    label: messages.docTypeNIDFront
+                  },
+                  {
+                    value: 'National ID (back)',
+                    label: messages.docTypeNIDBack
+                  }
                 ],
                 'Proof Deceased Permanent Address': [
                   { value: 'Birth Registration', label: messages.docTypeBR },
-                  { value: 'NID', label: messages.docTypeNID }
+                  {
+                    value: 'National ID (front)',
+                    label: messages.docTypeNIDFront
+                  },
+                  {
+                    value: 'National ID (back)',
+                    label: messages.docTypeNIDBack
+                  }
                 ],
                 'Proof of Death of Deceased': [
                   {
@@ -216,11 +238,25 @@ export const documentsSection: IFormSection = {
                 ],
                 'Proof of Date of Birth of Deceased': [
                   { value: 'Birth Registration', label: messages.docTypeBR },
-                  { value: 'NID', label: messages.docTypeNID }
+                  {
+                    value: 'National ID (front)',
+                    label: messages.docTypeNIDFront
+                  },
+                  {
+                    value: 'National ID (back)',
+                    label: messages.docTypeNIDBack
+                  }
                 ],
                 "Proof of Applicant's ID": [
                   { value: 'Birth Registration', label: messages.docTypeBR },
-                  { value: 'NID', label: messages.docTypeNID }
+                  {
+                    value: 'National ID (front)',
+                    label: messages.docTypeNIDFront
+                  },
+                  {
+                    value: 'National ID (back)',
+                    label: messages.docTypeNIDBack
+                  }
                 ]
               }
             }
@@ -228,7 +264,8 @@ export const documentsSection: IFormSection = {
         ]
       },
       mapping: {
-        mutation: deathFieldToAttachmentTransformer
+        mutation: deathFieldToAttachmentTransformer,
+        query: deathAttachmentToFieldTransformer
       }
     },
     {

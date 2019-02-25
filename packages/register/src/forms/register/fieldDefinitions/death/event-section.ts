@@ -23,14 +23,20 @@ import {
   copyEventAddressTransformer
 } from 'src/forms/mappings/mutation/field-mappings'
 import {
-  deceasedDateTransformation,
+  fieldToDeceasedDateTransformation,
   eventLocationMutationTransformer
 } from './mappings/mutation/event-mappings'
 import {
-  sameEventAddressFieldTransformer,
   eventLocationIDQueryTransformer,
+  bundleFieldToSectionFieldTransformer,
   eventLocationQueryTransformer
 } from 'src/forms/mappings/query/field-mappings'
+import {
+  deceasedDateToFieldTransformation,
+  deathPlaceToFieldTransformer
+} from './mappings/query/event-mappings'
+import { setRegistrationSectionTransformer } from './mappings/mutation/event-mappings'
+import { getRegistrationSectionTransformer } from './mappings/query/event-mappings'
 
 const messages = defineMessages({
   deathEventTab: {
@@ -130,7 +136,7 @@ const messages = defineMessages({
   },
   otherInstitution: {
     id: 'formFields.otherInstitution',
-    defaultMessage: 'Other Institution',
+    defaultMessage: 'Other',
     description: 'Select item for Other Institution'
   }
 })
@@ -149,7 +155,8 @@ export const eventSection: IFormSection = {
       initialValue: '',
       validate: [dateFormat],
       mapping: {
-        mutation: deceasedDateTransformation('deceased')
+        mutation: fieldToDeceasedDateTransformation('deceased'),
+        query: deceasedDateToFieldTransformation('deceased')
       }
     },
     {
@@ -176,7 +183,8 @@ export const eventSection: IFormSection = {
         }
       ],
       mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath')
+        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath'),
+        query: bundleFieldToSectionFieldTransformer('mannerOfDeath')
       }
     },
     {
@@ -207,7 +215,7 @@ export const eventSection: IFormSection = {
       conditionals: [],
       mapping: {
         mutation: copyEventAddressTransformer('deceased'),
-        query: sameEventAddressFieldTransformer('deceased')
+        query: deathPlaceToFieldTransformer
       }
     },
     {
@@ -480,5 +488,9 @@ export const eventSection: IFormSection = {
         query: eventLocationQueryTransformer(0, 'postalCode')
       }
     }
-  ]
+  ],
+  mapping: {
+    mutation: setRegistrationSectionTransformer,
+    query: getRegistrationSectionTransformer
+  }
 }

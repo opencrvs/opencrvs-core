@@ -100,6 +100,38 @@ describe('Registration type resolvers', () => {
 
     expect(patient).toBeNull()
   })
+  it('returns id from identifier', () => {
+    const id = typeResolvers.IdentityType.id({
+      value: '123456789',
+      type: 'PASSPORT'
+    })
+    expect(id).toBe('123456789')
+  })
+
+  it('returns type from identifier', () => {
+    const type = typeResolvers.IdentityType.type({
+      value: '123456789',
+      type: 'PASSPORT'
+    })
+    expect(type).toBe('PASSPORT')
+  })
+
+  it('returns otherType from identifier', () => {
+    const type = typeResolvers.IdentityType.otherType({
+      value: '123456789',
+      type: 'OTHER',
+      otherType: 'Office ID'
+    })
+    expect(type).toBe('Office ID')
+  })
+
+  it('returns id from identifier', () => {
+    const id = typeResolvers.IdentityType.id({
+      value: '123456789',
+      type: 'PASSPORT'
+    })
+    expect(id).toBe('123456789')
+  })
 
   it('returns first names part with one name', () => {
     // @ts-ignore
@@ -212,7 +244,7 @@ describe('Registration type resolvers', () => {
       expect(registration).toBeDefined()
       expect(registration.resourceType).toBe('Task')
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Task?focus=Composition/123',
+        'http://localhost:5001/fhir/Task?focus=Composition/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -235,7 +267,7 @@ describe('Registration type resolvers', () => {
       })
       expect(registration).toBeNull()
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Task?focus=Composition/123',
+        'http://localhost:5001/fhir/Task?focus=Composition/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -688,19 +720,19 @@ describe('Registration type resolvers', () => {
       }
 
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Composition/123',
+        'http://localhost:5001/fhir/Composition/123',
         expectedOpts
       )
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/DocumentReference/xxx',
+        'http://localhost:5001/fhir/DocumentReference/xxx',
         expectedOpts
       )
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/DocumentReference/yyy',
+        'http://localhost:5001/fhir/DocumentReference/yyy',
         expectedOpts
       )
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/DocumentReference/zzz',
+        'http://localhost:5001/fhir/DocumentReference/zzz',
         expectedOpts
       )
     })
@@ -712,7 +744,7 @@ describe('Registration type resolvers', () => {
       const attachments = await typeResolvers.Registration.attachments(mockTask)
       expect(attachments).toBeNull()
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Composition/123',
+        'http://localhost:5001/fhir/Composition/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -845,7 +877,7 @@ describe('Registration type resolvers', () => {
       const user = await typeResolvers.RegWorkflow.user(mockTask)
 
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/Practitioner/123',
+        'http://localhost:5001/fhir/Practitioner/123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -885,7 +917,7 @@ describe('Registration type resolvers', () => {
       const role = await typeResolvers.User.role(mockUser)
 
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/PractitionerRole?practitioner=123',
+        'http://localhost:5001/fhir/PractitionerRole?practitioner=123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -921,7 +953,7 @@ describe('Registration type resolvers', () => {
       }
 
       expect(mock).toBeCalledWith(
-        'http://localhost:5050/fhir/PractitionerRole?practitioner=123',
+        'http://localhost:5001/fhir/PractitionerRole?practitioner=123',
         {
           body: undefined,
           headers: { 'Content-Type': 'application/fhir+json' },
@@ -946,7 +978,7 @@ describe('Registration type resolvers', () => {
       const mock = fetch.mockResponseOnce(JSON.stringify(mockLocation))
 
       const taskLocation = await typeResolvers.RegWorkflow.location(mockTask)
-      expect(mock).toBeCalledWith('http://localhost:5050/fhir/Location/123', {
+      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Location/123', {
         body: undefined,
         headers: { 'Content-Type': 'application/fhir+json' },
         method: 'GET'

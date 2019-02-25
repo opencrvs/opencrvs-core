@@ -1,14 +1,11 @@
-A wrapper for input elements that adds a label, an error message and an indicator if the input field is optional
+A wrapper for input elements that adds a label, an error message and an asterisk indicator if the input field is required
 
 **With TextInput (default)**
 
 ```js
-const TextInput = require('../TextInput').TextInput;
+const TextInput = require('../TextInput').TextInput
 
-<InputField
-  id="default-input"
-  label="Mobile number"
->
+;<InputField id="default-input" label="Mobile number">
   <TextInput placeholder="e.g: +44-XXXX-XXXXXX" />
 </InputField>
 ```
@@ -16,9 +13,9 @@ const TextInput = require('../TextInput').TextInput;
 **With Select**
 
 ```js
-const Select = require('../Select').Select;
+const Select = require('../Select').Select
 
-<InputField
+;<InputField
   required={false}
   id="select-input"
   label="Your favourite ice create flavour?"
@@ -28,14 +25,16 @@ const Select = require('../Select').Select;
       { value: 'chocolate', label: 'Chocolate' },
       { value: 'strawberry', label: 'Strawberry' },
       { value: 'vanilla', label: 'Vanilla' }
-    ]} />
+    ]}
+  />
 </InputField>
 ```
 
 **With an error**
+
 ```js
-const TextInput = require('../TextInput').TextInput;
-<InputField
+const TextInput = require('../TextInput').TextInput
+;<InputField
   id="erro-on-input"
   label="Mobile number"
   placeholder="e.g: +44-XXXX-XXXXXX"
@@ -47,18 +46,16 @@ const TextInput = require('../TextInput').TextInput;
     error
     value="An input error"
     onChange={() => {}}
-    placeholder="e.g: +44-XXXX-XXXXXX" />
+    placeholder="e.g: +44-XXXX-XXXXXX"
+  />
 </InputField>
 ```
 
 **Disabled field**
+
 ```js
-const TextInput = require('../TextInput').TextInput;
-<InputField
-  id="disabled-input"
-  label="A disabled field"
-  disabled
->
+const TextInput = require('../TextInput').TextInput
+;<InputField id="disabled-input" label="A disabled field" disabled>
   <TextInput disabled placeholder="e.g: +44-XXXX-XXXXXX" />
 </InputField>
 ```
@@ -66,12 +63,8 @@ const TextInput = require('../TextInput').TextInput;
 **Optional field**
 
 ```js
-const TextInput = require('../TextInput').TextInput;
-<InputField
-  id="optional-input"
-  label="An optional field"
-  required={false}
->
+const TextInput = require('../TextInput').TextInput
+;<InputField id="optional-input" label="An optional field" required={false}>
   <TextInput placeholder="e.g: +44-XXXX-XXXXXX" />
 </InputField>
 ```
@@ -81,13 +74,8 @@ const TextInput = require('../TextInput').TextInput;
 The prefix postfix props can take either a `string` or a `Component` to render.
 
 ```js
-const TextInput = require('../TextInput').TextInput;
-<InputField
-  id="optional-input"
-  label="Dollar weight?"
-  prefix="$"
-  postfix="kg"
->
+const TextInput = require('../TextInput').TextInput
+;<InputField id="optional-input" label="Dollar weight?" prefix="$" postfix="kg">
   <TextInput />
 </InputField>
 ```
@@ -105,7 +93,8 @@ const TextInput = require('../TextInput').TextInput;
       { value: 'chocolate', label: 'Chocolate' },
       { value: 'strawberry', label: 'Strawberry' },
       { value: 'vanilla', label: 'Vanilla' }
-    ]} />
+    ]}
+  />
 </InputField>
 ```
 
@@ -114,10 +103,10 @@ const TextInput = require('../TextInput').TextInput;
 This is used for async validation.
 
 ```js
-const TextInput = require('../TextInput').TextInput;
-const VerifyingIndicator = require('../VerifyingIndicator').VerifyingIndicator;
+const TextInput = require('../TextInput').TextInput
+const VerifyingIndicator = require('../VerifyingIndicator').VerifyingIndicator
 
-<InputField
+;<InputField
   id="optional-input"
   label="Is Valid?"
   postfix={<VerifyingIndicator />}
@@ -126,21 +115,27 @@ const VerifyingIndicator = require('../VerifyingIndicator').VerifyingIndicator;
 </InputField>
 ```
 
-
 **Text field with postfix for async validity**
 
 This is used for async validation.
 
 ```js
-const TextInput = require('../TextInput').TextInput;
-const ValidIndicator = require('../ValidIndicator').ValidIndicator;
+const TextInput = require('../TextInput').TextInput
+const ValidIndicator = require('../ValidIndicator').ValidIndicator
 
-
-<InputField
-  id="optional-input"
-  label="Is Valid?"
-  postfix={<ValidIndicator />}
->
+;<InputField id="optional-input" label="Is Valid?" postfix={<ValidIndicator />}>
   <TextInput />
+</InputField>
+```
+
+**Required without asterisk indicator**
+
+Asterisk indicator can be hidden with `hideAsterisk` prop even if the input field is required
+
+```js
+const TextInput = require('../TextInput').TextInput
+
+;<InputField id="default-input" label="Mobile number" hideAsterisk={true}>
+  <TextInput placeholder="e.g: +44-XXXX-XXXXXX" />
 </InputField>
 ```

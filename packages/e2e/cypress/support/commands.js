@@ -56,7 +56,9 @@ Cypress.Commands.add('login', (userType, options = {}) => {
           cy.visit(`${Cypress.env('REGISTER_URL')}?token=${body.token}`)
         })
     })
-  cy.wait(1000)
+
+  // Wait for app to load so token can be stored
+  cy.wait(3000)
 })
 
 Cypress.Commands.add('selectOption', (selector, text, option) => {

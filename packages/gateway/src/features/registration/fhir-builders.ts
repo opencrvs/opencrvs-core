@@ -119,7 +119,7 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         person,
         'identifier',
         fieldValue,
-        'id',
+        'value',
         context
       )
     },
@@ -1144,6 +1144,18 @@ const builders: IFieldBuilders = {
     }
   },
   informant: {
+    _fhirID: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        INFORMANT_CODE,
+        INFORMANT_TITLE,
+        fhirBundle
+      )
+      relatedPersonResource.id = fieldValue
+    },
     individual: {
       _fhirID: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
@@ -1164,7 +1176,7 @@ const builders: IFieldBuilders = {
             person,
             'identifier',
             fieldValue,
-            'id',
+            'value',
             context
           )
         },

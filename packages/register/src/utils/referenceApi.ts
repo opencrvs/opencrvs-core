@@ -10,14 +10,14 @@ export interface IFacilitiesDataResponse {
   data: ILocation[]
 }
 
-async function loadLocations(): Promise<ILocationDataResponse> {
+async function loadLocations(): Promise<any> {
   const url = resolve(window.config.RESOURCES_URL, 'locations')
 
   const res = await fetch(url, {
     method: 'GET'
   })
 
-  if (res.status !== 200) {
+  if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
 
@@ -27,14 +27,14 @@ async function loadLocations(): Promise<ILocationDataResponse> {
   }
 }
 
-async function loadFacilities(): Promise<ILocationDataResponse> {
+async function loadFacilities(): Promise<any> {
   const url = resolve(window.config.RESOURCES_URL, 'facilities')
 
   const res = await fetch(url, {
     method: 'GET'
   })
 
-  if (res.status !== 200) {
+  if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
 
