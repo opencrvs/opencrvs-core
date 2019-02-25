@@ -33,7 +33,8 @@ import {
   defineMessages,
   InjectedIntlProps,
   injectIntl,
-  InjectedIntl
+  InjectedIntl,
+  FormattedMessage
 } from 'react-intl'
 import {
   PrimaryButton,
@@ -55,9 +56,12 @@ import {
   IDynamicOptions,
   IFormSectionData,
   WARNING,
-  DATE
+  DATE,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IDynamicFormField
 } from 'src/forms'
 import { formatLongDate } from 'src/utils/date-formatting'
+import { getFieldLabel } from 'src/forms/utils'
 
 const messages = defineMessages({
   valueYes: {
@@ -617,7 +621,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         return (
                           <SectionRow key={key}>
                             <SectionLabel>
-                              {intl.formatMessage(field.label)}
+                              {field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+                              field.dynamicDefinitions.label &&
+                              draft.data[section.id]
+                                ? intl.formatMessage(getFieldLabel(
+                                    field as IDynamicFormField,
+                                    draft.data[section.id]
+                                  ) as FormattedMessage.MessageDescriptor)
+                                : intl.formatMessage(field.label)}
                             </SectionLabel>
                             <SectionValue>
                               {errorsOnField.length > 0 ? (
