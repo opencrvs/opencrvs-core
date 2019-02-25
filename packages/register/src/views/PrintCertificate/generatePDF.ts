@@ -392,7 +392,8 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
             {
               image: secreatarySignature,
               alignment: 'center',
-              margin: [0, 30, 0, 0]
+              margin: [0, 30, 0, 0],
+              fit: [78, 78]
             },
             { alignment: 'center', text: 'Secretary: Md. Jahangir Alam' },
             {
@@ -405,7 +406,8 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
             {
               image: chairSignature,
               alignment: 'center',
-              margin: [0, 30, 0, 0]
+              margin: [0, 30, 0, 0],
+              fit: [78, 78]
             },
             { alignment: 'center', text: 'Chair: A.K.M Mahmudur Rohman' },
             {
