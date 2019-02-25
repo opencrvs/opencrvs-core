@@ -3,6 +3,8 @@ import * as Sticky from 'react-stickynode'
 import styled from 'styled-components'
 import { SupportingDocument } from './../icons'
 import { Select, ISelectOption as SelectComponentOptions } from './../forms'
+import { DocumentImage } from './components/DocumentImage'
+import { isEqual } from 'lodash'
 
 const Header = styled.div`
   padding: 14px 18px;
@@ -50,15 +52,21 @@ const WhiteBackground = styled.div`
   }
 `
 
+export interface IDocumentViewerOptions {
+  selectOptions: SelectComponentOptions[]
+  documentOptions: SelectComponentOptions[]
+}
+
 interface IProps {
   title: string
   tagline?: string
   icon?: React.ReactNode
-  options: SelectComponentOptions[]
+  options: IDocumentViewerOptions
 }
 
 interface IState {
   selectedOption: string
+  selectedDocument: string
 }
 
 export class DocumentViewer extends React.Component<IProps, IState> {
@@ -67,8 +75,12 @@ export class DocumentViewer extends React.Component<IProps, IState> {
 
     this.state = {
       selectedOption:
-        typeof this.props.options[0] !== 'undefined'
-          ? this.props.options[0].value
+        typeof this.props.options.selectOptions[0] !== 'undefined'
+          ? this.props.options.selectOptions[0].value
+          : '',
+      selectedDocument:
+        typeof this.props.options.documentOptions[0] !== 'undefined'
+          ? this.props.options.documentOptions[0].value
           : ''
     }
   }
@@ -89,19 +101,25 @@ export class DocumentViewer extends React.Component<IProps, IState> {
           <SelectContainer>
             <Select
               id="selectDocument"
-              options={options}
+              options={options.selectOptions}
               value={this.state.selectedOption as string}
               onChange={(val: string) => {
-                this.setState({ selectedOption: val })
+                const imgArray = options.documentOptions.filter(doc => {
+                  return doc.label === val
+                })
+                if (imgArray[0]) {
+                  this.setState({
+                    selectedOption: val,
+                    selectedDocument: imgArray[0].value
+                  })
+                }
               }}
             />
           </SelectContainer>
 
-          <ImageContainer>
-            {this.state.selectedOption && (
-              <Image src={this.state.selectedOption} />
-            )}
-          </ImageContainer>
+          {this.state.selectedDocument && (
+            <DocumentImage image={this.state.selectedDocument} />
+          )}
         </WhiteBackground>
       </Sticky>
     )

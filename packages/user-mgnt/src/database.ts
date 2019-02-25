@@ -10,7 +10,7 @@ db.on('disconnected', () => {
 })
 
 db.on('connected', () => {
-  logger.info('Connected to MongoBD')
+  logger.info('Connected to MongoDB')
 })
 
 const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))

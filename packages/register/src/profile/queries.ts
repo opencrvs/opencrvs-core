@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 import { client } from 'src/utils/apolloClient'
 
-const FETCH_USER = gql`
+export const FETCH_USER = gql`
   query($userId: String!) {
     getUser(userId: $userId) {
       role
@@ -28,10 +28,13 @@ const FETCH_USER = gql`
   }
 `
 async function fetchUserDetails(userId: string) {
-  return client.query({
-    query: FETCH_USER,
-    variables: { userId }
-  })
+  return (
+    client &&
+    client.query({
+      query: FETCH_USER,
+      variables: { userId }
+    })
+  )
 }
 
 export const queries = {
