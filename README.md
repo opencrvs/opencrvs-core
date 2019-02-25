@@ -51,7 +51,9 @@ Start the development environment as described above, then:
 
 1. `cd packages/resource && yarn populate && cd ../..`
 2. `cd packages/user-mgnt && yarn populate && cd ../..`
-3. Login to the OpenHIM console and update the base config file.
+3. Login to the OpenHIM console and upload the base config file.
+4. `yarn db:backup:create`
+5. Commit and push the new db dump archive files that have been created.
 
 ### tmuxed development setup
 
