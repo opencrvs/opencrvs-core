@@ -16,7 +16,10 @@ import {
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
-import { DocumentViewer } from '@opencrvs/components/lib/interface'
+import {
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/interface'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
 import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
 import { getScope } from 'src/profile/profileSelectors'
@@ -447,9 +450,10 @@ type ImageMeta = {
 }
 type FullIFileValue = IFileValue & ImageMeta
 
-const prepDocumentOption = (draft: IDraft): SelectComponentOptions[] => {
+const prepDocumentOption = (draft: IDraft): IDocumentViewerOptions => {
   const draftItemName = documentsSection.id
-  const documentviewerOptions: SelectComponentOptions[] = []
+  const documentOptions: SelectComponentOptions[] = []
+  const selectOptions: SelectComponentOptions[] = []
 
   const uploadedDocuments =
     draft.data[draftItemName] &&
@@ -459,13 +463,19 @@ const prepDocumentOption = (draft: IDraft): SelectComponentOptions[] => {
 
   uploadedDocuments.map(document => {
     const label = document.title + ' ' + document.description
-    documentviewerOptions.push({
+    documentOptions.push({
       value: document.data,
       label
     })
+    selectOptions.push({
+      value: label,
+      label
+    })
   })
-
-  return documentviewerOptions
+  return {
+    selectOptions,
+    documentOptions
+  }
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {

@@ -4,7 +4,7 @@ import { IFileValue } from 'src/forms'
 import { ActionPage } from '@opencrvs/components/lib/interface'
 import { OverlayContainer } from './ImageUploadOption'
 
-const PreviewContainer = OverlayContainer.extend`
+const PreviewContainer = styled(OverlayContainer)`
   background: ${({ theme }) => theme.colors.black};
 `
 const ImageHolder = styled.div`
