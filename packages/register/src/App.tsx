@@ -27,6 +27,7 @@ import { SessionExpireConfirmation } from './components/SessionExpireConfirmatio
 import { MyDrafts } from './views/MyDrafts/MyDrafts'
 import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -39,98 +40,100 @@ export const store = createStore()
 export class App extends React.Component<IAppProps> {
   public render() {
     return (
-      <ApolloProvider
-        client={this.props.client || createClient(this.props.store)}
-      >
-        <Provider store={this.props.store}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
-              <ConnectedRouter history={this.props.history}>
-                <ScrollToTop>
-                  <SessionExpireConfirmation />
-                  <NotificationComponent>
-                    <Page>
-                      <Switch>
-                        <ProtectedRoute
-                          exact
-                          path={routes.HOME}
-                          component={Home}
-                        />
-                        <ProtectedRoute
-                          exact
-                          path={routes.SELECT_VITAL_EVENT}
-                          component={SelectVitalEvent}
-                        />
-                        <ProtectedRoute
-                          exact
-                          path={routes.SELECT_INFORMANT}
-                          component={SelectInformant}
-                        />
-                        <ProtectedRoute
-                          exact
-                          path={routes.DRAFT_BIRTH_PARENT_FORM}
-                          component={ApplicationForm}
-                        />
+      <ErrorBoundary>
+        <ApolloProvider
+          client={this.props.client || createClient(this.props.store)}
+        >
+          <Provider store={this.props.store}>
+            <I18nContainer>
+              <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
+                <ConnectedRouter history={this.props.history}>
+                  <ScrollToTop>
+                    <SessionExpireConfirmation />
+                    <NotificationComponent>
+                      <Page>
+                        <Switch>
+                          <ProtectedRoute
+                            exact
+                            path={routes.HOME}
+                            component={Home}
+                          />
+                          <ProtectedRoute
+                            exact
+                            path={routes.SELECT_VITAL_EVENT}
+                            component={SelectVitalEvent}
+                          />
+                          <ProtectedRoute
+                            exact
+                            path={routes.SELECT_INFORMANT}
+                            component={SelectInformant}
+                          />
+                          <ProtectedRoute
+                            exact
+                            path={routes.DRAFT_BIRTH_PARENT_FORM}
+                            component={ApplicationForm}
+                          />
 
-                        <ProtectedRoute
-                          exact
-                          path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
-                          component={ApplicationForm}
-                        />
+                          <ProtectedRoute
+                            exact
+                            path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                            component={ApplicationForm}
+                          />
 
-                        <ProtectedRoute
-                          exact
-                          path={routes.DRAFT_DEATH_FORM}
-                          component={ApplicationForm}
-                        />
+                          <ProtectedRoute
+                            exact
+                            path={routes.DRAFT_DEATH_FORM}
+                            component={ApplicationForm}
+                          />
 
-                        <ProtectedRoute
-                          exact
-                          path={routes.DRAFT_DEATH_FORM_TAB}
-                          component={ApplicationForm}
-                        />
+                          <ProtectedRoute
+                            exact
+                            path={routes.DRAFT_DEATH_FORM_TAB}
+                            component={ApplicationForm}
+                          />
 
-                        <ProtectedRoute
-                          exact
-                          path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
-                          component={ReviewForm}
-                        />
+                          <ProtectedRoute
+                            exact
+                            path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
+                            component={ReviewForm}
+                          />
 
-                        <ProtectedRoute
-                          path={routes.CONFIRMATION_SCREEN}
-                          component={ConfirmationScreen}
-                        />
+                          <ProtectedRoute
+                            path={routes.CONFIRMATION_SCREEN}
+                            component={ConfirmationScreen}
+                          />
 
-                        <ProtectedRoute
-                          path={routes.WORK_QUEUE}
-                          component={WorkQueue}
-                        />
-                        <ProtectedRoute
-                          path={routes.MY_RECORDS}
-                          component={MyRecords}
-                        />
+                          <ProtectedRoute
+                            path={routes.WORK_QUEUE}
+                            component={WorkQueue}
+                          />
+                          <ProtectedRoute
+                            path={routes.MY_RECORDS}
+                            component={MyRecords}
+                          />
 
-                        <ProtectedRoute
-                          path={routes.MY_DRAFTS}
-                          component={MyDrafts}
-                        />
-                        <ProtectedRoute
-                          path={routes.REVIEW_DUPLICATES}
-                          component={ReviewDuplicates}
-                        />
-                        <ProtectedRoute
-                          path={routes.PRINT_CERTIFICATE}
-                          component={PrintCertificateAction}
-                        />
-                      </Switch>
-                    </Page>
-                  </NotificationComponent>
-                </ScrollToTop>
-              </ConnectedRouter>
-            </ThemeProvider>
-          </I18nContainer>
-        </Provider>
-      </ApolloProvider>
+                          <ProtectedRoute
+                            path={routes.MY_DRAFTS}
+                            component={MyDrafts}
+                          />
+                          <ProtectedRoute
+                            path={routes.REVIEW_DUPLICATES}
+                            component={ReviewDuplicates}
+                          />
+                          <ProtectedRoute
+                            path={routes.PRINT_CERTIFICATE}
+                            component={PrintCertificateAction}
+                          />
+                        </Switch>
+                      </Page>
+                    </NotificationComponent>
+                  </ScrollToTop>
+                </ConnectedRouter>
+              </ThemeProvider>
+            </I18nContainer>
+          </Provider>
+        </ApolloProvider>
+      </ErrorBoundary>
     )
   }
 }

@@ -4,10 +4,12 @@
   "private": true,
   "dependencies": {
     "@opencrvs/components": "^0.1.0",
+    "@sentry/browser": "^4.6.3",
     "@types/history": "^4.6.2",
     "@types/react-intl": "^2.3.8",
     "@types/react-redux": "^6.0.0",
     "@types/react-router-redux": "^5.0.14",
+    "@types/redux-sentry-middleware": "^0.0.1",
     "@types/xregexp": "^3.0.29",
     "apollo-boost": "^0.1.6",
     "apollo-client": "^2.4.5",
@@ -21,6 +23,7 @@
     "lint-staged": "^7.1.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
+    "logrocket": "^0.6.19",
     "moment": "^2.22.2",
     "pdfmake": "^0.1.40",
     "query-string": "^6.1.0",
@@ -37,6 +40,7 @@
     "react-swipeable": "^4.3.0",
     "redux": "^4.0.1",
     "redux-loop": "^4.4.1",
+    "redux-sentry-middleware": "^0.0.15",
     "styled-components": "^3.3.3",
     "xregexp": "^4.2.0"
   },

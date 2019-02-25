@@ -36,6 +36,8 @@ import {
   rejectReducer
 } from '@opencrvs/register/src/review/reducer'
 import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
+import * as Sentry from '@sentry/browser'
+import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {
   profile: ProfileState
@@ -71,10 +73,10 @@ export type AppStore = Store<IStoreState, AnyAction>
 
 export const createStore = (): { store: AppStore; history: History } => {
   const history = createBrowserHistory()
-  const middleware = routerMiddleware(history)
   const enhancer = compose(
     install(),
-    applyMiddleware(middleware),
+    applyMiddleware(routerMiddleware(history)),
+    applyMiddleware(createSentryMiddleware(Sentry)),
     // tslint:disable no-any
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()

@@ -4,9 +4,11 @@
   "private": true,
   "dependencies": {
     "@opencrvs/components": "^0.1.0",
+    "@sentry/browser": "^4.6.3",
     "@types/history": "^4.6.2",
     "@types/react-intl": "^2.3.8",
     "@types/react-redux": "^6.0.0",
+    "@types/redux-sentry-middleware": "^0.0.1",
     "axios": "^0.18.0",
     "country-data": "^0.0.31",
     "history": "^4.7.2",
@@ -22,6 +24,7 @@
     "redux": "^4.0.1",
     "redux-form": "^7.4.2",
     "redux-loop": "^4.4.1",
+    "redux-sentry-middleware": "^0.0.15",
     "styled-components": "^3.3.3"
   },
   "scripts": {
