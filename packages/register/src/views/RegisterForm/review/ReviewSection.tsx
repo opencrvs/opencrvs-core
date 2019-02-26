@@ -648,6 +648,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                       tabRoute,
                                       draft.id,
                                       section.id,
+                                      draft.event.toLowerCase(),
                                       field.name
                                     )
                                   }}
