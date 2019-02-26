@@ -46,7 +46,8 @@ import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
 import {
   storeDraft,
   createReviewDraft,
-  IDraftsState
+  IDraftsState,
+  IDraft
 } from '@opencrvs/register/src/drafts'
 import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
@@ -253,11 +254,11 @@ const messages = defineMessages({
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
   },
-  service: {
-    id: 'register.workQueue.print.service',
-    defaultMessage:
-      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph'
+  birthService: {
+    id: 'register.workQueue.print.birthService'
+  },
+  deathService: {
+    id: 'register.workQueue.print.deathService'
   },
   certificateHeader: {
     id: 'register.work-queue.certificate.header'
@@ -346,7 +347,9 @@ interface IFullName {
   fullNameInEng: string
 }
 
-const getFullName = (certificateDetails: CertificateDetails): IFullName => {
+export const getFullName = (
+  certificateDetails: CertificateDetails
+): IFullName => {
   let fullNameInBn = ''
   let fullNameInEng = ''
   if (certificateDetails && certificateDetails.name) {
@@ -374,6 +377,7 @@ type State = {
 }
 
 type IProps = {
+  event: Event
   registrationId: string
   language: string
   collectCertificateForm: IFormSection
@@ -382,6 +386,7 @@ type IProps = {
   registerForm: IForm
   userDetails: IUserDetails
   offlineResources: IOfflineDataState
+  draft: IDraft
 }
 
 type IFullProps = InjectedIntlProps &
@@ -403,7 +408,7 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   finishSubmission = (certificateDetails: CertificateDetails) => {
-    const { history } = this.props
+    const { history, event } = this.props
     const fullName = getFullName(certificateDetails)
     const noOfCertificate = 103
 
@@ -413,7 +418,8 @@ class PrintCertificateActionComponent extends React.Component<
       eventName: CERTIFICATION,
       actionName: COMPLETION,
       fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
+      fullNameInEng: fullName.fullNameInEng,
+      eventType: event
     })
   }
 
@@ -465,22 +471,9 @@ class PrintCertificateActionComponent extends React.Component<
         throw new Error(`No form found for id ${currentForm}`)
     }
   }
-  getDraft() {
-    const {
-      registrationId,
-      drafts: { drafts }
-    } = this.props
-    return (
-      drafts.find(draftItem => draftItem.id === registrationId) || {
-        data: {},
-        eventType: 'birth'
-      }
-    )
-  }
   processSubmitData() {
-    const { registrationId, registerForm } = this.props
+    const { registrationId, registerForm, draft } = this.props
     const { data } = this.state
-    const draft = this.getDraft()
 
     const result = {
       id: registrationId,
@@ -529,7 +522,7 @@ class PrintCertificateActionComponent extends React.Component<
     registrant: Registrant,
     certificateDetails: CertificateDetails
   ) => {
-    const { intl, paymentFormSection } = this.props
+    const { intl, paymentFormSection, event } = this.props
     const { enableConfirmButton } = this.state
     const issuerDetails = this.getIssuerDetails()
     const amountObj = paymentFormSection.fields.find(
@@ -597,11 +590,13 @@ class PrintCertificateActionComponent extends React.Component<
           <>
             <Box>
               <Info>
-                <B>{intl.formatMessage(messages.certificateIsCorrect)}</B>
+                <B>
+                  {intl.formatMessage(messages.certificateIsCorrect, { event })}
+                </B>
                 {intl.formatMessage(messages.certificateConfirmationTxt)}
               </Info>
               <MutationProvider
-                event={this.getEvent()}
+                event={event}
                 action={Action.COLLECT_CERTIFICATE}
                 payload={this.processSubmitData()}
                 onCompleted={() => {
@@ -703,17 +698,30 @@ class PrintCertificateActionComponent extends React.Component<
   }
 
   setRegistrant(data: IFormData): Registrant {
-    const names = data.child.name as Array<{ [key: string]: {} }>
-    const nameObj = names.find(name => name.use === this.props.language)
+    const { event } = this.props
+    let names
+    let eventDateTime
+    if (event === Event.BIRTH) {
+      names = data.child.name as Array<{ [key: string]: {} }>
+      eventDateTime = data.child.birthDate
+    }
+    if (event === Event.DEATH) {
+      names = data.deceased.name as Array<{ [key: string]: {} }>
+      eventDateTime = data.deceased.deceasedDateTime
+    }
+    const nameObj =
+      names && names.find(name => name.use === this.props.language)
     const registrant = { name: '', DOBDiff: '' }
     moment.locale(this.props.language)
 
     if (nameObj) {
       registrant.name = nameObj.firstNames + ' ' + nameObj.familyName
-      registrant.DOBDiff = moment(data.child.birthDate.toString(), 'YYYY-MM-DD')
-        .fromNow()
-        .replace(' ago', '')
-        .replace(' আগে', '')
+      if (eventDateTime) {
+        registrant.DOBDiff = moment(eventDateTime.toString(), 'YYYY-MM-DD')
+          .fromNow()
+          .replace(' ago', '')
+          .replace(' আগে', '')
+      }
     }
 
     return registrant
@@ -724,14 +732,25 @@ class PrintCertificateActionComponent extends React.Component<
     intl: InjectedIntl,
     offlineResources: IOfflineDataState
   ): CertificateDetails {
-    const names = data.child.name as Array<{ [key: string]: {} }>
-    const NameBn = names.find(name => name.use === 'bn')
-    const NameEn = names.find(name => name.use === 'en')
-    const DOBEn = moment(data.child.birthDate as string).format(
+    const { event } = this.props
+    let names
+    let eventDateTime
+    if (event === Event.BIRTH) {
+      names = data.child.name as Array<{ [key: string]: {} }>
+      eventDateTime = data.child.birthDate
+    }
+    if (event === Event.DEATH) {
+      names = data.deceased.name as Array<{ [key: string]: {} }>
+      eventDateTime = data.deceased.deceasedDateTime
+    }
+
+    const NameBn = names && names.find(name => name.use === 'bn')
+    const NameEn = names && names.find(name => name.use === 'en')
+    const DOBEn = moment(eventDateTime as string).format(
       CERTIFICATE_DATE_FORMAT
     )
     moment.locale('bn')
-    const DOBBn = moment(data.child.birthDate as string).format(
+    const DOBBn = moment(eventDateTime as string).format(
       CERTIFICATE_DATE_FORMAT
     )
 
@@ -891,18 +910,7 @@ class PrintCertificateActionComponent extends React.Component<
         bn: DOBBn,
         en: DOBEn
       },
-      event: this.getEvent()
-    }
-  }
-  getEvent() {
-    const eventType = this.getDraft().eventType || 'BIRTH'
-    switch (eventType.toLocaleLowerCase()) {
-      case 'birth':
-        return Event.BIRTH
-      case 'death':
-        return Event.DEATH
-      default:
-        return Event.BIRTH
+      event: this.props.event
     }
   }
 
@@ -932,8 +940,18 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
+  getEventDate(data: any, event: Event) {
+    switch (event) {
+      case Event.BIRTH:
+        return data.child.birthDate
+      case Event.DEATH:
+        return data.deceased.deceased.deathDate
+    }
+  }
+
   render = () => {
     const {
+      event,
       intl,
       registrationId,
       collectCertificateForm,
@@ -945,7 +963,6 @@ class PrintCertificateActionComponent extends React.Component<
 
     const { currentForm } = this.state
     const form = this.getForm(currentForm)
-    const eventFromDraft = this.getEvent()
 
     return (
       <ActionPageWrapper>
@@ -958,7 +975,7 @@ class PrintCertificateActionComponent extends React.Component<
         >
           <HeaderContent>
             <QueryProvider
-              event={eventFromDraft}
+              event={event}
               action={Action.LOAD_CERTIFICATE_APPLICATION}
               payload={{ id: registrationId }}
             >
@@ -972,33 +989,22 @@ class PrintCertificateActionComponent extends React.Component<
                     const retrievedData = data[dataKey]
                     let fields = collectCertificateForm.fields
                     fields = fields.map(field => {
-                      if (
-                        field &&
-                        field.type === INFORMATIVE_RADIO_GROUP &&
-                        field.name === 'motherDetails'
-                      ) {
-                        field.information = retrievedData.mother
-                      } else if (
-                        field &&
-                        field.type === INFORMATIVE_RADIO_GROUP &&
-                        field.name === 'fatherDetails'
-                      ) {
-                        field.information = retrievedData.father
+                      if (field && field.type === INFORMATIVE_RADIO_GROUP) {
+                        if (field.dynamicInformationRetriever) {
+                          field.information = field.dynamicInformationRetriever(
+                            retrievedData
+                          )
+                        }
                       }
-
                       return field
                     })
 
-                    const paymentAmount = calculatePrice(
-                      eventFromDraft,
-                      retrievedData.child.birthDate
-                    )
+                    const eventDate = this.getEventDate(retrievedData, event)
+
+                    const paymentAmount = calculatePrice(event, eventDate)
 
                     moment.locale(this.props.language)
-                    const DOBDiff = moment(
-                      retrievedData.child.birthDate,
-                      'YYYY-MM-DD'
-                    )
+                    const eventDateDiff = moment(eventDate, 'YYYY-MM-DD')
                       .fromNow()
                       .replace(' ago', '')
                       .replace(' আগে', '')
@@ -1019,8 +1025,8 @@ class PrintCertificateActionComponent extends React.Component<
                         field.type === PARAGRAPH &&
                         field.name === 'service'
                       ) {
-                        field.initialValue = DOBDiff.toString()
-                        field.label = messages[`service`]
+                        field.initialValue = eventDateDiff.toString()
+                        field.label = messages[`${event}Service`]
                       }
                     })
 
@@ -1039,6 +1045,7 @@ class PrintCertificateActionComponent extends React.Component<
                       retrievedData
                     )
                     if (
+                      event === Event.BIRTH &&
                       form.fields.filter(
                         field => field.name === 'personCollectingCertificate'
                       ).length === 0 &&
@@ -1056,7 +1063,7 @@ class PrintCertificateActionComponent extends React.Component<
                     const reviewDraft = createReviewDraft(
                       registrationId,
                       transData,
-                      this.getEvent()
+                      event
                     )
                     const draftExist = !!drafts.find(
                       draft => draft.id === registrationId
@@ -1103,23 +1110,56 @@ class PrintCertificateActionComponent extends React.Component<
   }
 }
 
-const event = 'birth'
+const getDraft = (
+  drafts: IDraft[],
+  registrationId: string,
+  eventType: string
+) =>
+  drafts.find(draftItem => draftItem.id === registrationId) || {
+    data: {},
+    event: getEvent(eventType)
+  }
+
+const getEvent = (eventType: string | undefined) => {
+  switch (eventType && eventType.toLowerCase()) {
+    case 'birth':
+    default:
+      return Event.BIRTH
+    case 'death':
+      return Event.DEATH
+  }
+}
+
+const getCollectCertificateForm = (event: Event, state: IStoreState) => {
+  switch (event) {
+    case Event.BIRTH:
+    default:
+      return state.printCertificateForm.collectBirthCertificateForm
+    case Event.DEATH:
+      return state.printCertificateForm.collectDeathCertificateForm
+  }
+}
 
 function mapStatetoProps(
   state: IStoreState,
-  props: RouteComponentProps<{ registrationId: string }>
+  props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
-  const { match } = props
+  const { registrationId, eventType } = props.match.params
+
+  const draft = getDraft(state.drafts.drafts, registrationId, eventType)
+  const event = getEvent(draft.event)
 
   return {
-    registrationId: match.params.registrationId,
+    event,
+    registrationId,
     language: state.i18n.language,
     paymentFormSection: state.printCertificateForm.paymentForm,
     certificatePreviewFormSection:
       state.printCertificateForm.certificatePreviewForm,
+    draft,
     drafts: state.drafts,
     registerForm: state.registerForm.registerForm[event],
-    collectCertificateForm: state.printCertificateForm.collectCertificateForm,
+    collectCertificateForm: getCollectCertificateForm(event, state),
     userDetails: getUserDetails(state),
     offlineResources: getOfflineState(state)
   }

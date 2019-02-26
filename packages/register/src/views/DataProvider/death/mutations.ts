@@ -19,6 +19,12 @@ const REJECT_DEATH_APPLICATION = gql`
   }
 `
 
+const COLLECT_DEATH_CERTIFICATE = gql`
+  mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
+    markDeathAsCertified(id: $id, details: $details)
+  }
+`
+
 export function getDeathMutationMappings(
   action: Action,
   payload?: any,
@@ -36,6 +42,14 @@ export function getDeathMutationMappings(
               }
             : {},
         dataKey: 'createDeathRegistration'
+      }
+    case Action.COLLECT_CERTIFICATE:
+      return {
+        mutation: COLLECT_DEATH_CERTIFICATE,
+        variables: {
+          ...payload
+        },
+        dataKey: 'markDeathAsCertified'
       }
     case Action.REGISTER_APPLICATION:
       return {

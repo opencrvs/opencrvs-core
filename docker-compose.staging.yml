@@ -34,6 +34,9 @@ services:
         - 'traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}'
         - 'traefik.port=5000'
         - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
 
   performance:
     configs:
@@ -45,6 +48,9 @@ services:
         - 'traefik.frontend.rule=Host: performance.{{hostname}}'
         - 'traefik.port=5000'
         - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
 
   login:
     configs:
@@ -56,6 +62,9 @@ services:
         - 'traefik.frontend.rule=Host: login.{{hostname}}'
         - 'traefik.port=5000'
         - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
 
   auth:
     secrets:
@@ -70,12 +79,19 @@ services:
         - 'traefik.frontend.rule=Host: auth.{{hostname}}'
         - 'traefik.port=4040'
         - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
 
   user-mgnt:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
 
   notification:
     secrets:
@@ -94,6 +110,10 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGE=bn
       - COUNTRY_ALPHA3=BGD
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
 
   gateway:
     secrets:
@@ -106,18 +126,30 @@ services:
         - 'traefik.frontend.rule=Host: gateway.{{hostname}}'
         - 'traefik.port=7070'
         - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
 
   workflow:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
+
 
   deduplication:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
 
   resources:
     secrets:
@@ -130,6 +162,9 @@ services:
         - 'traefik.frontend.rule=Host: resources.{{hostname}}'
         - 'traefik.port=3040'
         - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
 
   hearth:
     secrets:

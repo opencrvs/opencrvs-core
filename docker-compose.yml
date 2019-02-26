@@ -7,10 +7,6 @@ services:
       context: .
       dockerfile: ./Dockerfile-register
     restart: unless-stopped
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   performance:
     image: jembi/ocrvs-performance:${VERSION:-latest}
@@ -18,10 +14,6 @@ services:
       context: .
       dockerfile: ./Dockerfile-performance
     restart: unless-stopped
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   login:
     image: jembi/ocrvs-login:${VERSION:-latest}
@@ -29,10 +21,6 @@ services:
       context: .
       dockerfile: ./Dockerfile-login
     restart: unless-stopped
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   gateway:
     image: jembi/ocrvs-gateway:${VERSION:-latest}
@@ -43,10 +31,6 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - COUNTRY=bgd
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   workflow:
     image: jembi/ocrvs-workflow:${VERSION:-latest}
@@ -59,10 +43,6 @@ services:
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=bgd
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   deduplication:
     image: jembi/ocrvs-deduplication:${VERSION:-latest}
@@ -73,10 +53,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   auth:
     image: jembi/ocrvs-auth:${VERSION:-latest}
@@ -88,10 +64,6 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   user-mgnt:
     image: jembi/ocrvs-user-mgnt:${VERSION:-latest}
@@ -99,10 +71,6 @@ services:
     restart: unless-stopped
     environment:
       - MONGO_URL=mongodb://mongo/user-mgnt
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
@@ -110,10 +78,6 @@ services:
     restart: unless-stopped
     environment:
       - LANGUAGE=bn
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}
@@ -121,9 +85,5 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
-      - FHIR_URL=http://openhim-core:5001/fhir
+      - FHIR_URL=http://hearth:3447/fhir
       - ADMINISTRATIVE_STRUCTURE_URL=http://174.136.37.245:8090/gen
-    deploy:
-      replicas: 2
-    networks:
-      - overlay_net

@@ -38,9 +38,9 @@ const messages = defineMessages({
     description: 'Form section title for Registration'
   },
   whoIsPresentLabel: {
-    defaultMessage: "Who's present for the registration",
+    defaultMessage: 'Who is present for the registration',
     id: 'formFields.registration.whoIsPresent',
-    description: "Input label for Who's present input"
+    description: 'Input label for who is present input'
   },
   presentBoth: {
     id: 'formFields.registration.whoIsPresent.both',

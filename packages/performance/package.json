@@ -8,7 +8,7 @@
     "apollo-client": "^2.4.7",
     "apollo-link-context": "^1.0.12",
     "apollo-link-http": "^1.5.9",
-    "formik": "^1.0.3",
+    "formik": "^1.5.1",
     "graphql": "^14.0.2",
     "graphql-tools": "^4.0.3",
     "localforage": "^1.7.2",

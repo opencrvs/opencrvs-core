@@ -10,7 +10,8 @@ export const getServer = (
   const server = new Hapi.Server({
     port,
     routes: {
-      cors: { origin: ['*'] }
+      cors: { origin: ['*'] },
+      payload: { maxBytes: 52428800 }
     }
   })
 

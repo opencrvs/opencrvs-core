@@ -16,7 +16,10 @@ import {
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
-import { DocumentViewer } from '@opencrvs/components/lib/interface'
+import {
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/interface'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
 import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
 import { getScope } from 'src/profile/profileSelectors'
@@ -33,7 +36,8 @@ import {
   defineMessages,
   InjectedIntlProps,
   injectIntl,
-  InjectedIntl
+  InjectedIntl,
+  FormattedMessage
 } from 'react-intl'
 import {
   PrimaryButton,
@@ -55,9 +59,12 @@ import {
   IDynamicOptions,
   IFormSectionData,
   WARNING,
-  DATE
+  DATE,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IDynamicFormField
 } from 'src/forms'
 import { formatLongDate } from 'src/utils/date-formatting'
+import { getFieldLabel } from 'src/forms/utils'
 
 const messages = defineMessages({
   valueYes: {
@@ -447,9 +454,10 @@ type ImageMeta = {
 }
 type FullIFileValue = IFileValue & ImageMeta
 
-const prepDocumentOption = (draft: IDraft): SelectComponentOptions[] => {
+const prepDocumentOption = (draft: IDraft): IDocumentViewerOptions => {
   const draftItemName = documentsSection.id
-  const documentviewerOptions: SelectComponentOptions[] = []
+  const documentOptions: SelectComponentOptions[] = []
+  const selectOptions: SelectComponentOptions[] = []
 
   const uploadedDocuments =
     draft.data[draftItemName] &&
@@ -459,13 +467,19 @@ const prepDocumentOption = (draft: IDraft): SelectComponentOptions[] => {
 
   uploadedDocuments.map(document => {
     const label = document.title + ' ' + document.description
-    documentviewerOptions.push({
+    documentOptions.push({
       value: document.data,
       label
     })
+    selectOptions.push({
+      value: label,
+      label
+    })
   })
-
-  return documentviewerOptions
+  return {
+    selectOptions,
+    documentOptions
+  }
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
@@ -617,7 +631,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         return (
                           <SectionRow key={key}>
                             <SectionLabel>
-                              {intl.formatMessage(field.label)}
+                              {field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+                              field.dynamicDefinitions.label &&
+                              draft.data[section.id]
+                                ? intl.formatMessage(getFieldLabel(
+                                    field as IDynamicFormField,
+                                    draft.data[section.id]
+                                  ) as FormattedMessage.MessageDescriptor)
+                                : intl.formatMessage(field.label)}
                             </SectionLabel>
                             <SectionValue>
                               {errorsOnField.length > 0 ? (
