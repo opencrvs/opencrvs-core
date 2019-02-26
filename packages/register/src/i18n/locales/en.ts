@@ -681,6 +681,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
     'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
+    'register.workQueue.labels.results.eventRegistrationNumber':
+      '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
     'register.workQueue.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',

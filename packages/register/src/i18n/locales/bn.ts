@@ -793,6 +793,8 @@ export const BENGALI_STATE: ILanguage = {
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'register.workQueue.labels.results.birthRegistrationNumber':
       'জন্ম নিবন্ধন সংখ্যা',
+    'register.workQueue.labels.results.eventRegistrationNumber':
+      '{event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} নিবন্ধন সংখ্যা',
     'register.workQueue.labels.results.deathRegistrationNumber':
       'মৃত্যু নিবন্ধন সংখ্যা',
     'register.work-queue.certificate.header': '{event} নিবন্ধন রশিদ',
