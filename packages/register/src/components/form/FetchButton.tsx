@@ -18,7 +18,7 @@ const messages = defineMessages({
     description: 'Back button text in the modal'
   },
   cancel: {
-    id: 'formFields.FetchButton.cancel',
+    id: 'formFields.fetchButton.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal'
   }
