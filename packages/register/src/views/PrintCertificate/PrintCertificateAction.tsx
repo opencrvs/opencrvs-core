@@ -566,7 +566,8 @@ class PrintCertificateActionComponent extends React.Component<
                     registrant,
                     issuerDetails,
                     amount,
-                    this.props.language
+                    this.props.language,
+                    event
                   )
                 }}
               />
@@ -708,7 +709,8 @@ class PrintCertificateActionComponent extends React.Component<
     }
     if (event === Event.DEATH) {
       names = data.deceased.name as Array<{ [key: string]: {} }>
-      eventDateTime = data.deceased.deceasedDateTime
+      eventDateTime = (data.deceased.deceased as { [key: string]: string })
+        .deathDate
     }
     const nameObj =
       names && names.find(name => name.use === this.props.language)
@@ -717,12 +719,12 @@ class PrintCertificateActionComponent extends React.Component<
 
     if (nameObj) {
       registrant.name = nameObj.firstNames + ' ' + nameObj.familyName
-      if (eventDateTime) {
-        registrant.DOBDiff = moment(eventDateTime.toString(), 'YYYY-MM-DD')
-          .fromNow()
-          .replace(' ago', '')
-          .replace(' আগে', '')
-      }
+    }
+    if (eventDateTime) {
+      registrant.DOBDiff = moment(eventDateTime.toString(), 'YYYY-MM-DD')
+        .fromNow()
+        .replace(' ago', '')
+        .replace(' আগে', '')
     }
 
     return registrant
@@ -742,7 +744,7 @@ class PrintCertificateActionComponent extends React.Component<
     }
     if (event === Event.DEATH) {
       names = data.deceased.name as Array<{ [key: string]: {} }>
-      eventDateTime = data.deceased.deceasedDateTime
+      eventDateTime = data.deceased.deceased.deathDate
     }
 
     const NameBn = names && names.find(name => name.use === 'bn')

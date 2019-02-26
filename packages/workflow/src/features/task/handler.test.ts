@@ -2,7 +2,10 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 import { createServer } from '../..'
-import { testFhirTaskBundle } from '../../test/utils'
+import {
+  testFhirTaskBundle,
+  testFhirBundleWithIdsForDeath
+} from '../../test/utils'
 
 describe('Verify handler', () => {
   let server: any
@@ -60,7 +63,7 @@ describe('Verify handler', () => {
       ]
     )
   })
-  it('updateTaskHandler returns OK for a correctly authenticated user', async () => {
+  it('updateTaskHandler returns OK for a correctly authenticated user for birth', async () => {
     fetch.mockResponse(
       JSON.stringify({
         resourceType: 'Bundle',
@@ -86,6 +89,38 @@ describe('Verify handler', () => {
       method: 'PUT',
       url: '/fhir/Task/123',
       payload: testFhirTaskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+  it('updateTaskHandler returns OK for a correctly authenticated user for death', async () => {
+    fetch.mockResponse(
+      JSON.stringify({
+        resourceType: 'Bundle',
+        entry: [
+          {
+            response: { resourceType: 'Task' }
+          }
+        ]
+      })
+    )
+
+    const token = jwt.sign(
+      { scope: ['declare'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/fhir/Task/123',
+      payload: testFhirBundleWithIdsForDeath,
       headers: {
         Authorization: `Bearer ${token}`
       }

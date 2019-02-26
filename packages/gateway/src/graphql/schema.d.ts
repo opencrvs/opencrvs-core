@@ -70,7 +70,8 @@ export enum GQLIdentityIDType {
   DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
   REFUGEE_NUMBER = 'REFUGEE_NUMBER',
   ALIEN_NUMBER = 'ALIEN_NUMBER',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  NO_ID = 'NO_ID'
 }
 
 export interface GQLHumanName {
@@ -341,7 +342,8 @@ export enum GQLRelationshipType {
   SON = 'SON',
   DAUGHTER = 'DAUGHTER',
   EXTENDED_FAMILY = 'EXTENDED_FAMILY',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  INFORMANT = 'INFORMANT'
 }
 
 export interface GQLPayment {

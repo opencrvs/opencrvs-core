@@ -668,7 +668,9 @@ export const typeResolvers: GQLResolver = {
       return {
         composition: composition.id,
         encounter: encounterReference.split('/')[1],
-        eventLocation: encounter.location[0].location.reference.split('/')[1],
+        eventLocation:
+          encounter.location &&
+          encounter.location[0].location.reference.split('/')[1],
         observation
       }
     },

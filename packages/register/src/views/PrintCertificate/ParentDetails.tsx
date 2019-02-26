@@ -3,6 +3,7 @@ import styled from '../../styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { countries } from 'src/forms/countries'
 import { identityNameMapper } from 'src/forms/identity'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 const messages = defineMessages({
   firstName: {
@@ -120,7 +121,10 @@ function ParentDetailsComponent({
       <Text>{information.name[1] ? information.name[1].familyName : ''}</Text>
       <br />
       <Label>{intl.formatMessage(messages.dateOfBirth)}:</Label>
-      <Text>{information.birthDate}</Text>
+      <Text>
+        {information.birthDate &&
+          formatLongDate(information.birthDate, intl.locale)}
+      </Text>
       <br />
       <Label>{intl.formatMessage(messages.nationality)}:</Label>
       <Text>{i18nNationality}</Text>

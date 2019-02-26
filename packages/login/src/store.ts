@@ -24,7 +24,7 @@ import { reducer as formReducer, FormStateMap, FormAction } from 'redux-form'
 import { loginReducer, LoginState } from './login/reducer'
 import { intlReducer, IntlState } from './i18n/reducer'
 import * as Sentry from '@sentry/browser'
-import createSentryMiddleware from 'redux-sentry-middleware'
+import * as createSentryMiddleware from 'redux-sentry-middleware'
 
 export const history = createBrowserHistory()
 
@@ -52,6 +52,7 @@ const enhancedCreateStore = createReduxStore as StoreCreator
 const enhancer = compose(
   install(),
   applyMiddleware(routerMiddleware(history)),
+  // @ts-ignore types are not correct for this module yet
   applyMiddleware(createSentryMiddleware(Sentry)),
   // tslint:disable no-any
   typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'

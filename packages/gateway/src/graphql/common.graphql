@@ -33,6 +33,7 @@ enum IdentityIDType {
   REFUGEE_NUMBER
   ALIEN_NUMBER
   OTHER
+  NO_ID
 }
 
 enum EducationType {

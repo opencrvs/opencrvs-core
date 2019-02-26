@@ -595,7 +595,7 @@ export const BENGALI_STATE: ILanguage = {
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle': 'একটি নতুন ইভেন্ট ঘোষণা',
-    'register.home.buttons.registerNewEvent': 'নতুন জন্ম ঘোষণা',
+    'register.home.buttons.registerNewEvent': 'নতুন ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়াগুলি',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
     'register.home.buttons.completedSumissions': 'সমাপ্ত জমাগুলি',
@@ -793,9 +793,13 @@ export const BENGALI_STATE: ILanguage = {
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'register.workQueue.labels.results.birthRegistrationNumber':
       'জন্ম নিবন্ধন সংখ্যা',
-    'register.work-queue.certificate.header': 'জন্ম নিবন্ধন রশিদ',
+    'register.workQueue.labels.results.eventRegistrationNumber':
+      '{event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} নিবন্ধন সংখ্যা',
+    'register.workQueue.labels.results.deathRegistrationNumber':
+      'মৃত্যু নিবন্ধন সংখ্যা',
+    'register.work-queue.certificate.header': '{event} নিবন্ধন রশিদ',
     'register.work-queue.certificate.subheader':
-      'জন্মদিবসের {DOBDiff} পর জন্ম নিবন্ধন',
+      '{DOE} {DOBDiff} পর {event} নিবন্ধন',
     'register.work-queue.certificate.service': 'সেবা: ',
     'register.work-queue.certificate.amount': 'পরিশোধিত মূল্য: \n\n',
     'register.work-queue.certificate.issuer':
@@ -857,7 +861,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.fetchDeceasedModalErrorTitle': 'অকার্যকর আইডি',
     'formFields.fetchDeceasedModalErrorText':
       'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
-    'formFields.loaderButton.cancel': 'বাতিল',
+    'formFields.fetchButton.cancel': 'বাতিল',
     'formFields.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
     'formFields.fetchDeceasedModalInfo': 'জন্ম নিবন্ধন নম্বর',
     'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন}
@@ -873,13 +877,16 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.confirmationScreen.buttons.newDeclaration': 'নতুন আবেদন',
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
-    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং নম্বর : } registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} 
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং নম্বর : } registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :}
       rejection {ট্র্যাকিং নম্বর : } certificate {} offline {ট্র্যাকিং নম্বর :}} `,
     'formFields.fetchModalTitle': 'পরীক্ষা করা হচ্ছে',
     'formFields.fetchModalSuccessTitle': 'আইডি বৈধ',
     'formFields.fetchModalErrorTitle': 'অকার্যকর আইডি',
     'formFields.fetchModalErrorText':
-      'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
+      'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি',
+    'formFields.fetchPersonByNIDModalInfo': 'জাতীয় পরিচয়পত্র',
+    'formFields.fetchPersonByNIDModalErrorText':
+      'প্রদত্ত NID এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি',
     'formFields.fetchModalInfo': 'জন্ম নিবন্ধন নম্বর',
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select,declaration {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা } registration { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন}
      duplication { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নকল} certificate { এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন সনদ} offline {এর {eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন ঘোষণা }}`,
@@ -891,17 +898,21 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.notDuplicate.modal.yes': 'হাঁ',
     'register.duplicates.notDuplicate.modal.confirmationText':
       'আপনি কি নিশ্চিত এই আবেদন নকল না?',
-    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন পর্যালোচনার জন্য পাঠানো হয়েছে।} 
-      registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
-      duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} 
-      rejection {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন প্রত্যাখ্যাত হয়েছে।} 
-      certificate {{eventType, select, birth {জন্ম} death {মৃত্যু}} সনদপত্র সম্পূর্ণ হয়েছে।} 
+    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন পর্যালোচনার জন্য পাঠানো হয়েছে।}
+      registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।}
+      duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।}
+      rejection {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন প্রত্যাখ্যাত হয়েছে।}
+      certificate {{eventType, select, birth {জন্ম} death {মৃত্যু}} সনদপত্র সম্পূর্ণ হয়েছে।}
       offline {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদনটি আপনি পুনরায় সংযুক্ত হলে পাঠানো হবে।} }`,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।}
-      declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} 
-      registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।} 
+      declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}
+      registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
       duplication{সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
       rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।} 
-      offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `
+      offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `,
+    'register.event.dob': 'জন্মদিবসের',
+    'register.event.dod': 'মৃত্যুদিবসের',
+    'register.event.death': 'মৃত্যু',
+    'register.event.birth': 'জন্ম'
   }
 }

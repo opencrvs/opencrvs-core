@@ -400,7 +400,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Attested copy(s) of the document as prescribed by the Registrar',
     'register.form.tabs.registrationTab': 'Application',
     'register.form.section.registrationTitle': 'Application',
-    'formFields.registration.whoIsPresent': "Who's present for the application",
+    'formFields.registration.whoIsPresent':
+      'Who is present for the application',
     'formFields.registration.whoIsPresent.both': 'Both Parents',
     'formFields.registration.whoIsPresent.mother': 'Mother',
     'formFields.registration.whoIsPresent.father': 'Father',
@@ -680,6 +681,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
     'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
+    'register.workQueue.labels.results.eventRegistrationNumber':
+      '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
     'register.workQueue.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',
@@ -801,9 +804,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.buttons.newRegistration': 'New registration',
     'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
     'register.work-queue.certificate.header':
-      'Receipt for Birth Certificate of',
+      'Receipt for {event} Certificate of',
     'register.work-queue.certificate.subheader':
-      'Birth Registration after {DOBDiff} of D.o.B',
+      '{event} Registration after {DOBDiff} of {DOE}',
     'register.work-queue.certificate.service': 'Service: ',
     'register.work-queue.certificate.amount': 'Amount paid:\n\n',
     'register.work-queue.certificate.issuer':
@@ -866,9 +869,12 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.fetchDeceasedModalErrorTitle': 'Invalid Id',
     'formFields.fetchDeceasedModalErrorText':
       'No registration found for provided BRN',
-    'formFields.loaderButton.cancel': 'Cancel',
+    'formFields.fetchButton.cancel': 'Cancel',
     'formFields.fetchDeceasedDetails': "Retrieve Deceased's Details",
     'formFields.fetchDeceasedModalInfo': 'Birth Registration Number',
+    'formFields.fetchPersonByNIDModalInfo': 'National ID',
+    'formFields.fetchPersonByNIDModalErrorText':
+      'No person found for provided NID',
     'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
     certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
     submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
@@ -883,13 +889,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.buttons.back': 'Back to homescreen',
     'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
-    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking number:} registration {{eventType, select, birth {Birth} death {Death}} Registration Number:} 
+    'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking number:} registration {{eventType, select, birth {Birth} death {Death}} Registration Number:}
     duplication {{eventType, select, birth {Birth} death {Death}} Registration Number:} rejection {Tracking number:} certificate {} offline {Tracking number:}} `,
     'register.confirmationScreen.trackingSectionDesc': `{event, select, certificate {Certificates have been collected from your jurisdiction.}
-    declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.} 
+    declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
     duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
-    rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.} 
+    rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.}
     offline {The informant will receive the tracking ID number via SMS when the application has been sent for review.}} `,
     'register.confirmationScreen.boxHeaderDescFirst': `{event, select, declaration {The {eventType, select, birth {birth} death {death}} declaration of } registration {The {eventType, select, birth {birth} death {death}} of }
       duplication {The {eventType, select, birth {birth} death {death}} duplication of } certificate {The {eventType, select, birth {birth} death {death}} certificate of } offline {The {eventType, select, birth {birth} death {death}} declaration of }}`,
@@ -900,9 +906,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.notDuplicate.modal.yes': 'Yes',
     'register.duplicates.notDuplicate.modal.confirmationText':
       'Are you sure this is not a duplicate application?',
-    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.} 
-    duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.} 
-    certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.} 
-    offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`
+    'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.}
+    duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.}
+    certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.}
+    offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`,
+    'register.event.dob': 'D.o.B',
+    'register.event.dod': 'D.o.D',
+    'register.event.death': 'Death',
+    'register.event.birth': 'Birth'
   }
 }
