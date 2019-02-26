@@ -44,6 +44,7 @@ export const resolvers: GQLResolver = {
           `/Location/${splitRef[1]}`,
           AuthHeader
         )
+        console.log(JSON.stringify(locationResponse))
         if (
           !locationResponse ||
           !locationResponse.physicalType ||

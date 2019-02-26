@@ -127,13 +127,35 @@ const localRegistrar3 = new User({
   scope: ['register', 'performance', 'certify', 'demo']
 })
 
+const fieldAgent4 = new User({
+  name: 'Abdullah Al Arafat',
+  email: 'test@test.org',
+  mobile: '+8801711081454',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Field Agent',
+  scope: ['declare', 'demo']
+})
+
+const registrationClerk4 = new User({
+  name: 'Neelima Yasmeen',
+  email: 'test@test.org',
+  mobile: '+8801610005011',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'Local Registrar',
+  scope: ['register', 'performance', 'certify', 'demo']
+})
+
 const testUsers = [
   fieldAgent,
   fieldAgent2,
   fieldAgent3,
+  fieldAgent4,
   registrationClerk,
   registrationClerk2,
   registrationClerk3,
+  registrationClerk4,
   localRegistrar,
   localRegistrar2,
   localRegistrar3,
