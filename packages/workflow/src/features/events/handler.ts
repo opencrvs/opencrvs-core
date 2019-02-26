@@ -80,7 +80,12 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    return Events.BIRTH_MARK_VOID
+    const eventType = getEventType(request.payload as fhir.Bundle)
+    if (eventType === EVENT_TYPE.BIRTH) {
+      return Events.BIRTH_MARK_VOID
+    } else if (eventType === EVENT_TYPE.DEATH) {
+      return Events.DEATH_MARK_VOID
+    }
   }
 
   return Events.UNKNOWN
@@ -149,10 +154,16 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
       break
-    case Events.BIRTH_MARK_CERT || Events.DEATH_MARK_CERT:
+    case Events.BIRTH_MARK_CERT:
+      response = await markEventAsCertifiedHandler(request, h)
+      break
+    case Events.DEATH_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)
       break
     case Events.BIRTH_MARK_VOID:
+      response = await updateTaskHandler(request, h)
+      break
+    case Events.DEATH_MARK_VOID:
       response = await updateTaskHandler(request, h)
       break
     default:
