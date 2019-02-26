@@ -354,7 +354,23 @@ export const collectDeathCertificateFormSection: IFormSection = {
     },
     {
       name: 'documentNumber',
-      type: TEXT,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'otherPersonIDType',
+          labelMapper: identityNameMapper
+        },
+        type: {
+          dependency: 'otherPersonIDType',
+          typeMapper: identityTypeMapper
+        },
+        validate: [
+          {
+            validator: validIDNumber,
+            dependencies: ['otherPersonIDType']
+          }
+        ]
+      },
       label: messages.documentNumber,
       required: true,
       initialValue: '',
