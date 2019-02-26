@@ -30,6 +30,7 @@ import {
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from 'src/utils/date-formatting'
+import * as Sentry from '@sentry/browser'
 
 interface IMatchParams {
   applicationId: string
@@ -440,6 +441,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               !data.fetchBirthRegistration ||
               !data.fetchBirthRegistration.registration
             ) {
+              Sentry.captureException(error)
               console.error(error)
 
               return (
@@ -481,6 +483,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   }
 
                   if (errorDetails) {
+                    Sentry.captureException(errorDetails)
                     console.error(errorDetails)
 
                     return (

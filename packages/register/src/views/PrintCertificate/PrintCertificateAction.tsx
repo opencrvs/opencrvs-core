@@ -80,6 +80,7 @@ import {
 } from 'src/offline/reducer'
 import { getOfflineState } from 'src/offline/selectors'
 import { renderSelectDynamicLabel } from 'src/views/RegisterForm/review/ReviewSection'
+import * as Sentry from '@sentry/browser'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -1095,6 +1096,8 @@ class PrintCertificateActionComponent extends React.Component<
                     )
                   }
                   if (error) {
+                    Sentry.captureException(error)
+
                     return (
                       <ErrorText id="print-certificate-queue-error-text">
                         {intl.formatMessage(messages.queryError)}

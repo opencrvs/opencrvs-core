@@ -11,6 +11,7 @@ import { showSessionExpireConfirmation } from 'src/notification/actions'
 import { from } from 'apollo-link'
 import { IStoreState } from 'src/store'
 import { AnyAction, Store } from 'redux'
+import * as Sentry from '@sentry/browser'
 
 export let client: any
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
@@ -36,6 +37,8 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
       error.networkError.statusCode === 401
     ) {
       store.dispatch(showSessionExpireConfirmation())
+    } else {
+      Sentry.captureException(error)
     }
   })
 
