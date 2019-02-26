@@ -9,7 +9,7 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
-import { IDynamicValues } from '@opencrvs/register/src/navigation'
+import { IQuery } from '@opencrvs/register/src/forms'
 
 const messages = defineMessages({
   back: {
@@ -18,27 +18,24 @@ const messages = defineMessages({
     description: 'Back button text in the modal'
   },
   cancel: {
-    id: 'formFields.loaderButton.cancel',
+    id: 'formFields.fetchButton.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal'
   }
 })
 
-interface ILoaderButtonProps {
+interface IFetchButtonProps {
   id: string
-  query: any
+  queryData?: IQuery
   label: string
   className?: string
   modalTitle: string
-  modalInfoText: string
   successTitle: string
   errorTitle: string
-  errorText: string
-  variables: IDynamicValues
-  onFetch?: (response: ApolloQueryResult<GQLQuery>) => void
+  onFetch?: (response: any) => void
 }
 
-interface ILoaderButtonState {
+interface IFetchButtonState {
   response?: ApolloQueryResult<GQLQuery>
   error?: boolean
   success?: boolean
@@ -46,7 +43,7 @@ interface ILoaderButtonState {
   show?: boolean
 }
 
-type IFullProps = ILoaderButtonProps & InjectedIntlProps
+type IFullProps = IFetchButtonProps & InjectedIntlProps
 
 const Container = styled.div`
   display: flex;
@@ -115,8 +112,7 @@ const StyledPrimaryButton = styled(PrimaryButton)`
     }`
   }}
 `
-
-class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
+class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -133,26 +129,29 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
     })
   }
   performQuery = async (client: any) => {
+    const { query, variables, responseTransformer } = this.props
+      .queryData as IQuery
     try {
       this.setState({ show: true, loading: true, success: false, error: false })
       const response = await client.query({
-        query: this.props.query,
-        variables: this.props.variables
+        query,
+        variables
       })
       this.setState({ success: true, loading: false, error: false })
-      if (this.props.onFetch) {
-        this.props.onFetch(response)
+      if (responseTransformer && this.props.onFetch) {
+        const transformedResponse = responseTransformer(response)
+        this.props.onFetch(transformedResponse)
       }
     } catch (error) {
       this.setState({ error: true, loading: false, success: false })
     }
   }
 
-  getModalInfo = () => {
-    const { modalInfoText, variables } = this.props
+  getModalInfo = (intl: ReactIntl.InjectedIntl) => {
+    const { variables, modalInfoText } = this.props.queryData as IQuery
     return (
       <>
-        {modalInfoText && <Info>{modalInfoText}</Info>}
+        {modalInfoText && <Info>{intl.formatMessage(modalInfoText)}</Info>}
         {variables && <Info>{Object.values(variables)}</Info>}
       </>
     )
@@ -165,7 +164,7 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
       modalTitle,
       successTitle,
       errorTitle,
-      errorText
+      queryData
     } = this.props
     const { loading, error, success, show } = this.state
 
@@ -190,23 +189,27 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
                       {success && (
                         <>
                           <Heading>{successTitle}</Heading>
-                          {this.getModalInfo()}
+                          {this.getModalInfo(intl)}
                           <StyledSuccess id="loader-button-success" />
                         </>
                       )}
                       {error && (
                         <>
                           <Heading>{errorTitle}</Heading>
-                          {this.getModalInfo()}
+                          {this.getModalInfo(intl)}
                           <StyledError id="loader-button-error" />
-                          <Info>{errorText}</Info>
+                          {queryData && (
+                            <Info>
+                              {intl.formatMessage(queryData.errorText)}
+                            </Info>
+                          )}
                         </>
                       )}
 
                       {loading && (
                         <>
                           <Heading>{modalTitle}</Heading>
-                          {this.getModalInfo()}
+                          {this.getModalInfo(intl)}
                           <StyledSpinner id="loader-button-spinner" />
                           <ConfirmButton onClick={this.hideModal}>
                             {intl.formatMessage(messages.cancel)}
@@ -231,4 +234,4 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
   }
 }
 
-export const LoaderButtonField = injectIntl<IFullProps>(LoaderButton)
+export const FetchButtonField = injectIntl<IFullProps>(FetchButton)

@@ -18,9 +18,10 @@ import {
   IFormData,
   IDynamicFormFieldValidators,
   IDynamicFormField,
-  LOADER_BUTTON,
+  FETCH_BUTTON,
   ILoaderButton,
-  IFieldInput
+  IFieldInput,
+  IQuery
 } from './'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from 'src/forms/validation'
@@ -60,21 +61,15 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === LOADER_BUTTON) {
+  if (base.type === FETCH_BUTTON) {
     ;(base as any).modalTitle = intl.formatMessage(
       (field as ILoaderButton).modalTitle
-    )
-    ;(base as any).modalInfoText = intl.formatMessage(
-      (field as ILoaderButton).modalInfoText
     )
     ;(base as any).successTitle = intl.formatMessage(
       (field as ILoaderButton).successTitle
     )
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
-    )
-    ;(base as any).errorText = intl.formatMessage(
-      (field as ILoaderButton).errorText
     )
   }
 
@@ -270,12 +265,28 @@ export function isCityLocation(
   }
 }
 
-export function getInputValues(
+export function getQueryData(
   field: ILoaderButton,
+  values: IFormSectionData
+): IQuery | undefined {
+  const selectedValue = values[field.querySelectorInput.valueField] as string
+  const queryData = field.queryMap[selectedValue]
+
+  if (!queryData) {
+    return
+  }
+
+  const variables = getInputValues(queryData.inputs, values)
+  queryData.variables = variables
+  return queryData
+}
+
+export function getInputValues(
+  inputs: IFieldInput[],
   values: IFormSectionData
 ): IDynamicValues {
   const variables = {}
-  field.inputs.forEach((input: IFieldInput) => {
+  inputs.forEach((input: IFieldInput) => {
     variables[input.name] = values[input.valueField]
   })
   return variables
@@ -461,10 +472,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
   },
-  deceasedBRNSelected: {
+  deceasedIDSelected: {
     action: 'hide',
     expression:
-      '(!values.iDType || values.iDType !== "BIRTH_REGISTRATION_NUMBER")'
+      '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
   },
   otherRelationship: {
     action: 'hide',
