@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
+import * as Sentry from '@sentry/browser'
 
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
@@ -144,6 +145,7 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
         this.props.onFetch(response)
       }
     } catch (error) {
+      Sentry.captureException(error)
       this.setState({ error: true, loading: false, success: false })
     }
   }

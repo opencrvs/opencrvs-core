@@ -25,6 +25,7 @@ import {
   QueryProvider,
   QueryContext
 } from 'src/views/DataProvider/QueryProvider'
+import * as Sentry from '@sentry/browser'
 
 const messages = defineMessages({
   queryError: {
@@ -102,6 +103,8 @@ export class ReviewFormView extends React.Component<IProps> {
                 )
               }
               if (error) {
+                Sentry.captureException(error)
+
                 return (
                   <ErrorText id="review-error-text">
                     {intl.formatMessage(messages.queryError)}

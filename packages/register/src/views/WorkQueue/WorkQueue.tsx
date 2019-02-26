@@ -59,6 +59,7 @@ import { createNamesMap } from 'src/utils/data-formating'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { messages as rejectionMessages } from 'src/review/reject-registration'
 import { formatLongDate } from 'src/utils/date-formatting'
+import * as Sentry from '@sentry/browser'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
@@ -1255,6 +1256,8 @@ export class WorkQueueView extends React.Component<
                   )
                 }
                 if (error) {
+                  Sentry.captureException(error)
+
                   return (
                     <ErrorText id="work-queue-error-text">
                       {intl.formatMessage(messages.queryError)}

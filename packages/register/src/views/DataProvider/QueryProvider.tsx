@@ -4,6 +4,7 @@ import { Event, Action } from 'src/forms'
 import { getBirthQueryMappings } from './birth/queries'
 import { getDeathQueryMappings } from './death/queries'
 import { Query } from 'react-apollo'
+import * as Sentry from '@sentry/browser'
 
 interface IQueryProviderProps {
   event: Event
@@ -40,6 +41,10 @@ class QueryProviderComponent extends React.Component<IProps> {
         variables={this.props.payload || {}}
       >
         {({ loading, error, data }) => {
+          if (error) {
+            Sentry.captureException(error)
+          }
+
           return (
             <QueryContext.Provider
               value={{

@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { resolve } from 'url'
+import * as Sentry from '@sentry/browser'
 
 export interface ICodeVerifyData {
   nonce: string
@@ -34,8 +35,8 @@ function request<T>(options: AxiosRequestConfig) {
       // other than 2xx
     } else {
       // Something else happened while setting up the request
-      // TODO: replace with call to Sentry
       console.error('Error Message:', error.message)
+      Sentry.captureException(error)
     }
 
     throw error
