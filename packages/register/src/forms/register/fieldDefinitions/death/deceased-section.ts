@@ -9,7 +9,7 @@ import {
   NUMBER,
   RADIO_GROUP,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
-  LOADER_BUTTON
+  FETCH_BUTTON
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
@@ -45,7 +45,14 @@ import {
   addressToFieldTransformer,
   sameAddressFieldTransformer
 } from 'src/forms/mappings/query/field-mappings'
-import { FETCH_DECEASED } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
+import {
+  FETCH_REGISTRATION,
+  transformRegistrationData
+} from '@opencrvs/register/src/forms/register/queries/registration'
+import {
+  FETCH_PERSON,
+  transformPersonData
+} from '@opencrvs/register/src/forms/register/queries/person'
 
 const messages = defineMessages({
   deceasedTab: {
@@ -93,9 +100,19 @@ const messages = defineMessages({
     defaultMessage: 'No registration found for provided BRN',
     description: 'Label for fetch modal error title'
   },
+  fetchPersonByNIDModalErrorText: {
+    id: 'formFields.fetchPersonByNIDModalErrorText',
+    defaultMessage: 'No person found for provided NID',
+    description: 'Label for fetch modal error title'
+  },
   fetchDeceasedModalInfo: {
     id: 'formFields.fetchDeceasedModalInfo',
     defaultMessage: 'Birth Registration Number',
+    description: 'Label for loader button'
+  },
+  fetchPersonByNIDModalInfo: {
+    id: 'formFields.fetchPersonByNIDModalInfo',
+    defaultMessage: 'National ID',
     description: 'Label for loader button'
   },
   deceasedGivenNames: {
@@ -234,26 +251,46 @@ export const deceasedSection: IFormSection = {
       }
     },
     {
-      name: 'loaderButton',
-      type: LOADER_BUTTON,
+      name: 'fetchButton',
+      type: FETCH_BUTTON,
       label: messages.fetchDeceasedDetails,
       required: false,
       initialValue: '',
-      query: FETCH_DECEASED,
-      inputs: [
-        {
-          name: 'identifier',
-          valueField: 'iD',
-          labelField: 'iDType'
+      queryMap: {
+        BIRTH_REGISTRATION_NUMBER: {
+          query: FETCH_REGISTRATION,
+          inputs: [
+            {
+              name: 'identifier',
+              valueField: 'iD'
+            }
+          ],
+          responseTransformer: transformRegistrationData,
+          modalInfoText: messages.fetchDeceasedModalInfo,
+          errorText: messages.fetchDeceasedModalErrorText
+        },
+        NATIONAL_ID: {
+          query: FETCH_PERSON,
+          inputs: [
+            {
+              name: 'identifier',
+              valueField: 'iD'
+            }
+          ],
+          responseTransformer: transformPersonData,
+          modalInfoText: messages.fetchPersonByNIDModalInfo,
+          errorText: messages.fetchPersonByNIDModalErrorText
         }
-      ],
+      },
+      querySelectorInput: {
+        name: 'identifierType',
+        valueField: 'iDType'
+      },
       validate: [],
-      conditionals: [conditionals.deceasedBRNSelected],
+      conditionals: [conditionals.deceasedIDSelected],
       modalTitle: messages.fetchDeceasedModalTitle,
-      modalInfoText: messages.fetchDeceasedModalInfo,
       successTitle: messages.fetchDeceasedModalSuccessTitle,
-      errorTitle: messages.fetchDeceasedModalErrorTitle,
-      errorText: messages.fetchDeceasedModalErrorText
+      errorTitle: messages.fetchDeceasedModalErrorTitle
     },
     {
       name: 'firstNames',

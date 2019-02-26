@@ -26,7 +26,7 @@ import {
   getFieldLabel,
   getFieldOptionsByValueMapper,
   getFieldType,
-  getInputValues
+  getQueryData
 } from 'src/forms/utils'
 
 import styled, { keyframes } from 'src/styled-components'
@@ -62,7 +62,7 @@ import {
   IDynamicListFormField,
   IListFormField,
   IFormData,
-  LOADER_BUTTON,
+  FETCH_BUTTON,
   ILoaderButton
 } from 'src/forms'
 
@@ -74,10 +74,9 @@ import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
 
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
-import { LoaderButtonField } from './LoaderButton'
+import { FetchButtonField } from './FetchButton'
 
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
-import { transformDeceasedData } from '@opencrvs/register/src/forms/register/fieldDefinitions/death/deceased-loader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -302,19 +301,16 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === LOADER_BUTTON) {
+  if (fieldDefinition.type === FETCH_BUTTON) {
     return (
-      <LoaderButtonField
+      <FetchButtonField
         id={fieldDefinition.name}
-        query={fieldDefinition.query}
+        queryData={fieldDefinition.queryData}
         modalTitle={fieldDefinition.modalTitle}
         label={fieldDefinition.label}
-        modalInfoText={fieldDefinition.modalInfoText}
         successTitle={fieldDefinition.successTitle}
-        errorText={fieldDefinition.errorText}
         errorTitle={fieldDefinition.errorTitle}
         onFetch={fieldDefinition.onFetch}
-        variables={fieldDefinition.variables}
       />
     )
   }
@@ -407,7 +403,6 @@ class FormSectionComponent extends React.Component<Props> {
     const errors = (this.props.errors as any) as {
       [key: string]: IValidationResult[]
     }
-
     /*
      * HACK
      *
@@ -470,18 +465,13 @@ class FormSectionComponent extends React.Component<Props> {
                     field.dynamicItems.valueMapper
                   )
                 } as IListFormField)
-              : field.type === LOADER_BUTTON
+              : field.type === FETCH_BUTTON
               ? ({
                   ...field,
-                  variables: getInputValues(field as ILoaderButton, values),
+                  queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
-                    const transformedData = transformDeceasedData(response)
-                    const updatedValues = Object.assign(
-                      {},
-                      values,
-                      transformedData
-                    )
+                    const updatedValues = Object.assign({}, values, response)
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)
@@ -490,7 +480,7 @@ class FormSectionComponent extends React.Component<Props> {
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
             field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
-            field.type === LOADER_BUTTON ||
+            field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
           ) {
             return (
