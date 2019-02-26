@@ -7,8 +7,8 @@ import {
   GQLPerson
 } from '@opencrvs/gateway/src/graphql/schema.d'
 
-export const FETCH_DECEASED = gql`
-  query fetchDeceased($identifier: ID!) {
+export const FETCH_REGISTRATION = gql`
+  query fetchRegistration($identifier: ID!) {
     queryRegistrationByIdentifier(identifier: $identifier) {
       id
       child {
@@ -24,7 +24,7 @@ export const FETCH_DECEASED = gql`
     }
   }
 `
-export const transformDeceasedData = (
+export const transformRegistrationData = (
   response: ApolloQueryResult<GQLQuery>
 ) => {
   const responseData = response.data
