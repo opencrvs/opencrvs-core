@@ -9,7 +9,7 @@ import {
   NUMBER,
   RADIO_GROUP,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
-  LOADER_BUTTON
+  FETCH_BUTTON
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
 import {
@@ -251,8 +251,8 @@ export const deceasedSection: IFormSection = {
       }
     },
     {
-      name: 'loaderButton',
-      type: LOADER_BUTTON,
+      name: 'fetchButton',
+      type: FETCH_BUTTON,
       label: messages.fetchDeceasedDetails,
       required: false,
       initialValue: '',

@@ -18,13 +18,13 @@ const messages = defineMessages({
     description: 'Back button text in the modal'
   },
   cancel: {
-    id: 'formFields.loaderButton.cancel',
+    id: 'formFields.FetchButton.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal'
   }
 })
 
-interface ILoaderButtonProps {
+interface IFetchButtonProps {
   id: string
   queryData?: IQuery
   label: string
@@ -35,7 +35,7 @@ interface ILoaderButtonProps {
   onFetch?: (response: any) => void
 }
 
-interface ILoaderButtonState {
+interface IFetchButtonState {
   response?: ApolloQueryResult<GQLQuery>
   error?: boolean
   success?: boolean
@@ -43,7 +43,7 @@ interface ILoaderButtonState {
   show?: boolean
 }
 
-type IFullProps = ILoaderButtonProps & InjectedIntlProps
+type IFullProps = IFetchButtonProps & InjectedIntlProps
 
 const Container = styled.div`
   display: flex;
@@ -112,7 +112,7 @@ const StyledPrimaryButton = styled(PrimaryButton)`
     }`
   }}
 `
-class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
+class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -234,4 +234,4 @@ class LoaderButton extends React.Component<IFullProps, ILoaderButtonState> {
   }
 }
 
-export const LoaderButtonField = injectIntl<IFullProps>(LoaderButton)
+export const FetchButtonField = injectIntl<IFullProps>(FetchButton)

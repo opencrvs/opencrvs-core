@@ -857,7 +857,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.fetchDeceasedModalErrorTitle': 'অকার্যকর আইডি',
     'formFields.fetchDeceasedModalErrorText':
       'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
-    'formFields.loaderButton.cancel': 'বাতিল',
+    'formFields.fetchButton.cancel': 'বাতিল',
     'formFields.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
     'formFields.fetchDeceasedModalInfo': 'জন্ম নিবন্ধন নম্বর',
     'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন}

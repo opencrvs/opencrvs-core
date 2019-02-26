@@ -28,7 +28,7 @@ export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
-export const LOADER_BUTTON = 'LOADER_BUTTON'
+export const FETCH_BUTTON = 'FETCH_BUTTON'
 
 import { defineMessages } from 'react-intl'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
@@ -246,7 +246,7 @@ export interface IQueryMap {
   [key: string]: IQuery
 }
 export interface ILoaderButton extends IFormFieldBase {
-  type: typeof LOADER_BUTTON
+  type: typeof FETCH_BUTTON
   queryMap: IQueryMap
   queryData?: IQuery
   querySelectorInput: IFieldInput
@@ -466,7 +466,7 @@ export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
 }
 
 export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
-  type: typeof LOADER_BUTTON
+  type: typeof FETCH_BUTTON
   queryMap: IQueryMap
   queryData?: IQuery
   querySelectorInput: IFieldInput

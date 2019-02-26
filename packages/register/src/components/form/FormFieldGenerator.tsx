@@ -62,7 +62,7 @@ import {
   IDynamicListFormField,
   IListFormField,
   IFormData,
-  LOADER_BUTTON,
+  FETCH_BUTTON,
   ILoaderButton
 } from 'src/forms'
 
@@ -74,7 +74,7 @@ import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
 
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
-import { LoaderButtonField } from './LoaderButton'
+import { FetchButtonField } from './FetchButton'
 
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
 
@@ -301,9 +301,9 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === LOADER_BUTTON) {
+  if (fieldDefinition.type === FETCH_BUTTON) {
     return (
-      <LoaderButtonField
+      <FetchButtonField
         id={fieldDefinition.name}
         queryData={fieldDefinition.queryData}
         modalTitle={fieldDefinition.modalTitle}
@@ -465,7 +465,7 @@ class FormSectionComponent extends React.Component<Props> {
                     field.dynamicItems.valueMapper
                   )
                 } as IListFormField)
-              : field.type === LOADER_BUTTON
+              : field.type === FETCH_BUTTON
               ? ({
                   ...field,
                   queryData: getQueryData(field as ILoaderButton, values),
@@ -480,7 +480,7 @@ class FormSectionComponent extends React.Component<Props> {
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
             field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
-            field.type === LOADER_BUTTON ||
+            field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
           ) {
             return (

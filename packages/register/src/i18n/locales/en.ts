@@ -867,7 +867,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.fetchDeceasedModalErrorTitle': 'Invalid Id',
     'formFields.fetchDeceasedModalErrorText':
       'No registration found for provided BRN',
-    'formFields.loaderButton.cancel': 'Cancel',
+    'formFields.fetchButton.cancel': 'Cancel',
     'formFields.fetchDeceasedDetails': "Retrieve Deceased's Details",
     'formFields.fetchDeceasedModalInfo': 'Birth Registration Number',
     'formFields.fetchPersonByNIDModalInfo': 'National ID',

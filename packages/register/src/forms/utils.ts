@@ -18,7 +18,7 @@ import {
   IFormData,
   IDynamicFormFieldValidators,
   IDynamicFormField,
-  LOADER_BUTTON,
+  FETCH_BUTTON,
   ILoaderButton,
   IFieldInput,
   IQuery
@@ -61,7 +61,7 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === LOADER_BUTTON) {
+  if (base.type === FETCH_BUTTON) {
     ;(base as any).modalTitle = intl.formatMessage(
       (field as ILoaderButton).modalTitle
     )
@@ -284,9 +284,14 @@ export function isCityLocation(
 export function getQueryData(
   field: ILoaderButton,
   values: IFormSectionData
-): IQuery {
+): IQuery | undefined {
   const selectedValue = values[field.querySelectorInput.valueField] as string
   const queryData = field.queryMap[selectedValue]
+
+  if (!queryData) {
+    return
+  }
+
   const variables = getInputValues(queryData.inputs, values)
   queryData.variables = variables
   return queryData
@@ -486,7 +491,7 @@ export const conditionals: IConditionals = {
   deceasedIDSelected: {
     action: 'hide',
     expression:
-      '(!values.iDType && (values.iDType !== "BIRTH_REGISTRATION_NUMBER" || values.iDType !== "NATIONAL_ID"))'
+      '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
   },
   otherRelationship: {
     action: 'hide',

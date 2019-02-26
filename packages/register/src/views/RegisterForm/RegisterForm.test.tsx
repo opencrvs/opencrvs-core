@@ -186,7 +186,7 @@ describe('when user is in the register form for death event', async () => {
       )
       component = testComponent.component
       selectOption(component, '#iDType', 'Birth Registration Number')
-      expect(component.find('#loaderButton').hostNodes()).toHaveLength(1)
+      expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
     it('renders loader button when idType is National ID', () => {
@@ -210,7 +210,7 @@ describe('when user is in the register form for death event', async () => {
       )
       component = testComponent.component
       selectOption(component, '#iDType', 'National ID')
-      expect(component.find('#loaderButton').hostNodes()).toHaveLength(1)
+      expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
     it('fetches deceased information by entered BRN', async () => {
@@ -283,7 +283,7 @@ describe('when user is in the register form for death event', async () => {
         setTimeout(resolve, 200)
       })
       component
-        .find('#loaderButton')
+        .find('#fetchButton')
         .hostNodes()
         .childAt(0)
         .childAt(0)
@@ -401,7 +401,7 @@ describe('when user is in the register form for death event', async () => {
         setTimeout(resolve, 200)
       })
       component
-        .find('#loaderButton')
+        .find('#fetchButton')
         .hostNodes()
         .childAt(0)
         .childAt(0)
@@ -472,7 +472,7 @@ describe('when user is in the register form for death event', async () => {
       component.update()
 
       component
-        .find('#loaderButton')
+        .find('#fetchButton')
         .hostNodes()
         .childAt(0)
         .childAt(0)
@@ -541,7 +541,7 @@ describe('when user is in the register form for death event', async () => {
       component.update()
 
       component
-        .find('#loaderButton')
+        .find('#fetchButton')
         .hostNodes()
         .childAt(0)
         .childAt(0)
