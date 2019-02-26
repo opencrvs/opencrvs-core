@@ -793,9 +793,11 @@ export const BENGALI_STATE: ILanguage = {
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'register.workQueue.labels.results.birthRegistrationNumber':
       'জন্ম নিবন্ধন সংখ্যা',
-    'register.work-queue.certificate.header': 'জন্ম নিবন্ধন রশিদ',
+    'register.workQueue.labels.results.deathRegistrationNumber':
+      'মৃত্যু নিবন্ধন সংখ্যা',
+    'register.work-queue.certificate.header': '{event} নিবন্ধন রশিদ',
     'register.work-queue.certificate.subheader':
-      'জন্মদিবসের {DOBDiff} পর জন্ম নিবন্ধন',
+      '{DOE} {DOBDiff} পর {event} নিবন্ধন',
     'register.work-queue.certificate.service': 'সেবা: ',
     'register.work-queue.certificate.amount': 'পরিশোধিত মূল্য: \n\n',
     'register.work-queue.certificate.issuer':
@@ -904,7 +906,11 @@ export const BENGALI_STATE: ILanguage = {
       declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}
       registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
       duplication{সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
-      rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।}
-      offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `
+      rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।} 
+      offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `,
+    'register.event.dob': 'জন্মদিবসের',
+    'register.event.dod': 'মৃত্যুদিবসের',
+    'register.event.death': 'মৃত্যু',
+    'register.event.birth': 'জন্ম'
   }
 }
