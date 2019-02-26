@@ -54,7 +54,17 @@ export const typeResolvers: GQLResolver = {
       return name.family.join(' ')
     }
   },
-
+  IdentityType: {
+    id: identifier => {
+      return identifier.value
+    },
+    type: identifier => {
+      return identifier.type
+    },
+    otherType: identifier => {
+      return identifier.otherType
+    }
+  },
   Person: {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
     dateOfMarriage: person => {
@@ -113,6 +123,9 @@ export const typeResolvers: GQLResolver = {
     }
   },
   RelatedPerson: {
+    id: relatedPerson => {
+      return relatedPerson && relatedPerson.id
+    },
     relationship: relatedPerson => {
       return (
         relatedPerson &&
@@ -451,6 +464,11 @@ export const typeResolvers: GQLResolver = {
     address: location => location.address
   },
   DeathRegistration: {
+    async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+      return {
+        composition: composition.id
+      }
+    },
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
@@ -526,7 +544,10 @@ export const typeResolvers: GQLResolver = {
         (observations &&
           observations.entry &&
           observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
+          observations.entry[0].resource.valueCodeableConcept &&
+          observations.entry[0].resource.valueCodeableConcept.coding &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
         null
       )
     },
@@ -552,7 +573,10 @@ export const typeResolvers: GQLResolver = {
         (observations &&
           observations.entry &&
           observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
+          observations.entry[0].resource.valueCodeableConcept &&
+          observations.entry[0].resource.valueCodeableConcept.coding &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
         null
       )
     },
