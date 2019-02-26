@@ -681,6 +681,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
     'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
+    'register.workQueue.labels.results.eventRegistrationNumber':
+      '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
     'register.workQueue.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',
@@ -802,9 +804,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.buttons.newRegistration': 'New registration',
     'register.workQueue.buttons.reviewAndRegister': 'Review and Register',
     'register.work-queue.certificate.header':
-      'Receipt for Birth Certificate of',
+      'Receipt for {event} Certificate of',
     'register.work-queue.certificate.subheader':
-      'Birth Registration after {DOBDiff} of D.o.B',
+      '{event} Registration after {DOBDiff} of {DOE}',
     'register.work-queue.certificate.service': 'Service: ',
     'register.work-queue.certificate.amount': 'Amount paid:\n\n',
     'register.work-queue.certificate.issuer':
@@ -907,6 +909,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.}
     duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.}
     certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.}
-    offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`
+    offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`,
+    'register.event.dob': 'D.o.B',
+    'register.event.dod': 'D.o.D',
+    'register.event.death': 'Death',
+    'register.event.birth': 'Birth'
   }
 }

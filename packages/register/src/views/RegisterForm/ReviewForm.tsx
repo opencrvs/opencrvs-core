@@ -25,6 +25,7 @@ import {
   QueryProvider,
   QueryContext
 } from 'src/views/DataProvider/QueryProvider'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 
 const messages = defineMessages({
   queryError: {
@@ -145,7 +146,12 @@ function getEvent(eventType: string) {
 
 function mapStatetoProps(
   state: IStoreState,
-  props: RouteComponentProps<{ tabId: string; draftId: string; event: string }>
+  props: RouteComponentProps<{
+    tabRoute: string
+    tabId: string
+    draftId: string
+    event: string
+  }>
 ) {
   const { match, history } = props
   if (!match.params.event) {
@@ -162,6 +168,7 @@ function mapStatetoProps(
     draftId: match.params.draftId,
     event: getEvent(match.params.event),
     registerForm: form,
+    tabRoute: REVIEW_EVENT_PARENT_FORM_TAB,
     duplicate: history.location.state && history.location.state.duplicate
   }
 }

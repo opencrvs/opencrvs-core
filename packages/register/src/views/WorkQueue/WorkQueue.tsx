@@ -283,7 +283,13 @@ const messages = defineMessages({
   listItemDeathRegistrationNumber: {
     id: 'register.workQueue.labels.results.deathRegistrationNumber',
     defaultMessage: 'DRN',
-    description: 'Label for BRN in work queue list item'
+    description: 'Label for DRN in work queue list item'
+  },
+  listItemEventRegistrationNumber: {
+    id: 'register.workQueue.labels.results.eventRegistrationNumber',
+    defaultMessage:
+      '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
+    description: 'Label for event registration number in work queue list item'
   },
   listItemDuplicateLabel: {
     id: 'register.workQueue.labels.results.duplicate',
@@ -918,9 +924,8 @@ export class WorkQueueView extends React.Component<
     if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
-          item.dob
-            ? messages.listItemBirthRegistrationNumber
-            : messages.listItemDeathRegistrationNumber
+          messages.listItemEventRegistrationNumber,
+          { event: item.event.toLowerCase() }
         ),
         value: item.registrationNumber
       })
