@@ -13,43 +13,46 @@ import * as routes from './navigation/routes'
 import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from './views/StepOne/StepOneContainer'
 import { ManagerViewContainer } from './views/Manager/ManagerView'
+import { ErrorBoundary } from './ErrorBoundary'
 
 export const store = createStore()
 export class App extends React.Component {
   public render() {
     return (
-      <Provider store={store}>
-        <IntlContainer>
-          <ThemeProvider
-            theme={getTheme(
-              (window as Window & { config: { [key: string]: string } }).config
-                .COUNTRY
-            )}
-          >
-            <ConnectedRouter history={history}>
-              <PageContainer>
-                <Switch>
-                  <Route
-                    exact
-                    path={routes.STEP_ONE}
-                    component={StepOneContainer}
-                  />
-                  <Route
-                    exact
-                    path={routes.STEP_TWO}
-                    component={StepTwoContainer}
-                  />
-                  <Route
-                    exact
-                    path={routes.MANAGER}
-                    component={ManagerViewContainer}
-                  />
-                </Switch>
-              </PageContainer>
-            </ConnectedRouter>
-          </ThemeProvider>
-        </IntlContainer>
-      </Provider>
+      <ErrorBoundary>
+        <Provider store={store}>
+          <IntlContainer>
+            <ThemeProvider
+              theme={getTheme(
+                (window as Window & { config: { [key: string]: string } })
+                  .config.COUNTRY
+              )}
+            >
+              <ConnectedRouter history={history}>
+                <PageContainer>
+                  <Switch>
+                    <Route
+                      exact
+                      path={routes.STEP_ONE}
+                      component={StepOneContainer}
+                    />
+                    <Route
+                      exact
+                      path={routes.STEP_TWO}
+                      component={StepTwoContainer}
+                    />
+                    <Route
+                      exact
+                      path={routes.MANAGER}
+                      component={ManagerViewContainer}
+                    />
+                  </Switch>
+                </PageContainer>
+              </ConnectedRouter>
+            </ThemeProvider>
+          </IntlContainer>
+        </Provider>
+      </ErrorBoundary>
     )
   }
 }

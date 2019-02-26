@@ -17,6 +17,7 @@ import { Home } from 'src/views/home/Home'
 import { ConnectedRouter } from 'react-router-redux'
 import { client } from 'src/utils/apolloClient'
 import { ApolloProvider } from 'react-apollo'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -36,21 +37,27 @@ export class App extends React.Component<IAppProps, {}> {
   }
   public render() {
     return (
-      <ApolloProvider client={this.props.client || client}>
-        <Provider store={this.props.store}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
-              <ConnectedRouter history={this.props.history}>
-                <Page>
-                  <Switch>
-                    <ProtectedRoute exact path={routes.HOME} component={Home} />
-                  </Switch>
-                </Page>
-              </ConnectedRouter>
-            </ThemeProvider>
-          </I18nContainer>
-        </Provider>
-      </ApolloProvider>
+      <ErrorBoundary>
+        <ApolloProvider client={this.props.client || client}>
+          <Provider store={this.props.store}>
+            <I18nContainer>
+              <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
+                <ConnectedRouter history={this.props.history}>
+                  <Page>
+                    <Switch>
+                      <ProtectedRoute
+                        exact
+                        path={routes.HOME}
+                        component={Home}
+                      />
+                    </Switch>
+                  </Page>
+                </ConnectedRouter>
+              </ThemeProvider>
+            </I18nContainer>
+          </Provider>
+        </ApolloProvider>
+      </ErrorBoundary>
     )
   }
 }
