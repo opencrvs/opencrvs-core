@@ -472,7 +472,6 @@ class FormSectionComponent extends React.Component<Props> {
                   draftData: draftData as IFormData,
                   onFetch: response => {
                     const updatedValues = Object.assign({}, values, response)
-                    console.log(updatedValues)
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)

@@ -30,6 +30,7 @@ import { draftToGqlTransformer } from 'src/transformer'
 import { IForm } from 'src/forms'
 import { clone } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
+import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
@@ -188,6 +189,30 @@ describe('when user is in the register form for death event', async () => {
       expect(component.find('#loaderButton').hostNodes()).toHaveLength(1)
     })
 
+    it('renders loader button when idType is National ID', () => {
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+      selectOption(component, '#iDType', 'National ID')
+      expect(component.find('#loaderButton').hostNodes()).toHaveLength(1)
+    })
+
     it('fetches deceased information by entered BRN', async () => {
       const graphqlMock = [
         {
@@ -249,21 +274,132 @@ describe('when user is in the register form for death event', async () => {
       component = testComponent.component
       selectOption(component, '#iDType', 'Birth Registration Number')
 
-      const input = component.find('input#iD')
-      // @ts-ignore
-      input
-        .props()
-        // @ts-ignore
-        .onChange({
-          // @ts-ignore
-          target: {
-            // @ts-ignore
-            id: 'iD',
-            value: '2019333494BQNXOHJ2'
-          }
-        })
+      component.find('input#iD').simulate('change', {
+        target: { id: 'iD', value: '2019333494BQNXOHJ2' }
+      })
+
+      component.update()
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
+      component
+        .find('#loaderButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
       component.update()
 
+      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
+        1
+      )
+    })
+
+    it('fetches deceased information by entered NID', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_PERSON,
+            variables: {
+              identifier: '1234567898765'
+            }
+          },
+          result: {
+            data: {
+              queryPersonByIdentifier: {
+                id: '26499e5c-72a2-42f6-b8e6-1ffc99b5311e',
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: 'গায়ত্রী',
+                    familyName: 'স্পিভক'
+                  },
+                  {
+                    use: 'en',
+                    firstNames: 'Gayatri',
+                    familyName: 'Spivak'
+                  }
+                ],
+                birthDate: '2018-08-01',
+                gender: 'female',
+                address: [
+                  {
+                    line: [
+                      '40',
+                      '',
+                      'My street',
+                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
+                      '',
+                      '3f65c407-e249-4096-9291-404f9e682897'
+                    ],
+                    type: 'PERMANENT',
+                    city: null,
+                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
+                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
+                    postalCode: '10024',
+                    country: 'BGD'
+                  },
+                  {
+                    line: [
+                      '40',
+                      '',
+                      'My street',
+                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
+                      '',
+                      '3f65c407-e249-4096-9291-404f9e682897'
+                    ],
+                    type: 'CURRENT',
+                    city: null,
+                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
+                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
+                    postalCode: '10024',
+                    country: 'BGD'
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component = testComponent.component
+      selectOption(component, '#iDType', 'National ID')
+
+      component.find('input#iD').simulate('change', {
+        target: { id: 'iD', value: '1234567898765' }
+      })
+
+      component.update()
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
       component
         .find('#loaderButton')
         .hostNodes()
@@ -331,6 +467,75 @@ describe('when user is in the register form for death event', async () => {
             // @ts-ignore
             id: 'iD',
             value: '2019333494BQNXOHJ2'
+          }
+        })
+      component.update()
+
+      component
+        .find('#loaderButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+
+      expect(component.find('#loader-button-error').hostNodes()).toHaveLength(1)
+    })
+
+    it('displays error message if no registration found by NID', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_PERSON,
+            variables: {
+              identifier: '1234567898765'
+            }
+          },
+          error: new Error('boom')
+        }
+      ]
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component = testComponent.component
+      selectOption(component, '#iDType', 'National ID')
+
+      const input = component.find('input#iD')
+      // @ts-ignore
+      input
+        .props()
+        // @ts-ignore
+        .onChange({
+          // @ts-ignore
+          target: {
+            // @ts-ignore
+            id: 'iD',
+            value: '1234567898765'
           }
         })
       component.update()

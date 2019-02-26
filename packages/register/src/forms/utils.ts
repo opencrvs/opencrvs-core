@@ -292,21 +292,6 @@ export function getQueryData(
   return queryData
 }
 
-// export function getQuery(field: ILoaderButton, values: IFormSectionData) {
-//   const selectedValue = values[field.querySelectorInput.valueField] as string
-//   return field.queryMap[selectedValue] && field.queryMap[selectedValue].query
-// }
-
-// export function getResponseTransformer(
-//   field: ILoaderButton,
-//   values: IFormSectionData
-// ) {
-//   const selectedValue = values[field.querySelectorInput.valueField] as string
-//   return (
-//     field.queryMap[selectedValue] && field.queryMap[selectedValue].transformer
-//   )
-// }
-
 export function getInputValues(
   inputs: IFieldInput[],
   values: IFormSectionData
