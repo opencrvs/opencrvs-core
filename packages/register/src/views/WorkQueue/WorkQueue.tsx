@@ -247,6 +247,11 @@ const messages = defineMessages({
     defaultMessage: 'Collected',
     description: 'Label for the filter by collected option'
   },
+  filtersRejected: {
+    id: 'register.workQueue.labels.statuses.rejected',
+    defaultMessage: 'Rejected',
+    description: 'Label for the filter by rejected option'
+  },
   filtersAllLocations: {
     id: 'register.workQueue.labels.locations.all',
     defaultMessage: 'All locations',
@@ -1203,6 +1208,10 @@ export class WorkQueueView extends React.Component<
               {
                 value: 'CERTIFIED',
                 label: intl.formatMessage(messages.filtersCollected)
+              },
+              {
+                value: 'REJECTED',
+                label: intl.formatMessage(messages.filtersRejected)
               }
             ],
             value: this.state.filter.declarationStatus
@@ -1245,7 +1254,6 @@ export class WorkQueueView extends React.Component<
               }}
             >
               {({ loading, error, data, refetch }) => {
-                console.log(error)
                 if (loading) {
                   return (
                     <StyledSpinner
@@ -1304,8 +1312,8 @@ export class WorkQueueView extends React.Component<
                           }
                         })
                         refetch({
-                          event: this.state.filter.event,
-                          status: this.state.filter.declarationStatus,
+                          event: values.event,
+                          status: values.declaration_status,
                           count: this.pageSize,
                           skip: (this.state.currentPage - 1) * this.pageSize
                         })
