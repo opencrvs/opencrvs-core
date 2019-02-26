@@ -595,7 +595,7 @@ export const BENGALI_STATE: ILanguage = {
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
     'register.selectVitalEvent.registerNewEventTitle': 'একটি নতুন ইভেন্ট ঘোষণা',
-    'register.home.buttons.registerNewEvent': 'নতুন জন্ম ঘোষণা',
+    'register.home.buttons.registerNewEvent': 'নতুন ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়াগুলি',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
     'register.home.buttons.completedSumissions': 'সমাপ্ত জমাগুলি',
@@ -795,9 +795,11 @@ export const BENGALI_STATE: ILanguage = {
       'জন্ম নিবন্ধন সংখ্যা',
     'register.workQueue.labels.results.eventRegistrationNumber':
       '{event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} নিবন্ধন সংখ্যা',
-    'register.work-queue.certificate.header': 'জন্ম নিবন্ধন রশিদ',
+    'register.workQueue.labels.results.deathRegistrationNumber':
+      'মৃত্যু নিবন্ধন সংখ্যা',
+    'register.work-queue.certificate.header': '{event} নিবন্ধন রশিদ',
     'register.work-queue.certificate.subheader':
-      'জন্মদিবসের {DOBDiff} পর জন্ম নিবন্ধন',
+      '{DOE} {DOBDiff} পর {event} নিবন্ধন',
     'register.work-queue.certificate.service': 'সেবা: ',
     'register.work-queue.certificate.amount': 'পরিশোধিত মূল্য: \n\n',
     'register.work-queue.certificate.issuer':
@@ -906,7 +908,11 @@ export const BENGALI_STATE: ILanguage = {
       declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}
       registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
       duplication{সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
-      rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।}
-      offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `
+      rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।} 
+      offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `,
+    'register.event.dob': 'জন্মদিবসের',
+    'register.event.dod': 'মৃত্যুদিবসের',
+    'register.event.death': 'মৃত্যু',
+    'register.event.birth': 'জন্ম'
   }
 }

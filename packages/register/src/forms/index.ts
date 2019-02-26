@@ -110,7 +110,12 @@ export interface IFieldInput {
   valueField: string
 }
 
-export type IFormFieldValue = string | string[] | boolean | IFileValue[]
+export type IFormFieldValue =
+  | string
+  | string[]
+  | boolean
+  | IFileValue[]
+  | { [key: string]: string }
 
 export type IFileValue = {
   optionValues: IFormFieldValue[]
