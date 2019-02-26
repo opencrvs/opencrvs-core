@@ -71,22 +71,6 @@ export const internationaliseFieldObject = (
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
     )
-    // const queryData = (field as ILoaderButton).queryData
-    // if (queryData && typeof queryData.modalInfoText !== 'string') {
-    //   console.log(field)
-    //   // @ts-ignore
-    //   base.queryData.modalInfoText = intl.formatMessage(
-    //     // @ts-ignore
-    //     field.queryData.modalInfoText
-    //   )
-    // }
-    // if (queryData && typeof queryData.errorText !== 'string') {
-    //   // @ts-ignore
-    //   base.queryData.errorText = intl.formatMessage(
-    //     // @ts-ignore
-    //     field.queryData.errorText
-    //   )
-    // }
   }
 
   return base as Ii18nFormField
