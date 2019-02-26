@@ -743,7 +743,7 @@ class PrintCertificateActionComponent extends React.Component<
     }
     if (event === Event.DEATH) {
       names = data.deceased.name as Array<{ [key: string]: {} }>
-      eventDateTime = data.deceased.deceasedDateTime
+      eventDateTime = data.deceased.deceased.deathDate
     }
 
     const NameBn = names && names.find(name => name.use === 'bn')
