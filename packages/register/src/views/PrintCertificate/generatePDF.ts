@@ -29,6 +29,18 @@ const messages = defineMessages({
   },
   certificateService: {
     id: 'register.work-queue.certificate.service'
+  },
+  death: {
+    id: 'register.event.death'
+  },
+  birth: {
+    id: 'register.event.birth'
+  },
+  dod: {
+    id: 'register.event.dod'
+  },
+  dob: {
+    id: 'register.event.dob'
   }
 })
 
@@ -83,25 +95,49 @@ const certificateDefinitionText = {
   }
 }
 
+const moneyReceiptDefinitionText = (event: string, intl: InjectedIntl) => {
+  const definitionMap = {
+    [Event.BIRTH]: {
+      EVENT: intl.formatMessage(messages.birth),
+      DOE: intl.formatMessage(messages.dob)
+    },
+    [Event.DEATH]: {
+      EVENT: intl.formatMessage(messages.death),
+      DOE: intl.formatMessage(messages.dod)
+    },
+    DEAFULT: {
+      EVENT: '',
+      DOE: ''
+    }
+  }
+
+  return event in definitionMap ? definitionMap[event] : definitionMap.DEAFULT
+}
+
 export function generateMoneyReceipt(
   intl: InjectedIntl,
   registrant: Registrant,
   IssuerDetails: Issuer,
   amount: string,
-  language: string
+  language: string,
+  event: string
 ) {
-  moment.lang(language)
+  moment.locale(language)
+  const eventText = moneyReceiptDefinitionText(event, intl).EVENT
+  const DOE = moneyReceiptDefinitionText(event, intl).DOE
   const dateOfPayment = moment().format(CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT)
   const docDefinition = {
     info: {
-      title: 'Receipt-for-Birth-Certificate'
+      title: `Receipt-for-${event}-certificate`
     },
     defaultStyle: {
       font: 'notosans'
     },
     content: [
       {
-        text: intl.formatMessage(messages.certificateHeader),
+        text: intl.formatMessage(messages.certificateHeader, {
+          event: eventText
+        }),
         style: 'header'
       },
       {
@@ -112,11 +148,15 @@ export function generateMoneyReceipt(
       {
         text: [
           {
-            text: intl.formatMessage(messages.certificateService)
+            text: intl.formatMessage(messages.certificateService, {
+              event: eventText
+            })
           },
           {
             text: intl.formatMessage(messages.certificateSubHeader, {
-              DOBDiff: registrant.DOBDiff
+              event: eventText,
+              DOBDiff: registrant.DOBDiff,
+              DOE
             }),
             style: 'subheader'
           }
