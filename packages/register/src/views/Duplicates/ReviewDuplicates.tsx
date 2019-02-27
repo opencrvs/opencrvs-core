@@ -255,7 +255,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
 }
 export const rejectMutation = gql`
   mutation submitBirthAsRejected($id: String!, $reason: String!) {
-    markBirthAsVoided(id: $id, reason: $reason)
+    markEventAsVoided(id: $id, reason: $reason)
   }
 `
 export const notADuplicateMutation = gql`
