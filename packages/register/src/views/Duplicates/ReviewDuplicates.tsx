@@ -452,6 +452,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             }
 
             if (
+              !data.fetchBirthRegistration.registration.duplicates ||
               data.fetchBirthRegistration.registration.duplicates.length <= 0
             ) {
               window.location.assign(WORK_QUEUE)
