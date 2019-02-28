@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/register",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha.1",
   "private": true,
   "dependencies": {
     "@opencrvs/components": "^0.1.0",
