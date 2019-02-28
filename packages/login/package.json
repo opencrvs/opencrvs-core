@@ -3,7 +3,7 @@
   "version": "1.0.0-alpha.1",
   "private": true,
   "dependencies": {
-    "@opencrvs/components": "^0.1.0",
+    "@opencrvs/components": "^1.0.0-alpha.1",
     "@sentry/browser": "^4.6.3",
     "@types/history": "^4.6.2",
     "@types/react-intl": "^2.3.8",
