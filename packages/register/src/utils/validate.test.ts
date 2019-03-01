@@ -13,7 +13,8 @@ import {
   range,
   validIDNumber,
   maxLength,
-  isValidBirthDate
+  isValidBirthDate,
+  isValidDeathOccurrenceDate
 } from './validate'
 
 describe('validate', () => {
@@ -494,6 +495,49 @@ describe('validate', () => {
     it('should pass when a hyphenated English name is given', () => {
       const goodValue = 'Anne-Marie'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+  })
+
+  describe('isValidDeathOccrenceDate. Checks a given date of death is valid', () => {
+    it('should error when input invalid chararcters', () => {
+      const invalidDate = '1901-+2-2e'
+      expect(isValidDeathOccurrenceDate(invalidDate)).toEqual({
+        message: messages.isValidDateOfDeath
+      })
+    })
+
+    it('should error when input invalid format', () => {
+      const invalidDate = '190-2-21'
+      expect(isValidDeathOccurrenceDate(invalidDate)).toEqual({
+        message: messages.isValidDateOfDeath
+      })
+    })
+
+    it('should error when input invalid date', () => {
+      const invalidDate = '2017-2-29'
+      expect(isValidDeathOccurrenceDate(invalidDate)).toEqual({
+        message: messages.isValidDateOfDeath
+      })
+    })
+
+    it('should error when input a future date', () => {
+      const futureDate = '2099-08-12'
+
+      expect(isValidDeathOccurrenceDate(futureDate)).toEqual({
+        message: messages.isValidDateOfDeath
+      })
+    })
+
+    it('should pass when supplied a valid date with single digit', () => {
+      const validDate = '2011-8-12'
+      const response = undefined
+      expect(isValidDeathOccurrenceDate(validDate)).toEqual(response)
+    })
+
+    it('should pass when supplied a valid date', () => {
+      const validDate = '2011-08-12'
+      const response = undefined
+      expect(isValidDeathOccurrenceDate(validDate)).toEqual(response)
     })
   })
 })

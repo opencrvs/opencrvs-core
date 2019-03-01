@@ -123,6 +123,12 @@ export const messages = defineMessages({
       'The Passport Number can only be alpha numeric and must be {validLength} characters long',
     description:
       'The error message that appears when an invalid value is used as passport number'
+  },
+  isValidDateOfDeath: {
+    id: 'validations.isValidDateOfDeath',
+    defaultMessage: 'Must be a valid date of death',
+    description:
+      'The error message appears when the given date of death is not valid'
   }
 })
 
@@ -416,4 +422,12 @@ export const validIDNumber: ValidationInitializer = (
     default:
       return undefined
   }
+}
+
+export const isValidDeathOccurrenceDate: Validation = (value: string) => {
+  return value && isDateNotInFuture(value) && isAValidDateFormat(value)
+    ? undefined
+    : {
+        message: messages.isValidDateOfDeath
+      }
 }
