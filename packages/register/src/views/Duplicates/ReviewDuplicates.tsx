@@ -540,7 +540,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: this.state.selectedCompositionID,
             reason: 'Duplicate'
           }}
-          onCompleted={data => this.successfulRejection(data.markBirthAsVoided)}
+          onCompleted={data => this.successfulRejection(data.markEventAsVoided)}
         >
           {(submitBirthAsRejected, { data }) => {
             return (
