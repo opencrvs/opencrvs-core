@@ -118,3 +118,19 @@ The applications will be available here:
 ## Setting up a new cluster of servers for OpenCRVS
 
 [See the documentation here](infrastructure/server-setup/README.md)
+
+## Release branches
+
+When doing releases that will require hotfixes we will create a new release branch off `master` with the naming format of `release/<name_of_release>`. E.g. `git checkout -b release/bn-demo`.
+
+All hotfixes that are done for that release should be submitted in a PR against that release branch AS WELL AS submitted to the master branch in another PR if the code is relevent to master as well. Please comment in the PRs with the link to the other PR so that they may be tracked together. The reviewer should look at both and merge them in when they are happy.
+
+## How to do a release
+
+1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together.
+2. Update all dependencies to point to the newly created versions. E.g. `register` depend on `components`, so update the dependency in register to have the new version for the `components` package.
+3. Run `yarn` to ensure there are no version errors.
+4. Run `yarn test` and ensure all passed.
+5. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.1`
+6. Run `git push origin v<version_number>`
+7. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
