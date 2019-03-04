@@ -10,7 +10,7 @@ import {
   NUMBER
 } from 'src/forms'
 import { defineMessages } from 'react-intl'
-import { dateFormat } from 'src/utils/validate'
+import { isValidDeathOccurrenceDate } from 'src/utils/validate'
 import { messages as addressMessages } from '../../../address'
 import { countries } from 'src/forms/countries'
 import { conditionals } from 'src/forms/utils'
@@ -153,7 +153,7 @@ export const eventSection: IFormSection = {
       label: messages.deathDate,
       required: true,
       initialValue: '',
-      validate: [dateFormat],
+      validate: [isValidDeathOccurrenceDate],
       mapping: {
         mutation: fieldToDeceasedDateTransformation('deceased'),
         query: deceasedDateToFieldTransformation('deceased')
