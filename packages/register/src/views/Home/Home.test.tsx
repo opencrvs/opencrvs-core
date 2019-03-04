@@ -77,7 +77,7 @@ describe('when the home page loads for a field worker', () => {
         app.update()
       })
 
-      it('work queue view renders to load list', () => {
+      it('search result view renders to load list', () => {
         expect(app.find('#search-result-spinner').hostNodes()).toHaveLength(1)
       })
     })
