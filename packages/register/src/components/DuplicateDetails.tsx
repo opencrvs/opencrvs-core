@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { goToTab as goToTabAction } from 'src/navigation'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import Moment from 'react-moment'
-import { getRejectionReasonDisplayValue } from 'src/views/WorkQueue/WorkQueue'
+import { getRejectionReasonDisplayValue } from 'src/views/SearchResult/SearchResult'
 
 export enum Event {
   BIRTH = 'BIRTH',
