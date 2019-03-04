@@ -702,7 +702,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Application submitted on',
     'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',
     'register.workQueue.listItem.status.dateLabel.rejected': 'Rejected on',
-    'register.workQueue.listItem.status.dateLabel.collected': 'Collected on',
+    'register.workQueue.listItem.status.dateLabel.collected': 'Printed on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.labels.results.rejectionReason': 'Reason',
     'register.workQueue.print.form.name': 'Print',
