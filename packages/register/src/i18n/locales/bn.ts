@@ -694,7 +694,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.application': 'আবেদন জমা',
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.rejected': 'প্রত্যাখ্যাত',
-    'register.workQueue.listItem.status.dateLabel.collected': 'সংগৃহীত',
+    'register.workQueue.listItem.status.dateLabel.collected': 'মুদ্রণ',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
     'register.workQueue.labels.results.rejectionReason': 'কারণ',
     'register.workQueue.print.form.name': 'মুদ্রণ',
@@ -914,6 +914,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.event.dob': 'জন্মদিবসের',
     'register.event.dod': 'মৃত্যুদিবসের',
     'register.event.death': 'মৃত্যু',
-    'register.event.birth': 'জন্ম'
+    'register.event.birth': 'জন্ম',
+    'validations.isValidDateOfDeath': 'মৃত্যু ঘটনার তারিখ বৈধ হতে হবে'
   }
 }

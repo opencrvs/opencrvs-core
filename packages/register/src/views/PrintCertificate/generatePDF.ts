@@ -494,26 +494,31 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
       },
       [
         {
-          text: data.printDate.en,
-          bold: true,
-          alignment: 'center',
-          margin: [0, 50, 0, 0]
+          margin: [0, 50, 0, 0],
+          columns: [
+            {
+              text: 'Date of issue',
+              alignment: 'right'
+            },
+            {
+              text: data.printDate.en,
+              bold: true
+            }
+          ]
         },
         {
-          text: data.printDate.bn,
-          font: 'notosansbn',
-          bold: true,
-          alignment: 'center'
-        },
-        {
-          text: 'Date of issue',
-          alignment: 'center',
-          margin: [0, 10, 0, 0]
-        },
-        {
-          text: 'প্রদান এর তারিখ',
-          alignment: 'center',
-          font: 'notosansbn'
+          columns: [
+            {
+              text: 'প্রদান এর তারিখ',
+              alignment: 'right',
+              font: 'notosansbn'
+            },
+            {
+              text: data.printDate.bn,
+              font: 'notosansbn',
+              bold: true
+            }
+          ]
         }
       ]
     ],
