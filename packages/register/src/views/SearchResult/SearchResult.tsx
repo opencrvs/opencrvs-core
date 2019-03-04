@@ -592,7 +592,7 @@ const StatusIconCollected = styled.div`
   margin-top: 3px;
 `
 
-interface IBaseWorkQueueProps {
+interface IBaseSearchResultProps {
   theme: ITheme
   language: string
   scope: Scope
@@ -603,12 +603,12 @@ interface IBaseWorkQueueProps {
   goToPrintCertificate: typeof goToPrintCertificateAction
 }
 
-type IWorkQueueProps = InjectedIntlProps &
+type ISearchResultProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps &
-  IBaseWorkQueueProps
+  IBaseSearchResultProps
 
-interface IWorkQueueState {
+interface ISearchResultState {
   printCertificateModalVisible: boolean
   regId: string | null
   currentPage: number
@@ -618,13 +618,13 @@ interface IData {
   [key: string]: unknown
 }
 
-interface IWorkQueueListItem {
+interface ISearchResultListItem {
   [key: string]: IData | string | undefined
 }
 
-export class WorkQueueView extends React.Component<
-  IWorkQueueProps,
-  IWorkQueueState
+export class SearchResultView extends React.Component<
+  ISearchResultProps,
+  ISearchResultState
 > {
   state = { printCertificateModalVisible: false, regId: null, currentPage: 1 }
   pageSize = 10
@@ -824,8 +824,8 @@ export class WorkQueueView extends React.Component<
   }
 
   getApplicationData = (
-    applicationData: IWorkQueueListItem[]
-  ): IWorkQueueListItem[] => {
+    applicationData: ISearchResultListItem[]
+  ): ISearchResultListItem[] => {
     return applicationData.filter(application => {
       if (application.status && application.status[0].type) {
         return application.status[0].type === 'DECLARED'
@@ -1250,7 +1250,7 @@ export class WorkQueueView extends React.Component<
                 if (loading) {
                   return (
                     <StyledSpinner
-                      id="work-queue-spinner"
+                      id="search-result-spinner"
                       baseColor={theme.colors.background}
                     />
                   )
@@ -1259,7 +1259,7 @@ export class WorkQueueView extends React.Component<
                   Sentry.captureException(error)
 
                   return (
-                    <ErrorText id="work-queue-error-text">
+                    <ErrorText id="search-result-error-text">
                       {intl.formatMessage(messages.queryError)}
                     </ErrorText>
                   )
@@ -1320,7 +1320,7 @@ export class WorkQueueView extends React.Component<
     )
   }
 }
-export const WorkQueue = connect(
+export const SearchResult = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
@@ -1332,4 +1332,4 @@ export const WorkQueue = connect(
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
-)(injectIntl(withTheme(WorkQueueView)))
+)(injectIntl(withTheme(SearchResultView)))

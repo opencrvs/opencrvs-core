@@ -33,6 +33,7 @@ import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { NOTIFICATION_STATUS, REJECTED_STATUS } from 'src/utils/constants'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { SEARCH_RESULT } from 'src/navigation/routes'
 
 const messages = defineMessages({
   declareNewEventActionTitle: {
@@ -243,7 +244,7 @@ class HomeView extends React.Component<FullProps> {
       userDetails.role &&
       userDetails.role !== 'FIELD_AGENT'
     ) {
-      history.push('/work-queue')
+      history.push(SEARCH_RESULT)
       return <></>
     } else {
       return <></>

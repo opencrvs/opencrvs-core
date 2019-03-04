@@ -11,7 +11,7 @@ import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
 import { Dispatch } from 'redux'
-import { goToWorkQueue } from 'src/navigation'
+import { goToSearchResult } from 'src/navigation'
 import {
   MutationProvider,
   MutationContext
@@ -169,8 +169,8 @@ export const RejectRegistrationForm = connect(
   }),
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
-      goToWorkQueue: () => {
-        dispatch(goToWorkQueue())
+      goToSearchResult: () => {
+        dispatch(goToSearchResult())
       }
     }
   }

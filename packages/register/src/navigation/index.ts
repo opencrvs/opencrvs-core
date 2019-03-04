@@ -2,7 +2,7 @@ import { push, goBack as back } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   HOME,
-  WORK_QUEUE,
+  SEARCH_RESULT,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
@@ -59,8 +59,8 @@ export function goToPerformance() {
   window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
-export function goToWorkQueue() {
-  return push(WORK_QUEUE)
+export function goToSearchResult() {
+  return push(SEARCH_RESULT)
 }
 export function goToMyRecords() {
   return push(MY_RECORDS)

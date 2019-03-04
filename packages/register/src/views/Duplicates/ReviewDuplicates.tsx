@@ -10,7 +10,7 @@ import { Duplicate } from '@opencrvs/components/lib/icons'
 import { Mutation } from 'react-apollo'
 import styled from 'src/styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { WORK_QUEUE } from 'src/navigation/routes'
+import { SEARCH_RESULT } from 'src/navigation/routes'
 import { DuplicateDetails, Action } from 'src/components/DuplicateDetails'
 import { Event } from 'src/forms'
 import { NotDuplicateConfirmation } from 'src/views/Duplicates/NotDuplicateConfirmation'
@@ -421,7 +421,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
   successfulDuplicateRemoval = (response: string) => {
     this.toggleNotDuplicateModal()
     if (response === this.state.selectedCompositionID) {
-      window.location.assign('/work-queue')
+      window.location.assign(SEARCH_RESULT)
     } else {
       window.location.reload()
     }
@@ -435,7 +435,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     return (
       <ActionPage
         goBack={() => {
-          window.location.assign(WORK_QUEUE)
+          window.location.assign(SEARCH_RESULT)
         }}
         title={intl.formatMessage(messages.pageTitle)}
       >
@@ -469,7 +469,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               !data.fetchBirthRegistration.registration.duplicates ||
               data.fetchBirthRegistration.registration.duplicates.length <= 0
             ) {
-              window.location.assign(WORK_QUEUE)
+              window.location.assign(SEARCH_RESULT)
             }
 
             let duplicateIds = [applicationId]

@@ -11,6 +11,7 @@ import { createStore } from 'src/store'
 import { ReactWrapper } from 'enzyme'
 import { DuplicateDetails } from 'src/components/DuplicateDetails'
 import { clone } from 'lodash'
+import { SEARCH_RESULT } from 'src/navigation/routes'
 
 const assign = window.location.assign as jest.Mock
 
@@ -948,7 +949,7 @@ describe('Review Duplicates component', () => {
       })
       testComponent.component.update()
 
-      expect(assign).toBeCalledWith('/work-queue')
+      expect(assign).toBeCalledWith(SEARCH_RESULT)
     })
 
     it('successfully redirects to work queue if no duplicates returned from fetch query', async () => {
@@ -976,7 +977,7 @@ describe('Review Duplicates component', () => {
       })
       testComponent.component.update()
 
-      expect(assign).toBeCalledWith('/work-queue')
+      expect(assign).toBeCalledWith(SEARCH_RESULT)
     })
   })
 
@@ -1008,6 +1009,6 @@ describe('Review Duplicates component', () => {
       .simulate('click')
     testComponent.component.update()
 
-    expect(assign).toBeCalledWith('/work-queue')
+    expect(assign).toBeCalledWith(SEARCH_RESULT)
   })
 })

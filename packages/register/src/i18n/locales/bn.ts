@@ -914,6 +914,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.event.dob': 'জন্মদিবসের',
     'register.event.dod': 'মৃত্যুদিবসের',
     'register.event.death': 'মৃত্যু',
-    'register.event.birth': 'জন্ম'
+    'register.event.birth': 'জন্ম',
+    'validations.isValidDateOfDeath': 'মৃত্যু ঘটনার তারিখ বৈধ হতে হবে'
   }
 }
