@@ -359,7 +359,7 @@ const messages = defineMessages({
   },
   workflowStatusDateCollected: {
     id: 'register.workQueue.listItem.status.dateLabel.collected',
-    defaultMessage: 'Collected on',
+    defaultMessage: 'Printed on',
     description: 'Label for the workflow timestamp when the status is collected'
   },
   workflowPractitionerLabel: {
