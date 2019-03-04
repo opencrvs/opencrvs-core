@@ -239,7 +239,7 @@ type Mutation {
   markBirthAsVerified(id: ID!, location: LocationInput): BirthRegistration
   markBirthAsRegistered(id: ID!, location: LocationInput): BirthRegistration
   markBirthAsCertified(id: ID!, location: LocationInput): BirthRegistration
-  markBirthAsVoided(
+  markEventAsVoided(
     id: ID!
     reason: String!
     location: LocationInput

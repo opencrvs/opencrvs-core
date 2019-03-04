@@ -736,7 +736,7 @@ describe('Review Duplicates component', () => {
         result: {
           data: {
             // @ts-ignore
-            markBirthAsVoided: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            markEventAsVoided: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }
       })
