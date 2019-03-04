@@ -55,11 +55,12 @@ import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
 import { APPLICATIONS_STATUS } from 'src/utils/constants'
 import { getUserDetails } from 'src/profile/profileSelectors'
-import { createNamesMap } from 'src/utils/data-formating'
+import { createNamesMap } from 'src/utils/data-formatting'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { messages as rejectionMessages } from 'src/review/reject-registration'
 import { formatLongDate } from 'src/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
+import { extractRejectReason } from 'src/utils/data-formatting'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
@@ -533,8 +534,8 @@ function formatRoleCode(str: string) {
   return formattedString.join(' ')
 }
 
-function getRejectionReasonDisplayValue(reason: string) {
-  switch (reason) {
+export function getRejectionReasonDisplayValue(reason: string) {
+  switch (reason.toLowerCase()) {
     case 'duplicate':
       return rejectionMessages.rejectionReasonDuplicate
     case 'misspelling':
@@ -801,17 +802,13 @@ export class WorkQueueView extends React.Component<
             reg.registration.status &&
             (reg.registration.status[0] as GQLRegWorkflow).type,
           event: reg.registration && reg.registration.type,
-          rejection_reason:
+          rejection_reasons:
             (type === 'REJECTED' &&
-              (reg.registration &&
-                reg.registration.status &&
-                (reg.registration.status[0] as GQLRegWorkflow).comments &&
-                ((reg.registration.status[0] as GQLRegWorkflow)
-                  .comments as GQLComment[]) &&
-                ([
-                  ...((reg.registration.status[0] as GQLRegWorkflow)
-                    .comments as GQLComment[])
-                ].pop() as GQLComment).comment)) ||
+              reg.registration &&
+              reg.registration.status &&
+              (reg.registration.status[0] as GQLRegWorkflow).comments &&
+              extractRejectReason((reg.registration.status[0] as GQLRegWorkflow)
+                .comments as GQLComment[])) ||
             '',
           duplicates: reg.registration && reg.registration.duplicates,
           location:
@@ -886,7 +883,7 @@ export class WorkQueueView extends React.Component<
   }
 
   renderCell = (
-    item: { [key: string]: string & Array<{ type: string }> },
+    item: { [key: string]: string & Array<{ [key: string]: string }> },
     key: number
   ): JSX.Element => {
     const applicationIsRegistered = item.declaration_status === 'REGISTERED'
@@ -941,10 +938,8 @@ export class WorkQueueView extends React.Component<
       label: this.getDeclarationStatusLabel(item.declaration_status)
     })
 
-    if (applicationIsRejected && item.rejection_reason) {
-      const parsedComment = item.rejection_reason.split('&')[0]
-      const parsedReason = parsedComment && parsedComment.split('=')[1]
-      const reasons = parsedReason && parsedReason.split(',')
+    if (applicationIsRejected && item.rejection_reasons) {
+      const reasons = item.rejection_reasons.split(',')
 
       info.push({
         label: this.props.intl.formatMessage(

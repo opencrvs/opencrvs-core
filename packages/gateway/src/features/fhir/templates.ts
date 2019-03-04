@@ -190,9 +190,9 @@ export function updateTaskTemplate(
     throw new Error('Task has no businessStatus code')
   }
   task.businessStatus.coding[0].code = status
-  if (comment && reason) {
+  if (comment || reason) {
     const newNote: fhir.Annotation = {
-      text: `reason=${reason}&comment=${comment}`,
+      text: `reason=${reason ? reason : ''}&comment=${comment ? comment : ''}`,
       time: new Date().toUTCString(),
       authorString: ''
     }

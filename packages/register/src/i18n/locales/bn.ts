@@ -828,6 +828,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.details.registered': 'নিবন্ধভুক্ত',
     'register.duplicates.details.certified': 'প্রত্যয়িত',
     'register.duplicates.button.reject': 'প্রত্যাখ্যান',
+    'register.duplicates.details.reason': 'কারণ',
     'register.duplicates.modal.reject':
       'আপনি কি এই অ্যাপ্লিকেশনটি অনুলিপি করার জন্য প্রত্যাখ্যান করতে চান?',
     'register.duplicates.male': 'পুরুষ',
@@ -908,7 +909,7 @@ export const BENGALI_STATE: ILanguage = {
       declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।}
       registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
       duplication{সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।}
-      rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।} 
+      rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।}
       offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `,
     'register.event.dob': 'জন্মদিবসের',
     'register.event.dod': 'মৃত্যুদিবসের',
