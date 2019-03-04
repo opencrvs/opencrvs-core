@@ -69,7 +69,7 @@ describe('when the home page loads for a field worker', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
       })
     })
-    describe('when user has a register scope they are redirected to the work-queue', () => {
+    describe('when user has a register scope they are redirected to the search-result', () => {
       beforeEach(() => {
         store.dispatch(
           getStorageUserDetailsSuccess(JSON.stringify(registerUserDetails))
@@ -77,8 +77,8 @@ describe('when the home page loads for a field worker', () => {
         app.update()
       })
 
-      it('work queue view renders to load list', () => {
-        expect(app.find('#work-queue-spinner').hostNodes()).toHaveLength(1)
+      it('search result view renders to load list', () => {
+        expect(app.find('#search-result-spinner').hostNodes()).toHaveLength(1)
       })
     })
   })
