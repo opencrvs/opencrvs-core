@@ -1,5 +1,5 @@
-export const HOST = process.env.AUTH_HOST || 'localhost'
-export const PORT = process.env.AUTH_PORT || 1050
+export const HOST = process.env.METRICS_HOST || '0.0.0.0'
+export const PORT = process.env.METRICS_PORT || 1050
 export const fhirUrl = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
