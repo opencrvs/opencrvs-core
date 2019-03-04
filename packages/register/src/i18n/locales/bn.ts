@@ -694,7 +694,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.application': 'আবেদন জমা',
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.workQueue.listItem.status.dateLabel.rejected': 'প্রত্যাখ্যাত',
-    'register.workQueue.listItem.status.dateLabel.collected': 'সংগৃহীত',
+    'register.workQueue.listItem.status.dateLabel.collected': 'মুদ্রণ',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
     'register.workQueue.labels.results.rejectionReason': 'কারণ',
     'register.workQueue.print.form.name': 'মুদ্রণ',
