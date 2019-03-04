@@ -1,5 +1,9 @@
 import { getLoggedInPractitionerResource } from 'src/features/user/utils'
-import { setupAuthorOnNotes } from 'src/features/registration/fhir/fhir-bundle-modifier'
+import {
+  setupLastRegUser,
+  setupLastRegLocation,
+  setupAuthorOnNotes
+} from 'src/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from 'src/features/registration/fhir/fhir-template'
 
 export async function modifyTaskBundle(
@@ -14,10 +18,16 @@ export async function modifyTaskBundle(
   ) {
     throw new Error('Invalid FHIR bundle found for task')
   }
-
+  const taskResource = getTaskResource(fhirBundle) as fhir.Task
   const practitioner = await getLoggedInPractitionerResource(token)
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
 
   /* setting author and time on notes here */
-  setupAuthorOnNotes(getTaskResource(fhirBundle) as fhir.Task, practitioner)
+  setupAuthorOnNotes(taskResource, practitioner)
+
   return fhirBundle
 }
