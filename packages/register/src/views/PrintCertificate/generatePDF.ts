@@ -21,6 +21,9 @@ const messages = defineMessages({
   certificateSubHeader: {
     id: 'register.work-queue.certificate.subheader'
   },
+  certificateIssuedAt: {
+    id: 'register.work-queue.certificate.issuedAt'
+  },
   certificateIssuer: {
     id: 'register.work-queue.certificate.issuer'
   },
@@ -126,6 +129,43 @@ export function generateMoneyReceipt(
   const eventText = moneyReceiptDefinitionText(event, intl).EVENT
   const DOE = moneyReceiptDefinitionText(event, intl).DOE
   const dateOfPayment = moment().format(CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT)
+  const fonts = {
+    bn: {
+      notosans: {
+        normal: 'NotoSansBengali-Light.ttf',
+        regular: 'NotoSansBengali-Light.ttf',
+        bold: 'NotoSansBengali-Regular.ttf'
+      },
+      notosanscurrency: {
+        normal: 'NotoSansBengali-Light.ttf',
+        regular: 'NotoSansBengali-Light.ttf',
+        bold: 'NotoSansBengali-Light.ttf'
+      },
+      notosanslocation: {
+        normal: 'NotoSans-Light.ttf',
+        regular: 'NotoSans-Light.ttf',
+        bold: 'NotoSans-Regular.ttf'
+      }
+    },
+    en: {
+      notosanscurrency: {
+        normal: 'NotoSansBengali-Light.ttf',
+        regular: 'NotoSansBengali-Light.ttf',
+        bold: 'NotoSansBengali-Light.ttf'
+      },
+      notosans: {
+        normal: 'NotoSans-Light.ttf',
+        regular: 'NotoSans-Light.ttf',
+        bold: 'NotoSans-Regular.ttf'
+      },
+      notosanslocation: {
+        normal: 'NotoSans-Light.ttf',
+        regular: 'NotoSans-Light.ttf',
+        bold: 'NotoSans-Regular.ttf'
+      }
+    }
+  }
+
   const docDefinition = {
     info: {
       title: `Receipt-for-${event}-certificate`
@@ -167,8 +207,20 @@ export function generateMoneyReceipt(
         text: `${amount}\n\n`,
         style: 'amount'
       },
+      {
+        columns: [
+          {
+            text: intl.formatMessage(messages.certificateIssuedAt),
+            font: 'notosans',
+            width: 65
+          },
+          {
+            text: IssuerDetails.issuedAt,
+            font: 'notosanslocation'
+          }
+        ]
+      },
       intl.formatMessage(messages.certificateIssuer, {
-        issuedAt: IssuerDetails.issuedAt,
         role: IssuerDetails.role,
         name: IssuerDetails.name,
         dateOfPayment
@@ -188,34 +240,8 @@ export function generateMoneyReceipt(
       }
     }
   }
-  const fonts = {
-    bn: {
-      notosans: {
-        normal: 'NotoSansBengali-Light.ttf',
-        regular: 'NotoSansBengali-Light.ttf',
-        bold: 'NotoSansBengali-Regular.ttf'
-      },
-      notosanscurrency: {
-        normal: 'NotoSansBengali-Light.ttf',
-        regular: 'NotoSansBengali-Light.ttf',
-        bold: 'NotoSansBengali-Light.ttf'
-      }
-    },
-    en: {
-      notosanscurrency: {
-        normal: 'NotoSansBengali-Light.ttf',
-        regular: 'NotoSansBengali-Light.ttf',
-        bold: 'NotoSansBengali-Light.ttf'
-      },
-      notosans: {
-        normal: 'NotoSans-Light.ttf',
-        regular: 'NotoSans-Light.ttf',
-        bold: 'NotoSans-Regular.ttf'
-      }
-    }
-  }
-  const font = fonts[language]
 
+  const font = fonts[language]
   pdfMake.vfs = pdfFonts.pdfMake.vfs
   const generatedPDF = pdfMake.createPdf(docDefinition, null, font)
 

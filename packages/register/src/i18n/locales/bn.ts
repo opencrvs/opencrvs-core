@@ -802,8 +802,9 @@ export const BENGALI_STATE: ILanguage = {
       '{DOE} {DOBDiff} পর {event} নিবন্ধন',
     'register.work-queue.certificate.service': 'সেবা: ',
     'register.work-queue.certificate.amount': 'পরিশোধিত মূল্য: \n\n',
+    'register.work-queue.certificate.issuedAt': 'প্রদানের স্থান:',
     'register.work-queue.certificate.issuer':
-      'প্রদানের স্থান: {issuedAt},\n প্রদানকারী: {role}, {name}\n তারিখ: {dateOfPayment}',
+      'প্রদানকারী: {role}, {name}\n তারিখ: {dateOfPayment}',
     'register.duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
     'register.duplicates.description':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
