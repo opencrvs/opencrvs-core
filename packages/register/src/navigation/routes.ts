@@ -20,3 +20,5 @@ export const MY_DRAFTS = '/my-drafts'
 export const REVIEW_DUPLICATES = '/duplicates/:applicationId'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
+
+export const WORK_QUEUE = '/work-queue/:tabId'

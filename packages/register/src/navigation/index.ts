@@ -9,7 +9,8 @@ import {
   MY_RECORDS,
   MY_DRAFTS,
   REVIEW_DUPLICATES,
-  PRINT_CERTIFICATE
+  PRINT_CERTIFICATE,
+  WORK_QUEUE
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -37,8 +38,15 @@ type GoToTabAction = {
     historyState?: IDynamicValues
   }
 }
+export const GO_TO_WORK_QUEUE = 'navigation/GO_TO_WORK_QUEUE'
+type GoToWorkQueue = {
+  type: typeof GO_TO_WORK_QUEUE
+  payload: {
+    tabId: string
+  }
+}
 
-export type Action = GoToTabAction
+export type Action = GoToTabAction | GoToWorkQueue
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -94,6 +102,13 @@ export function goToDeathRegistration(draftId: string) {
   return push(formatUrl(DRAFT_DEATH_FORM, { draftId: draftId.toString() }))
 }
 
+export function goToWorkQueueTab(tabId: string) {
+  return {
+    type: GO_TO_WORK_QUEUE,
+    payload: { tabId }
+  }
+}
+
 export function goToTab(
   tabRoute: string,
   draftId: string,
@@ -133,6 +148,12 @@ export function navigationReducer(state: INavigationState, action: Action) {
             historyState
           )
         )
+      )
+    case GO_TO_WORK_QUEUE:
+      const { tabId: workQueueTabId } = action.payload
+      return loop(
+        state,
+        Cmd.action(push(formatUrl(WORK_QUEUE, { tabId: workQueueTabId })))
       )
   }
 }
