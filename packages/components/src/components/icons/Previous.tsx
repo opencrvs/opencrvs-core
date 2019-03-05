@@ -2,7 +2,6 @@ import * as React from 'react'
 
 export const Previous = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={48} height={40} {...props}>
-    <title>{`D96D7B67-F71A-41E9-8BE2-3E1D1E9B1184-565-00008E0CCC274AEB`}</title>
     <g fill="none" fillRule="evenodd">
       <rect
         fill="#FFF"
