@@ -184,6 +184,7 @@ describe('ReviewForm tests', async () => {
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: null,
                 trackingId: 'B123456',
@@ -270,7 +271,7 @@ describe('ReviewForm tests', async () => {
 
     testComponent.component.unmount()
   })
-  it("when registration contact is father, father's should be set", async () => {
+  it('Shared contact phone number should be set properly', async () => {
     const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
@@ -343,6 +344,7 @@ describe('ReviewForm tests', async () => {
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'FATHER',
+                contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: null,
                 trackingId: 'B123456',
@@ -404,102 +406,7 @@ describe('ReviewForm tests', async () => {
       .find(RegisterForm)
       .prop('draft') as IDraft
 
-    expect(data.data.registration.registrationPhone).toBe('01711111111')
-    testComponent.component.unmount()
-  })
-  it('when registration contact is there but no contact information for father/mother', async () => {
-    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
-    const graphqlMock = [
-      {
-        request: {
-          query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: draft.id }
-        },
-        result: {
-          data: {
-            fetchBirthRegistration: {
-              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-              _fhirIDMap: {
-                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
-                observation: {
-                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
-                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
-                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  presentAtBirthRegistration:
-                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
-                }
-              },
-              child: null,
-              mother: null,
-              father: null,
-              registration: {
-                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
-                contact: 'MOTHER',
-                attachments: null,
-                status: null,
-                trackingId: 'B123456',
-                registrationNumber: '12345',
-                type: 'BIRTH'
-              },
-              attendantAtBirth: 'NURSE',
-              weightAtBirth: 2,
-              birthType: 'SINGLE',
-              eventLocation: {
-                address: {
-                  country: 'BGD',
-                  state: 'state4',
-                  district: 'district2',
-                  postalCode: '',
-                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
-                  postCode: '1020'
-                },
-                type: 'PRIVATE_HOME',
-                partOf: 'Location/upazila10'
-              },
-              presentAtBirthRegistration: 'MOTHER_ONLY'
-            }
-          }
-        }
-      }
-    ]
-    const testComponent = createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
-        scope={scope}
-        event={draft.event}
-        registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
-        match={{
-          params: {
-            draftId: draft.id,
-            tabId: 'review',
-            event: draft.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftId={draft.id}
-      />,
-      store,
-      graphqlMock
-    )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 0)
-    })
-
-    testComponent.component.update()
-
-    const data = testComponent.component
-      .find(RegisterForm)
-      .prop('draft') as IDraft
-
-    expect(data.data.registration.registrationPhone).toBeUndefined()
-
+    expect(data.data.registration.registrationPhone).toBe('01733333333')
     testComponent.component.unmount()
   })
   it('when registration has attachment', async () => {
@@ -531,6 +438,7 @@ describe('ReviewForm tests', async () => {
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactPhoneNumber: '01733333333',
                 attachments: [
                   {
                     contentType: 'image/jpeg',
@@ -686,6 +594,7 @@ describe('ReviewForm tests', async () => {
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: [
                   {
@@ -760,7 +669,7 @@ describe('ReviewForm tests', async () => {
       _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
       whoseContactDetails: 'MOTHER',
       presentAtBirthRegistration: 'MOTHER_ONLY',
-      registrationPhone: '01711111111',
+      registrationPhone: '01733333333',
       commentsOrNotes: 'This is a note',
       trackingId: 'B123456',
       type: 'birth'

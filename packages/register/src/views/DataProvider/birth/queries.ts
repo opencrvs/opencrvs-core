@@ -80,6 +80,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       registration {
         id
         contact
+        contactPhoneNumber
         attachments {
           data
           type
@@ -192,6 +193,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       registration {
         id
         contact
+        contactPhoneNumber
         attachments {
           data
           type

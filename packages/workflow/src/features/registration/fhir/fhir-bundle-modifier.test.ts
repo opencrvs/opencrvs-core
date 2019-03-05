@@ -167,8 +167,8 @@ describe('Verify fhir bundle modifier functions', () => {
         practitioner
       )
 
-      expect(taskResource.extension[1].valueReference.reference).toBeDefined()
-      expect(taskResource.extension[1].valueReference.reference).toEqual(
+      expect(taskResource.extension[2].valueReference.reference).toBeDefined()
+      expect(taskResource.extension[2].valueReference.reference).toEqual(
         'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
       )
     })
@@ -196,7 +196,7 @@ describe('Verify fhir bundle modifier functions', () => {
       )
 
       expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
-      expect(taskResource.extension[1].valueReference.reference).toEqual(
+      expect(taskResource.extension[2].valueReference.reference).toEqual(
         'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
       )
     })
@@ -353,7 +353,7 @@ describe('Verify fhir bundle modifier functions', () => {
         testFhirBundle.entry[1].resource as fhir.Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
-      expect(taskResource.extension[2]).toEqual({
+      expect(taskResource.extension[3]).toEqual({
         url: 'http://opencrvs.org/specs/extension/regLastLocation',
         valueReference: {
           reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
@@ -365,7 +365,7 @@ describe('Verify fhir bundle modifier functions', () => {
         testFhirBundle.entry[1].resource as fhir.Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
-      expect(taskResource.extension[3]).toEqual({
+      expect(taskResource.extension[4]).toEqual({
         url: 'http://opencrvs.org/specs/extension/regLastOffice',
         valueReference: {
           reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd12yy'
