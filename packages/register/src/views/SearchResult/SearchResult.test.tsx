@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { WorkQueue, FETCH_REGISTRATION_QUERY } from './WorkQueue'
+import { SearchResult, FETCH_REGISTRATION_QUERY } from './SearchResult'
 import { createTestComponent, mockUserResponse } from 'src/tests/util'
 import { createStore } from 'src/store'
 import {
@@ -45,7 +45,7 @@ describe('WorkQueue tests', async () => {
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue />,
+      <SearchResult />,
       store
     )
 
@@ -210,7 +210,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue />,
+      <SearchResult />,
       store,
       graphqlMock
     )
@@ -295,7 +295,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue />,
+      <SearchResult />,
       store,
       graphqlMock
     )
@@ -309,7 +309,7 @@ describe('WorkQueue tests', async () => {
 
     expect(
       testComponent.component
-        .find('#work-queue-error-text')
+        .find('#search-result-error-text')
         .children()
         .text()
     ).toBe('An error occurred while searching')
@@ -411,7 +411,7 @@ describe('WorkQueue tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <WorkQueue />,
+        <SearchResult />,
         store,
         graphqlMock
       )
@@ -548,7 +548,7 @@ describe('WorkQueue tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <WorkQueue />,
+        <SearchResult />,
         store,
         graphqlMock
       )
@@ -986,7 +986,7 @@ describe('WorkQueue tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <WorkQueue />,
+        <SearchResult />,
         store,
         graphqlMock
       )
@@ -1117,7 +1117,7 @@ describe('WorkQueue tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <WorkQueue />,
+        <SearchResult />,
         store,
         graphqlMock
       )
@@ -1247,7 +1247,7 @@ describe('WorkQueue tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <WorkQueue />,
+        <SearchResult />,
         store,
         graphqlMock
       )

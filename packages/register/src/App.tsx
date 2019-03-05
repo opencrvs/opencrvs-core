@@ -17,7 +17,7 @@ import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SelectInformant } from './views/SelectInformant/SelectInformant'
 import { ApplicationForm } from './views/RegisterForm/ApplicationForm'
 import { ReviewForm } from './views/RegisterForm/ReviewForm'
-import { WorkQueue } from './views/WorkQueue/WorkQueue'
+import { SearchResult } from './views/SearchResult/SearchResult'
 import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
 import { createClient } from 'src/utils/apolloClient'
@@ -104,8 +104,8 @@ export class App extends React.Component<IAppProps> {
                           />
 
                           <ProtectedRoute
-                            path={routes.WORK_QUEUE}
-                            component={WorkQueue}
+                            path={routes.SEARCH_RESULT}
+                            component={SearchResult}
                           />
                           <ProtectedRoute
                             path={routes.MY_RECORDS}
