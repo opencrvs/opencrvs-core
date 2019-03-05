@@ -27,21 +27,9 @@ describe('Verify getSharedContactMsisdn', () => {
     ).rejects.toThrow('Invalid FHIR bundle found for declaration')
   })
 
-  it('Throws error when invalid shared contact info given', async () => {
+  it('Returns false when phonenumber is missing for shared contact', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
-    fhirBundle.entry[1].resource.extension[0].valueString = 'INVALID'
-    expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
-  })
-
-  it('Throws error when telecom is missing for shared contact', async () => {
-    const fhirBundle = cloneDeep(testFhirBundle)
-    fhirBundle.entry[1].resource.extension[0].valueString = 'FATHER'
-    expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
-  })
-
-  it('Throws error when phonenumber is missing for shared contact', async () => {
-    const fhirBundle = cloneDeep(testFhirBundle)
-    fhirBundle.entry[3].resource.telecom = []
+    fhirBundle.entry[1].resource.extension[1].url = 'INVALID'
     expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
   })
 })
