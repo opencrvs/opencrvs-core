@@ -17,6 +17,7 @@ context('Login', () => {
     cy.get('#code6').type('0')
 
     cy.get('#login-mobile-submit').click()
-    cy.get('#view_title').contains('Hello Shakib Al Hasan')
+
+    cy.get('#view_title', { timeout: 30000 }).contains('Hello Shakib Al Hasan')
   })
 })
