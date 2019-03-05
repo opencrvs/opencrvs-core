@@ -21,12 +21,14 @@ export enum Events {
   BIRTH_NEW_DEC = '/events/birth/new-declaration',
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_NEW_REG = '/events/birth/new-registration',
+  BIRTH_REG = '/events/birth/registration',
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   DEATH_NEW_DEC = '/events/death/new-declaration',
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
   DEATH_NEW_REG = '/events/death/new-registration',
+  DEATH_REG = '/events/death/registration',
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
@@ -157,6 +159,7 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.BIRTH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_NEW_REG, request)
       break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
@@ -167,7 +170,7 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_NEW_REG, request)
+      forwardToOpenHim(Events.BIRTH_REG, request)
       break
     case Events.DEATH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
