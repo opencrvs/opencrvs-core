@@ -316,7 +316,7 @@ export const applicantsSection: IFormSection = {
       name: 'applicantFamilyNameEng',
       type: TEXT,
       label: messages.applicantsFamilyNameEng,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
