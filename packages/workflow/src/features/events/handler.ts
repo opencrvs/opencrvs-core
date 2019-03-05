@@ -15,7 +15,7 @@ import { logger } from 'src/logger'
 import { isUserAuthorized } from './auth'
 import { EVENT_TYPE } from '../registration/fhir/constants'
 import { getEventType } from '../registration/utils'
-import { hasScope } from 'src/utils/authUtils'
+import { hasRegisterScope } from 'src/utils/authUtils'
 
 export enum Events {
   BIRTH_NEW_DEC = '/events/birth/new-declaration',
@@ -33,10 +33,6 @@ export enum Events {
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
   UNKNOWN = 'unknown'
-}
-
-function hasRegisterScope(request: Hapi.Request): boolean {
-  return hasScope(request, 'register')
 }
 
 function detectEvent(request: Hapi.Request): Events {
