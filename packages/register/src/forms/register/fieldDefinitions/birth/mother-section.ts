@@ -237,7 +237,7 @@ export const motherSection: IFormSection = {
       name: 'familyNameEng',
       type: TEXT,
       label: messages.motherFamilyNameEng,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
