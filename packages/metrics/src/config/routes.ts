@@ -15,19 +15,7 @@ export const getRoutes = () => {
     // Event receiver routes
     {
       method: 'POST',
-      path: '/events/new-registration',
-      handler: (request: any, h: any) => {
-        // TODO: generate metrics from this event
-        return {}
-      },
-      config: {
-        tags: ['api'],
-        auth: false
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/registration',
+      path: '/events/birth/new-registration',
       handler: (request: any, h: any) => {
         // TODO: generate metrics from this event
         return {}
