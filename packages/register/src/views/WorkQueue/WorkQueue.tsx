@@ -302,6 +302,11 @@ const messages = defineMessages({
     defaultMessage: 'Reason',
     description: 'Label for rejection reason'
   },
+  listItemCommentLabel: {
+    id: 'register.workQueue.labels.results.rejectionComment',
+    defaultMessage: 'Comment',
+    description: 'Label for rejection comment'
+  },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
     defaultMessage: 'New registration',
@@ -942,28 +947,36 @@ export class WorkQueueView extends React.Component<
     })
 
     if (applicationIsRejected && item.rejection_reason) {
-      const parsedComment = item.rejection_reason.split('&')[0]
-      const parsedReason = parsedComment && parsedComment.split('=')[1]
+      const parsedReasonPart = item.rejection_reason.split('&')[0]
+      const parsedCommentPart = item.rejection_reason.split('&')[1]
+      const parsedComment = parsedCommentPart && parsedCommentPart.split('=')[1]
+      const parsedReason = parsedReasonPart && parsedReasonPart.split('=')[1]
       const reasons = parsedReason && parsedReason.split(',')
 
-      info.push({
-        label: this.props.intl.formatMessage(
-          messages.listItemRejectionReasonLabel
-        ),
-        value:
-          reasons &&
-          reasons
-            .reduce(
-              (prev, curr) => [
-                ...prev,
-                this.props.intl.formatMessage(
-                  getRejectionReasonDisplayValue(curr)
-                )
-              ],
-              []
-            )
-            .join(', ')
-      })
+      info.push(
+        {
+          label: this.props.intl.formatMessage(
+            messages.listItemRejectionReasonLabel
+          ),
+          value:
+            reasons &&
+            reasons
+              .reduce(
+                (prev, curr) => [
+                  ...prev,
+                  this.props.intl.formatMessage(
+                    getRejectionReasonDisplayValue(curr)
+                  )
+                ],
+                []
+              )
+              .join(', ')
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemCommentLabel),
+          value: parsedComment
+        }
+      )
     }
 
     if (item.duplicates && item.duplicates.length > 0) {
