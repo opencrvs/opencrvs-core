@@ -1,3 +1,4 @@
+import * as fetch from 'jest-fetch-mock'
 import {
   selectOrCreateTaskRefResource,
   findPersonEntry,
@@ -49,6 +50,9 @@ describe('Verify fhir templates', () => {
       expect(taskResource).toEqual({
         resourceType: 'Task',
         status: 'requested',
+        focus: {
+          reference: 'urn:uuid:888'
+        },
         code: {
           coding: [
             {
@@ -87,6 +91,48 @@ describe('Verify fhir templates', () => {
         MOTHER_SECTION_CODE,
         testFhirBundle
       )
+
+      expect(personEntryResourse).toBeDefined()
+      expect(personEntryResourse).toEqual({
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            given: ['Jane'],
+            family: ['Doe']
+          }
+        ],
+        gender: 'female',
+        telecom: [
+          {
+            system: 'phone',
+            value: '+8801622688231'
+          }
+        ]
+      })
+    })
+    it('returns the right person entry when task entry is passed', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            ...testFhirBundle.entry[0].resource
+          })
+        ],
+        [
+          JSON.stringify({
+            ...testFhirBundle.entry[3].resource
+          })
+        ]
+      )
+      const personEntryResourse = await findPersonEntry(MOTHER_SECTION_CODE, {
+        resourceType: 'Bundle',
+        type: 'document',
+        entry: [
+          {
+            ...testFhirBundle.entry[1]
+          }
+        ]
+      })
 
       expect(personEntryResourse).toBeDefined()
       expect(personEntryResourse).toEqual({
