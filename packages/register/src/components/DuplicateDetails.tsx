@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import { goToTab as goToTabAction } from 'src/navigation'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import Moment from 'react-moment'
+import { getRejectionReasonDisplayValue } from 'src/views/SearchResult/SearchResult'
 
 export enum Event {
   BIRTH = 'BIRTH',
@@ -57,7 +58,7 @@ interface IProps {
       usersName: string
       usersRole: string
       office: string
-      reason?: string
+      reasons?: string
     }>
   }
   notDuplicateHandler?: () => void
@@ -120,6 +121,11 @@ const messages = defineMessages({
     id: 'register.duplicates.details.by',
     defaultMessage: 'By',
     description: 'Label for By (the person who performed the action)'
+  },
+  reason: {
+    id: 'register.duplicates.details.reason',
+    defaultMessage: 'Reason',
+    description: 'Label for Reason the application was rejected'
   },
   review: {
     id: 'register.duplicates.details.review',
@@ -363,6 +369,20 @@ class DuplicateDetailsClass extends React.Component<
                 {status.usersRole}
                 <br />
                 {status.office}
+                <br />
+                {status.action === Action.REJECTED && status.reasons && (
+                  <>
+                    <b>{intl.formatMessage(messages.reason)}:</b>{' '}
+                    {status.reasons
+                      .split(',')
+                      .map(reason =>
+                        intl.formatMessage(
+                          getRejectionReasonDisplayValue(reason)
+                        )
+                      )
+                      .join(', ')}
+                  </>
+                )}
                 <br />
               </DetailText>
             </ListItem>

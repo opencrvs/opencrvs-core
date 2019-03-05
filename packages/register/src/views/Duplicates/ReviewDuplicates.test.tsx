@@ -98,7 +98,8 @@ describe('Review Duplicates component', () => {
                   },
                   office: {
                     name: 'Moktarpur Union Parishad'
-                  }
+                  },
+                  comments: [{ comment: 'note' }]
                 }
               ]
             },
@@ -194,7 +195,8 @@ describe('Review Duplicates component', () => {
                   },
                   office: {
                     name: 'Moktarpur Union Parishad'
-                  }
+                  },
+                  comments: [{ comment: 'note' }]
                 }
               ]
             },
@@ -349,7 +351,8 @@ describe('Review Duplicates component', () => {
                   },
                   office: {
                     name: null
-                  }
+                  },
+                  comments: [{ comment: 'note' }]
                 }
               ]
             },
@@ -440,7 +443,8 @@ describe('Review Duplicates component', () => {
                   },
                   office: {
                     name: null
-                  }
+                  },
+                  comments: [{ comment: 'note' }]
                 }
               ]
             },
@@ -731,7 +735,7 @@ describe('Review Duplicates component', () => {
           query: rejectMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
-            reason: 'Duplicate'
+            reason: 'duplicate'
           }
         },
         result: {
