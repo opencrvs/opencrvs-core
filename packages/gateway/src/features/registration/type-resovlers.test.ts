@@ -836,6 +836,14 @@ describe('Registration type resolvers', () => {
 
       expect(contact).toEqual('MOTHER')
     })
+    it('returns contact person phone number from the task', async () => {
+      // @ts-ignore
+      const contactNumber = await typeResolvers.Registration.contactPhoneNumber(
+        mockTask
+      )
+
+      expect(contactNumber).toEqual('01733333333')
+    })
 
     it('returns business status of the task', async () => {
       // @ts-ignore
