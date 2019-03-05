@@ -175,9 +175,8 @@ describe('when draft data is transformed to graphql', () => {
         'PRIVATE_HOME'
       )
     })
-    it('Pass BOTH_PARENTS as whoseContactDetails value', () => {
+    it('Check if contactNumber is found properly', () => {
       const registration = clone(registrationDetails)
-      registration.whoseContactDetails = 'BOTH_PARENTS'
 
       const data = {
         child: childDetails,
@@ -187,24 +186,9 @@ describe('when draft data is transformed to graphql', () => {
         documents: { image_uploader: '' }
       }
 
-      expect(draftToGqlTransformer(form, data).father.telecom).toBeFalsy()
-    })
-
-    it('Pass FATHER as whoseContactDetails value', () => {
-      const registration = clone(registrationDetails)
-      registration.whoseContactDetails = 'FATHER'
-
-      const data = {
-        child: childDetails,
-        father: fatherDetails,
-        mother: motherDetails,
-        registration,
-        documents: { image_uploader: '' }
-      }
-
-      expect(draftToGqlTransformer(form, data).father.telecom[0].value).toBe(
-        '01736478884'
-      )
+      expect(
+        draftToGqlTransformer(form, data).registration.contactPhoneNumber
+      ).toBe('01736478884')
     })
 
     it('Pass false as fathersDetailsExist on father section', () => {

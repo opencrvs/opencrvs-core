@@ -93,6 +93,9 @@ export const testFhirBundle = {
       resource: {
         resourceType: 'Task',
         status: 'requested',
+        focus: {
+          reference: 'urn:uuid:888'
+        },
         code: {
           coding: [
             {
@@ -115,6 +118,11 @@ export const testFhirBundle = {
           {
             url: 'http://opencrvs.org/specs/extension/contact-person',
             valueString: 'MOTHER'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '+8801622688231'
           }
         ]
       }

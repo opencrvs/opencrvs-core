@@ -95,6 +95,7 @@ test('should build a minimal FHIR registration document without error', async ()
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
         contact: 'MOTHER',
+        contactPhoneNumber: '01733333333',
         paperFormID: '12345678',
         trackingId: 'B123456',
         registrationNumber: '201923324512345671',
@@ -335,6 +336,10 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[4].resource.extension[0]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
     valueString: 'MOTHER'
+  })
+  expect(fhir.entry[4].resource.extension[1]).toEqual({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
+    valueString: '01733333333'
   })
   expect(fhir.entry[4].resource.lastModified).toEqual(
     '2018-10-31T09:45:05+10:00'
