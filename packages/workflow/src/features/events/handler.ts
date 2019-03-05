@@ -17,8 +17,6 @@ import { EVENT_TYPE } from '../registration/fhir/constants'
 import { getEventType } from '../registration/utils'
 
 export enum Events {
-  EVENT_NEW_REG = '/events/new-registration',
-  EVENT_REG = '/events/registration',
   BIRTH_NEW_DEC = '/events/birth/new-declaration',
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_NEW_REG = '/events/birth/new-registration',
@@ -145,7 +143,6 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
-      forwardToOpenHim(Events.EVENT_NEW_REG, request)
       break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
@@ -153,7 +150,7 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
-      forwardToOpenHim(Events.EVENT_REG, request)
+      forwardToOpenHim(Events.BIRTH_NEW_REG, request)
       break
     case Events.DEATH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
