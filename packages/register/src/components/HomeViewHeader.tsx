@@ -29,7 +29,7 @@ export class HomeViewHeader extends React.Component<IViewHeadingProps> {
   render() {
     const { title, description, id } = this.props
     return (
-      <HeaderWrapper {...this.props}>
+      <HeaderWrapper>
         <HeaderContent>
           <ConnectivityStatus />
           <TopMenu hideBackButton={true} />
