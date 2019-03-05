@@ -17,6 +17,6 @@ context('Login', () => {
     cy.get('#code6').type('0')
 
     cy.get('#login-mobile-submit').click()
-    cy.location('search').should('match', /\?token=.*/)
+    cy.get('#view_title').contains('Hello Shakib Al Hasan')
   })
 })

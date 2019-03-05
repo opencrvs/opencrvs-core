@@ -36,6 +36,7 @@ export const resolvers: GQLResolver = {
 
       const locations = roleEntry.location
 
+      practitionerResource.userMgntUserID = userMgntUserID
       practitionerResource.catchmentArea = []
       practitionerResource.role = role
       for (const location of locations) {
