@@ -76,7 +76,7 @@ describe('when user wants to print certificate', async () => {
                   {
                     use: 'en',
                     firstNames: '',
-                    familyName: '',
+                    familyName: 'Mashrur',
                     __typename: 'HumanName'
                   }
                 ],
@@ -550,7 +550,7 @@ describe('when user wants to print certificate', async () => {
                     {
                       use: 'en',
                       firstNames: '',
-                      familyName: '',
+                      familyName: 'Mashrur',
                       __typename: 'HumanName'
                     }
                   ],
