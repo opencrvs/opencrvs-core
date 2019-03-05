@@ -809,8 +809,9 @@ export const ENGLISH_STATE: ILanguage = {
       '{event} Registration after {DOBDiff} of {DOE}',
     'register.work-queue.certificate.service': 'Service: ',
     'register.work-queue.certificate.amount': 'Amount paid:\n\n',
+    'register.work-queue.certificate.issuedAt': 'Issued at:',
     'register.work-queue.certificate.issuer':
-      'Issued at: {issuedAt},\n By: {role}, {name}\n Date of payment: {dateOfPayment}',
+      'By: {role}, {name}\n Date of payment: {dateOfPayment}',
     'register.duplicates.title': 'Possible duplicates found',
     'register.duplicates.description':
       'The following application has been flagged as a possible duplicate of an existing registered record.',
