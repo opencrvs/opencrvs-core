@@ -7,7 +7,7 @@ import {
   markBundleAsCertified,
   setTrackingId
 } from './fhir/fhir-bundle-modifier'
-import { getToken, hasScope } from 'src/utils/authUtils'
+import { getToken } from 'src/utils/authUtils'
 import { sendEventNotification } from './utils'
 import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
 import { logger } from 'src/logger'
@@ -48,7 +48,7 @@ export async function createRegistrationHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-    if (hasScope(request, 'register')) {
+    if (event === Events.BIRTH_NEW_REG || event === Events.DEATH_NEW_REG) {
       payload = await markBundleAsRegistered(
         payload as fhir.Bundle,
         getToken(request)
@@ -59,15 +59,9 @@ export async function createRegistrationHandler(
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      sendEventNotification(
-        payload,
-        event,
-        msisdn,
-        {
-          Authorization: request.headers.authorization
-        },
-        hasScope(request, 'register')
-      )
+      sendEventNotification(payload, event, msisdn, {
+        Authorization: request.headers.authorization
+      })
     }
 
     return resBundle
@@ -94,15 +88,9 @@ export async function markEventAsRegisteredHandler(
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      sendEventNotification(
-        payload,
-        event,
-        msisdn,
-        {
-          Authorization: request.headers.authorization
-        },
-        hasScope(request, 'register')
-      )
+      sendEventNotification(payload, event, msisdn, {
+        Authorization: request.headers.authorization
+      })
     }
 
     return resBundle
