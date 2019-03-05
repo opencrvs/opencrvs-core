@@ -28,6 +28,7 @@ import { MyDrafts } from './views/MyDrafts/MyDrafts'
 import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { WorkQueue } from './views/WorkQueue/WorkQueue'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -96,6 +97,12 @@ export class App extends React.Component<IAppProps> {
                             exact
                             path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
                             component={ReviewForm}
+                          />
+
+                          <ProtectedRoute
+                            exact
+                            path={routes.WORK_QUEUE}
+                            component={WorkQueue}
                           />
 
                           <ProtectedRoute
