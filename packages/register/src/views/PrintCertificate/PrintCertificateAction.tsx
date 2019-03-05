@@ -343,6 +343,17 @@ const messages = defineMessages({
   }
 })
 
+const locationText = {
+  district: {
+    en: 'District',
+    bn: 'জেলা'
+  },
+  state: {
+    en: 'Division',
+    bn: 'বিভাগ'
+  }
+}
+
 interface IFullName {
   fullNameInBn: string
   fullNameInEng: string
@@ -749,6 +760,7 @@ class PrintCertificateActionComponent extends React.Component<
 
     const NameBn = names && names.find(name => name.use === 'bn')
     const NameEn = names && names.find(name => name.use === 'en')
+    moment.locale('en')
     const DOBEn = moment(eventDateTime as string).format(
       CERTIFICATE_DATE_FORMAT
     )
@@ -855,7 +867,7 @@ class PrintCertificateActionComponent extends React.Component<
             intl,
             offlineResources,
             'en'
-          )} ${intl.formatMessage(messages.district)}`,
+          )} ${locationText.district.en}`,
           `${renderSelectDynamicLabel(
             data.eventLocation.address.state,
             {
@@ -866,10 +878,10 @@ class PrintCertificateActionComponent extends React.Component<
             intl,
             offlineResources,
             'en'
-          )} ${intl.formatMessage(messages.state)}`
+          )} ${locationText.state.en}`
         ].join(', ')
         eventLocationBn = [
-          renderSelectDynamicLabel(
+          `${renderSelectDynamicLabel(
             data.eventLocation.address.district,
             {
               resource: OFFLINE_LOCATIONS_KEY,
@@ -879,8 +891,8 @@ class PrintCertificateActionComponent extends React.Component<
             intl,
             offlineResources,
             'bn'
-          ),
-          renderSelectDynamicLabel(
+          )} ${locationText.district.bn}`,
+          `${renderSelectDynamicLabel(
             data.eventLocation.address.state,
             {
               resource: OFFLINE_LOCATIONS_KEY,
@@ -890,7 +902,7 @@ class PrintCertificateActionComponent extends React.Component<
             intl,
             offlineResources,
             'bn'
-          )
+          )} ${locationText.state.bn}`
         ].join(', ')
       }
     }
