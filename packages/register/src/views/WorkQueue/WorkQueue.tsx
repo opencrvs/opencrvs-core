@@ -190,6 +190,7 @@ interface IBaseWorkQueueProps {
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
   tabId: string
+  draftCount: number
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -204,7 +205,7 @@ const TAB_ID = {
 }
 export class WorkQueueView extends React.Component<IWorkQueueProps> {
   render() {
-    const { intl, userDetails, language, tabId } = this.props
+    const { intl, userDetails, language, tabId, draftCount } = this.props
 
     let fullName = ''
     if (userDetails && userDetails.name) {
@@ -250,7 +251,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                 icon={() => <StatusProgress />}
                 onClick={() => this.props.gotoTab(TAB_ID.inProgress)}
               >
-                {intl.formatMessage(messages.inProgress)} (10)
+                {intl.formatMessage(messages.inProgress)} ({draftCount})
               </IconTab>
               <IconTab
                 id={`tab_${TAB_ID.readyForReview}`}
@@ -297,7 +298,8 @@ function mapStateToProps(
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
-    tabId: match.params.tabId
+    tabId: match.params.tabId,
+    draftCount: state.drafts.drafts.length
   }
 }
 
