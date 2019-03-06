@@ -247,6 +247,7 @@ describe('WorkQueue tests', async () => {
           }
         ],
         rejection_reasons: '',
+        rejection_comment: '',
         location: 'Kaliganj Union Sub Center'
       },
       {
@@ -271,6 +272,7 @@ describe('WorkQueue tests', async () => {
           }
         ],
         rejection_reasons: '',
+        rejection_comment: '',
         location: 'Kaliganj Union Sub Center'
       }
     ])

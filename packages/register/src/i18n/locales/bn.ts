@@ -697,6 +697,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.collected': 'মুদ্রণ',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
     'register.workQueue.labels.results.rejectionReason': 'কারণ',
+    'register.workQueue.labels.results.rejectionComment': 'মন্তব্য',
     'register.workQueue.print.form.name': 'মুদ্রণ',
     'register.workQueue.print.form.title': 'সার্টিফিকেট মুদ্রণ',
     'formFields.print.whoToCollect': 'কে সার্টিফিকেট সংগ্রহ করছে?',

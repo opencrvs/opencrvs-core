@@ -15,24 +15,27 @@ export const createNamesMap = (names: GQLHumanName[]) =>
     return prevNamesMap
   }, {})
 
-export const extractRejectReason = (comments: GQLComment[]): string => {
-  let reasons: string = ''
+export const extractCommentFragmentValue = (
+  comments: GQLComment[],
+  fragmentItem: string
+): string => {
+  let fragmentValue: string = ''
 
   for (const comment of comments) {
     if (comment.comment) {
       const commentFragments = comment.comment.split('&')
       for (const fragment of commentFragments) {
-        if (fragment.includes('reason=')) {
-          reasons = fragment.replace('reason=', '')
+        if (fragment.includes(`${fragmentItem}=`)) {
+          fragmentValue = fragment.replace(`${fragmentItem}=`, '')
           break
         }
       }
     }
 
-    if (reasons.length > 0) {
+    if (fragmentValue.length > 0) {
       break
     }
   }
 
-  return reasons
+  return fragmentValue
 }
