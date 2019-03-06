@@ -332,7 +332,7 @@ export const deceasedSection: IFormSection = {
       name: 'familyNameEng',
       type: TEXT,
       label: messages.deceasedFamilyNameEng,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {

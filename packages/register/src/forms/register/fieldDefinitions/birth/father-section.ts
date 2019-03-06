@@ -279,7 +279,7 @@ export const fatherSection: IFormSection = {
       name: 'familyNameEng',
       type: TEXT,
       label: messages.fatherFamilyNameEng,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [englishOnlyNameFormat],
       conditionals: [conditionals.fathersDetailsExist],
