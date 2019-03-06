@@ -399,6 +399,7 @@ class FormSectionComponent extends React.Component<Props> {
       draftData,
       setValues
     } = this.props
+    const language = this.props.intl.locale
 
     const errors = (this.props.errors as any) as {
       [key: string]: IValidationResult[]
@@ -507,7 +508,7 @@ class FormSectionComponent extends React.Component<Props> {
             )
           } else {
             return (
-              <FormItem key={`${field.name}`}>
+              <FormItem key={`${field.name}${language}`}>
                 <FastField name={field.name}>
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
