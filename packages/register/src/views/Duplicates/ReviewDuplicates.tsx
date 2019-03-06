@@ -32,7 +32,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from 'src/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
-import { extractRejectReason } from 'src/utils/data-formatting'
+import { extractCommentFragmentValue } from 'src/utils/data-formatting'
 
 interface IMatchParams {
   applicationId: string
@@ -373,8 +373,9 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               .map((status: GQLRegWorkflow) => {
                 let reasonString = ''
                 if (status.comments) {
-                  reasonString = extractRejectReason(
-                    status.comments as GQLComment[]
+                  reasonString = extractCommentFragmentValue(
+                    status.comments as GQLComment[],
+                    'reason'
                   )
                 }
 

@@ -705,6 +705,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.collected': 'Printed on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.labels.results.rejectionReason': 'Reason',
+    'register.workQueue.labels.results.rejectionComment': 'Comment',
     'register.workQueue.print.form.name': 'Print',
     'register.workQueue.print.form.title': 'Print certificate',
     'formFields.print.whoToCollect': 'Who is collecting the certificate?',

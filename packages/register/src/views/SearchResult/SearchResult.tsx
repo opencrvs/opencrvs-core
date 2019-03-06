@@ -60,7 +60,7 @@ import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { messages as rejectionMessages } from 'src/review/reject-registration'
 import { formatLongDate } from 'src/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
-import { extractRejectReason } from 'src/utils/data-formatting'
+import { extractCommentFragmentValue } from 'src/utils/data-formatting'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
@@ -302,6 +302,11 @@ const messages = defineMessages({
     id: 'register.workQueue.labels.results.rejectionReason',
     defaultMessage: 'Reason',
     description: 'Label for rejection reason'
+  },
+  listItemCommentLabel: {
+    id: 'register.workQueue.labels.results.rejectionComment',
+    defaultMessage: 'Comment',
+    description: 'Label for rejection comment'
   },
   newRegistration: {
     id: 'register.workQueue.buttons.newRegistration',
@@ -807,8 +812,22 @@ export class SearchResultView extends React.Component<
               reg.registration &&
               reg.registration.status &&
               (reg.registration.status[0] as GQLRegWorkflow).comments &&
-              extractRejectReason((reg.registration.status[0] as GQLRegWorkflow)
-                .comments as GQLComment[])) ||
+              extractCommentFragmentValue(
+                (reg.registration.status[0] as GQLRegWorkflow)
+                  .comments as GQLComment[],
+                'reason'
+              )) ||
+            '',
+          rejection_comment:
+            (type === 'REJECTED' &&
+              reg.registration &&
+              reg.registration.status &&
+              (reg.registration.status[0] as GQLRegWorkflow).comments &&
+              extractCommentFragmentValue(
+                (reg.registration.status[0] as GQLRegWorkflow)
+                  .comments as GQLComment[],
+                'comment'
+              )) ||
             '',
           duplicates: reg.registration && reg.registration.duplicates,
           location:
@@ -940,6 +959,7 @@ export class SearchResultView extends React.Component<
 
     if (applicationIsRejected && item.rejection_reasons) {
       const reasons = item.rejection_reasons.split(',')
+      const rejectComment = item.rejection_comment
 
       info.push({
         label: this.props.intl.formatMessage(
@@ -959,6 +979,13 @@ export class SearchResultView extends React.Component<
             )
             .join(', ')
       })
+
+      if (rejectComment) {
+        info.push({
+          label: this.props.intl.formatMessage(messages.listItemCommentLabel),
+          value: rejectComment
+        })
+      }
     }
 
     if (item.duplicates && item.duplicates.length > 0) {
