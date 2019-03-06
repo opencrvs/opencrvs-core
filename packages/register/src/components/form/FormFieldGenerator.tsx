@@ -100,6 +100,7 @@ type GeneratedInputFieldProps = {
   value: IFormFieldValue
   touched: boolean
   error: string
+  language: string
 }
 
 function GeneratedInputField({
@@ -110,7 +111,8 @@ function GeneratedInputField({
   resetDependentSelectValues,
   error,
   touched,
-  value
+  value,
+  language
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -314,7 +316,6 @@ function GeneratedInputField({
       />
     )
   }
-
   return (
     <InputField {...inputFieldProps}>
       <TextInput
@@ -339,6 +340,7 @@ interface IFormSectionProps {
   offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
+  language?: string
 }
 
 type Props = IFormSectionProps &
@@ -397,7 +399,8 @@ class FormSectionComponent extends React.Component<Props> {
       offlineResources,
       intl,
       draftData,
-      setValues
+      setValues,
+      language = 'en'
     } = this.props
 
     const errors = (this.props.errors as any) as {
@@ -500,6 +503,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      language={language}
                     />
                   )}
                 </Field>
@@ -507,23 +511,26 @@ class FormSectionComponent extends React.Component<Props> {
             )
           } else {
             return (
-              <FormItem key={`${field.name}`}>
+              <FormItem key={`${field.name}${language}`}>
                 <FastField name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      onSetFieldValue={setFieldValue}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={error}
-                    />
-                  )}
+                  {(formikFieldProps: FieldProps<any>) => {
+                    return (
+                      <GeneratedInputField
+                        fieldDefinition={internationaliseFieldObject(
+                          intl,
+                          withDynamicallyGeneratedFields
+                        )}
+                        onSetFieldValue={setFieldValue}
+                        resetDependentSelectValues={
+                          this.resetDependentSelectValues
+                        }
+                        {...formikFieldProps.field}
+                        touched={touched[field.name] || false}
+                        error={error}
+                        language={language}
+                      />
+                    )
+                  }}
                 </FastField>
               </FormItem>
             )

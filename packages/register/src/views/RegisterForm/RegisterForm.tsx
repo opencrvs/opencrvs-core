@@ -303,8 +303,9 @@ type Props = {
 
 type FullProps = IFormProps &
   Props &
-  DispatchProps &
-  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
+  DispatchProps & { language?: string } & InjectedIntlProps & {
+    scope: Scope
+  } & RouteComponentProps<{}>
 
 type State = {
   showSubmitModal: boolean
@@ -685,6 +686,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       fields={activeSection.fields}
                       offlineResources={offlineResources}
                       draftData={draft.data}
+                      language={this.props.language}
                     />
                   </form>
                   <FormActionSection>
@@ -922,7 +924,8 @@ function mapStateToProps(
       ...activeSection,
       fields
     },
-    draft
+    draft,
+    language: state.i18n.language
   }
 }
 

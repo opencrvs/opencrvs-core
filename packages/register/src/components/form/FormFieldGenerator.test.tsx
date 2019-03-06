@@ -43,6 +43,7 @@ describe('form component', () => {
       onChange={modifyDraft}
       setAllFieldsDirty={false}
       offlineResources={offlineResources}
+      language="en"
       fields={[
         {
           name: 'countryPermanent',
@@ -143,6 +144,7 @@ describe('form component registration section', () => {
       onChange={modifyDraft}
       setAllFieldsDirty={false}
       offlineResources={offlineResources}
+      language="en"
       fields={[
         {
           name: 'registrationPhone',
