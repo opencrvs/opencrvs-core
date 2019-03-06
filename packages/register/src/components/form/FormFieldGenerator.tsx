@@ -100,7 +100,6 @@ type GeneratedInputFieldProps = {
   value: IFormFieldValue
   touched: boolean
   error: string
-  language: string
 }
 
 function GeneratedInputField({
@@ -111,8 +110,7 @@ function GeneratedInputField({
   resetDependentSelectValues,
   error,
   touched,
-  value,
-  language
+  value
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -503,7 +501,6 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
-                      language={language}
                     />
                   )}
                 </Field>
@@ -527,7 +524,6 @@ class FormSectionComponent extends React.Component<Props> {
                         {...formikFieldProps.field}
                         touched={touched[field.name] || false}
                         error={error}
-                        language={language}
                       />
                     )
                   }}
