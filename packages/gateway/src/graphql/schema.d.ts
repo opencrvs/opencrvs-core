@@ -305,6 +305,7 @@ export enum GQLRegStatus {
 
 export interface GQLUser {
   id: string
+  userMgntUserID?: string
   name?: Array<GQLHumanName | null>
   role?: string
   primaryOffice?: GQLLocation
@@ -1634,6 +1635,7 @@ export interface RegWorkflowToOfficeResolver<TParent = any, TResult = any> {
 
 export interface GQLUserTypeResolver<TParent = any> {
   id?: UserToIdResolver<TParent>
+  userMgntUserID?: UserToUserMgntUserIDResolver<TParent>
   name?: UserToNameResolver<TParent>
   role?: UserToRoleResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
@@ -1642,6 +1644,10 @@ export interface GQLUserTypeResolver<TParent = any> {
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToUserMgntUserIDResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

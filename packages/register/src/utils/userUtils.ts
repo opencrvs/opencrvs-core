@@ -19,6 +19,7 @@ export interface IGQLLocation {
 }
 
 export interface IUserDetails {
+  userMgntUserID?: string
   role?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
@@ -26,8 +27,11 @@ export interface IUserDetails {
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
-  const { catchmentArea, primaryOffice, name, role } = user
+  const { catchmentArea, primaryOffice, name, role, userMgntUserID } = user
   const userDetails: IUserDetails = {}
+  if (userMgntUserID) {
+    userDetails.userMgntUserID = userMgntUserID
+  }
   if (name) {
     userDetails.name = name
   }
