@@ -830,6 +830,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.details.registered': 'নিবন্ধভুক্ত',
     'register.duplicates.details.certified': 'প্রত্যয়িত',
     'register.duplicates.button.reject': 'প্রত্যাখ্যান',
+    'register.duplicates.details.reason': 'কারণ',
     'register.duplicates.modal.reject':
       'আপনি কি এই অ্যাপ্লিকেশনটি অনুলিপি করার জন্য প্রত্যাখ্যান করতে চান?',
     'register.duplicates.male': 'পুরুষ',

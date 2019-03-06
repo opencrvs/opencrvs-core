@@ -44,3 +44,7 @@ export const hasScope = (request: Hapi.Request, scope: string): boolean => {
   }
   return request.auth.credentials.scope.includes(scope)
 }
+
+export function hasRegisterScope(request: Hapi.Request): boolean {
+  return hasScope(request, 'register')
+}

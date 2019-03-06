@@ -40,7 +40,7 @@ merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
-describe('WorkQueue tests', async () => {
+describe('SearchResult tests', async () => {
   const { store, history } = createStore()
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
@@ -246,7 +246,7 @@ describe('WorkQueue tests', async () => {
             practitionerRole: 'Registrar'
           }
         ],
-        rejection_reason: '',
+        rejection_reasons: '',
         location: 'Kaliganj Union Sub Center'
       },
       {
@@ -270,7 +270,7 @@ describe('WorkQueue tests', async () => {
             practitionerRole: 'Registrar'
           }
         ],
-        rejection_reason: '',
+        rejection_reasons: '',
         location: 'Kaliganj Union Sub Center'
       }
     ])
@@ -317,7 +317,7 @@ describe('WorkQueue tests', async () => {
     testComponent.component.unmount()
   })
 
-  describe('WorkQueue tests for register scope', () => {
+  describe('SearchResult tests for register scope', () => {
     beforeAll(() => {
       getItem.mockReturnValue(registerScopeToken)
       store.dispatch(checkAuth({ '?token': registerScopeToken }))
@@ -1023,7 +1023,7 @@ describe('WorkQueue tests', async () => {
     })
   })
 
-  describe('WorkQueue tests with duplicates for register scope', () => {
+  describe('SearchResult tests with duplicates for register scope', () => {
     beforeAll(() => {
       getItem.mockReturnValue(registerScopeToken)
       store.dispatch(checkAuth({ '?token': registerScopeToken }))
@@ -1153,7 +1153,7 @@ describe('WorkQueue tests', async () => {
     })
   })
 
-  describe('WorkQueue tests for declare scope', () => {
+  describe('SearchResult tests for declare scope', () => {
     beforeAll(() => {
       getItem.mockReturnValue(declareScope)
       store.dispatch(checkAuth({ '?token': declareScope }))

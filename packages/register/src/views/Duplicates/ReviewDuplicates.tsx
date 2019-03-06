@@ -17,7 +17,7 @@ import { NotDuplicateConfirmation } from 'src/views/Duplicates/NotDuplicateConfi
 import { RouteComponentProps } from 'react-router'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
-import { createNamesMap } from 'src/utils/data-formating'
+import { createNamesMap } from 'src/utils/data-formatting'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import {
@@ -27,10 +27,12 @@ import {
   GQLUser,
   GQLIdentityType,
   GQLLocation,
-  GQLRegStatus
+  GQLRegStatus,
+  GQLComment
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from 'src/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
+import { extractCommentFragmentValue } from 'src/utils/data-formatting'
 
 interface IMatchParams {
   applicationId: string
@@ -205,6 +207,9 @@ export function createDuplicateDetailsQuery(ids: string[]) {
           office {
             name
           }
+          comments {
+            comment
+          }
         }
       }
       child {
@@ -254,7 +259,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
   `
 }
 export const rejectMutation = gql`
-  mutation submitBirthAsRejected($id: String!, $reason: String!) {
+  mutation submitEventAsRejected($id: String!, $reason: String!) {
     markEventAsVoided(id: $id, reason: $reason)
   }
 `
@@ -366,6 +371,14 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             rec.registration.status &&
             rec.registration.status
               .map((status: GQLRegWorkflow) => {
+                let reasonString = ''
+                if (status.comments) {
+                  reasonString = extractCommentFragmentValue(
+                    status.comments as GQLComment[],
+                    'reason'
+                  )
+                }
+
                 return {
                   action:
                     Action[status.type as GQLRegStatus] || Action.DECLARED,
@@ -379,7 +392,9 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                       )) ||
                     '',
                   office:
-                    (status.office && (status.office as GQLLocation).name) || ''
+                    (status.office && (status.office as GQLLocation).name) ||
+                    '',
+                  reasons: reasonString
                 }
               })
               .reverse()) ||
@@ -538,11 +553,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           mutation={rejectMutation}
           variables={{
             id: this.state.selectedCompositionID,
-            reason: 'Duplicate'
+            reason: 'duplicate'
           }}
           onCompleted={data => this.successfulRejection(data.markEventAsVoided)}
         >
-          {(submitBirthAsRejected, { data }) => {
+          {submitEventAsRejected => {
             return (
               <Modal
                 title={intl.formatMessage(messages.rejectDescription)}
@@ -550,7 +565,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   <PrimaryButton
                     key="reject"
                     id="reject_confirm"
-                    onClick={() => submitBirthAsRejected()}
+                    onClick={() => submitEventAsRejected()}
                   >
                     {intl.formatMessage(messages.rejectButton)}
                   </PrimaryButton>,

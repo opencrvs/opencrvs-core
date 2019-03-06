@@ -32,27 +32,19 @@ export async function sendEventNotification(
   fhirBundle: fhir.Bundle,
   event: Events,
   msisdn: string,
-  authHeader: { Authorization: string },
-  hasRegistrarScope: boolean
+  authHeader: { Authorization: string }
 ) {
   switch (event) {
     case Events.BIRTH_NEW_DEC:
-      hasRegistrarScope
-        ? await sendRegistrationNotification(
-            fhirBundle,
-            msisdn,
-            CHILD_SECTION_CODE,
-            'birthRegistrationSMS',
-            authHeader
-          )
-        : await sendDeclarationNotification(
-            fhirBundle,
-            msisdn,
-            CHILD_SECTION_CODE,
-            'birthDeclarationSMS',
-            authHeader
-          )
+      await sendDeclarationNotification(
+        fhirBundle,
+        msisdn,
+        CHILD_SECTION_CODE,
+        'birthDeclarationSMS',
+        authHeader
+      )
       break
+    case Events.BIRTH_NEW_REG:
     case Events.BIRTH_MARK_REG:
       await sendRegistrationNotification(
         fhirBundle,
@@ -63,22 +55,15 @@ export async function sendEventNotification(
       )
       break
     case Events.DEATH_NEW_DEC:
-      hasRegistrarScope
-        ? await sendRegistrationNotification(
-            fhirBundle,
-            msisdn,
-            DECEASED_SECTION_CODE,
-            'deathRegistrationSMS',
-            authHeader
-          )
-        : await sendDeclarationNotification(
-            fhirBundle,
-            msisdn,
-            DECEASED_SECTION_CODE,
-            'deathDeclarationSMS',
-            authHeader
-          )
+      await sendDeclarationNotification(
+        fhirBundle,
+        msisdn,
+        DECEASED_SECTION_CODE,
+        'deathDeclarationSMS',
+        authHeader
+      )
       break
+    case Events.DEATH_NEW_REG:
     case Events.DEATH_MARK_REG:
       await sendRegistrationNotification(
         fhirBundle,

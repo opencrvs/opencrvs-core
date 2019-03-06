@@ -1,8 +1,6 @@
 import {
   OPENCRVS_SPECIFICATION_URL,
   CHILD_SECTION_CODE,
-  MOTHER_SECTION_CODE,
-  FATHER_SECTION_CODE,
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
   EVENT_TYPE
@@ -17,60 +15,40 @@ import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
 import fetch from 'node-fetch'
 import { getEventType } from '../utils'
 
-enum CONTACT {
-  MOTHER,
-  FATHER,
-  BOTH
-}
-
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'phoneNumberExists: Invalid FHIR bundle found for declaration'
-    )
+    throw new Error('Invalid FHIR bundle found for declaration')
   }
-  let contact
+  let phoneNumber
   const eventType = getEventType(fhirBundle)
   if (eventType === EVENT_TYPE.BIRTH) {
     const taskResource = getTaskResource(fhirBundle) as fhir.Task
-    const sharedContact =
+    const phoneExtension =
       taskResource &&
       taskResource.extension &&
       taskResource.extension.find(extension => {
         return (
           extension.url ===
-          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`
+          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`
         )
       })
-
-    if (
-      !sharedContact ||
-      !sharedContact.valueString ||
-      Object.keys(CONTACT).indexOf(sharedContact.valueString.toUpperCase()) < 0
-    ) {
+    phoneNumber = phoneExtension && phoneExtension.valueString
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    const contact = selectInformantResource(fhirBundle)
+    if (!contact || !contact.telecom) {
       return false
     }
-
-    contact = await findPersonEntry(
-      getContactSection(CONTACT[sharedContact.valueString.toUpperCase()]),
-      fhirBundle
+    const phoneEntry = contact.telecom.find(
+      (contactPoint: fhir.ContactPoint) => {
+        return contactPoint.system === 'phone'
+      }
     )
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    contact = selectInformantResource(fhirBundle)
+    phoneNumber = phoneEntry && phoneEntry.value
   }
-
-  if (!contact || !contact.telecom) {
-    return false
-  }
-  const phoneNumber = contact.telecom.find(
-    (contactPoint: fhir.ContactPoint) => {
-      return contactPoint.system === 'phone'
-    }
-  )
   if (!phoneNumber) {
     return false
   }
-  return phoneNumber.value
+  return phoneNumber
 }
 
 export async function getInformantName(
@@ -192,18 +170,6 @@ export function getPaperFormID(taskResource: fhir.Task) {
     throw new Error("Didn't find any identifier for paper form id")
   }
   return paperFormIdentifier.value
-}
-
-function getContactSection(contact: CONTACT) {
-  switch (contact) {
-    case CONTACT.MOTHER:
-    case CONTACT.BOTH:
-      return MOTHER_SECTION_CODE
-    case CONTACT.FATHER:
-      return FATHER_SECTION_CODE
-    default:
-      throw new Error('No valid shared contact found')
-  }
 }
 
 export function getRegStatusCode(tokenPayload: ITokenPayload) {

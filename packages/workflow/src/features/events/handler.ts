@@ -15,17 +15,20 @@ import { logger } from 'src/logger'
 import { isUserAuthorized } from './auth'
 import { EVENT_TYPE } from '../registration/fhir/constants'
 import { getEventType } from '../registration/utils'
+import { hasRegisterScope } from 'src/utils/authUtils'
 
 export enum Events {
   BIRTH_NEW_DEC = '/events/birth/new-declaration',
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_NEW_REG = '/events/birth/new-registration',
+  BIRTH_REG = '/events/birth/registration',
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   DEATH_NEW_DEC = '/events/death/new-declaration',
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
   DEATH_NEW_REG = '/events/death/new-registration',
+  DEATH_REG = '/events/death/registration',
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
@@ -54,6 +57,9 @@ function detectEvent(request: Hapi.Request): Events {
               return Events.BIRTH_MARK_CERT
             }
           } else {
+            if (hasRegisterScope(request)) {
+              return Events.BIRTH_NEW_REG
+            }
             return Events.BIRTH_NEW_DEC
           }
         } else if (eventType === EVENT_TYPE.DEATH) {
@@ -64,6 +70,9 @@ function detectEvent(request: Hapi.Request): Events {
               return Events.DEATH_MARK_CERT
             }
           } else {
+            if (hasRegisterScope(request)) {
+              return Events.DEATH_NEW_REG
+            }
             return Events.DEATH_NEW_DEC
           }
         }
@@ -144,12 +153,20 @@ export async function fhirWorkflowEventHandler(
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
       break
+    case Events.BIRTH_NEW_REG:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_NEW_REG, request)
+      break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.DEATH_NEW_DEC, request)
       break
+    case Events.DEATH_NEW_REG:
+      response = await createRegistrationHandler(request, h, event)
+      break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_REG, request)
       break
     case Events.DEATH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
