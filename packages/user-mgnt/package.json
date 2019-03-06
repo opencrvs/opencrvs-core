@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/user-mgnt",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "OpenCRVS user management service",
   "main": "src/index.js",
   "license": "NONE",

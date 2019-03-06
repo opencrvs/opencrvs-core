@@ -131,6 +131,7 @@ All hotfixes that are done for that release should be submitted in a PR against 
 2. Update all dependencies to point to the newly created versions. E.g. `register` depend on `components`, so update the dependency in register to have the new version for the `components` package.
 3. Run `yarn` to ensure there are no version errors.
 4. Run `yarn test` and ensure all passed.
-5. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.1`
-6. Run `git push origin v<version_number>`
-7. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
+5. Commit version changes
+6. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.1`
+7. Run `git push origin v<version_number>`
+8. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
