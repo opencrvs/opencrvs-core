@@ -17,14 +17,8 @@ import {
   bundleFieldToSectionFieldTransformer,
   commentToFieldTransformer
 } from 'src/forms/mappings/query/field-mappings'
-import {
-  fieldToBirthPhoneNumberTransformer,
-  setRegistrationSectionTransformer
-} from './mappings/mutation/registration-mappings'
-import {
-  phoneNumberToFieldTransformer,
-  getRegistrationSectionTransformer
-} from './mappings/query/registration-mappings'
+import { setRegistrationSectionTransformer } from './mappings/mutation/registration-mappings'
+import { getRegistrationSectionTransformer } from './mappings/query/registration-mappings'
 
 const messages = defineMessages({
   registrationTab: {
@@ -202,8 +196,8 @@ export const registrationSection: IFormSection = {
       initialValue: '',
       validate: [phoneNumberFormat],
       mapping: {
-        mutation: fieldToBirthPhoneNumberTransformer('whoseContactDetails'),
-        query: phoneNumberToFieldTransformer('contact')
+        mutation: fieldNameTransformer('contactPhoneNumber'),
+        query: fieldValueTransformer('contactPhoneNumber')
       }
     },
     {

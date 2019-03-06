@@ -272,6 +272,7 @@ export interface GQLRegistration {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachment | null>
@@ -304,6 +305,7 @@ export enum GQLRegStatus {
 
 export interface GQLUser {
   id: string
+  userMgntUserID?: string
   name?: Array<GQLHumanName | null>
   role?: string
   primaryOffice?: GQLLocation
@@ -588,6 +590,7 @@ export interface GQLRegistrationInput {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   attachments?: Array<GQLAttachmentInput | null>
@@ -1507,6 +1510,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
+  contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
@@ -1552,6 +1556,13 @@ export interface RegistrationToBookResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToContactResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToContactPhoneNumberResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1624,6 +1635,7 @@ export interface RegWorkflowToOfficeResolver<TParent = any, TResult = any> {
 
 export interface GQLUserTypeResolver<TParent = any> {
   id?: UserToIdResolver<TParent>
+  userMgntUserID?: UserToUserMgntUserIDResolver<TParent>
   name?: UserToNameResolver<TParent>
   role?: UserToRoleResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
@@ -1632,6 +1644,10 @@ export interface GQLUserTypeResolver<TParent = any> {
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToUserMgntUserIDResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

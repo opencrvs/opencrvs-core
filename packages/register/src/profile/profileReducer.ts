@@ -68,6 +68,12 @@ export const profileReducer: LoopReducer<
       )
     case actions.CHECK_AUTH:
       const token = getToken()
+
+      // Remove token from url if it exists
+      if (window.location.search.includes('token=')) {
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+
       const payload = getTokenPayload(token)
 
       if (!payload) {
@@ -134,9 +140,15 @@ export const profileReducer: LoopReducer<
     case actions.GET_USER_DETAILS_SUCCESS:
       const userDetailsString = action.payload
       const userDetailsCollection = JSON.parse(
-        userDetailsString ? userDetailsString : '[]'
+        userDetailsString ? userDetailsString : 'null'
       )
-      if (userDetailsCollection.length === 0 && state.tokenPayload) {
+
+      // if the user detail cannot be found or they don't match the user specified in the token
+      if (
+        state.tokenPayload &&
+        (!userDetailsCollection ||
+          userDetailsCollection.userMgntUserID !== state.tokenPayload.sub)
+      ) {
         return loop(
           {
             ...state,

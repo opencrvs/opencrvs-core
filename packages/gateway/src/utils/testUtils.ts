@@ -223,6 +223,10 @@ export const mockTask = {
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
       valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+      valueString: '01733333333'
     }
   ],
   meta: {

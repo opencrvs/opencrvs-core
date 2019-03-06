@@ -550,6 +550,7 @@ type Registration {
   page: String
   book: String
   contact: RegistrationContactType
+  contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
   attachments: [Attachment]
@@ -571,6 +572,7 @@ input RegistrationInput {
   page: String
   book: String
   contact: RegistrationContactType
+  contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType
   attachments: [AttachmentInput]

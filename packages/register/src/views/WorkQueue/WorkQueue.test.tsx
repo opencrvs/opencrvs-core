@@ -246,7 +246,8 @@ describe('WorkQueue tests', async () => {
             practitionerRole: 'Registrar'
           }
         ],
-        rejection_reason: '',
+        rejection_reasons: '',
+        rejection_comment: '',
         location: 'Kaliganj Union Sub Center'
       },
       {
@@ -270,7 +271,8 @@ describe('WorkQueue tests', async () => {
             practitionerRole: 'Registrar'
           }
         ],
-        rejection_reason: '',
+        rejection_reasons: '',
+        rejection_comment: '',
         location: 'Kaliganj Union Sub Center'
       }
     ])
