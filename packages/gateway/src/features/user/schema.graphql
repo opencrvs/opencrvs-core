@@ -20,6 +20,7 @@ input UserInput {
 
 type User {
   id: ID!
+  userMgntUserID: ID
   name: [HumanName] # -> .name
   role: String
   primaryOffice: Location

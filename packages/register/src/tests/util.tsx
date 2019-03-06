@@ -134,6 +134,7 @@ export const selectOption = (
 }
 
 export const userDetails = {
+  userMgntUserID: '123',
   name: [
     {
       use: 'en',
@@ -226,6 +227,7 @@ export const mockUserResponseWithName = {
 export const mockUserResponse = {
   data: {
     getUser: {
+      userMgntUserID: '123',
       catchmentArea: [
         {
           id: 'ddab090d-040e-4bef-9475-314a448a576a',
