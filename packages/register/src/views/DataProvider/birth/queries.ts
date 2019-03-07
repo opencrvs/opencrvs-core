@@ -239,7 +239,14 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
     }
   }
 `
-
+export const COUNT_REGISTRATION_QUERY = gql`
+  query data($locationIds: [String]) {
+    countEventRegistrations(locationIds: $locationIds) {
+      declared
+      rejected
+    }
+  }
+`
 export function getBirthQueryMappings(action: Action) {
   switch (action) {
     case Action.LOAD_REVIEW_APPLICATION:

@@ -1291,6 +1291,7 @@ export class SearchResultView extends React.Component<
                     </ErrorText>
                   )
                 }
+                console.log(data)
                 const transformedData = this.transformData(data)
                 const applicationData = this.getApplicationData(transformedData)
                 return (
