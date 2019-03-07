@@ -307,12 +307,12 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         rec.father && rec.father.name
           ? createNamesMap(rec.father.name as GQLHumanName[])
           : {}
-      const userNamesMap =
+      const userNamesMap = (index: number) =>
         rec.registration &&
         rec.registration.status &&
-        rec.registration.status[0] &&
-        (rec.registration.status[0] as GQLRegWorkflow).user
-          ? createNamesMap(((rec.registration.status[0] as GQLRegWorkflow)
+        rec.registration.status[index] &&
+        (rec.registration.status[index] as GQLRegWorkflow).user
+          ? createNamesMap(((rec.registration.status[index] as GQLRegWorkflow)
               .user as GQLUser).name as GQLHumanName[])
           : {}
 
@@ -370,7 +370,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           (rec.registration &&
             rec.registration.status &&
             rec.registration.status
-              .map((status: GQLRegWorkflow) => {
+              .map((status: GQLRegWorkflow, index: number) => {
                 let reasonString = ''
                 if (status.comments) {
                   reasonString = extractCommentFragmentValue(
@@ -383,7 +383,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   action:
                     Action[status.type as GQLRegStatus] || Action.DECLARED,
                   date: formatLongDate(status.timestamp, locale) || '',
-                  usersName: userNamesMap[language],
+                  usersName: userNamesMap(index)[language],
                   usersRole:
                     (status.user &&
                       (status.user as GQLUser).role &&
