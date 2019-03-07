@@ -292,12 +292,13 @@ function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string }>
 ) {
+  console.log('inside')
   const { match } = props
   return {
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
-    tabId: match.params.tabId
+    tabId: match.params.tabId || 'review'
   }
 }
 
