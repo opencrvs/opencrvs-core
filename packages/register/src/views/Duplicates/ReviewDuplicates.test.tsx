@@ -333,21 +333,7 @@ describe('Review Duplicates component', () => {
                 {
                   type: 'DECLARED',
                   timestamp: '2019-01-22T09:46:02.547Z',
-                  user: {
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Shakib',
-                        familyName: 'Al Hasan'
-                      },
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: ''
-                      }
-                    ],
-                    role: 'FIELD_AGENT'
-                  },
+                  user: null,
                   office: {
                     name: null
                   },
@@ -425,21 +411,7 @@ describe('Review Duplicates component', () => {
                 {
                   type: 'REGISTERED',
                   timestamp: '2019-01-22T09:46:02.547Z',
-                  user: {
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Shakib',
-                        familyName: 'Al Hasan'
-                      },
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: ''
-                      }
-                    ],
-                    role: 'FIELD_AGENT'
-                  },
+                  user: null,
                   office: {
                     name: null
                   },
