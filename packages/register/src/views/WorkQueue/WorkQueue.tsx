@@ -12,7 +12,8 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import {
   SearchInput,
-  ISearchInputProps
+  ISearchInputProps,
+  Spinner
 } from '@opencrvs/components/lib/interface'
 import {
   Plus,
@@ -32,10 +33,13 @@ import {
   goToPrintCertificate as goToPrintCertificateAction
 } from 'src/navigation'
 import { goToWorkQueueTab as goToTabAction } from '../../navigation'
-import { IUserDetails } from 'src/utils/userUtils'
+import { IUserDetails, getUserLocation } from 'src/utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { RouteComponentProps } from 'react-router'
+import { Query } from 'react-apollo'
+import { COUNT_REGISTRATION_QUERY } from '../DataProvider/birth/queries'
+import * as Sentry from '@sentry/browser'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -182,6 +186,15 @@ const StyledIconAction = styled(IconAction)`
     color: ${({ theme }) => theme.colors.white};
   }
 `
+const StyledSpinner = styled(Spinner)`
+  margin: 50% auto;
+`
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
+`
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -205,8 +218,8 @@ const TAB_ID = {
 }
 export class WorkQueueView extends React.Component<IWorkQueueProps> {
   render() {
-    const { intl, userDetails, language, tabId, draftCount } = this.props
-
+    const { theme, intl, userDetails, language, tabId, draftCount } = this.props
+    const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let fullName = ''
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
@@ -242,38 +255,75 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
               buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
               {...this.props}
             />
-            <IconTabs>
-              <IconTab
-                id={`tab_${TAB_ID.inProgress}`}
-                key={TAB_ID.inProgress}
-                active={tabId === TAB_ID.inProgress}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusProgress />}
-                onClick={() => this.props.gotoTab(TAB_ID.inProgress)}
-              >
-                {intl.formatMessage(messages.inProgress)} ({draftCount})
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.readyForReview}`}
-                key={TAB_ID.readyForReview}
-                active={tabId === TAB_ID.readyForReview}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusOrange />}
-                onClick={() => this.props.gotoTab(TAB_ID.readyForReview)}
-              >
-                {intl.formatMessage(messages.readyForReview)} (20)
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.sentForUpdates}`}
-                key={TAB_ID.sentForUpdates}
-                active={tabId === TAB_ID.sentForUpdates}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusRejected />}
-                onClick={() => this.props.gotoTab(TAB_ID.sentForUpdates)}
-              >
-                {intl.formatMessage(messages.sentForUpdates)} (5)
-              </IconTab>
-            </IconTabs>
+            <Query
+              query={COUNT_REGISTRATION_QUERY}
+              variables={{
+                locationIds: [registrarUnion]
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return (
+                    <StyledSpinner
+                      id="search-result-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
+                }
+                if (error) {
+                  Sentry.captureException(error)
+                  return (
+                    <ErrorText id="search-result-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+
+                return (
+                  <>
+                    <IconTabs>
+                      <IconTab
+                        id={`tab_${TAB_ID.inProgress}`}
+                        key={TAB_ID.inProgress}
+                        active={tabId === TAB_ID.inProgress}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusProgress />}
+                        onClick={() => this.props.gotoTab(TAB_ID.inProgress)}
+                      >
+                        {intl.formatMessage(messages.inProgress)} ({draftCount})
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.readyForReview}`}
+                        key={TAB_ID.readyForReview}
+                        active={tabId === TAB_ID.readyForReview}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusOrange />}
+                        onClick={() =>
+                          this.props.gotoTab(TAB_ID.readyForReview)
+                        }
+                      >
+                        {intl.formatMessage(messages.readyForReview)} (
+                        {data.countEventRegistrations.declared})
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.sentForUpdates}`}
+                        key={TAB_ID.sentForUpdates}
+                        active={tabId === TAB_ID.sentForUpdates}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusRejected />}
+                        onClick={() =>
+                          this.props.gotoTab(TAB_ID.sentForUpdates)
+                        }
+                      >
+                        {intl.formatMessage(messages.sentForUpdates)} (
+                        {data.countEventRegistrations.rejected})
+                      </IconTab>
+                    </IconTabs>
+                  </>
+                )
+              }}
+            </Query>
+
             {tabId === TAB_ID.inProgress && (
               <div>{intl.formatMessage(messages.inProgress)}</div>
             )}

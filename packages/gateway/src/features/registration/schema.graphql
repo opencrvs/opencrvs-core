@@ -335,6 +335,11 @@ type EventRegResultSet {
   totalItems: Int
 }
 
+type RegistrationCount {
+  declared: Int
+  rejected: Int
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
@@ -368,6 +373,7 @@ type Query {
     count: Int
     skip: Int
   ): EventRegResultSet
+  countEventRegistrations(locationIds: [String]): RegistrationCount
 }
 
 type Mutation {
