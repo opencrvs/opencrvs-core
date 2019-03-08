@@ -293,7 +293,6 @@ function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string }>
 ) {
-  console.log('inside')
   const { match } = props
   return {
     language: state.i18n.language,
