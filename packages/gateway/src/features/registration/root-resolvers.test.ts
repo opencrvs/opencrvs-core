@@ -26,16 +26,18 @@ describe('Registration root resolvers', () => {
   })
   describe('listEventRegistrations()', () => {
     it('returns an array of composition results', async () => {
-      fetch.mockResponseOnce(JSON.stringify({ entry: [{}, {}], total: 2 }))
+      fetch.mockResponse(
+        JSON.stringify({ entry: [{ resource: { focus: {} } }], total: 1 })
+      )
       // @ts-ignore
       const result = await resolvers.Query.listEventRegistrations(
         {},
-        { status: 'preliminary' }
+        { status: 'DECLARED' }
       )
 
       expect(result).toBeDefined()
       expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(2)
+      expect(result.totalItems).toBe(1)
     })
 
     it('returns an array of composition results when location ids provided', async () => {
@@ -49,7 +51,10 @@ describe('Registration root resolvers', () => {
       // @ts-ignore
       const result = await resolvers.Query.listEventRegistrations(
         {},
-        { locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'] }
+        {
+          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
+          status: 'DECLARED'
+        }
       )
 
       expect(result).toBeDefined()

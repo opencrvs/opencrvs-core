@@ -14,11 +14,6 @@ import { IAuthHeader } from 'src/common-types'
 import { hasScope } from 'src/features/user/utils'
 import { EVENT_TYPE } from '../fhir/constants'
 
-const statusMap = {
-  declared: 'preliminary',
-  registered: 'final'
-}
-
 export const resolvers: GQLResolver = {
   Query: {
     async fetchBirthRegistration(_, { id }, authHeader) {
@@ -58,24 +53,30 @@ export const resolvers: GQLResolver = {
     },
     async listEventRegistrations(
       _,
-      { status, locationIds, count = 0, skip = 0 },
+      { status = null, locationIds = null, count = 0, skip = 0 },
       authHeader
     ) {
-      if (locationIds) {
-        return getCompositionsByLocation(locationIds, authHeader, count, skip)
-      } else {
-        const bundle = await fetchFHIR(
-          `/Composition${
-            status ? `?status=${statusMap[status]}&` : '?'
-          }_count=${count}&_getpagesoffset=${skip}`,
-          authHeader
-        )
-        return {
-          results: bundle.entry.map(
-            (entry: { resource: {} }) => entry.resource
-          ),
-          totalItems: bundle.total
-        }
+      return getCompositions(status, locationIds, authHeader, count, skip)
+    },
+    async countEventRegistrations(_, { locationIds = null }, authHeader) {
+      const declaredBundle = await getCompositions(
+        'DECLARED',
+        locationIds,
+        authHeader,
+        0,
+        0
+      )
+      const rejectedBundle = await getCompositions(
+        'REJECTED',
+        locationIds,
+        authHeader,
+        0,
+        0
+      )
+
+      return {
+        declared: declaredBundle.totalItems,
+        rejected: rejectedBundle.totalItems
       }
     }
   },
@@ -220,24 +221,37 @@ async function markEventAsCertified(
   return getIDFromResponse(res)
 }
 
-async function getCompositionsByLocation(
-  locationIds: Array<string | null>,
+async function getCompositions(
+  status: string | null,
+  locationIds: Array<string | null> | null,
   authHeader: IAuthHeader,
   count: number,
   skip: number
 ) {
-  const tasksResponses = await Promise.all(
-    locationIds.map(locationId => {
-      return fetchFHIR(
-        `/Task?location=Location/${locationId}&_count=0`,
+  let tasksResponses: fhir.Bundle[]
+  if (locationIds) {
+    tasksResponses = await Promise.all(
+      locationIds.map(locationId => {
+        return fetchFHIR(
+          `/Task?location=Location/${locationId}${
+            status ? `&business-status=${status}` : ''
+          }&_count=0`,
+          authHeader
+        )
+      })
+    )
+  } else {
+    tasksResponses = [
+      await fetchFHIR(
+        `/Task?_count=0${status ? `&business-status=${status}` : ''}`,
         authHeader
       )
-    })
-  )
+    ]
+  }
 
   const compositions = await Promise.all(
     tasksResponses.map(tasksResponse => {
-      return getComposition(tasksResponse, authHeader)
+      return getCompositionByTask(tasksResponse, authHeader)
     })
   )
 
@@ -245,7 +259,6 @@ async function getCompositionsByLocation(
 
   const filteredComposition =
     flattened && flattened.filter(composition => composition !== undefined)
-
   // TODO: we should rather try do the skip and count in Hearth directly for efficiency, that would require a more complex query
   return {
     totalItems: (filteredComposition && filteredComposition.length) || 0,
@@ -254,7 +267,7 @@ async function getCompositionsByLocation(
   }
 }
 
-async function getComposition(
+async function getCompositionByTask(
   tasksResponse: fhir.Bundle,
   authHeader: IAuthHeader
 ) {
