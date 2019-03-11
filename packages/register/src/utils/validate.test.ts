@@ -14,7 +14,8 @@ import {
   validIDNumber,
   maxLength,
   isValidBirthDate,
-  isValidDeathOccurrenceDate
+  isValidDeathOccurrenceDate,
+  greaterThanZero
 } from './validate'
 
 describe('validate', () => {
@@ -538,6 +539,26 @@ describe('validate', () => {
       const validDate = '2011-08-12'
       const response = undefined
       expect(isValidDeathOccurrenceDate(validDate)).toEqual(response)
+    })
+  })
+
+  describe('greaterThanZero. Checks a input value is greater than zero', () => {
+    it('should error when supplied 0 as a inputvalue .', () => {
+      const badValue = '0'
+      const response = {
+        message: {
+          id: 'validations.greaterThanZero',
+          defaultMessage: 'Must be a greater than zero',
+          description:
+            'The error message appears when input is less than or equal to 0'
+        }
+      }
+      expect(greaterThanZero(badValue)).toEqual(response)
+    })
+    it('should pass when supplied 1 as good value.', () => {
+      const goodValue = '1'
+      const response = undefined
+      expect(greaterThanZero(goodValue)).toEqual(response)
     })
   })
 })
