@@ -667,6 +667,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.locations.all': 'সব জায়গা',
     'register.workQueue.labels.selects.sort': 'ক্রমানুসার:',
     'register.workQueue.labels.selects.filter': 'ফিল্টার করুন:',
+    'register.workQueue.labels.results.type': 'ধরণ',
     'register.workQueue.labels.results.name': 'নাম',
     'register.workQueue.labels.results.dob': 'জন্ম তারিখ',
     'register.workQueue.labels.results.dod': 'মৃত্যুর তারিখ',

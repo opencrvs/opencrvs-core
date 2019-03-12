@@ -21,7 +21,6 @@ import {
   StatusRejected,
   StatusProgress
 } from '@opencrvs/components/lib/icons'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema.d'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
@@ -29,17 +28,33 @@ import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   goToEvents as goToEventsAction,
+  goToTab as goToTabAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from 'src/navigation'
-import { goToWorkQueueTab as goToTabAction } from '../../navigation'
+import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
 import { IUserDetails, getUserLocation } from 'src/utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { RouteComponentProps } from 'react-router'
 import { Query } from 'react-apollo'
-import { COUNT_REGISTRATION_QUERY } from '../DataProvider/birth/queries'
+import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import * as Sentry from '@sentry/browser'
+import {
+  GQLBirthRegistration,
+  GQLHumanName,
+  GQLQuery,
+  GQLEventRegistration,
+  GQLDeathRegistration
+} from '@opencrvs/gateway/src/graphql/schema.d'
+import { createNamesMap } from 'src/utils/data-formatting'
+import {
+  GridTable,
+  IAction,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface/GridTable'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import * as moment from 'moment'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -158,6 +173,52 @@ const messages = defineMessages({
     id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
+  },
+  listItemType: {
+    id: 'register.workQueue.labels.results.type',
+    defaultMessage: 'Type',
+    description: 'Label for type of event in work queue list item'
+  },
+  listItemTrackingNumber: {
+    id: 'register.workQueue.labels.results.trackingID',
+    defaultMessage: 'Tracking ID',
+    description: 'Label for tracking ID in work queue list item'
+  },
+  listItemApplicationDate: {
+    id: 'register.workQueue.labels.results.applicationDate',
+    defaultMessage: 'Application sent',
+    description: 'Label for application date in work queue list item'
+  },
+  listItemUpdateDate: {
+    id: 'register.workQueue.labels.results.updateDate',
+    defaultMessage: 'Sent for updates',
+    description: 'Label for rejection date in work queue list item'
+  },
+  listItemEventDate: {
+    id: 'register.workQueue.labels.results.eventDate',
+    defaultMessage: 'Date of event',
+    description: 'Label for event date in work queue list item'
+  },
+  reviewDuplicates: {
+    id: 'register.workQueue.buttons.reviewDuplicates',
+    defaultMessage: 'Review Duplicates',
+    description:
+      'The title of review duplicates button in expanded area of list item'
+  },
+  review: {
+    id: 'register.workQueue.list.buttons.review',
+    defaultMessage: 'Review',
+    description: 'The title of review button in list item actions'
+  },
+  update: {
+    id: 'register.workQueue.list.buttons.update',
+    defaultMessage: 'Update',
+    description: 'The title of update button in list item actions'
+  },
+  listItemName: {
+    id: 'register.workQueue.labels.results.name',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
   }
 })
 const Container = styled.div`
@@ -202,8 +263,14 @@ interface IBaseWorkQueueProps {
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
+  goToWorkQueueTab: typeof goToWorkQueueTabAction
+  goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
   draftCount: number
+}
+
+interface IWorkQueueState {
+  currentPage: number
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -216,10 +283,186 @@ const TAB_ID = {
   readyForReview: 'review',
   sentForUpdates: 'updates'
 }
-export class WorkQueueView extends React.Component<IWorkQueueProps> {
+
+const EVENT_STATUS = {
+  DECLARED: 'DECLARED',
+  REJECTED: 'REJECTED'
+}
+export class WorkQueueView extends React.Component<
+  IWorkQueueProps,
+  IWorkQueueState
+> {
+  pageSize = 10
+  constructor(props: IWorkQueueProps) {
+    super(props)
+    this.state = {
+      currentPage: 1
+    }
+  }
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
+  transformDeclaredContent = (data: GQLQuery) => {
+    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+      return []
+    }
+
+    return data.listEventRegistrations.results.map(
+      (reg: GQLEventRegistration) => {
+        let dateOfEvent
+        if (reg.registration && reg.registration.type === 'BIRTH') {
+          const birthReg = reg as GQLBirthRegistration
+          dateOfEvent = birthReg && birthReg.child && birthReg.child.birthDate
+        } else {
+          const deathReg = reg as GQLDeathRegistration
+          dateOfEvent =
+            deathReg &&
+            deathReg.deceased &&
+            deathReg.deceased.deceased &&
+            deathReg.deceased.deceased.deathDate
+        }
+        const actions = [] as IAction[]
+        if (this.userHasRegisterScope()) {
+          if (
+            reg.registration &&
+            reg.registration.duplicates &&
+            reg.registration.duplicates.length > 0
+          ) {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.reviewDuplicates),
+              handler: () => this.props.goToReviewDuplicate(reg.id)
+            })
+          } else {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.review),
+              handler: () =>
+                this.props.gotoTab(
+                  REVIEW_EVENT_PARENT_FORM_TAB,
+                  reg.id,
+                  'review',
+                  (reg.registration &&
+                    reg.registration.type &&
+                    reg.registration.type.toLowerCase()) ||
+                    ''
+                )
+            })
+          }
+        }
+        return {
+          id: reg.id,
+          date_of_event:
+            (dateOfEvent &&
+              moment(dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
+            '',
+          date_of_application:
+            (reg.createdAt &&
+              moment(reg.createdAt.toString(), 'YYYY-MM-DD').fromNow()) ||
+            '',
+          tracking_id: (reg.registration && reg.registration.trackingId) || '',
+          event:
+            (reg.registration &&
+              reg.registration.type &&
+              reg.registration.type.toString()) ||
+            '',
+          duplicates: (reg.registration && reg.registration.duplicates) || [],
+          actions
+        }
+      }
+    )
+  }
+
+  transformRejectedContent = (data: GQLQuery) => {
+    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+      return []
+    }
+
+    return data.listEventRegistrations.results.map(
+      (reg: GQLEventRegistration) => {
+        let names
+        if (reg.registration && reg.registration.type === 'BIRTH') {
+          const birthReg = reg as GQLBirthRegistration
+          names =
+            (birthReg &&
+              birthReg.child &&
+              (birthReg.child.name as GQLHumanName[])) ||
+            []
+        } else {
+          const deathReg = reg as GQLDeathRegistration
+          names =
+            (deathReg &&
+              deathReg.deceased &&
+              (deathReg.deceased.name as GQLHumanName[])) ||
+            []
+        }
+        const actions = [] as IAction[]
+        if (this.userHasRegisterScope()) {
+          if (
+            reg.registration &&
+            reg.registration.duplicates &&
+            reg.registration.duplicates.length > 0
+          ) {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.reviewDuplicates),
+              handler: () => this.props.goToReviewDuplicate(reg.id)
+            })
+          } else {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.update),
+              handler: () =>
+                this.props.gotoTab(
+                  REVIEW_EVENT_PARENT_FORM_TAB,
+                  reg.id,
+                  'review',
+                  (reg.registration &&
+                    reg.registration.type &&
+                    reg.registration.type.toLowerCase()) ||
+                    ''
+                )
+            })
+          }
+        }
+        const lang = 'en'
+        return {
+          id: reg.id,
+          name:
+            (createNamesMap(names)[lang] as string) ||
+            /* tslint:disable:no-string-literal */
+            (createNamesMap(names)['bn'] as string) ||
+            '',
+          date_of_rejection:
+            reg.registration &&
+            reg.registration.status &&
+            reg.registration.status[0] &&
+            // @ts-ignore
+            reg.registration.status[0].timestamp &&
+            moment(
+              // @ts-ignore
+              reg.registration.status[0].timestamp.toString(),
+              'YYYY-MM-DD'
+            ).fromNow(),
+          tracking_id: (reg.registration && reg.registration.trackingId) || '',
+          event:
+            (reg.registration &&
+              reg.registration.type &&
+              reg.registration.type.toString()) ||
+            '',
+          duplicates: (reg.registration && reg.registration.duplicates) || [],
+          actions
+        }
+      }
+    )
+  }
+
+  onPageChange = (newPageNumber: number) => {
+    this.setState({ currentPage: newPageNumber })
+  }
+
   render() {
     const { theme, intl, userDetails, language, tabId, draftCount } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
+    let countQueryLoading = false
+
     let fullName = ''
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
@@ -263,6 +506,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
             >
               {({ loading, error, data }) => {
                 if (loading) {
+                  countQueryLoading = true
                   return (
                     <StyledSpinner
                       id="search-result-spinner"
@@ -270,6 +514,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                     />
                   )
                 }
+                countQueryLoading = false
                 if (error) {
                   Sentry.captureException(error)
                   return (
@@ -288,7 +533,9 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                         active={tabId === TAB_ID.inProgress}
                         align={ICON_ALIGNMENT.LEFT}
                         icon={() => <StatusProgress />}
-                        onClick={() => this.props.gotoTab(TAB_ID.inProgress)}
+                        onClick={() =>
+                          this.props.goToWorkQueueTab(TAB_ID.inProgress)
+                        }
                       >
                         {intl.formatMessage(messages.inProgress)} ({draftCount})
                       </IconTab>
@@ -299,7 +546,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                         align={ICON_ALIGNMENT.LEFT}
                         icon={() => <StatusOrange />}
                         onClick={() =>
-                          this.props.gotoTab(TAB_ID.readyForReview)
+                          this.props.goToWorkQueueTab(TAB_ID.readyForReview)
                         }
                       >
                         {intl.formatMessage(messages.readyForReview)} (
@@ -312,7 +559,7 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                         align={ICON_ALIGNMENT.LEFT}
                         icon={() => <StatusRejected />}
                         onClick={() =>
-                          this.props.gotoTab(TAB_ID.sentForUpdates)
+                          this.props.goToWorkQueueTab(TAB_ID.sentForUpdates)
                         }
                       >
                         {intl.formatMessage(messages.sentForUpdates)} (
@@ -323,15 +570,186 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
                 )
               }}
             </Query>
-
             {tabId === TAB_ID.inProgress && (
               <div>{intl.formatMessage(messages.inProgress)}</div>
             )}
             {tabId === TAB_ID.readyForReview && (
-              <div>{intl.formatMessage(messages.readyForReview)}</div>
+              <Query
+                query={FETCH_REGISTRATIONS_QUERY}
+                variables={{
+                  status: EVENT_STATUS.DECLARED,
+                  locationIds: [registrarUnion],
+                  count: this.pageSize,
+                  skip: (this.state.currentPage - 1) * this.pageSize
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    if (countQueryLoading) {
+                      return null
+                    } else {
+                      return (
+                        <StyledSpinner
+                          id="search-result-spinner"
+                          baseColor={theme.colors.background}
+                        />
+                      )
+                    }
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
+                    return (
+                      <ErrorText id="search-result-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return (
+                    <>
+                      <GridTable
+                        content={this.transformDeclaredContent(data)}
+                        columns={[
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemType
+                            ),
+                            width: 15,
+                            key: 'event'
+                          },
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemTrackingNumber
+                            ),
+                            width: 20,
+                            key: 'tracking_id'
+                          },
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemApplicationDate
+                            ),
+                            width: 25,
+                            key: 'date_of_application'
+                          },
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemEventDate
+                            ),
+                            width: 25,
+                            key: 'date_of_event'
+                          },
+                          {
+                            label: 'Action',
+                            width: 15,
+                            key: 'actions',
+                            isActionColumn: true,
+                            alignment: ColumnContentAlignment.CENTER
+                          }
+                        ]}
+                        noResultText={intl.formatMessage(
+                          messages.dataTableNoResults
+                        )}
+                        onPageChange={(currentPage: number) => {
+                          this.onPageChange(currentPage)
+                        }}
+                        pageSize={this.pageSize}
+                        totalPages={Math.ceil(
+                          ((data.listEventRegistrations &&
+                            data.listEventRegistrations.totalItems) ||
+                            0) / this.pageSize
+                        )}
+                        initialPage={this.state.currentPage}
+                      />
+                    </>
+                  )
+                }}
+              </Query>
             )}
             {tabId === TAB_ID.sentForUpdates && (
-              <div>{intl.formatMessage(messages.sentForUpdates)}</div>
+              <Query
+                query={FETCH_REGISTRATIONS_QUERY}
+                variables={{
+                  status: EVENT_STATUS.REJECTED,
+                  locationIds: [registrarUnion],
+                  count: this.pageSize,
+                  skip: (this.state.currentPage - 1) * this.pageSize
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    return (
+                      <StyledSpinner
+                        id="search-result-spinner"
+                        baseColor={theme.colors.background}
+                      />
+                    )
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
+                    return (
+                      <ErrorText id="search-result-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return (
+                    <>
+                      <GridTable
+                        content={this.transformRejectedContent(data)}
+                        columns={[
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemType
+                            ),
+                            width: 15,
+                            key: 'event'
+                          },
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemName
+                            ),
+                            width: 25,
+                            key: 'name'
+                          },
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemTrackingNumber
+                            ),
+                            width: 20,
+                            key: 'tracking_id'
+                          },
+                          {
+                            label: this.props.intl.formatMessage(
+                              messages.listItemUpdateDate
+                            ),
+                            width: 25,
+                            key: 'date_of_rejection'
+                          },
+                          {
+                            label: 'Action',
+                            width: 15,
+                            key: 'actions',
+                            isActionColumn: true,
+                            alignment: ColumnContentAlignment.CENTER
+                          }
+                        ]}
+                        noResultText={intl.formatMessage(
+                          messages.dataTableNoResults
+                        )}
+                        onPageChange={(currentPage: number) => {
+                          this.onPageChange(currentPage)
+                        }}
+                        pageSize={this.pageSize}
+                        totalPages={Math.ceil(
+                          ((data.listEventRegistrations &&
+                            data.listEventRegistrations.totalItems) ||
+                            0) / this.pageSize
+                        )}
+                        initialPage={this.state.currentPage}
+                      />
+                    </>
+                  )
+                }}
+              </Query>
             )}
           </HeaderContent>
         </Container>
@@ -358,6 +776,7 @@ export const WorkQueue = connect(
   {
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
+    goToWorkQueueTab: goToWorkQueueTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
