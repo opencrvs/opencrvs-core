@@ -120,7 +120,7 @@ function createMotherIndex(
   body.motherFamilyNameLocal =
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
   body.motherDoB = mother.birthDate
-  body.motherIdentifier = mother.identifier && mother.identifier[0].id
+  body.motherIdentifier = mother.identifier && mother.identifier[0].value
 }
 
 function createFatherIndex(
@@ -149,7 +149,7 @@ function createFatherIndex(
   body.fatherFamilyNameLocal =
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
   body.fatherDoB = father.birthDate
-  body.fatherIdentifier = father.identifier && father.identifier[0].id
+  body.fatherIdentifier = father.identifier && father.identifier[0].value
 }
 
 async function detectAndUpdateDuplicates(
