@@ -60,7 +60,7 @@ const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   text-align: center;
-  margin-top: 50px;
+  margin-top: 100px;
 `
 
 export enum ColumnContentAlignment {
@@ -158,16 +158,18 @@ export class GridTable extends React.Component<
         )
     return (
       <Wrapper>
-        <TableHeader>
-          {columns.map((preference, index) =>
-            ContentBlock(
-              preference.label,
-              preference.width,
-              index,
-              preference.alignment
-            )
-          )}
-        </TableHeader>
+        {content.length > 0 && (
+          <TableHeader>
+            {columns.map((preference, index) =>
+              ContentBlock(
+                preference.label,
+                preference.width,
+                index,
+                preference.alignment
+              )
+            )}
+          </TableHeader>
+        )}
         {this.getDisplayItems(currentPage, pageSize, content).map(
           (item, index) => {
             return (

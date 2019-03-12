@@ -53,8 +53,13 @@ import {
   IAction,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/interface/GridTable'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import {
+  REVIEW_EVENT_PARENT_FORM_TAB,
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_DEATH_FORM
+} from 'src/navigation/routes'
 import * as moment from 'moment'
+import { IDraft } from 'src/drafts'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -194,6 +199,11 @@ const messages = defineMessages({
     defaultMessage: 'Sent for updates',
     description: 'Label for rejection date in work queue list item'
   },
+  listItemModificationDate: {
+    id: 'register.workQueue.labels.results.modificationDate',
+    defaultMessage: 'Sent for updates',
+    description: 'Label for rejection date in work queue list item'
+  },
   listItemEventDate: {
     id: 'register.workQueue.labels.results.eventDate',
     defaultMessage: 'Date of event',
@@ -266,7 +276,7 @@ interface IBaseWorkQueueProps {
   goToWorkQueueTab: typeof goToWorkQueueTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
-  draftCount: number
+  drafts: IDraft[]
 }
 
 interface IWorkQueueState {
@@ -314,7 +324,7 @@ export class WorkQueueView extends React.Component<
         if (reg.registration && reg.registration.type === 'BIRTH') {
           const birthReg = reg as GQLBirthRegistration
           dateOfEvent = birthReg && birthReg.child && birthReg.child.birthDate
-        } else {
+        } else if (reg.registration && reg.registration.type === 'DEATH') {
           const deathReg = reg as GQLDeathRegistration
           dateOfEvent =
             deathReg &&
@@ -387,7 +397,7 @@ export class WorkQueueView extends React.Component<
               birthReg.child &&
               (birthReg.child.name as GQLHumanName[])) ||
             []
-        } else {
+        } else if (reg.registration && reg.registration.type === 'DEATH') {
           const deathReg = reg as GQLDeathRegistration
           names =
             (deathReg &&
@@ -426,9 +436,9 @@ export class WorkQueueView extends React.Component<
         return {
           id: reg.id,
           name:
-            (createNamesMap(names)[lang] as string) ||
+            (names && (createNamesMap(names)[lang] as string)) ||
             /* tslint:disable:no-string-literal */
-            (createNamesMap(names)['bn'] as string) ||
+            (names && (createNamesMap(names)['bn'] as string)) ||
             '',
           date_of_rejection:
             reg.registration &&
@@ -454,12 +464,81 @@ export class WorkQueueView extends React.Component<
     )
   }
 
+  transformDraftContent = () => {
+    if (!this.props.drafts || this.props.drafts.length <= 0) {
+      return []
+    }
+    return this.props.drafts.map((draft: IDraft) => {
+      let name
+      let tabRoute: string
+      if (draft.event && draft.event.toString() === 'birth') {
+        name =
+          (draft.data &&
+            draft.data.child &&
+            draft.data.child.familyNameEng &&
+            (!draft.data.child.firstNamesEng
+              ? ''
+              : draft.data.child.firstNamesEng + ' ') +
+              draft.data.child.familyNameEng) ||
+          (draft.data &&
+            draft.data.child &&
+            draft.data.child.familyName &&
+            (!draft.data.child.firstNames
+              ? ''
+              : draft.data.child.firstNames + ' ') +
+              draft.data.child.familyName) ||
+          ''
+        tabRoute = DRAFT_BIRTH_PARENT_FORM
+      } else if (draft.event && draft.event.toString() === 'death') {
+        name =
+          (draft.data &&
+            draft.data.deceased &&
+            draft.data.deceased.familyNameEng &&
+            (!draft.data.deceased.firstNamesEng
+              ? ''
+              : draft.data.deceased.firstNamesEng + ' ') +
+              draft.data.deceased.familyNameEng) ||
+          (draft.data &&
+            draft.data.deceased &&
+            draft.data.deceased.familyName &&
+            (!draft.data.deceased.firstNames
+              ? ''
+              : draft.data.deceased.firstNames + ' ') +
+              draft.data.deceased.familyName) ||
+          ''
+        tabRoute = DRAFT_DEATH_FORM
+      }
+      const lastModificationDate = draft.modifiedOn || draft.savedOn
+      const actions = [
+        {
+          label: this.props.intl.formatMessage(messages.update),
+          handler: () =>
+            this.props.gotoTab(
+              tabRoute,
+              draft.id,
+              '',
+              (draft.event && draft.event.toString()) || ''
+            )
+        }
+      ]
+      return {
+        id: draft.id,
+        event: (draft.event && draft.event.toUpperCase()) || '',
+        name: name || '',
+        date_of_modification:
+          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+          '',
+        actions
+      }
+    })
+  }
+
   onPageChange = (newPageNumber: number) => {
     this.setState({ currentPage: newPageNumber })
   }
 
   render() {
-    const { theme, intl, userDetails, language, tabId, draftCount } = this.props
+    const { theme, intl, userDetails, language, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let countQueryLoading = false
 
@@ -537,7 +616,8 @@ export class WorkQueueView extends React.Component<
                           this.props.goToWorkQueueTab(TAB_ID.inProgress)
                         }
                       >
-                        {intl.formatMessage(messages.inProgress)} ({draftCount})
+                        {intl.formatMessage(messages.inProgress)} (
+                        {(drafts && drafts.length) || 0})
                       </IconTab>
                       <IconTab
                         id={`tab_${TAB_ID.readyForReview}`}
@@ -571,7 +651,44 @@ export class WorkQueueView extends React.Component<
               }}
             </Query>
             {tabId === TAB_ID.inProgress && (
-              <div>{intl.formatMessage(messages.inProgress)}</div>
+              <GridTable
+                content={this.transformDraftContent()}
+                columns={[
+                  {
+                    label: this.props.intl.formatMessage(messages.listItemType),
+                    width: 15,
+                    key: 'event'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(messages.listItemName),
+                    width: 35,
+                    key: 'name'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(
+                      messages.listItemModificationDate
+                    ),
+                    width: 35,
+                    key: 'date_of_modification'
+                  },
+                  {
+                    label: 'Action',
+                    width: 15,
+                    key: 'actions',
+                    isActionColumn: true,
+                    alignment: ColumnContentAlignment.CENTER
+                  }
+                ]}
+                noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                onPageChange={(currentPage: number) => {
+                  this.onPageChange(currentPage)
+                }}
+                pageSize={this.pageSize}
+                totalPages={Math.ceil(
+                  ((drafts && drafts.length) || 0) / this.pageSize
+                )}
+                initialPage={this.state.currentPage}
+              />
             )}
             {tabId === TAB_ID.readyForReview && (
               <Query
@@ -605,61 +722,59 @@ export class WorkQueueView extends React.Component<
                     )
                   }
                   return (
-                    <>
-                      <GridTable
-                        content={this.transformDeclaredContent(data)}
-                        columns={[
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemType
-                            ),
-                            width: 15,
-                            key: 'event'
-                          },
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemTrackingNumber
-                            ),
-                            width: 20,
-                            key: 'tracking_id'
-                          },
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemApplicationDate
-                            ),
-                            width: 25,
-                            key: 'date_of_application'
-                          },
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemEventDate
-                            ),
-                            width: 25,
-                            key: 'date_of_event'
-                          },
-                          {
-                            label: 'Action',
-                            width: 15,
-                            key: 'actions',
-                            isActionColumn: true,
-                            alignment: ColumnContentAlignment.CENTER
-                          }
-                        ]}
-                        noResultText={intl.formatMessage(
-                          messages.dataTableNoResults
-                        )}
-                        onPageChange={(currentPage: number) => {
-                          this.onPageChange(currentPage)
-                        }}
-                        pageSize={this.pageSize}
-                        totalPages={Math.ceil(
-                          ((data.listEventRegistrations &&
-                            data.listEventRegistrations.totalItems) ||
-                            0) / this.pageSize
-                        )}
-                        initialPage={this.state.currentPage}
-                      />
-                    </>
+                    <GridTable
+                      content={this.transformDeclaredContent(data)}
+                      columns={[
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemType
+                          ),
+                          width: 15,
+                          key: 'event'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemTrackingNumber
+                          ),
+                          width: 20,
+                          key: 'tracking_id'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemApplicationDate
+                          ),
+                          width: 25,
+                          key: 'date_of_application'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemEventDate
+                          ),
+                          width: 25,
+                          key: 'date_of_event'
+                        },
+                        {
+                          label: 'Action',
+                          width: 15,
+                          key: 'actions',
+                          isActionColumn: true,
+                          alignment: ColumnContentAlignment.CENTER
+                        }
+                      ]}
+                      noResultText={intl.formatMessage(
+                        messages.dataTableNoResults
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        this.onPageChange(currentPage)
+                      }}
+                      pageSize={this.pageSize}
+                      totalPages={Math.ceil(
+                        ((data.listEventRegistrations &&
+                          data.listEventRegistrations.totalItems) ||
+                          0) / this.pageSize
+                      )}
+                      initialPage={this.state.currentPage}
+                    />
                   )
                 }}
               </Query>
@@ -692,61 +807,59 @@ export class WorkQueueView extends React.Component<
                     )
                   }
                   return (
-                    <>
-                      <GridTable
-                        content={this.transformRejectedContent(data)}
-                        columns={[
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemType
-                            ),
-                            width: 15,
-                            key: 'event'
-                          },
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemName
-                            ),
-                            width: 25,
-                            key: 'name'
-                          },
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemTrackingNumber
-                            ),
-                            width: 20,
-                            key: 'tracking_id'
-                          },
-                          {
-                            label: this.props.intl.formatMessage(
-                              messages.listItemUpdateDate
-                            ),
-                            width: 25,
-                            key: 'date_of_rejection'
-                          },
-                          {
-                            label: 'Action',
-                            width: 15,
-                            key: 'actions',
-                            isActionColumn: true,
-                            alignment: ColumnContentAlignment.CENTER
-                          }
-                        ]}
-                        noResultText={intl.formatMessage(
-                          messages.dataTableNoResults
-                        )}
-                        onPageChange={(currentPage: number) => {
-                          this.onPageChange(currentPage)
-                        }}
-                        pageSize={this.pageSize}
-                        totalPages={Math.ceil(
-                          ((data.listEventRegistrations &&
-                            data.listEventRegistrations.totalItems) ||
-                            0) / this.pageSize
-                        )}
-                        initialPage={this.state.currentPage}
-                      />
-                    </>
+                    <GridTable
+                      content={this.transformRejectedContent(data)}
+                      columns={[
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemType
+                          ),
+                          width: 15,
+                          key: 'event'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemName
+                          ),
+                          width: 25,
+                          key: 'name'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemTrackingNumber
+                          ),
+                          width: 20,
+                          key: 'tracking_id'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemUpdateDate
+                          ),
+                          width: 25,
+                          key: 'date_of_rejection'
+                        },
+                        {
+                          label: 'Action',
+                          width: 15,
+                          key: 'actions',
+                          isActionColumn: true,
+                          alignment: ColumnContentAlignment.CENTER
+                        }
+                      ]}
+                      noResultText={intl.formatMessage(
+                        messages.dataTableNoResults
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        this.onPageChange(currentPage)
+                      }}
+                      pageSize={this.pageSize}
+                      totalPages={Math.ceil(
+                        ((data.listEventRegistrations &&
+                          data.listEventRegistrations.totalItems) ||
+                          0) / this.pageSize
+                      )}
+                      initialPage={this.state.currentPage}
+                    />
                   )
                 }}
               </Query>
@@ -767,7 +880,7 @@ function mapStateToProps(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     tabId: match.params.tabId || 'review',
-    draftCount: state.drafts.drafts.length
+    drafts: state.drafts.drafts
   }
 }
 

@@ -671,6 +671,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.labels.results.type': 'Type',
     'register.workQueue.labels.results.applicationDate': 'Application sent',
     'register.workQueue.labels.results.updateDate': 'Sent for updates',
+    'register.workQueue.labels.results.modificationDate': 'Last edited',
     'register.workQueue.labels.results.eventDate': 'Date of event',
     'register.workQueue.labels.results.name': 'Name',
     'register.workQueue.labels.results.dob': 'D.o.B.',
