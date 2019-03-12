@@ -922,6 +922,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.event.dod': 'D.o.D',
     'register.event.death': 'Death',
     'register.event.birth': 'Birth',
-    'validations.isValidDateOfDeath': 'Must be a valid date of death'
+    'validations.isValidDateOfDeath': 'Must be a valid date of death',
+    'validations.greaterThanZero': 'Must be a greater than zero'
   }
 }
