@@ -54,16 +54,16 @@ export function buildQuery(body: ICompositionBody) {
 
   if (body.childFirstNames) {
     must.push({
-      fuzzy: {
-        childFirstNames: body.childFirstNames
+      match: {
+        childFirstNames: { query: body.childFirstNames, fuzziness: 'AUTO' }
       }
     })
   }
 
   if (body.childFamilyName) {
     must.push({
-      fuzzy: {
-        childFamilyName: body.childFamilyName
+      match: {
+        childFamilyName: { query: body.childFamilyName, fuzziness: 'AUTO' }
       }
     })
   }
@@ -86,16 +86,16 @@ export function buildQuery(body: ICompositionBody) {
 
   if (body.motherFirstNames) {
     should.push({
-      fuzzy: {
-        motherFirstNames: body.motherFirstNames
+      match: {
+        motherFirstNames: { query: body.motherFirstNames, fuzziness: 'AUTO' }
       }
     })
   }
 
   if (body.motherFamilyName) {
     should.push({
-      fuzzy: {
-        motherFamilyName: body.motherFamilyName
+      match: {
+        motherFamilyName: { query: body.motherFamilyName, fuzziness: 'AUTO' }
       }
     })
   }
@@ -121,16 +121,16 @@ export function buildQuery(body: ICompositionBody) {
 
   if (body.fatherFirstNames) {
     should.push({
-      fuzzy: {
-        fatherFirstNames: body.fatherFirstNames
+      match: {
+        fatherFirstNames: { query: body.fatherFirstNames, fuzziness: 'AUTO' }
       }
     })
   }
 
   if (body.fatherFamilyName) {
     should.push({
-      fuzzy: {
-        fatherFamilyName: body.fatherFamilyName
+      match: {
+        fatherFamilyName: { query: body.fatherFamilyName, fuzziness: 'AUTO' }
       }
     })
   }
