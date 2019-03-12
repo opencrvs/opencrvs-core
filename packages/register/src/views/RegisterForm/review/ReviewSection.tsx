@@ -65,6 +65,7 @@ import {
 } from 'src/forms'
 import { formatLongDate } from 'src/utils/date-formatting'
 import { getFieldLabel } from 'src/forms/utils'
+import { REJECTED } from 'src/utils/constants'
 
 const messages = defineMessages({
   valueYes: {
@@ -591,6 +592,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const numberOfErrors = flatten(
       Object.values(errorsOnFields).map(Object.values)
     ).filter(errors => errors.length > 0).length
+
+    const isRejected =
+      this.props.draft.status && this.props.draft.status === REJECTED
+
     return (
       <>
         <Row>
@@ -713,7 +718,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               </ButtonContainer>
             )}
 
-            {!!rejectApplicationClickEvent && (
+            {!!rejectApplicationClickEvent && !isRejected && (
               <ButtonContainer>
                 <RejectApplication
                   id="rejectApplicationBtn"

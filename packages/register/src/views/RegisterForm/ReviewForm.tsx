@@ -118,11 +118,16 @@ export class ReviewFormView extends React.Component<IProps> {
                 // @ts-ignore
                 data && data[dataKey]
               )
+
+              // @ts-ignore
+              const status: string = data[dataKey].registration.status[0].type
+
               const reviewDraft = createReviewDraft(
                 draftId,
                 // @ts-ignore
                 transData,
-                this.props.event
+                this.props.event,
+                status
               )
               dispatch(storeDraft(reviewDraft))
 
