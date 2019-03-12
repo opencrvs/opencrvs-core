@@ -120,7 +120,11 @@ export class ReviewFormView extends React.Component<IProps> {
               )
 
               // @ts-ignore
-              const status: string = data[dataKey].registration.status[0].type
+              const statusData = data[dataKey].registration.status
+
+              // @ts-ignore
+              const status: string =
+                (statusData && statusData[0] && statusData[0].type) || ''
 
               const reviewDraft = createReviewDraft(
                 draftId,

@@ -602,7 +602,8 @@ describe('ReviewForm tests', async () => {
                       {
                         comment: 'This is a note'
                       }
-                    ]
+                    ],
+                    type: 'DECLARED'
                   }
                 ],
                 trackingId: 'B123456',
@@ -903,6 +904,11 @@ describe('ReviewForm tests', async () => {
                 registration: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
                   attachments: null,
+                  status: [
+                    {
+                      type: 'DECLARED'
+                    }
+                  ],
                   type: 'DEATH',
                   trackingId: 'DS8QZ0Z',
                   registrationNumber: null
@@ -1146,6 +1152,11 @@ describe('ReviewForm tests', async () => {
                 registration: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
                   attachments: null,
+                  status: [
+                    {
+                      type: 'DECLARED'
+                    }
+                  ],
                   type: 'DEATH',
                   trackingId: 'DS8QZ0Z',
                   registrationNumber: '2019123223DS8QZ0Z1'
