@@ -1,8 +1,8 @@
 import {
   getSectionBySectionCode,
   getRegLastLocation,
-  getComposition,
-  getTask
+  getResourceByType,
+  FHIR_RESOURCE_TYPE
 } from './fhirUtils'
 
 describe('fhirUtils', () => {
@@ -388,7 +388,9 @@ describe('fhirUtils', () => {
       }
     }
 
-    expect(getComposition(bundle)).toBeFalsy()
+    expect(
+      getResourceByType(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+    ).toBeFalsy()
   })
   it('returns false if no resource is provided in the bundle to get task', () => {
     const bundle = {
@@ -407,6 +409,6 @@ describe('fhirUtils', () => {
       }
     }
 
-    expect(getTask(bundle)).toBeFalsy()
+    expect(getResourceByType(bundle, FHIR_RESOURCE_TYPE.TASK)).toBeFalsy()
   })
 })

@@ -2,7 +2,10 @@ export function getSectionBySectionCode(
   bundle: fhir.Bundle,
   sectionCode: string
 ): fhir.Patient {
-  const composition = getComposition(bundle)
+  const composition: fhir.Composition = getResourceByType(
+    bundle,
+    FHIR_RESOURCE_TYPE.COMPOSITION
+  ) as fhir.Composition
   const personSection =
     composition &&
     composition.section &&
@@ -30,7 +33,10 @@ export function getSectionBySectionCode(
 }
 
 export function getRegLastLocation(bundle: fhir.Bundle) {
-  const task: fhir.Task | undefined = getTask(bundle)
+  const task: fhir.Task = getResourceByType(
+    bundle,
+    FHIR_RESOURCE_TYPE.TASK
+  ) as fhir.Task
   if (!task) {
     throw new Error('Task not found!')
   }
@@ -48,9 +54,10 @@ export function getRegLastLocation(bundle: fhir.Bundle) {
   )
 }
 
-export function getComposition(
-  bundle: fhir.Bundle
-): fhir.Composition | undefined {
+export function getResourceByType(
+  bundle: fhir.Bundle,
+  type: string
+): fhir.Resource | undefined {
   const bundleEntry =
     bundle &&
     bundle.entry &&
@@ -58,22 +65,13 @@ export function getComposition(
       if (!entry.resource) {
         return false
       } else {
-        return entry.resource.resourceType === 'Composition'
+        return entry.resource.resourceType === type
       }
     })
-  return bundleEntry && (bundleEntry.resource as fhir.Composition)
+  return bundleEntry && (bundleEntry.resource as fhir.Resource)
 }
 
-export function getTask(bundle: fhir.Bundle): fhir.Task | undefined {
-  const bundleEntry =
-    bundle &&
-    bundle.entry &&
-    bundle.entry.find(entry => {
-      if (!entry.resource) {
-        return false
-      } else {
-        return entry.resource.resourceType === 'Task'
-      }
-    })
-  return bundleEntry && (bundleEntry.resource as fhir.Task)
+export enum FHIR_RESOURCE_TYPE {
+  COMPOSITION = 'Composition',
+  TASK = 'Task'
 }
