@@ -15,37 +15,6 @@ const TableHeader = styled.div`
   padding: 0 25px;
   line-height: 22px;
 `
-const ContentBlock = (
-  content: string,
-  width: number,
-  key: number,
-  alignment?: ColumnContentAlignment
-) => {
-  const ContentWrapper = styled.span`
-    width: ${width}%;
-    display: inline-block;
-    text-align: ${alignment ? alignment.toString() : 'left'};
-  `
-  return <ContentWrapper key={key}>{content}</ContentWrapper>
-}
-
-const ActionBlock = (
-  actions: IAction[],
-  width: number,
-  key: number,
-  alignment?: ColumnContentAlignment
-) => {
-  const ContentWrapper = styled.span`
-    width: ${width}%;
-    display: inline-block;
-    text-align: ${alignment ? alignment.toString() : 'left'};
-  `
-  return (
-    <ContentWrapper key={key}>
-      <ListItemAction actions={actions} />
-    </ContentWrapper>
-  )
-}
 
 const StyledBox = styled(Box)`
   margin-top: 15px;
@@ -61,6 +30,17 @@ const ErrorText = styled.div`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
+`
+
+const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
+  {}
+)`
+  width: ${({ width }) => width}%;
+  display: inline-block;
+  text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
+`
+const ClickableContentWrapper = styled(ContentWrapper)`
+  cursor: pointer;
 `
 
 export enum ColumnContentAlignment {
@@ -94,10 +74,12 @@ interface IGridTableProps {
   pageSize?: number
   totalPages?: number
   initialPage?: number
+  expandable?: boolean
 }
 
 interface IGridTableState {
   currentPage: number
+  expanded: string[]
 }
 
 const defaultConfiguration = {
@@ -114,7 +96,69 @@ export class GridTable extends React.Component<
   IGridTableState
 > {
   state = {
-    currentPage: this.props.initialPage || defaultConfiguration.initialPage
+    currentPage: this.props.initialPage || defaultConfiguration.initialPage,
+    expanded: []
+  }
+
+  renderContentBlock = (
+    content: string,
+    width: number,
+    key: number,
+    clickableId: string = '',
+    alignment?: ColumnContentAlignment
+  ) => {
+    if (clickableId === '' || !this.props.expandable) {
+      return (
+        <ContentWrapper key={key} width={width} alignment={alignment}>
+          {content}
+        </ContentWrapper>
+      )
+    } else {
+      return (
+        <ClickableContentWrapper
+          key={key}
+          width={width}
+          alignment={alignment}
+          onClick={() => this.toggleExpanded(clickableId)}
+        >
+          {content}
+        </ClickableContentWrapper>
+      )
+    }
+  }
+
+  renderActionBlock = (
+    itemId: string,
+    actions: IAction[],
+    width: number,
+    key: number,
+    alignment?: ColumnContentAlignment
+  ) => {
+    const { expandable } = this.props
+    return (
+      <ContentWrapper key={key} width={width} alignment={alignment}>
+        <ListItemAction actions={actions} />
+      </ContentWrapper>
+    )
+  }
+
+  toggleExpanded = (itemId: string) => {
+    const toggledExpandedList = []
+    const { expanded } = this.state
+    const index = expanded.findIndex(id => id === itemId)
+    if (index < 0) {
+      toggledExpandedList.push(itemId)
+    }
+    expanded.forEach(id => {
+      if (itemId !== id) {
+        toggledExpandedList.push(id)
+      }
+    })
+    this.setState({ expanded: toggledExpandedList })
+  }
+
+  shouldExpand = (itemId: string) => {
+    return true
   }
 
   getDisplayItems = (
@@ -161,10 +205,11 @@ export class GridTable extends React.Component<
         {content.length > 0 && (
           <TableHeader>
             {columns.map((preference, index) =>
-              ContentBlock(
+              this.renderContentBlock(
                 preference.label,
                 preference.width,
                 index,
+                '',
                 preference.alignment
               )
             )}
@@ -176,17 +221,19 @@ export class GridTable extends React.Component<
               <StyledBox key={index}>
                 {columns.map((preference, indx) => {
                   if (preference.isActionColumn) {
-                    return ActionBlock(
+                    return this.renderActionBlock(
+                      item.id as string,
                       item[preference.key] as IAction[],
                       preference.width,
                       indx,
                       preference.alignment
                     )
                   } else {
-                    return ContentBlock(
+                    return this.renderContentBlock(
                       item[preference.key] as string,
                       preference.width,
                       indx,
+                      item.id as string,
                       preference.alignment
                     )
                   }

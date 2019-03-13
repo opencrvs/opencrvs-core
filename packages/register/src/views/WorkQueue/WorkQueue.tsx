@@ -774,6 +774,7 @@ export class WorkQueueView extends React.Component<
                           0) / this.pageSize
                       )}
                       initialPage={this.state.currentPage}
+                      expandable={true}
                     />
                   )
                 }}
@@ -859,6 +860,7 @@ export class WorkQueueView extends React.Component<
                           0) / this.pageSize
                       )}
                       initialPage={this.state.currentPage}
+                      expandable={true}
                     />
                   )
                 }}
