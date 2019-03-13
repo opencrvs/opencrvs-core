@@ -15,36 +15,36 @@ export const BENGALI_STATE = {
     'performance.graph.birthRegistrationBoxTitle':
       'জন্ম নিবন্ধন মূল পরিসংখ্যান',
     'performance.graph.birthRegistrationBoxFooter':
-      'জাতীয় জনসংখ্যার গণনা তথ্য ব্যবহার করে উপলব্ধ অনুমান',
+      'আদমশুমারী হতে আনুমানিক জনসংখ্যা',
     'performance.graph.liveBirthsWithin45DaysLabel':
-      '45 দিনের<br />মধ্যে নিবন্ধন',
+      'জন্মের ৪৫ দিনের মধ্যে নিবন্ধন',
     'performance.graph.liveBirthsWithin45DaysDescription':
       '204000 এর মধ্যে 142500',
     'performance.graph.liveBirthsWithin1yearLabel':
-      '1 বছরের জন্মের<br />মধ্যে নিবন্ধন',
+      'জন্মের ১ বছরের মধ্যে নিবন্ধন',
     'performance.graph.liveBirthsWithin1yearDescription':
       '204000 এর মধ্যে 61500',
-    'performance.graph.totalLiveBirthsLabel': 'মোট লাইভ<br />জন্ম নিবন্ধিত',
+    'performance.graph.totalLiveBirthsLabel': 'মোট জীবিত জন্ম নিবন্ধন',
     'performance.graph.estimatedBirthsInTimeLabel':
-      '[সময়কাল] মধ্যে আনুমানিক জন্ম',
+      'আনুমানিক জন্মকাল [সময়কাল]',
     'performance.graph.estimatedBirthsInTimeDescription':
-      '2018 সালের জনসংখ্যার জনসংখ্যা থেকে প্রাপ্ত',
+      '২০১৮ সালের আনুমানিক জনসংখ্যা হতে প্রাপ্ত',
     'performance.graph.birthRegistrationBarChartBoxWithin10YearsTitle':
-      '0-10 বছর বাচ্চাদের মধ্যে বয়স নিবন্ধিত হয়',
+      '০-১০ বছর শিশুদের মধ্যে বয়স নিবন্ধিত হয়',
     'performance.graph.birthRegistrationInAgesLabel': 'বয়স (বছর)',
     'performance.graph.birthRegistrationPercentageLabel':
-      'মোট জন্ম নিবন্ধিত (%)',
+      'মোট জন্ম নিবন্ধন (%)',
     'performance.graph.birthRegistrationRateWithin45DaysTitle':
-      '45 দিনের মধ্যে নিবন্ধনের জন্য জন্মের হার',
-    'performance.graph.birthRegistrationRatePerMonthLabel': 'ক্যালেন্ডার মাস',
+      '৪৫ দিনের মধ্যে জন্ম নিবন্ধনের হার',
+    'performance.graph.birthRegistrationRatePerMonthLabel': 'পঞ্জিকা মাস',
     'performance.graph.birthRegistrationPercentageOfEstimateLabel':
       'আনুমানিক জন্ম নিবন্ধন%',
-    'register.home.header.hello': 'Hello {fullName}',
-    'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
-    'register.home.header.LOCAL_REGISTRAR': 'Registrar',
-    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.header.STATE_REGISTRAR': 'State Registrar',
-    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar'
+    'register.home.header.hello': 'হ্যালো {fullName}',
+    'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
+    'register.home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
+    'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
+    'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
+    'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক'
   }
 }
