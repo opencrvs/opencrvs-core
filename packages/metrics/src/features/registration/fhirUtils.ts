@@ -48,7 +48,9 @@ export function getRegLastLocation(bundle: fhir.Bundle) {
   )
 }
 
-function getComposition(bundle: fhir.Bundle): fhir.Composition | undefined {
+export function getComposition(
+  bundle: fhir.Bundle
+): fhir.Composition | undefined {
   const bundleEntry =
     bundle &&
     bundle.entry &&
@@ -62,7 +64,7 @@ function getComposition(bundle: fhir.Bundle): fhir.Composition | undefined {
   return bundleEntry && (bundleEntry.resource as fhir.Composition)
 }
 
-function getTask(bundle: fhir.Bundle): fhir.Task | undefined {
+export function getTask(bundle: fhir.Bundle): fhir.Task | undefined {
   const bundleEntry =
     bundle &&
     bundle.entry &&
