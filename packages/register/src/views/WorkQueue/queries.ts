@@ -22,6 +22,7 @@ export const FETCH_REGISTRATIONS_QUERY = gql`
         registration {
           type
           trackingId
+          contactPhoneNumber
           status {
             timestamp
           }
@@ -46,6 +47,14 @@ export const FETCH_REGISTRATIONS_QUERY = gql`
             }
             deceased {
               deathDate
+            }
+          }
+          informant {
+            individual {
+              telecom {
+                system
+                value
+              }
             }
           }
         }

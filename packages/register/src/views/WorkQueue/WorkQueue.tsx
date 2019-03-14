@@ -189,6 +189,11 @@ const messages = defineMessages({
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
   },
+  listItemApplicantNumber: {
+    id: 'register.workQueue.labels.results.applicantNumber',
+    defaultMessage: 'Applicant No.',
+    description: 'Label for applicant number in work queue list item'
+  },
   listItemApplicationDate: {
     id: 'register.workQueue.labels.results.applicationDate',
     defaultMessage: 'Application sent',
@@ -196,7 +201,7 @@ const messages = defineMessages({
   },
   listItemUpdateDate: {
     id: 'register.workQueue.labels.results.updateDate',
-    defaultMessage: 'Sent for updates',
+    defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item'
   },
   listItemModificationDate: {
@@ -390,6 +395,7 @@ export class WorkQueueView extends React.Component<
     return data.listEventRegistrations.results.map(
       (reg: GQLEventRegistration) => {
         let names
+        let contactPhoneNumber
         if (reg.registration && reg.registration.type === 'BIRTH') {
           const birthReg = reg as GQLBirthRegistration
           names =
@@ -397,6 +403,10 @@ export class WorkQueueView extends React.Component<
               birthReg.child &&
               (birthReg.child.name as GQLHumanName[])) ||
             []
+          contactPhoneNumber =
+            (birthReg.registration &&
+              birthReg.registration.contactPhoneNumber) ||
+            ''
         } else if (reg.registration && reg.registration.type === 'DEATH') {
           const deathReg = reg as GQLDeathRegistration
           names =
@@ -404,6 +414,16 @@ export class WorkQueueView extends React.Component<
               deathReg.deceased &&
               (deathReg.deceased.name as GQLHumanName[])) ||
             []
+          const phoneEntry =
+            (deathReg.informant &&
+              deathReg.informant.individual &&
+              deathReg.informant.individual.telecom &&
+              deathReg.informant.individual.telecom.find(
+                contactPoint =>
+                  (contactPoint && contactPoint.system === 'phone') || false
+              )) ||
+            null
+          contactPhoneNumber = (phoneEntry && phoneEntry.value) || ''
         }
         const actions = [] as IAction[]
         if (this.userHasRegisterScope()) {
@@ -451,7 +471,7 @@ export class WorkQueueView extends React.Component<
               reg.registration.status[0].timestamp.toString(),
               'YYYY-MM-DD'
             ).fromNow(),
-          tracking_id: (reg.registration && reg.registration.trackingId) || '',
+          contact_number: contactPhoneNumber || '',
           event:
             (reg.registration &&
               reg.registration.type &&
@@ -824,15 +844,15 @@ export class WorkQueueView extends React.Component<
                           label: this.props.intl.formatMessage(
                             messages.listItemName
                           ),
-                          width: 24,
+                          width: 23,
                           key: 'name'
                         },
                         {
                           label: this.props.intl.formatMessage(
-                            messages.listItemTrackingNumber
+                            messages.listItemApplicantNumber
                           ),
-                          width: 20,
-                          key: 'tracking_id'
+                          width: 21,
+                          key: 'contact_number'
                         },
                         {
                           label: this.props.intl.formatMessage(
