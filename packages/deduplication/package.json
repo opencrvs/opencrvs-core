@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/deduplication",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "OpenCRVS de-duplication service",
   "main": "src/index.js",
   "license": "NONE",

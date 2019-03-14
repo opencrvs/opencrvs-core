@@ -1,9 +1,9 @@
 {
   "name": "@opencrvs/register",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "private": true,
   "dependencies": {
-    "@opencrvs/components": "^1.0.0-alpha.2",
+    "@opencrvs/components": "^1.0.0-alpha.3",
     "@sentry/browser": "^4.6.3",
     "@types/history": "^4.6.2",
     "@types/react-intl": "^2.3.8",

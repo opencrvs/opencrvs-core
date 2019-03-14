@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/components",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "private": true,
   "dependencies": {
     "@types/react-select": "^2.0.2",
