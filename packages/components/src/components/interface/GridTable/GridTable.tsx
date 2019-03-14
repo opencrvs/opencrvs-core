@@ -32,15 +32,21 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
+const RowBox = styled.div.attrs<{ expandable?: boolean }>({})`
+  width: 100%;
+  cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
+`
+
 const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
   {}
 )`
   width: ${({ width }) => width}%;
   display: inline-block;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
+  padding-right: 10px;
 `
-const ClickableContentWrapper = styled(ContentWrapper)`
-  cursor: pointer;
+const ActionWrapper = styled(ContentWrapper)`
+  padding-right: 0px;
 `
 
 export enum ColumnContentAlignment {
@@ -100,33 +106,6 @@ export class GridTable extends React.Component<
     expanded: []
   }
 
-  renderContentBlock = (
-    content: string,
-    width: number,
-    key: number,
-    clickableId: string = '',
-    alignment?: ColumnContentAlignment
-  ) => {
-    if (clickableId === '' || !this.props.expandable) {
-      return (
-        <ContentWrapper key={key} width={width} alignment={alignment}>
-          {content}
-        </ContentWrapper>
-      )
-    } else {
-      return (
-        <ClickableContentWrapper
-          key={key}
-          width={width}
-          alignment={alignment}
-          onClick={() => this.toggleExpanded(clickableId)}
-        >
-          {content}
-        </ClickableContentWrapper>
-      )
-    }
-  }
-
   renderActionBlock = (
     itemId: string,
     actions: IAction[],
@@ -136,7 +115,7 @@ export class GridTable extends React.Component<
   ) => {
     if (this.props.expandable) {
       return (
-        <ContentWrapper key={key} width={width} alignment={alignment}>
+        <ActionWrapper key={key} width={width} alignment={alignment}>
           <ListItemAction
             actions={actions}
             expanded={
@@ -144,18 +123,21 @@ export class GridTable extends React.Component<
             }
             onExpand={() => this.toggleExpanded(itemId)}
           />
-        </ContentWrapper>
+        </ActionWrapper>
       )
     } else {
       return (
-        <ContentWrapper key={key} width={width} alignment={alignment}>
+        <ActionWrapper key={key} width={width} alignment={alignment}>
           <ListItemAction actions={actions} />
-        </ContentWrapper>
+        </ActionWrapper>
       )
     }
   }
 
   toggleExpanded = (itemId: string) => {
+    if (!this.props.expandable) {
+      return
+    }
     const toggledExpandedList = []
     const { expanded } = this.state
     const index = expanded.findIndex(id => id === itemId)
@@ -217,40 +199,47 @@ export class GridTable extends React.Component<
       <Wrapper>
         {content.length > 0 && (
           <TableHeader>
-            {columns.map((preference, index) =>
-              this.renderContentBlock(
-                preference.label,
-                preference.width,
-                index,
-                '',
-                preference.alignment
-              )
-            )}
+            {columns.map((preference, index) => (
+              <ContentWrapper
+                key={index}
+                width={preference.width}
+                alignment={preference.alignment}
+              >
+                {preference.label}
+              </ContentWrapper>
+            ))}
           </TableHeader>
         )}
         {this.getDisplayItems(currentPage, pageSize, content).map(
           (item, index) => {
             return (
               <StyledBox key={index}>
-                {columns.map((preference, indx) => {
-                  if (preference.isActionColumn) {
-                    return this.renderActionBlock(
-                      item.id as string,
-                      item[preference.key] as IAction[],
-                      preference.width,
-                      indx,
-                      preference.alignment
-                    )
-                  } else {
-                    return this.renderContentBlock(
-                      item[preference.key] as string,
-                      preference.width,
-                      indx,
-                      item.id as string,
-                      preference.alignment
-                    )
-                  }
-                })}
+                <RowBox
+                  expandable={this.props.expandable}
+                  onClick={() => this.toggleExpanded(item.id as string)}
+                >
+                  {columns.map((preference, indx) => {
+                    if (preference.isActionColumn) {
+                      return this.renderActionBlock(
+                        item.id as string,
+                        item[preference.key] as IAction[],
+                        preference.width,
+                        indx,
+                        preference.alignment
+                      )
+                    } else {
+                      return (
+                        <ContentWrapper
+                          key={indx}
+                          width={preference.width}
+                          alignment={preference.alignment}
+                        >
+                          {item[preference.key] as string}
+                        </ContentWrapper>
+                      )
+                    }
+                  })}
+                </RowBox>
                 {this.showExpandedSection(item.id as string) && (
                   <p> expanded - change me</p>
                 )}

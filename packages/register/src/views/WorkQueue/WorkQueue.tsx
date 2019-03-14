@@ -822,7 +822,7 @@ export class WorkQueueView extends React.Component<
                           label: this.props.intl.formatMessage(
                             messages.listItemName
                           ),
-                          width: 23,
+                          width: 24,
                           key: 'name'
                         },
                         {
@@ -836,7 +836,7 @@ export class WorkQueueView extends React.Component<
                           label: this.props.intl.formatMessage(
                             messages.listItemUpdateDate
                           ),
-                          width: 23,
+                          width: 22,
                           key: 'date_of_rejection'
                         },
                         {
