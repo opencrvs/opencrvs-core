@@ -206,7 +206,7 @@ const messages = defineMessages({
   },
   listItemModificationDate: {
     id: 'register.workQueue.labels.results.modificationDate',
-    defaultMessage: 'Sent for updates',
+    defaultMessage: 'Last edited',
     description: 'Label for rejection date in work queue list item'
   },
   listItemEventDate: {
@@ -234,6 +234,11 @@ const messages = defineMessages({
     id: 'register.workQueue.labels.results.name',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
+  },
+  listItemAction: {
+    id: 'register.workQueue.labels.results.action',
+    defaultMessage: 'Action',
+    description: 'Label for action in work queue list item'
   }
 })
 const Container = styled.div`
@@ -692,7 +697,9 @@ export class WorkQueueView extends React.Component<
                     key: 'date_of_modification'
                   },
                   {
-                    label: 'Action',
+                    label: this.props.intl.formatMessage(
+                      messages.listItemAction
+                    ),
                     width: 15,
                     key: 'actions',
                     isActionColumn: true,
@@ -773,7 +780,9 @@ export class WorkQueueView extends React.Component<
                           key: 'date_of_event'
                         },
                         {
-                          label: 'Action',
+                          label: this.props.intl.formatMessage(
+                            messages.listItemAction
+                          ),
                           width: 20,
                           key: 'actions',
                           isActionColumn: true,
@@ -862,7 +871,9 @@ export class WorkQueueView extends React.Component<
                           key: 'date_of_rejection'
                         },
                         {
-                          label: 'Action',
+                          label: this.props.intl.formatMessage(
+                            messages.listItemAction
+                          ),
                           width: 20,
                           key: 'actions',
                           isActionColumn: true,
