@@ -729,7 +729,7 @@ export class WorkQueueView extends React.Component<
                           label: this.props.intl.formatMessage(
                             messages.listItemType
                           ),
-                          width: 15,
+                          width: 14,
                           key: 'event'
                         },
                         {
@@ -743,19 +743,19 @@ export class WorkQueueView extends React.Component<
                           label: this.props.intl.formatMessage(
                             messages.listItemApplicationDate
                           ),
-                          width: 25,
+                          width: 23,
                           key: 'date_of_application'
                         },
                         {
                           label: this.props.intl.formatMessage(
                             messages.listItemEventDate
                           ),
-                          width: 25,
+                          width: 23,
                           key: 'date_of_event'
                         },
                         {
                           label: 'Action',
-                          width: 15,
+                          width: 20,
                           key: 'actions',
                           isActionColumn: true,
                           alignment: ColumnContentAlignment.CENTER
@@ -815,14 +815,14 @@ export class WorkQueueView extends React.Component<
                           label: this.props.intl.formatMessage(
                             messages.listItemType
                           ),
-                          width: 15,
+                          width: 14,
                           key: 'event'
                         },
                         {
                           label: this.props.intl.formatMessage(
                             messages.listItemName
                           ),
-                          width: 25,
+                          width: 23,
                           key: 'name'
                         },
                         {
@@ -836,12 +836,12 @@ export class WorkQueueView extends React.Component<
                           label: this.props.intl.formatMessage(
                             messages.listItemUpdateDate
                           ),
-                          width: 25,
+                          width: 23,
                           key: 'date_of_rejection'
                         },
                         {
                           label: 'Action',
-                          width: 15,
+                          width: 20,
                           key: 'actions',
                           isActionColumn: true,
                           alignment: ColumnContentAlignment.CENTER

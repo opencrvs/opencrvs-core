@@ -134,12 +134,25 @@ export class GridTable extends React.Component<
     key: number,
     alignment?: ColumnContentAlignment
   ) => {
-    const { expandable } = this.props
-    return (
-      <ContentWrapper key={key} width={width} alignment={alignment}>
-        <ListItemAction actions={actions} />
-      </ContentWrapper>
-    )
+    if (this.props.expandable) {
+      return (
+        <ContentWrapper key={key} width={width} alignment={alignment}>
+          <ListItemAction
+            actions={actions}
+            expanded={
+              this.state.expanded.findIndex(id => id === itemId) >= 0 || false
+            }
+            onExpand={() => this.toggleExpanded(itemId)}
+          />
+        </ContentWrapper>
+      )
+    } else {
+      return (
+        <ContentWrapper key={key} width={width} alignment={alignment}>
+          <ListItemAction actions={actions} />
+        </ContentWrapper>
+      )
+    }
   }
 
   toggleExpanded = (itemId: string) => {
@@ -157,8 +170,8 @@ export class GridTable extends React.Component<
     this.setState({ expanded: toggledExpandedList })
   }
 
-  shouldExpand = (itemId: string) => {
-    return true
+  showExpandedSection = (itemId: string) => {
+    return this.state.expanded.findIndex(id => id === itemId) >= 0
   }
 
   getDisplayItems = (
@@ -238,6 +251,9 @@ export class GridTable extends React.Component<
                     )
                   }
                 })}
+                {this.showExpandedSection(item.id as string) && (
+                  <p> expanded - change me</p>
+                )}
               </StyledBox>
             )
           }
