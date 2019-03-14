@@ -258,7 +258,7 @@ const StyledIconAction = styled(IconAction)`
   }
 `
 const StyledSpinner = styled(Spinner)`
-  margin: 50% auto;
+  margin: 20% auto;
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -540,7 +540,7 @@ export class WorkQueueView extends React.Component<
   render() {
     const { theme, intl, userDetails, language, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
-    let countQueryLoading = false
+    let parentQueryLoading = false
 
     let fullName = ''
     if (userDetails && userDetails.name) {
@@ -585,7 +585,7 @@ export class WorkQueueView extends React.Component<
             >
               {({ loading, error, data }) => {
                 if (loading) {
-                  countQueryLoading = true
+                  parentQueryLoading = true
                   return (
                     <StyledSpinner
                       id="search-result-spinner"
@@ -593,7 +593,7 @@ export class WorkQueueView extends React.Component<
                     />
                   )
                 }
-                countQueryLoading = false
+                parentQueryLoading = false
                 if (error) {
                   Sentry.captureException(error)
                   return (
@@ -702,16 +702,15 @@ export class WorkQueueView extends React.Component<
               >
                 {({ loading, error, data }) => {
                   if (loading) {
-                    if (countQueryLoading) {
-                      return null
-                    } else {
-                      return (
+                    return (
+                      (!parentQueryLoading && (
                         <StyledSpinner
                           id="search-result-spinner"
                           baseColor={theme.colors.background}
                         />
-                      )
-                    }
+                      )) ||
+                      null
+                    )
                   }
                   if (error) {
                     Sentry.captureException(error)
@@ -793,10 +792,13 @@ export class WorkQueueView extends React.Component<
                 {({ loading, error, data }) => {
                   if (loading) {
                     return (
-                      <StyledSpinner
-                        id="search-result-spinner"
-                        baseColor={theme.colors.background}
-                      />
+                      (!parentQueryLoading && (
+                        <StyledSpinner
+                          id="search-result-spinner"
+                          baseColor={theme.colors.background}
+                        />
+                      )) ||
+                      null
                     )
                   }
                   if (error) {

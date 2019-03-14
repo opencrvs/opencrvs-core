@@ -32,7 +32,7 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const RowBox = styled.div.attrs<{ expandable?: boolean }>({})`
+const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
   width: 100%;
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
 `
@@ -214,7 +214,7 @@ export class GridTable extends React.Component<
           (item, index) => {
             return (
               <StyledBox key={index}>
-                <RowBox
+                <RowWrapper
                   expandable={this.props.expandable}
                   onClick={() => this.toggleExpanded(item.id as string)}
                 >
@@ -239,7 +239,7 @@ export class GridTable extends React.Component<
                       )
                     }
                   })}
-                </RowBox>
+                </RowWrapper>
                 {this.showExpandedSection(item.id as string) && (
                   <p> expanded - change me</p>
                 )}
