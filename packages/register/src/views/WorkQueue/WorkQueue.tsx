@@ -60,6 +60,7 @@ import {
 } from 'src/navigation/routes'
 import * as moment from 'moment'
 import { IDraft } from 'src/drafts'
+import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -330,10 +331,17 @@ export class WorkQueueView extends React.Component<
 
     return data.listEventRegistrations.results.map(
       (reg: GQLEventRegistration) => {
+        const lang = 'bn'
         let dateOfEvent
+        let names: GQLHumanName[] = []
         if (reg.registration && reg.registration.type === 'BIRTH') {
           const birthReg = reg as GQLBirthRegistration
           dateOfEvent = birthReg && birthReg.child && birthReg.child.birthDate
+          names =
+            (birthReg &&
+              birthReg.child &&
+              (birthReg.child.name as GQLHumanName[])) ||
+            []
         } else if (reg.registration && reg.registration.type === 'DEATH') {
           const deathReg = reg as GQLDeathRegistration
           dateOfEvent =
@@ -341,6 +349,11 @@ export class WorkQueueView extends React.Component<
             deathReg.deceased &&
             deathReg.deceased.deceased &&
             deathReg.deceased.deceased.deathDate
+          names =
+            (deathReg &&
+              deathReg.deceased &&
+              (deathReg.deceased.name as GQLHumanName[])) ||
+            []
         }
         const actions = [] as IAction[]
         if (this.userHasRegisterScope()) {
@@ -369,13 +382,26 @@ export class WorkQueueView extends React.Component<
             })
           }
         }
+
         return {
           id: reg.id,
+          name:
+            (createNamesMap(names)[lang] as string) ||
+            /* tslint:disable:no-string-literal */
+            (createNamesMap(names)['default'] as string) ||
+            /* tslint:enable:no-string-literal */
+            '',
           date_of_event:
+            (dateOfEvent &&
+              moment(dateOfEvent.toString(), 'YYYY-MM-DD').format(
+                CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
+              )) ||
+            '',
+          event_time_elapsed:
             (dateOfEvent &&
               moment(dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
             '',
-          date_of_application:
+          application_time_elapsed:
             (reg.createdAt &&
               moment(reg.createdAt.toString(), 'YYYY-MM-DD').fromNow()) ||
             '',
@@ -770,14 +796,14 @@ export class WorkQueueView extends React.Component<
                             messages.listItemApplicationDate
                           ),
                           width: 23,
-                          key: 'date_of_application'
+                          key: 'application_time_elapsed'
                         },
                         {
                           label: this.props.intl.formatMessage(
                             messages.listItemEventDate
                           ),
                           width: 23,
-                          key: 'date_of_event'
+                          key: 'event_time_elapsed'
                         },
                         {
                           label: this.props.intl.formatMessage(

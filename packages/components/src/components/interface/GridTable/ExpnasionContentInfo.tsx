@@ -24,7 +24,7 @@ const BoldSpan = styled.span`
 `
 type IProps = InjectedIntlProps & {
   data: {
-    [key: string]: string & Array<{ [key: string]: string }>
+    [key: string]: string & Array<{ [key: string]: string | any }>
   }
 }
 const viewableField = ['name', 'dob', 'dod']

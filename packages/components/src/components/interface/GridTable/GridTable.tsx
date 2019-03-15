@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
+import { ExpansionContentInfo } from './ExpnasionContentInfo'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -18,7 +19,7 @@ const TableHeader = styled.div`
 
 const StyledBox = styled(Box)`
   margin-top: 15px;
-  padding: 12px 25px;
+  padding: 12px 0px;
   color: ${({ theme }) => theme.colors.placeholder};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
@@ -35,6 +36,7 @@ const ErrorText = styled.div`
 const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
   width: 100%;
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
+  padding: 0 25px;
 `
 
 const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
@@ -47,6 +49,11 @@ const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
 `
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
+`
+
+const ExpendedSectionContainer = styled.div`
+  border-top: ${({ theme }) => `2px solid ${theme.colors.greyBorder}`};
+  margin-top: 5px;
 `
 
 export enum ColumnContentAlignment {
@@ -241,7 +248,9 @@ export class GridTable extends React.Component<
                   })}
                 </RowWrapper>
                 {this.showExpandedSection(item.id as string) && (
-                  <p> expanded - change me</p>
+                  <ExpendedSectionContainer>
+                    <ExpansionContentInfo data={item} />
+                  </ExpendedSectionContainer>
                 )}
               </StyledBox>
             )

@@ -24,7 +24,34 @@ export const FETCH_REGISTRATIONS_QUERY = gql`
           trackingId
           contactPhoneNumber
           status {
+            id
+            user {
+              id
+              name {
+                use
+                firstNames
+                familyName
+              }
+              role
+            }
+            location {
+              id
+              name
+              alias
+            }
+            office {
+              name
+              alias
+              address {
+                district
+                state
+              }
+            }
+            type
             timestamp
+            comments {
+              comment
+            }
           }
         }
         createdAt
