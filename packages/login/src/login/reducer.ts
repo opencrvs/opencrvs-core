@@ -144,7 +144,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.GOTO_APP:
       let redirectUrl: string
       if (action.payload === REGISTER_APP) {
-        redirectUrl = `${window.config.REGISTER_APP_URL}search-result?token=${
+        redirectUrl = `${window.config.REGISTER_APP_URL}work-queue?token=${
           state.token
         }`
       } else {

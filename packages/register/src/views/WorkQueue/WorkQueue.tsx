@@ -12,7 +12,8 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import {
   SearchInput,
-  ISearchInputProps
+  ISearchInputProps,
+  Spinner
 } from '@opencrvs/components/lib/interface'
 import {
   Plus,
@@ -20,7 +21,6 @@ import {
   StatusRejected,
   StatusProgress
 } from '@opencrvs/components/lib/icons'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema.d'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
@@ -28,14 +28,38 @@ import { Scope } from 'src/utils/authUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   goToEvents as goToEventsAction,
+  goToTab as goToTabAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from 'src/navigation'
-import { goToWorkQueueTab as goToTabAction } from '../../navigation'
-import { IUserDetails } from 'src/utils/userUtils'
+import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
+import { IUserDetails, getUserLocation } from 'src/utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { RouteComponentProps } from 'react-router'
+import { Query } from 'react-apollo'
+import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
+import * as Sentry from '@sentry/browser'
+import {
+  GQLBirthRegistration,
+  GQLHumanName,
+  GQLQuery,
+  GQLEventRegistration,
+  GQLDeathRegistration
+} from '@opencrvs/gateway/src/graphql/schema.d'
+import { createNamesMap } from 'src/utils/data-formatting'
+import {
+  GridTable,
+  IAction,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface/GridTable'
+import {
+  REVIEW_EVENT_PARENT_FORM_TAB,
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_DEATH_FORM
+} from 'src/navigation/routes'
+import * as moment from 'moment'
+import { IDraft } from 'src/drafts'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -154,6 +178,67 @@ const messages = defineMessages({
     id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
+  },
+  listItemType: {
+    id: 'register.workQueue.labels.results.type',
+    defaultMessage: 'Type',
+    description: 'Label for type of event in work queue list item'
+  },
+  listItemTrackingNumber: {
+    id: 'register.workQueue.labels.results.trackingID',
+    defaultMessage: 'Tracking ID',
+    description: 'Label for tracking ID in work queue list item'
+  },
+  listItemApplicantNumber: {
+    id: 'register.workQueue.labels.results.applicantNumber',
+    defaultMessage: 'Applicant No.',
+    description: 'Label for applicant number in work queue list item'
+  },
+  listItemApplicationDate: {
+    id: 'register.workQueue.labels.results.applicationDate',
+    defaultMessage: 'Application sent',
+    description: 'Label for application date in work queue list item'
+  },
+  listItemUpdateDate: {
+    id: 'register.workQueue.labels.results.updateDate',
+    defaultMessage: 'Sent on',
+    description: 'Label for rejection date in work queue list item'
+  },
+  listItemModificationDate: {
+    id: 'register.workQueue.labels.results.modificationDate',
+    defaultMessage: 'Last edited',
+    description: 'Label for rejection date in work queue list item'
+  },
+  listItemEventDate: {
+    id: 'register.workQueue.labels.results.eventDate',
+    defaultMessage: 'Date of event',
+    description: 'Label for event date in work queue list item'
+  },
+  reviewDuplicates: {
+    id: 'register.workQueue.buttons.reviewDuplicates',
+    defaultMessage: 'Review Duplicates',
+    description:
+      'The title of review duplicates button in expanded area of list item'
+  },
+  review: {
+    id: 'register.workQueue.list.buttons.review',
+    defaultMessage: 'Review',
+    description: 'The title of review button in list item actions'
+  },
+  update: {
+    id: 'register.workQueue.list.buttons.update',
+    defaultMessage: 'Update',
+    description: 'The title of update button in list item actions'
+  },
+  listItemName: {
+    id: 'register.workQueue.labels.results.name',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
+  },
+  listItemAction: {
+    id: 'register.workQueue.labels.results.action',
+    defaultMessage: 'Action',
+    description: 'Label for action in work queue list item'
   }
 })
 const Container = styled.div`
@@ -182,6 +267,15 @@ const StyledIconAction = styled(IconAction)`
     color: ${({ theme }) => theme.colors.white};
   }
 `
+const StyledSpinner = styled(Spinner)`
+  margin: 20% auto;
+`
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
+`
 interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
@@ -189,8 +283,14 @@ interface IBaseWorkQueueProps {
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
+  goToWorkQueueTab: typeof goToWorkQueueTabAction
+  goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
-  draftCount: number
+  drafts: IDraft[]
+}
+
+interface IWorkQueueState {
+  currentPage: number
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -203,9 +303,269 @@ const TAB_ID = {
   readyForReview: 'review',
   sentForUpdates: 'updates'
 }
-export class WorkQueueView extends React.Component<IWorkQueueProps> {
+
+const EVENT_STATUS = {
+  DECLARED: 'DECLARED',
+  REJECTED: 'REJECTED'
+}
+export class WorkQueueView extends React.Component<
+  IWorkQueueProps,
+  IWorkQueueState
+> {
+  pageSize = 10
+  constructor(props: IWorkQueueProps) {
+    super(props)
+    this.state = {
+      currentPage: 1
+    }
+  }
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
+  transformDeclaredContent = (data: GQLQuery) => {
+    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+      return []
+    }
+
+    return data.listEventRegistrations.results.map(
+      (reg: GQLEventRegistration) => {
+        let dateOfEvent
+        if (reg.registration && reg.registration.type === 'BIRTH') {
+          const birthReg = reg as GQLBirthRegistration
+          dateOfEvent = birthReg && birthReg.child && birthReg.child.birthDate
+        } else if (reg.registration && reg.registration.type === 'DEATH') {
+          const deathReg = reg as GQLDeathRegistration
+          dateOfEvent =
+            deathReg &&
+            deathReg.deceased &&
+            deathReg.deceased.deceased &&
+            deathReg.deceased.deceased.deathDate
+        }
+        const actions = [] as IAction[]
+        if (this.userHasRegisterScope()) {
+          if (
+            reg.registration &&
+            reg.registration.duplicates &&
+            reg.registration.duplicates.length > 0
+          ) {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.reviewDuplicates),
+              handler: () => this.props.goToReviewDuplicate(reg.id)
+            })
+          } else {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.review),
+              handler: () =>
+                this.props.gotoTab(
+                  REVIEW_EVENT_PARENT_FORM_TAB,
+                  reg.id,
+                  'review',
+                  (reg.registration &&
+                    reg.registration.type &&
+                    reg.registration.type.toLowerCase()) ||
+                    ''
+                )
+            })
+          }
+        }
+        return {
+          id: reg.id,
+          date_of_event:
+            (dateOfEvent &&
+              moment(dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
+            '',
+          date_of_application:
+            (reg.createdAt &&
+              moment(reg.createdAt.toString(), 'YYYY-MM-DD').fromNow()) ||
+            '',
+          tracking_id: (reg.registration && reg.registration.trackingId) || '',
+          event:
+            (reg.registration &&
+              reg.registration.type &&
+              reg.registration.type.toString()) ||
+            '',
+          duplicates: (reg.registration && reg.registration.duplicates) || [],
+          actions
+        }
+      }
+    )
+  }
+
+  transformRejectedContent = (data: GQLQuery) => {
+    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+      return []
+    }
+
+    return data.listEventRegistrations.results.map(
+      (reg: GQLEventRegistration) => {
+        let names
+        let contactPhoneNumber
+        if (reg.registration && reg.registration.type === 'BIRTH') {
+          const birthReg = reg as GQLBirthRegistration
+          names =
+            (birthReg &&
+              birthReg.child &&
+              (birthReg.child.name as GQLHumanName[])) ||
+            []
+          contactPhoneNumber =
+            (birthReg.registration &&
+              birthReg.registration.contactPhoneNumber) ||
+            ''
+        } else if (reg.registration && reg.registration.type === 'DEATH') {
+          const deathReg = reg as GQLDeathRegistration
+          names =
+            (deathReg &&
+              deathReg.deceased &&
+              (deathReg.deceased.name as GQLHumanName[])) ||
+            []
+          const phoneEntry =
+            (deathReg.informant &&
+              deathReg.informant.individual &&
+              deathReg.informant.individual.telecom &&
+              deathReg.informant.individual.telecom.find(
+                contactPoint =>
+                  (contactPoint && contactPoint.system === 'phone') || false
+              )) ||
+            null
+          contactPhoneNumber = (phoneEntry && phoneEntry.value) || ''
+        }
+        const actions = [] as IAction[]
+        if (this.userHasRegisterScope()) {
+          if (
+            reg.registration &&
+            reg.registration.duplicates &&
+            reg.registration.duplicates.length > 0
+          ) {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.reviewDuplicates),
+              handler: () => this.props.goToReviewDuplicate(reg.id)
+            })
+          } else {
+            actions.push({
+              label: this.props.intl.formatMessage(messages.update),
+              handler: () =>
+                this.props.gotoTab(
+                  REVIEW_EVENT_PARENT_FORM_TAB,
+                  reg.id,
+                  'review',
+                  (reg.registration &&
+                    reg.registration.type &&
+                    reg.registration.type.toLowerCase()) ||
+                    ''
+                )
+            })
+          }
+        }
+        const lang = 'en'
+        return {
+          id: reg.id,
+          name:
+            (names && (createNamesMap(names)[lang] as string)) ||
+            /* tslint:disable:no-string-literal */
+            (names && (createNamesMap(names)['bn'] as string)) ||
+            '',
+          date_of_rejection:
+            reg.registration &&
+            reg.registration.status &&
+            reg.registration.status[0] &&
+            // @ts-ignore
+            reg.registration.status[0].timestamp &&
+            moment(
+              // @ts-ignore
+              reg.registration.status[0].timestamp.toString(),
+              'YYYY-MM-DD'
+            ).fromNow(),
+          contact_number: contactPhoneNumber || '',
+          event:
+            (reg.registration &&
+              reg.registration.type &&
+              reg.registration.type.toString()) ||
+            '',
+          duplicates: (reg.registration && reg.registration.duplicates) || [],
+          actions
+        }
+      }
+    )
+  }
+
+  transformDraftContent = () => {
+    if (!this.props.drafts || this.props.drafts.length <= 0) {
+      return []
+    }
+    return this.props.drafts.map((draft: IDraft) => {
+      let name
+      let tabRoute: string
+      if (draft.event && draft.event.toString() === 'birth') {
+        name =
+          (draft.data &&
+            draft.data.child &&
+            draft.data.child.familyNameEng &&
+            (!draft.data.child.firstNamesEng
+              ? ''
+              : draft.data.child.firstNamesEng + ' ') +
+              draft.data.child.familyNameEng) ||
+          (draft.data &&
+            draft.data.child &&
+            draft.data.child.familyName &&
+            (!draft.data.child.firstNames
+              ? ''
+              : draft.data.child.firstNames + ' ') +
+              draft.data.child.familyName) ||
+          ''
+        tabRoute = DRAFT_BIRTH_PARENT_FORM
+      } else if (draft.event && draft.event.toString() === 'death') {
+        name =
+          (draft.data &&
+            draft.data.deceased &&
+            draft.data.deceased.familyNameEng &&
+            (!draft.data.deceased.firstNamesEng
+              ? ''
+              : draft.data.deceased.firstNamesEng + ' ') +
+              draft.data.deceased.familyNameEng) ||
+          (draft.data &&
+            draft.data.deceased &&
+            draft.data.deceased.familyName &&
+            (!draft.data.deceased.firstNames
+              ? ''
+              : draft.data.deceased.firstNames + ' ') +
+              draft.data.deceased.familyName) ||
+          ''
+        tabRoute = DRAFT_DEATH_FORM
+      }
+      const lastModificationDate = draft.modifiedOn || draft.savedOn
+      const actions = [
+        {
+          label: this.props.intl.formatMessage(messages.update),
+          handler: () =>
+            this.props.gotoTab(
+              tabRoute,
+              draft.id,
+              '',
+              (draft.event && draft.event.toString()) || ''
+            )
+        }
+      ]
+      return {
+        id: draft.id,
+        event: (draft.event && draft.event.toUpperCase()) || '',
+        name: name || '',
+        date_of_modification:
+          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+          '',
+        actions
+      }
+    })
+  }
+
+  onPageChange = (newPageNumber: number) => {
+    this.setState({ currentPage: newPageNumber })
+  }
+
   render() {
-    const { intl, userDetails, language, tabId, draftCount } = this.props
+    const { theme, intl, userDetails, language, tabId, drafts } = this.props
+    const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
+    let parentQueryLoading = false
 
     let fullName = ''
     if (userDetails && userDetails.name) {
@@ -242,46 +602,302 @@ export class WorkQueueView extends React.Component<IWorkQueueProps> {
               buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
               {...this.props}
             />
-            <IconTabs>
-              <IconTab
-                id={`tab_${TAB_ID.inProgress}`}
-                key={TAB_ID.inProgress}
-                active={tabId === TAB_ID.inProgress}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusProgress />}
-                onClick={() => this.props.gotoTab(TAB_ID.inProgress)}
-              >
-                {intl.formatMessage(messages.inProgress)} ({draftCount})
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.readyForReview}`}
-                key={TAB_ID.readyForReview}
-                active={tabId === TAB_ID.readyForReview}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusOrange />}
-                onClick={() => this.props.gotoTab(TAB_ID.readyForReview)}
-              >
-                {intl.formatMessage(messages.readyForReview)} (20)
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.sentForUpdates}`}
-                key={TAB_ID.sentForUpdates}
-                active={tabId === TAB_ID.sentForUpdates}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusRejected />}
-                onClick={() => this.props.gotoTab(TAB_ID.sentForUpdates)}
-              >
-                {intl.formatMessage(messages.sentForUpdates)} (5)
-              </IconTab>
-            </IconTabs>
+            <Query
+              query={COUNT_REGISTRATION_QUERY}
+              variables={{
+                locationIds: [registrarUnion]
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  parentQueryLoading = true
+                  return (
+                    <StyledSpinner
+                      id="search-result-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
+                }
+                parentQueryLoading = false
+                if (error) {
+                  Sentry.captureException(error)
+                  return (
+                    <ErrorText id="search-result-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+
+                return (
+                  <>
+                    <IconTabs>
+                      <IconTab
+                        id={`tab_${TAB_ID.inProgress}`}
+                        key={TAB_ID.inProgress}
+                        active={tabId === TAB_ID.inProgress}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusProgress />}
+                        onClick={() =>
+                          this.props.goToWorkQueueTab(TAB_ID.inProgress)
+                        }
+                      >
+                        {intl.formatMessage(messages.inProgress)} (
+                        {(drafts && drafts.length) || 0})
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.readyForReview}`}
+                        key={TAB_ID.readyForReview}
+                        active={tabId === TAB_ID.readyForReview}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusOrange />}
+                        onClick={() =>
+                          this.props.goToWorkQueueTab(TAB_ID.readyForReview)
+                        }
+                      >
+                        {intl.formatMessage(messages.readyForReview)} (
+                        {data.countEventRegistrations.declared})
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.sentForUpdates}`}
+                        key={TAB_ID.sentForUpdates}
+                        active={tabId === TAB_ID.sentForUpdates}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusRejected />}
+                        onClick={() =>
+                          this.props.goToWorkQueueTab(TAB_ID.sentForUpdates)
+                        }
+                      >
+                        {intl.formatMessage(messages.sentForUpdates)} (
+                        {data.countEventRegistrations.rejected})
+                      </IconTab>
+                    </IconTabs>
+                  </>
+                )
+              }}
+            </Query>
             {tabId === TAB_ID.inProgress && (
-              <div>{intl.formatMessage(messages.inProgress)}</div>
+              <GridTable
+                content={this.transformDraftContent()}
+                columns={[
+                  {
+                    label: this.props.intl.formatMessage(messages.listItemType),
+                    width: 15,
+                    key: 'event'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(messages.listItemName),
+                    width: 35,
+                    key: 'name'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(
+                      messages.listItemModificationDate
+                    ),
+                    width: 35,
+                    key: 'date_of_modification'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(
+                      messages.listItemAction
+                    ),
+                    width: 15,
+                    key: 'actions',
+                    isActionColumn: true,
+                    alignment: ColumnContentAlignment.CENTER
+                  }
+                ]}
+                noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                onPageChange={(currentPage: number) => {
+                  this.onPageChange(currentPage)
+                }}
+                pageSize={this.pageSize}
+                totalPages={Math.ceil(
+                  ((drafts && drafts.length) || 0) / this.pageSize
+                )}
+                initialPage={this.state.currentPage}
+              />
             )}
             {tabId === TAB_ID.readyForReview && (
-              <div>{intl.formatMessage(messages.readyForReview)}</div>
+              <Query
+                query={FETCH_REGISTRATIONS_QUERY}
+                variables={{
+                  status: EVENT_STATUS.DECLARED,
+                  locationIds: [registrarUnion],
+                  count: this.pageSize,
+                  skip: (this.state.currentPage - 1) * this.pageSize
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    return (
+                      (!parentQueryLoading && (
+                        <StyledSpinner
+                          id="search-result-spinner"
+                          baseColor={theme.colors.background}
+                        />
+                      )) ||
+                      null
+                    )
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
+                    return (
+                      <ErrorText id="search-result-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return (
+                    <GridTable
+                      content={this.transformDeclaredContent(data)}
+                      columns={[
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemType
+                          ),
+                          width: 14,
+                          key: 'event'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemTrackingNumber
+                          ),
+                          width: 20,
+                          key: 'tracking_id'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemApplicationDate
+                          ),
+                          width: 23,
+                          key: 'date_of_application'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemEventDate
+                          ),
+                          width: 23,
+                          key: 'date_of_event'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemAction
+                          ),
+                          width: 20,
+                          key: 'actions',
+                          isActionColumn: true,
+                          alignment: ColumnContentAlignment.CENTER
+                        }
+                      ]}
+                      noResultText={intl.formatMessage(
+                        messages.dataTableNoResults
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        this.onPageChange(currentPage)
+                      }}
+                      pageSize={this.pageSize}
+                      totalPages={Math.ceil(
+                        ((data.listEventRegistrations &&
+                          data.listEventRegistrations.totalItems) ||
+                          0) / this.pageSize
+                      )}
+                      initialPage={this.state.currentPage}
+                      expandable={true}
+                    />
+                  )
+                }}
+              </Query>
             )}
             {tabId === TAB_ID.sentForUpdates && (
-              <div>{intl.formatMessage(messages.sentForUpdates)}</div>
+              <Query
+                query={FETCH_REGISTRATIONS_QUERY}
+                variables={{
+                  status: EVENT_STATUS.REJECTED,
+                  locationIds: [registrarUnion],
+                  count: this.pageSize,
+                  skip: (this.state.currentPage - 1) * this.pageSize
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    return (
+                      (!parentQueryLoading && (
+                        <StyledSpinner
+                          id="search-result-spinner"
+                          baseColor={theme.colors.background}
+                        />
+                      )) ||
+                      null
+                    )
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
+                    return (
+                      <ErrorText id="search-result-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return (
+                    <GridTable
+                      content={this.transformRejectedContent(data)}
+                      columns={[
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemType
+                          ),
+                          width: 14,
+                          key: 'event'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemName
+                          ),
+                          width: 23,
+                          key: 'name'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemApplicantNumber
+                          ),
+                          width: 21,
+                          key: 'contact_number'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemUpdateDate
+                          ),
+                          width: 22,
+                          key: 'date_of_rejection'
+                        },
+                        {
+                          label: this.props.intl.formatMessage(
+                            messages.listItemAction
+                          ),
+                          width: 20,
+                          key: 'actions',
+                          isActionColumn: true,
+                          alignment: ColumnContentAlignment.CENTER
+                        }
+                      ]}
+                      noResultText={intl.formatMessage(
+                        messages.dataTableNoResults
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        this.onPageChange(currentPage)
+                      }}
+                      pageSize={this.pageSize}
+                      totalPages={Math.ceil(
+                        ((data.listEventRegistrations &&
+                          data.listEventRegistrations.totalItems) ||
+                          0) / this.pageSize
+                      )}
+                      initialPage={this.state.currentPage}
+                      expandable={true}
+                    />
+                  )
+                }}
+              </Query>
             )}
           </HeaderContent>
         </Container>
@@ -298,8 +914,8 @@ function mapStateToProps(
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
-    tabId: match.params.tabId,
-    draftCount: state.drafts.drafts.length
+    tabId: match.params.tabId || 'review',
+    drafts: state.drafts.drafts
   }
 }
 
@@ -308,6 +924,7 @@ export const WorkQueue = connect(
   {
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
+    goToWorkQueueTab: goToWorkQueueTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }

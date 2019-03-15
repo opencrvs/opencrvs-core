@@ -129,6 +129,12 @@ export const messages = defineMessages({
     defaultMessage: 'Must be a valid date of death',
     description:
       'The error message appears when the given date of death is not valid'
+  },
+  greaterThanZero: {
+    id: 'validations.greaterThanZero',
+    defaultMessage: 'Must be a greater than zero',
+    description:
+      'The error message appears when input is less than or equal to 0'
   }
 })
 
@@ -429,5 +435,13 @@ export const isValidDeathOccurrenceDate: Validation = (value: string) => {
     ? undefined
     : {
         message: messages.isValidDateOfDeath
+      }
+}
+
+export const greaterThanZero: Validation = (value: string) => {
+  return value && Number(value) > 0
+    ? undefined
+    : {
+        message: messages.greaterThanZero
       }
 }

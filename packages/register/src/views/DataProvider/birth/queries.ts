@@ -239,7 +239,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
     }
   }
 `
-
 export function getBirthQueryMappings(action: Action) {
   switch (action) {
     case Action.LOAD_REVIEW_APPLICATION:

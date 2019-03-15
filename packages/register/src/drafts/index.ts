@@ -16,6 +16,7 @@ export interface IDraft {
   id: string
   data: IFormData
   savedOn?: number
+  modifiedOn?: number
   eventType?: string
   review?: boolean
   event: Event
@@ -97,6 +98,7 @@ export function storeDraft(draft: IDraft): IStoreDraftAction {
 }
 
 export function modifyDraft(draft: IDraft): IModifyDraftAction {
+  draft.modifiedOn = Date.now()
   return { type: MODIFY_DRAFT, payload: { draft } }
 }
 export function setInitialDrafts() {

@@ -668,6 +668,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.labels.locations.all': 'All locations',
     'register.workQueue.labels.selects.sort': 'Sort by:',
     'register.workQueue.labels.selects.filter': 'Filter by:',
+    'register.workQueue.labels.results.type': 'Type',
+    'register.workQueue.labels.results.applicationDate': 'Application sent',
+    'register.workQueue.labels.results.updateDate': 'Sent on',
+    'register.workQueue.labels.results.applicantNumber': 'Applicant No.',
+    'register.workQueue.labels.results.modificationDate': 'Last edited',
+    'register.workQueue.labels.results.eventDate': 'Date of event',
     'register.workQueue.labels.results.name': 'Name',
     'register.workQueue.labels.results.dob': 'D.o.B.',
     'register.workQueue.labels.results.dod': 'D.o.D.',
@@ -694,6 +700,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
     'register.workQueue.list.buttons.review': 'Review',
+    'register.workQueue.list.buttons.update': 'Update',
     'register.workQueue.list.buttons.print': 'Print',
     'register.workQueue.title.certificateCollection': 'Certificate Collection',
     'register.workQueue.list.buttons.printCertificate': 'Print certificate',
@@ -917,6 +924,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.event.dod': 'D.o.D',
     'register.event.death': 'Death',
     'register.event.birth': 'Birth',
-    'validations.isValidDateOfDeath': 'Must be a valid date of death'
+    'validations.isValidDateOfDeath': 'Must be a valid date of death',
+    'validations.greaterThanZero': 'Must be a greater than zero'
   }
 }

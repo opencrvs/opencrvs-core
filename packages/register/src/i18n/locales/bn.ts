@@ -667,6 +667,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.locations.all': 'সব জায়গা',
     'register.workQueue.labels.selects.sort': 'ক্রমানুসার:',
     'register.workQueue.labels.selects.filter': 'ফিল্টার করুন:',
+    'register.workQueue.labels.results.type': 'ধরণ',
     'register.workQueue.labels.results.name': 'নাম',
     'register.workQueue.labels.results.dob': 'জন্ম তারিখ',
     'register.workQueue.labels.results.dod': 'মৃত্যুর তারিখ',
@@ -676,6 +677,15 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.results.dateOfRegistration': 'নিবন্ধনের তারিখ',
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.workQueue.labels.results.trackingID': 'ট্র্যাকিং আইডি',
+    'register.workQueue.labels.results.applicationDate': 'আবেদন পাঠানো',
+    'register.workQueue.labels.results.updateDate': 'পাঠানো',
+    'register.workQueue.labels.results.modificationDate': 'শেষ সম্পাদনা',
+    'register.workQueue.labels.results.action': 'সম্ভাব্য কর্ম',
+    'register.workQueue.labels.results.applicantNumber': 'ফোন নম্বর',
+    'register.workQueue.tabs.inProgress': 'চলমান',
+    'register.workQueue.tabs.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
+    'register.workQueue.tabs.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
+    'register.workQueue.labels.results.eventDate': 'ঘটনা তারিখ',
     'register.workQueue.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
     'print.certificate.queryError': 'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
     'print.certificate.confirm': 'নিশ্চিত করুন',
@@ -917,6 +927,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.event.dod': 'মৃত্যুদিবসের',
     'register.event.death': 'মৃত্যু',
     'register.event.birth': 'জন্ম',
-    'validations.isValidDateOfDeath': 'মৃত্যু ঘটনার তারিখ বৈধ হতে হবে'
+    'validations.isValidDateOfDeath': 'মৃত্যু ঘটনার তারিখ বৈধ হতে হবে',
+    'validations.greaterThanZero': '0 (শূন্য) থেকে বড় হতে হবে'
   }
 }
