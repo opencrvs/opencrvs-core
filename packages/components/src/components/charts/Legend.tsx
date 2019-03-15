@@ -89,10 +89,10 @@ function LegendBody({
   total: number
   estimate: number
 }) {
-  let title = `${Math.round(dataPoint.value / total * 100)}%`
+  let title = `${Math.round((dataPoint.value / total) * 100)}%`
 
   if (dataPoint.total) {
-    title = `${Math.round(dataPoint.value / estimate * 100)}%`
+    title = `${Math.round((dataPoint.value / estimate) * 100)}%`
   }
 
   if (dataPoint.total) {

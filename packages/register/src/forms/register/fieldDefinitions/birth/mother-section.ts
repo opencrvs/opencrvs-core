@@ -20,9 +20,10 @@ import {
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat,
+  // dateFormat,
   validIDNumber,
-  isValidBirthDate
+  isValidBirthDate,
+  isValidMarriageDate
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -284,7 +285,7 @@ export const motherSection: IFormSection = {
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
+      validate: [isValidMarriageDate],
       conditionals: [conditionals.isMarried]
     },
     {

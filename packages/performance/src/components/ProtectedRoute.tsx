@@ -40,7 +40,10 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 export const ProtectedRoute = withRouter<Props>(
-  connect<IProps, IDispatchProps>(mapStateToProps, {
-    checkAuth
-  })(ProtectedRouteWrapper)
+  connect<IProps, IDispatchProps>(
+    mapStateToProps,
+    {
+      checkAuth
+    }
+  )(ProtectedRouteWrapper)
 )
