@@ -33,7 +33,7 @@ describe('Login app step one', () => {
       store.dispatch(action)
 
       expect(component.find('p').text()).toEqual(
-        'দয়া করে আপনার মোবাইল নম্বর এবং পাসওয়ার্ড লিখুন'
+        'অনুগ্রহপূর্বক আপনার মোবাইল নম্বর  এবং পাসওয়ার্ড টাইপ করুন'
       )
     })
   })

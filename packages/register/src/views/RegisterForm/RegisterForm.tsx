@@ -203,6 +203,11 @@ export const messages = defineMessages({
     id: 'formFields.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
+  },
+  submitConfirmation: {
+    id: 'modal.title.submitConfirmation',
+    defaultMessage: 'Are you ready to submit?',
+    description: 'Title for submit confirmation modal'
   }
 })
 
@@ -757,7 +762,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             <MutationContext.Consumer>
               {({ mutation, loading, data }) => (
                 <Modal
-                  title="Are you ready to submit?"
+                  title={intl.formatMessage(messages.submitConfirmation)}
                   actions={[
                     <ConfirmBtn
                       key="submit"
@@ -807,7 +812,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             <MutationContext.Consumer>
               {({ mutation, loading, data }) => (
                 <Modal
-                  title="Are you ready to submit?"
+                  title={intl.formatMessage(messages.submitConfirmation)}
                   actions={[
                     <ConfirmBtn
                       key="register"
