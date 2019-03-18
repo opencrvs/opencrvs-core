@@ -146,7 +146,7 @@ const mobilePhonePatternTable = {
     example: '07123456789'
   },
   bgd: {
-    pattern: /^01[156789][0-9]{8}$/,
+    pattern: /^01[1-9][0-9]{8}$/,
     example: '01741234567'
   }
 }
