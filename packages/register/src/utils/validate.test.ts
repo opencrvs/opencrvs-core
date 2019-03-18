@@ -22,28 +22,15 @@ describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
-      const response = false
-      expect(isAValidPhoneNumberFormat(badValue, 'bgd')).toEqual(response)
-    })
-    it('should error when given an invalid phone number', () => {
-      const badNumber = '01200345678'
-      const response = false
-      expect(isAValidPhoneNumberFormat(badNumber, 'bgd')).toEqual(response)
-    })
-    it('should pass when supplied a good value for a British number', () => {
-      const goodValue = '07111111111'
-      const response = true
-      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(response)
+      expect(isAValidPhoneNumberFormat(badValue, 'bgd')).toEqual(false)
     })
     it('should pass when supplied a good value for a Bangladeshi number', () => {
       const goodValue = '01720067890'
-      const response = true
-      expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(response)
+      expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(true)
     })
     it('should pass when supplied a good value and country is not added to the lookup table', () => {
       const goodValue = '01720067890'
-      const response = true
-      expect(isAValidPhoneNumberFormat(goodValue, 'th')).toEqual(response)
+      expect(isAValidPhoneNumberFormat(goodValue, 'th')).toEqual(true)
     })
   })
 
