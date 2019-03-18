@@ -15,7 +15,7 @@ export const SecondaryButton = styled(Button)`
       ${({ theme }) => theme.colors.primary}
     );
     color: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => theme.colors.white};
+    border: ${({ theme }) => `1px solid ${theme.colors.white}`};
   }
 
   &:active {
