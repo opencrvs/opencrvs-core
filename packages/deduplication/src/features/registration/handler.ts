@@ -3,10 +3,10 @@ import { internal } from 'boom'
 import {
   insertNewDeclaration,
   insertUpdatedDeclaration
-} from 'src/features/newDeclaration/service'
+} from 'src/features/registration/service'
 import { logger } from 'src/logger'
 
-export async function newDeclarationHandler(
+export async function newBirthDeclarationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -21,7 +21,7 @@ export async function newDeclarationHandler(
   return h.response().code(200)
 }
 
-export async function updatedDeclarationHandler(
+export async function updatedBirthDeclarationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

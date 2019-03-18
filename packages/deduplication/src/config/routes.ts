@@ -1,7 +1,7 @@
 import {
-  newDeclarationHandler,
-  updatedDeclarationHandler
-} from 'src/features/newDeclaration/handler'
+  newBirthDeclarationHandler,
+  updatedBirthDeclarationHandler
+} from 'src/features/registration/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -19,7 +19,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/new-declaration',
-      handler: newDeclarationHandler,
+      handler: newBirthDeclarationHandler,
       config: {
         tags: ['api'],
         auth: false,
@@ -30,7 +30,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/update-declaration',
-      handler: updatedDeclarationHandler,
+      handler: updatedBirthDeclarationHandler,
       config: {
         tags: ['api'],
         auth: false,
