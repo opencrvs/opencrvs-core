@@ -110,7 +110,7 @@ describe('WorkQueue tests', async () => {
 
     expect(
       testComponent.component
-        .find('#search-result-error-text')
+        .find('#search-result-error-text-review')
         .children()
         .text()
     ).toBe('An error occurred while searching')

@@ -1,3 +1,8 @@
+import {
+  newBirthRegistrationHandler,
+  birthRegistrationHandler
+} from 'src/features/registration/handler'
+
 export const getRoutes = () => {
   const routes = [
     // add ping route by default for health check
@@ -16,10 +21,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/new-registration',
-      handler: (request: any, h: any) => {
-        // TODO: generate metrics from this event
-        return {}
-      },
+      handler: newBirthRegistrationHandler,
       config: {
         tags: ['api'],
         auth: false
@@ -28,10 +30,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/registration',
-      handler: (request: any, h: any) => {
-        // TODO: generate metrics from this event
-        return {}
-      },
+      handler: birthRegistrationHandler,
       config: {
         tags: ['api'],
         auth: false

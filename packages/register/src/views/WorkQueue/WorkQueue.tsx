@@ -50,9 +50,9 @@ import {
 import { createNamesMap } from 'src/utils/data-formatting'
 import {
   GridTable,
-  IAction,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/interface/GridTable'
+import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import {
   REVIEW_EVENT_PARENT_FORM_TAB,
   DRAFT_BIRTH_PARENT_FORM,
@@ -726,7 +726,7 @@ export class WorkQueueView extends React.Component<
                 if (error) {
                   Sentry.captureException(error)
                   return (
-                    <ErrorText id="search-result-error-text">
+                    <ErrorText id="search-result-error-text-count">
                       {intl.formatMessage(messages.queryError)}
                     </ErrorText>
                   )
@@ -846,7 +846,7 @@ export class WorkQueueView extends React.Component<
                   if (error) {
                     Sentry.captureException(error)
                     return (
-                      <ErrorText id="search-result-error-text">
+                      <ErrorText id="search-result-error-text-review">
                         {intl.formatMessage(messages.queryError)}
                       </ErrorText>
                     )
@@ -937,7 +937,7 @@ export class WorkQueueView extends React.Component<
                   if (error) {
                     Sentry.captureException(error)
                     return (
-                      <ErrorText id="search-result-error-text">
+                      <ErrorText id="search-result-error-text-reject">
                         {intl.formatMessage(messages.queryError)}
                       </ErrorText>
                     )

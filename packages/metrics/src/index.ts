@@ -6,6 +6,8 @@ import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from './constants'
 import getPlugins from './config/plugins'
 import { getRoutes } from './config/routes'
 import { readFileSync } from 'fs'
+import { influx } from './influxdb/client'
+import { INFLUX_DB, INFLUX_HOST, INFLUX_PORT } from './influxdb/constants'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -39,8 +41,21 @@ export async function createServer() {
   server.route(routes)
 
   async function start() {
-    await server.start()
-    server.log('info', `Metrics server started on ${HOST}:${PORT}`)
+    influx
+      .getDatabaseNames()
+      .then((names: any) => {
+        if (!names.includes(INFLUX_DB)) {
+          return influx.createDatabase(INFLUX_DB)
+        }
+      })
+      .then(async () => {
+        server.log('info', `InfluxDB started on ${INFLUX_HOST}:${INFLUX_PORT}`)
+        await server.start()
+        server.log('info', `Metrics server started on ${HOST}:${PORT}`)
+      })
+      .catch((err: Error) => {
+        console.error(`Error creating Influx database! ${err.stack}`)
+      })
   }
 
   async function stop() {
