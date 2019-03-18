@@ -1,9 +1,9 @@
 import { client } from 'src/elasticsearch/client'
-import { ICompositionBody, buildQuery } from 'src/elasticsearch/utils'
+import { IBirthCompositionBody, buildQuery } from 'src/elasticsearch/utils'
 
 export const indexComposition = async (
   compositionIdentifier: string,
-  body: ICompositionBody
+  body: IBirthCompositionBody
 ) => {
   const response = await client.index({
     index: 'ocrvs',
@@ -15,7 +15,7 @@ export const indexComposition = async (
   return response
 }
 
-export const searchComposition = async (body: ICompositionBody) => {
+export const searchComposition = async (body: IBirthCompositionBody) => {
   const response = client.search({
     index: 'ocrvs',
     type: 'compositions',

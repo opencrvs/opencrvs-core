@@ -6,7 +6,10 @@ import {
   addDuplicatesToComposition
 } from 'src/features/fhir/fhir-utils'
 import { logger } from 'src/logger'
-import { ICompositionBody, detectDuplicates } from 'src/elasticsearch/utils'
+import {
+  IBirthCompositionBody,
+  detectDuplicates
+} from 'src/elasticsearch/utils'
 import { indexComposition } from 'src/elasticsearch/dbhelper'
 
 const MOTHER_CODE = 'mother-details'
@@ -57,14 +60,14 @@ async function indexAndSearchComposition(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const body: ICompositionBody = {}
+  const body: IBirthCompositionBody = {}
   createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
   await detectAndUpdateDuplicates(compositionIdentifier, composition, body)
 }
 
 function createIndexBody(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -73,7 +76,7 @@ function createIndexBody(
   createFatherIndex(body, composition, bundleEntries)
 }
 function createChildIndex(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -98,7 +101,7 @@ function createChildIndex(
 }
 
 function createMotherIndex(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -124,7 +127,7 @@ function createMotherIndex(
 }
 
 function createFatherIndex(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -155,7 +158,7 @@ function createFatherIndex(
 async function detectAndUpdateDuplicates(
   compositionIdentifier: string,
   composition: fhir.Composition,
-  body: ICompositionBody
+  body: IBirthCompositionBody
 ) {
   const duplicates = await detectDuplicates(compositionIdentifier, body)
   if (!duplicates.length) {

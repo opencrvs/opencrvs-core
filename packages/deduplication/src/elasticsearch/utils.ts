@@ -2,7 +2,7 @@ import { searchComposition } from 'src/elasticsearch/dbhelper'
 import { SearchResponse } from 'elasticsearch'
 import { MATCH_SCORE_THRESHOLD } from 'src/constants'
 
-export interface ICompositionBody {
+export interface IBirthCompositionBody {
   childFirstNames?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
@@ -25,7 +25,7 @@ export interface ICompositionBody {
 
 export async function detectDuplicates(
   compositionIdentifier: string,
-  body: ICompositionBody
+  body: IBirthCompositionBody
 ) {
   const searchResponse = await searchComposition(body)
   const duplicates = findDuplicateIdentifers(
@@ -48,7 +48,7 @@ function findDuplicateIdentifers(
     .map(hit => hit._id)
 }
 
-export function buildQuery(body: ICompositionBody) {
+export function buildQuery(body: IBirthCompositionBody) {
   const must = []
   const should = []
 
