@@ -1,9 +1,6 @@
 import { GQLRegStatus } from '@opencrvs/gateway/src/graphql/schema'
-
-export interface IAction {
-  label: string
-  handler: () => void
-}
+import { IAction } from '../ListItem'
+export { IAction } from '../ListItem'
 
 interface IStatus {
   type: GQLRegStatus | null | undefined
