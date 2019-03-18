@@ -41,6 +41,7 @@ import {
   RADIO_GROUP,
   CHECKBOX_GROUP,
   DATE,
+  DATE_WITH_BOUND,
   TEXTAREA,
   NUMBER,
   SUBSECTION,
@@ -207,6 +208,19 @@ function GeneratedInputField({
       </InputField>
     )
   }
+
+  if (fieldDefinition.type === DATE_WITH_BOUND) {
+    return (
+      <InputField {...inputFieldProps}>
+        <DateField
+          {...inputProps}
+          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          value={value as string}
+        />
+      </InputField>
+    )
+  }
+
   if (fieldDefinition.type === TEXTAREA) {
     return (
       <InputField {...inputFieldProps}>
