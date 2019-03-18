@@ -24,7 +24,6 @@ export const FETCH_REGISTRATIONS_QUERY = gql`
           trackingId
           contactPhoneNumber
           status {
-            id
             user {
               id
               name {
@@ -49,9 +48,6 @@ export const FETCH_REGISTRATIONS_QUERY = gql`
             }
             type
             timestamp
-            comments {
-              comment
-            }
           }
         }
         createdAt

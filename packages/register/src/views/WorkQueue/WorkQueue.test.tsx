@@ -6,9 +6,9 @@ import { v4 as uuid } from 'uuid'
 import { mockUserResponse } from 'src/tests/util'
 import { storage } from 'src/storage'
 import { createStore } from 'src/store'
-import { WorkQueue } from './WorkQueue'
-import { Spinner } from '@opencrvs/components/lib/interface'
-import { COUNT_REGISTRATION_QUERY } from './queries'
+import { WorkQueue, EVENT_STATUS } from './WorkQueue'
+import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
+import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { checkAuth } from 'src/profile/profileActions'
 import { storeDraft, createReviewDraft } from 'src/drafts'
 import { Event } from 'src/forms'
@@ -287,5 +287,184 @@ describe('WorkQueue tests', async () => {
         .hostNodes()
         .text()
     ).toContain('Sent for updates (5)')
+  })
+  it('renders all items returned from graphql query in ready for reivew', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATIONS_QUERY,
+          variables: {
+            status: EVENT_STATUS.DECLARED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            listEventRegistrations: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
+                  registration: {
+                    trackingId: 'B222222',
+                    contactPhoneNumber: null,
+                    type: 'DEATH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  deceased: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'মাসুম'
+                      }
+                    ],
+                    deceased: {
+                      deathDate: '2010-10-10'
+                    }
+                  },
+                  informant: {
+                    individual: {
+                      telecom: [
+                        {
+                          system: 'phone',
+                          value: '01622688231'
+                        }
+                      ]
+                    }
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <WorkQueue />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    const data = testComponent.component.find(GridTable).prop('content')
+    // @ts-ignore
+    expect(data.length).toBe(2)
+    // @ts-ignore
+    expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    // @ts-ignore
+    expect(data[0].event_time_elapsed).toBe('8 years ago')
+    // @ts-ignore
+    expect(data[0].application_time_elapsed).toBe('10 months ago')
+    // @ts-ignore
+    expect(data[0].tracking_id).toBe('B111111')
+    // @ts-ignore
+    expect(data[0].event).toBe('BIRTH')
+    // @ts-ignore
+    expect(data[0].actions).toBeDefined()
+
+    testComponent.component.unmount()
   })
 })

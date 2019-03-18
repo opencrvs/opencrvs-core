@@ -311,7 +311,7 @@ const TAB_ID = {
   sentForUpdates: 'updates'
 }
 
-const EVENT_STATUS = {
+export const EVENT_STATUS = {
   DECLARED: 'DECLARED',
   REJECTED: 'REJECTED'
 }
@@ -1018,7 +1018,7 @@ function mapStateToProps(
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
-    tabId: match.params.tabId || 'review',
+    tabId: (match && match.params && match.params.tabId) || 'review',
     drafts: state.drafts.drafts
   }
 }
