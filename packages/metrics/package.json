@@ -28,11 +28,13 @@
     "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "^8.1.0",
+    "influx": "^5.0.7",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "node-fetch": "^2.3.0",
     "typescript": "^3.0.1",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "moment": "^2.22.2"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
