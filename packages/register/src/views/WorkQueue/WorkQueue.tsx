@@ -61,6 +61,7 @@ import {
 import * as moment from 'moment'
 import { IDraft } from 'src/drafts'
 import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -154,6 +155,11 @@ const messages = defineMessages({
     id: 'register.workQueue.tabs.sentForUpdates',
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab'
+  },
+  FIELD_AGENT: {
+    id: 'register.home.header.FIELD_AGENT',
+    defaultMessage: 'Field Agent',
+    description: 'The description for FIELD_AGENT role'
   },
   REGISTRATION_CLERK: {
     id: 'register.home.header.REGISTRATION_CLERK',
@@ -325,6 +331,7 @@ export class WorkQueueView extends React.Component<
   }
 
   transformDeclaredContent = (data: GQLQuery) => {
+    const { locale } = this.props.intl
     if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
       return []
     }
@@ -412,13 +419,49 @@ export class WorkQueueView extends React.Component<
               reg.registration.type.toString()) ||
             '',
           duplicates: (reg.registration && reg.registration.duplicates) || [],
-          actions
+          actions,
+          status:
+            reg.registration &&
+            reg.registration.status &&
+            reg.registration.status
+              .map(status => {
+                return {
+                  type: status && status.type,
+                  practitionerName:
+                    (status &&
+                      status.user &&
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        this.props.language
+                      ] as string)) ||
+                    (status &&
+                      status.user &&
+                      /* tslint:disable:no-string-literal */
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        'default'
+                      ] as string)) ||
+                    /* tslint:enable:no-string-literal */
+                    '',
+                  timestamp: status && formatLongDate(status.timestamp, locale),
+                  practitionerRole:
+                    status && status.user && status.user.role
+                      ? this.props.intl.formatMessage(
+                          messages[status.user.role as string]
+                        )
+                      : '',
+                  officeName:
+                    locale === 'en'
+                      ? status && status.office && status.office.name
+                      : status && status.office && status.office.alias
+                }
+              })
+              .reverse()
         }
       }
     )
   }
 
   transformRejectedContent = (data: GQLQuery) => {
+    const { locale } = this.props.intl
     if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
       return []
     }
@@ -509,7 +552,42 @@ export class WorkQueueView extends React.Component<
               reg.registration.type.toString()) ||
             '',
           duplicates: (reg.registration && reg.registration.duplicates) || [],
-          actions
+          actions,
+          status:
+            reg.registration &&
+            reg.registration.status &&
+            reg.registration.status
+              .map(status => {
+                return {
+                  type: status && status.type,
+                  practitionerName:
+                    (status &&
+                      status.user &&
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        this.props.language
+                      ] as string)) ||
+                    (status &&
+                      status.user &&
+                      /* tslint:disable:no-string-literal */
+                      (createNamesMap(status.user.name as GQLHumanName[])[
+                        'default'
+                      ] as string)) ||
+                    /* tslint:enable:no-string-literal */
+                    '',
+                  timestamp: status && formatLongDate(status.timestamp, locale),
+                  practitionerRole:
+                    status && status.user && status.user.role
+                      ? this.props.intl.formatMessage(
+                          messages[status.user.role as string]
+                        )
+                      : '',
+                  officeName:
+                    locale === 'en'
+                      ? status && status.office && status.office.name
+                      : status && status.office && status.office.alias
+                }
+              })
+              .reverse()
         }
       }
     )

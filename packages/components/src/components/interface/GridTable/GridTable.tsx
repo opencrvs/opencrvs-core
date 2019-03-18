@@ -4,6 +4,8 @@ import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
 import { ExpansionContentInfo } from './ExpnasionContentInfo'
+import { IAction, IDynamicValues } from './types'
+export { IAction } from './types'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -60,15 +62,6 @@ export enum ColumnContentAlignment {
   LEFT = 'left',
   RIGHT = 'right',
   CENTER = 'center'
-}
-
-export interface IAction {
-  label: string
-  handler: () => void
-}
-
-interface IDynamicValues {
-  [key: string]: string | IAction[] | Array<string | null>
 }
 
 interface IGridPreference {
@@ -249,7 +242,7 @@ export class GridTable extends React.Component<
                 </RowWrapper>
                 {this.showExpandedSection(item.id as string) && (
                   <ExpendedSectionContainer>
-                    <ExpansionContentInfo data={item} />
+                    {<ExpansionContentInfo data={item} />}
                   </ExpendedSectionContainer>
                 )}
               </StyledBox>
