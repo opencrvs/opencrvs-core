@@ -4,7 +4,6 @@ import { isEqual } from 'lodash'
 
 const ImageContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.imageContainerBackground};
-  margin-top: 16px;
   text-align: center;
   min-height: calc(100vh - 200px);
   position: relative;
