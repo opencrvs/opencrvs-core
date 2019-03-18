@@ -21,6 +21,31 @@ export function findCompositionSection(
   )
 }
 
+export function findTask(
+  bundleEntries?: fhir.BundleEntry[]
+): fhir.Task | undefined {
+  const taskEntry: fhir.BundleEntry | undefined =
+    bundleEntries &&
+    bundleEntries.find(entry => {
+      if (entry && entry.resource) {
+        return entry.resource.resourceType === 'Task'
+      } else {
+        return false
+      }
+    })
+  return taskEntry && (taskEntry.resource as fhir.Task)
+}
+
+export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
+  return (
+    task &&
+    task.extension &&
+    task.extension.find(
+      extension => extension && extension.url === extensionUrl
+    )
+  )
+}
+
 export function findEntry(
   code: string,
   composition: fhir.Composition,

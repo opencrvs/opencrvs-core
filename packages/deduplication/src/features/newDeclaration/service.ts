@@ -3,7 +3,9 @@ import {
   findName,
   updateInHearth,
   getCompositionByIdentifier,
-  addDuplicatesToComposition
+  addDuplicatesToComposition,
+  findTask,
+  findTaskExtension
 } from 'src/features/fhir/fhir-utils'
 import { logger } from 'src/logger'
 import {
@@ -74,7 +76,36 @@ function createIndexBody(
   createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
+  createApplicationIndex(body, composition, bundleEntries)
 }
+
+function createApplicationIndex(
+  body: IBirthCompositionBody,
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  const task = findTask(bundleEntries)
+  const contactNumberExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
+  const placeOfApplicationExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastLocation'
+  )
+
+  body.contactNumber =
+    contactNumberExtension && contactNumberExtension.valueString
+  body.dateOfApplication = task && task.lastModified
+  body.trackingId = task && task.identifier && task.identifier[0].value
+  body.placeOfApplication = {
+    placeOfDeclaration:
+      placeOfApplicationExtension &&
+      placeOfApplicationExtension.valueReference &&
+      placeOfApplicationExtension.valueReference.reference
+  }
+}
+
 function createChildIndex(
   body: IBirthCompositionBody,
   composition: fhir.Composition,

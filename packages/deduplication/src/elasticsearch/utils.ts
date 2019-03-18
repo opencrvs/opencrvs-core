@@ -2,7 +2,20 @@ import { searchComposition } from 'src/elasticsearch/dbhelper'
 import { SearchResponse } from 'elasticsearch'
 import { MATCH_SCORE_THRESHOLD } from 'src/constants'
 
-export interface IBirthCompositionBody {
+interface ICompositionBody {
+  compositionId?: string
+  contactNumber?: string
+  dateOfApplication?: string
+  trackingId?: string
+  placeOfApplication?: IPlaceOfApplication
+}
+
+interface IPlaceOfApplication {
+  placeOfDeclaration?: string
+  placeOfRegistration?: string
+}
+
+export interface IBirthCompositionBody extends ICompositionBody {
   childFirstNames?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
