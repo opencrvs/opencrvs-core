@@ -70,7 +70,7 @@ describe('when the home page loads for a field worker', () => {
       })
     })
     describe('when user has a register scope they are redirected to the work-queue', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         store.dispatch(
           getStorageUserDetailsSuccess(JSON.stringify(registerUserDetails))
         )
@@ -78,7 +78,7 @@ describe('when the home page loads for a field worker', () => {
       })
 
       it('search result view renders to load list', () => {
-        expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
+        expect(app.find('#search-result-spinner').hostNodes()).toHaveLength(1)
       })
     })
   })

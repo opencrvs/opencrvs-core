@@ -291,6 +291,11 @@ enum EducationType {
   NOT_STATED
 }
 
+type EventRegResultSet {
+  results: [EventRegistration]
+  totalItems: Int
+}
+
 type HumanName {
   use: String
   firstNames: String
@@ -639,4 +644,10 @@ input UserInput {
   primaryOffice: LocationInput
   currentLocation: LocationInput
   catchmentArea: [LocationInput]
+}
+
+type EventRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  createdAt: Date
 }
