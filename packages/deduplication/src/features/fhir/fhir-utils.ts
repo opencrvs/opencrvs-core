@@ -50,18 +50,26 @@ export function findEntry(
   code: string,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
-) {
+): fhir.Resource | undefined {
   const patientSection = findCompositionSection(code, composition)
   if (!patientSection || !patientSection.entry) {
-    return null
+    return undefined
   }
   const reference = patientSection.entry[0].reference
-  const entry =
+  const entry = findEntryByUrl(reference, bundleEntries)
+  return entry && entry.resource
+}
+
+export function findEntryByUrl(
+  url?: string,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  return (
     bundleEntries &&
     bundleEntries.find(
-      (bundleEntry: fhir.BundleEntry) => bundleEntry.fullUrl === reference
+      (bundleEntry: fhir.BundleEntry) => bundleEntry.fullUrl === url
     )
-  return entry && entry.resource
+  )
 }
 
 export function findName(code: string, patient: fhir.Patient) {
